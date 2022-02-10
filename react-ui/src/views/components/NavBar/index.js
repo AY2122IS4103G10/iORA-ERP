@@ -6,7 +6,7 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
 import { Menu, Transition } from "@headlessui/react";
-import { classNames } from "../../util/Util";
+import { classNames } from "../../../utilities/Util";
 
 export const NavBar = ({ setSidebarOpen }) => {
   return (

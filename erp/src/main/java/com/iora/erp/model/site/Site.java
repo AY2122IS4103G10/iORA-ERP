@@ -1,0 +1,99 @@
+package com.iora.erp.model.site;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+
+@MappedSuperclass
+public class Site {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @NotBlank
+    private String name;
+
+    @NotBlank
+    private String country;
+
+    @NotBlank
+    private String address;
+
+    @Min(-90)
+    @Max(90)
+    private double latitude;
+
+    @Min(-180)
+    @Max(180)
+    private double longitude;
+
+    private String siteCode;
+
+    protected Site() {
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Site[id=%d, name='%s', coordinates=(%d,%d)]",
+                id, name, latitude, longitude);
+    }
+
+    public Site(String name, String address, double latitude, double longitude, String siteCode) {
+
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getSiteCode() {
+        return siteCode;
+    }
+
+    public void setSiteCode(String siteCode) {
+        this.siteCode = siteCode;
+    }
+
+}

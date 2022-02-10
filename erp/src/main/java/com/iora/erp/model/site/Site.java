@@ -1,27 +1,27 @@
 package com.iora.erp.model.site;
 
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 
 @MappedSuperclass
 public class Site {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @NotBlank
+    @Column(nullable = false)
     private String country;
 
-    @NotBlank
+    @Column(nullable = false)
     private String address;
 
     @Min(-90)
@@ -32,6 +32,7 @@ public class Site {
     @Max(180)
     private double longitude;
 
+    @Column(nullable = false, unique = true)
     private String siteCode;
 
     protected Site() {
@@ -70,6 +71,10 @@ public class Site {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getCoordinates() {
+        return String.format("(%d, %d)", latitude, longitude);
     }
 
     public double getLatitude() {

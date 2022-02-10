@@ -1,4 +1,4 @@
-import { classNames } from "../../../util/Util";
+import { classNames } from "../../../../utilities/Util";
 
 export const SimpleButton = ({ children, className, ...rest }) => {
   return (

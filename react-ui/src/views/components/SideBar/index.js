@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { Link } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   ClockIcon,
@@ -15,8 +16,8 @@ import {
 import { classNames } from "../../../utilities/Util";
 
 const navigation = [
-  { name: "Home", href: "#", icon: HomeIcon, current: true },
-  { name: "History", href: "#", icon: ClockIcon, current: false },
+  { name: "Home", href: "/", icon: HomeIcon, current: true },
+  { name: "Products", href: "/products", icon: ClockIcon, current: false },
   { name: "Balances", href: "#", icon: ScaleIcon, current: false },
   { name: "Cards", href: "#", icon: CreditCardIcon, current: false },
   { name: "Recipients", href: "#", icon: UserGroupIcon, current: false },
@@ -154,9 +155,9 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
           >
             <div className="px-2 space-y-1">
               {navigation.map((item) => (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.href}
                   className={classNames(
                     item.current
                       ? "bg-cyan-800 text-white"
@@ -170,15 +171,15 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
                     aria-hidden="true"
                   />
                   {item.name}
-                </a>
+                </Link>
               ))}
             </div>
             <div className="mt-6 pt-6">
               <div className="px-2 space-y-1">
                 {secondaryNavigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.href}
                     className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
                   >
                     <item.icon
@@ -186,7 +187,7 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
                       aria-hidden="true"
                     />
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>

@@ -1,6 +1,9 @@
 package com.iora.erp.model.site;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -8,6 +11,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+
+import com.iora.erp.enumeration.Country;
 
 @MappedSuperclass
 public class Site {
@@ -20,7 +25,8 @@ public class Site {
     private String name;
 
     @Column(nullable = false)
-    private String country;
+    @Enumerated(EnumType.STRING)
+    private Country country;
 
     @Column(nullable = false)
     private String address;
@@ -39,6 +45,9 @@ public class Site {
     @Column(nullable = false)
     private boolean active;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private StockLevel stockLevel;
+
     protected Site() {
     }
 
@@ -48,6 +57,7 @@ public class Site {
         this.latitude = latitude;
         this.longitude = longitude;
         this.siteCode = siteCode;
+        this.stockLevel = new StockLevel();
     }
 
     @Override
@@ -82,11 +92,11 @@ public class Site {
         this.address = address;
     }
 
-    public String getCountry() {
+    public Country getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(Country country) {
         this.country = country;
     }
 
@@ -124,6 +134,14 @@ public class Site {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public StockLevel getStockLevel() {
+        return this.stockLevel;
+    }
+
+    public void setStockLevel(StockLevel stockLevel) {
+        this.stockLevel = stockLevel;
     }
 
 }

@@ -3,6 +3,9 @@ package com.iora.erp.model.product;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.xml.bind.annotation.XmlTransient;
+
+import com.iora.erp.model.site.StockLevel;
 
 public class ProductItem {
     @Id
@@ -13,6 +16,10 @@ public class ProductItem {
 
     @ManyToOne
     private Product product;
+
+    @ManyToOne
+    @XmlTransient
+    private StockLevel stockLevel;
 
     public ProductItem(String rfid) {
         this.rfid = rfid;
@@ -41,6 +48,14 @@ public class ProductItem {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public StockLevel getStockLevel() {
+        return this.stockLevel;
+    }
+
+    public void setStockLevel(StockLevel stockLevel) {
+        this.stockLevel = stockLevel;
     }
 
     @Override

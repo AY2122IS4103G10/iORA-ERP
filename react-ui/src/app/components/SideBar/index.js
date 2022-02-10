@@ -12,7 +12,7 @@ import {
   UserGroupIcon,
   XIcon,
 } from "@heroicons/react/outline";
-import { classNames } from "../../util/ClassNames";
+import { classNames } from "../../util/Util";
 
 const navigation = [
   { name: "Home", href: "#", icon: HomeIcon, current: true },

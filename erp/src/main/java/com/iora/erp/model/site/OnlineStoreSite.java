@@ -12,6 +12,11 @@ public class OnlineStoreSite extends Site {
     
     public OnlineStoreSite(String name, String address, double latitude, double longitude, String siteCode) {
         super(name, address, latitude, longitude, siteCode);
-        this.stockLevel = new StockLevel();
+        this.stockLevel = new StockLevel(super.getId());
+    }
+
+    public OnlineStoreSite(Site site) {
+        super(site.getName(), site.getAddress(), site.getLatitude(), site.getLongitude(), site.getSiteCode());
+        this.stockLevel = new StockLevel(super.getId());
     }
 }

@@ -15,6 +15,7 @@ public interface SiteService {
 
     public abstract StockLevel getAllStockLevels();
     public abstract StockLevel getStockLevelOfSite(Long siteId);
+    public abstract StockLevel getStockLevelByProduct(String SKUCode);
     public abstract void addStockLevelToSite(Long siteId, StockLevel stockLevel);
     public abstract void removeStockLevelFromSite(Long siteId, StockLevel stockLevel);
     public abstract void moveStockLevel(Long fromSiteId, Long toSiteId, StockLevel stockLevel);

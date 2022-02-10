@@ -11,4 +11,8 @@ public class HeadquartersSite extends Site {
     @OneToOne(cascade = CascadeType.ALL)
     private StockLevel inventory;
     
+    public HeadquartersSite(String name, String address, double latitude, double longitude, String siteCode) {
+        super(name, address, latitude, longitude, siteCode);
+        this.inventory = new StockLevel();
+    }
 }

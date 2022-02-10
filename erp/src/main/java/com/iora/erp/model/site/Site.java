@@ -35,7 +35,18 @@ public class Site {
     @Column(nullable = false, unique = true)
     private String siteCode;
 
+    @Column(nullable = false)
+    private boolean active;
+
     protected Site() {
+    }
+
+    public Site(String name, String address, double latitude, double longitude, String siteCode) {
+        this.name = name;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.siteCode = siteCode;
     }
 
     @Override
@@ -43,10 +54,6 @@ public class Site {
         return String.format(
                 "Site[id=%d, name='%s', coordinates=(%d,%d)]",
                 id, name, latitude, longitude);
-    }
-
-    public Site(String name, String address, double latitude, double longitude, String siteCode) {
-
     }
 
     public String getName() {
@@ -99,6 +106,14 @@ public class Site {
 
     public void setSiteCode(String siteCode) {
         this.siteCode = siteCode;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
 }

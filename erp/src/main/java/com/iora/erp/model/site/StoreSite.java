@@ -10,4 +10,8 @@ public class StoreSite extends Site {
     @OneToOne(cascade = CascadeType.ALL)
     private StockLevel stockLevel;
     
+    public StoreSite(String name, String address, double latitude, double longitude, String siteCode) {
+        super(name, address, latitude, longitude, siteCode);
+        this.stockLevel = new StockLevel();
+    }
 }

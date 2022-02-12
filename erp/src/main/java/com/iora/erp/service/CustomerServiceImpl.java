@@ -65,18 +65,25 @@ public class CustomerServiceImpl implements CustomerService {
             throw new CustomerException("Customer not found");
         }
         c.setAvailStatus(true);
-
     }
 
+    
     @Override
     public List<Customer> listOfCustomer() {
-        // TODO Auto-generated method stub
-        return null;
+        Query q = em.createQuery("SELECT c FROM Customer c");
+
+        //need run test if query exits timing for large database
+        return q.getResultList();
     }
 
     @Override
-    public List<Customer> getCustomerByFields(Customer customer) {
-        // TODO Auto-generated method stub
+    public List<Customer> getCustomerByFields(String search) {
+        Query q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
+        "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact");
+        q.setParameter("email", "%" + search.toLowerCase() + "%");
+        q.setParameter("last", "%" + search.toLowerCase() + "%");
+        q.setParameter("first", "%" + search.toLowerCase() + "%");
+        q.setParameter("contact", "%" + search + "%");
         return null;
     }
 

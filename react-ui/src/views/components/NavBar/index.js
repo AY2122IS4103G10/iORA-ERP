@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   MenuAlt1Icon,
   SearchIcon,
@@ -7,8 +8,23 @@ import {
 } from "@heroicons/react/outline";
 import { Menu, Transition } from "@headlessui/react";
 import { classNames } from "../../../utilities/Util";
+import { logout } from "../../../stores/slices/userSlice";
+import { selectUser } from "../../../stores/slices/userSlice";
 
 export const NavBar = ({ setSidebarOpen }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const handleLogout = (e) => {
+    console.log("logout" + user);
+    e.preventDefault();
+    dispatch(
+      logout()
+    );
+
+    console.log(user);
+  }
+
+
   return (
     <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
       <button
@@ -110,7 +126,8 @@ export const NavBar = ({ setSidebarOpen }) => {
                 <Menu.Item>
                   {({ active }) => (
                     <a
-                      href="#"
+                      href="/"
+                      onClick={handleLogout}
                       className={classNames(
                         active ? "bg-gray-100" : "",
                         "block px-4 py-2 text-sm text-gray-700"

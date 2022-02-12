@@ -14,8 +14,8 @@ export default function Login() {
     const dispatch = useDispatch();
 
     const handleLogin = (e) => {
-      console.log("login");
       e.preventDefault();
+      console.log("login");
       
       dispatch(
         login({
@@ -24,21 +24,9 @@ export default function Login() {
           loggedIn: true,
         })
       );
+      
+      console.log(username + user);
 
-      console.log(user);
-        // Api.login({username: username, password: password})
-        //     .then((response) => {
-        //         if (response.ok) {
-        //             return response.json();
-        //         } else {
-        //             throw new Error(response.statusText);
-        //         }
-        //     })
-        //     .then((data) => {
-        //         window.localStorage.setItem("user", JSON.stringify(data));
-        //         this.props.history.push('/home');
-        //     })
-        //     .catch((error) => alert(error));
     };
 
 

@@ -9,11 +9,12 @@ function App() {
     <div className="wrapper">
       <Routes>
         <Route path="/" element={<Login/>}/>
-        <Route path="/" element={<Index />}>
+        <Route path="/home" element={<Index />}>
           <Route path="products" element={<Outlet />}>
             <Route index element={<ManageProducts />} />
             <Route path="create" element={<AddProductForm />} />
           </Route>
+
         </Route>
       </Routes>
     </div>

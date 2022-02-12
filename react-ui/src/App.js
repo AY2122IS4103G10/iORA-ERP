@@ -8,6 +8,7 @@ function App() {
   return (
     <div className="wrapper">
       <Routes>
+        <Route path="/" element={<Login/>}/>
         <Route path="/" element={<Index />}>
           <Route path="products" element={<Outlet />}>
             <Route index element={<ManageProducts />} />

@@ -1,5 +1,7 @@
 package com.iora.erp.model.site;
 
+import java.io.Serializable;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
@@ -7,16 +9,19 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import com.iora.erp.enumeration.Country;
+import com.iora.erp.model.company.Company;
 
 @MappedSuperclass
-public class Site {
+public class Site implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,6 +53,10 @@ public class Site {
     @OneToOne(cascade = CascadeType.ALL)
     private StockLevel stockLevel;
 
+    // cant map it the other way using mappedsuperclass
+    @ManyToOne
+    private Company company;
+
     protected Site() {
     }
 
@@ -66,7 +75,6 @@ public class Site {
                 "Site[id=%d, name='%s', coordinates=(%d,%d)]",
                 id, name, latitude, longitude);
     }
-
 
     public Long getId() {
         return this.id;
@@ -142,6 +150,14 @@ public class Site {
 
     public void setStockLevel(StockLevel stockLevel) {
         this.stockLevel = stockLevel;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
 }

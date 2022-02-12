@@ -17,6 +17,7 @@ public class ProductItem {
     private boolean available;
 
     @ManyToOne
+    @XmlTransient
     private Product product;
 
     @ManyToOne

@@ -1,22 +1,9 @@
 import { nanoid } from "@reduxjs/toolkit";
-import { list } from "postcss";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { productAdded } from "../../../../stores/slices/productSlice";
-import MainWrapper from "../../../components/MainWrapper";
-
-const header = (
-  <div className="bg-white shadow">
-    <div className="md:flex md:items-center md:justify-between">
-      <div className="flex-1 min-w-0">
-        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-          Add Product
-        </h2>
-      </div>
-    </div>
-  </div>
-);
 
 const formInput = ({
   label,
@@ -26,6 +13,7 @@ const formInput = ({
   inputType = "text",
   placeholder = "",
   fieldType = "box",
+  ...rest
 }) => (
   <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
     <label
@@ -46,6 +34,7 @@ const formInput = ({
             className="flex-1 block w-full focus:ring-cyan-500 focus:border-cyan-500 min-w-0 rounded-md sm:text-sm border-gray-300"
             value={value}
             onChange={onChange}
+            {...rest}
           />
         ) : (
           <>
@@ -63,29 +52,65 @@ const formInput = ({
   </div>
 );
 
-const checkboxes = ({ legend, options }) => (
-  <fieldset className="space-y-5">
-    <legend className="sr-only">{legend}</legend>
-    {options.map((option) => (
-      <div className="relative flex items-start">
-        <div className="flex items-center h-5">
-          <input
-            id="comments"
-            aria-describedby="comments-description"
-            name="comments"
-            type="checkbox"
-            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-          />
+const checkboxes = ({ legend, options, inputField, onFieldsChanged }) => {
+  return (
+    <fieldset className="space-y-5">
+      <legend className="sr-only">{legend}</legend>
+      {options.map((option, index) => (
+        <div key={index} className="relative flex items-start">
+          <div className="flex items-center h-5">
+            <input
+              id={inputField}
+              aria-describedby="comments-description"
+              name={inputField}
+              type="checkbox"
+              className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+              onChange={() => onFieldsChanged(index)}
+            />
+          </div>
+          <div className="ml-3 text-sm">
+            <label htmlFor="comments" className="font-medium text-gray-700">
+              {option.fieldValue}
+            </label>
+          </div>
         </div>
-        <div className="ml-3 text-sm">
-          <label htmlFor="comments" className="font-medium text-gray-700">
-            {option.name}
-          </label>
+      ))}
+    </fieldset>
+  );
+};
+const rightColSection = ({ fieldName, fields, onFieldsChanged }) => (
+  <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
+    <div className="rounded-lg bg-white overflow-hidden shadow">
+      <div className="p-6">
+        <h2
+          className="text-base font-medium text-gray-900"
+          id="announcements-title"
+        >
+          {fieldName}
+        </h2>
+        <div className="flow-root mt-6">
+          {fields.length
+            ? checkboxes({
+                legend: fieldName,
+                options: fields,
+                inputField: fieldName,
+                onFieldsChanged: onFieldsChanged,
+              })
+            : `No ${fieldName.toLowerCase()} found.`}
+        </div>
+        <div className="mt-6">
+          <a
+            href="#"
+            className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            Add {fieldName.toLowerCase()}
+          </a>
         </div>
       </div>
-    ))}
-  </fieldset>
+    </div>
+  </section>
 );
+
 const AddProductFormBody = ({
   prodCode,
   onProdChanged,
@@ -98,6 +123,15 @@ const AddProductFormBody = ({
   discPrice,
   onDiscPriceChanged,
   onAddPostClicked,
+  onCancelClicked,
+  colors,
+  onColorsChanged,
+  sizes,
+  onSizesChanged,
+  tags,
+  onTagsChanged,
+  categories,
+  onCatsChanged,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">Add Product</h1>
@@ -108,70 +142,75 @@ const AddProductFormBody = ({
         {/* Form */}
         <section aria-labelledby="profile-overview-title">
           <div className="rounded-lg bg-white overflow-hidden shadow">
-            <form className="p-8 space-y-8 divide-y divide-gray-200">
-              <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-                <div>
+            <form>
+              <div className="p-8 space-y-8 divide-y divide-gray-200">
+                <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                      Add New Product
-                    </h3>
-                  </div>
-                  <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                    {formInput({
-                      label: "Product Code",
-                      inputField: "prodCode",
-                      value: prodCode,
-                      onChange: onProdChanged,
-                      inputType: "number",
-                    })}
-                    {formInput({
-                      label: "Name",
-                      inputField: "name",
-                      value: name,
-                      onChange: onNameChanged,
-                      inputType: "number",
-                    })}
-                    {formInput({
-                      label: "Description",
-                      inputField: "description",
-                      value: description,
-                      onChange: onDescChanged,
-                      inputType: "number",
-                      fieldType: "area",
-                    })}
-                    {formInput({
-                      label: "List Price",
-                      inputField: "listPrice",
-                      value: listPrice,
-                      onChange: onListPriceChanged,
-                      inputType: "number",
-                    })}
-                    {formInput({
-                      label: "Discounted Price",
-                      inputField: "discPrice",
-                      value: discPrice,
-                      onChange: onDiscPriceChanged,
-                      inputType: "number",
-                    })}
+                    <div>
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">
+                        Add New Product
+                      </h3>
+                    </div>
+                    <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                      {formInput({
+                        label: "Product Code",
+                        inputField: "prodCode",
+                        value: prodCode,
+                        onChange: onProdChanged,
+                        inputType: "text",
+                      })}
+                      {formInput({
+                        label: "Name",
+                        inputField: "name",
+                        value: name,
+                        onChange: onNameChanged,
+                        inputType: "text",
+                      })}
+                      {formInput({
+                        label: "Description",
+                        inputField: "description",
+                        value: description,
+                        onChange: onDescChanged,
+                        inputType: "number",
+                        fieldType: "area",
+                      })}
+                      {formInput({
+                        label: "List Price",
+                        inputField: "listPrice",
+                        value: listPrice,
+                        onChange: onListPriceChanged,
+                        inputType: "number",
+                        step: "0.01",
+                      })}
+                      {formInput({
+                        label: "Discounted Price",
+                        inputField: "discPrice",
+                        value: discPrice,
+                        onChange: onDiscPriceChanged,
+                        inputType: "number",
+                        step: "0.01",
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="pt-5">
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    onClick={onAddPostClicked}
-                  >
-                    Add Product
-                  </button>
+                <div className="pt-5">
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      onClick={onCancelClicked}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      onClick={onAddPostClicked}
+                    >
+                      Add Product
+                    </button>
+                  </div>
                 </div>
               </div>
             </form>
@@ -181,55 +220,27 @@ const AddProductFormBody = ({
 
       {/* Right column */}
       <div className="grid grid-cols-1 gap-4">
-        {/* Sizes */}
-        <section aria-labelledby="announcements-title">
-          <div className="rounded-lg bg-white overflow-hidden shadow">
-            <div className="p-6">
-              <h2
-                className="text-base font-medium text-gray-900"
-                id="announcements-title"
-              >
-                Sizes
-              </h2>
-              <div className="flow-root mt-6">
-                <ul role="list" className="-my-5 divide-y divide-gray-200"></ul>
-              </div>
-              <div className="mt-6">
-                <a
-                  href="#"
-                  className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  Add size
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Colors */}
-        <section aria-labelledby="recent-hires-title">
-          <div className="rounded-lg bg-white overflow-hidden shadow">
-            <div className="p-6">
-              <h2
-                className="text-base font-medium text-gray-900"
-                id="recent-hires-title"
-              >
-                Colors
-              </h2>
-              <div className="flow-root mt-6">
-                <ul role="list" className="-my-5 divide-y divide-gray-200"></ul>
-              </div>
-              <div className="mt-6">
-                <a
-                  href="#"
-                  className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  Add color
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+        {rightColSection({
+          fieldName: "Color",
+          fields: colors,
+          onFieldsChanged: onColorsChanged,
+        })}
+        {rightColSection({
+          fieldName: "Size",
+          fields: sizes,
+          onFieldsChanged: onSizesChanged,
+        })}
+        {rightColSection({
+          fieldName: "Category",
+          fields: categories,
+          onFieldsChanged: onCatsChanged,
+        })}
+        {rightColSection({
+          fieldName: "Tag",
+          fields: tags,
+          onFieldsChanged: onTagsChanged,
+        })}
       </div>
     </div>
   </div>
@@ -242,44 +253,114 @@ export const AddProductForm = () => {
   const [listPrice, setListPrice] = useState(0.0);
   const [discPrice, setDiscPrice] = useState(0.0);
 
+  const fields = useSelector((state) => state.prodFields)
+  const colors = fields.filter(
+    (field) => field.fieldName === "Color"
+  );
+  const sizes = fields.filter(
+    (field) => field.fieldName === "Size"
+  );
+  const tags = fields.filter(
+    (field) => field.fieldName === "Tag"
+  );
+  const categories = fields.filter(
+    (field) => field.fieldName === "Category"
+  );
+
+  const [colorCheckedState, setColorCheckedState] = useState(
+    new Array(colors.length).fill(false)
+  );
+  const [sizeCheckedState, setSizeCheckedState] = useState(
+    new Array(sizes.length).fill(false)
+  );
+  const [tagCheckedState, setTagCheckedState] = useState(
+    new Array(tags.length).fill(false)
+  );
+  const [catCheckedState, setCatCheckedState] = useState(
+    new Array(categories.length).fill(false)
+  );
+
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
   const onListPriceChanged = (e) => setListPrice(e.target.value);
   const onDiscPriceChanged = (e) => setDiscPrice(e.target.value);
+  const onColorsChanged = (pos) => {
+    const updateCheckedState = colorCheckedState.map((item, index) =>
+      index === pos ? !item : item
+    );
+    setColorCheckedState(updateCheckedState);
+  };
+  const onSizesChanged = (pos) => {
+    const updateCheckedState = sizeCheckedState.map((item, index) =>
+      index === pos ? !item : item
+    );
+    setSizeCheckedState(updateCheckedState);
+  };
+  const onTagsChanged = (pos) => {
+    const updateCheckedState = tagCheckedState.map((item, index) =>
+      index === pos ? !item : item
+    );
+    setTagCheckedState(updateCheckedState);
+  };
+  const onCatsChanged = (pos) => {
+    const updateCheckedState = catCheckedState.map((item, index) =>
+      index === pos ? !item : item
+    );
+    setCatCheckedState(updateCheckedState);
+  };
 
   const onAddPostClicked = () => {
+    const fields = [];
+    colors.forEach(
+      (color, index) => colorCheckedState[index] && fields.push(color)
+    );
+    sizes.forEach(
+      (size, index) => sizeCheckedState[index] && fields.push(size)
+    );
     name &&
       description &&
       dispatch(
         productAdded({
-          id: prodCode ? prodCode : nanoid(),
+          id: nanoid(),
           name,
           description,
+          listPrice,
+          discPrice,
+          fields: fields
         })
       );
     setProdCode("");
     setName("");
     setDescription("");
   };
+  const onCancelClicked = () => navigate(-1);
+
   return (
-    <>
-      {/* {header} */}
-      <AddProductFormBody
-        prodCode={prodCode}
-        onProdChanged={onProdChanged}
-        name={name}
-        onNameChanged={onNameChanged}
-        description={description}
-        onDescChanged={onDescChanged}
-        listPrice={listPrice}
-        onListPriceChanged={onListPriceChanged}
-        discPrice={discPrice}
-        onDiscPriceChanged={onDiscPriceChanged}
-        onAddPostClicked={onAddPostClicked}
-      />
-    </>
+    <AddProductFormBody
+      prodCode={prodCode}
+      onProdChanged={onProdChanged}
+      name={name}
+      onNameChanged={onNameChanged}
+      description={description}
+      onDescChanged={onDescChanged}
+      listPrice={listPrice}
+      onListPriceChanged={onListPriceChanged}
+      discPrice={discPrice}
+      onDiscPriceChanged={onDiscPriceChanged}
+      onAddPostClicked={onAddPostClicked}
+      onCancelClicked={onCancelClicked}
+      colors={colors}
+      onColorsChanged={onColorsChanged}
+      sizes={sizes}
+      onSizesChanged={onSizesChanged}
+      tags={tags}
+      onTagsChanged={onTagsChanged}
+      categories={categories}
+      onCatChanged={onCatsChanged}
+    />
   );
 };

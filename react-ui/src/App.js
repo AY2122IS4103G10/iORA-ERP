@@ -7,17 +7,14 @@ import Login from "./views/containers/Login";
 function App() {
   return (
     <div className="wrapper">
-      <div className="h-screen bg-gray-100">
-        <Routes>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/" element={<Index />}>
-            <Route path="products" element={<Outlet />}>
-              <Route index element={<ManageProducts />} />
-              <Route path="create" element={<AddProductForm />} />
-            </Route>
+      <Routes>
+        <Route path="/" element={<Index />}>
+          <Route path="products" element={<Outlet />}>
+            <Route index element={<ManageProducts />} />
+            <Route path="create" element={<AddProductForm />} />
           </Route>
-        </Routes>
-      </div>
+        </Route>
+      </Routes>
     </div>
   );
 }

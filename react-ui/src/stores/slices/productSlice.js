@@ -5,6 +5,8 @@ const initialState = [
     prodCode: 1,
     prodName: "First Post!",
     description: "Hello!",
+    listPrice: 10.99,
+    discPrice: 8.99,
     fields: [
       {
         fieldId: 1,
@@ -40,7 +42,7 @@ const initialState = [
   },
 ];
 
-export const productSlice = createSlice({
+const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {

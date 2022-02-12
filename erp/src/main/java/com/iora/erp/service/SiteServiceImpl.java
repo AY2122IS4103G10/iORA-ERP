@@ -19,6 +19,9 @@ import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 
+import org.springframework.stereotype.Service;
+
+@Service("siteServiceImpl")
 public class SiteServiceImpl implements SiteService {
 
     @PersistenceContext
@@ -157,8 +160,12 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public void deleteSite(Long id) {
-        // TODO Auto-generated method stub
-
+        Site site = getSite(id);
+        if (site.getStockLevel().getProductItems().size() == 0) {
+            em.remove(site);
+        } else {
+            site.setActive(false);
+        }
     }
 
     @Override

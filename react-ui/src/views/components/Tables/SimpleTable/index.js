@@ -214,7 +214,7 @@ export const SimpleTable = ({ columns, data }) => {
             <label>
               <span className="sr-only">Items Per Page</span>
               <select
-                className="text-sm mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
+                className="text-sm mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-700 focus:ring focus:ring-cyan-600 focus:ring-opacity-50"
                 value={state.pageSize}
                 onChange={(e) => {
                   setPageSize(Number(e.target.value));

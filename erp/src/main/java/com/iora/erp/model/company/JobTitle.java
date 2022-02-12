@@ -20,7 +20,7 @@ public class JobTitle implements Serializable {
     private String title;
     private String description;
     private ArrayList<AccessRights> responsibility;
-    
+
     public JobTitle() {
         responsibility = new ArrayList<>();
     }
@@ -30,11 +30,10 @@ public class JobTitle implements Serializable {
         this.description = description;
         this.responsibility = responsibility;
     }
-    
+
     public Long getId() {
         return id;
     }
-
 
     public String getTitle() {
         return title;
@@ -63,5 +62,5 @@ public class JobTitle implements Serializable {
     @Override
     public String toString() {
         return "JobTitle [id=" + id + "]";
-    } 
+    }
 }

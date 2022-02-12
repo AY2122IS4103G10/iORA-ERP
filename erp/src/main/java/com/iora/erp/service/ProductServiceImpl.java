@@ -1,5 +1,6 @@
 package com.iora.erp.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityExistsException;
@@ -37,28 +38,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductField getProductField(String name) throws ProductFieldException {
-        Query q = em.createQuery("SELECT pf FROM ProductField pf WHERE " + "LOWER(pf.name) LIKE :fieldName");
-        q.setParameter("fieldName", name);
+    public ProductField getProductField(String fieldName) throws ProductFieldException {
+        Query q = em.createQuery("SELECT pf FROM ProductField pf WHERE " + "LOWER(pf.fieldName) LIKE :fieldName");
+        q.setParameter("fieldName", fieldName);
 
         try {
             ProductField pf = (ProductField) q.getSingleResult();
             return pf;
         } catch (NoResultException | NonUniqueResultException ex) {
-            throw new ProductFieldException("Field name " + name + " does not exist.");
+            throw new ProductFieldException("Field name " + fieldName + " does not exist.");
         }
     }
 
     @Override
-    public List<String> getProductFieldValues(String name) throws ProductFieldException {
-        Query q = em.createQuery("SELECT pf FROM ProductField pf WHERE " + "LOWER(pf.name) LIKE :fieldName");
-        q.setParameter("fieldName", name);
+    public List<String> getProductFieldValues(String fieldName) throws ProductFieldException {
+        Query q = em.createQuery("SELECT pf FROM ProductField pf WHERE " + "LOWER(pf.fieldName) LIKE :fieldName");
+        q.setParameter("fieldName", fieldName);
 
         try {
             ProductField pf = (ProductField) q.getSingleResult();
-            return pf.getValues();
+            return pf.getFieldValues();
         } catch (NoResultException | NonUniqueResultException ex) {
-            throw new ProductFieldException("Field name " + name + " does not exist.");
+            throw new ProductFieldException("Field name " + fieldName + " does not exist.");
         }
     }
 
@@ -69,16 +70,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void addProductFieldValue(String name, String value) throws ProductFieldException {
-        ProductField pf = getProductField(name);
-        List<String> values = pf.getValues();
+    public void addProductFieldValue(String fieldName, String fieldValue) throws ProductFieldException {
+        ProductField pf = getProductField(fieldName);
+        ArrayList<String> fieldValues = pf.getFieldValues();
 
-        if (values.contains(value)) {
+        if (fieldValues.contains(fieldValue)) {
             throw new ProductFieldException("Value already exist in this field.");
         }
 
-        values.add(value);
-        pf.setValues(values);
+        fieldValues.add(fieldValue);
+        pf.setFieldValues(fieldValues);
         em.merge(pf);
     }
 
@@ -139,7 +140,7 @@ public class ProductServiceImpl implements ProductService {
 
         TypedQuery<Model> q;
         q = em.createQuery(
-                "SELECT m FROM Model m, IN (m.productFields) pfield WHERE pfield.name = :name AND pfield.value = :value",
+                "SELECT m FROM Model m, IN (m.productFields) pfield WHERE pfield.fieldName = :name AND pfield.fieldValue = :value",
                 Model.class);
         q.setParameter("name", fieldName);
         q.setParameter("value", fieldValue);
@@ -220,7 +221,7 @@ public class ProductServiceImpl implements ProductService {
 
         TypedQuery<Product> q;
         q = em.createQuery(
-                "SELECT p FROM Product p, IN (p.productFields) pfield WHERE pfield.name = :name AND pfield.value = :value",
+                "SELECT p FROM Product p, IN (p.productFields) pfield WHERE pfield.fieldName = :name AND pfield.fieldValue = :value",
                 Product.class);
         q.setParameter("name", fieldName);
         q.setParameter("value", fieldValue);

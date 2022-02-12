@@ -1,7 +1,8 @@
 package com.iora.erp.model.product;
 
-import java.util.List;
+import java.util.ArrayList;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,10 +17,15 @@ public class ProductField {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String name;
+    private String fieldName;
 
     @Column(nullable = false)
-    private List<String> values;
+    @Basic
+    private ArrayList<String> fieldValues;
+
+    public ProductField() {
+        fieldValues = new ArrayList<>();
+    }
 
     public Long getId() {
         return id;
@@ -29,20 +35,20 @@ public class ProductField {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFieldName() {
+        return fieldName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 
-    public List<String> getValues() {
-        return values;
+    public ArrayList<String> getFieldValues() {
+        return fieldValues;
     }
 
-    public void setValues(List<String> values) {
-        this.values = values;
+    public void setFieldValues(ArrayList<String> fieldValues) {
+        this.fieldValues = fieldValues;
     }
 
     @Override
@@ -54,7 +60,6 @@ public class ProductField {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof ProductField)) {
             return false;
         }

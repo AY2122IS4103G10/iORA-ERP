@@ -1,12 +1,14 @@
 package com.iora.erp.model.product;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.iora.erp.model.site.StockLevel;
 
+@Entity
 public class ProductItem {
     @Id
     private String rfid;
@@ -15,11 +17,15 @@ public class ProductItem {
     private boolean available;
 
     @ManyToOne
+    @XmlTransient
     private Product product;
 
     @ManyToOne
     @XmlTransient
     private StockLevel stockLevel;
+
+    public ProductItem() {
+    }
 
     public ProductItem(String rfid) {
         this.rfid = rfid;

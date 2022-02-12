@@ -16,6 +16,9 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<ProductItem> productItems;
 
+    public Product() {
+    }
+
     public Product(String sku) {
         this.sku = sku;
         this.productItems = new ArrayList<>();

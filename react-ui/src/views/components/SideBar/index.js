@@ -18,10 +18,10 @@ import { classNames } from "../../../utilities/Util";
 const navigation = [
   { name: "Home", href: "/", icon: HomeIcon, current: true },
   { name: "Products", href: "/products", icon: ClockIcon, current: false },
-  { name: "Balances", href: "#", icon: ScaleIcon, current: false },
-  { name: "Cards", href: "#", icon: CreditCardIcon, current: false },
-  { name: "Recipients", href: "#", icon: UserGroupIcon, current: false },
-  { name: "Reports", href: "#", icon: DocumentReportIcon, current: false },
+  { name: "Stock Levels", href: "/stocklevels", icon: ScaleIcon, current: false },
+  { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },
+  { name: "Reports", href: "#", icon: UserGroupIcon, current: false },
+  { name: "Reports & Analytics", href: "#", icon: DocumentReportIcon, current: false },
 ];
 
 const secondaryNavigation = [
@@ -197,3 +197,5 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
     </>
   );
 };
+
+

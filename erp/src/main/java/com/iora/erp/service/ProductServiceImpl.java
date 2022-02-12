@@ -1,5 +1,6 @@
 package com.iora.erp.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityExistsException;
@@ -71,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void addProductFieldValue(String name, String value) throws ProductFieldException {
         ProductField pf = getProductField(name);
-        List<String> values = pf.getValues();
+        ArrayList<String> values = pf.getValues();
 
         if (values.contains(value)) {
             throw new ProductFieldException("Value already exist in this field.");

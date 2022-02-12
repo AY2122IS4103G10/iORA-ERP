@@ -1,7 +1,8 @@
 package com.iora.erp.model.product;
 
-import java.util.List;
+import java.util.ArrayList;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,7 +20,8 @@ public class ProductField {
     private String name;
 
     @Column(nullable = false)
-    private List<String> values;
+    @Basic
+    private ArrayList<String> values;
 
     public Long getId() {
         return id;
@@ -37,11 +39,11 @@ public class ProductField {
         this.name = name;
     }
 
-    public List<String> getValues() {
+    public ArrayList<String> getValues() {
         return values;
     }
 
-    public void setValues(List<String> values) {
+    public void setValues(ArrayList<String> values) {
         this.values = values;
     }
 

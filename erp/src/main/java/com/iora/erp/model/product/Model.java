@@ -46,6 +46,9 @@ public class Model {
     @ManyToMany
     private List<ProductField> productFields;
 
+    public Model() {
+    }
+
     public Model(String modelCode) {
         this.modelCode = modelCode;
         products = new ArrayList<>();

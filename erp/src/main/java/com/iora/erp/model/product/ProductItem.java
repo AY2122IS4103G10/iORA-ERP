@@ -24,6 +24,9 @@ public class ProductItem {
     @XmlTransient
     private StockLevel stockLevel;
 
+    public ProductItem() {
+    }
+
     public ProductItem(String rfid) {
         this.rfid = rfid;
         this.available = true;

@@ -2,10 +2,10 @@ package com.iora.erp.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.exception.IllegalTransferException;
@@ -65,15 +65,83 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public List<Site> getAllSites() {
-        List<Site> resultList = em.createQuery("SELECT s FROM Site s", Site.class).getResultList();
-        return resultList;
+        List<Site> sites = new ArrayList<>();
+        Stream.of(getAllHeadquarters(), getAllManufacturing(), getAllStores(), getAllOnlineStores(), getAllWarehouses())
+                .forEach(sites::addAll);
+        return sites;
     }
 
     public List<Site> getSitesByCountry(Country country) {
-        List<Site> resultList = em.createQuery("SELECT s FROM Site s WHERE s.country = :country", Site.class)
+        List<Site> sites = new ArrayList<>();
+        Stream.of(getHeadquartersByCountry(country), getManufacturingByCountry(country), getStoresByCountry(country),
+                getOnlineStoresByCountry(country), getWarehousesByCountry(country))
+                .forEach(sites::addAll);
+        return sites;
+    }
+
+    public List<? extends Site> getAllHeadquarters() {
+        List<? extends Site> resultList = em.createQuery("SELECT s FROM HeadquartersSite s", HeadquartersSite.class)
+                .getResultList();
+        return resultList;
+    }
+
+    public List<? extends Site> getHeadquartersByCountry(Country country) {
+        List<? extends Site> resultList = em
+                .createQuery("SELECT s FROM HeadquartersSite s WHERE s.country = :country", HeadquartersSite.class)
                 .setParameter("country", country.name()).getResultList();
         return resultList;
-    };
+    }
+
+    public List<? extends Site> getAllManufacturing() {
+        List<? extends Site> resultList = em.createQuery("SELECT s FROM ManufacturingSite s", ManufacturingSite.class)
+                .getResultList();
+        return resultList;
+    }
+
+    public List<? extends Site> getManufacturingByCountry(Country country) {
+        List<? extends Site> resultList = em
+                .createQuery("SELECT s FROM ManufacturingSite s WHERE s.country = :country", ManufacturingSite.class)
+                .setParameter("country", country.name()).getResultList();
+        return resultList;
+    }
+
+    public List<? extends Site> getAllStores() {
+        List<? extends Site> resultList = em.createQuery("SELECT s FROM StoreSite s", StoreSite.class).getResultList();
+        return resultList;
+    }
+
+    public List<? extends Site> getStoresByCountry(Country country) {
+        List<? extends Site> resultList = em
+                .createQuery("SELECT s FROM StoreSite s WHERE s.country = :country", StoreSite.class)
+                .setParameter("country", country.name()).getResultList();
+        return resultList;
+    }
+
+    public List<? extends Site> getAllOnlineStores() {
+        List<? extends Site> resultList = em.createQuery("SELECT s FROM OnlineStoreSite s", OnlineStoreSite.class)
+                .getResultList();
+        return resultList;
+    }
+
+    public List<? extends Site> getOnlineStoresByCountry(Country country) {
+        List<? extends Site> resultList = em
+                .createQuery("SELECT s FROM OnlineStoreSite s WHERE s.country = :country", OnlineStoreSite.class)
+                .setParameter("country", country.name()).getResultList();
+        return resultList;
+    }
+
+    public List<? extends Site> getAllWarehouses() {
+        List<? extends Site> resultList = em.createQuery("SELECT s FROM WarehouseSite s", WarehouseSite.class)
+                .getResultList();
+        return resultList;
+    }
+
+    public List<? extends Site> getWarehousesByCountry(Country country) {
+        List<? extends Site> resultList = em
+                .createQuery("SELECT s FROM WarehouseSite s WHERE s.country = :country", WarehouseSite.class)
+                .setParameter("country", country.name()).getResultList();
+        return resultList;
+    }
 
     @Override
     public void updateSite(Site site) {

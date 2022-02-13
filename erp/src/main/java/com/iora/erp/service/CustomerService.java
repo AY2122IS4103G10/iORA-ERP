@@ -12,11 +12,10 @@ public interface CustomerService {
     public abstract void unblockCustomer(Customer customer) throws CustomerException;
     public abstract List<Customer> listOfCustomer();
     public abstract List<Customer> getCustomerByFields(String search);
-    public abstract Customer getCustomerById(Long id);
+    public abstract Customer getCustomerById(Long id)  throws CustomerException;
     public abstract Customer getCustomerByEmail(String Email) throws CustomerException;
     
-    public abstract String saltGeneration();
-    public abstract String hashPassword(String password);
-    public abstract Boolean loginAuthentication(Customer customer);
+    public abstract byte[] saltGeneration();
+    public abstract Boolean loginAuthentication(Customer customer) throws CustomerException;
 
 }

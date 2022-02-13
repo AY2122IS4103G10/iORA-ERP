@@ -1,5 +1,6 @@
 package com.iora.erp.service;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -24,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             em.persist(customer);
         } catch (Exception ex) {
-            throw new CustomerException("Customer has been created");
+            throw new CustomerException("Customer has been already been created");
         }
     }
 
@@ -67,30 +68,36 @@ public class CustomerServiceImpl implements CustomerService {
         c.setAvailStatus(true);
     }
 
-    
     @Override
-    public List<Customer> listOfCustomer() {
-        Query q = em.createQuery("SELECT c FROM Customer c");
+    public List<Customer> listOfCustomer() throws CustomerException {
+        try {
+            Query q = em.createQuery("SELECT c FROM Customer c");
 
-        //need run test if query exits timing for large database
-        return q.getResultList();
+            // need run test if query exits timing for large database
+            return q.getResultList();
+        } catch (Exception ex) {
+            throw new CustomerException();
+        }
     }
 
     @Override
     public List<Customer> getCustomerByFields(String search) {
         Query q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
-        "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact");
+                "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact");
         q.setParameter("email", "%" + search.toLowerCase() + "%");
         q.setParameter("last", "%" + search.toLowerCase() + "%");
         q.setParameter("first", "%" + search.toLowerCase() + "%");
         q.setParameter("contact", "%" + search + "%");
-        return null;
+        return q.getResultList();
     }
 
     @Override
-    public Customer getCustomerById(Long id) {
-        // TODO Auto-generated method stub
-        return null;
+    public Customer getCustomerById(Long id) throws CustomerException {
+        Customer customer = em.find(Customer.class, id);
+        if (customer == null) {
+            throw new CustomerException("Customer with id: " + id + " not found.");
+        }
+        return customer;
     }
 
     @Override
@@ -107,20 +114,26 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public String saltGeneration() {
-        // TODO Auto-generated method stub
-        return null;
+    public byte[] saltGeneration() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return salt;
     }
 
     @Override
-    public String hashPassword(String password) {
-        // TODO Auto-generated method stub
-        return null;
+    public Customer loginAuthentication(Customer customer) throws CustomerException {
+        try {
+            Customer c = getCustomerByEmail(customer.getEmail());
+            if (c.authentication(customer.gethashPass())) {
+                return c;
+            } else {
+                throw new CustomerException();
+            }
+        } catch (Exception ex) {
+            throw new CustomerException("Invalid Username or Password.");
+        }
+
     }
 
-    @Override
-    public Boolean loginAuthentication(Customer customer) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

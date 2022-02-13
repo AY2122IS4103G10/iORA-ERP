@@ -11,9 +11,13 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
+import com.iora.erp.exception.AddressException;
+import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.DepartmentException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.exception.JobTitleException;
+import com.iora.erp.model.company.Address;
+import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
@@ -22,155 +26,10 @@ import org.springframework.stereotype.Service;
 
 @Service("adminServiceImpl")
 public class AdminService implements AdminServiceImpl {
+    
     @PersistenceContext
     private EntityManager em;
 
-    @Override
-    public void createEmployee(Employee employee) throws EmployeeException {
-        try {
-            em.persist(employee);
-        } catch (Exception ex) {
-            throw new EmployeeException("Employee has already been created");
-        }
-    }
-
-    @Override
-    public void updateEmployeeAccount(Employee employee) throws EmployeeException {
-        Employee old = em.find(Employee.class, employee.getId());
-
-        if (old == null) {
-            throw new EmployeeException("Employee not found");
-        }
-
-        try {
-            old.setUsername(employee.getUsername());
-        } catch (Exception ex) {
-            throw new EmployeeException("Username " + employee.getUsername() + " has been used!");
-        }
-
-        //department
-        try {
-            Department d = getDepartmentById(employee.getDepartment().getId());
-            old.setDepartment(d);
-        } catch (DepartmentException e) {
-           throw new EmployeeException();
-        }
-
-        try {
-            JobTitle j = getJobTitleById(employee.getJobTitle().getId());
-            old.setJobTitle(j);
-        } catch (JobTitleException e) {
-           throw new EmployeeException();
-        }
-
-        old.setName(employee.getName());
-        old.setSalary(employee.getSalary());
-    }
-
-    @Override
-    public void blockEmployee(Employee employee) throws EmployeeException {
-        Employee e = em.find(Employee.class, employee.getId());
-
-        if (e == null) {
-            throw new EmployeeException("Employee not found");
-        }
-        e.setAvailStatus(false);
-    }
-
-    @Override
-    public void unblockEmployee(Employee employee) throws EmployeeException {
-        Employee e = em.find(Employee.class, employee.getId());
-
-        if (e == null) {
-            throw new EmployeeException("Employee not found");
-        }
-        e.setAvailStatus(true);
-    }
-
-    @Override
-    public void removeEmployee(Employee employee) throws EmployeeException {
-        try {
-            Employee e = em.find(Employee.class, employee.getId());
-
-            if (e == null) {
-                throw new EmployeeException("Employee not found");
-            }
-
-            em.remove(e);
-            em.flush();
-        } catch (IllegalArgumentException | TransactionRequiredException ex) {
-            blockEmployee(employee);
-        }
-    }
-
-    @Override
-    public List<Employee> listOfEmployee() throws EmployeeException {
-        try {
-            Query q = em.createQuery("SELECT e FROM Employee e");
-
-            // need run test if query exits timing for large database
-            return q.getResultList();
-        } catch (Exception ex) {
-            throw new EmployeeException();
-        }
-    }
-
-    @Override
-    public List<Employee> getEmployeeByFields(String search) {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
-                "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary");
-        q.setParameter("email", "%" + search.toLowerCase() + "%");
-        q.setParameter("username", "%" + search.toLowerCase() + "%");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        q.setParameter("salary", "%" + search + "%");
-        return q.getResultList();
-    }
-
-    @Override
-    public Employee getEmployeeById(Long id) throws EmployeeException {
-        Employee employee = em.find(Employee.class, id);
-        if (employee == null) {
-            throw new EmployeeException("Employee with id: " + id + " not found.");
-        }
-        return employee;
-
-    }
-
-    @Override
-    public Employee getEmployeeByUsername(String username) throws EmployeeException {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.getUsername = :username");
-        q.setParameter("username", username);
-
-        try {
-            return (Employee) q.getSingleResult();
-
-        } catch (NoResultException | NonUniqueResultException ex) {
-            throw new EmployeeException("Employee username " + username + " does not exist.");
-        }
-    }
-
-    @Override
-    public byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
-    }
-
-    @Override
-    public Employee loginAuthentication(Employee employee) throws EmployeeException {
-        try {
-            Employee c = getEmployeeByUsername(employee.getUsername());
-            if (c.authentication(employee.getHashPass())) {
-                return c;
-            } else {
-                throw new EmployeeException();
-            }
-        } catch (Exception ex) {
-            throw new EmployeeException("Invalid Username or Password.");
-        }
-
-    }
 
     @Override
     public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
@@ -349,6 +208,121 @@ public class AdminService implements AdminServiceImpl {
         Query q = em.createQuery("SELECT e FROM Employee e, IN (e.department) d WHERE LOWER(d.getDeptName) = :name ORDER BY e.name");
         q.setParameter("name", department.toLowerCase());
         return q.getResultList();
+    }
+
+    @Override
+    public void createAddress(Address address) throws AddressException {
+        try {
+            if(checkAddress(address)== false) {
+                em.persist(address);
+            }
+
+        } catch (Exception ex) {
+            throw new AddressException("Address has already been created");
+        }
+    }
+
+    @Override
+    public void updateAddress(Address address) throws AddressException {
+        Address old = getAddressById(address.getId());
+        old.setCountry(address.getCountry());
+        old.setBuilding(address.getBuilding());
+        old.setCity(address.getCity());
+        old.setUnit(address.getUnit());
+        old.setPostalCode(address.getPostalCode());
+        old.setState(address.getState());
+        old.setBilling(address.getBilling());
+        
+    }
+
+    @Override
+    public void deleteAddress(Address address) throws AddressException {
+        try {
+            Address e = em.find(Address.class, address.getId());
+
+            if (e == null) {
+                throw new AddressException("Address is not found");
+            }
+            em.remove(address);
+            em.flush();
+        } catch (IllegalArgumentException | TransactionRequiredException ex) {
+            throw new AddressException("Address cannot be removed");
+        }
+        
+    }
+
+    @Override
+    public Address getAddressById(Long id) throws AddressException {
+        Address addr = em.find(Address.class, id);
+        if (addr == null) {
+            throw new AddressException("Address with id: " + id + " not found.");
+        }
+        return addr;
+    }
+
+    @Override
+    public Boolean checkAddress(Address address) {
+        Query q = em.createQuery("SELECT e FROM Address e WHERE LOWER(e.getCountry) = :country AND LOWER(e.getCity) = :city "+
+        "AND LOWER(e.getPostalCode) = :postal AND LOWER(e.getUnit) = :unit");
+        q.setParameter("country", address.getCountry().toLowerCase());
+        q.setParameter("city", address.getCity().toLowerCase());
+        q.setParameter("postal", address.getPostalCode().toLowerCase());
+        q.setParameter("unit", address.getUnit().toLowerCase());
+        Address a = (Address) q.getSingleResult();
+        
+        if (a != null) {
+            return true;
+        } else { 
+            return false;
+        }
+    }
+
+    @Override
+    public void createCompany(Company company) throws CompanyException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void updateCompany(Company company) throws CompanyException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteCompany(Company company) throws CompanyException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public List<Company> listOfCompanys() throws CompanyException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Company> getCompanysByFields(String search) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Company getCompanyById(Long id) throws CompanyException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Company getCompanysByName(String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Employee> getEmployeesInCompanys(String deparment) throws CompanyException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-
 @Entity
 public class Company implements Serializable {
 
@@ -26,6 +25,8 @@ public class Company implements Serializable {
     private String registerNumber;
     @Column(nullable = false)
     private String telephone;
+    @Column(nullable = false)
+    private Boolean active;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Address address;
@@ -61,6 +62,14 @@ public class Company implements Serializable {
 
     public Long getId() {
         return id;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public List<Department> getDepartments() {

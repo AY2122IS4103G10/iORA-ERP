@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.CompoundName;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -16,20 +17,21 @@ import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.DepartmentException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.exception.JobTitleException;
+import com.iora.erp.exception.VendorException;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
+import com.iora.erp.model.company.Vendor;
 
 import org.springframework.stereotype.Service;
 
 @Service("adminServiceImpl")
 public class AdminService implements AdminServiceImpl {
-    
+
     @PersistenceContext
     private EntityManager em;
-
 
     @Override
     public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
@@ -126,7 +128,7 @@ public class AdminService implements AdminServiceImpl {
     }
 
     @Override
-    public void updateDepartment(Department department) throws DepartmentException {
+    public void editDepartment(Department department) throws DepartmentException {
         Department old = em.find(Department.class, department.getId());
 
         if (old == null) {
@@ -140,7 +142,7 @@ public class AdminService implements AdminServiceImpl {
         }
 
         old.setJobTitles(new ArrayList<>());
-        for (JobTitle j : department.getJobTitles()){
+        for (JobTitle j : department.getJobTitles()) {
             try {
                 JobTitle newJ = getJobTitleById(j.getId());
                 old.getJobTitles().add(newJ);
@@ -205,7 +207,8 @@ public class AdminService implements AdminServiceImpl {
 
     @Override
     public List<Employee> getEmployeesInDepartments(String department) throws DepartmentException {
-        Query q = em.createQuery("SELECT e FROM Employee e, IN (e.department) d WHERE LOWER(d.getDeptName) = :name ORDER BY e.name");
+        Query q = em.createQuery(
+                "SELECT e FROM Employee e, IN (e.department) d WHERE LOWER(d.getDeptName) = :name ORDER BY e.name");
         q.setParameter("name", department.toLowerCase());
         return q.getResultList();
     }
@@ -213,7 +216,7 @@ public class AdminService implements AdminServiceImpl {
     @Override
     public void createAddress(Address address) throws AddressException {
         try {
-            if(checkAddress(address)== false) {
+            if (checkAddress(address) == false) {
                 em.persist(address);
             }
 
@@ -232,7 +235,7 @@ public class AdminService implements AdminServiceImpl {
         old.setPostalCode(address.getPostalCode());
         old.setState(address.getState());
         old.setBilling(address.getBilling());
-        
+
     }
 
     @Override
@@ -248,7 +251,7 @@ public class AdminService implements AdminServiceImpl {
         } catch (IllegalArgumentException | TransactionRequiredException ex) {
             throw new AddressException("Address cannot be removed");
         }
-        
+
     }
 
     @Override
@@ -262,67 +265,192 @@ public class AdminService implements AdminServiceImpl {
 
     @Override
     public Boolean checkAddress(Address address) {
-        Query q = em.createQuery("SELECT e FROM Address e WHERE LOWER(e.getCountry) = :country AND LOWER(e.getCity) = :city "+
-        "AND LOWER(e.getPostalCode) = :postal AND LOWER(e.getUnit) = :unit");
+        Query q = em.createQuery(
+                "SELECT e FROM Address e WHERE LOWER(e.getCountry) = :country AND LOWER(e.getCity) = :city " +
+                        "AND LOWER(e.getPostalCode) = :postal AND LOWER(e.getUnit) = :unit");
         q.setParameter("country", address.getCountry().toLowerCase());
         q.setParameter("city", address.getCity().toLowerCase());
         q.setParameter("postal", address.getPostalCode().toLowerCase());
         q.setParameter("unit", address.getUnit().toLowerCase());
         Address a = (Address) q.getSingleResult();
-        
+
         if (a != null) {
             return true;
-        } else { 
+        } else {
             return false;
         }
     }
 
-    @Override
-    public void createCompany(Company company) throws CompanyException {
-        // TODO Auto-generated method stub
-        
+    @Override // address to be persist beforehand, vendor and department and site is seperated
+    public void createCompany(Company company, Address address) throws CompanyException {
+        try {
+            em.persist(company);
+
+            Address a = getAddressById(address.getId());
+            company.setAddress(a);
+
+        } catch (Exception ex) {
+            throw new CompanyException("Company has already been created");
+        }
     }
 
     @Override
-    public void updateCompany(Company company) throws CompanyException {
+    public void addDepartmentToCompany(Company company) throws CompanyException, DepartmentException {
+        Company c = getCompanyById(company.getId());
+
+        for (Department d : company.getDepartments()) {
+            Department dNew = getDepartmentById(d.getId());
+            c.getDepartments().add(dNew);
+        }
+    }
+
+    @Override
+    public void addVendorToCompany(Company company) throws CompanyException, VendorException {
+        Company c = getCompanyById(company.getId());
+
+       /* for (Vendor v : company.getVendors()) {
+            Vendor vNew = c.getVendors().add(vNew);
+        }*/
+    }
+
+    // need addd
+    @Override
+    public void editCompany(Company company) throws CompanyException {
+        Company old = getCompanyById(company.getId());
+
+        if (company.getName() != old.getName() && company.getRegisterNumber() != old.getRegisterNumber()) {
+            if (checkUniqueN(company.getName()) == true && checkUniqueR(company.getRegisterNumber()) == true) {
+
+                old.setName(company.getName());
+                old.setRegisterNumber(company.getRegisterNumber());
+                old.setTelephone(company.getTelephone());
+                old.setActive(company.getActive());
+
+            } else if (checkUniqueN(company.getName()) == true) {
+                throw new CompanyException("New company registeration number is not unique");
+            } else {
+                throw new CompanyException("New company Name is not unique");
+            }
+
+        } else if (company.getName() != old.getName()) {
+            if (checkUniqueN(company.getName()) == true) {
+                old.setName(company.getName());
+                old.setTelephone(company.getTelephone());
+                old.setActive(company.getActive());
+
+            } else {
+                throw new CompanyException("New company Name is not unique");
+            }
+
+        } else if (company.getRegisterNumber() != old.getRegisterNumber()) {
+            if (checkUniqueR(company.getRegisterNumber()) == true) {
+                old.setRegisterNumber(company.getRegisterNumber());
+                old.setTelephone(company.getTelephone());
+                old.setActive(company.getActive());
+
+            } else {
+                throw new CompanyException("New company registeration number is not unique");
+            }
+        } else {
+            old.setTelephone(company.getTelephone());
+            old.setActive(company.getActive());
+        }
+    }
+
+    @Override
+    public void updateDepartmentToCompany(Company company) throws CompanyException, DepartmentException {
+        Company c = getCompanyById(company.getId());
+
+        c.setDepartments(new ArrayList<>());
+
+        for (Department d : company.getDepartments()) {
+            Department dNew = getDepartmentById(d.getId());
+            c.getDepartments().add(dNew);
+        }
+
+    }
+
+    @Override
+    public void updateVendorToCompany(Company company) throws CompanyException, VendorException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void deleteCompany(Company company) throws CompanyException {
-        // TODO Auto-generated method stub
-        
+        Query q = em.createQuery("SELECT e FROM Site e WHERE e.getCompany.getId = :id");
+        q.setParameter("id", company.getId());
+
+        Company c = getCompanyById(company.getId());
+
+        if (q.getResultList().size() > 0) {
+            c.setActive(false);
+        } else {
+            em.remove(c);
+        }
     }
 
     @Override
     public List<Company> listOfCompanys() throws CompanyException {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            Query q = em.createQuery("SELECT c FROM Company c");
+            return q.getResultList();
+
+        } catch (Exception ex) {
+            throw new CompanyException();
+        }
     }
 
     @Override
     public List<Company> getCompanysByFields(String search) {
-        // TODO Auto-generated method stub
-        return null;
+        Query q = em.createQuery("SELECT c FROM Company c WHERE lOWER(e.getName) Like :name OR " +
+                "LOWER(e.getRegisterNumber) Like :regsNum OR e.getTelephone Like :telephone");
+        q.setParameter("name", "%" + search.toLowerCase() + "%");
+        q.setParameter("regsNum", "%" + search.toLowerCase() + "%");
+        q.setParameter("telephone", "%" + search + "%");
+
+        return q.getResultList();
     }
 
     @Override
     public Company getCompanyById(Long id) throws CompanyException {
-        // TODO Auto-generated method stub
-        return null;
+        Company com = em.find(Company.class, id);
+        if (com == null) {
+            throw new CompanyException("Company with id: " + id + " not found.");
+        }
+        return com;
     }
 
     @Override
     public Company getCompanysByName(String name) {
-        // TODO Auto-generated method stub
-        return null;
+        Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(e.getName) = :name") ;
+        q.setParameter("name", name.toLowerCase());
+
+        return (Company) q.getSingleResult();
     }
 
     @Override
-    public List<Employee> getEmployeesInCompanys(String deparment) throws CompanyException {
-        // TODO Auto-generated method stub
-        return null;
+    public Boolean checkUniqueR(String register) {
+        Query q = em.createQuery("SELECT e FROM Company e WHERE e.getRegisterNumber = :num");
+        q.setParameter("num", register);
+
+        if (q.getResultList().size() > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public Boolean checkUniqueN(String name) {
+        Query q = em.createQuery("SELECT e FROM Company e WHERE LOWER(e.getName) = :name ");
+        q.setParameter("name", name.toLowerCase());
+
+        if (q.getResultList().size() > 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

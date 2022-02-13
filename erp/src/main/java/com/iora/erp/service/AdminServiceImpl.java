@@ -5,8 +5,8 @@ import java.util.List;
 import com.iora.erp.exception.AddressException;
 import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.DepartmentException;
-import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.exception.JobTitleException;
+import com.iora.erp.exception.VendorException;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
@@ -25,7 +25,7 @@ public interface AdminServiceImpl {
 
     //company vendor
     public abstract void createDepartment(Department department) throws DepartmentException;
-    public abstract void updateDepartment(Department department) throws DepartmentException;
+    public abstract void editDepartment(Department department) throws DepartmentException;
     public abstract void deleteDepartment(Department department) throws DepartmentException;
     public abstract List<Department> listOfDepartments() throws DepartmentException;
     public abstract List<Department> getDepartmentsByFields(String search);
@@ -39,14 +39,19 @@ public interface AdminServiceImpl {
     public abstract Address getAddressById(Long id)  throws AddressException;
     public abstract Boolean checkAddress(Address address) ;
 
-    public abstract void createCompany(Company company) throws CompanyException;
-    public abstract void updateCompany(Company company) throws CompanyException;
+    public abstract void createCompany(Company company, Address address) throws CompanyException;
+    public abstract void addDepartmentToCompany(Company company) throws CompanyException, DepartmentException;
+    public abstract void addVendorToCompany(Company company) throws CompanyException, VendorException;
+    public abstract void updateDepartmentToCompany(Company company) throws CompanyException, DepartmentException;
+    public abstract void updateVendorToCompany(Company company) throws CompanyException, VendorException;
+    public abstract void editCompany(Company company) throws CompanyException;
     public abstract void deleteCompany(Company company) throws CompanyException;
     public abstract List<Company> listOfCompanys() throws CompanyException;
     public abstract List<Company> getCompanysByFields(String search);
     public abstract Company getCompanyById(Long id)  throws CompanyException;
     public abstract Company getCompanysByName(String name) ;
-    public abstract List<Employee> getEmployeesInCompanys(String deparment) throws CompanyException;
+    public abstract Boolean checkUniqueR(String register) ;
+    public abstract Boolean checkUniqueN(String name) ;
 
 }
 

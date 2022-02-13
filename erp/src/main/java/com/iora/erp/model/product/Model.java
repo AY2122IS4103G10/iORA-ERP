@@ -1,7 +1,9 @@
 package com.iora.erp.model.product;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,7 +46,7 @@ public class Model {
     private List<Product> products;
 
     @ManyToMany
-    private List<ProductField> productFields;
+    private Set<ProductField> productFields;
 
     public Model() {
     }
@@ -52,7 +54,7 @@ public class Model {
     public Model(String modelCode) {
         this.modelCode = modelCode;
         products = new ArrayList<>();
-        productFields = new ArrayList<>();
+        productFields = new HashSet<>();
     }
 
     public Model(String modelCode, String name, String description, FashionLine fashionLine, double price, boolean onlineOnly,
@@ -130,12 +132,16 @@ public class Model {
         this.products = products;
     }
 
-    public List<ProductField> getProductFields() {
+    public Set<ProductField> getProductFields() {
         return this.productFields;
     }
 
-    public void setProductFields(List<ProductField> productFields) {
+    public void setProductFields(Set<ProductField> productFields) {
         this.productFields = productFields;
+    }
+
+    public void addProductField(ProductField productField) {
+        this.productFields.add(productField);
     }
 
     @Override

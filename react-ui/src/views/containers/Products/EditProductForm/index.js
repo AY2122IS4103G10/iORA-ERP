@@ -1,8 +1,20 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { productAdded } from "../../../../stores/slices/productSlice";
+import { productUpdated } from "../../../../stores/slices/productSlice";
+
+const checkboxState = (object, items) => {
+  const arr = [];
+  items.forEach((item) =>
+    arr.push(
+      object.fields.includes((field) => field.fieldValue === item.fieldValue)
+        ? true
+        : false
+    )
+  );
+  return arr;
+};
 
 const formInput = ({
   label,
@@ -36,15 +48,13 @@ const formInput = ({
             {...rest}
           />
         ) : (
-          <>
-            <textarea
-              id={inputField}
-              name="about"
-              rows={3}
-              className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md"
-              defaultValue={""}
-            />
-          </>
+          <textarea
+            id={inputField}
+            name="about"
+            rows={3}
+            className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md"
+            defaultValue={""}
+          />
         )}
       </div>
     </div>
@@ -111,7 +121,7 @@ const rightColSection = ({ fieldName, fields, onFieldsChanged }) => (
   </section>
 );
 
-const AddProductFormBody = ({
+const EditProductFormBody = ({
   prodCode,
   onProdChanged,
   name,
@@ -122,7 +132,7 @@ const AddProductFormBody = ({
   onListPriceChanged,
   discPrice,
   onDiscPriceChanged,
-  onAddProductClicked,
+  onSaveProductClicked,
   onCancelClicked,
   colors,
   onColorsChanged,
@@ -206,7 +216,7 @@ const AddProductFormBody = ({
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      onClick={onAddProductClicked}
+                      onClick={onSaveProductClicked}
                     >
                       Add Product
                     </button>
@@ -246,12 +256,16 @@ const AddProductFormBody = ({
   </div>
 );
 
-export const AddProductForm = () => {
-  const [prodCode, setProdCode] = useState("");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [listPrice, setListPrice] = useState(0.0);
-  const [discPrice, setDiscPrice] = useState(0.0);
+export const EditProductForm = () => {
+  const { prodCode } = useParams();
+  const product = useSelector((state) =>
+    state.products.find((product) => product.prodCode === prodCode)
+  );
+
+  const [name, setName] = useState(product.prodName);
+  const [description, setDescription] = useState(product.description);
+  const [listPrice, setListPrice] = useState(product.listPrice);
+  const [discPrice, setDiscPrice] = useState(product.discPrice);
 
   const fields = useSelector((state) => state.prodFields);
   const colors = fields.filter((field) => field.fieldName === "Color");
@@ -259,23 +273,22 @@ export const AddProductForm = () => {
   const tags = fields.filter((field) => field.fieldName === "Tag");
   const categories = fields.filter((field) => field.fieldName === "Category");
 
-  const [colorCheckedState, setColorCheckedState] = useState(
-    new Array(colors.length).fill(false)
+  const [colorCheckedState, setColorCheckedState] = useState(() =>
+    checkboxState(product, sizes)
   );
-  const [sizeCheckedState, setSizeCheckedState] = useState(
-    new Array(sizes.length).fill(false)
+  const [sizeCheckedState, setSizeCheckedState] = useState(() =>
+    checkboxState(product, sizes)
   );
-  const [tagCheckedState, setTagCheckedState] = useState(
-    new Array(tags.length).fill(false)
+  const [tagCheckedState, setTagCheckedState] = useState(() =>
+    checkboxState(product, tags)
   );
-  const [catCheckedState, setCatCheckedState] = useState(
-    new Array(categories.length).fill(false)
+  const [catCheckedState, setCatCheckedState] = useState(() =>
+    checkboxState(product, categories)
   );
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
   const onListPriceChanged = (e) => setListPrice(e.target.value);
@@ -305,7 +318,7 @@ export const AddProductForm = () => {
     setCatCheckedState(updateCheckedState);
   };
 
-  const onAddProductClicked = () => {
+  const onSaveProductClicked = () => {
     const fields = [];
     colors.forEach(
       (color, index) => colorCheckedState[index] && fields.push(color)
@@ -313,23 +326,27 @@ export const AddProductForm = () => {
     sizes.forEach(
       (size, index) => sizeCheckedState[index] && fields.push(size)
     );
-    canAdd &&
+    canSave &&
       dispatch(
-        productAdded(prodCode, name, description, listPrice, discPrice, fields)
+        productUpdated({
+          id: prodCode,
+          name,
+          description,
+          listPrice,
+          discPrice,
+          fields: fields,
+        })
       );
-    setProdCode("");
-    setName("");
-    setDescription("");
+    navigate(`/products/${prodCode}`);
   };
 
-  const canAdd = name && description && listPrice && discPrice;
+  const canSave = name && description && listPrice && discPrice
 
   const onCancelClicked = () => navigate(-1);
 
   return (
-    <AddProductFormBody
+    <EditProductFormBody
       prodCode={prodCode}
-      onProdChanged={onProdChanged}
       name={name}
       onNameChanged={onNameChanged}
       description={description}
@@ -338,7 +355,7 @@ export const AddProductForm = () => {
       onListPriceChanged={onListPriceChanged}
       discPrice={discPrice}
       onDiscPriceChanged={onDiscPriceChanged}
-      onAddProductClicked={onAddProductClicked}
+      onSaveProductClicked={onSaveProductClicked}
       onCancelClicked={onCancelClicked}
       colors={colors}
       onColorsChanged={onColorsChanged}

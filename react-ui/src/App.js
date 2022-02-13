@@ -4,6 +4,8 @@ import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { AddProductForm } from "./views/containers/Products/AddProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { EditProductForm } from "./views/containers/Products/EditProductForm";
+import { ViewStockLevels } from "./views/containers/StockLevels/ViewStockLevels";
+import Login from "./views/containers/Login";
 
 function App() {
   return (
@@ -11,6 +13,7 @@ function App() {
       <Routes>
         {/* login */}
         {/* <Route path="/"></Route> */}
+        <Route path="/login" element={<Login/>}/>
         <Route path="/" element={<Index />}>
           <Route path="products" element={<Outlet />}>
             <Route index element={<ManageProducts />} />
@@ -18,6 +21,7 @@ function App() {
             <Route path="create" element={<AddProductForm />} />
             <Route path="edit/:prodCode" element={EditProductForm}/>
           </Route>
+          <Route path="stocklevels/*" element={<ViewStockLevels />} />
         </Route>
         <Route
           path="*"

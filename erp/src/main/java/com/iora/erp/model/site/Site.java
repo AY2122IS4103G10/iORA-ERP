@@ -1,27 +1,39 @@
 package com.iora.erp.model.site;
 
+import java.io.Serializable;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+
+import com.iora.erp.enumeration.Country;
+import com.iora.erp.model.company.Company;
 
 @MappedSuperclass
-public class Site {
+public class Site implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @NotBlank
-    private String country;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Country country;
 
-    @NotBlank
+    @Column(nullable = false)
     private String address;
 
     @Min(-90)
@@ -32,9 +44,29 @@ public class Site {
     @Max(180)
     private double longitude;
 
+    @Column(nullable = false, unique = true)
     private String siteCode;
 
+    @Column(nullable = false)
+    private boolean active;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private StockLevel stockLevel;
+
+    // cant map it the other way using mappedsuperclass
+    @ManyToOne
+    private Company company;
+
     protected Site() {
+    }
+
+    public Site(String name, String address, double latitude, double longitude, String siteCode) {
+        this.name = name;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.siteCode = siteCode;
+        this.stockLevel = new StockLevel();
     }
 
     @Override
@@ -44,8 +76,12 @@ public class Site {
                 id, name, latitude, longitude);
     }
 
-    public Site(String name, String address, double latitude, double longitude, String siteCode) {
+    public Long getId() {
+        return this.id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -64,12 +100,16 @@ public class Site {
         this.address = address;
     }
 
-    public String getCountry() {
+    public Country getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(Country country) {
         this.country = country;
+    }
+
+    public String getCoordinates() {
+        return String.format("(%d, %d)", latitude, longitude);
     }
 
     public double getLatitude() {
@@ -94,6 +134,30 @@ public class Site {
 
     public void setSiteCode(String siteCode) {
         this.siteCode = siteCode;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public StockLevel getStockLevel() {
+        return this.stockLevel;
+    }
+
+    public void setStockLevel(StockLevel stockLevel) {
+        this.stockLevel = stockLevel;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
 }

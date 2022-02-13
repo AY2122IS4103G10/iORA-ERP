@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { productAdded } from "../../../../stores/slices/productSlice";
 
-const formInput = ({
+const FormInput = ({
   label,
   inputField,
   value,
@@ -36,15 +36,17 @@ const formInput = ({
             {...rest}
           />
         ) : (
-          <>
-            <textarea
-              id={inputField}
-              name="about"
-              rows={3}
-              className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md"
-              defaultValue={""}
-            />
-          </>
+          <textarea
+            type={inputType}
+            id={inputField}
+            name={inputField}
+            rows={3}
+            placeholder={placeholder}
+            className="max-w-lg shadow-sm block w-full focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm border border-gray-300 rounded-md"
+            value={value}
+            onChange={onChange}
+            {...rest}
+          />
         )}
       </div>
     </div>
@@ -152,44 +154,49 @@ const AddProductFormBody = ({
                       </h3>
                     </div>
                     <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                      {formInput({
-                        label: "Product Code",
-                        inputField: "prodCode",
-                        value: prodCode,
-                        onChange: onProdChanged,
-                        inputType: "text",
-                      })}
-                      {formInput({
-                        label: "Name",
-                        inputField: "name",
-                        value: name,
-                        onChange: onNameChanged,
-                        inputType: "text",
-                      })}
-                      {formInput({
-                        label: "Description",
-                        inputField: "description",
-                        value: description,
-                        onChange: onDescChanged,
-                        inputType: "number",
-                        fieldType: "area",
-                      })}
-                      {formInput({
-                        label: "List Price",
-                        inputField: "listPrice",
-                        value: listPrice,
-                        onChange: onListPriceChanged,
-                        inputType: "number",
-                        step: "0.01",
-                      })}
-                      {formInput({
-                        label: "Discounted Price",
-                        inputField: "discPrice",
-                        value: discPrice,
-                        onChange: onDiscPriceChanged,
-                        inputType: "number",
-                        step: "0.01",
-                      })}
+                      <FormInput
+                        label="Product Code"
+                        inputField="prodCode"
+                        value={prodCode}
+                        onChange={onProdChanged}
+                        inputType="text"
+                        required
+                      />
+                      <FormInput
+                        label="Name"
+                        inputField="name"
+                        value={name}
+                        onChange={onNameChanged}
+                        inputType="text"
+                        required
+                      />
+                      <FormInput
+                        label="Description"
+                        inputField="description"
+                        value={description}
+                        onChange={onDescChanged}
+                        inputType="text"
+                        fieldType="area"
+                        required
+                      />
+                      <FormInput
+                        label="List Price"
+                        inputField="listPrice"
+                        value={listPrice}
+                        onChange={onListPriceChanged}
+                        inputType="number"
+                        step="0.01"
+                        required
+                      />
+                      <FormInput
+                        label="Discount Price"
+                        inputField="discPrice"
+                        value={discPrice}
+                        onChange={onDiscPriceChanged}
+                        inputType="number"
+                        step="0.01"
+                        required
+                      />
                     </div>
                   </div>
                 </div>
@@ -305,7 +312,8 @@ export const AddProductForm = () => {
     setCatCheckedState(updateCheckedState);
   };
 
-  const onAddProductClicked = () => {
+  const onAddProductClicked = (evt) => {
+    evt.preventDefault();
     const fields = [];
     colors.forEach(
       (color, index) => colorCheckedState[index] && fields.push(color)
@@ -320,11 +328,12 @@ export const AddProductForm = () => {
     setProdCode("");
     setName("");
     setDescription("");
+    navigate("/products");
   };
 
   const canAdd = name && description && listPrice && discPrice;
 
-  const onCancelClicked = () => navigate(-1);
+  const onCancelClicked = () => navigate("/products");
 
   return (
     <AddProductFormBody

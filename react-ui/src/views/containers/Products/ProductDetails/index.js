@@ -158,7 +158,7 @@ export const ProductDetails = () => {
   return (
     <ProductDetailsBody
       prodCode={prodCode}
-      name={product.prodName}
+      name={product.name}
       description={product.description}
       listPrice={product.listPrice}
       discPrice={product.discPrice}

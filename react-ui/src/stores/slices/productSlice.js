@@ -1,9 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, nanoid } from "@reduxjs/toolkit";
 
 const initialState = [
   {
+    id: 1,
     prodCode: "ADQ0010406H",
-    prodName: "Cut-in Dress",
+    name: "Cut-in Dress",
     description: "Hello!",
     listPrice: 10.99,
     discPrice: 8.99,
@@ -41,22 +42,23 @@ const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {
-    productAdded : {
+    productAdded: {
       reducer(state, action) {
         state.push(action.payload);
       },
-      prepare(prodCode, prodName, description, listPrice, discPrice, fields) {
+      prepare(prodCode, name, description, listPrice, discPrice, fields) {
         return {
           payload: {
-            prodCode: prodCode.length ? prodCode : "A0123456789B",
-            prodName,
+            id: nanoid(),
+            prodCode,
+            name,
             description,
-            listPrice,
-            discPrice,
-            fields
-          }
-        }
-      }
+            listPrice: parseFloat(listPrice),
+            discPrice: parseFloat(discPrice),
+            fields,
+          },
+        };
+      },
     },
     productUpdated(state, action) {
       const { code, name, description, listPrice, discPrice, fields } =
@@ -76,3 +78,8 @@ const productSlice = createSlice({
 export const { productAdded, productUpdated } = productSlice.actions;
 
 export default productSlice.reducer;
+
+export const selectAllProducts = (state) => state.products;
+
+export const selectProductByCode = (state, prodCode) =>
+  state.products.find((product) => product.id === prodCode);

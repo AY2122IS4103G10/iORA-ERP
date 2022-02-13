@@ -9,22 +9,16 @@ import {
   OptionsCell,
 } from "../../../components/Tables/SimpleTable";
 
-const processFields = (fields, selector) => {
-  const fieldValues = [];
-  fields
-    .filter((field) => field.fieldName === selector)
-    .forEach((field) => fieldValues.push(field.fieldValue))
-  return fieldValues.length
-    ? fieldValues.join(", ")
-    : `No ${selector.toLowerCase()}`;
-};
-
-export const ProductsTable = () => {
+export const VouchersTable = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Product Code",
-        accessor: "prodCode",
+        Header: "Name",
+        accessor: "id",
+      },
+      {
+        Header: "Voucher Code",
+        accessor: "code",
         Cell: (e) => (
           <Link
             to={`/products/${e.value}`}
@@ -35,28 +29,23 @@ export const ProductsTable = () => {
         ),
       },
       {
-        Header: "Name",
-        accessor: "name",
-      },
-      {
-        Header: "Category",
-        accessor: "",
-        // Cell: (e) => processFields(e.value, "Category"),
-      },
-      {
-        Header: "Color",
-        accessor: "fields",
-        Cell: (e) => processFields(e.value, "Color"),
-      },
-      {
-        Header: "Size",
-        accessor: "",
-        // Cell: (e) => processFields(e.value, "Size"),
-      },
-      {
-        Header: "List Price",
-        accessor: "listPrice",
+        Header: "Value",
+        accessor: "value",
         Cell: (e) => `$${e.value}`,
+      },
+      {
+        Header: "Issued Date",
+        accessor: "issuedDate",
+      },
+      {
+        Header: "Expiry Date",
+        accessor: "expDate",
+      },
+      {
+        Header: "Redeemed",
+        accessor: "isRedeemed",
+        Filter: SelectColumnFilter,
+        filter: 'includes',
       },
       // {
       //   Header: CogIcon,
@@ -73,7 +62,7 @@ export const ProductsTable = () => {
     ],
     []
   );
-  const data = useSelector((state) => state.products);
+  const data = useSelector((state) => state.vouchers);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
@@ -83,6 +72,6 @@ export const ProductsTable = () => {
   );
 };
 
-export const ProductsList = () => {
-  return <ProductsTable />;
+export const VouchersList = () => {
+  return <VouchersTable />;
 };

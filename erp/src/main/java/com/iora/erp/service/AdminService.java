@@ -1,0 +1,456 @@
+package com.iora.erp.service;
+
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.naming.CompoundName;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TransactionRequiredException;
+
+import com.iora.erp.exception.AddressException;
+import com.iora.erp.exception.CompanyException;
+import com.iora.erp.exception.DepartmentException;
+import com.iora.erp.exception.EmployeeException;
+import com.iora.erp.exception.JobTitleException;
+import com.iora.erp.exception.VendorException;
+import com.iora.erp.model.company.Address;
+import com.iora.erp.model.company.Company;
+import com.iora.erp.model.company.Department;
+import com.iora.erp.model.company.Employee;
+import com.iora.erp.model.company.JobTitle;
+import com.iora.erp.model.company.Vendor;
+
+import org.springframework.stereotype.Service;
+
+@Service("adminServiceImpl")
+public class AdminService implements AdminServiceImpl {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    @Override
+    public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
+        try {
+            em.persist(jobTitle);
+        } catch (Exception ex) {
+            throw new JobTitleException("Job Title has already been created");
+        }
+    }
+
+    @Override
+    public void updateJobTitle(JobTitle jobTitle) throws JobTitleException {
+        JobTitle old = em.find(JobTitle.class, jobTitle.getId());
+
+        if (old == null) {
+            throw new JobTitleException("Job title not found");
+        }
+
+        try {
+            old.setTitle(jobTitle.getTitle());
+        } catch (Exception ex) {
+            throw new JobTitleException("Job Title " + jobTitle.getTitle() + " has been used!");
+        }
+
+        old.setDescription(jobTitle.getDescription());
+        old.setResponsibility(jobTitle.getResponsibility());
+    }
+
+    @Override
+    public void deleteJobTitle(JobTitle jobTitle) throws JobTitleException {
+        JobTitle j = em.find(JobTitle.class, jobTitle.getId());
+
+        if (j == null) {
+            throw new JobTitleException("JobTitle not found");
+        }
+
+        em.remove(j);
+        em.flush();
+    }
+
+    @Override
+    public List<JobTitle> listOfJobTitles() throws JobTitleException {
+        try {
+            Query q = em.createQuery("SELECT e FROM JobTitle e");
+
+            // need run test if query exits timing for large database
+            return q.getResultList();
+        } catch (Exception ex) {
+            throw new JobTitleException();
+        }
+    }
+
+    @Override
+    public List<JobTitle> getJobTitlesByFields(String search) {
+        Query q = em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.getTitle) Like :title");
+        q.setParameter("title", "%" + search.toLowerCase() + "%");
+        return q.getResultList();
+    }
+
+    @Override
+    public JobTitle getJobTitleById(Long id) throws JobTitleException {
+        JobTitle jobTitle = em.find(JobTitle.class, id);
+        if (jobTitle == null) {
+            throw new JobTitleException("Job Title with id: " + id + " not found.");
+        }
+        return jobTitle;
+    }
+
+    @Override
+    public JobTitle getJobTitlesByName(String title) throws JobTitleException {
+        Query q = em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.getTitle) = :title");
+        q.setParameter("title", title.toLowerCase());
+
+        try {
+            return (JobTitle) q.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new JobTitleException("Job Title " + title + " does not exist.");
+        }
+    }
+
+    @Override
+    public void createDepartment(Department department) throws DepartmentException {
+        try {
+            Department d = new Department(department.getDeptName());
+            em.persist(d);
+
+            for (JobTitle j : department.getJobTitles()) {
+                d.getJobTitles().add(j);
+            }
+
+        } catch (Exception ex) {
+            throw new DepartmentException("Department has already been created");
+        }
+    }
+
+    @Override
+    public void editDepartment(Department department) throws DepartmentException {
+        Department old = em.find(Department.class, department.getId());
+
+        if (old == null) {
+            throw new DepartmentException("Department not found");
+        }
+
+        try {
+            old.setDeptName(department.getDeptName());
+        } catch (Exception ex) {
+            throw new DepartmentException("Department " + department.getDeptName() + " has been used!");
+        }
+
+        old.setJobTitles(new ArrayList<>());
+        for (JobTitle j : department.getJobTitles()) {
+            try {
+                JobTitle newJ = getJobTitleById(j.getId());
+                old.getJobTitles().add(newJ);
+            } catch (JobTitleException e) {
+                throw new DepartmentException("Error occured while changing Job Title");
+            }
+        }
+    }
+
+    @Override
+    public void deleteDepartment(Department department) throws DepartmentException {
+        try {
+            Department e = em.find(Department.class, department.getId());
+
+            if (e == null) {
+                throw new DepartmentException("Department not found");
+            }
+
+            em.remove(e);
+            em.flush();
+        } catch (IllegalArgumentException | TransactionRequiredException ex) {
+            throw new DepartmentException("Department cannot be removed");
+        }
+
+    }
+
+    @Override
+    public List<Department> listOfDepartments() throws DepartmentException {
+        try {
+            Query q = em.createQuery("SELECT e FROM Department e");
+
+            // need run test if query exits timing for large database
+            return q.getResultList();
+        } catch (Exception ex) {
+            throw new DepartmentException();
+        }
+    }
+
+    @Override
+    public List<Department> getDepartmentsByFields(String search) {
+        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) Like :name");
+        q.setParameter("name", "%" + search.toLowerCase() + "%");
+        return q.getResultList();
+    }
+
+    @Override
+    public Department getDepartmentById(Long id) throws DepartmentException {
+        Department department = em.find(Department.class, id);
+        if (department == null) {
+            throw new DepartmentException("Department with id: " + id + " not found.");
+        }
+
+        return department;
+    }
+
+    @Override
+    public Department getDepartmentsByName(String name) {
+        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) = :name");
+        q.setParameter("name", name.toLowerCase());
+        return (Department) q.getSingleResult();
+    }
+
+    @Override
+    public List<Employee> getEmployeesInDepartments(String department) throws DepartmentException {
+        Query q = em.createQuery(
+                "SELECT e FROM Employee e, IN (e.department) d WHERE LOWER(d.getDeptName) = :name ORDER BY e.name");
+        q.setParameter("name", department.toLowerCase());
+        return q.getResultList();
+    }
+
+    @Override
+    public void createAddress(Address address) throws AddressException {
+        try {
+            if (checkAddress(address) == false) {
+                em.persist(address);
+            }
+
+        } catch (Exception ex) {
+            throw new AddressException("Address has already been created");
+        }
+    }
+
+    @Override
+    public void updateAddress(Address address) throws AddressException {
+        Address old = getAddressById(address.getId());
+        old.setCountry(address.getCountry());
+        old.setBuilding(address.getBuilding());
+        old.setCity(address.getCity());
+        old.setUnit(address.getUnit());
+        old.setPostalCode(address.getPostalCode());
+        old.setState(address.getState());
+        old.setBilling(address.getBilling());
+
+    }
+
+    @Override
+    public void deleteAddress(Address address) throws AddressException {
+        try {
+            Address e = em.find(Address.class, address.getId());
+
+            if (e == null) {
+                throw new AddressException("Address is not found");
+            }
+            em.remove(address);
+            em.flush();
+        } catch (IllegalArgumentException | TransactionRequiredException ex) {
+            throw new AddressException("Address cannot be removed");
+        }
+
+    }
+
+    @Override
+    public Address getAddressById(Long id) throws AddressException {
+        Address addr = em.find(Address.class, id);
+        if (addr == null) {
+            throw new AddressException("Address with id: " + id + " not found.");
+        }
+        return addr;
+    }
+
+    @Override
+    public Boolean checkAddress(Address address) {
+        Query q = em.createQuery(
+                "SELECT e FROM Address e WHERE LOWER(e.getCountry) = :country AND LOWER(e.getCity) = :city " +
+                        "AND LOWER(e.getPostalCode) = :postal AND LOWER(e.getUnit) = :unit");
+        q.setParameter("country", address.getCountry().toLowerCase());
+        q.setParameter("city", address.getCity().toLowerCase());
+        q.setParameter("postal", address.getPostalCode().toLowerCase());
+        q.setParameter("unit", address.getUnit().toLowerCase());
+        Address a = (Address) q.getSingleResult();
+
+        if (a != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override // address to be persist beforehand, vendor and department and site is seperated
+    public void createCompany(Company company, Address address) throws CompanyException {
+        try {
+            em.persist(company);
+
+            Address a = getAddressById(address.getId());
+            company.setAddress(a);
+
+        } catch (Exception ex) {
+            throw new CompanyException("Company has already been created");
+        }
+    }
+
+    @Override
+    public void addDepartmentToCompany(Company company) throws CompanyException, DepartmentException {
+        Company c = getCompanyById(company.getId());
+
+        for (Department d : company.getDepartments()) {
+            Department dNew = getDepartmentById(d.getId());
+            c.getDepartments().add(dNew);
+        }
+    }
+
+    @Override
+    public void addVendorToCompany(Company company) throws CompanyException, VendorException {
+        Company c = getCompanyById(company.getId());
+
+       /* for (Vendor v : company.getVendors()) {
+            Vendor vNew = c.getVendors().add(vNew);
+        }*/
+    }
+
+    // need addd
+    @Override
+    public void editCompany(Company company) throws CompanyException {
+        Company old = getCompanyById(company.getId());
+
+        if (company.getName() != old.getName() && company.getRegisterNumber() != old.getRegisterNumber()) {
+            if (checkUniqueN(company.getName()) == true && checkUniqueR(company.getRegisterNumber()) == true) {
+
+                old.setName(company.getName());
+                old.setRegisterNumber(company.getRegisterNumber());
+                old.setTelephone(company.getTelephone());
+                old.setActive(company.getActive());
+
+            } else if (checkUniqueN(company.getName()) == true) {
+                throw new CompanyException("New company registeration number is not unique");
+            } else {
+                throw new CompanyException("New company Name is not unique");
+            }
+
+        } else if (company.getName() != old.getName()) {
+            if (checkUniqueN(company.getName()) == true) {
+                old.setName(company.getName());
+                old.setTelephone(company.getTelephone());
+                old.setActive(company.getActive());
+
+            } else {
+                throw new CompanyException("New company Name is not unique");
+            }
+
+        } else if (company.getRegisterNumber() != old.getRegisterNumber()) {
+            if (checkUniqueR(company.getRegisterNumber()) == true) {
+                old.setRegisterNumber(company.getRegisterNumber());
+                old.setTelephone(company.getTelephone());
+                old.setActive(company.getActive());
+
+            } else {
+                throw new CompanyException("New company registeration number is not unique");
+            }
+        } else {
+            old.setTelephone(company.getTelephone());
+            old.setActive(company.getActive());
+        }
+    }
+
+    @Override
+    public void updateDepartmentToCompany(Company company) throws CompanyException, DepartmentException {
+        Company c = getCompanyById(company.getId());
+
+        c.setDepartments(new ArrayList<>());
+
+        for (Department d : company.getDepartments()) {
+            Department dNew = getDepartmentById(d.getId());
+            c.getDepartments().add(dNew);
+        }
+
+    }
+
+    @Override
+    public void updateVendorToCompany(Company company) throws CompanyException, VendorException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void deleteCompany(Company company) throws CompanyException {
+        Query q = em.createQuery("SELECT e FROM Site e WHERE e.getCompany.getId = :id");
+        q.setParameter("id", company.getId());
+
+        Company c = getCompanyById(company.getId());
+
+        if (q.getResultList().size() > 0) {
+            c.setActive(false);
+        } else {
+            em.remove(c);
+        }
+    }
+
+    @Override
+    public List<Company> listOfCompanys() throws CompanyException {
+        try {
+            Query q = em.createQuery("SELECT c FROM Company c");
+            return q.getResultList();
+
+        } catch (Exception ex) {
+            throw new CompanyException();
+        }
+    }
+
+    @Override
+    public List<Company> getCompanysByFields(String search) {
+        Query q = em.createQuery("SELECT c FROM Company c WHERE lOWER(e.getName) Like :name OR " +
+                "LOWER(e.getRegisterNumber) Like :regsNum OR e.getTelephone Like :telephone");
+        q.setParameter("name", "%" + search.toLowerCase() + "%");
+        q.setParameter("regsNum", "%" + search.toLowerCase() + "%");
+        q.setParameter("telephone", "%" + search + "%");
+
+        return q.getResultList();
+    }
+
+    @Override
+    public Company getCompanyById(Long id) throws CompanyException {
+        Company com = em.find(Company.class, id);
+        if (com == null) {
+            throw new CompanyException("Company with id: " + id + " not found.");
+        }
+        return com;
+    }
+
+    @Override
+    public Company getCompanysByName(String name) {
+        Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(e.getName) = :name") ;
+        q.setParameter("name", name.toLowerCase());
+
+        return (Company) q.getSingleResult();
+    }
+
+    @Override
+    public Boolean checkUniqueR(String register) {
+        Query q = em.createQuery("SELECT e FROM Company e WHERE e.getRegisterNumber = :num");
+        q.setParameter("num", register);
+
+        if (q.getResultList().size() > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public Boolean checkUniqueN(String name) {
+        Query q = em.createQuery("SELECT e FROM Company e WHERE LOWER(e.getName) = :name ");
+        q.setParameter("name", name.toLowerCase());
+
+        if (q.getResultList().size() > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+}

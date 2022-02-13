@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,12 +11,13 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
+import com.iora.erp.exception.DepartmentException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.exception.JobTitleException;
+import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
 
-import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
 import org.springframework.stereotype.Service;
 
 @Service("adminServiceImpl")
@@ -46,8 +48,21 @@ public class AdminService implements AdminServiceImpl {
             throw new EmployeeException("Username " + employee.getUsername() + " has been used!");
         }
 
-        old.setDepartment(employee.getDepartment());
-        old.setJobTitle(employee.getJobTitle());
+        //department
+        try {
+            Department d = getDepartmentById(employee.getDepartment().getId());
+            old.setDepartment(d);
+        } catch (DepartmentException e) {
+           throw new EmployeeException();
+        }
+
+        try {
+            JobTitle j = getJobTitleById(employee.getJobTitle().getId());
+            old.setJobTitle(j);
+        } catch (JobTitleException e) {
+           throw new EmployeeException();
+        }
+
         old.setName(employee.getName());
         old.setSalary(employee.getSalary());
     }
@@ -225,7 +240,7 @@ public class AdminService implements AdminServiceImpl {
     }
 
     @Override
-    public JobTitle ggetJobTitlesByName(String title) throws JobTitleException {
+    public JobTitle getJobTitlesByName(String title) throws JobTitleException {
         Query q = em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.getTitle) = :title");
         q.setParameter("title", title.toLowerCase());
 
@@ -234,6 +249,106 @@ public class AdminService implements AdminServiceImpl {
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new JobTitleException("Job Title " + title + " does not exist.");
         }
+    }
+
+    @Override
+    public void createDepartment(Department department) throws DepartmentException {
+        try {
+            Department d = new Department(department.getDeptName());
+            em.persist(d);
+
+            for (JobTitle j : department.getJobTitles()) {
+                d.getJobTitles().add(j);
+            }
+
+        } catch (Exception ex) {
+            throw new DepartmentException("Department has already been created");
+        }
+    }
+
+    @Override
+    public void updateDepartment(Department department) throws DepartmentException {
+        Department old = em.find(Department.class, department.getId());
+
+        if (old == null) {
+            throw new DepartmentException("Department not found");
+        }
+
+        try {
+            old.setDeptName(department.getDeptName());
+        } catch (Exception ex) {
+            throw new DepartmentException("Department " + department.getDeptName() + " has been used!");
+        }
+
+        old.setJobTitles(new ArrayList<>());
+        for (JobTitle j : department.getJobTitles()){
+            try {
+                JobTitle newJ = getJobTitleById(j.getId());
+                old.getJobTitles().add(newJ);
+            } catch (JobTitleException e) {
+                throw new DepartmentException("Error occured while changing Job Title");
+            }
+        }
+    }
+
+    @Override
+    public void deleteDepartment(Department department) throws DepartmentException {
+        try {
+            Department e = em.find(Department.class, department.getId());
+
+            if (e == null) {
+                throw new DepartmentException("Department not found");
+            }
+
+            em.remove(e);
+            em.flush();
+        } catch (IllegalArgumentException | TransactionRequiredException ex) {
+            throw new DepartmentException("Department cannot be removed");
+        }
+
+    }
+
+    @Override
+    public List<Department> listOfDepartments() throws DepartmentException {
+        try {
+            Query q = em.createQuery("SELECT e FROM Department e");
+
+            // need run test if query exits timing for large database
+            return q.getResultList();
+        } catch (Exception ex) {
+            throw new DepartmentException();
+        }
+    }
+
+    @Override
+    public List<Department> getDepartmentsByFields(String search) {
+        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) Like :name");
+        q.setParameter("name", "%" + search.toLowerCase() + "%");
+        return q.getResultList();
+    }
+
+    @Override
+    public Department getDepartmentById(Long id) throws DepartmentException {
+        Department department = em.find(Department.class, id);
+        if (department == null) {
+            throw new DepartmentException("Department with id: " + id + " not found.");
+        }
+
+        return department;
+    }
+
+    @Override
+    public Department getDepartmentsByName(String name) {
+        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) = :name");
+        q.setParameter("name", name.toLowerCase());
+        return (Department) q.getSingleResult();
+    }
+
+    @Override
+    public List<Employee> getEmployeesInDepartments(String department) throws DepartmentException {
+        Query q = em.createQuery("SELECT e FROM Employee e, IN (e.department) d WHERE LOWER(d.getDeptName) = :name ORDER BY e.name");
+        q.setParameter("name", department.toLowerCase());
+        return q.getResultList();
     }
 
 }

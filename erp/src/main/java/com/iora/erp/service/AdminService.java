@@ -11,8 +11,11 @@ import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
 import com.iora.erp.exception.EmployeeException;
+import com.iora.erp.exception.JobTitleException;
 import com.iora.erp.model.company.Employee;
+import com.iora.erp.model.company.JobTitle;
 
+import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
 import org.springframework.stereotype.Service;
 
 @Service("adminServiceImpl")
@@ -77,7 +80,7 @@ public class AdminService implements AdminServiceImpl {
             if (e == null) {
                 throw new EmployeeException("Employee not found");
             }
-            
+
             em.remove(e);
             em.flush();
         } catch (IllegalArgumentException | TransactionRequiredException ex) {
@@ -152,6 +155,85 @@ public class AdminService implements AdminServiceImpl {
             throw new EmployeeException("Invalid Username or Password.");
         }
 
+    }
+
+    @Override
+    public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
+        try {
+            em.persist(jobTitle);
+        } catch (Exception ex) {
+            throw new JobTitleException("Job Title has already been created");
+        }
+    }
+
+    @Override
+    public void updateJobTitle(JobTitle jobTitle) throws JobTitleException {
+        JobTitle old = em.find(JobTitle.class, jobTitle.getId());
+
+        if (old == null) {
+            throw new JobTitleException("Job title not found");
+        }
+
+        try {
+            old.setTitle(jobTitle.getTitle());
+        } catch (Exception ex) {
+            throw new JobTitleException("Job Title " + jobTitle.getTitle() + " has been used!");
+        }
+
+        old.setDescription(jobTitle.getDescription());
+        old.setResponsibility(jobTitle.getResponsibility());
+    }
+
+    @Override
+    public void deleteJobTitle(JobTitle jobTitle) throws JobTitleException {
+        JobTitle j = em.find(JobTitle.class, jobTitle.getId());
+
+        if (j == null) {
+            throw new JobTitleException("JobTitle not found");
+        }
+
+        em.remove(j);
+        em.flush();
+    }
+
+    @Override
+    public List<JobTitle> listOfJobTitles() throws JobTitleException {
+        try {
+            Query q = em.createQuery("SELECT e FROM JobTitle e");
+
+            // need run test if query exits timing for large database
+            return q.getResultList();
+        } catch (Exception ex) {
+            throw new JobTitleException();
+        }
+    }
+
+    @Override
+    public List<JobTitle> getJobTitlesByFields(String search) {
+        Query q = em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.getTitle) Like :title");
+        q.setParameter("title", "%" + search.toLowerCase() + "%");
+        return q.getResultList();
+    }
+
+    @Override
+    public JobTitle getJobTitleById(Long id) throws JobTitleException {
+        JobTitle jobTitle = em.find(JobTitle.class, id);
+        if (jobTitle == null) {
+            throw new JobTitleException("Job Title with id: " + id + " not found.");
+        }
+        return jobTitle;
+    }
+
+    @Override
+    public JobTitle ggetJobTitlesByName(String title) throws JobTitleException {
+        Query q = em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.getTitle) = :title");
+        q.setParameter("title", title.toLowerCase());
+
+        try {
+            return (JobTitle) q.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new JobTitleException("Job Title " + title + " does not exist.");
+        }
     }
 
 }

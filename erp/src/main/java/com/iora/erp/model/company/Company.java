@@ -99,6 +99,10 @@ public class Company implements Serializable {
         return "Company [id=" + id + "]";
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     // Locale.getISOCountries();
 
 }

@@ -111,4 +111,8 @@ public class Address implements Serializable{
         return "Address [id=" + id + "]";
     }
 
+    public static long getSerialversionuid() {
+        return serialVersionUID;
+    }
+
 }

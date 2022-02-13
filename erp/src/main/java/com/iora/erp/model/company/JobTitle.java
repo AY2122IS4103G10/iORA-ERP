@@ -16,7 +16,7 @@ public class JobTitle implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String title;
     private String description;
     private ArrayList<AccessRights> responsibility;
@@ -63,5 +63,17 @@ public class JobTitle implements Serializable {
     @Override
     public String toString() {
         return "JobTitle [id=" + id + "]";
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public ArrayList<AccessRights> getResponsibility() {
+        return responsibility;
+    }
+
+    public void setResponsibility(ArrayList<AccessRights> responsibility) {
+        this.responsibility = responsibility;
     } 
 }

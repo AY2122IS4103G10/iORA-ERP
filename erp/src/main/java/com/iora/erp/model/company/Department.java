@@ -64,4 +64,16 @@ public class Department implements Serializable {
         return "Department [id=" + id + "]";
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
 }

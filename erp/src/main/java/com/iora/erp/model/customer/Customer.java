@@ -171,4 +171,8 @@ public class Customer implements Serializable {
     this.availStatus = availStatus;
   }
 
+  public void setId(Long id) {
+    this.id = id;
+  }
+
 }

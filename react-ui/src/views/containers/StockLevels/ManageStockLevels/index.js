@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { SiteStocks } from "../BySite";
 import { ProductStocks } from "../ByProduct";
-import {SiteStock} from "../ASiteStock";
+import {ASiteStock} from "../ASiteStock";
 
 const tabs = [
     { name: 'By Site', href: '', current: true},
@@ -17,19 +17,11 @@ return classes.filter(Boolean).join(' ')
 
 export const SectionHeading = () => {
 
-    const [firstTab, setFirstTab] = useState(true);  
+    const [currTab, setCurrTab] = useState("");  
 
-    function changeTab(e) {
+    function changeTab(tabnumber) {
         console.log("changetab");
-        setFirstTab(!firstTab);
-        if (firstTab) {
-            tabs[0].current = true;
-            tabs[1].current = false;
-        } else {
-            tabs[0].current = false;
-            tabs[1].current = true;
-        }
-
+        setCurrTab(tabnumber)
     }
 
     return (
@@ -48,13 +40,13 @@ export const SectionHeading = () => {
                         key={tabs[0].name}
                         to={tabs[0].href}
                         className={classNames(
-                        tabs[0].current
+                        currTab == 0
                             ? 'border-indigo-500 text-indigo-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
                         'whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm'
                         )}
                         aria-current={tabs[0].current ? 'page' : undefined}
-                        onClick={changeTab}
+                        onClick={() => changeTab(0)}
                     >
                         {tabs[0].name}
                     </Link>
@@ -63,13 +55,13 @@ export const SectionHeading = () => {
                         key={tabs[1].name}
                         to={tabs[1].href}
                         className={classNames(
-                        tabs[1].current
+                        currTab == 1
                             ? 'border-indigo-500 text-indigo-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
                         'whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm'
                         )}
                         aria-current={tabs[1].current ? 'page' : undefined}
-                        onClick={changeTab}
+                        onClick={() => changeTab(1)}
                     >
                         {tabs[1].name}
                     </Link>
@@ -92,7 +84,7 @@ export const ViewStockLevels = () => {
         <Routes>
             <Route path="/" element={<SiteStocks/>}/>
             <Route path="products" element={<ProductStocks/>}/>
-            <Route path=":id" element={<SiteStock/>} />
+            <Route exact path="stocklevels/:id" element={<ASiteStock/>} />
         </Routes>
       </>
     );

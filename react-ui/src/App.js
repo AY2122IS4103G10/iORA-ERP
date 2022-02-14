@@ -4,17 +4,17 @@ import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { AddProductForm } from "./views/containers/Products/AddProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { EditProductForm } from "./views/containers/Products/EditProductForm";
-import { ViewStockLevels } from "./views/containers/StockLevels/ManageStockLevels";
+import { ViewStockLevels } from "./views/containers/StockLevels/ViewStockLevels";
 import Login from "./views/containers/Login";
 
 function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Login/>}/>
-
-        {/* Sales and Marketing Subsystem */}
-        <Route path="/sm" element={<Index />}>
+        {/* login */}
+        {/* <Route path="/"></Route> */}
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/" element={<Index />}>
           <Route path="products" element={<Outlet />}>
             <Route index element={<ManageProducts />} />
             <Route path=":prodCode" element={<ProductDetails />} />

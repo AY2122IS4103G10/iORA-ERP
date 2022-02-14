@@ -1,18 +1,19 @@
 import { useMemo } from "react";
-import { SelectableTable } from "../../../components/Tables/SelectableTable";
-import { SelectColumnFilter } from "../../../components/Tables/SelectableTable";
+
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { SelectColumnFilter } from "../../../components/Tables/SimpleTable";
+
+
 
 
 const getData = () => {
     const data = [
         {
-            id: 1,
             productCode: "SKU1231",
             name: "Sky Blue V-neck Top",
             qty: 100,
         },
         {
-            id: 0, 
             productCode: "SKU4321",
             name: "Black Blue V-neck Top",
             qty: 100,
@@ -44,7 +45,7 @@ export const ProductTable = () => {
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="mt-4">
-          <SelectableTable columns={columns} data={data} path="/sm/stocklevels/products" />
+          <SimpleTable columns={columns} data={data} />
         </div>
       </div>
     );

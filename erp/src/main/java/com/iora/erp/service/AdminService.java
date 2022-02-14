@@ -54,7 +54,7 @@ public class AdminService implements AdminServiceImpl {
         }
 
         old.setDescription(jobTitle.getDescription());
-        old.setResponsibility(jobTitle.getResponsibility());
+        old.setresponsibility(jobTitle.getresponsibility());
     }
 
     @Override

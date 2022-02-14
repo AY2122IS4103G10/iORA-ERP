@@ -68,11 +68,4 @@ public class JobTitle implements Serializable {
         this.id = id;
     }
 
-    public ArrayList<AccessRights> getResponsibility() {
-        return responsibility;
-    }
-
-    public void setResponsibility(ArrayList<AccessRights> responsibility) {
-        this.responsibility = responsibility;
-    } 
 }

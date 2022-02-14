@@ -3,7 +3,6 @@ package com.iora.erp.model.company;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,13 +16,13 @@ public class Vendor implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String companyName;
     private String telephone;
     private String description;
     private String email;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     private List<Address> address;
 
     public Vendor() {

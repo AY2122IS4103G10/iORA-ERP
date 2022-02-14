@@ -253,6 +253,7 @@ public class AdminServiceImpl implements AdminService {
         } catch (IllegalArgumentException | TransactionRequiredException ex) {
             throw new AddressException("Address cannot be removed");
         }
+
     }
 
     @Override
@@ -293,6 +294,25 @@ public class AdminServiceImpl implements AdminService {
         } catch (Exception ex) {
             throw new CompanyException("Company has already been created");
         }
+    }
+
+    @Override
+    public void addDepartmentToCompany(Company company) throws CompanyException, DepartmentException {
+        Company c = getCompanyById(company.getId());
+
+        for (Department d : company.getDepartments()) {
+            Department dNew = getDepartmentById(d.getId());
+            c.getDepartments().add(dNew);
+        }
+    }
+
+    @Override
+    public void addVendorToCompany(Company company) throws CompanyException, VendorException {
+        Company c = getCompanyById(company.getId());
+
+       /* for (Vendor v : company.getVendors()) {
+            Vendor vNew = c.getVendors().add(vNew);
+        }*/
     }
 
     // need addd
@@ -337,6 +357,25 @@ public class AdminServiceImpl implements AdminService {
             old.setTelephone(company.getTelephone());
             old.setActive(company.getActive());
         }
+    }
+
+    @Override
+    public void updateDepartmentToCompany(Company company) throws CompanyException, DepartmentException {
+        Company c = getCompanyById(company.getId());
+
+        c.setDepartments(new ArrayList<>());
+
+        for (Department d : company.getDepartments()) {
+            Department dNew = getDepartmentById(d.getId());
+            c.getDepartments().add(dNew);
+        }
+
+    }
+
+    @Override
+    public void updateVendorToCompany(Company company) throws CompanyException, VendorException {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

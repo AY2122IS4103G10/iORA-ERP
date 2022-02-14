@@ -1,14 +1,6 @@
 package com.iora.erp.service;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TransactionRequiredException;
 
 import com.iora.erp.exception.AddressException;
 import com.iora.erp.exception.CompanyException;
@@ -20,7 +12,6 @@ import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
-import com.iora.erp.model.company.Vendor;
 
 public interface AdminService {
     //need fix @role things
@@ -32,7 +23,7 @@ public interface AdminService {
     public abstract JobTitle getJobTitleById(Long id)  throws JobTitleException;
     public abstract JobTitle getJobTitlesByName(String name) throws JobTitleException;
 
-    //vendor
+    //company vendor
     public abstract void createDepartment(Department department) throws DepartmentException;
     public abstract void editDepartment(Department department) throws DepartmentException;
     public abstract void deleteDepartment(Department department) throws DepartmentException;
@@ -46,15 +37,13 @@ public interface AdminService {
     public abstract void updateAddress(Address address) throws AddressException;
     public abstract void deleteAddress(Address address) throws AddressException;
     public abstract Address getAddressById(Long id)  throws AddressException;
-    public abstract List<Address> getListAddress();
-    public abstract List<Address> getListAddressFields(String search);
     public abstract Boolean checkAddress(Address address) ;
 
     public abstract void createCompany(Company company, Address address) throws CompanyException;
-    public abstract void addADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException;
-    public abstract void addAVendorToCompany(Long cid, Long vid) throws CompanyException, VendorException;
-    public abstract void removeADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException;
-    public abstract void removeAVendorToCompany(Long cid, Long vid) throws CompanyException, VendorException;
+    public abstract void addDepartmentToCompany(Company company) throws CompanyException, DepartmentException;
+    public abstract void addVendorToCompany(Company company) throws CompanyException, VendorException;
+    public abstract void updateDepartmentToCompany(Company company) throws CompanyException, DepartmentException;
+    public abstract void updateVendorToCompany(Company company) throws CompanyException, VendorException;
     public abstract void editCompany(Company company) throws CompanyException;
     public abstract void deleteCompany(Company company) throws CompanyException;
     public abstract List<Company> listOfCompanys() throws CompanyException;
@@ -64,10 +53,5 @@ public interface AdminService {
     public abstract Boolean checkUniqueR(String register) ;
     public abstract Boolean checkUniqueN(String name) ;
 
-    public abstract void createVendor(Vendor vendor) throws VendorException;
-    public abstract void updateVendor(Vendor vendor) throws VendorException, AddressException;
-    public abstract void deleteVendor(Vendor vendor) throws VendorException;
-    public abstract Vendor getVendorById(Long id)  throws VendorException;
-    public abstract Boolean uniqueVendorName(String name) throws VendorException;
 }
 

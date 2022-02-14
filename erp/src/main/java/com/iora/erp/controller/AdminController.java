@@ -7,7 +7,7 @@ import com.iora.erp.enumeration.Country;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.site.Site;
-import com.iora.erp.service.AdminService;
+import com.iora.erp.service.AdminServiceImpl;
 import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.SiteService;
 
@@ -32,7 +32,7 @@ public class AdminController {
     @Autowired
     private EmployeeService employeeService;
     @Autowired
-    private AdminService adminService;
+    private AdminServiceImpl adminService;
 
     // Employee/JobTitle/Department stuff here
 

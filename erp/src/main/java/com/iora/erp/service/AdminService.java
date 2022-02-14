@@ -13,7 +13,7 @@ import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
 
-public interface AdminServiceImpl {
+public interface AdminService {
     //need fix @role things
     public abstract void createJobTitle(JobTitle jobTitle) throws JobTitleException;
     public abstract void updateJobTitle(JobTitle jobTitle) throws JobTitleException;

@@ -27,7 +27,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @PersistenceContext
     private EntityManager em;
 
-    private AdminServiceImpl adminService;
+    private AdminService adminService;
 
     @Override
     public void createEmployee(Employee employee) throws EmployeeException {

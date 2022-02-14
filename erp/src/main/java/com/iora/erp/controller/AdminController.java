@@ -1,6 +1,6 @@
 package com.iora.erp.controller;
 
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.iora.erp.enumeration.Country;
@@ -10,7 +10,6 @@ import com.iora.erp.service.SiteService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,16 +43,9 @@ public class AdminController {
     public ResponseEntity<Object> editSite(@RequestBody Site site) {
         try {
             siteService.updateSite(site);
-
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(site.getId())
-                    .toUri();
-
-            return ResponseEntity.created(location).build();
+            return ResponseEntity.ok("Site with site ID " + site.getId() + " is successfully updated.");
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
@@ -61,64 +53,43 @@ public class AdminController {
     public ResponseEntity<Object> deleteSite(@RequestParam Long siteId) {
         try {
             siteService.deleteSite(siteId);
-
-            return ResponseEntity.accepted().build();
+            return ResponseEntity.ok("Site with site ID " + siteId + " is successfully deleted/deactivated.");
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @GetMapping(path = "/viewSites", produces = "application/json")
-    public List<? extends Site> viewSites(@RequestParam String country, @RequestParam String storeType) {
+    public List<? extends Site> viewSites(@RequestParam List<String> storeTypes, @RequestParam String country,
+            @RequestParam String company) {
+        return siteService.searchAllSites(storeTypes, country, company);
+    }
 
-        if (country == "SINGAPORE" || country == "MALAYSIA" || country == "CHINA") {
-            Country countryEnum = Country.valueOf(country.toUpperCase());
-            switch (storeType) {
-                case "Headquarters":
-                    return siteService.getHeadquartersByCountry(countryEnum);
-
-                case "Manufacturing":
-                    return siteService.getManufacturingByCountry(countryEnum);
-
-                case "OnlineStore":
-                    return siteService.getOnlineStoresByCountry(countryEnum);
-
-                case "Store":
-                    return siteService.getStoresByCountry(countryEnum);
-
-                case "Warehouse":
-                    return siteService.getWarehousesByCountry(countryEnum);
-
-                default:
-                    return siteService.getSitesByCountry(countryEnum);
-            }
-        }
-
+    @GetMapping(path = "/viewSites/{storeType}", produces = "application/json")
+    public List<? extends Site> viewSitesBySubclass(@PathVariable String storeType, @RequestParam String country,
+            @RequestParam String company) {
         switch (storeType) {
             case "Headquarters":
-                return siteService.getAllHeadquarters();
-
+                return siteService.searchHeadquarters(country, company);
             case "Manufacturing":
-                return siteService.getAllManufacturing();
-
+                return siteService.searchManufacturing(country, company);
             case "OnlineStore":
-                return siteService.getAllOnlineStores();
-
+                return siteService.searchOnlineStores(country, company);
             case "Store":
-                return siteService.getAllStores();
-
+                return siteService.searchStores(country, company);
             case "Warehouse":
-                return siteService.getAllWarehouses();
-
+                return siteService.searchWarehouses(country, company);
             default:
-                return siteService.getAllSites();
+                return new ArrayList<>();
         }
     }
 
-    @GetMapping(path = "/viewSite", produces = "application/json")
-    public Site viewSite(@RequestParam Long siteId) {
+    @GetMapping(path = "/viewSite/{siteId}", produces = "application/json")
+    public Site viewSite(@PathVariable Long siteId) {
         try {
-            return siteService.getSite(siteId);
+            Site site = siteService.getSite(siteId);
+            site.getStockLevel();
+            return site;
         } catch (Exception e) {
             return null;
         }

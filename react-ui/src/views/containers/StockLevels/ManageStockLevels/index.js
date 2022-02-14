@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { SiteStocks } from "../BySite";
 import { ProductStocks } from "../ByProduct";
-import {SiteStock} from "../ViewSiteStock";
+import {SiteStock} from "../ASiteStock";
 
 const tabs = [
     { name: 'By Site', href: '', current: true},
@@ -14,7 +14,7 @@ function classNames(...classes) {
 return classes.filter(Boolean).join(' ')
 }
 
-//tabs are buggy
+
 export const SectionHeading = () => {
 
     const [firstTab, setFirstTab] = useState(true);  

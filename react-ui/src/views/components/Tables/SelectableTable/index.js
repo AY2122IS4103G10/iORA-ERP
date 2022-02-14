@@ -4,6 +4,7 @@
  * React Table Part 2: https://www.samuelliedtke.com/blog/react-table-tutorial-part-2/
  */
  import { useState, useMemo } from "react";
+ import { useNavigate } from "react-router-dom";
  import {
    useTable,
    useGlobalFilter,
@@ -11,6 +12,7 @@
    useFilters,
    useSortBy,
    usePagination,
+   useRowSelect,
  } from "react-table";
  import {
    ChevronDoubleRightIcon,
@@ -86,7 +88,7 @@
    );
  };
  
- export const SelectableTable = ({ columns, data }) => {
+ export const SelectableTable = ({ columns, data, path }) => {
    const {
      getTableProps,
      getTableBodyProps,
@@ -112,8 +114,10 @@
      usePagination
    );
 
-   function handleRowClick(row) {
-       console.log(row);
+   const navigate = useNavigate();
+   const handleRowClick = (row) => {
+       console.log(row.original.id);
+       navigate(`${path}/${row.original.id}`)
    }
 
 
@@ -178,10 +182,10 @@
                    {page.map((row, i) => {
                      prepareRow(row);
                      return (
-                        <tr
-                            onClick={() => handleRowClick(row)}
+                        <tr 
                             {...row.getRowProps()}
-                            className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                            className="bg-white cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleRowClick(row)}
                         >
                             {row.cells.map((cell) => (
                             <td

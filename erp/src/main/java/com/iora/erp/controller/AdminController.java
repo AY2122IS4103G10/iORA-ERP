@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.iora.erp.enumeration.Country;
+import com.iora.erp.exception.EmployeeException;
+import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.site.Site;
+import com.iora.erp.service.AdminService;
+import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +30,10 @@ public class AdminController {
 
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private AdminService adminService;
 
     // Employee/JobTitle/Department stuff here
 
@@ -90,6 +98,41 @@ public class AdminController {
             Site site = siteService.getSite(siteId);
             site.getStockLevel();
             return site;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.createEmployee(employee);
+            return ResponseEntity.ok("Employee " + employee.getName() + " is successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+
+    @PostMapping(path = "/addEmployees", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addEmployee(@RequestBody List<Employee> employee) {
+        try {
+            for(Employee e : employee) {
+                employeeService.createEmployee(e);
+            }
+            return ResponseEntity.ok("All employees has been successfully created");
+        } catch (EmployeeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage()); 
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    //faulty
+    @GetMapping(path = "/viewEmployees", produces = "application/json")
+    public List<Employee> viewEmployees(@RequestParam String keyword) {
+        try {
+            return employeeService.getEmployeeByFields(keyword);
         } catch (Exception e) {
             return null;
         }

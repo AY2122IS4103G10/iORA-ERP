@@ -34,7 +34,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             em.persist(employee);
         } catch (Exception ex) {
-            throw new EmployeeException("Employee has already been created");
+            throw new EmployeeException("Employee " + employee.getUsername() + " has already been created");
         }
     }
 
@@ -115,19 +115,29 @@ public class EmployeeServiceImpl implements EmployeeService {
             // need run test if query exits timing for large database
             return q.getResultList();
         } catch (Exception ex) {
-            throw new EmployeeException();
+            throw new EmployeeException(ex.getMessage());
         }
     }
 
     @Override
-    public List<Employee> getEmployeeByFields(String search) {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
-                "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary");
-        q.setParameter("email", "%" + search.toLowerCase() + "%");
-        q.setParameter("username", "%" + search.toLowerCase() + "%");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        q.setParameter("salary", "%" + search + "%");
-        return q.getResultList();
+    public List<Employee> getEmployeeByFields(String search) throws EmployeeException {
+
+        try {
+            if (search == null) {
+                return listOfEmployee();
+            } else {
+                Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
+                        "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary");
+                q.setParameter("email", "%" + search.toLowerCase() + "%");
+                q.setParameter("username", "%" + search.toLowerCase() + "%");
+                q.setParameter("name", "%" + search.toLowerCase() + "%");
+                q.setParameter("salary", "%" + search + "%");
+                return q.getResultList();
+            }
+        } catch (Exception ex) {
+            throw new EmployeeException(ex.getMessage());
+        }
+
     }
 
     @Override

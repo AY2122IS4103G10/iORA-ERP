@@ -1,10 +1,8 @@
 package com.iora.erp.service;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.CompoundName;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -15,7 +13,6 @@ import javax.persistence.TransactionRequiredException;
 import com.iora.erp.exception.AddressException;
 import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.DepartmentException;
-import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.exception.JobTitleException;
 import com.iora.erp.exception.VendorException;
 import com.iora.erp.model.company.Address;

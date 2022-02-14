@@ -9,11 +9,13 @@ import { SelectColumnFilter } from "../../../components/Tables/SimpleTable";
 const getData = () => {
     const data = [
         {
+            id: 1,
             productCode: "SKU1231",
             name: "Sky Blue V-neck Top",
             qty: 100,
         },
         {
+            id: 0, 
             productCode: "SKU4321",
             name: "Black Blue V-neck Top",
             qty: 100,

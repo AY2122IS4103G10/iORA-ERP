@@ -243,12 +243,29 @@ public class AdminService implements AdminServiceImpl {
             if (e == null) {
                 throw new AddressException("Address is not found");
             }
+
             em.remove(address);
             em.flush();
         } catch (IllegalArgumentException | TransactionRequiredException ex) {
             throw new AddressException("Address cannot be removed");
         }
 
+    }
+
+    @Override
+    public List<Address> getListAddress() {
+        Query q = em.createQuery("SELECT a FROM Address a");
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Address> getListAddressFields(String search) {
+        Query q = em.createQuery(
+                "SELECT a FROM Address a WHERE a.getBuilding Like :building OR a.getPostalCode Like :postal OR a.getUnit Like :unit");
+        q.setParameter("building", "%" + search + "%");
+        q.setParameter("postal", "%" + search + "%");
+        q.setParameter("unit", "%" + search + "%");
+        return q.getResultList();
     }
 
     @Override
@@ -292,25 +309,35 @@ public class AdminService implements AdminServiceImpl {
     }
 
     @Override
-    public void addDepartmentToCompany(Company company) throws CompanyException, DepartmentException {
-        Company c = getCompanyById(company.getId());
-
-        for (Department d : company.getDepartments()) {
-            Department dNew = getDepartmentById(d.getId());
-            c.getDepartments().add(dNew);
-        }
+    public void addADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException {
+        Company c = getCompanyById(cid);
+        Department d = getDepartmentById(did);
+        c.getDepartments().add(d);
     }
 
     @Override
-    public void addVendorToCompany(Company company) throws CompanyException, VendorException {
-        Company c = getCompanyById(company.getId());
-
-       /* for (Vendor v : company.getVendors()) {
-            Vendor vNew = c.getVendors().add(vNew);
-        }*/
+    public void removeADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException {
+        Company c = getCompanyById(cid);
+        Department d = getDepartmentById(did);
+        c.getDepartments().remove(d);
     }
 
-    // need addd
+    @Override
+    public void addAVendorToCompany(Long cid, Long vid) throws CompanyException, VendorException {
+        Company c = getCompanyById(cid);
+        Vendor v = getVendorById(vid);
+        c.getVendors().add(v);
+
+    }
+
+    @Override
+    public void removeAVendorToCompany(Long cid, Long vid) throws CompanyException, VendorException {
+        Company c = getCompanyById(cid);
+        Vendor v = getVendorById(vid);
+        c.getVendors().remove(v);
+    }
+
+    // need add vendor, Department and site mapping
     @Override
     public void editCompany(Company company) throws CompanyException {
         Company old = getCompanyById(company.getId());
@@ -352,25 +379,6 @@ public class AdminService implements AdminServiceImpl {
             old.setTelephone(company.getTelephone());
             old.setActive(company.getActive());
         }
-    }
-
-    @Override
-    public void updateDepartmentToCompany(Company company) throws CompanyException, DepartmentException {
-        Company c = getCompanyById(company.getId());
-
-        c.setDepartments(new ArrayList<>());
-
-        for (Department d : company.getDepartments()) {
-            Department dNew = getDepartmentById(d.getId());
-            c.getDepartments().add(dNew);
-        }
-
-    }
-
-    @Override
-    public void updateVendorToCompany(Company company) throws CompanyException, VendorException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -420,7 +428,7 @@ public class AdminService implements AdminServiceImpl {
 
     @Override
     public Company getCompanysByName(String name) {
-        Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(e.getName) = :name") ;
+        Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(e.getName) = :name");
         q.setParameter("name", name.toLowerCase());
 
         return (Company) q.getSingleResult();
@@ -442,6 +450,87 @@ public class AdminService implements AdminServiceImpl {
     public Boolean checkUniqueN(String name) {
         Query q = em.createQuery("SELECT e FROM Company e WHERE LOWER(e.getName) = :name ");
         q.setParameter("name", name.toLowerCase());
+
+        if (q.getResultList().size() > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // need to add address first
+    @Override
+    public void createVendor(Vendor vendor) throws VendorException {
+        try {
+            em.persist(vendor);
+        } catch (Exception ex) {
+            throw new VendorException("Vendor has already already been created");
+        }
+
+    }
+
+    @Override
+    public void updateVendor(Vendor vendor) throws VendorException, AddressException {
+        Vendor v = getVendorById(vendor.getId());
+
+        if (vendor.getCompanyName() != v.getCompanyName()) {
+            if (uniqueVendorName(vendor.getCompanyName()) == true) {
+                v.setCompanyName(vendor.getCompanyName());
+                v.setDescription(vendor.getDescription());
+                v.setEmail(vendor.getDescription());
+                v.setTelephone(vendor.getDescription());
+                v.setAddress(new ArrayList<>());
+
+                for (Address a : vendor.getAddress()) {
+                    if (checkAddress(a) == true) {
+                        Address aa = getAddressById(a.getId());
+                        v.getAddress().add(aa);
+                    } else {
+                        em.persist(a);
+                        v.getAddress().add(a);
+                    }
+                }
+            } else {
+                throw new VendorException("Vendor Name is not unique");
+            }
+        } else {
+            v.setDescription(vendor.getDescription());
+            v.setEmail(vendor.getDescription());
+            v.setTelephone(vendor.getDescription());
+            v.setAddress(new ArrayList<>());
+
+            for (Address a : vendor.getAddress()) {
+                if (checkAddress(a) == true) {
+                    Address aa = getAddressById(a.getId());
+                    v.getAddress().add(aa);
+                } else {
+                    em.persist(a);
+                    v.getAddress().add(a);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void deleteVendor(Vendor vendor) throws VendorException {
+        Vendor v = getVendorById(vendor.getId());
+        em.remove(v);
+
+    }
+
+    @Override
+    public Vendor getVendorById(Long id) throws VendorException {
+        Vendor vendor = em.find(Vendor.class, id);
+        if (vendor == null) {
+            throw new VendorException("Vendor with id: " + id + " not found.");
+        }
+        return vendor;
+    }
+
+    @Override
+    public Boolean uniqueVendorName(String name) throws VendorException {
+        Query q = em.createQuery("SELECT v FROM Vendor v WHERE Lower(v.getCompanyName) = :name");
+        q.setParameter("name", name);
 
         if (q.getResultList().size() > 0) {
             return false;

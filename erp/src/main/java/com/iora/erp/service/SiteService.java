@@ -22,6 +22,7 @@ public interface SiteService {
     public abstract List<? extends Site> getOnlineStoresByCountry(Country country);
     public abstract List<? extends Site> getAllWarehouses();
     public abstract List<? extends Site> getWarehousesByCountry(Country country);
+    // getSitesByCompany(Company company);
     public abstract void updateSite(Site site);
     public abstract void deleteSite(Long id);
 

@@ -53,19 +53,19 @@ public class Site implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     private StockLevel stockLevel;
 
-    // cant map it the other way using mappedsuperclass
     @ManyToOne
     private Company company;
 
     protected Site() {
     }
 
-    public Site(String name, String address, double latitude, double longitude, String siteCode) {
+    public Site(String name, String address, double latitude, double longitude, String siteCode, Company company) {
         this.name = name;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
         this.siteCode = siteCode;
+        this.company = company;
         this.stockLevel = new StockLevel();
     }
 

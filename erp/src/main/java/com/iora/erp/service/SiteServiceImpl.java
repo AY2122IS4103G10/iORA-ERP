@@ -20,8 +20,10 @@ import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("siteServiceImpl")
+@Transactional
 public class SiteServiceImpl implements SiteService {
 
     @PersistenceContext

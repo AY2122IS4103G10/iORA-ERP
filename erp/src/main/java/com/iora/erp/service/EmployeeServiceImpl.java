@@ -18,8 +18,10 @@ import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("employeeServiceImpl")
+@Transactional
 public class EmployeeServiceImpl implements EmployeeService {
 
     @PersistenceContext

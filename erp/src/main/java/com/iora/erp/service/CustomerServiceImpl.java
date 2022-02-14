@@ -13,8 +13,10 @@ import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("customerServiceImpl")
+@Transactional
 public class CustomerServiceImpl implements CustomerService {
 
     @PersistenceContext

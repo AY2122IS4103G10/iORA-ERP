@@ -27,6 +27,12 @@ public class AdminController {
     @Autowired
     private SiteService siteService;
 
+    /*
+     * ---------------------------------------------------------
+     * C.1 Account Management
+     * ---------------------------------------------------------
+     */
+
     // Employee/JobTitle/Department stuff here
 
     @PostMapping(path = "/addSite/{storeType}", consumes = MediaType.APPLICATION_JSON_VALUE)

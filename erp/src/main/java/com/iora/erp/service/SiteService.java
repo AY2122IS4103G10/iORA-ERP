@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.model.site.Site;
@@ -18,9 +19,9 @@ public interface SiteService {
     public abstract void updateSite(Site site);
     public abstract void deleteSite(Long id);
 
-    public abstract StockLevel getAllStockLevels(List<Site> sites);
+    public abstract List<Site> searchStockLevels(List<String> storeTypes, String country, String company);
     public abstract StockLevel getStockLevelOfSite(Long siteId) throws NoStockLevelException;
-    public abstract StockLevel getStockLevelByProduct(String SKUCode);
+    public abstract Map<Long,Long> getStockLevelByProduct(String SKUCode);
     public abstract void addProductItemToSite(Long siteId, Long productItemId) throws NoStockLevelException;
     public abstract void removeProductItemFromSite(Long siteId, Long productItemId) throws NoStockLevelException;
     public abstract void addStockLevelToSite(Long siteId, List<Long> productItemIds) throws NoStockLevelException;

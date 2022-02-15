@@ -2,15 +2,18 @@ package com.iora.erp.service;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.Voucher;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,6 +139,61 @@ public class CustomerServiceImpl implements CustomerService {
             throw new CustomerException("Invalid Username or Password.");
         }
 
+    }
+
+    @Override
+    public Voucher getVoucher(String voucherCode) throws CustomerException {
+        Voucher voucher = em.find(Voucher.class, voucherCode);
+
+        if (voucher  == null) {
+            throw new CustomerException("Voucher with voucherCode " + voucherCode + " does not exist.");
+        } else {
+            return voucher;
+        }
+    }
+
+    @Override
+    public void generateVouchers(double amount, int qty) {
+        IntStream.range(0, qty)
+        .forEach( i -> {
+            Voucher voucher1 = new Voucher(amount);
+            try {
+                getVoucher(voucher1.getVoucherCode());
+                //Voucher with the generate voucher code already exist
+                Voucher voucher2 = new Voucher(amount);
+                em.persist(voucher2);
+            } catch (CustomerException ex) {
+                //Voucher code does not already exist
+                em.persist(voucher1);
+            }
+        });
+    }
+
+    @Override
+    public List<Voucher> getAllVouchers() {
+        TypedQuery<Voucher> q;
+        q = em.createQuery("SELECT v FROM Voucher v", Voucher.class);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Voucher> getAvailableVouchersByAmount(double amount) {
+        TypedQuery<Voucher> q;
+        q = em.createQuery("SELECT v FROM Voucher v WHERE :amount = v.amount AND v.issued = false", Voucher.class);
+        q.setParameter("amount", amount);
+        return q.getResultList();
+    }
+
+    @Override
+    public void issueVoucher(String voucherCode) throws CustomerException {
+        Voucher voucher = getVoucher(voucherCode);
+        voucher.setIssued(true);
+    }
+
+    @Override
+    public void redeemVoucher(String voucherCode) throws CustomerException {
+        Voucher voucher = getVoucher(voucherCode);
+        voucher.setRedeemed(true);
     }
 
 }

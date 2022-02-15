@@ -6,9 +6,13 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.iora.erp.enumeration.FashionLine;
+import com.iora.erp.exception.ModelException;
+import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
+import com.iora.erp.model.product.Model;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
@@ -62,6 +66,49 @@ public class DataLoader implements CommandLineRunner {
 
         HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", iora);
         em.persist(iorahq);
+
+        // Add a Model
+        Model model = new Model("ASK0009968A");
+        model.setAvailable(true);
+        model.setDescription("Front self-tie sash. Back elasticated waistband. Fabric: Polyester");
+        model.setFashionLine(FashionLine.IORA);
+        model.setName("Wrapped Shift Skirt");
+        model.setOnlineOnly(false);
+        model.setPrice(29);
+        try {
+            productService.createModel(model);
+        } catch (ModelException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        // Add Products of the Model
+        List<String> colours = new ArrayList<>();
+        colours.add("black");
+        colours.add("green");
+        colours.add("khaki");
+
+        List<String> sizes = new ArrayList<>();
+        sizes.add("S");
+        sizes.add("M");
+        sizes.add("L");
+        sizes.add("XL");
+
+        List<String> tags = new ArrayList<>();
+        tags.add("bottoms");
+        tags.add("skirts");
+
+        try {
+            productService.createProduct(model.getModelCode(), colours, sizes, tags);
+        } catch (ProductException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        // Add Promotion to the Model
+        try {
+            productService.addPromoCategory(model.getModelCode(), "2 FOR S$49", 24.5);
+        } catch (ModelException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
 }

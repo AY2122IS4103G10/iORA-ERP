@@ -46,6 +46,15 @@ export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
     const response = await productsApi.getAll();
+    console.log(response.data);
+    return response.data;
+  }
+);
+
+export const addNewProduct = createAsyncThunk(
+  "products/addNewPost",
+  async (initialProduct) => {
+    const response = await productsApi.create(initialProduct);
     return response.data;
   }
 );
@@ -54,28 +63,30 @@ const productSlice = createSlice({
   name: "products",
   initialState,
   reducers: {
-    productAdded: {
-      reducer(state, action) {
-        state.products.push(action.payload);
-      },
-      prepare(prodCode, name, description, listPrice, discPrice, fields) {
-        return {
-          payload: {
-            id: nanoid(),
-            prodCode,
-            name,
-            description,
-            listPrice: parseFloat(listPrice),
-            discPrice: parseFloat(discPrice),
-            fields,
-          },
-        };
-      },
-    },
+    // productAdded: {
+    //   reducer(state, action) {
+    //     state.products.push(action.payload);
+    //   },
+    //   prepare(prodCode, name, description, listPrice, discPrice, fields) {
+    //     return {
+    //       payload: {
+    //         id: nanoid(),
+    //         prodCode,
+    //         name,
+    //         description,
+    //         listPrice: parseFloat(listPrice),
+    //         discPrice: parseFloat(discPrice),
+    //         fields,
+    //       },
+    //     };
+    //   },
+    // },
     productUpdated(state, action) {
       const { prodCode, name, description, listPrice, discPrice, fields } =
         action.payload;
-      const existingProd = state.products.find((prod) => prod.prodCode === prodCode);
+      const existingProd = state.products.find(
+        (prod) => prod.prodCode === prodCode
+      );
       if (existingProd) {
         existingProd.name = name;
         existingProd.description = description;
@@ -85,7 +96,24 @@ const productSlice = createSlice({
       }
     },
     productDeleted(state, action) {
-      state.products.filter((product) => product !== action.payload);
+      state.products = state.products.filter(
+        ({ prodCode }) => prodCode !== action.payload.prodCode
+      );
+    },
+    extraReducers(builder) {
+      builder.addCase(fetchProducts.pending, (state, action) => {
+        state.status = "loading";
+      });
+      builder.addCase(fetchProducts.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.products = state.products.concat(action.payload);
+      });
+      builder.addCase(fetchProducts.rejected, (state, action) => {
+        state.status = "failed";
+      });
+      builder.addCase(addNewProduct.fulfilled, (state, action) => {
+        state.products.push(action.payload);
+      });
     },
   },
 });

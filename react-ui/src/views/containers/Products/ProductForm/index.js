@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { selectAllProdFields } from "../../../../stores/slices/prodFieldSlice";
 
 import {
+  addNewProduct,
   productAdded,
   productUpdated,
   selectProductByCode,
@@ -54,7 +55,12 @@ export const FormCheckboxes = ({
   );
 };
 
-const rightColSection = ({ fieldName, fields, onFieldsChanged, fieldValues }) => (
+const rightColSection = ({
+  fieldName,
+  fields,
+  onFieldsChanged,
+  fieldValues,
+}) => (
   <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
     <div className="rounded-lg bg-white overflow-hidden shadow">
       <div className="p-6">
@@ -303,9 +309,7 @@ const AddProductFormBody = ({
 
 export const ProductForm = () => {
   const { prodId } = useParams();
-  const product = useSelector((state) =>
-    selectProductByCode(state, prodId)
-  );
+  const product = useSelector((state) => selectProductByCode(state, prodId));
   const isEditing = Boolean(product);
   const [prodCode, setProdCode] = useState(!isEditing ? "" : product.prodCode);
   const [name, setName] = useState(!isEditing ? "" : product.name);
@@ -366,6 +370,8 @@ export const ProductForm = () => {
         )
   );
 
+  const [addRequestStatus, setAddRequestStatus] = useState("idle");
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -412,18 +418,12 @@ export const ProductForm = () => {
     categories.forEach(
       (cat, index) => catCheckedState[index] && fields.push(cat)
     );
-    canAdd &&
-      dispatch(
-        !isEditing
-          ? productAdded(
-              prodCode,
-              name,
-              description,
-              listPrice,
-              discPrice,
-              fields
-            )
-          : productUpdated({
+    if (canAdd) {
+      if (!isEditing) {
+        try {
+          setAddRequestStatus("pending");
+          dispatch(
+            addNewProduct({
               prodCode,
               name,
               description,
@@ -431,10 +431,38 @@ export const ProductForm = () => {
               discPrice,
               fields,
             })
-      );
-    setProdCode("");
-    setName("");
-    setDescription("");
+          ).unwrap();
+          setProdCode("");
+          setName("");
+          setDescription("");
+        } catch (err) {
+          console.error("Failed to add product: ", err);
+        } finally {
+          setAddRequestStatus("idle");
+        }
+      }
+      // productAdded(
+      //     prodCode,
+      //     name,
+      //     description,
+      //     listPrice,
+      //     discPrice,
+      //     fields
+      //   )
+      else {
+        dispatch(
+          productUpdated({
+            prodCode,
+            name,
+            description,
+            listPrice,
+            discPrice,
+            fields,
+          })
+        );
+      }
+    }
+
     navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
   };
 

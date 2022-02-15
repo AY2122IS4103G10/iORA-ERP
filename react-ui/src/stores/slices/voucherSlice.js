@@ -39,7 +39,9 @@ const voucherSlice = createSlice({
     voucherUpdated(state, action) {
       const { id, code, value, issuedDate, expDate, isRedeemed } =
         action.payload;
-      const existingVoucher = state.vouchers.find((voucher) => voucher.id === id);
+      const existingVoucher = state.vouchers.find(
+        (voucher) => voucher.id === id
+      );
       if (existingVoucher) {
         existingVoucher.code = code;
         existingVoucher.value = value;
@@ -49,12 +51,15 @@ const voucherSlice = createSlice({
       }
     },
     voucherDeleted(state, action) {
-      state.vouchers.filter((voucher) => voucher !== action.payload);
+      state.vouchers = state.vouchers.filter(
+        ({ id }) => id !== action.payload.id
+      );
     },
   },
 });
 
-export const { voucherAdded, voucherUpdated, voucherDeleted } = voucherSlice.actions;
+export const { voucherAdded, voucherUpdated, voucherDeleted } =
+  voucherSlice.actions;
 
 export default voucherSlice.reducer;
 

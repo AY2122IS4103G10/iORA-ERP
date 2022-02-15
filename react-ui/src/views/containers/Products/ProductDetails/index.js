@@ -4,12 +4,12 @@ import {
   CurrencyDollarIcon as CurrencyDollarIconSolid,
   PencilIcon,
 } from "@heroicons/react/solid";
-
 import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
 import {
   productDeleted,
   selectProductByCode,
 } from "../../../../stores/slices/productSlice";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 
 const fieldSection = ({ fieldName, fields }) => {
   return (
@@ -198,17 +198,20 @@ export const ProductDetails = () => {
   };
 
   return (
-    <ProductDetailsBody
-      prodCode={prodCode}
-      name={product.name}
-      description={product.description}
-      listPrice={product.listPrice}
-      discPrice={product.discPrice}
-      colors={colors}
-      sizes={sizes}
-      tags={tags}
-      categories={categories}
-      onDeleteProdClicked={onDeleteProdClicked}
-    />
+    <>
+      <NavigatePrev page="Products" path="/sm/products" />
+      <ProductDetailsBody
+        prodCode={prodCode}
+        name={product.name}
+        description={product.description}
+        listPrice={product.listPrice}
+        discPrice={product.discPrice}
+        colors={colors}
+        sizes={sizes}
+        tags={tags}
+        categories={categories}
+        onDeleteProdClicked={onDeleteProdClicked}
+      />
+    </>
   );
 };

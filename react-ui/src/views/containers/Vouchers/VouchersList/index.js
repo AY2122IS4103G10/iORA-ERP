@@ -39,12 +39,12 @@ export const VouchersTable = () => {
       {
         Header: "Issued Date",
         accessor: "issuedDate",
-        Cell: (e) => moment(e.value).format("lll"),
+        Cell: (e) => moment(e.value).format("DD/MM/YY, h:mm a"),
       },
       {
         Header: "Expiry Date",
         accessor: "expDate",
-        Cell: (e) => moment(e.value).format("lll"),
+        Cell: (e) => moment(e.value).format("DD/MM/YY, h:mm a"),
       },
       {
         Header: "Redeemed",

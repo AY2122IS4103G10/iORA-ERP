@@ -12,6 +12,7 @@ import {
   fetchProducts,
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
+import { productsApi } from "../../../../environments/Api.js";
 
 const processFields = (fields, selector) => {
   const fieldValues = [];
@@ -80,9 +81,9 @@ export const ProductsTable = () => {
   const dispatch = useDispatch();
   const data = useSelector(selectAllProducts);
   const prodStatus = useSelector((state) => state.products.status);
-  // useEffect(() => {
-  //   prodStatus === "idle" && dispatch(fetchProducts());
-  // }, [prodStatus, dispatch]);
+  useEffect(() => {
+    prodStatus === "idle" && dispatch(fetchProducts());
+  }, [prodStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

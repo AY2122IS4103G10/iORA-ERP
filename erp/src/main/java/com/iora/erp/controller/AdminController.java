@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.model.site.Site;
-import com.iora.erp.service.AdminServiceImpl;
+import com.iora.erp.service.AdminService;
 import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.SiteService;
 
@@ -31,7 +31,7 @@ public class AdminController {
     @Autowired
     private EmployeeService employeeService;
     @Autowired
-    private AdminServiceImpl adminService;
+    private AdminService adminService;
 
     /*
      * ---------------------------------------------------------

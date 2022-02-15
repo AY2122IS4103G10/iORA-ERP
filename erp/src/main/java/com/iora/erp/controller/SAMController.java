@@ -261,4 +261,9 @@ public class SAMController {
                 return new ArrayList<>();
         }
     }
+
+    @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
+    public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
+        return siteService.getStockLevelByProduct(sku);
+    }
 }

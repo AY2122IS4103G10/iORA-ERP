@@ -20,15 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("warehouse")
-public class WarehouseController {
+@RequestMapping("store")
+public class StoreController {
 
     @Autowired
     private SiteService siteService;
 
     /*
      * ---------------------------------------------------------
-     * E.1 Inventory Management
+     * F.1 Store Inventory Management
      * ---------------------------------------------------------
      */
 

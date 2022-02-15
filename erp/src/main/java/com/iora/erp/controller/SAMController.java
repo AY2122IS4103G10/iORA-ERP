@@ -87,7 +87,7 @@ public class SAMController {
     public ResponseEntity<Object> createProduct(@PathVariable String modelCode,
             @RequestBody Map<String, List<String>> body) {
         try {
-            productService.createProduct(modelCode, body.get("colours"), body.get("sizes"));
+            productService.createProduct(modelCode, body.get("colours"), body.get("sizes"), body.get("tags"));
             return ResponseEntity.ok("Multiple Products are successfully created and linked to Model " + modelCode);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -118,6 +118,40 @@ public class SAMController {
             @PathVariable String fieldValue) {
         try {
             return ResponseEntity.ok(productService.getModelsByFieldValue(fieldName, fieldValue));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    // Get models by fashion line (iORA) and tag (top)
+    // Return empty list if no results
+    @GetMapping(path = "/model/tag/{fashionLine}/{tag}", produces = "application/json")
+    public ResponseEntity<Object> getModelsByFashionLineTag(@PathVariable String fashionLine,
+            @PathVariable String tag) {
+        try {
+            return ResponseEntity.ok(productService.getModelsByFashionLineTag(fashionLine, tag));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    // Get models by tag (top)
+    // Return empty list if no results
+    @GetMapping(path = "/model/tag/{tag}", produces = "application/json")
+    public ResponseEntity<Object> getModelsByTag(@PathVariable String tag) {
+        try {
+            return ResponseEntity.ok(productService.getModelsByTag(tag));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    // Get models by category (2 FOR S$49 / IORA NEW ARRIVALS)
+    // Return empty list if no results
+    @GetMapping(path = "/model/category/{category}", produces = "application/json")
+    public ResponseEntity<Object> getModelsByCategory(@PathVariable String category) {
+        try {
+            return ResponseEntity.ok(productService.getModelsByCategory(category));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -226,6 +260,19 @@ public class SAMController {
         try {
             productService.returnProductItem(rfid);
             return ResponseEntity.ok("Product Item with RFID " + rfid.trim() + " is successfully marked as unsold.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/promo/add/{modelCode}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addPromoCategory(@PathVariable String modelCode,
+            @RequestBody Map<String, String> body) {
+        try {
+            productService.addPromoCategory(modelCode, body.get("category"),
+                    Double.parseDouble(body.get("discountedPrice")));
+            return ResponseEntity
+                    .ok("Promotion " + body.get("category") + " is successfully added to the Model " + modelCode);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

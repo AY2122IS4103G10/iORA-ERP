@@ -10,6 +10,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import com.iora.erp.enumeration.FashionLine;
 import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
@@ -18,6 +19,7 @@ import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.PromotionField;
 
 import org.hibernate.NonUniqueResultException;
 import org.springframework.stereotype.Service;
@@ -79,6 +81,42 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public PromotionField getPromoField(String fieldName, String fieldValue, double discountedPrice)
+            throws ProductFieldException {
+        Query q = em.createQuery(
+                "SELECT prf FROM PromotionField prf WHERE " +
+                        "LOWER(prf.fieldName) LIKE :fieldName AND LOWER(prf.fieldValue) LIKE :fieldValue AND prf.discountedPrice = :price");
+        q.setParameter("fieldName", fieldName.trim().toLowerCase());
+        q.setParameter("fieldValue", fieldValue.trim().toLowerCase());
+        q.setParameter("price", discountedPrice);
+
+        try {
+            PromotionField prf = (PromotionField) q.getSingleResult();
+            return prf;
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new ProductFieldException("PromotionField does not exist.");
+        }
+    }
+
+    @Override
+    public void addPromoCategory(String modelCode, String category, double discountedPrice)
+            throws ModelException {
+        Model model = getModel(modelCode);
+
+        try {
+            ProductField pf = getPromoField("category", category, discountedPrice);
+            model.addProductField(pf);
+        } catch (ProductFieldException ex) {
+            PromotionField prf = new PromotionField();
+            prf.setFieldName("category");
+            prf.setFieldValue(category);
+            prf.setDiscountedPrice(discountedPrice);
+            em.persist(prf);
+            model.addProductField(prf);
+        }
+    }
+
+    @Override
     public void createModel(Model model) throws ModelException {
         try {
             em.persist(model);
@@ -88,12 +126,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void createProduct(String modelCode, List<String> colours, List<String> sizes) throws ProductException {
+    public void createProduct(String modelCode, List<String> colours, List<String> sizes, List<String> tags)
+            throws ProductException {
         try {
+            List<ProductField> tagFields = new ArrayList<>();
+
+            // Loop for each tag
+            for (int i = 0; i < tags.size(); i++) {
+                try {
+                    ProductField tagField = getProductFieldByNameValue("tag", tags.get(i));
+                    tagFields.add(tagField);
+                } catch (ProductFieldException ex) {
+                    ProductField newField = new ProductField();
+                    newField.setFieldName("tag");
+                    newField.setFieldValue(tags.get(i));
+                    createProductField(newField);
+                    tagFields.add(newField);
+                }
+            }
+
             Model model = getModel(modelCode);
             List<Product> products = new ArrayList<>();
             int count = 1;
 
+            // Loop for each combination of size and colour
             for (int i = 0; i < colours.size(); i++) {
                 for (int j = 0; j < sizes.size(); j++) {
                     Product p = new Product(modelCode + "-" + count);
@@ -128,10 +184,20 @@ public class ProductServiceImpl implements ProductService {
                         model.addProductField(newField);
                     }
 
+                    // adding the tags to products
+                    for (int k = 0; k < tags.size(); k++) {
+                        p.addProductField(tagFields.get(k));
+                    }
+
                     em.persist(p);
                     products.add(p);
                     count++;
                 }
+            }
+
+            // adding the tags to models
+            for (int k = 0; k < tags.size(); k++) {
+                model.addProductField(tagFields.get(k));
             }
 
             model.setProducts(products);
@@ -186,7 +252,7 @@ public class ProductServiceImpl implements ProductService {
     public List<Model> getModelsByFieldValue(String fieldName, String fieldValue) {
         try {
             if (fieldName == null || fieldValue == null) {
-                return null;
+                return new ArrayList<Model>();
             }
 
             fieldName = fieldName.trim();
@@ -201,7 +267,67 @@ public class ProductServiceImpl implements ProductService {
 
             return q.getResultList();
         } catch (ProductFieldException ex) {
-            return null;
+            return new ArrayList<Model>();
+        }
+    }
+
+    @Override
+    public List<Model> getModelsByFashionLineTag(String fashionLine, String tag) {
+        try {
+            if (tag == null
+                    || (!fashionLine.equals("IORA") && !fashionLine.equals("LALU") && !fashionLine.equals("SORA"))) {
+                return new ArrayList<Model>();
+            }
+            tag = tag.trim();
+            ProductField productField = getProductFieldByNameValue("tag", tag);
+
+            FashionLine fl;
+            if (fashionLine.equals("IORA")) {
+                fl = FashionLine.IORA;
+            } else if (fashionLine.equals("LALU")) {
+                fl = FashionLine.LALU;
+            } else {
+                fl = FashionLine.SORA;
+            }
+
+            TypedQuery<Model> q;
+            q = em.createQuery(
+                    "SELECT DISTINCT m FROM Model m WHERE m.fashionLine = :fashionLine AND :productField MEMBER OF m.productFields",
+                    Model.class);
+            q.setParameter("fashionLine", fl);
+            q.setParameter("productField", productField);
+
+            return q.getResultList();
+        } catch (ProductFieldException ex) {
+            return new ArrayList<Model>();
+        }
+    }
+
+    public List<Model> getModelsByTag(String tag) {
+        try {
+            TypedQuery<Model> q;
+            ProductField pf = getProductFieldByNameValue("tag", tag);
+
+            q = em.createQuery("SELECT m FROM Model m WHERE :pf MEMBER OF m.productFields", Model.class);
+            q.setParameter("pf", pf);
+
+            return q.getResultList();
+        } catch (ProductFieldException ex) {
+            return new ArrayList<Model>();
+        }
+    }
+
+    public List<Model> getModelsByCategory(String category) {
+        try {
+            TypedQuery<Model> q;
+            ProductField pf = getProductFieldByNameValue("category", category);
+
+            q = em.createQuery("SELECT m FROM Model m WHERE :pf MEMBER OF m.productFields", Model.class);
+            q.setParameter("pf", pf);
+
+            return q.getResultList();
+        } catch (ProductFieldException ex) {
+            return new ArrayList<Model>();
         }
     }
 
@@ -262,7 +388,7 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getProductsByFieldValue(String fieldName, String fieldValue) {
         try {
             if (fieldName == null || fieldValue == null) {
-                return null;
+                return new ArrayList<Product>();
             }
 
             fieldName = fieldName.trim();
@@ -276,7 +402,7 @@ public class ProductServiceImpl implements ProductService {
 
             return q.getResultList();
         } catch (ProductFieldException ex) {
-            return null;
+            return new ArrayList<Product>();
         }
     }
 

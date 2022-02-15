@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Entity
 public class Address implements Serializable{
@@ -27,9 +29,15 @@ public class Address implements Serializable{
     private String postalCode;
     @Column(nullable = false)
     private Boolean billing;
+    @Min(-90)
+    @Max(90)
+    private double latitude;
+    @Min(-180)
+    @Max(180)
+    private double longitude;
 
     public Address(String country, String city, String building, String state, String unit, String postalCode,
-            Boolean billing) {
+            Boolean billing, double latitude, double longitude) {
         this.country = country;
         this.city = city;
         this.building = building;
@@ -37,6 +45,8 @@ public class Address implements Serializable{
         this.unit = unit;
         this.postalCode = postalCode;
         this.billing = billing;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Address() {
@@ -104,6 +114,26 @@ public class Address implements Serializable{
 
     public void setBilling(Boolean billing) {
         this.billing = billing;
+    }
+
+    public double getLatitude() {
+        return this.latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return this.longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getCoordinates() {
+        return String.format("(%d, %d)", latitude, longitude);
     }
 
     @Override

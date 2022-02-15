@@ -160,8 +160,6 @@ public class SiteServiceImpl implements SiteService {
         old.setName(site.getName());
         old.setCountry(site.getCountry());
         old.setAddress(site.getAddress());
-        old.setLatitude(site.getLatitude());
-        old.setLongitude(site.getLongitude());
         old.setSiteCode(site.getSiteCode());
         old.setActive(site.isActive());
     }

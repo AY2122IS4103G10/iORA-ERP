@@ -58,7 +58,7 @@ const ProductDetailsBody = ({
                 <p className="mt-2 text-sm text-gray-500">{prodCode}</p>
               </div>
               <div className="mt-4 flex space-x-3 md:mt-0">
-                <Link to={`/products/edit/${prodCode}`}>
+                <Link to={`/sm/products/edit/${prodCode}`}>
                   <button
                     type="button"
                     className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
@@ -194,7 +194,7 @@ export const ProductDetails = () => {
 
   const onDeleteProdClicked = () => {
     dispatch(productDeleted(product));
-    navigate("/products");
+    navigate("/sm/products");
   };
 
   return (

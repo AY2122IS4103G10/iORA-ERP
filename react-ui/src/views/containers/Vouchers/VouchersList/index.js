@@ -19,7 +19,7 @@ export const VouchersTable = () => {
         accessor: "id",
         Cell: (e) => (
           <Link
-            to={`/vouchers/${e.value}`}
+            to={`/sm/vouchers/${e.value}`}
             className="hover:text-gray-700 hover:underline"
           >
             {e.value}

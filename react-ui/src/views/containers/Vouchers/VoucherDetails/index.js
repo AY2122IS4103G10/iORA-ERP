@@ -37,7 +37,7 @@ const VoucherDetailsBody = ({
                 } Redeemed`}</p>
               </div>
               <div className="mt-4 flex space-x-3 md:mt-0">
-                <Link to={`/vouchers/edit/${voucherId}`}>
+                <Link to={`/sm/vouchers/edit/${voucherId}`}>
                   <button
                     type="button"
                     className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
@@ -118,7 +118,7 @@ export const VoucherDetails = () => {
 
   const onDeleteVoucherClicked = () => {
     dispatch(voucherDeleted(voucher));
-    navigate("/products");
+    navigate("/sm/vouchers");
   };
 
   return (

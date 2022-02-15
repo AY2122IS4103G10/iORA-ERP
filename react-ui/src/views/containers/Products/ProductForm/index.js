@@ -435,13 +435,13 @@ export const ProductForm = () => {
     setProdCode("");
     setName("");
     setDescription("");
-    navigate(!isEditing ? "/products" : `/products/${prodCode}`);
+    navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
   };
 
   const canAdd = name && description && listPrice && discPrice;
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/products" : `/products/${prodCode}`);
+    navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
 
   return (
     <AddProductFormBody

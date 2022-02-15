@@ -31,7 +31,7 @@ export const ProductsTable = () => {
         accessor: "prodCode",
         Cell: (e) => (
           <Link
-            to={`/products/${e.value}`}
+            to={`/sm/products/${e.value}`}
             className="hover:text-gray-700 hover:underline"
           >
             {e.value}

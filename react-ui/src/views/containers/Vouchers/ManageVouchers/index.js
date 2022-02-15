@@ -22,7 +22,7 @@ const header = (
           </div>
         </div>
         <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-          <Link to="/vouchers/create">
+          <Link to="/sm/vouchers/create">
           <button
             type="button"
             className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"

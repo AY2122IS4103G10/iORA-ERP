@@ -158,13 +158,13 @@ export const VoucherForm = () => {
     canAdd && dispatch(voucherAdded(voucherCode, value, expDate));
     setVoucherCode("");
     setValue("");
-    navigate(!isEditing ? "/vouchers" : `/vouchers/${voucherId}`);
+    navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherId}`);
   };
 
   const canAdd = voucherCode && value && expDate;
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/vouchers" : `/vouchers/${voucherId}`);
+    navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherId}`);
 
   return (
     <VoucherFormBody

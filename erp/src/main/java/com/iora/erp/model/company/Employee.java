@@ -1,6 +1,8 @@
 package com.iora.erp.model.company;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,9 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-
 @Entity
-public class Employee implements Serializable{
+public class Employee implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,10 +22,9 @@ public class Employee implements Serializable{
 
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
     private String email;
     private Double salary;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
     private String hashPass;
@@ -47,9 +47,42 @@ public class Employee implements Serializable{
         this.email = email;
         this.salary = salary;
         this.username = username;
-        this.hashPass = hashPass;
+        this.hashPass = generateProtectedPassword(salt, hashPass);
         this.salt = salt;
         this.availStatus = availStatus;
+    }
+
+    private static String generateProtectedPassword(String salt, String password) {
+        String generatedPassword;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.reset();
+            md.update((salt + password).getBytes("utf8"));
+
+            generatedPassword = String.format("%0129x", new BigInteger(1, md.digest()));
+            return generatedPassword;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public Boolean authentication(String authenticate) {
+        String tryPassword;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.reset();
+            md.update((this.salt + authenticate).getBytes("utf8"));
+
+            tryPassword = String.format("%0128x", new BigInteger(1, md.digest()));
+
+            if (tryPassword.equals(this.hashPass)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public Department getDepartment() {
@@ -80,8 +113,8 @@ public class Employee implements Serializable{
         return hashPass;
     }
 
-    public void setHashPass(String hashPass) {
-        this.hashPass = hashPass;
+    public void setHashPass(String password) {
+        this.hashPass = generateProtectedPassword(this.salt, password);
     }
 
     public String getUsername() {
@@ -136,6 +169,10 @@ public class Employee implements Serializable{
     @Override
     public String toString() {
         return "Employee[ id=" + id + " ]";
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
 }

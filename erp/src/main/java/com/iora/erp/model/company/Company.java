@@ -3,6 +3,7 @@ package com.iora.erp.model.company;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-
 @Entity
 public class Company implements Serializable {
 
@@ -19,14 +19,16 @@ public class Company implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String registerNumber;
     @Column(nullable = false)
     private String telephone;
+    @Column(nullable = false)
+    private Boolean active;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Address address;
     @OneToMany
     private List<Department> departments;
@@ -40,6 +42,7 @@ public class Company implements Serializable {
         this.name = name;
         this.registerNumber = registerNumber;
         this.telephone = telephone;
+        this.active = true;
     }
 
     public Address getAddress() {
@@ -60,6 +63,14 @@ public class Company implements Serializable {
 
     public Long getId() {
         return id;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public List<Department> getDepartments() {
@@ -97,6 +108,10 @@ public class Company implements Serializable {
     @Override
     public String toString() {
         return "Company [id=" + id + "]";
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     // Locale.getISOCountries();

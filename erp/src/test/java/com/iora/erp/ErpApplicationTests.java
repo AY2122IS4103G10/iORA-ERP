@@ -10,4 +10,7 @@ class ErpApplicationTests {
 	void contextLoads() {
 	}
 
+	public ErpApplicationTests(){
+	}
+
 }

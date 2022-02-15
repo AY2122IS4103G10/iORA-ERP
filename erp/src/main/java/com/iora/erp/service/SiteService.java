@@ -1,35 +1,36 @@
 package com.iora.erp.service;
 
 import java.util.List;
+import java.util.Map;
 
-import com.iora.erp.enumeration.Country;
+import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
+import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 
 public interface SiteService {
     public abstract void createSite(Site site, String storeType);
     public abstract Site getSite(Long id);
-    public abstract List<Site> getAllSites();
-    public abstract List<Site> getSitesByCountry(Country country);
-    public abstract List<? extends Site> getAllHeadquarters();
-    public abstract List<? extends Site> getHeadquartersByCountry(Country country);
-    public abstract List<? extends Site> getAllManufacturing();
-    public abstract List<? extends Site> getManufacturingByCountry(Country country);
-    public abstract List<? extends Site> getAllStores();
-    public abstract List<? extends Site> getStoresByCountry(Country country);
-    public abstract List<? extends Site> getAllOnlineStores();
-    public abstract List<? extends Site> getOnlineStoresByCountry(Country country);
-    public abstract List<? extends Site> getAllWarehouses();
-    public abstract List<? extends Site> getWarehousesByCountry(Country country);
+    public abstract List<Site> searchAllSites(List<String> storeTypes, String country, String company);
+    public abstract List<? extends Site> searchHeadquarters(String country, String company);
+    public abstract List<? extends Site> searchManufacturing(String country, String company);
+    public abstract List<? extends Site> searchOnlineStores(String country, String company);
+    public abstract List<? extends Site> searchStores(String country, String company);
+    public abstract List<? extends Site> searchWarehouses(String country, String company);
     public abstract void updateSite(Site site);
     public abstract void deleteSite(Long id);
 
-    public abstract StockLevel getAllStockLevels(List<Site> sites);
+    public abstract Site getSiteFromStockLevel(Long stockLevelId);
+
+    public abstract List<Site> searchStockLevels(List<String> storeTypes, String country, String company);
     public abstract StockLevel getStockLevelOfSite(Long siteId) throws NoStockLevelException;
-    public abstract StockLevel getStockLevelByProduct(String SKUCode);
-    public abstract void addProductItemToSite(Long siteId, Long productItemId) throws NoStockLevelException;
-    public abstract void removeProductItemFromSite(Long siteId, Long productItemId) throws NoStockLevelException;
-    public abstract void addStockLevelToSite(Long siteId, List<Long> productItemIds) throws NoStockLevelException;
-    public abstract void removeStockLevelFromSite(Long siteId, List<Long> productItemIds) throws NoStockLevelException;
+    public abstract Map<Long,Long> getStockLevelByProduct(String SKUCode);
+    public abstract void addProductItemToSite(Long siteId, String productItemId) throws NoStockLevelException;
+    public abstract void removeProductItemFromSite(Long siteId, String productItemId) throws NoStockLevelException;
+    public abstract void addStockLevelToSite(Long siteId, List<String> productItemIds) throws NoStockLevelException;
+    public abstract void removeStockLevelFromSite(Long siteId, List<String> productItemIds) throws NoStockLevelException;
+
+    public abstract void addToStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException;
+    public abstract void removeFromStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException;
 }

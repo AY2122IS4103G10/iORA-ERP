@@ -83,4 +83,8 @@ public class Vendor implements Serializable {
     public String toString() {
         return "Vendor [id=" + id + "]";
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

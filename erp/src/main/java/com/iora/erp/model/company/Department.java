@@ -2,6 +2,8 @@ package com.iora.erp.model.company;
 
 import java.io.Serializable;
 import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,28 +17,17 @@ public class Department implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String deptName;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<JobTitle> jobTitles;
-
-    @OneToMany(mappedBy = "department")
-    private List<Employee> employee;
 
     public Department() {
     }
 
     public Department(String department) {
         this.deptName = department;
-    }
-
-    public List<Employee> getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(List<Employee> employee) {
-        this.employee = employee;
     }
 
     public List<JobTitle> getJobTitles() {
@@ -62,6 +53,18 @@ public class Department implements Serializable {
     @Override
     public String toString() {
         return "Department [id=" + id + "]";
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
     }
 
 }

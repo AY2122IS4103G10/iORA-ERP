@@ -3,7 +3,7 @@ import { Index } from "./views/containers/Index";
 import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
-import { ViewStockLevels } from "./views/containers/StockLevels/ViewStockLevels";
+import { ViewStockLevels } from "./views/containers/StockLevels/ManageStockLevels";
 import Login from "./views/containers/Login";
 import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
@@ -13,10 +13,10 @@ function App() {
   return (
     <div>
       <Routes>
-        {/* login */}
-        {/* <Route path="/"></Route> */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Index />}>
+        <Route path="/" element={<Login/>}/>
+
+        {/* Sales and Marketing Subsystem */}
+        <Route path="/sm" element={<Index />}>
           <Route path="products" element={<Outlet />}>
             <Route index element={<ManageProducts />} />
             <Route path=":prodCode" element={<ProductDetails />} />

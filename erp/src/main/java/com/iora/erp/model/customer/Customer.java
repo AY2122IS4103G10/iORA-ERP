@@ -1,6 +1,8 @@
 package com.iora.erp.model.customer;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,14 +20,15 @@ public class Customer implements Serializable {
   @Column(nullable = false)
   private String firstName;
   private String lastName;
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String email;
   private String contactNumber;
   private Integer membershipPoints;
   private Double storeCredit;
+  private Boolean availStatus;
 
   @Column(nullable = false)
-  private String passHash;
+  private String hashPass;
   @Column(nullable = false)
   private String salt;
 
@@ -35,15 +38,49 @@ public class Customer implements Serializable {
   }
 
   public Customer(String firstName, String lastName, String email, String contactNumber, Integer membershipPoints,
-      Double storeCredit, String passHash, String salt) {
+      Double storeCredit, String pass, String salt, Boolean availStatus) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.contactNumber = contactNumber;
     this.membershipPoints = membershipPoints;
     this.storeCredit = storeCredit;
-    this.passHash = passHash;
+    this.hashPass = generateProtectedPassword(salt, pass);
     this.salt = salt;
+    this.availStatus = availStatus;
+  }
+
+  private static String generateProtectedPassword(String passwordSalt, String plainPassword) {
+    String generatedPassword;
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-512");
+      md.reset();
+      md.update((passwordSalt + plainPassword).getBytes("utf8"));
+
+      generatedPassword = String.format("%0128x", new BigInteger(1, md.digest()));
+      return generatedPassword;
+    } catch (Exception ex) {
+      return null;
+    }
+  }
+
+  public Boolean authentication(String authenticate) {
+    String tryPassword;
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-512");
+      md.reset();
+      md.update((this.salt + authenticate).getBytes("utf8"));
+
+      tryPassword = String.format("%0128x", new BigInteger(1, md.digest()));
+
+      if (tryPassword.equals(this.hashPass)) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (Exception ex) {
+      return false;
+    }
   }
 
   public String getSalt() {
@@ -54,12 +91,12 @@ public class Customer implements Serializable {
     this.salt = salt;
   }
 
-  public String getPassHash() {
-    return passHash;
+  public String gethashPass() {
+    return hashPass;
   }
 
-  public void setPassHash(String passHash) {
-    this.passHash = passHash;
+  public void sethashPass(String password) {
+    this.hashPass = generateProtectedPassword(this.salt, password);
   }
 
   public Customer(String firstName, String lastName) {
@@ -124,6 +161,18 @@ public class Customer implements Serializable {
     return String.format(
         "Customer[id=%d, firstName='%s', lastName='%s']",
         id, firstName, lastName);
+  }
+
+  public Boolean getAvailStatus() {
+    return availStatus;
+  }
+
+  public void setAvailStatus(Boolean availStatus) {
+    this.availStatus = availStatus;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
 }

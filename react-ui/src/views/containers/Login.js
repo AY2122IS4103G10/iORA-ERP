@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../stores/slices/userSlice";
 import { login } from "../../stores/slices/userSlice";
 import Api from "../../environments/Api";
-import logo from "../../images/iORAlogo.png";
+import logo from "../../assets/images/iORAlogo.png";
 
 export default function Login() {
     const [username, setUsername] = useState("");

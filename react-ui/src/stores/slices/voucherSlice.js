@@ -1,50 +1,64 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
 
-const initialState = [
-  {
-    id: 1,
-    code: "RKF3X8NDND",
-    issuedDate: new Date(),
-    expDate: new Date(),
-    isRedeemed: false,
-  },
-];
+const initialState = {
+  vouchers: [
+    {
+      id: 1,
+      code: "RKF3X8NDND",
+      value: 10,
+      issuedDate: new Date().toJSON(),
+      expDate: new Date().toJSON(),
+      isRedeemed: false,
+    },
+  ],
+  status: "idle",
+  error: null,
+};
 
 const voucherSlice = createSlice({
-  name: "voucher",
+  name: "vouchers",
   initialState,
   reducers: {
     voucherAdded: {
       reducer(state, action) {
-        state.push(action.payload);
+        state.vouchers.push(action.payload);
       },
-      prepare(code, value, issuedDate, expDate, isRedeemed) {
+      prepare(code, value, expDate) {
         return {
           payload: {
             id: nanoid(),
             code,
             value,
-            issuedDate,
-            expDate,
-            isRedeemed,
+            issuedDate: new Date().toJSON(),
+            expDate: expDate.toJSON(),
+            isRedeemed: false,
           },
         };
       },
     },
     voucherUpdated(state, action) {
-      const { id, code, value, issuedDate, expDate, isRedeemed } = action.payload;
-      const existingProd = state.vouchers.find((voucher) => voucher.id === id);
-      if (existingProd) {
-        existingProd.code = code;
-        existingProd.value = value;
-        existingProd.issuedDate = issuedDate;
-        existingProd.expDate = expDate;
-        existingProd.isRedeemed = isRedeemed;
+      const { id, code, value, issuedDate, expDate, isRedeemed } =
+        action.payload;
+      const existingVoucher = state.vouchers.find((voucher) => voucher.id === id);
+      if (existingVoucher) {
+        existingVoucher.code = code;
+        existingVoucher.value = value;
+        existingVoucher.issuedDate = issuedDate;
+        existingVoucher.expDate = expDate;
+        existingVoucher.isRedeemed = isRedeemed;
       }
+    },
+    voucherDeleted(state, action) {
+      state.vouchers.filter((voucher) => voucher !== action.payload);
     },
   },
 });
 
-export const { voucherAdded, voucherUpdated } = voucherSlice.actions;
+export const { voucherAdded, voucherUpdated, voucherDeleted } = voucherSlice.actions;
 
 export default voucherSlice.reducer;
+
+export const selectAllVouchers = (state) => state.vouchers.vouchers;
+
+export const selectVoucherById = (state, voucherId) =>
+  state.vouchers.vouchers.find((voucher) => voucher.id === voucherId);

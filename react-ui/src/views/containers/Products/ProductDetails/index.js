@@ -1,19 +1,23 @@
-import { useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   CurrencyDollarIcon as CurrencyDollarIconSolid,
   PencilIcon,
 } from "@heroicons/react/solid";
 
-import { CurrencyDollarIcon } from "@heroicons/react/outline";
+import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
+import {
+  productDeleted,
+  selectProductByCode,
+} from "../../../../stores/slices/productSlice";
 
 const fieldSection = ({ fieldName, fields }) => {
   return (
     <div>
       <h2 className="text-sm font-medium text-gray-500">{fieldName}</h2>
       <ul className="mt-2 leading-8">
-        {fields.map((field) => (
-          <li className="inline">
+        {fields.map((field, index) => (
+          <li key={index} className="inline">
             <div className="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5">
               <div className="absolute flex-shrink-0 flex items-center justify-center">
                 <span
@@ -41,6 +45,7 @@ const ProductDetailsBody = ({
   sizes,
   tags,
   categories,
+  onDeleteProdClicked,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-5xl xl:grid xl:grid-cols-3">
@@ -65,6 +70,17 @@ const ProductDetailsBody = ({
                     <span>Edit</span>
                   </button>
                 </Link>
+                <button
+                  type="button"
+                  className="inline-flex justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-700"
+                  onClick={onDeleteProdClicked}
+                >
+                  <TrashIcon
+                    className="-ml-1 mr-2 h-5 w-5 text-white"
+                    aria-hidden="true"
+                  />
+                  <span>Delete</span>
+                </button>
               </div>
             </div>
             <aside className="mt-8 xl:hidden">
@@ -119,6 +135,26 @@ const ProductDetailsBody = ({
       </div>
       <aside className="hidden xl:block xl:pl-8">
         <h2 className="sr-only">Details</h2>
+        <div className="space-y-5">
+          <div className="flex items-center space-x-2">
+            <CurrencyDollarIcon
+              className="h-5 w-5 text-gray-400"
+              aria-hidden="true"
+            />
+            <span className="text-gray-900 text-sm font-medium">
+              {`List Price: $${listPrice}`}
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <CurrencyDollarIconSolid
+              className="h-5 w-5 text-gray-400"
+              aria-hidden="true"
+            />
+            <span className="text-gray-900 text-sm font-medium">
+              {`Discount Price: $${discPrice}`}
+            </span>
+          </div>
+        </div>
         <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
           {fieldSection({
             fieldName: "Colors",
@@ -145,15 +181,21 @@ const ProductDetailsBody = ({
 
 export const ProductDetails = () => {
   const { prodCode } = useParams();
-  const product = useSelector((state) =>
-    state.products.find((product) => product.prodCode === prodCode)
-  );
+  const product = useSelector((state) => selectProductByCode(state, prodCode));
 
   const fields = product.fields;
   const colors = fields.filter((field) => field.fieldName === "Color");
   const sizes = fields.filter((field) => field.fieldName === "Size");
   const tags = fields.filter((field) => field.fieldName === "Tag");
   const categories = fields.filter((field) => field.fieldName === "Category");
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const onDeleteProdClicked = () => {
+    dispatch(productDeleted(product));
+    navigate("/products");
+  };
 
   return (
     <ProductDetailsBody
@@ -166,6 +208,7 @@ export const ProductDetails = () => {
       sizes={sizes}
       tags={tags}
       categories={categories}
+      onDeleteProdClicked={onDeleteProdClicked}
     />
   );
 };

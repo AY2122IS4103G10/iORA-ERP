@@ -1,50 +1,62 @@
-import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
+import { productsApi } from "../../environments/Api";
 
-const initialState = [
-  {
-    id: 1,
-    prodCode: "ADQ0010406H",
-    name: "Cut-in Dress",
-    description: "Hello!",
-    listPrice: 10.99,
-    discPrice: 8.99,
-    fields: [
-      {
-        fieldId: 1,
-        fieldName: "Color",
-        fieldValue: "RED",
-      },
-      {
-        fieldId: 2,
-        fieldName: "Color",
-        fieldValue: "BLUE",
-      },
-      {
-        fieldId: 3,
-        fieldName: "Color",
-        fieldValue: "YELLOW",
-      },
-      {
-        fieldId: 4,
-        fieldName: "Size",
-        fieldValue: "S",
-      },
-      {
-        fieldId: 5,
-        fieldName: "Size",
-        fieldValue: "M",
-      },
-    ],
-  },
-];
+const initialState = {
+  products: [
+    {
+      prodCode: "ADQ0010406H",
+      name: "Cut-in Dress",
+      description: "Hello!",
+      listPrice: 10.99,
+      discPrice: 8.99,
+      fields: [
+        {
+          fieldId: 1,
+          fieldName: "Color",
+          fieldValue: "RED",
+        },
+        {
+          fieldId: 2,
+          fieldName: "Color",
+          fieldValue: "BLUE",
+        },
+        {
+          fieldId: 3,
+          fieldName: "Color",
+          fieldValue: "YELLOW",
+        },
+        {
+          fieldId: 4,
+          fieldName: "Size",
+          fieldValue: "S",
+        },
+        {
+          fieldId: 5,
+          fieldName: "Size",
+          fieldValue: "M",
+        },
+      ],
+    },
+  ],
+  status: "idle",
+  error: null,
+};
+
+export const fetchProducts = createAsyncThunk(
+  "products/fetchProducts",
+  async () => {
+    const response = await productsApi.getAll();
+    return response.data;
+  }
+);
 
 const productSlice = createSlice({
-  name: "product",
+  name: "products",
   initialState,
   reducers: {
     productAdded: {
       reducer(state, action) {
-        state.push(action.payload);
+        state.products.push(action.payload);
       },
       prepare(prodCode, name, description, listPrice, discPrice, fields) {
         return {
@@ -61,9 +73,9 @@ const productSlice = createSlice({
       },
     },
     productUpdated(state, action) {
-      const { code, name, description, listPrice, discPrice, fields } =
+      const { prodCode, name, description, listPrice, discPrice, fields } =
         action.payload;
-      const existingProd = state.products.find((prod) => prod.code === code);
+      const existingProd = state.products.find((prod) => prod.prodCode === prodCode);
       if (existingProd) {
         existingProd.name = name;
         existingProd.description = description;
@@ -72,14 +84,18 @@ const productSlice = createSlice({
         existingProd.fields = fields;
       }
     },
+    productDeleted(state, action) {
+      state.products.filter((product) => product !== action.payload);
+    },
   },
 });
 
-export const { productAdded, productUpdated } = productSlice.actions;
+export const { productAdded, productUpdated, productDeleted } =
+  productSlice.actions;
 
 export default productSlice.reducer;
 
-export const selectAllProducts = (state) => state.products;
+export const selectAllProducts = (state) => state.products.products;
 
 export const selectProductByCode = (state, prodCode) =>
-  state.products.find((product) => product.id === prodCode);
+  state.products.products.find((product) => product.prodCode === prodCode);

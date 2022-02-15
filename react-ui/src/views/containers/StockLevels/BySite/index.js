@@ -86,7 +86,7 @@ export const SiteTables = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {people.map((person) => (
+                {/* {people.map((person) => (
                   <tr key={person.email}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{person.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.title}</td>
@@ -98,7 +98,7 @@ export const SiteTables = () => {
                       </a>
                     </td>
                   </tr>
-                ))}
+                ))} */}
               </tbody>
             </table>
           </div>

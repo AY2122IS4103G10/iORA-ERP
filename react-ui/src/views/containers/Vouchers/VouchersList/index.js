@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import moment from "moment";
 import { CogIcon } from "@heroicons/react/outline";
 
 import {
@@ -8,25 +9,27 @@ import {
   SelectColumnFilter,
   OptionsCell,
 } from "../../../components/Tables/SimpleTable";
+import { selectAllVouchers } from "../../../../stores/slices/voucherSlice";
 
 export const VouchersTable = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Name",
+        Header: "Id",
         accessor: "id",
-      },
-      {
-        Header: "Voucher Code",
-        accessor: "code",
         Cell: (e) => (
           <Link
-            to={`/products/${e.value}`}
+            to={`/vouchers/${e.value}`}
             className="hover:text-gray-700 hover:underline"
           >
             {e.value}
           </Link>
         ),
+      },
+      {
+        Header: "Voucher Code",
+        accessor: "code",
+        
       },
       {
         Header: "Value",
@@ -36,16 +39,19 @@ export const VouchersTable = () => {
       {
         Header: "Issued Date",
         accessor: "issuedDate",
+        Cell: (e) => moment(e.value).format("lll"),
       },
       {
         Header: "Expiry Date",
         accessor: "expDate",
+        Cell: (e) => moment(e.value).format("lll"),
       },
       {
         Header: "Redeemed",
         accessor: "isRedeemed",
+        Cell: (e) => (e.value ? "Yes" : "No"),
         Filter: SelectColumnFilter,
-        filter: 'includes',
+        filter: "includes",
       },
       // {
       //   Header: CogIcon,
@@ -62,7 +68,7 @@ export const VouchersTable = () => {
     ],
     []
   );
-  const data = useSelector((state) => state.vouchers);
+  const data = useSelector(selectAllVouchers);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

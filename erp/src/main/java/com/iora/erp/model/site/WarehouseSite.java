@@ -12,7 +12,7 @@ public class WarehouseSite extends Site {
     public WarehouseSite() {
     }
     
-    public WarehouseSite(String name, Address address, double latitude, double longitude, String siteCode, Company company) {
+    public WarehouseSite(String name, Address address, String siteCode, Company company) {
         super(name, address, siteCode, company);
     }
 

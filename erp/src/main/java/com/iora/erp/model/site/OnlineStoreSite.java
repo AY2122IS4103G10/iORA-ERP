@@ -11,7 +11,7 @@ public class OnlineStoreSite extends Site {
     public OnlineStoreSite() {
     }
     
-    public OnlineStoreSite(String name, Address address, double latitude, double longitude, String siteCode, Company company) {
+    public OnlineStoreSite(String name, Address address, String siteCode, Company company) {
         super(name, address, siteCode, company);
     }
 

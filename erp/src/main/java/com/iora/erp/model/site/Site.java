@@ -31,10 +31,6 @@ public class Site implements Serializable {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Country country;
-
     @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
@@ -59,6 +55,7 @@ public class Site implements Serializable {
         this.siteCode = siteCode;
         this.company = company;
         this.stockLevel = new StockLevel();
+        this.active = true;
     }
 
     @Override
@@ -88,14 +85,6 @@ public class Site implements Serializable {
 
     public void setAddress(Address address) {
         this.address = address;
-    }
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
     }
 
     public String getSiteCode() {

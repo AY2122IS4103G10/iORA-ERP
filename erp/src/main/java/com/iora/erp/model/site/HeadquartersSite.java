@@ -11,7 +11,7 @@ public class HeadquartersSite extends Site {
     public HeadquartersSite() {
     }
     
-    public HeadquartersSite(String name, Address address, double latitude, double longitude, String siteCode, Company company) {
+    public HeadquartersSite(String name, Address address, String siteCode, Company company) {
         super(name, address, siteCode, company);
     }
 

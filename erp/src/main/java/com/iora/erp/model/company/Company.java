@@ -42,6 +42,7 @@ public class Company implements Serializable {
         this.name = name;
         this.registerNumber = registerNumber;
         this.telephone = telephone;
+        this.active = true;
     }
 
     public Address getAddress() {

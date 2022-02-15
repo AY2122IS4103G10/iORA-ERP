@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
+import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.EmployeeService;
@@ -55,10 +56,12 @@ public class DataLoader implements CommandLineRunner {
         departments.add(sam);
 
         Company iora = new Company("iORA Fashion Pte. Ltd.", "199703089W", "63610056");
-        iora.setActive(true);
         iora.setDepartments(departments);
         iora.setAddress(a1);
         em.persist(iora);
+
+        HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", iora);
+        em.persist(iorahq);
     }
 
 }

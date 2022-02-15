@@ -11,7 +11,7 @@ public class ManufacturingSite extends Site {
     public ManufacturingSite() {
     }
     
-    public ManufacturingSite(String name, Address address, double latitude, double longitude, String siteCode, Company company) {
+    public ManufacturingSite(String name, Address address, String siteCode, Company company) {
         super(name, address, siteCode, company);
     }
 

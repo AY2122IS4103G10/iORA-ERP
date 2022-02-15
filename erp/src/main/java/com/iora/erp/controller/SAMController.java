@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
+import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 
@@ -29,6 +31,8 @@ public class SAMController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CustomerService customerService;
     @Autowired
     private SiteService siteService;
 
@@ -273,6 +277,58 @@ public class SAMController {
                     Double.parseDouble(body.get("discountedPrice")));
             return ResponseEntity
                     .ok("Promotion " + body.get("category") + " is successfully added to the Model " + modelCode);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/voucher/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> getVoucher(@PathVariable String voucherCode) {
+        try {
+            return ResponseEntity.ok(customerService.getVoucher(voucherCode));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/voucher/{amount}/{qty}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> generateVouchers(@PathVariable double amount, @PathVariable int qty,
+            @RequestBody(required = false) Object body) {
+        try {
+            customerService.generateVouchers(amount, qty);
+            return ResponseEntity.ok(qty + " quantity of S$" + amount + " vouchers have been successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/voucher", produces = "application/json")
+    public List<Voucher> getAllVouchers() {
+        return customerService.getAllVouchers();
+    }
+
+    @GetMapping(path = "/voucher/amount/{amount}", produces = "application/json")
+    public List<Voucher> getAvailableVouchersByAmount(@PathVariable double amount) {
+        return customerService.getAvailableVouchersByAmount(amount);
+    }
+
+    @PutMapping(path = "/voucher/issue/{voucherCode}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode,
+            @RequestBody(required = false) Object body) {
+        try {
+            customerService.issueVoucher(voucherCode);
+            return ResponseEntity.ok("Voucher " + voucherCode + " has been marked as issued.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/voucher/redeem/{voucherCode}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> redeemVouchers(@PathVariable String voucherCode,
+            @RequestBody(required = false) Object body) {
+        try {
+            customerService.redeemVoucher(voucherCode);
+            return ResponseEntity.ok("Voucher " + voucherCode + " has been marked as redeemed.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

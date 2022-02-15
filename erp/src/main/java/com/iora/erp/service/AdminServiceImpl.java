@@ -281,9 +281,9 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Boolean checkAddress(Address address) {
         Query q = em.createQuery(
-                "SELECT e FROM Address e WHERE LOWER(e.getCountry) = :country AND LOWER(e.getCity) = :city " +
+                "SELECT e FROM Address e WHERE UPPER(e.getCountry) = :country AND LOWER(e.getCity) = :city " +
                         "AND LOWER(e.getPostalCode) = :postal AND LOWER(e.getUnit) = :unit");
-        q.setParameter("country", address.getCountry().toLowerCase());
+        q.setParameter("country", address.getCountry().toString());
         q.setParameter("city", address.getCity().toLowerCase());
         q.setParameter("postal", address.getPostalCode().toLowerCase());
         q.setParameter("unit", address.getUnit().toLowerCase());

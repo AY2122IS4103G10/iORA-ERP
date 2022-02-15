@@ -158,7 +158,6 @@ public class SiteServiceImpl implements SiteService {
     public void updateSite(Site site) {
         Site old = em.find(Site.class, site.getId());
         old.setName(site.getName());
-        old.setCountry(site.getCountry());
         old.setAddress(site.getAddress());
         old.setSiteCode(site.getSiteCode());
         old.setActive(site.isActive());

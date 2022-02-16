@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.model.site.Site;
+import com.iora.erp.service.AdminService;
+import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,16 @@ public class AdminController {
 
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private AdminService adminService;
+
+    /*
+     * ---------------------------------------------------------
+     * C.1 Account Management
+     * ---------------------------------------------------------
+     */
 
     // Employee/JobTitle/Department stuff here
 

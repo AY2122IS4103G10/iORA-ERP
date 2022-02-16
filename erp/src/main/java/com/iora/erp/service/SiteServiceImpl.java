@@ -1,16 +1,14 @@
 package com.iora.erp.service;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.iora.erp.enumeration.Country;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
-import com.iora.erp.model.company.Company;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
@@ -71,36 +69,49 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public List<Site> searchAllSites(List<String> storeTypes, String country, String company) {
-        List<Site> resultList = new ArrayList<>();
-        if (storeTypes.contains("Headquarters")) {
-            resultList.addAll(searchHeadquarters(country, company));
-        }
-        if (storeTypes.contains("Manufacturing")) {
-            resultList.addAll(searchManufacturing(country, company));
-        }
-        if (storeTypes.contains("OnlineStore")) {
-            resultList.addAll(searchOnlineStores(country, company));
-        }
-        if (storeTypes.contains("Store")) {
-            resultList.addAll(searchStores(country, company));
-        }
-        if (storeTypes.contains("Warehouse")) {
-            resultList.addAll(searchWarehouses(country, company));
-        }
+        List<Site> resultList = em.createQuery(siteQuery("SELECT s FROM Site s", country.toUpperCase(), company),
+                Site.class)
+                .getResultList();
         return resultList;
     };
+
+    // @Override
+    // public List<Site> searchAllSites(List<String> storeTypes, String country,
+    // String company) {
+    // List<Site> resultList = new ArrayList<>();
+    // if (storeTypes.contains("Headquarters")) {
+    // resultList.addAll(searchHeadquarters(country, company));
+    // }
+    // if (storeTypes.contains("Manufacturing")) {
+    // resultList.addAll(searchManufacturing(country, company));
+    // }
+    // if (storeTypes.contains("OnlineStore")) {
+    // resultList.addAll(searchOnlineStores(country, company));
+    // }
+    // if (storeTypes.contains("Store")) {
+    // resultList.addAll(searchStores(country, company));
+    // }
+    // if (storeTypes.contains("Warehouse")) {
+    // resultList.addAll(searchWarehouses(country, company));
+    // }
+    // return resultList;
+    // };
 
     @Override
     public List<? extends Site> searchHeadquarters(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM HeadquartersSite s", country.toUpperCase(), company), HeadquartersSite.class).getResultList();
+                .createQuery(siteQuery("SELECT s FROM HeadquartersSite s", country.toUpperCase(), company),
+                        HeadquartersSite.class)
+                .getResultList();
         return resultList;
     }
 
     @Override
     public List<? extends Site> searchManufacturing(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM ManufacturingSite s", country.toUpperCase(), company), ManufacturingSite.class).getResultList();
+                .createQuery(siteQuery("SELECT s FROM ManufacturingSite s", country.toUpperCase(), company),
+                        ManufacturingSite.class)
+                .getResultList();
         return resultList;
     }
 
@@ -147,10 +158,7 @@ public class SiteServiceImpl implements SiteService {
     public void updateSite(Site site) {
         Site old = em.find(Site.class, site.getId());
         old.setName(site.getName());
-        old.setCountry(site.getCountry());
         old.setAddress(site.getAddress());
-        old.setLatitude(site.getLatitude());
-        old.setLongitude(site.getLongitude());
         old.setSiteCode(site.getSiteCode());
         old.setActive(site.isActive());
     }
@@ -166,12 +174,20 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public StockLevel getAllStockLevels(List<Site> sites) {
-        List<ProductItem> temp = new ArrayList<>();
-        for (Site s : sites) {
-            temp.addAll(s.getStockLevel().getProductItems());
+    public Site getSiteFromStockLevel(Long stockLevelId) {
+        return em.createQuery("SELECT s from Site s WHERE s.stockLevel.id = :id", Site.class)
+                .setParameter("id", stockLevelId).getSingleResult();
+    };
+
+    @Override
+    public List<Site> searchStockLevels(List<String> storeTypes, String country, String company) {
+        List<Site> resultList = em.createQuery(siteQuery("SELECT s FROM Site s", country.toUpperCase(), company),
+                Site.class)
+                .getResultList();
+        for (Site s : resultList) {
+            s.getStockLevel();
         }
-        return new StockLevel(temp);
+        return resultList;
     }
 
     @Override
@@ -184,7 +200,7 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public void addProductItemToSite(Long siteId, Long productItemId) throws NoStockLevelException {
+    public void addProductItemToSite(Long siteId, String productItemId) throws NoStockLevelException {
         StockLevel stockLevel = getStockLevelOfSite(siteId);
         ProductItem item = em.find(ProductItem.class, productItemId);
         try {
@@ -196,7 +212,7 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public void removeProductItemFromSite(Long siteId, Long productItemId) throws NoStockLevelException {
+    public void removeProductItemFromSite(Long siteId, String productItemId) throws NoStockLevelException {
         StockLevel stockLevel = getStockLevelOfSite(siteId);
         ProductItem item = em.find(ProductItem.class, productItemId);
         try {
@@ -207,9 +223,9 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public void addStockLevelToSite(Long siteId, List<Long> productItemIds) throws NoStockLevelException {
+    public void addStockLevelToSite(Long siteId, List<String> productItemIds) throws NoStockLevelException {
         StockLevel stockLevel = getStockLevelOfSite(siteId);
-        for (Long productItemId : productItemIds) {
+        for (String productItemId : productItemIds) {
             try {
                 ProductItem item = em.find(ProductItem.class, productItemId);
                 removeFromStockLevel(stockLevel, item);
@@ -221,9 +237,9 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public void removeStockLevelFromSite(Long siteId, List<Long> productItemIds) throws NoStockLevelException {
+    public void removeStockLevelFromSite(Long siteId, List<String> productItemIds) throws NoStockLevelException {
         StockLevel stockLevel = getStockLevelOfSite(siteId);
-        for (Long productItemId : productItemIds) {
+        for (String productItemId : productItemIds) {
             try {
                 ProductItem item = em.find(ProductItem.class, productItemId);
                 removeFromStockLevel(stockLevel, item);
@@ -234,13 +250,21 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public StockLevel getStockLevelByProduct(String SKUCode) {
-        // TODO Auto-generated method stub
-        return null;
+    public Map<Long, Long> getStockLevelByProduct(String SKUCode) {
+        List<Object[]> resultList = (List<Object[]>) em
+                .createQuery("SELECT s.id, sl FROM Site s JOIN StockLevel sl", Object[].class)
+                .getResultList();
+        Map<Long, Long> resultMap = new HashMap<Long, Long>();
+        for (Object[] o : resultList) {
+            Long siteId = (Long) o[0];
+            StockLevel stockLevel = (StockLevel) o[1];
+            resultMap.put(siteId, stockLevel.getProducts().getOrDefault(SKUCode, 0L));
+        }
+        return resultMap;
     }
 
-    // Helper methods
-    private void addToStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException {
+    @Override
+    public void addToStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException {
         if (stockLevel.getProductItems().contains(productItem)) {
             throw new IllegalTransferException("Product Item already added");
         }
@@ -252,7 +276,8 @@ public class SiteServiceImpl implements SiteService {
         stockLevel.getModels().merge(modelCode, 1L, (x, y) -> x + y);
     }
 
-    private void removeFromStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException {
+    @Override
+    public void removeFromStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException {
         if (!stockLevel.getProductItems().contains(productItem)) {
             throw new IllegalTransferException("Product Item already removed");
         }

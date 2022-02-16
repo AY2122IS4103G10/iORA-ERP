@@ -10,6 +10,7 @@ import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.PromotionField;
 
 public interface ProductService {
     public abstract ProductField getProductFieldByName(String fieldName) throws ProductFieldException;
@@ -17,14 +18,20 @@ public interface ProductService {
     public abstract void createProductField(ProductField productField) throws ProductFieldException;
     public abstract List<ProductField> getAllProductFields();
 
+    public abstract PromotionField getPromoField(String fieldName, String fieldValue, double discountedPrice) throws ProductFieldException;
+    public abstract void addPromoCategory(String modelCode, String category, double discountedPrice) throws ModelException;
+
     public abstract void createModel(Model model) throws ModelException;
     public abstract Model getModel(String modelCode) throws ModelException;
     public abstract List<Model> searchModelsByModelCode(String modelCode);
     public abstract List<Model> searchModelsByName(String name);
     public abstract List<Model> getModelsByFieldValue(String fieldName, String fieldValue);
+    public abstract List<Model> getModelsByFashionLineTag(String fashionLine, String tag);
+    public abstract List<Model> getModelsByTag(String tag);
+    public abstract List<Model> getModelsByCategory(String category);
     public abstract void updateModel(Model model) throws ModelException;
 
-    public abstract void createProduct(String modelCode, List<String> colours, List<String> sizes) throws ProductException;
+    public abstract void createProduct(String modelCode, List<String> colours, List<String> sizes, List<String> tags) throws ProductException;
     public abstract Product getProduct(String sku) throws ProductException;
     public abstract List<Product> searchProductsBySKU(String sku);
     public abstract List<Product> getProductsByModel(String modelCode) throws ProductException;

@@ -3,7 +3,9 @@ package com.iora.erp.service;
 import java.util.List;
 
 import com.iora.erp.exception.EmployeeException;
+import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
+import com.iora.erp.model.company.JobTitle;
 
 public interface EmployeeService {
     public abstract void createEmployee(Employee employee) throws EmployeeException;
@@ -16,6 +18,5 @@ public interface EmployeeService {
     public abstract Employee getEmployeeById(Long id)  throws EmployeeException;
     public abstract Employee getEmployeeByUsername(String username) throws EmployeeException;
     
-    public abstract byte[] saltGeneration();
     public abstract Employee loginAuthentication(Employee employee) throws EmployeeException;
 }

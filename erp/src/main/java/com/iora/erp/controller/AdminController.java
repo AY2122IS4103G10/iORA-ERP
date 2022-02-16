@@ -2,8 +2,11 @@ package com.iora.erp.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.iora.erp.enumeration.Country;
+import com.iora.erp.exception.EmployeeException;
+import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.AdminServiceImpl;
 import com.iora.erp.service.EmployeeService;
@@ -100,4 +103,52 @@ public class AdminController {
             return null;
         }
     }
+
+    @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.createEmployee(employee);
+            return ResponseEntity.ok("Employee " + employee.getName() + " is successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/addEmployees", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addEmployee(@RequestBody List<Employee> employee) {
+        try {
+            for (Employee e : employee) {
+                employeeService.createEmployee(e);
+            }
+            return ResponseEntity.ok("All employees has been successfully created");
+        } catch (EmployeeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    public List<Employee> viewEmployees(@RequestParam("search") String search) {
+        try {
+            return employeeService.getEmployeeByFields(search);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+    //need do management update
+    @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> editSite(@RequestBody Employee employee) {
+        try {
+            employeeService.updateEmployeeAccount(employee);
+            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " is successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+
+
+
 }

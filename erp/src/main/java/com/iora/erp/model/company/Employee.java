@@ -1,8 +1,8 @@
 package com.iora.erp.model.company;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,8 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
-public class Employee implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Employee  {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -41,14 +40,13 @@ public class Employee implements Serializable {
     public Employee() {
     }
 
-    public Employee(String name, String email, Double salary, String username, String hashPass, String salt,
-            Boolean availStatus) {
+    public Employee(String name, String email, Double salary, String username, String hashPass, Boolean availStatus) {
         this.name = name;
         this.email = email;
         this.salary = salary;
         this.username = username;
-        this.hashPass = generateProtectedPassword(salt, hashPass);
-        this.salt = salt;
+        this.salt = saltGeneration();
+        this.hashPass = generateProtectedPassword(this.salt, hashPass);
         this.availStatus = availStatus;
     }
 
@@ -64,6 +62,13 @@ public class Employee implements Serializable {
         } catch (Exception ex) {
             return null;
         }
+    }
+
+    private static String saltGeneration() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return salt.toString();
     }
 
     public Boolean authentication(String authenticate) {
@@ -105,8 +110,8 @@ public class Employee implements Serializable {
         return salt;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
+    public void setSalt(byte[] bs) {
+        this.salt = bs.toString();
     }
 
     public String getHashPass() {

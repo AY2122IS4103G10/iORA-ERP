@@ -48,27 +48,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         try {
             old.setUsername(employee.getUsername());
+            old.setName(employee.getName());
+            old.setSalary(employee.getSalary());
+
+            old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
+            old.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
+
         } catch (Exception ex) {
             throw new EmployeeException("Username " + employee.getUsername() + " has been used!");
         }
 
-        // department
-        try {
-            Department d = adminService.getDepartmentById(employee.getDepartment().getId());
-            old.setDepartment(d);
-        } catch (DepartmentException e) {
-            throw new EmployeeException();
-        }
-
-        try {
-            JobTitle j = adminService.getJobTitleById(employee.getJobTitle().getId());
-            old.setJobTitle(j);
-        } catch (JobTitleException e) {
-            throw new EmployeeException();
-        }
-
-        old.setName(employee.getName());
-        old.setSalary(employee.getSalary());
     }
 
     @Override
@@ -175,4 +164,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
     }
+
 }

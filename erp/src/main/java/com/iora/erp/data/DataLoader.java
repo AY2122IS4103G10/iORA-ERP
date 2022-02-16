@@ -153,10 +153,10 @@ public class DataLoader implements CommandLineRunner {
         }
 
         // Generate 10 $10 vouchers
-        customerService.generateVouchers(10, 10);
+        customerService.generateVouchers(10, 10, "2022-02-16");
 
         // Generate 10 $5 vouchers
-        customerService.generateVouchers(5, 10);
+        customerService.generateVouchers(5, 10, "2022-02-16");
     }
 
 }

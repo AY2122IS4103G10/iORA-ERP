@@ -82,7 +82,8 @@ public class SAMController {
 
     // Creates multiple Product instances with given Model Code in URL,
     @PostMapping(path = "/product/{modelCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProduct(@PathVariable String modelCode, @RequestBody List<ProductField> productFields) {
+    public ResponseEntity<Object> createProduct(@PathVariable String modelCode,
+            @RequestBody List<ProductField> productFields) {
         try {
             productService.createProduct(modelCode, productFields);
             return ResponseEntity.ok("Multiple Products are successfully created and linked to Model " + modelCode);
@@ -207,10 +208,12 @@ public class SAMController {
     }
 
     @PostMapping(path = "/productItem/{sku}/{rfid}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProductItem(@PathVariable String sku, @PathVariable String rfid, @RequestBody(required = false) Object body) {
+    public ResponseEntity<Object> createProductItem(@PathVariable String sku, @PathVariable String rfid,
+            @RequestBody(required = false) Object body) {
         try {
             productService.createProductItem(rfid, sku);
-            return ResponseEntity.ok("ProductItem with RFID " + rfid + " is successfully created and linked to product " + sku);
+            return ResponseEntity
+                    .ok("ProductItem with RFID " + rfid + " is successfully created and linked to product " + sku);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -283,11 +286,12 @@ public class SAMController {
         }
     }
 
-    @PutMapping(path = "/voucher/{amount}/{qty}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> generateVouchers(@PathVariable double amount, @PathVariable int qty,
-            @RequestBody(required = false) Object body) {
+    @PostMapping(path = "/voucher", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> generateVouchers(@RequestBody Map<String,String> body) {
         try {
-            customerService.generateVouchers(amount, qty);
+            double amount = Double.parseDouble(body.get("amount"));
+            int qty = Integer.parseInt(body.get("quantity"));
+            customerService.generateVouchers(amount, qty, body.get("expDate").substring(0, 10));
             return ResponseEntity.ok(qty + " quantity of S$" + amount + " vouchers have been successfully created.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());

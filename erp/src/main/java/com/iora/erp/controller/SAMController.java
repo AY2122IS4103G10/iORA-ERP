@@ -42,11 +42,11 @@ public class SAMController {
      * ---------------------------------------------------------
      */
 
-    // Returns ProductField instance with given fieldName
+    // Returns list of values by supplying fieldName
     @GetMapping(path = "/productField/{fieldName}", produces = "application/json")
-    public ResponseEntity<Object> getProductField(@PathVariable String fieldName) {
+    public ResponseEntity<Object> getProductFieldValues(@PathVariable String fieldName) {
         try {
-            return ResponseEntity.ok(productService.getProductFieldByName(fieldName));
+            return ResponseEntity.ok(productService.getProductFieldValues(fieldName));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -81,17 +81,10 @@ public class SAMController {
     }
 
     // Creates multiple Product instances with given Model Code in URL,
-    // and list of Colours and Sizes in JSON Body
-    // JSON Body e.g.: { "colours": ["red", "black"] , "sizes": "["S", "M", "L",
-    // "XL"] }
-    // JSON BODY MUST BE IN THE CORRECT FORMAT: List<String> colours, List<String>
-    // sizes
-    // This method is designed to be used right after the createModel method above
     @PostMapping(path = "/product/{modelCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProduct(@PathVariable String modelCode,
-            @RequestBody Map<String, List<String>> body) {
+    public ResponseEntity<Object> createProduct(@PathVariable String modelCode, @RequestBody List<ProductField> productFields) {
         try {
-            productService.createProduct(modelCode, body.get("colours"), body.get("sizes"), body.get("tags"));
+            productService.createProduct(modelCode, productFields);
             return ResponseEntity.ok("Multiple Products are successfully created and linked to Model " + modelCode);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -129,11 +122,10 @@ public class SAMController {
 
     // Get models by fashion line (iORA) and tag (top)
     // Return empty list if no results
-    @GetMapping(path = "/model/tag/{fashionLine}/{tag}", produces = "application/json")
-    public ResponseEntity<Object> getModelsByFashionLineTag(@PathVariable String fashionLine,
-            @PathVariable String tag) {
+    @GetMapping(path = "/model/tag/{company}/{tag}", produces = "application/json")
+    public ResponseEntity<Object> getModelsByCompanyAndTag(@PathVariable String company, @PathVariable String tag) {
         try {
-            return ResponseEntity.ok(productService.getModelsByFashionLineTag(fashionLine, tag));
+            return ResponseEntity.ok(productService.getModelsByCompanyAndTag(company, tag));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -185,7 +177,7 @@ public class SAMController {
         return productService.searchProductsBySKU(sku);
     }
 
-    @GetMapping(path = "/product/{modelCode}", produces = "application/json")
+    @GetMapping(path = "/product/modelCode/{modelCode}", produces = "application/json")
     public ResponseEntity<Object> getProductsByModel(@PathVariable String modelCode) {
         try {
             return ResponseEntity.ok(productService.getProductsByModel(modelCode));
@@ -214,11 +206,11 @@ public class SAMController {
         }
     }
 
-    @PostMapping(path = "/productItem", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProductItem(@RequestBody ProductItem productItem) {
+    @PostMapping(path = "/productItem/{sku}/{rfid}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createProductItem(@PathVariable String sku, @PathVariable String rfid, @RequestBody(required = false) Object body) {
         try {
-            productService.createProductItem(productItem);
-            return ResponseEntity.ok("ProductItem with RFID " + productItem.getRfid() + " is successfully created.");
+            productService.createProductItem(rfid, sku);
+            return ResponseEntity.ok("ProductItem with RFID " + rfid + " is successfully created and linked to product " + sku);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

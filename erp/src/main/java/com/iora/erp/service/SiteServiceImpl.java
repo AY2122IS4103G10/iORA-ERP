@@ -269,7 +269,7 @@ public class SiteServiceImpl implements SiteService {
             throw new IllegalTransferException("Product Item already added");
         }
         productItem.setStockLevel(stockLevel);
-        String SKUCode = productItem.getProduct().getsku();
+        String SKUCode = productItem.getProductSKU();
         String modelCode = SKUCode.split("-")[0];
         stockLevel.getProductItems().add(productItem);
         stockLevel.getProducts().merge(SKUCode, 1L, (x, y) -> x + y);
@@ -281,7 +281,7 @@ public class SiteServiceImpl implements SiteService {
         if (!stockLevel.getProductItems().contains(productItem)) {
             throw new IllegalTransferException("Product Item already removed");
         }
-        String SKUCode = productItem.getProduct().getsku();
+        String SKUCode = productItem.getProductSKU();
         String modelCode = SKUCode.split("-")[0];
         stockLevel.getProducts().merge(SKUCode, -1L, (x, y) -> x + y);
         stockLevel.getModels().merge(modelCode, -1L, (x, y) -> x + y);

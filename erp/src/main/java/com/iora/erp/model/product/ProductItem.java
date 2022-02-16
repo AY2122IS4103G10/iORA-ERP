@@ -3,6 +3,7 @@ package com.iora.erp.model.product;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -16,9 +17,8 @@ public class ProductItem {
     @Column(nullable = false)
     private boolean available;
 
-    @ManyToOne
-    @XmlTransient
-    private Product product;
+    @Column(nullable = false)
+    private String productSKU;
 
     @ManyToOne
     @XmlTransient
@@ -48,12 +48,12 @@ public class ProductItem {
         this.available = available;
     }
 
-    public Product getProduct() {
-        return this.product;
+    public String getProductSKU() {
+        return this.productSKU;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductSKU(String productSKU) {
+        this.productSKU = productSKU;
     }
 
     public StockLevel getStockLevel() {

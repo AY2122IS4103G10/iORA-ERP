@@ -14,8 +14,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
-import com.iora.erp.enumeration.FashionLine;
-
 @Entity
 public class Model {
 
@@ -28,10 +26,6 @@ public class Model {
     @Column(length = 512)
     @Size(max = 512)
     private String description;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private FashionLine fashionLine;
 
     @Column(nullable = false, scale = 2)
     private double price;
@@ -57,12 +51,11 @@ public class Model {
         productFields = new HashSet<>();
     }
 
-    public Model(String modelCode, String name, String description, FashionLine fashionLine, double price, boolean onlineOnly,
+    public Model(String modelCode, String name, String description, double price, boolean onlineOnly,
             boolean available) {
         this(modelCode);
         this.name = name;
         this.description = description;
-        this.fashionLine = fashionLine;
         this.price = price;
         this.onlineOnly = onlineOnly;
         this.available = available;
@@ -90,14 +83,6 @@ public class Model {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public FashionLine getFashionLine() {
-        return this.fashionLine;
-    }
-
-    public void setFashionLine(FashionLine fashionLine) {
-        this.fashionLine = fashionLine;
     }
 
     public double getPrice() {

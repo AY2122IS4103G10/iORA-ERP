@@ -4,21 +4,20 @@ import java.io.Serializable;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
-import com.iora.erp.enumeration.Country;
+import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Site implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,20 +28,8 @@ public class Site implements Serializable {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Country country;
-
-    @Column(nullable = false)
-    private String address;
-
-    @Min(-90)
-    @Max(90)
-    private double latitude;
-
-    @Min(-180)
-    @Max(180)
-    private double longitude;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Address address;
 
     @Column(nullable = false, unique = true)
     private String siteCode;
@@ -59,21 +46,18 @@ public class Site implements Serializable {
     protected Site() {
     }
 
-    public Site(String name, String address, double latitude, double longitude, String siteCode, Company company) {
+    public Site(String name, Address address, String siteCode, Company company) {
         this.name = name;
         this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.siteCode = siteCode;
         this.company = company;
         this.stockLevel = new StockLevel();
+        this.active = true;
     }
 
     @Override
     public String toString() {
-        return String.format(
-                "Site[id=%d, name='%s', coordinates=(%d,%d)]",
-                id, name, latitude, longitude);
+        return String.format("Site[id=%d, name='%s'", id, name);
     }
 
     public Long getId() {
@@ -92,40 +76,12 @@ public class Site implements Serializable {
         this.name = name;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
-    }
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
-    }
-
-    public String getCoordinates() {
-        return String.format("(%d, %d)", latitude, longitude);
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
     }
 
     public String getSiteCode() {

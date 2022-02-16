@@ -6,16 +6,12 @@ import { SelectColumnFilter } from "../../../components/Tables/SelectableTable";
 const getData = () => {
     const data = [
         {
-            id: 1,
-            productCode: "SKU1231",
+            sku: "SKU1231",
             name: "Sky Blue V-neck Top",
-            qty: 100,
         },
         {
-            id: 2, 
-            productCode: "SKU4321",
+            sku: "SKU4321",
             name: "Black Blue V-neck Top",
-            qty: 100,
         }
     ];
     return data;
@@ -25,16 +21,12 @@ export const ProductTable = () => {
     const columns = useMemo(
         () => [
             {
-                Header: "Product Code", 
-                accessor: "productCode"
+                Header: "SKU Code", 
+                accessor: "sku"
             }, 
             {
                 Header: "Name", 
                 accessor: "name"
-            },
-            {
-                Header: "Quantity", 
-                accessor: "qty",
             },
         ],
         []

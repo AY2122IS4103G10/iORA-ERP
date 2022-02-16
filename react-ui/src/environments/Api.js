@@ -22,3 +22,10 @@ export const productsApi = {
     return axios.delete(`${REST_ENDPOINT}model/${modelId}`);
   },
 };
+
+export const sitesApi = {
+  getAll() {
+    return axios
+      .get(`${REST_ENDPOINT}viewSites`)
+  },
+};

@@ -5,10 +5,10 @@ import { Tabs } from "../Tabs";
 
 export const SectionHeading = ({header, tabs}) => {
     let location = useLocation();
-    console.log(location);
     
     // so that sectionheading does not appear in these paths
-    if (location.pathname.startsWith('/sm/stocklevels/products/') || location.pathname.startsWith('/sm/stocklevels/') ) {
+    var hasNumber = /\d/;  
+    if (location.pathname.startsWith("/sm/stocklevels/") && hasNumber.test(location.pathname)) {
         return null;
     } else {
 

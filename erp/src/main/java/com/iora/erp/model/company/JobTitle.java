@@ -1,8 +1,11 @@
 package com.iora.erp.model.company;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,13 +22,14 @@ public class JobTitle implements Serializable {
     @Column(nullable = false, unique = true)
     private String title;
     private String description;
-    private ArrayList<AccessRights> responsibility;
+    @ElementCollection
+    private Set<AccessRights> responsibility;
 
     public JobTitle() {
-        responsibility = new ArrayList<>();
+        responsibility = new HashSet<>();
     }
 
-    public JobTitle(String title, String description, ArrayList<AccessRights> responsibility) {
+    public JobTitle(String title, String description, Set<AccessRights> responsibility) {
         this.title = title;
         this.description = description;
         this.responsibility = responsibility;
@@ -60,11 +64,12 @@ public class JobTitle implements Serializable {
         this.id = id;
     }
 
-    public ArrayList<AccessRights> getResponsibility() {
-        return responsibility;
+    public Set<AccessRights> getResponsibility() {
+        return this.responsibility;
     }
 
-    public void setResponsibility(ArrayList<AccessRights> responsibility) {
+    public void setResponsibility(Set<AccessRights> responsibility) {
         this.responsibility = responsibility;
-    } 
+    }
+
 }

@@ -10,7 +10,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import com.iora.erp.enumeration.FashionLine;
 import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
@@ -33,15 +32,16 @@ public class ProductServiceImpl implements ProductService {
     private EntityManager em;
 
     @Override
-    public ProductField getProductFieldByName(String fieldName) throws ProductFieldException {
-        Query q = em.createQuery("SELECT pf FROM ProductField pf WHERE LOWER(pf.fieldName) LIKE :fieldName");
-        q.setParameter("fieldName", "%" + fieldName.toLowerCase() + "%");
+    public List<String> getProductFieldValues(String fieldName) throws ProductFieldException {
+        TypedQuery<String> q = em
+                .createQuery("SELECT pf.fieldValue FROM ProductField pf WHERE pf.fieldName = :fieldName", String.class);
+        q.setParameter("fieldName", fieldName.trim().toUpperCase());
 
-        try {
-            ProductField pf = (ProductField) q.getSingleResult();
-            return pf;
-        } catch (NoResultException | NonUniqueResultException ex) {
+        List<String> values = q.getResultList();
+        if (values == null) {
             throw new ProductFieldException("Field name " + fieldName + " does not exist.");
+        } else {
+            return values;
         }
     }
 
@@ -62,9 +62,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void createProductField(ProductField productField) throws ProductFieldException {
+        productField.setFieldName(productField.getFieldName().trim().toUpperCase());
+        productField.setFieldValue(productField.getFieldValue().trim().toUpperCase());
         try {
-            productField.setFieldName(productField.getFieldName().trim());
-            productField.setFieldValue(productField.getFieldValue().trim());
             getProductFieldByNameValue(productField.getFieldName(), productField.getFieldValue());
         } catch (ProductFieldException ex) {
             em.persist(productField);
@@ -126,22 +126,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void createProduct(String modelCode, List<String> colours, List<String> sizes, List<String> tags)
-            throws ProductException {
+    public void createProduct(String modelCode, List<ProductField> productFields)
+            throws ProductException, ProductFieldException {
         try {
-            List<ProductField> tagFields = new ArrayList<>();
+            List<String> colours = new ArrayList<>();
+            List<String> sizes = new ArrayList<>();
 
-            // Loop for each tag
-            for (int i = 0; i < tags.size(); i++) {
-                try {
-                    ProductField tagField = getProductFieldByNameValue("tag", tags.get(i));
-                    tagFields.add(tagField);
-                } catch (ProductFieldException ex) {
-                    ProductField newField = new ProductField();
-                    newField.setFieldName("tag");
-                    newField.setFieldValue(tags.get(i));
-                    createProductField(newField);
-                    tagFields.add(newField);
+            for (ProductField pf : productFields) {
+                if (pf.getFieldName().equals("COLOUR")) {
+                    colours.add(pf.getFieldValue());
+                } else if (pf.getFieldName().equals("SIZE")) {
+                    sizes.add(pf.getFieldValue());
                 }
             }
 
@@ -154,50 +149,16 @@ public class ProductServiceImpl implements ProductService {
                 for (int j = 0; j < sizes.size(); j++) {
                     Product p = new Product(modelCode + "-" + count);
 
-                    try {
-                        ProductField colourField = getProductFieldByNameValue("colour", colours.get(i));
-                        // ProductField already exist, link it to product
-                        p.addProductField(colourField);
-                        model.addProductField(colourField);
-                    } catch (ProductFieldException ex) {
-                        // ProductField does not exist, creates new one before linking to product
-                        ProductField newField = new ProductField();
-                        newField.setFieldName("colour");
-                        newField.setFieldValue(colours.get(i));
-                        createProductField(newField);
-                        p.addProductField(newField);
-                        model.addProductField(newField);
-                    }
+                    ProductField colourField = getProductFieldByNameValue("colour", colours.get(i));
+                    p.addProductField(colourField);
 
-                    try {
-                        ProductField sizeField = getProductFieldByNameValue("size", sizes.get(j));
-                        // ProductField already exist, link it to product
-                        p.addProductField(sizeField);
-                        model.addProductField(sizeField);
-                    } catch (ProductFieldException ex) {
-                        // ProductField does not exist, creates new one before linking to product
-                        ProductField newField = new ProductField();
-                        newField.setFieldName("size");
-                        newField.setFieldValue(sizes.get(j));
-                        createProductField(newField);
-                        p.addProductField(newField);
-                        model.addProductField(newField);
-                    }
-
-                    // adding the tags to products
-                    for (int k = 0; k < tags.size(); k++) {
-                        p.addProductField(tagFields.get(k));
-                    }
+                    ProductField sizeField = getProductFieldByNameValue("size", sizes.get(j));
+                    p.addProductField(sizeField);
 
                     em.persist(p);
                     products.add(p);
                     count++;
                 }
-            }
-
-            // adding the tags to models
-            for (int k = 0; k < tags.size(); k++) {
-                model.addProductField(tagFields.get(k));
             }
 
             model.setProducts(products);
@@ -206,8 +167,6 @@ public class ProductServiceImpl implements ProductService {
             throw new ProductException("Model with model code " + modelCode + " does not exist.");
         } catch (EntityExistsException ex) {
             throw new ProductException("Product was already created.");
-        } catch (ProductFieldException ex) {
-            throw new ProductException(ex.getMessage());
         }
     }
 
@@ -272,30 +231,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Model> getModelsByFashionLineTag(String fashionLine, String tag) {
+    public List<Model> getModelsByCompanyAndTag(String company, String tag) {
         try {
-            if (tag == null
-                    || (!fashionLine.equals("IORA") && !fashionLine.equals("LALU") && !fashionLine.equals("SORA"))) {
+            if (tag == null || company == null) {
                 return new ArrayList<Model>();
             }
             tag = tag.trim();
-            ProductField productField = getProductFieldByNameValue("tag", tag);
-
-            FashionLine fl;
-            if (fashionLine.equals("IORA")) {
-                fl = FashionLine.IORA;
-            } else if (fashionLine.equals("LALU")) {
-                fl = FashionLine.LALU;
-            } else {
-                fl = FashionLine.SORA;
-            }
+            company = company.trim();
+            ProductField tagField = getProductFieldByNameValue("tag", tag);
+            ProductField companyField = getProductFieldByNameValue("company", company);
 
             TypedQuery<Model> q;
             q = em.createQuery(
-                    "SELECT DISTINCT m FROM Model m WHERE m.fashionLine = :fashionLine AND :productField MEMBER OF m.productFields",
+                    "SELECT DISTINCT m FROM Model m WHERE :companyField MEMBER OF m.productFields AND :tagField MEMBER OF m.productFields",
                     Model.class);
-            q.setParameter("fashionLine", fl);
-            q.setParameter("productField", productField);
+            q.setParameter("companyField", companyField);
+            q.setParameter("tagField", tagField);
 
             return q.getResultList();
         } catch (ProductFieldException ex) {
@@ -340,13 +291,11 @@ public class ProductServiceImpl implements ProductService {
         }
 
         old.setDescription(model.getDescription());
-        old.setFashionLine(model.getFashionLine());
         old.setAvailable(model.isAvailable());
         old.setName(model.getName());
         old.setOnlineOnly(model.isOnlineOnly());
         old.setPrice(model.getPrice());
         old.setProductFields(model.getProductFields());
-        old.setProducts(model.getProducts());
     }
 
     @Override
@@ -418,11 +367,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void createProductItem(ProductItem productItem) throws ProductItemException {
+    public void createProductItem(String rfid, String sku) throws ProductItemException {
         try {
-            em.persist(productItem);
+            Product p = getProduct(sku);
+            ProductItem pi = new ProductItem(rfid);
+            pi.setProductSKU(sku);
+            em.persist(pi);
+            
+            p.addProductItem(pi);
         } catch (EntityExistsException ex) {
-            throw new ProductItemException("ProductItem with rfid " + productItem.getRfid() + " already exist.");
+            throw new ProductItemException("ProductItem with rfid " + rfid + " already exist.");
+        } catch (ProductException ex) {
+            throw new ProductItemException("Product with sku " + sku + " does not exist.");
         }
     }
 

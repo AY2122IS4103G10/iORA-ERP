@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -153,14 +154,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void generateVouchers(double amount, int qty) {
+    public void generateVouchers(double amount, int qty, String date) {
         IntStream.range(0, qty)
         .forEach( i -> {
-            Voucher voucher1 = new Voucher(amount);
+            Voucher voucher1 = new Voucher(amount, LocalDate.parse(date));
             try {
                 getVoucher(voucher1.getVoucherCode());
                 //Voucher with the generate voucher code already exist
-                Voucher voucher2 = new Voucher(amount);
+                Voucher voucher2 = new Voucher(amount, LocalDate.parse(date));
                 em.persist(voucher2);
             } catch (CustomerException ex) {
                 //Voucher code does not already exist

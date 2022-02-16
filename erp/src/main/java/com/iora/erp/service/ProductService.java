@@ -13,7 +13,7 @@ import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 
 public interface ProductService {
-    public abstract ProductField getProductFieldByName(String fieldName) throws ProductFieldException;
+    public abstract List<String> getProductFieldValues(String fieldName) throws ProductFieldException;
     public abstract ProductField getProductFieldByNameValue(String fieldName, String fieldValue) throws ProductFieldException;
     public abstract void createProductField(ProductField productField) throws ProductFieldException;
     public abstract List<ProductField> getAllProductFields();
@@ -26,19 +26,19 @@ public interface ProductService {
     public abstract List<Model> searchModelsByModelCode(String modelCode);
     public abstract List<Model> searchModelsByName(String name);
     public abstract List<Model> getModelsByFieldValue(String fieldName, String fieldValue);
-    public abstract List<Model> getModelsByFashionLineTag(String fashionLine, String tag);
+    public abstract List<Model> getModelsByCompanyAndTag(String company, String tag);
     public abstract List<Model> getModelsByTag(String tag);
     public abstract List<Model> getModelsByCategory(String category);
     public abstract void updateModel(Model model) throws ModelException;
 
-    public abstract void createProduct(String modelCode, List<String> colours, List<String> sizes, List<String> tags) throws ProductException;
+    public abstract void createProduct(String modelCode, List<ProductField> productFields) throws ProductException, ProductFieldException;
     public abstract Product getProduct(String sku) throws ProductException;
     public abstract List<Product> searchProductsBySKU(String sku);
     public abstract List<Product> getProductsByModel(String modelCode) throws ProductException;
     public abstract List<Product> getProductsByFieldValue(String fieldName, String fieldValue);
     public abstract void updateProduct(Product product) throws ProductException;
 
-    public abstract void createProductItem(ProductItem productItem) throws ProductItemException;
+    public abstract void createProductItem(String rfid, String sku) throws ProductItemException;
     public abstract ProductItem getProductItem(String rfid) throws ProductItemException;
     public abstract List<ProductItem> getProductItemsBySKU(String sku) throws ProductException;
     public abstract List<ProductItem> searchProductItems(String rfid);

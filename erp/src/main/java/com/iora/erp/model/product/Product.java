@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
@@ -16,7 +17,8 @@ public class Product {
     @Id
     private String sku;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany
+    @JoinColumn(name = "productSKU")
     private List<ProductItem> productItems;
 
     @ManyToMany
@@ -45,6 +47,10 @@ public class Product {
 
     public void setProductItems(List<ProductItem> productItems) {
         this.productItems = productItems;
+    }
+
+    public void addProductItem(ProductItem productItem) {
+        this.productItems.add(productItem);
     }
 
     public Set<ProductField> getProductFields() {

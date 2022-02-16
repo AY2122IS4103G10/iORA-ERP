@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { VouchersList } from "../VouchersList";
+import { PromotionsList } from "../PromotionsList";
 
 const header = (
   <div className="bg-white shadow">
@@ -36,11 +36,11 @@ const header = (
   </div>
 );
 
-export const ManageVouchers = () => {
+export const ManagePromotions = () => {
   return (
     <>
       {header}
-      {<VouchersList />}
+      {<PromotionsList />}
     </>
   );
 }

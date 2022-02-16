@@ -1,13 +1,6 @@
 import { Link } from "react-router-dom";
-import { classNames } from "../../../../utilities/Util";
 import { ProductsList } from "../ProductsList";
-const tabs = [
-  { name: 'Applied', href: '#', current: false },
-  { name: 'Phone Screening', href: '#', current: false },
-  { name: 'Interview', href: '#', current: true },
-  { name: 'Offer', href: '#', current: false },
-  { name: 'Hired', href: '#', current: false },
-]
+
 const header = () => {
   return (
     <div className="bg-white shadow">
@@ -48,7 +41,7 @@ const header = () => {
 export const ManageProducts = () => {
   return (
     <>
-      {header}
+      {header()}
       {<ProductsList />}
     </>
   );

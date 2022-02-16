@@ -11,7 +11,7 @@ import {
 } from "../../../components/Tables/SimpleTable";
 import { fetchVouchers, selectAllVouchers } from "../../../../stores/slices/voucherSlice";
 
-export const VouchersTable = () => {
+export const PromotionsTable = () => {
   const columns = useMemo(
     () => [
       {
@@ -27,18 +27,18 @@ export const VouchersTable = () => {
         ),
       },
       {
-        Header: "Voucher Code",
-        accessor: "code",
+        Header: "Name",
+        accessor: "name",
         
       },
       {
-        Header: "Value",
-        accessor: "value",
+        Header: "Discounted Price",
+        accessor: "discPrice",
         Cell: (e) => `$${e.value}`,
       },
       {
-        Header: "Issued Date",
-        accessor: "issuedDate",
+        Header: "Products",
+        accessor: "products",
         Cell: (e) => moment(e.value).format("DD/MM/YY, h:mm a"),
       },
       {
@@ -83,6 +83,6 @@ export const VouchersTable = () => {
   );
 };
 
-export const VouchersList = () => {
-  return <VouchersTable />;
+export const PromotionsList = () => {
+  return <PromotionsTable />;
 };

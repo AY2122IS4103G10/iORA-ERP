@@ -17,30 +17,30 @@ import {
 export const VouchersTable = () => {
   const columns = useMemo(
     () => [
-      {
-        Header: "Id",
-        accessor: "id",
-        Cell: (e) => (
-          <Link
-            to={`/sm/vouchers/${e.value}`}
-            className="hover:text-gray-700 hover:underline"
-          >
-            {e.value}
-          </Link>
-        ),
-      },
+      // {
+      //   Header: "Id",
+      //   accessor: "id",
+      //   Cell: (e) => (
+      //     <Link
+      //       to={`/sm/vouchers/${e.value}`}
+      //       className="hover:text-gray-700 hover:underline"
+      //     >
+      //       {e.value}
+      //     </Link>
+      //   ),
+      // },
       {
         Header: "Voucher Code",
-        accessor: "code",
+        accessor: "voucherCode",
       },
       {
         Header: "Value",
-        accessor: "value",
+        accessor: "amount",
         Cell: (e) => `$${e.value}`,
       },
       {
         Header: "Expiry Date",
-        accessor: "expDate",
+        accessor: "expiry",
         Cell: (e) => moment(e.value).format("DD/MM/YY"),
       },
       {
@@ -73,7 +73,7 @@ export const VouchersTable = () => {
   );
   const dispatch = useDispatch();
   const data = useSelector(selectAllVouchers);
-  const voucherStatus = useSelector((state) => state.vouchers.state);
+  const voucherStatus = useSelector((state) => state.vouchers.status);
   useEffect(() => {
     voucherStatus === "idle" && dispatch(fetchVouchers());
   }, [voucherStatus, dispatch]);

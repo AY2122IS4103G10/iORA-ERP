@@ -12,7 +12,7 @@ const getData = () => {
             qty: 100,
         },
         {
-            id: 0, 
+            id: 2, 
             productCode: "SKU4321",
             name: "Black Blue V-neck Top",
             qty: 100,

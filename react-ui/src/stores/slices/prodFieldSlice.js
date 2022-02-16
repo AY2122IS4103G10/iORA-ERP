@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { api } from "../../environments/Api";
 
 const initialState = {
   prodFields: [
@@ -47,12 +48,28 @@ const initialState = {
   error: null,
 };
 
+export const fetchProductFields = createAsyncThunk(
+  "vouchers/fetchProductFields",
+  async () => {
+    const response = await api.getAll("productField");
+    return response.data;
+  }
+);
+
+export const addNewProductField = createAsyncThunk(
+  "products/addNewPost",
+  async (initialVoucher) => {
+    const response = await api.create(initialVoucher);
+    return response.data;
+  }
+);
+
 const prodFieldSlice = createSlice({
   name: "prodFields",
   initialState,
   reducers: {
     prodFieldAdded(state, action) {
-      state.posts.push(action.payload);
+      state.prodFields.push(action.payload);
     },
   },
 });

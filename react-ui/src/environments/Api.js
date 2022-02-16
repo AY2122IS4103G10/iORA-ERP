@@ -4,21 +4,21 @@
 import axios from "axios";
 import { REST_ENDPOINT } from "../constants/restEndpoint";
 
-export const productsApi = {
-  getAll() {
+export const api = {
+  getAll(path) {
     return axios
-      .get(`${REST_ENDPOINT}model`);
+      .get(`${REST_ENDPOINT}${path}`);
   },
-  get(modelId) {
-    return axios.get(`${REST_ENDPOINT}model/${modelId}`);
+  get(path, id) {
+    return axios.get(`${REST_ENDPOINT}${path}/${id}`);
   },
-  create(model) {
-    return axios.post(`${REST_ENDPOINT}model`, model);
+  create(path, item) {
+    return axios.post(`${REST_ENDPOINT}${path}`, item);
   },
-  update(model) {
-    return axios.put(`${REST_ENDPOINT}model`, model);
+  update(path, id, item) {
+    return axios.put(`${REST_ENDPOINT}${path}/${id}`, item);
   },
-  delete(modelId) {
-    return axios.delete(`${REST_ENDPOINT}model/${modelId}`);
+  delete(path, id) {
+    return axios.delete(`${REST_ENDPOINT}${path}/${id}`);
   },
 };

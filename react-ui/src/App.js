@@ -8,15 +8,23 @@ import Login from "./views/containers/Login";
 import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
+import { SMRoute } from "./routes/SMRoute";
 
 function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Login/>}/>
+        <Route path="/" element={<Login />} />
 
         {/* Sales and Marketing Subsystem */}
-        <Route path="/sm" element={<Index />}>
+        <Route
+          path="/sm"
+          element={
+            <SMRoute>
+              <Index />
+            </SMRoute>
+          }
+        >
           <Route path="products" element={<Outlet />}>
             <Route index element={<ManageProducts />} />
             <Route path=":prodCode" element={<ProductDetails />} />

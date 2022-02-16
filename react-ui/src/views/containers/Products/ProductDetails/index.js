@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/solid";
 import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
 import {
-  productDeleted,
+  deleteExistingProduct,
   selectProductByCode,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
@@ -39,8 +39,7 @@ const ProductDetailsBody = ({
   prodCode,
   name,
   description,
-  listPrice,
-  discPrice,
+  price,
   colors,
   sizes,
   tags,
@@ -92,7 +91,7 @@ const ProductDetailsBody = ({
                     aria-hidden="true"
                   />
                   <span className="text-gray-900 text-sm font-medium">
-                    {`List Price: $${listPrice}`}
+                    {`List Price: $${price}`}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -101,7 +100,7 @@ const ProductDetailsBody = ({
                     aria-hidden="true"
                   />
                   <span className="text-gray-900 text-sm font-medium">
-                    {`Discount Price: $${discPrice}`}
+                    {`Discount Price: $${price}`}
                   </span>
                 </div>
               </div>
@@ -142,7 +141,7 @@ const ProductDetailsBody = ({
               aria-hidden="true"
             />
             <span className="text-gray-900 text-sm font-medium">
-              {`List Price: $${listPrice}`}
+              {`List Price: $${price}`}
             </span>
           </div>
           <div className="flex items-center space-x-2">
@@ -151,7 +150,7 @@ const ProductDetailsBody = ({
               aria-hidden="true"
             />
             <span className="text-gray-900 text-sm font-medium">
-              {`Discount Price: $${discPrice}`}
+              {`Discount Price: $${price}`}
             </span>
           </div>
         </div>
@@ -182,18 +181,17 @@ const ProductDetailsBody = ({
 export const ProductDetails = () => {
   const { prodCode } = useParams();
   const product = useSelector((state) => selectProductByCode(state, prodCode));
-
-  const fields = product.fields;
-  const colors = fields.filter((field) => field.fieldName === "Color");
-  const sizes = fields.filter((field) => field.fieldName === "Size");
-  const tags = fields.filter((field) => field.fieldName === "Tag");
-  const categories = fields.filter((field) => field.fieldName === "Category");
+  const fields = product.productFields;
+  const colors = fields.filter((field) => field.fieldName === "colour");
+  const sizes = fields.filter((field) => field.fieldName === "size");
+  const tags = fields.filter((field) => field.fieldName === "tag");
+  const categories = fields.filter((field) => field.fieldName === "category");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const onDeleteProdClicked = () => {
-    dispatch(productDeleted(product));
+    dispatch(deleteExistingProduct(product.modelCode));
     navigate("/sm/products");
   };
 
@@ -204,8 +202,7 @@ export const ProductDetails = () => {
         prodCode={prodCode}
         name={product.name}
         description={product.description}
-        listPrice={product.listPrice}
-        discPrice={product.discPrice}
+        price={product.price}
         colors={colors}
         sizes={sizes}
         tags={tags}

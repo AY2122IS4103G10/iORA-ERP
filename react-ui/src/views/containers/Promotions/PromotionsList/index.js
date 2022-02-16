@@ -9,12 +9,9 @@ import {
   SelectColumnFilter,
   OptionsCell,
 } from "../../../components/Tables/SimpleTable";
-import {
-  fetchVouchers,
-  selectAllVouchers,
-} from "../../../../stores/slices/voucherSlice";
+import { fetchVouchers, selectAllVouchers } from "../../../../stores/slices/voucherSlice";
 
-export const VouchersTable = () => {
+export const PromotionsTable = () => {
   const columns = useMemo(
     () => [
       {
@@ -30,25 +27,25 @@ export const VouchersTable = () => {
         ),
       },
       {
-        Header: "Voucher Code",
-        accessor: "code",
+        Header: "Name",
+        accessor: "name",
+        
       },
       {
-        Header: "Value",
-        accessor: "value",
+        Header: "Discounted Price",
+        accessor: "discPrice",
         Cell: (e) => `$${e.value}`,
+      },
+      {
+        Header: "Products",
+        accessor: "products",
+        Cell: (e) => moment(e.value).format("DD/MM/YY, h:mm a"),
       },
       {
         Header: "Expiry Date",
         accessor: "expDate",
-        Cell: (e) => moment(e.value).format("DD/MM/YY"),
+        Cell: (e) => moment(e.value).format("DD/MM/YY, h:mm a"),
       },
-      {
-        Header: "Issued",
-        accessor: "isIssued",
-        Cell: (e) => (e.value ? "Yes" : "No"),
-      },
-
       {
         Header: "Redeemed",
         accessor: "isRedeemed",
@@ -71,12 +68,12 @@ export const VouchersTable = () => {
     ],
     []
   );
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
   const data = useSelector(selectAllVouchers);
-  const voucherStatus = useSelector((state) => state.vouchers.state);
+  const voucherStatus = useSelector((state) => state.vouchers.state)
   useEffect(() => {
-    voucherStatus === "idle" && dispatch(fetchVouchers());
-  }, [voucherStatus, dispatch]);
+    voucherStatus === "idle" && dispatch(fetchVouchers())
+  }, [voucherStatus, dispatch])
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
@@ -86,6 +83,6 @@ export const VouchersTable = () => {
   );
 };
 
-export const VouchersList = () => {
-  return <VouchersTable />;
+export const PromotionsList = () => {
+  return <PromotionsTable />;
 };

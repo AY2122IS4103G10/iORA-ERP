@@ -14,6 +14,7 @@ import {
   selectVoucherById,
   voucherDeleted,
 } from "../../../../stores/slices/voucherSlice";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 
 const VoucherDetailsBody = ({
   voucherId,
@@ -122,14 +123,17 @@ export const VoucherDetails = () => {
   };
 
   return (
-    <VoucherDetailsBody
-      voucherId={voucherId}
-      voucherCode={voucher.code}
-      value={voucher.value}
-      issuedDate={voucher.issuedDate}
-      expDate={voucher.expDate}
-      isRedeemed={voucher.isRedeemed}
-      onDeleteVoucherClicked={onDeleteVoucherClicked}
-    />
+    <>
+      <NavigatePrev page="Vouchers" path="/sm/vouchers" />
+      <VoucherDetailsBody
+        voucherId={voucherId}
+        voucherCode={voucher.code}
+        value={voucher.value}
+        issuedDate={voucher.issuedDate}
+        expDate={voucher.expDate}
+        isRedeemed={voucher.isRedeemed}
+        onDeleteVoucherClicked={onDeleteVoucherClicked}
+      />
+    </>
   );
 };

@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { selectAllProdFields } from "../../../../stores/slices/prodFieldSlice";
+import {
+  fetchProductFields,
+  selectAllProdFields,
+} from "../../../../stores/slices/prodFieldSlice";
 
 import {
-  productAdded,
-  productUpdated,
+  addNewProduct,
   selectProductByCode,
+  updateExistingProduct,
 } from "../../../../stores/slices/productSlice";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
@@ -34,7 +37,7 @@ export const FormCheckboxes = ({
           <div className="flex items-center h-5">
             <input
               id={inputField}
-              aria-describedby="comments-description"
+              aria-describedby={inputField}
               name={inputField}
               type="checkbox"
               className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
@@ -54,7 +57,12 @@ export const FormCheckboxes = ({
   );
 };
 
-const rightColSection = ({ fieldName, fields, onFieldsChanged, fieldValues }) => (
+const rightColSection = ({
+  fieldName,
+  fields,
+  onFieldsChanged,
+  fieldValues,
+}) => (
   <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
     <div className="rounded-lg bg-white overflow-hidden shadow">
       <div className="p-6">
@@ -98,12 +106,14 @@ const AddProductFormBody = ({
   onNameChanged,
   description,
   onDescChanged,
-  listPrice,
+  price,
   onListPriceChanged,
-  discPrice,
-  onDiscPriceChanged,
-  onAddProductClicked,
-  onCancelClicked,
+  available,
+  onAvailableChanged,
+  fashionLine,
+  onFashionLineChanged,
+  onlineOnly,
+  onOnlineOnlyChanged,
   colors,
   onColorsChanged,
   colorCheckedState,
@@ -116,6 +126,8 @@ const AddProductFormBody = ({
   categories,
   onCatsChanged,
   catCheckedState,
+  onSaveClicked,
+  onCancelClicked,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">Add Product</h1>
@@ -149,6 +161,8 @@ const AddProductFormBody = ({
                           value={prodCode}
                           onChange={onProdChanged}
                           required
+                          disabled={isEditing}
+                          className={isEditing && "bg-gray-50 text-gray-400"}
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
@@ -183,7 +197,7 @@ const AddProductFormBody = ({
                       </SimpleInputGroup>
                       <SimpleInputGroup
                         label="List Price"
-                        inputField="listPrice"
+                        inputField="price"
                         className="relative rounded-md sm:mt-0 sm:col-span-2"
                       >
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -191,54 +205,77 @@ const AddProductFormBody = ({
                         </div>
                         <input
                           type="number"
-                          name="listPrice"
-                          id="listPrice"
-                          autoComplete="listPrice"
+                          name="price"
+                          id="price"
+                          autoComplete="price"
                           className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                           placeholder="0.00"
-                          value={listPrice}
+                          value={price}
                           onChange={onListPriceChanged}
                           required
                           step="0.01"
-                          aria-describedby="listPrice-currency"
+                          aria-describedby="price-currency"
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                           <span
                             className="text-gray-500 sm:text-sm"
-                            id="listPrice-currency"
+                            id="price-currency"
                           >
                             SGD
                           </span>
                         </div>
                       </SimpleInputGroup>
                       <SimpleInputGroup
-                        label="Discount Price"
-                        inputField="discPrice"
-                        className="relative rounded-md sm:mt-0 sm:col-span-2"
+                        label="Fashion Line"
+                        inputField="fashionLine"
+                        className="sm:mt-0 sm:col-span-2"
                       >
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">$</span>
-                        </div>
-                        <input
-                          type="number"
-                          name="discPrice"
-                          id="discPrice"
-                          autoComplete="discPrice"
-                          className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                          placeholder="0.00"
-                          value={discPrice}
-                          onChange={onDiscPriceChanged}
+                        <SimpleInputBox
+                          type="text"
+                          name="fashionLine"
+                          id="fashionLine"
+                          autoComplete="fashionLine"
+                          value={fashionLine}
+                          onChange={onFashionLineChanged}
                           required
-                          step="0.01"
-                          aria-describedby="discPrice-currency"
                         />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span
-                            className="text-gray-500 sm:text-sm"
-                            id="discPrice-currency"
-                          >
-                            SGD
-                          </span>
+                      </SimpleInputGroup>
+                      <SimpleInputGroup
+                        label="Available"
+                        inputField="available"
+                        className="sm:mt-0 sm:col-span-2"
+                      >
+                        <div className="flex items-center h-5">
+                          <input
+                            type="checkbox"
+                            name="available"
+                            id="available"
+                            autoComplete="available"
+                            className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                            value={available}
+                            onChange={onAvailableChanged}
+                            required
+                            defaultChecked
+                            aria-describedby="available"
+                          />
+                        </div>
+                      </SimpleInputGroup>
+                      <SimpleInputGroup
+                        label="Online Only"
+                        inputField="onlineOnly"
+                        className="sm:mt-0 sm:col-span-2"
+                      >
+                        <div className="flex items-center h-5">
+                          <input
+                            type="checkbox"
+                            name="onlineOnly"
+                            id="onlineOnly"
+                            className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                            value={available}
+                            onChange={onAvailableChanged}
+                            required
+                            aria-describedby="onlineOnly"
+                          />
                         </div>
                       </SimpleInputGroup>
                     </div>
@@ -257,7 +294,7 @@ const AddProductFormBody = ({
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={onAddProductClicked}
+                      onClick={onSaveClicked}
                     >
                       {!isEditing ? "Add" : "Edit"} product
                     </button>
@@ -302,36 +339,43 @@ const AddProductFormBody = ({
 );
 
 export const ProductForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { prodId } = useParams();
-  const product = useSelector((state) =>
-    selectProductByCode(state, prodId)
-  );
+  const product = useSelector((state) => selectProductByCode(state, prodId));
   const isEditing = Boolean(product);
-  const [prodCode, setProdCode] = useState(!isEditing ? "" : product.prodCode);
+  const [prodCode, setProdCode] = useState(!isEditing ? "" : product.modelCode);
   const [name, setName] = useState(!isEditing ? "" : product.name);
   const [description, setDescription] = useState(
     !isEditing ? "" : product.description
   );
-  const [listPrice, setListPrice] = useState(
-    !isEditing ? "" : product.listPrice
+  const [price, setDiscPrice] = useState(!isEditing ? "" : product.price);
+  const [fashionLine, setFashionLine] = useState(
+    !isEditing ? "" : product.fashionLine
   );
-  const [discPrice, setDiscPrice] = useState(
-    !isEditing ? "" : product.discPrice
+  const [onlineOnly, setOnlineOnly] = useState(
+    !isEditing ? false : product.onlineOnly
+  );
+  const [available, setAvailable] = useState(
+    !isEditing ? true : product.available
   );
 
   const fields = useSelector(selectAllProdFields);
-  const colors = fields.filter((field) => field.fieldName === "Color");
-  const sizes = fields.filter((field) => field.fieldName === "Size");
-  const tags = fields.filter((field) => field.fieldName === "Tag");
-  const categories = fields.filter((field) => field.fieldName === "Category");
-
+  const prodFieldStatus = useSelector((state) => state.prodFields.status);
+  useEffect(() => {
+    prodFieldStatus === "idle" && dispatch(fetchProductFields());
+  }, [prodFieldStatus, dispatch]);
+  const colors = fields.filter((field) => field.fieldName === "colour");
+  const sizes = fields.filter((field) => field.fieldName === "size");
+  const tags = fields.filter((field) => field.fieldName === "tag");
+  const categories = fields.filter((field) => field.fieldName === "category");
   const [colorCheckedState, setColorCheckedState] = useState(
     !isEditing
       ? new Array(colors.length).fill(false)
       : checkboxState(
           colors.map((field) => field.fieldValue),
-          product.fields
-            .filter((field) => field.fieldName === "Color")
+          product.productFields
+            .filter((field) => field.fieldName === "colour")
             .map((field) => field.fieldValue)
         )
   );
@@ -340,8 +384,8 @@ export const ProductForm = () => {
       ? new Array(sizes.length).fill(false)
       : checkboxState(
           sizes.map((field) => field.fieldValue),
-          product.fields
-            .filter((field) => field.fieldName === "Size")
+          product.productFields
+            .filter((field) => field.fieldName === "size")
             .map((field) => field.fieldValue)
         )
   );
@@ -350,8 +394,8 @@ export const ProductForm = () => {
       ? new Array(tags.length).fill(false)
       : checkboxState(
           tags.map((field) => field.fieldValue),
-          product.fields
-            .filter((field) => field.fieldName === "Tag")
+          product.productFields
+            .filter((field) => field.fieldName === "tag")
             .map((field) => field.fieldValue)
         )
   );
@@ -360,20 +404,20 @@ export const ProductForm = () => {
       ? new Array(categories.length).fill(false)
       : checkboxState(
           categories.map((field) => field.fieldValue),
-          product.fields
-            .filter((field) => field.fieldName === "Category")
+          product.productFields
+            .filter((field) => field.fieldName === "category")
             .map((field) => field.fieldValue)
         )
   );
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
-  const onListPriceChanged = (e) => setListPrice(e.target.value);
-  const onDiscPriceChanged = (e) => setDiscPrice(e.target.value);
+  const onListPriceChanged = (e) => setDiscPrice(e.target.value);
+  const onOnlineOnlyChanged = () => {
+    setOnlineOnly(!onlineOnly);
+  };
+  const onAvailableChanged = () => setAvailable(!available);
+  const onFashionLineChanged = (e) => setFashionLine(e.target.value);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
       index === pos ? !item : item
@@ -399,7 +443,13 @@ export const ProductForm = () => {
     setCatCheckedState(updateCheckedState);
   };
 
-  const onAddProductClicked = (evt) => {
+  const [requestStatus, setRequestStatus] = useState("idle");
+
+  const canAdd =
+    [prodCode, name, description, price, fashionLine].every(Boolean) &&
+    requestStatus === "idle";
+
+  const onSaveClicked = (evt) => {
     evt.preventDefault();
     const fields = [];
     colors.forEach(
@@ -412,33 +462,45 @@ export const ProductForm = () => {
     categories.forEach(
       (cat, index) => catCheckedState[index] && fields.push(cat)
     );
-    canAdd &&
-      dispatch(
-        !isEditing
-          ? productAdded(
-              prodCode,
+    if (canAdd) {
+      try {
+        setRequestStatus("pending");
+        if (!isEditing) {
+          dispatch(
+            addNewProduct({
+              modelCode: prodCode,
               name,
               description,
-              listPrice,
-              discPrice,
-              fields
-            )
-          : productUpdated({
-              prodCode,
-              name,
-              description,
-              listPrice,
-              discPrice,
-              fields,
+              fashionLine,
+              price,
+              onlineOnly,
+              available,
+              products: [],
+              productFields: fields,
             })
-      );
-    setProdCode("");
-    setName("");
-    setDescription("");
-    navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
-  };
+          ).unwrap();
+        } else {
+          product.name = name
+          product.description = description
+          product.fashionLine = fashionLine
+          product.price = price
+          product.onlineOnly = onlineOnly
 
-  const canAdd = name && description && listPrice && discPrice;
+          dispatch(
+            updateExistingProduct(product)
+          ).unwrap();
+        }
+        navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
+      } catch (err) {
+        console.error(
+          `Failed to ${!isEditing ? "add" : "update"} product: `,
+          err
+        );
+      } finally {
+        setRequestStatus("idle");
+      }
+    }
+  };
 
   const onCancelClicked = () =>
     navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
@@ -452,12 +514,14 @@ export const ProductForm = () => {
       onNameChanged={onNameChanged}
       description={description}
       onDescChanged={onDescChanged}
-      listPrice={listPrice}
+      price={price}
       onListPriceChanged={onListPriceChanged}
-      discPrice={discPrice}
-      onDiscPriceChanged={onDiscPriceChanged}
-      onAddProductClicked={onAddProductClicked}
-      onCancelClicked={onCancelClicked}
+      available={available}
+      onAvailableChanged={onAvailableChanged}
+      fashionLine={fashionLine}
+      onFashionLineChanged={onFashionLineChanged}
+      onlineOnly={onlineOnly}
+      onOnlineOnlyChanged={onOnlineOnlyChanged}
       colors={colors}
       onColorsChanged={onColorsChanged}
       colorCheckedState={colorCheckedState}
@@ -470,6 +534,8 @@ export const ProductForm = () => {
       categories={categories}
       onCatChanged={onCatsChanged}
       catCheckedState={catCheckedState}
+      onSaveClicked={onSaveClicked}
+      onCancelClicked={onCancelClicked}
     />
   );
 };

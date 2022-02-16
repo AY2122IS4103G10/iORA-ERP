@@ -1,3 +1,5 @@
+import { classNames } from "../../../../utilities/Util";
+
 export const SimpleInputBox = ({
   type = "text",
   name,
@@ -5,6 +7,7 @@ export const SimpleInputBox = ({
   placeholder = "",
   value,
   onChange,
+  className,
   ...rest
 }) => {
   return (
@@ -13,7 +16,10 @@ export const SimpleInputBox = ({
       name={name}
       id={id}
       placeholder={placeholder}
-      className="flex-1 block w-full focus:ring-cyan-500 focus:border-cyan-500 min-w-0 rounded-md sm:text-sm border-gray-300"
+      className={classNames(
+        "flex-1 block w-full focus:ring-cyan-500 focus:border-cyan-500 min-w-0 rounded-md sm:text-sm border-gray-300",
+        className
+      )}
       value={value}
       onChange={onChange}
       {...rest}

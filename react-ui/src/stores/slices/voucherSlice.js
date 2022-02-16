@@ -1,4 +1,5 @@
-import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
+import { api } from "../../environments/Api";
 
 const initialState = {
   vouchers: [
@@ -6,7 +7,7 @@ const initialState = {
       id: 1,
       code: "RKF3X8NDND",
       value: 10,
-      issuedDate: new Date().toJSON(),
+      isIssued: false,
       expDate: new Date().toJSON(),
       isRedeemed: false,
     },
@@ -14,6 +15,22 @@ const initialState = {
   status: "idle",
   error: null,
 };
+
+export const fetchVouchers = createAsyncThunk(
+  "vouchers/fetchVouchers",
+  async () => {
+    const response = await api.getAll("voucher");
+    return response.data;
+  }
+);
+
+export const addNewVouchers = createAsyncThunk(
+  "products/addNewPost",
+  async (initialVoucher) => {
+    const response = await api.create("voucher", initialVoucher);
+    return response.data;
+  }
+);
 
 const voucherSlice = createSlice({
   name: "vouchers",
@@ -29,7 +46,7 @@ const voucherSlice = createSlice({
             id: nanoid(),
             code,
             value,
-            issuedDate: new Date().toJSON(),
+            isIssued: false,
             expDate: expDate.toJSON(),
             isRedeemed: false,
           },
@@ -37,24 +54,44 @@ const voucherSlice = createSlice({
       },
     },
     voucherUpdated(state, action) {
-      const { id, code, value, issuedDate, expDate, isRedeemed } =
+      const { id, code, value, isIssued, expDate, isRedeemed } =
         action.payload;
-      const existingVoucher = state.vouchers.find((voucher) => voucher.id === id);
+      const existingVoucher = state.vouchers.find(
+        (voucher) => voucher.id === id
+      );
       if (existingVoucher) {
         existingVoucher.code = code;
         existingVoucher.value = value;
-        existingVoucher.issuedDate = issuedDate;
+        existingVoucher.isIssued = isIssued;
         existingVoucher.expDate = expDate;
         existingVoucher.isRedeemed = isRedeemed;
       }
     },
     voucherDeleted(state, action) {
-      state.vouchers.filter((voucher) => voucher !== action.payload);
+      state.vouchers = state.vouchers.filter(
+        ({ id }) => id !== action.payload.id
+      );
     },
+  },
+  extraReducers(builder) {
+    builder.addCase(fetchVouchers.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(fetchVouchers.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.products = state.products.concat(action.payload);
+    });
+    builder.addCase(fetchVouchers.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(addNewVouchers.fulfilled, (state, action) => {
+      state.vouchers.push(action.payload);
+    });
   },
 });
 
-export const { voucherAdded, voucherUpdated, voucherDeleted } = voucherSlice.actions;
+export const { voucherAdded, voucherUpdated, voucherDeleted } =
+  voucherSlice.actions;
 
 export default voucherSlice.reducer;
 

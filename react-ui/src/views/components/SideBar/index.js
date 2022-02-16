@@ -14,14 +14,14 @@ import {
 } from "@heroicons/react/outline";
 import { classNames } from "../../../utilities/Util";
 
-const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
-  { name: "Products", href: "/sm/products", icon: ClockIcon, current: false },
-  { name: "Stock Levels", href: "/sm/stocklevels", icon: ScaleIcon, current: false },
-  { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },
-  { name: "Vouchers", href: "/sm/vouchers", icon: CreditCardIcon, current: false },
-  { name: "Reports & Analytics", href: "#", icon: DocumentReportIcon, current: false },
-];
+// const navigation = [
+//   { name: "Home", href: "/", icon: HomeIcon, current: true },
+//   { name: "Products", href: "/sm/products", icon: ClockIcon, current: false },
+//   { name: "Stock Levels", href: "/sm/stocklevels", icon: ScaleIcon, current: false },
+//   { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },
+//   { name: "Vouchers", href: "/sm/vouchers", icon: CreditCardIcon, current: false },
+//   { name: "Reports & Analytics", href: "#", icon: DocumentReportIcon, current: false },
+// ];
 
 const secondaryNavigation = [
   { name: "Settings", href: "#", icon: CogIcon },
@@ -29,7 +29,8 @@ const secondaryNavigation = [
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];
 
-export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
+export const SideBar = ({ navigation, sidebarOpen, setSidebarOpen }) => {
+  console.log(navigation);
   return (
     <>
       <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -91,7 +92,7 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
                 aria-label="Sidebar"
               >
                 <div className="px-2 space-y-1">
-                  {navigation.map((item) => (
+                  {navigation?.map((item) => (
                     <a
                       key={item.name}
                       href={item.href}
@@ -142,11 +143,14 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex flex-col flex-grow bg-cyan-700 pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center flex-shrink-0 px-4">
-            <img
+            {/* <img
               className="h-8 w-auto"
               src="https://tailwindui.com/img/logos/easywire-logo-cyan-300-mark-white-text.svg"
               alt="Easywire logo"
-            />
+            /> */}
+            <h1 className="ml-3 text-2xl font-bold leading-7 text-white sm:leading-9 sm:truncate">
+              iORA ERP
+            </h1>
           </div>
           <nav
             className="mt-5 flex-1 flex flex-col divide-y divide-cyan-800 overflow-y-auto"

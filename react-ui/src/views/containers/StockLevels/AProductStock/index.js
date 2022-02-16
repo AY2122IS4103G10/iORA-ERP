@@ -35,11 +35,6 @@ export const AProductStock = () => {
         ]
     )
 
-
-
-
-
-
     return(
         <div className="min-h-full">
         <main className="py-10">
@@ -48,7 +43,6 @@ export const AProductStock = () => {
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
                 <div className="relative">
-                 
                   <span className="absolute inset-0 shadow-inner rounded-full" aria-hidden="true" />
                 </div>
               </div>
@@ -60,7 +54,7 @@ export const AProductStock = () => {
 
           <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
             <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-              {/* Description list*/}
+              {/* Product information*/}
               <section aria-labelledby="applicant-information-title">
                 <div className="bg-white shadow sm:rounded-lg">
                   <div className="px-4 py-5 sm:px-6">
@@ -93,7 +87,7 @@ export const AProductStock = () => {
                 </div>
               </section>
 
-              {/* Stock Levels By Site*/}
+              {/* Stock Levels By Products*/}
               <section aria-labelledby="stocks-level">
                   <div className="m-1">
                   {/* <SimpleTable columns={columns} data={data}/> */}

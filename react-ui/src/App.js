@@ -11,6 +11,7 @@ import Login from "./views/containers/Login";
 import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
+import { StoreIndex } from "./views/containers/Index/Store";
 
 function App() {
   return (
@@ -37,8 +38,9 @@ function App() {
         </Route>
 
         {/* Store Management Subsystem */}
-        <Route path="/str" element={<Index/>}>
-          
+        <Route path="/str" element={<StoreIndex/>}>
+          <Route path="stocklevels" element={<AsiteStock />}>
+          </Route>
         </Route>
         <Route
           path="*"

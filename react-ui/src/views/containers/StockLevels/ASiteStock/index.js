@@ -64,10 +64,6 @@ const site = {
             Header: "Reserved",
             accessor: "reserved",
         },
-        {
-            Header: "In Transit",
-            accessor: "inTransit"
-        }
     ];
 
 export const AsiteStock = () => {

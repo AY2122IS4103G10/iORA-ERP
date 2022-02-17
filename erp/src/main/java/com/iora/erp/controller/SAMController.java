@@ -9,6 +9,7 @@ import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
@@ -47,6 +48,22 @@ public class SAMController {
     public ResponseEntity<Object> getProductFieldValues(@PathVariable String fieldName) {
         try {
             return ResponseEntity.ok(productService.getProductFieldValues(fieldName));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    // Returns list of all PromotionFields
+    @GetMapping(path = "/promotionFields", produces = "application/json")
+    public List<PromotionField> getPromotionFields() {
+        return productService.getPromotionFields();
+    }
+
+    // Get Models by supplying PromotionField
+    @GetMapping(path = "/model/promo", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> getModelsByPromoField(@RequestBody PromotionField promoField) {
+        try {
+            return ResponseEntity.ok(productService.getModelsByPromoField(promoField));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -287,7 +304,7 @@ public class SAMController {
     }
 
     @PostMapping(path = "/voucher", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> generateVouchers(@RequestBody Map<String,String> body) {
+    public ResponseEntity<Object> generateVouchers(@RequestBody Map<String, String> body) {
         try {
             double amount = Double.parseDouble(body.get("amount"));
             int qty = Integer.parseInt(body.get("quantity"));

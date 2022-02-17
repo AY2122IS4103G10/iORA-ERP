@@ -17,13 +17,10 @@ export const NavBar = ({ setSidebarOpen }) => {
   const handleLogout = (e) => {
     console.log("logout" + user);
     e.preventDefault();
-    dispatch(
-      logout()
-    );
+    dispatch(logout());
 
     console.log(user);
-  }
-
+  };
 
   return (
     <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
@@ -37,7 +34,7 @@ export const NavBar = ({ setSidebarOpen }) => {
       </button>
       {/* Search bar */}
       <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
-        <div className="flex-1 flex">
+        <div className="flex-1 flex py-4">
           {/* <form className="w-full flex md:ml-0" action="#" method="GET">
             <label htmlFor="search-field" className="sr-only">
               Search
@@ -58,6 +55,9 @@ export const NavBar = ({ setSidebarOpen }) => {
               />
             </div>
           </form> */}
+          <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+            Sales and Marketing
+          </span>
         </div>
         <div className="ml-4 flex items-center md:ml-6">
           <button

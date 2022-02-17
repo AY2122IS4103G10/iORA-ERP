@@ -2,16 +2,7 @@ import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  vouchers: [
-    {
-      id: 1,
-      code: "RKF3X8NDND",
-      value: 10,
-      isIssued: false,
-      expDate: new Date().toJSON(),
-      isRedeemed: false,
-    },
-  ],
+  vouchers: [],
   status: "idle",
   error: null,
 };
@@ -25,7 +16,7 @@ export const fetchVouchers = createAsyncThunk(
 );
 
 export const addNewVouchers = createAsyncThunk(
-  "products/addNewPost",
+  "vouchers/addNewVouchers",
   async (initialVoucher) => {
     const response = await api.create("voucher", initialVoucher);
     return response.data;
@@ -36,26 +27,8 @@ const voucherSlice = createSlice({
   name: "vouchers",
   initialState,
   reducers: {
-    voucherAdded: {
-      reducer(state, action) {
-        state.vouchers.push(action.payload);
-      },
-      prepare(code, value, expDate) {
-        return {
-          payload: {
-            id: nanoid(),
-            code,
-            value,
-            isIssued: false,
-            expDate: expDate.toJSON(),
-            isRedeemed: false,
-          },
-        };
-      },
-    },
     voucherUpdated(state, action) {
-      const { id, code, value, isIssued, expDate, isRedeemed } =
-        action.payload;
+      const { id, code, value, isIssued, expDate, isRedeemed } = action.payload;
       const existingVoucher = state.vouchers.find(
         (voucher) => voucher.id === id
       );
@@ -79,19 +52,18 @@ const voucherSlice = createSlice({
     });
     builder.addCase(fetchVouchers.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.products = state.products.concat(action.payload);
+      state.vouchers = action.payload;
     });
     builder.addCase(fetchVouchers.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewVouchers.fulfilled, (state, action) => {
-      state.vouchers.push(action.payload);
+      state.status = "idle";
     });
   },
 });
 
-export const { voucherAdded, voucherUpdated, voucherDeleted } =
-  voucherSlice.actions;
+export const { voucherUpdated, voucherDeleted } = voucherSlice.actions;
 
 export default voucherSlice.reducer;
 

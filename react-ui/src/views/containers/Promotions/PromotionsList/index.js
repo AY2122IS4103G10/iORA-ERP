@@ -39,19 +39,6 @@ export const PromotionsTable = () => {
       {
         Header: "Products",
         accessor: "products",
-        Cell: (e) => moment(e.value).format("DD/MM/YY, h:mm a"),
-      },
-      {
-        Header: "Expiry Date",
-        accessor: "expDate",
-        Cell: (e) => moment(e.value).format("DD/MM/YY, h:mm a"),
-      },
-      {
-        Header: "Redeemed",
-        accessor: "isRedeemed",
-        Cell: (e) => (e.value ? "Yes" : "No"),
-        Filter: SelectColumnFilter,
-        filter: "includes",
       },
       // {
       //   Header: CogIcon,
@@ -70,7 +57,7 @@ export const PromotionsTable = () => {
   );
   const dispatch = useDispatch()
   const data = useSelector(selectAllVouchers);
-  const voucherStatus = useSelector((state) => state.vouchers.state)
+  const voucherStatus = useSelector((state) => state.vouchers.status)
   useEffect(() => {
     voucherStatus === "idle" && dispatch(fetchVouchers())
   }, [voucherStatus, dispatch])

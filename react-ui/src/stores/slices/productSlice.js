@@ -52,13 +52,13 @@ const productSlice = createSlice({
     });
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.products = state.products.concat(action.payload);
+      state.products = action.payload;
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {
-      state.products.push(action.payload);
+      state.status = "idle"
     });
     builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
       const {
@@ -88,6 +88,7 @@ const productSlice = createSlice({
       state.products = state.products.filter(
         ({ prodCode }) => prodCode !== action.payload.prodCode
       );
+      // state.status = "idle"
     });
   },
 });

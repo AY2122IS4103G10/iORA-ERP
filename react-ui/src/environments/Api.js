@@ -16,7 +16,7 @@ export const api = {
     return axios.post(`${REST_ENDPOINT}${path}`, item);
   },
   update(path, id, item) {
-    return axios.put(`${REST_ENDPOINT}${path}/${id}`, item);
+    return axios.put(`${REST_ENDPOINT}${path}`, item);
   },
   delete(path, id) {
     return axios.delete(`${REST_ENDPOINT}${path}/${id}`);

@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -28,11 +30,11 @@ public class Company implements Serializable {
     @Column(nullable = false)
     private Boolean active;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Address address;
-    @OneToMany
+    @ManyToMany
     private List<Department> departments;
-    @OneToMany
+    @ManyToMany
     private List<Vendor> vendors;
 
     public Company() {

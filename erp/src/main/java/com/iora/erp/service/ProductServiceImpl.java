@@ -46,6 +46,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<PromotionField> getPromotionFields() {
+        TypedQuery<PromotionField> q = em.createQuery("SELECT prf FROM PromotionField prf", PromotionField.class);
+        return q.getResultList();
+    }
+
+    @Override
     public ProductField getProductFieldByNameValue(String fieldName, String fieldValue) throws ProductFieldException {
         Query q = em.createQuery(
                 "SELECT pf FROM ProductField pf WHERE LOWER(pf.fieldName) LIKE :fieldName AND LOWER(pf.fieldValue) LIKE :fieldValue");
@@ -203,6 +209,15 @@ public class ProductServiceImpl implements ProductService {
         } else {
             q = em.createQuery("SELECT m FROM Model m", Model.class);
         }
+
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Model> getModelsByPromoField(PromotionField promoField) {
+        TypedQuery<Model> q = em.createQuery("SELECT m FROM Model m WHERE :promoField MEMBER OF m.productFields",
+                Model.class);
+        q.setParameter("promoField", promoField);
 
         return q.getResultList();
     }
@@ -373,7 +388,7 @@ public class ProductServiceImpl implements ProductService {
             ProductItem pi = new ProductItem(rfid);
             pi.setProductSKU(sku);
             em.persist(pi);
-            
+
             p.addProductItem(pi);
         } catch (EntityExistsException ex) {
             throw new ProductItemException("ProductItem with rfid " + rfid + " already exist.");

@@ -143,12 +143,12 @@ public class SiteServiceImpl implements SiteService {
     }
 
     String siteQuery(String mainQuery, String country, String company) {
-        if (country != null && company != null) {
-            return mainQuery + String.format(" WHERE s.country = %s AND s.company = %s", country, company);
-        } else if (country != null) {
-            return mainQuery + String.format(" WHERE s.country = %s", country);
-        } else if (company != null) {
-            return mainQuery + String.format(" WHERE s.company = %s", company);
+        if (!country.equals("") && !company.equals("")) {
+            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country, company);
+        } else if (!country.equals("")) {
+            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country);
+        } else if (!company.equals("")) {
+            return mainQuery + String.format(" WHERE s.company.name = '%s Fashion Pte. Ltd.'", company);
         } else {
             return mainQuery;
         }

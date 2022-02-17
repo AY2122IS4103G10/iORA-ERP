@@ -14,6 +14,7 @@ import com.iora.erp.model.product.PromotionField;
 
 public interface ProductService {
     public abstract List<String> getProductFieldValues(String fieldName) throws ProductFieldException;
+    public abstract List<PromotionField> getPromotionFields();
     public abstract ProductField getProductFieldByNameValue(String fieldName, String fieldValue) throws ProductFieldException;
     public abstract void createProductField(ProductField productField) throws ProductFieldException;
     public abstract List<ProductField> getAllProductFields();
@@ -25,6 +26,7 @@ public interface ProductService {
     public abstract Model getModel(String modelCode) throws ModelException;
     public abstract List<Model> searchModelsByModelCode(String modelCode);
     public abstract List<Model> searchModelsByName(String name);
+    public abstract List<Model> getModelsByPromoField(PromotionField promoField);
     public abstract List<Model> getModelsByFieldValue(String fieldName, String fieldValue);
     public abstract List<Model> getModelsByCompanyAndTag(String company, String tag);
     public abstract List<Model> getModelsByTag(String tag);

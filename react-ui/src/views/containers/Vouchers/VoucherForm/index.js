@@ -14,7 +14,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const VoucherFormBody = ({
   isEditing,
-  quanitity,
+  quantity,
   onQuanitity,
   value,
   onValueChanged,
@@ -84,7 +84,7 @@ const VoucherFormBody = ({
                       </SimpleInputGroup>
                       <SimpleInputGroup
                         label="Quanitity"
-                        inputField="quanitity"
+                        inputField="quantity"
                         className="sm:mt-0 sm:col-span-2"
                       >
                         <SimpleInputBox
@@ -92,7 +92,7 @@ const VoucherFormBody = ({
                           name="code"
                           id="code"
                           autoComplete="code"
-                          value={quanitity}
+                          value={quantity}
                           onChange={onQuanitity}
                           required
                         />
@@ -134,7 +134,7 @@ export const VoucherForm = () => {
     selectVoucherById(state, parseInt(voucherId))
   );
   const isEditing = Boolean(voucher);
-  const [quanitity, setQuantity] = useState(!isEditing ? 1 : voucher.code);
+  const [quantity, setQuantity] = useState(!isEditing ? 1 : voucher.code);
   const [value, setValue] = useState(!isEditing ? "" : voucher.value);
   const [expDate, setExpDate] = useState(
     !isEditing ? new Date() : new Date(voucher.expDate)
@@ -149,13 +149,15 @@ export const VoucherForm = () => {
 
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
-    [quanitity, value, expDate].every(Boolean) && requestStatus === "idle";
+    [quantity, value, expDate].every(Boolean) && requestStatus === "idle";
   const onAddVoucherClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
       try {
         setRequestStatus("pending");
-        dispatch(addNewVouchers({ quanitity, value, expDate })).unwrap();
+        dispatch(
+          addNewVouchers({ quantity, amount: value, expiry: expDate })
+        ).unwrap();
         setQuantity("");
         setValue("");
         navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherId}`);
@@ -172,7 +174,7 @@ export const VoucherForm = () => {
   return (
     <VoucherFormBody
       isEditing={isEditing}
-      quanitity={quanitity}
+      quantity={quantity}
       onQuanitity={onQuanitity}
       value={value}
       onValueChanged={onValueChanged}

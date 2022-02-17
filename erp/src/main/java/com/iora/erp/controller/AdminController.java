@@ -121,19 +121,19 @@ public class AdminController {
     }
 
     @PostMapping(path = "/addEmployees", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addEmployee(@RequestBody List<Employee> employee) {
+    public ResponseEntity<Object> addAllEmployee(@RequestBody List<Employee> employee) {
         try {
-            for (Employee e : employee) {
+            for(Employee e : employee) {
                 employeeService.createEmployee(e);
             }
+
             return ResponseEntity.ok("All employees has been successfully created");
-        } catch (EmployeeException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
+    @GetMapping(path = "/viewEmployees", produces = "application/json")
     public List<Employee> viewEmployees(@RequestParam("search") String search) {
         try {
             return employeeService.getEmployeeByFields(search);
@@ -141,7 +141,6 @@ public class AdminController {
             return null;
         }
     }
-
 
     //need do management update
     @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")

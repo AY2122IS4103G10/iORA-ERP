@@ -118,7 +118,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-    @Override
+ /*   @Override
     public byte[] saltGeneration() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
@@ -139,7 +139,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new CustomerException("Invalid Username or Password.");
         }
 
-    }
+    }*/
 
     @Override
     public Voucher getVoucher(String voucherCode) throws CustomerException {

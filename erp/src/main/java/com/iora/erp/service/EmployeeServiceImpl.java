@@ -111,14 +111,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Employee> getEmployeeByFields(String search) {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
-                "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary");
-        q.setParameter("email", "%" + search.toLowerCase() + "%");
-        q.setParameter("username", "%" + search.toLowerCase() + "%");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        q.setParameter("salary", "%" + search + "%");
-        return q.getResultList();
+    public List<Employee> getEmployeeByFields(String search) throws EmployeeException {
+        if (search == null) {
+            return listOfEmployee();
+        } else {
+            Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
+                    "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary");
+            q.setParameter("email", "%" + search.toLowerCase() + "%");
+            q.setParameter("username", "%" + search.toLowerCase() + "%");
+            q.setParameter("name", "%" + search.toLowerCase() + "%");
+            q.setParameter("salary", "%" + search + "%");
+            return q.getResultList();
+        }
     }
 
     @Override
@@ -144,24 +148,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-    @Override
-    public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
-        return getEmployeeById(id).getAccessRights();
-    }
 
-    @Override
-    public Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
-        return getEmployeeByUsername(username).getAccessRights();
-    }
-
-    @Override
-    public byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
-    }
-
+/*
     @Override
     public Employee loginAuthentication(Employee employee) throws EmployeeException {
         try {
@@ -175,6 +163,18 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EmployeeException("Invalid Username or Password.");
         }
 
+    }*/
+
+    @Override
+    public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

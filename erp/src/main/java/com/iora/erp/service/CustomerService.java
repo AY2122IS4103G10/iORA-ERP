@@ -6,6 +6,7 @@ import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.Voucher;
 
+
 public interface CustomerService {
     public abstract void createCustomerAccount(Customer customer) throws CustomerException;
     public abstract void updateCustomerAccount(Customer customer) throws CustomerException;
@@ -15,10 +16,10 @@ public interface CustomerService {
     public abstract List<Customer> getCustomerByFields(String search);
     public abstract Customer getCustomerById(Long id)  throws CustomerException;
     public abstract Customer getCustomerByEmail(String Email) throws CustomerException;
-    
+   /* 
     public abstract byte[] saltGeneration();
     public abstract Customer loginAuthentication(Customer customer) throws CustomerException;
-    
+*/
     public abstract Voucher getVoucher(String voucherCode) throws CustomerException;
     public abstract void generateVouchers(double amount, int qty);
     public abstract List<Voucher> getAllVouchers();

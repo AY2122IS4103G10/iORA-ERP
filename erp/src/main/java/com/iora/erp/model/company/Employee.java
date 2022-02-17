@@ -3,21 +3,33 @@ package com.iora.erp.model.company;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import com.iora.erp.enumeration.AccessRights;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Entity
-public class Employee  {
+public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -29,13 +41,13 @@ public class Employee  {
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
-    private String hashPass;
-    @Column(nullable = false)
-    private String salt;
-    @Column(nullable = false)
     private Boolean availStatus;
+    @JsonIgnore
+    @Column(nullable = false)
+    private String password;
+    private Collection<? extends GrantedAuthority> authorities;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL)
     private JobTitle jobTitle;
     @ManyToOne(fetch = FetchType.EAGER)
     private Department department;
@@ -43,13 +55,24 @@ public class Employee  {
     public Employee() {
     }
 
+    public Employee(Long id, String name, String email, Double salary, String username, Boolean availStatus,
+            JobTitle jobTitle, Department department, Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.salary = salary;
+        this.username = username;
+        this.availStatus = availStatus;
+        this.jobTitle = jobTitle;
+        this.department = department;
+        this.authorities = authorities;
+    }
+
     public Employee(String name, String email, Double salary, String username, String hashPass, Boolean availStatus) {
         this.name = name;
         this.email = email;
         this.salary = salary;
         this.username = username;
-        this.salt = saltGeneration();
-        this.hashPass = generateProtectedPassword(this.salt, hashPass);
         this.availStatus = availStatus;
     }
 
@@ -67,30 +90,22 @@ public class Employee  {
         }
     }
 
-    private static String saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt.toString();
-    }
 
-    public Boolean authentication(String authenticate) {
-        String tryPassword;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.reset();
-            md.update((this.salt + authenticate).getBytes("utf8"));
+    public static Employee build(Employee user) {
+        List<GrantedAuthority> authorities = user.getJobTitle().getResponsibility().stream()
+                .map(role -> new SimpleGrantedAuthority(role.toString())).collect(Collectors.toList());
 
-            tryPassword = String.format("%0128x", new BigInteger(1, md.digest()));
+        return new Employee(
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getSalary(),
+            user.getUsername(),
+            user.getAvailStatus(),
+            user.getJobTitle(),
+            user.getDepartment(),
+            authorities);
 
-            if (tryPassword.equals(this.hashPass)) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception ex) {
-            return false;
-        }
     }
 
     public Long getId() {
@@ -115,22 +130,6 @@ public class Employee  {
 
     public void setAvailStatus(Boolean availStatus) {
         this.availStatus = availStatus;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(byte[] bs) {
-        this.salt = bs.toString();
-    }
-
-    public String getHashPass() {
-        return hashPass;
-    }
-
-    public void setHashPass(String password) {
-        this.hashPass = generateProtectedPassword(this.salt, password);
     }
 
     public String getUsername() {
@@ -188,5 +187,31 @@ public class Employee  {
         accessRights.addAll(jobTitle.getResponsibility());
         return accessRights;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
+    }
+
+    @Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Employee user = (Employee) o;
+		return Objects.equals(id, user.id);
+	}
 
 }

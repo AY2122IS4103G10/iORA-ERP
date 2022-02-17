@@ -31,19 +31,14 @@ function App() {
             <Route path=":prodCode" element={<ProductDetails />} />
             <Route path="create" element={<ProductForm />} />
             <Route path="edit/:prodId" element={<ProductForm />} />
+            <Route path="promotions" element={<ManagePromotions />} />
           </Route>
           <Route path="stocklevels/*" element={<ViewStockLevels />} />
           <Route path="vouchers" element={<Outlet />}>
             <Route index element={<ManageVouchers />} />
-            <Route path=":voucherId" element={<VoucherDetails />} />
+            <Route path=":voucherCode" element={<VoucherDetails />} />
             <Route path="create" element={<VoucherForm />} />
             <Route path="edit/:voucherId" element={<VoucherForm />} />
-          </Route>
-          <Route path="vouchers" element={<Outlet />}>
-            <Route index element={<ManagePromotions />} />
-            {/* <Route path=":voucherId" element={<VoucherDetails />} />
-            <Route path="create" element={<VoucherForm />} />
-            <Route path="edit/:voucherId" element={<VoucherForm />} /> */}
           </Route>
         </Route>
         <Route

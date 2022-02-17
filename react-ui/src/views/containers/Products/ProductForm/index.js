@@ -490,6 +490,7 @@ export const ProductForm = () => {
             updateExistingProduct(product)
           ).unwrap();
         }
+        alert(`Successfully ${!isEditing ? "added" : "updated"} product`);
         navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
       } catch (err) {
         console.error(

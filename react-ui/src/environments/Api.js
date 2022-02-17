@@ -15,10 +15,19 @@ export const api = {
   create(path, item) {
     return axios.post(`${REST_ENDPOINT}${path}`, item);
   },
-  update(path, id, item) {
+  update(path, item) {
     return axios.put(`${REST_ENDPOINT}${path}`, item);
   },
   delete(path, id) {
     return axios.delete(`${REST_ENDPOINT}${path}/${id}`);
   },
+};
+
+export const voucherApi = {
+  issue(id) {
+    return axios.put(`${REST_ENDPOINT}voucher/issue/${id}`);
+  },
+  redeem(id) {
+    return axios.put(`${REST_ENDPOINT}voucher/redeem/${id}`);
+  }
 };

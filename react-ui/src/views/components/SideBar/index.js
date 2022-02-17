@@ -19,6 +19,7 @@ const navigation = [
   { name: "Products", href: "/sm/products", icon: ClockIcon, current: false },
   { name: "Stock Levels", href: "/sm/stocklevels", icon: ScaleIcon, current: false },
   { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },
+  { name: "Promotions", href: "/sm/promotions", icon: CreditCardIcon, current: false },
   { name: "Vouchers", href: "/sm/vouchers", icon: CreditCardIcon, current: false },
   { name: "Reports & Analytics", href: "#", icon: DocumentReportIcon, current: false },
 ];

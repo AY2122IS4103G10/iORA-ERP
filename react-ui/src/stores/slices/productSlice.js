@@ -28,7 +28,6 @@ export const updateExistingProduct = createAsyncThunk(
   async (existingProduct) => {
     const response = await api.update(
       "model",
-      existingProduct.modelCode,
       existingProduct
     );
     return response.data;

@@ -10,6 +10,8 @@ import {
   selectProductByCode,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import { useState } from "react";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete.js";
 
 const fieldSection = ({ fieldName, fields }) => {
   return (
@@ -44,7 +46,7 @@ const ProductDetailsBody = ({
   sizes,
   tags,
   categories,
-  onDeleteProdClicked,
+  openModal,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-5xl xl:grid xl:grid-cols-3">
@@ -71,8 +73,8 @@ const ProductDetailsBody = ({
                 </Link>
                 <button
                   type="button"
-                  className="inline-flex justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-700"
-                  onClick={onDeleteProdClicked}
+                  className="inline-flex justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  onClick={openModal}
                 >
                   <TrashIcon
                     className="-ml-1 mr-2 h-5 w-5 text-white"
@@ -186,14 +188,19 @@ export const ProductDetails = () => {
   const sizes = fields.filter((field) => field.fieldName === "size");
   const tags = fields.filter((field) => field.fieldName === "tag");
   const categories = fields.filter((field) => field.fieldName === "category");
+  const [openDelete, setOpenDelete] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const onDeleteProdClicked = () => {
     dispatch(deleteExistingProduct(product.modelCode));
+    closeModal();
     navigate("/sm/products");
   };
+
+  const openModal = () => setOpenDelete(true);
+  const closeModal = () => setOpenDelete(false);
 
   return (
     <>
@@ -207,7 +214,13 @@ export const ProductDetails = () => {
         sizes={sizes}
         tags={tags}
         categories={categories}
-        onDeleteProdClicked={onDeleteProdClicked}
+        openModal={openModal}
+      />
+      <ConfirmDelete
+        item={product.name}
+        open={openDelete}
+        closeModal={closeModal}
+        onConfirm={onDeleteProdClicked}
       />
     </>
   );

@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { api, voucherApi } from "../../environments/Api";
 
 const initialState = {
   vouchers: [],
@@ -23,26 +23,42 @@ export const addNewVouchers = createAsyncThunk(
   }
 );
 
+export const issueVoucher = createAsyncThunk(
+  "vouchers/issueVoucher",
+  async (voucherCode) => {
+    const response = await voucherApi.issue(voucherCode);
+    return response.data;
+  }
+);
+
+export const deleteExistingVoucher = createAsyncThunk(
+  "vouchers/deleteExistingVoucher",
+  async (existingVoucherCode) => {
+    const response = await api.delete("voucher", existingVoucherCode);
+    return response.data;
+  }
+);
+
 const voucherSlice = createSlice({
   name: "vouchers",
   initialState,
   reducers: {
-    voucherUpdated(state, action) {
-      const { id, code, value, isIssued, expDate, isRedeemed } = action.payload;
-      const existingVoucher = state.vouchers.find(
-        (voucher) => voucher.id === id
-      );
-      if (existingVoucher) {
-        existingVoucher.code = code;
-        existingVoucher.value = value;
-        existingVoucher.isIssued = isIssued;
-        existingVoucher.expDate = expDate;
-        existingVoucher.isRedeemed = isRedeemed;
-      }
-    },
+    // voucherUpdated(state, action) {
+    //   const { id, code, value, isIssued, expDate, isRedeemed } = action.payload;
+    //   const existingVoucher = state.vouchers.find(
+    //     (voucher) => voucher.id === id
+    //   );
+    //   if (existingVoucher) {
+    //     existingVoucher.code = code;
+    //     existingVoucher.value = value;
+    //     existingVoucher.isIssued = isIssued;
+    //     existingVoucher.expDate = expDate;
+    //     existingVoucher.isRedeemed = isRedeemed;
+    //   }
+    // },
     voucherDeleted(state, action) {
       state.vouchers = state.vouchers.filter(
-        ({ id }) => id !== action.payload.id
+        ({ voucherCode }) => voucherCode !== action.payload.voucherCode
       );
     },
   },
@@ -60,6 +76,12 @@ const voucherSlice = createSlice({
     builder.addCase(addNewVouchers.fulfilled, (state, action) => {
       state.status = "idle";
     });
+    builder.addCase(deleteExistingVoucher.fulfilled, (state, action) => {
+      state.vouchers = state.vouchers.filter(
+        ({ voucherCode }) => voucherCode !== action.payload.voucherCode
+      );
+      // state.status = "idle"
+    });
   },
 });
 
@@ -69,5 +91,7 @@ export default voucherSlice.reducer;
 
 export const selectAllVouchers = (state) => state.vouchers.vouchers;
 
-export const selectVoucherById = (state, voucherId) =>
-  state.vouchers.vouchers.find((voucher) => voucher.id === voucherId);
+export const selectVoucherByCode = (state, voucherCode) =>
+  state.vouchers.vouchers.find(
+    (voucher) => voucher.voucherCode === voucherCode
+  );

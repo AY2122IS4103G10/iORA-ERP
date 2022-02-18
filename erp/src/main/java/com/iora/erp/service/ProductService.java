@@ -22,7 +22,7 @@ public interface ProductService {
     public abstract PromotionField getPromoField(String fieldName, String fieldValue, double discountedPrice) throws ProductFieldException;
     public abstract void addPromoCategory(String modelCode, String category, double discountedPrice) throws ModelException;
 
-    public abstract void createModel(Model model) throws ModelException;
+    public abstract Model createModel(Model model) throws ModelException;
     public abstract Model getModel(String modelCode) throws ModelException;
     public abstract List<Model> searchModelsByModelCode(String modelCode);
     public abstract List<Model> searchModelsByName(String name);
@@ -31,7 +31,7 @@ public interface ProductService {
     public abstract List<Model> getModelsByCompanyAndTag(String company, String tag);
     public abstract List<Model> getModelsByTag(String tag);
     public abstract List<Model> getModelsByCategory(String category);
-    public abstract void updateModel(Model model) throws ModelException;
+    public abstract Model updateModel(Model model) throws ModelException;
 
     public abstract void createProduct(String modelCode, List<ProductField> productFields) throws ProductException, ProductFieldException;
     public abstract Product getProduct(String sku) throws ProductException;

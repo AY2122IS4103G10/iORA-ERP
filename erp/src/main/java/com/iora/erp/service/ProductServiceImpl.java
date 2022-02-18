@@ -123,9 +123,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void createModel(Model model) throws ModelException {
+    public Model createModel(Model model) throws ModelException {
         try {
             em.persist(model);
+            return model;
         } catch (EntityExistsException ex) {
             throw new ModelException("Model with model code " + model.getModelCode() + " already exist.");
         }
@@ -298,7 +299,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateModel(Model model) throws ModelException {
+    public Model updateModel(Model model) throws ModelException {
         Model old = em.find(Model.class, model.getModelCode());
 
         if (old == null) {
@@ -311,6 +312,7 @@ public class ProductServiceImpl implements ProductService {
         old.setOnlineOnly(model.isOnlineOnly());
         old.setPrice(model.getPrice());
         old.setProductFields(model.getProductFields());
+        return old;
     }
 
     @Override

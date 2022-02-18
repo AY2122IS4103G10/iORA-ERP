@@ -74,7 +74,7 @@ public class SAMController {
     public ResponseEntity<Object> createProductField(@RequestBody ProductField productField) {
         try {
             productService.createProductField(productField);
-            return ResponseEntity.ok("Product field " + productField.getFieldName() + " is successfully created");
+            return ResponseEntity.ok("Product field " + productField.getFieldName() + " : " +  productField.getFieldValue() + " is successfully created");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

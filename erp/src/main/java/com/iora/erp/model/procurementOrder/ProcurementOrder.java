@@ -3,13 +3,17 @@ package com.iora.erp.model.procurementOrder;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import com.iora.erp.model.site.Site;
 
 @Entity
 public class ProcurementOrder {
@@ -20,8 +24,15 @@ public class ProcurementOrder {
     private List<POStatus> statusHistory;
     @OneToOne
     private ProcurementOrderFulfilment procurementOrderFulfilment;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<ProcurementOrderLI> lineItems;
+
+    @ManyToOne
+    private Site manufacturing;
+    @ManyToOne
+    private Site headquarters;
+    @ManyToOne
+    private Site warehouse;
 
     public ProcurementOrder() {
     }
@@ -60,6 +71,30 @@ public class ProcurementOrder {
 
     public void setLineItems(List<ProcurementOrderLI> lineItems) {
         this.lineItems = lineItems;
+    }
+
+    public Site getManufacturing() {
+        return this.manufacturing;
+    }
+
+    public void setManufacturing(Site manufacturing) {
+        this.manufacturing = manufacturing;
+    }
+
+    public Site getHeadquarters() {
+        return this.headquarters;
+    }
+
+    public void setHeadquarters(Site headquarters) {
+        this.headquarters = headquarters;
+    }
+
+    public Site getWarehouse() {
+        return this.warehouse;
+    }
+
+    public void setWarehouse(Site warehouse) {
+        this.warehouse = warehouse;
     }
 
     public ProcurementOrder id(Long id) {

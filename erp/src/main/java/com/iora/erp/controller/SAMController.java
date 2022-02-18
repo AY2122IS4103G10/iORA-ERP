@@ -119,12 +119,12 @@ public class SAMController {
     }
 
     @GetMapping(path = "/model", produces = "application/json")
-    public List<Model> searchModelsByModelCode(@RequestParam(required = false) String modelCode) {
+    public List<Model> searchModelsByModelCode(@RequestParam String modelCode) {
         return productService.searchModelsByModelCode(modelCode);
     }
 
     @GetMapping(path = "/model/name", produces = "application/json")
-    public List<Model> searchModelsByName(@RequestParam(required = false) String name) {
+    public List<Model> searchModelsByName(@RequestParam String name) {
         return productService.searchModelsByName(name);
     }
 
@@ -191,7 +191,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/product", produces = "application/json")
-    public List<Product> searchProductsBySKU(@RequestParam(required = false) String sku) {
+    public List<Product> searchProductsBySKU(@RequestParam String sku) {
         return productService.searchProductsBySKU(sku);
     }
 
@@ -224,9 +224,8 @@ public class SAMController {
         }
     }
 
-    @PostMapping(path = "/productItem/{sku}/{rfid}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProductItem(@PathVariable String sku, @PathVariable String rfid,
-            @RequestBody(required = false) Object body) {
+    @PostMapping(path = "/productItem/{sku}/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> createProductItem(@PathVariable String sku, @PathVariable String rfid) {
         try {
             productService.createProductItem(rfid, sku);
             return ResponseEntity
@@ -255,13 +254,12 @@ public class SAMController {
     }
 
     @GetMapping(path = "/productItem", produces = "application/json")
-    public List<ProductItem> searchProductItems(@RequestParam(required = false) String rfid) {
+    public List<ProductItem> searchProductItems(@RequestParam String rfid) {
         return productService.searchProductItems(rfid);
     }
 
-    @PutMapping(path = "/productItem/sell/{rfid}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> sellProductItem(@PathVariable String rfid,
-            @RequestBody(required = false) Object body) {
+    @PutMapping(path = "/productItem/sell/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> sellProductItem(@PathVariable String rfid) {
         try {
             productService.sellProductItem(rfid);
             return ResponseEntity.ok("Product Item with RFID " + rfid.trim() + " is successfully marked as sold.");
@@ -270,9 +268,8 @@ public class SAMController {
         }
     }
 
-    @PutMapping(path = "/productItem/return/{rfid}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> returnProductItem(@PathVariable String rfid,
-            @RequestBody(required = false) Object body) {
+    @PutMapping(path = "/productItem/return/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> returnProductItem(@PathVariable String rfid) {
         try {
             productService.returnProductItem(rfid);
             return ResponseEntity.ok("Product Item with RFID " + rfid.trim() + " is successfully marked as unsold.");
@@ -325,9 +322,8 @@ public class SAMController {
         return customerService.getAvailableVouchersByAmount(amount);
     }
 
-    @PutMapping(path = "/voucher/issue/{voucherCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode,
-            @RequestBody(required = false) Object body) {
+    @PutMapping(path = "/voucher/issue/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode) {
         try {
             customerService.issueVoucher(voucherCode);
             return ResponseEntity.ok("Voucher " + voucherCode + " has been marked as issued.");
@@ -336,9 +332,8 @@ public class SAMController {
         }
     }
 
-    @PutMapping(path = "/voucher/redeem/{voucherCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> redeemVouchers(@PathVariable String voucherCode,
-            @RequestBody(required = false) Object body) {
+    @PutMapping(path = "/voucher/redeem/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> redeemVouchers(@PathVariable String voucherCode) {
         try {
             customerService.redeemVoucher(voucherCode);
             return ResponseEntity.ok("Voucher " + voucherCode + " has been marked as redeemed.");

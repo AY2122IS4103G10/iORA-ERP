@@ -10,7 +10,7 @@ const initialState = {
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const response = await api.getAll("sam/model");
+    const response = await api.getAll("sam/model?modelCode=");
     return response.data;
   }
 );
@@ -26,10 +26,7 @@ export const addNewProduct = createAsyncThunk(
 export const updateExistingProduct = createAsyncThunk(
   "products/updateExistingProduct",
   async (existingProduct) => {
-    const response = await api.update(
-      "sam/model",
-      existingProduct
-    );
+    const response = await api.update("sam/model", existingProduct);
     return response.data;
   }
 );
@@ -57,17 +54,17 @@ const productSlice = createSlice({
       state.status = "failed";
     });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {
-      state.status = "idle"
+      state.status = "idle";
     });
     builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
       const {
         modelCode,
         name,
         description,
-        fashionLine,
         price,
         onlineOnly,
         available,
+        products,
         productFields,
       } = action.payload;
       const existingProd = state.products.find(
@@ -76,12 +73,13 @@ const productSlice = createSlice({
       if (existingProd) {
         existingProd.name = name;
         existingProd.description = description;
-        existingProd.fashionLine = fashionLine;
         existingProd.price = price;
         existingProd.onlineOnly = onlineOnly;
         existingProd.available = available;
+        existingProd.products = products;
         existingProd.productFields = productFields;
       }
+      // state.status = "idle";
     });
     builder.addCase(deleteExistingProduct.fulfilled, (state, action) => {
       state.products = state.products.filter(

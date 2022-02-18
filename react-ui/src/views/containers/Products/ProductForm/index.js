@@ -389,7 +389,7 @@ export const ProductForm = () => {
   const tags = fields.filter((field) => field.fieldName === "TAG");
   const companies = fields.filter((field) => field.fieldName === "COMPANY");
   const categories = fields.filter((field) => field.fieldName === "category");
-  
+
   const [colorCheckedState, setColorCheckedState] = useState(
     !isEditing
       ? new Array(colors.length).fill(false)
@@ -501,13 +501,18 @@ export const ProductForm = () => {
             })
           ).unwrap();
         } else {
-          product.name = name;
-          product.description = description;
-          product.company = company;
-          product.price = price;
-          product.onlineOnly = onlineOnly;
-
-          dispatch(updateExistingProduct(product)).unwrap();
+          dispatch(
+            updateExistingProduct({
+              modelCode: prodCode,
+              name,
+              description,
+              price,
+              onlineOnly,
+              available,
+              products: product.products,
+              productFields: fields,
+            })
+          ).unwrap();
         }
         alert(`Successfully ${!isEditing ? "added" : "updated"} product`);
         navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);

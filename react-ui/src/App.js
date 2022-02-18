@@ -1,5 +1,6 @@
 import { Routes, Route, Outlet } from "react-router-dom";
-import { Index } from "./views/containers/Index";
+import { SMIndex } from "./views/containers/Index/SMIndex";
+import { AdminIndex } from "./views/containers/Index/AdminIndex";
 import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
@@ -11,6 +12,7 @@ import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index
 import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
 import { ADRoute } from "./routes/ADRoute";
+import { ManageSites } from "./views/containers/Sites/ManageSites";
 
 function App() {
   return (
@@ -23,7 +25,7 @@ function App() {
           path="/sm"
           element={
             <SMRoute>
-              <Index />
+              <SMIndex />
             </SMRoute>
           }
         >
@@ -45,13 +47,14 @@ function App() {
         <Route
           path="/ad"
           element={
-            <ADRoute>
-              <Index />
-            </ADRoute>
+            //Change to admin route
+            // <Route>
+              <AdminIndex />
+            /* </Route> */
           }
         >
           <Route path="sites" element={<Outlet />}>
-            <Route index element={<ManageProducts />} />
+            <Route index element={<ManageSites />} />
             {/* <Route path=":prodCode" element={<ProductDetails />} />
             <Route path="create" element={<ProductForm />} />
             <Route path="edit/:prodId" element={<ProductForm />} />

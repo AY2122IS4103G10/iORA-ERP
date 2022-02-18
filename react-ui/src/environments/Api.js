@@ -6,8 +6,7 @@ import { REST_ENDPOINT } from "../constants/restEndpoint";
 
 export const api = {
   getAll(path) {
-    return axios
-      .get(`${REST_ENDPOINT}${path}`);
+    return axios.get(`${REST_ENDPOINT}${path}`);
   },
   get(path, id) {
     return axios.get(`${REST_ENDPOINT}${path}/${id}`);
@@ -29,5 +28,5 @@ export const voucherApi = {
   },
   redeem(id) {
     return axios.put(`${REST_ENDPOINT}voucher/redeem/${id}`);
-  }
+  },
 };

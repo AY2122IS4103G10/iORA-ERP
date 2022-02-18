@@ -30,6 +30,13 @@ export const issueVoucher = createAsyncThunk(
     return response.data;
   }
 );
+export const redeemVoucher = createAsyncThunk(
+  "vouchers/redeemVoucher",
+  async (voucherCode) => {
+    const response = await voucherApi.redeem(voucherCode);
+    return response.data;
+  }
+);
 
 export const deleteExistingVoucher = createAsyncThunk(
   "vouchers/deleteExistingVoucher",
@@ -68,12 +75,18 @@ const voucherSlice = createSlice({
     });
     builder.addCase(fetchVouchers.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.vouchers = action.payload;
+      state.vouchers = state.vouchers.concat(action.payload);
     });
     builder.addCase(fetchVouchers.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewVouchers.fulfilled, (state, action) => {
+      state.status = "idle";
+    });
+    builder.addCase(issueVoucher.fulfilled, (state, action) => {
+      state.status = "idle";
+    });
+    builder.addCase(redeemVoucher.fulfilled, (state, action) => {
       state.status = "idle";
     });
     builder.addCase(deleteExistingVoucher.fulfilled, (state, action) => {

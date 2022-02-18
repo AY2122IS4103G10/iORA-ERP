@@ -7,11 +7,15 @@ import {
 import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
 import {
   deleteExistingProduct,
+  fetchProducts,
+  selectAllProducts,
   selectProductByCode,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete.js";
+import axios from "axios";
+import { REST_ENDPOINT } from "../../../../constants/restEndpoint";
 
 const fieldSection = ({ fieldName, fields }) => {
   return (
@@ -222,14 +226,14 @@ const ProductDetailsBody = ({
 export const ProductDetails = () => {
   const { prodCode } = useParams();
   const product = useSelector((state) => selectProductByCode(state, prodCode));
-  const fields = product.productFields;
-  const colors = fields.filter((field) => field.fieldName === "COLOUR");
-  const sizes = fields.filter((field) => field.fieldName === "SIZE");
-  const tags = fields.filter((field) => field.fieldName === "TAG");
-  const category = fields.find((field) => field.fieldName === "category");
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const prodStatus = useSelector((state) => state.products.status);
+  
+  useEffect(() => {
+    prodStatus === "idle" && dispatch(fetchProducts());
+  }, [prodStatus, dispatch]);
 
   const onDeleteProdClicked = () => {
     dispatch(deleteExistingProduct(product.modelCode));
@@ -243,23 +247,35 @@ export const ProductDetails = () => {
   return (
     <>
       <NavigatePrev page="Products" path="/sm/products" />
-      <ProductDetailsBody
-        prodCode={prodCode}
-        name={product.name}
-        description={product.description}
-        price={product.price}
-        colors={colors}
-        sizes={sizes}
-        tags={tags}
-        category={category}
-        openModal={openModal}
-      />
-      <ConfirmDelete
-        item={product.name}
-        open={openDelete}
-        closeModal={closeModal}
-        onConfirm={onDeleteProdClicked}
-      />
+      {Boolean(product) && (
+        <>
+          <ProductDetailsBody
+            prodCode={prodCode}
+            name={product.name}
+            description={product.description}
+            price={product.price}
+            colors={product.productFields.filter(
+              (field) => field.fieldName === "COLOUR"
+            )}
+            sizes={product.productFields.filter(
+              (field) => field.fieldName === "SIZE"
+            )}
+            tags={product.productFields.filter(
+              (field) => field.fieldName === "TAG"
+            )}
+            category={product.productFields.find(
+              (field) => field.fieldName === "category"
+            )}
+            openModal={openModal}
+          />
+          <ConfirmDelete
+            item={product.name}
+            open={openDelete}
+            closeModal={closeModal}
+            onConfirm={onDeleteProdClicked}
+          />
+        </>
+      )}
     </>
   );
 };

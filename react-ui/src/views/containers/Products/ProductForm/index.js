@@ -8,6 +8,7 @@ import {
 
 import {
   addNewProduct,
+  fetchProducts,
   selectProductByCode,
   updateExistingProduct,
 } from "../../../../stores/slices/productSlice";
@@ -371,7 +372,7 @@ export const ProductForm = () => {
     !isEditing ? "" : product.description
   );
   const [price, setDiscPrice] = useState(!isEditing ? "" : product.price);
-  const [company, setFashionLine] = useState(!isEditing ? "" : product.company);
+  const [company, setCompany] = useState(!isEditing ? "" : product.company);
   const [onlineOnly, setOnlineOnly] = useState(
     !isEditing ? false : product.onlineOnly
   );
@@ -389,7 +390,6 @@ export const ProductForm = () => {
   const tags = fields.filter((field) => field.fieldName === "TAG");
   const companies = fields.filter((field) => field.fieldName === "COMPANY");
   const categories = fields.filter((field) => field.fieldName === "category");
-
   const [colorCheckedState, setColorCheckedState] = useState(
     !isEditing
       ? new Array(colors.length).fill(false)
@@ -430,6 +430,11 @@ export const ProductForm = () => {
             .map((field) => field.fieldValue)
         )
   );
+  const prodStatus = useSelector((state) => state.products.status);
+  useEffect(() => {
+    prodStatus === "idle" && dispatch(fetchProducts());
+  }, [prodStatus, dispatch]);
+
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
@@ -438,7 +443,7 @@ export const ProductForm = () => {
     setOnlineOnly(!onlineOnly);
   };
   const onAvailableChanged = () => setAvailable(!available);
-  const onCompanyChanged = (e) => setFashionLine(e.target.value);
+  const onCompanyChanged = (e) => setCompany(e.target.value);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
       index === pos ? !item : item

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   CalendarIcon as CalendarIconSolid,
   CheckCircleIcon,
@@ -7,20 +7,20 @@ import {
 } from "@heroicons/react/solid";
 import moment from "moment";
 import {
-  CalendarIcon,
   CurrencyDollarIcon,
   TrashIcon,
 } from "@heroicons/react/outline";
 import {
+  fetchVouchers,
   issueVoucher,
+  redeemVoucher,
   selectVoucherByCode,
   voucherDeleted,
 } from "../../../../stores/slices/voucherSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete.js";
 import { classNames } from "../../../../utilities/Util";
-import axios from "axios";
 
 const VoucherDetailsBody = ({
   voucherCode,
@@ -29,8 +29,8 @@ const VoucherDetailsBody = ({
   expiry,
   redeemed,
   openModal,
-  onIssuedChanged,
-  onRedeemedChanged,
+  onIssueClicked,
+  onRedeemClicked,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-5xl xl:grid xl:grid-cols-3">
@@ -51,7 +51,7 @@ const VoucherDetailsBody = ({
                     !issued && "hover:bg-gray-50",
                     "inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
                   )}
-                  onClick={onIssuedChanged}
+                  onClick={onIssueClicked}
                   disabled={issued}
                 >
                   <PencilIcon
@@ -63,7 +63,7 @@ const VoucherDetailsBody = ({
                 <button
                   type="button"
                   className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
-                  onClick={onRedeemedChanged}
+                  onClick={onRedeemClicked}
                   disabled={redeemed}
                 >
                   <PencilIcon
@@ -134,70 +134,71 @@ export const VoucherDetails = () => {
   const voucher = useSelector((state) =>
     selectVoucherByCode(state, voucherCode)
   );
-  const [redeemed, setRedeemed] = useState(voucher.redeemed);
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const voucherStatus = useSelector((state) => state.vouchers.status);
+  useEffect(() => {
+    voucherStatus === "idle" && dispatch(fetchVouchers());
+  }, [voucherStatus, dispatch]);
 
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
+  
+  const [requestStatus, setRequestStatus] = useState("idle");
 
-  const onIssuedChanged = () => {
+  const onIssueClicked = () => {
     if (!voucher.issued && requestStatus === "idle")
-      // try {
-      //   setRequestStatus("pending");
-      //   dispatch(issueVoucher(voucher.voucherCode));
-      //   alert("Successfully updated voucher");
-      // } catch (err) {
-      //   console.error("Failed to update voucher: ", err);
-      // } finally {
-      //   setRequestStatus("idle");
-      // }
-      axios
-        .put(`http://localhost:8080/sam/voucher/${voucherCode}`, voucher)
-        .then((response) => console.log(response.data));
+      try {
+        setRequestStatus("pending");
+        dispatch(issueVoucher(voucherCode));
+        alert("Successfully issued voucher");
+      } catch (err) {
+        console.error("Failed to issue voucher: ", err);
+      } finally {
+        setRequestStatus("idle");
+      }
   };
-  const onRedeemedChanged = () => setRedeemed(!redeemed);
+  const onRedeemClicked = () => {
+    if (!voucher.redeemed && requestStatus === "idle")
+      try {
+        setRequestStatus("pending");
+        dispatch(redeemVoucher(voucherCode));
+        alert("Successfully redeemed voucher");
+      } catch (err) {
+        console.error("Failed to redeem voucher: ", err);
+      } finally {
+        setRequestStatus("idle");
+      }
+  };
 
   const onDeleteVoucherClicked = () => {
     dispatch(voucherDeleted(voucher));
     navigate("/sm/vouchers");
   };
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-
-  // const handleUpdateVoucher = (voucher) => {
-  //   if (requestStatus === "idle")
-  //     try {
-  //       setRequestStatus("pending");
-  //       dispatch(updateExistingVoucher(voucher)).unwrap();
-  //       alert("Successfully updated voucher");
-  //     } catch (err) {
-  //       console.error("Failed to update voucher: ", err);
-  //     } finally {
-  //       setRequestStatus("idle");
-  //     }
-  // };
 
   return (
-    <>
-      <NavigatePrev page="Vouchers" path="/sm/vouchers" />
-      <VoucherDetailsBody
-        voucherCode={voucher.voucherCode}
-        value={voucher.amount}
-        issued={voucher.issued}
-        expiry={voucher.expiry}
-        redeemed={redeemed}
-        openModal={openModal}
-        onIssuedChanged={onIssuedChanged}
-        onRedeemedChanged={onRedeemedChanged}
-      />
-      <ConfirmDelete
-        item={`${voucher.amount} voucher?`}
-        open={openDelete}
-        closeModal={closeModal}
-        onConfirm={onDeleteVoucherClicked}
-      />
-    </>
+    Boolean(voucher) && (
+      <>
+        <NavigatePrev page="Vouchers" path="/sm/vouchers" />
+        <VoucherDetailsBody
+          voucherCode={voucher.voucherCode}
+          value={voucher.amount}
+          issued={voucher.issued}
+          expiry={voucher.expiry}
+          redeemed={voucher.redeemed}
+          openModal={openModal}
+          onIssueClicked={onIssueClicked}
+          onRedeemClicked={onRedeemClicked}
+        />
+        <ConfirmDelete
+          item={`${voucher.amount} voucher?`}
+          open={openDelete}
+          closeModal={closeModal}
+          onConfirm={onDeleteVoucherClicked}
+        />
+      </>
+    )
   );
 };

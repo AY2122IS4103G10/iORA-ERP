@@ -10,7 +10,7 @@ const initialState = {
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const response = await api.getAll("sam/model?modelCode=");
+    const response = await api.getAll(`sam/model?modelCode=`);
     return response.data;
   }
 );
@@ -48,13 +48,13 @@ const productSlice = createSlice({
     });
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.products = action.payload;
+      state.products = state.products.concat(action.payload);
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {
-      state.status = "idle";
+      state.products.push(action.payload)
     });
     builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
       const {
@@ -67,6 +67,7 @@ const productSlice = createSlice({
         products,
         productFields,
       } = action.payload;
+      console.log(action.payload)
       const existingProd = state.products.find(
         (prod) => prod.modelCode === modelCode
       );

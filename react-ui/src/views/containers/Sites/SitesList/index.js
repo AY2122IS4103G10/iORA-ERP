@@ -12,20 +12,21 @@ import {
   fetchProducts,
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
+import { fetchSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 
 export const SitesTable = () => {
   const columns = useMemo(
     () => [
       {
         Header: "Id",
-        accessor: "id",
+        accessor: "siteId",
       },
       {
         Header: "Site Code",
         accessor: "siteCode",
         Cell: (e) => (
           <Link
-            to={`/sm/products/${e.value}`}
+            to={`/ad/sites/${e.value}`}
             className="hover:text-gray-700 hover:underline"
           >
             {e.value}
@@ -43,7 +44,7 @@ export const SitesTable = () => {
       //     options: [
       //       {
       //         name: "Delete",
-      //         navigate: "/products",
+      //         navigate: "/sites",
       //       },
       //     ],
       //   }),
@@ -51,12 +52,12 @@ export const SitesTable = () => {
     ],
     []
   );
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const data = useSelector(selectAllProducts);
-  const prodStatus = useSelector((state) => state.products.status);
-  useEffect(() => {
-    prodStatus === "idle" && dispatch(fetchProducts());
-  }, [prodStatus, dispatch]);
+  // const siteStatus = useSelector((state) => state.sites.status);
+  // useEffect(() => {
+  //   siteStatus === "idle" && dispatch(fetchSites());
+  // }, [siteStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

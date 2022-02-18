@@ -90,8 +90,7 @@ public class SAMController {
     @PostMapping(path = "/model", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createModel(@RequestBody Model model) {
         try {
-            productService.createModel(model);
-            return ResponseEntity.ok("Model with model code " + model.getModelCode() + " is successfully created.");
+            return ResponseEntity.ok(productService.createModel(model));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -174,8 +173,7 @@ public class SAMController {
     @PutMapping(path = "/model", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> updateModel(@RequestBody Model model) {
         try {
-            productService.updateModel(model);
-            return ResponseEntity.ok("Model with model code " + model.getModelCode() + " is successfully updated.");
+            return ResponseEntity.ok(productService.updateModel(model));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

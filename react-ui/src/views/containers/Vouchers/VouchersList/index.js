@@ -9,6 +9,7 @@ import {
   SelectColumnFilter,
   OptionsCell,
 } from "../../../components/Tables/SimpleTable";
+import { SelectableTable } from "../../../components/Tables/SelectableTable";
 import {
   fetchVouchers,
   selectAllVouchers,
@@ -32,6 +33,14 @@ export const VouchersTable = () => {
       {
         Header: "Voucher Code",
         accessor: "voucherCode",
+        Cell: (e) => (
+          <Link
+            to={`/sm/vouchers/${e.value}`}
+            className="hover:text-gray-700 hover:underline"
+          >
+            {e.value}
+          </Link>
+        ),
       },
       {
         Header: "Value",
@@ -45,13 +54,13 @@ export const VouchersTable = () => {
       },
       {
         Header: "Issued",
-        accessor: "isIssued",
+        accessor: "issued",
         Cell: (e) => (e.value ? "Yes" : "No"),
       },
 
       {
         Header: "Redeemed",
-        accessor: "isRedeemed",
+        accessor: "redeemed",
         Cell: (e) => (e.value ? "Yes" : "No"),
         Filter: SelectColumnFilter,
         filter: "includes",
@@ -80,7 +89,7 @@ export const VouchersTable = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        <SimpleTable columns={columns} data={data} />
+        <SimpleTable columns={columns} data={data} path={`/sm/vouchers`}/>
       </div>
     </div>
   );

@@ -51,7 +51,7 @@ export const ProductsTable = () => {
       {
         Header: "Color",
         accessor: "productFields",
-        Cell: (e) => processFields(e.value, "colour"),
+        Cell: (e) => processFields(e.value, "COLOUR"),
       },
       {
         Header: "Size",

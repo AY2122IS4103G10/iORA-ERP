@@ -1,35 +1,16 @@
 import { Fragment } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
-import {
-  ClockIcon,
-  CogIcon,
-  CreditCardIcon,
-  DocumentReportIcon,
-  HomeIcon,
-  QuestionMarkCircleIcon,
-  ScaleIcon,
-  ShieldCheckIcon,
-  XIcon,
-} from "@heroicons/react/outline";
+import { XIcon } from "@heroicons/react/outline";
 import { classNames } from "../../../utilities/Util";
 
-const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
-  { name: "Products", href: "/sm/products", icon: ClockIcon, current: false },
-  { name: "Stock Levels", href: "/sm/stocklevels", icon: ScaleIcon, current: false },
-  { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },
-  { name: "Vouchers", href: "/sm/vouchers", icon: CreditCardIcon, current: false },
-  { name: "Reports & Analytics", href: "#", icon: DocumentReportIcon, current: false },
-];
-
-const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
-  { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
-  { name: "Privacy", href: "#", icon: ShieldCheckIcon },
-];
-
-export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
+export const SideBar = ({
+  navigation,
+  secondaryNavigation,
+  sidebarOpen,
+  setSidebarOpen,
+}) => {
+  const { pathname } = useLocation();
   return (
     <>
       <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -92,31 +73,31 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
               >
                 <div className="px-2 space-y-1">
                   {navigation.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.href}
                       className={classNames(
-                        item.current
+                        item.href === pathname
                           ? "bg-cyan-800 text-white"
                           : "text-cyan-100 hover:text-white hover:bg-cyan-600",
                         "group flex items-center px-2 py-2 text-base font-medium rounded-md"
                       )}
-                      aria-current={item.current ? "page" : undefined}
+                      aria-current={item.href === pathname ? "page" : undefined}
                     >
                       <item.icon
                         className="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"
                         aria-hidden="true"
                       />
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
                 <div className="mt-6 pt-6">
                   <div className="px-2 space-y-1">
                     {secondaryNavigation.map((item) => (
-                      <a
+                      <Link
                         key={item.name}
-                        href={item.href}
+                        to={item.href}
                         className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
                       >
                         <item.icon
@@ -124,7 +105,7 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
                           aria-hidden="true"
                         />
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -158,12 +139,12 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
                   key={item.name}
                   to={item.href}
                   className={classNames(
-                    item.current
+                    item.href === pathname
                       ? "bg-cyan-800 text-white"
                       : "text-cyan-100 hover:text-white hover:bg-cyan-600",
                     "group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md"
                   )}
-                  aria-current={item.current ? "page" : undefined}
+                  aria-current={item.href === pathname ? "page" : undefined}
                 >
                   <item.icon
                     className="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"
@@ -196,5 +177,3 @@ export const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
     </>
   );
 };
-
-

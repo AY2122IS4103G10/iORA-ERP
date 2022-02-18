@@ -4,8 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import {
   addNewVouchers,
-  selectVoucherById,
-  voucherAdded,
+  selectVoucherByCode,
 } from "../../../../stores/slices/voucherSlice";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
@@ -129,9 +128,9 @@ const VoucherFormBody = ({
 );
 
 export const VoucherForm = () => {
-  const { voucherId } = useParams();
+  const { voucherCode } = useParams();
   const voucher = useSelector((state) =>
-    selectVoucherById(state, parseInt(voucherId))
+    selectVoucherByCode(state, voucherCode)
   );
   const isEditing = Boolean(voucher);
   const [quantity, setQuantity] = useState(!isEditing ? 1 : voucher.code);
@@ -158,18 +157,19 @@ export const VoucherForm = () => {
         dispatch(
           addNewVouchers({ quantity, amount: value, expiry: expDate })
         ).unwrap();
+        alert("Successfully added vouchers");
         setQuantity("");
         setValue("");
-        navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherId}`);
+        navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherCode}`);
       } catch (err) {
-        console.error("Failed to add product: ", err);
+        console.error("Failed to add vouchers: ", err);
       } finally {
         setRequestStatus("idle");
       }
   };
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherId}`);
+    navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherCode}`);
 
   return (
     <VoucherFormBody

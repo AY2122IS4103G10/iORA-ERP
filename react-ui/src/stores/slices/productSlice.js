@@ -10,7 +10,7 @@ const initialState = {
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const response = await api.getAll("model");
+    const response = await api.getAll(`sam/model?modelCode=`);
     return response.data;
   }
 );
@@ -18,7 +18,7 @@ export const fetchProducts = createAsyncThunk(
 export const addNewProduct = createAsyncThunk(
   "products/addNewPost",
   async (initialProduct) => {
-    const response = await api.create("model", initialProduct);
+    const response = await api.create("sam/model", initialProduct);
     return response.data;
   }
 );
@@ -26,11 +26,7 @@ export const addNewProduct = createAsyncThunk(
 export const updateExistingProduct = createAsyncThunk(
   "products/updateExistingProduct",
   async (existingProduct) => {
-    const response = await api.update(
-      "model",
-      existingProduct.modelCode,
-      existingProduct
-    );
+    const response = await api.update("sam/model", existingProduct);
     return response.data;
   }
 );
@@ -38,7 +34,7 @@ export const updateExistingProduct = createAsyncThunk(
 export const deleteExistingProduct = createAsyncThunk(
   "products/deleteExistingProduct",
   async (existingModelCode) => {
-    const response = await api.delete("model", existingModelCode);
+    const response = await api.delete("sam/model", existingModelCode);
     return response.data;
   }
 );
@@ -52,37 +48,39 @@ const productSlice = createSlice({
     });
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.products = action.payload;
+      state.products = state.products.concat(action.payload);
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {
-      state.status = "idle"
+      state.products.push(action.payload)
     });
     builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
       const {
         modelCode,
         name,
         description,
-        fashionLine,
         price,
         onlineOnly,
         available,
+        products,
         productFields,
       } = action.payload;
+      console.log(action.payload)
       const existingProd = state.products.find(
         (prod) => prod.modelCode === modelCode
       );
       if (existingProd) {
         existingProd.name = name;
         existingProd.description = description;
-        existingProd.fashionLine = fashionLine;
         existingProd.price = price;
         existingProd.onlineOnly = onlineOnly;
         existingProd.available = available;
+        existingProd.products = products;
         existingProd.productFields = productFields;
       }
+      // state.status = "idle";
     });
     builder.addCase(deleteExistingProduct.fulfilled, (state, action) => {
       state.products = state.products.filter(

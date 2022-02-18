@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import moment from "moment";
 import { CogIcon } from "@heroicons/react/outline";
 
 import {
@@ -9,7 +8,7 @@ import {
   SelectColumnFilter,
   OptionsCell,
 } from "../../../components/Tables/SimpleTable";
-import { fetchVouchers, selectAllVouchers } from "../../../../stores/slices/voucherSlice";
+import { fetchPromotions, selectAllPromotions } from "../../../../stores/slices/promotionsSlice";
 
 export const PromotionsTable = () => {
   const columns = useMemo(
@@ -17,23 +16,23 @@ export const PromotionsTable = () => {
       {
         Header: "Id",
         accessor: "id",
-        Cell: (e) => (
-          <Link
-            to={`/sm/vouchers/${e.value}`}
-            className="hover:text-gray-700 hover:underline"
-          >
-            {e.value}
-          </Link>
-        ),
+        // Cell: (e) => (
+        //   <Link
+        //     to={`/sm/promotions/${e.value}`}
+        //     className="hover:text-gray-700 hover:underline"
+        //   >
+        //     {e.value}
+        //   </Link>
+        // ),
       },
       {
         Header: "Name",
-        accessor: "name",
+        accessor: "fieldValue",
         
       },
       {
         Header: "Discounted Price",
-        accessor: "discPrice",
+        accessor: "discountedPrice",
         Cell: (e) => `$${e.value}`,
       },
       {
@@ -56,11 +55,11 @@ export const PromotionsTable = () => {
     []
   );
   const dispatch = useDispatch()
-  const data = useSelector(selectAllVouchers);
-  const voucherStatus = useSelector((state) => state.vouchers.status)
+  const data = useSelector(selectAllPromotions);
+  const promoStatus = useSelector((state) => state.promotions.status)
   useEffect(() => {
-    voucherStatus === "idle" && dispatch(fetchVouchers())
-  }, [voucherStatus, dispatch])
+    promoStatus === "idle" && dispatch(fetchPromotions())
+  }, [promoStatus, dispatch])
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

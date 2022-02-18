@@ -1,7 +1,17 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductsList } from "../ProductsList";
+import { classNames } from "../../../../utilities/Util";
 
-const header = () => {
+const tabs = [
+  { name: "All Products", href: "/sm/products", current: true },
+  { name: "Promotions", href: "/sm/products/promotions", current: false },
+];
+
+const Header = () => {
+  const [currTab, setCurrTab] = useState(0);
+
+  const changeTab = (tabnumber) => setCurrTab(tabnumber);
   return (
     <div className="bg-white shadow">
       <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
@@ -33,6 +43,41 @@ const header = () => {
             </Link>
           </div>
         </div>
+        <div className="ml-3">
+          <div className="sm:block">
+            <nav className="-mb-px flex space-x-8">
+              <Link
+                key={tabs[0].name}
+                to={tabs[0].href}
+                className={classNames(
+                  currTab === 0
+                    ? "border-cyan-500 text-cyan-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
+                  "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
+                )}
+                aria-current={tabs[0].current ? "page" : undefined}
+                onClick={() => changeTab(0)}
+              >
+                {tabs[0].name}
+              </Link>
+
+              <Link
+                key={tabs[1].name}
+                to={tabs[1].href}
+                className={classNames(
+                  currTab === 1
+                    ? "border-cyan-500 text-cyan-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
+                  "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
+                )}
+                aria-current={tabs[1].current ? "page" : undefined}
+                onClick={() => changeTab(1)}
+              >
+                {tabs[1].name}
+              </Link>
+            </nav>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -41,7 +86,7 @@ const header = () => {
 export const ManageProducts = () => {
   return (
     <>
-      {header()}
+      {<Header />}
       {<ProductsList />}
     </>
   );

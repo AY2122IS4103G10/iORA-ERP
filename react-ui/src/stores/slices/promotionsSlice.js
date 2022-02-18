@@ -10,7 +10,8 @@ const initialState = {
 export const fetchPromotions = createAsyncThunk(
   "promotions/fetchPromotions",
   async () => {
-    const response = await api.getAll("promotion");
+    const response = await api.getAll("sam/promotionFields");
+    console.log(response.data)
     return response.data;
   }
 );

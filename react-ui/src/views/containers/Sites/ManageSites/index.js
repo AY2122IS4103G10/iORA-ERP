@@ -1,15 +1,16 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { PromotionsList } from "../PromotionsList";
+import { SitesList } from "../SitesList";
 import { classNames } from "../../../../utilities/Util";
+import { useState } from "react";
 
 const tabs = [
-  { name: "All Products", href: "/sm/products", current: false },
-  { name: "Promotions", href: "/sm/products/promotions", current: true },
+  { name: "Sites", href: "/ad/sites", current: true },
+  { name: "Companies", href: "/sm/products/promotions", current: false },
 ];
 
 const Header = () => {
   const [currTab, setCurrTab] = useState(0);
+
   const changeTab = (tabnumber) => setCurrTab(tabnumber);
   return (
     <div className="bg-white shadow">
@@ -25,19 +26,19 @@ const Header = () => {
                     alt=""
                   />
                   <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                    Promotions
+                    Sites
                   </h1>
                 </div>
               </div>
             </div>
           </div>
           <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-            <Link to="/sm/products/create">
+            <Link to="/sm/vouchers/create">
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
               >
-                Add promotion
+                Add site
               </button>
             </Link>
           </div>
@@ -49,7 +50,7 @@ const Header = () => {
                 key={tabs[0].name}
                 to={tabs[0].href}
                 className={classNames(
-                  tabs[0].current
+                  currTab === 0
                     ? "border-cyan-500 text-cyan-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
                   "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
@@ -64,7 +65,7 @@ const Header = () => {
                 key={tabs[1].name}
                 to={tabs[1].href}
                 className={classNames(
-                  tabs[1].current
+                  currTab === 1
                     ? "border-cyan-500 text-cyan-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
                   "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
@@ -82,11 +83,11 @@ const Header = () => {
   );
 };
 
-export const ManagePromotions = () => {
+export const ManageSites = () => {
   return (
     <>
       {<Header />}
-      {<PromotionsList />}
+      {<SitesList />}
     </>
   );
 };

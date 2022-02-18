@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { VouchersList } from "../VouchersList";
+import { SitesList } from "../SitesList";
 
 const header = (
   <div className="bg-white shadow">
@@ -15,7 +15,7 @@ const header = (
                   alt=""
                 />
                 <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                  Vouchers
+                  Sites
                 </h1>
               </div>
             </div>
@@ -27,7 +27,7 @@ const header = (
             type="button"
             className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
           >
-            Add vouchers
+            Add site
           </button>
           </Link>
         </div>
@@ -40,7 +40,7 @@ export const ManageVouchers = () => {
   return (
     <>
       {header}
-      {<VouchersList />}
+      {<SitesList />}
     </>
   );
 }

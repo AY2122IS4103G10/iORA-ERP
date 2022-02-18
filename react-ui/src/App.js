@@ -10,6 +10,7 @@ import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
 import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
+import { ADRoute } from "./routes/ADRoute";
 
 function App() {
   return (
@@ -39,6 +40,22 @@ function App() {
             <Route path=":voucherCode" element={<VoucherDetails />} />
             <Route path="create" element={<VoucherForm />} />
             <Route path="edit/:voucherId" element={<VoucherForm />} />
+          </Route>
+        </Route>
+        <Route
+          path="/ad"
+          element={
+            <ADRoute>
+              <Index />
+            </ADRoute>
+          }
+        >
+          <Route path="sites" element={<Outlet />}>
+            <Route index element={<ManageProducts />} />
+            {/* <Route path=":prodCode" element={<ProductDetails />} />
+            <Route path="create" element={<ProductForm />} />
+            <Route path="edit/:prodId" element={<ProductForm />} />
+            <Route path="promotions" element={<ManagePromotions />} /> */}
           </Route>
         </Route>
         <Route

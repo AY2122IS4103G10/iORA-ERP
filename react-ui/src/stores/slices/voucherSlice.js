@@ -10,7 +10,7 @@ const initialState = {
 export const fetchVouchers = createAsyncThunk(
   "vouchers/fetchVouchers",
   async () => {
-    const response = await api.getAll("voucher");
+    const response = await api.getAll("sam/voucher");
     return response.data;
   }
 );
@@ -18,7 +18,7 @@ export const fetchVouchers = createAsyncThunk(
 export const addNewVouchers = createAsyncThunk(
   "vouchers/addNewVouchers",
   async (initialVoucher) => {
-    const response = await api.create("voucher", initialVoucher);
+    const response = await api.create("sam/voucher", initialVoucher);
     return response.data;
   }
 );
@@ -34,7 +34,7 @@ export const issueVoucher = createAsyncThunk(
 export const deleteExistingVoucher = createAsyncThunk(
   "vouchers/deleteExistingVoucher",
   async (existingVoucherCode) => {
-    const response = await api.delete("voucher", existingVoucherCode);
+    const response = await api.delete("sam/voucher", existingVoucherCode);
     return response.data;
   }
 );

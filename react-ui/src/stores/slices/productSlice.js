@@ -10,7 +10,7 @@ const initialState = {
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const response = await api.getAll("model");
+    const response = await api.getAll("sam/model");
     return response.data;
   }
 );
@@ -18,7 +18,7 @@ export const fetchProducts = createAsyncThunk(
 export const addNewProduct = createAsyncThunk(
   "products/addNewPost",
   async (initialProduct) => {
-    const response = await api.create("model", initialProduct);
+    const response = await api.create("sam/model", initialProduct);
     return response.data;
   }
 );
@@ -27,7 +27,7 @@ export const updateExistingProduct = createAsyncThunk(
   "products/updateExistingProduct",
   async (existingProduct) => {
     const response = await api.update(
-      "model",
+      "sam/model",
       existingProduct
     );
     return response.data;
@@ -37,7 +37,7 @@ export const updateExistingProduct = createAsyncThunk(
 export const deleteExistingProduct = createAsyncThunk(
   "products/deleteExistingProduct",
   async (existingModelCode) => {
-    const response = await api.delete("model", existingModelCode);
+    const response = await api.delete("sam/model", existingModelCode);
     return response.data;
   }
 );

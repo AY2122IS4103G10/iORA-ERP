@@ -57,12 +57,33 @@ export const FormCheckboxes = ({
   );
 };
 
-const rightColSection = ({
-  fieldName,
-  fields,
-  onFieldsChanged,
-  fieldValues,
-}) => (
+const RadioGroup = ({ options, defaultChecked }) => {
+  return (
+    <fieldset className="mt-4">
+      <legend className="sr-only">Option</legend>
+      <div className="space-y-4">
+        {options.map((option) => (
+          <div key={option.id} className="flex items-center">
+            <input
+              id={option.id}
+              name="option"
+              type="radio"
+              defaultChecked={defaultChecked(option)}
+              className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300"
+            />
+            <label
+              htmlFor={option.id}
+              className="ml-3 block text-sm font-medium text-gray-700"
+            >
+              {option.fieldValue}
+            </label>
+          </div>
+        ))}
+      </div>
+    </fieldset>
+  );
+};
+const RightColSection = ({ fieldName, fields, children }) => (
   <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
     <div className="rounded-lg bg-white overflow-hidden shadow">
       <div className="p-6">
@@ -72,19 +93,7 @@ const rightColSection = ({
         >
           {fieldName}
         </h2>
-        <div className="flow-root mt-6">
-          {fields.length ? (
-            <FormCheckboxes
-              legend={fieldName}
-              options={fields}
-              inputField={fieldName}
-              onFieldsChanged={onFieldsChanged}
-              fieldValues={fieldValues}
-            />
-          ) : (
-            `No ${fieldName.toLowerCase()} found.`
-          )}
-        </div>
+        <div className="flow-root mt-6">{children}</div>
         <div className="mt-6">
           <a
             href="#"
@@ -110,8 +119,8 @@ const AddProductFormBody = ({
   onListPriceChanged,
   available,
   onAvailableChanged,
-  fashionLine,
-  onFashionLineChanged,
+  company,
+  onCompanyChanged,
   onlineOnly,
   onOnlineOnlyChanged,
   colors,
@@ -126,6 +135,7 @@ const AddProductFormBody = ({
   categories,
   onCatsChanged,
   catCheckedState,
+  companies,
   onSaveClicked,
   onCancelClicked,
 }) => (
@@ -226,21 +236,6 @@ const AddProductFormBody = ({
                         </div>
                       </SimpleInputGroup>
                       <SimpleInputGroup
-                        label="Fashion Line"
-                        inputField="fashionLine"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="fashionLine"
-                          id="fashionLine"
-                          autoComplete="fashionLine"
-                          value={fashionLine}
-                          onChange={onFashionLineChanged}
-                          required
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
                         label="Available"
                         inputField="available"
                         className="sm:mt-0 sm:col-span-2"
@@ -271,8 +266,8 @@ const AddProductFormBody = ({
                             name="onlineOnly"
                             id="onlineOnly"
                             className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
-                            value={available}
-                            onChange={onAvailableChanged}
+                            value={onlineOnly}
+                            onChange={onOnlineOnlyChanged}
                             required
                             aria-describedby="onlineOnly"
                           />
@@ -309,30 +304,56 @@ const AddProductFormBody = ({
       {/* Right column */}
       <div className="grid grid-cols-1 gap-4">
         {/* Colors */}
-        {rightColSection({
-          fieldName: "Color",
-          fields: colors,
-          onFieldsChanged: onColorsChanged,
-          fieldValues: colorCheckedState,
-        })}
-        {rightColSection({
-          fieldName: "Size",
-          fields: sizes,
-          onFieldsChanged: onSizesChanged,
-          fieldValues: sizeCheckedState,
-        })}
-        {rightColSection({
-          fieldName: "Category",
-          fields: categories,
-          onFieldsChanged: onCatsChanged,
-          fieldValues: catCheckedState,
-        })}
-        {rightColSection({
-          fieldName: "Tag",
-          fields: tags,
-          onFieldsChanged: onTagsChanged,
-          fieldValues: tagCheckedState,
-        })}
+        <RightColSection fieldName="Colour" fields={colors}>
+          <FormCheckboxes
+            legend="Colour"
+            options={colors}
+            inputField="Colour"
+            onFieldsChanged={onColorsChanged}
+            fieldValues={colorCheckedState}
+          />
+        </RightColSection>
+        <RightColSection fieldName="Size" fields={sizes}>
+          <FormCheckboxes
+            legend="Size"
+            options={sizes}
+            inputField="Size"
+            onFieldsChanged={onSizesChanged}
+            fieldValues={sizeCheckedState}
+          />
+        </RightColSection>
+        <RightColSection fieldName="Category" fields={categories}>
+          <FormCheckboxes
+            legend="Category"
+            options={categories}
+            inputField="Category"
+            onFieldsChanged={onCatsChanged}
+            fieldValues={catCheckedState}
+          />
+        </RightColSection>
+        <RightColSection fieldName="Tag" fields={tags}>
+          {tags.length ? (
+            <FormCheckboxes
+              legend="Tag"
+              options={tags}
+              inputField="Tag"
+              onFieldsChanged={onTagsChanged}
+              fieldValues={tagCheckedState}
+            />
+          ) : (
+            `No tag found.`
+          )}
+        </RightColSection>
+        <RightColSection fieldName="Company">
+          {companies.length ? (
+            <RadioGroup
+              options={companies}
+              defaultChecked={(option) => option.fieldValue === "IORA"}
+            />
+          ) : (
+            `No company found.`
+          )}
+        </RightColSection>
       </div>
     </div>
   </div>
@@ -350,9 +371,7 @@ export const ProductForm = () => {
     !isEditing ? "" : product.description
   );
   const [price, setDiscPrice] = useState(!isEditing ? "" : product.price);
-  const [fashionLine, setFashionLine] = useState(
-    !isEditing ? "" : product.fashionLine
-  );
+  const [company, setFashionLine] = useState(!isEditing ? "" : product.company);
   const [onlineOnly, setOnlineOnly] = useState(
     !isEditing ? false : product.onlineOnly
   );
@@ -365,17 +384,19 @@ export const ProductForm = () => {
   useEffect(() => {
     prodFieldStatus === "idle" && dispatch(fetchProductFields());
   }, [prodFieldStatus, dispatch]);
-  const colors = fields.filter((field) => field.fieldName === "colour");
-  const sizes = fields.filter((field) => field.fieldName === "size");
-  const tags = fields.filter((field) => field.fieldName === "tag");
+  const colors = fields.filter((field) => field.fieldName === "COLOUR");
+  const sizes = fields.filter((field) => field.fieldName === "SIZE");
+  const tags = fields.filter((field) => field.fieldName === "TAG");
+  const companies = fields.filter((field) => field.fieldName === "COMPANY");
   const categories = fields.filter((field) => field.fieldName === "category");
+  
   const [colorCheckedState, setColorCheckedState] = useState(
     !isEditing
       ? new Array(colors.length).fill(false)
       : checkboxState(
           colors.map((field) => field.fieldValue),
           product.productFields
-            .filter((field) => field.fieldName === "colour")
+            .filter((field) => field.fieldName === "COLOUR")
             .map((field) => field.fieldValue)
         )
   );
@@ -385,7 +406,7 @@ export const ProductForm = () => {
       : checkboxState(
           sizes.map((field) => field.fieldValue),
           product.productFields
-            .filter((field) => field.fieldName === "size")
+            .filter((field) => field.fieldName === "SIZE")
             .map((field) => field.fieldValue)
         )
   );
@@ -417,7 +438,7 @@ export const ProductForm = () => {
     setOnlineOnly(!onlineOnly);
   };
   const onAvailableChanged = () => setAvailable(!available);
-  const onFashionLineChanged = (e) => setFashionLine(e.target.value);
+  const onCompanyChanged = (e) => setFashionLine(e.target.value);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
       index === pos ? !item : item
@@ -446,7 +467,7 @@ export const ProductForm = () => {
   const [requestStatus, setRequestStatus] = useState("idle");
 
   const canAdd =
-    [prodCode, name, description, price, fashionLine].every(Boolean) &&
+    [prodCode, name, description, price].every(Boolean) &&
     requestStatus === "idle";
 
   const onSaveClicked = (evt) => {
@@ -456,7 +477,7 @@ export const ProductForm = () => {
       (color, index) => colorCheckedState[index] && fields.push(color)
     );
     sizes.forEach(
-      (size, index) => sizeCheckedState[index] && fields.push(size)
+      (SIZE, index) => sizeCheckedState[index] && fields.push(SIZE)
     );
     tags.forEach((tag, index) => tagCheckedState[index] && fields.push(tag));
     categories.forEach(
@@ -471,7 +492,7 @@ export const ProductForm = () => {
               modelCode: prodCode,
               name,
               description,
-              fashionLine,
+              company,
               price,
               onlineOnly,
               available,
@@ -480,15 +501,13 @@ export const ProductForm = () => {
             })
           ).unwrap();
         } else {
-          product.name = name
-          product.description = description
-          product.fashionLine = fashionLine
-          product.price = price
-          product.onlineOnly = onlineOnly
+          product.name = name;
+          product.description = description;
+          product.company = company;
+          product.price = price;
+          product.onlineOnly = onlineOnly;
 
-          dispatch(
-            updateExistingProduct(product)
-          ).unwrap();
+          dispatch(updateExistingProduct(product)).unwrap();
         }
         alert(`Successfully ${!isEditing ? "added" : "updated"} product`);
         navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
@@ -519,8 +538,8 @@ export const ProductForm = () => {
       onListPriceChanged={onListPriceChanged}
       available={available}
       onAvailableChanged={onAvailableChanged}
-      fashionLine={fashionLine}
-      onFashionLineChanged={onFashionLineChanged}
+      company={company}
+      onCompanyChanged={onCompanyChanged}
       onlineOnly={onlineOnly}
       onOnlineOnlyChanged={onOnlineOnlyChanged}
       colors={colors}
@@ -535,6 +554,7 @@ export const ProductForm = () => {
       categories={categories}
       onCatChanged={onCatsChanged}
       catCheckedState={catCheckedState}
+      companies={companies}
       onSaveClicked={onSaveClicked}
       onCancelClicked={onCancelClicked}
     />

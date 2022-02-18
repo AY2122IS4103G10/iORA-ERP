@@ -13,23 +13,16 @@ import {
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
 
-const processFields = (fields, selector) => {
-  const fieldValues = [];
-  Boolean(fields) &&
-    fields
-      .filter((field) => field.fieldName === selector)
-      .forEach((field) => fieldValues.push(field.fieldValue));
-  return fieldValues.length
-    ? fieldValues.join(", ")
-    : `No ${selector.toLowerCase()}s`;
-};
-
-export const ProductsTable = () => {
+export const SitesTable = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Product Code",
-        accessor: "modelCode",
+        Header: "Id",
+        accessor: "id",
+      },
+      {
+        Header: "Site Code",
+        accessor: "siteCode",
         Cell: (e) => (
           <Link
             to={`/sm/products/${e.value}`}
@@ -42,31 +35,6 @@ export const ProductsTable = () => {
       {
         Header: "Name",
         accessor: "name",
-      },
-      // {
-      //   Header: "Category",
-      //   accessor: "",
-      //   Cell: (e) => processFields(e.value, "Category"),
-      // },
-      {
-        Header: "Color",
-        accessor: "productFields",
-        Cell: (e) => processFields(e.value, "COLOUR"),
-      },
-      {
-        Header: "Size",
-        accessor: "",
-        // Cell: (e) => processFields(e.value, "Size"),
-      },
-      {
-        Header: "List Price",
-        accessor: "price",
-        Cell: (e) => `$${e.value}`,
-      },
-      {
-        Header: "Available",
-        accessor: "available",
-        Cell: (e) => (e.value ? "Yes" : "No"),
       },
       // {
       //   Header: CogIcon,
@@ -98,6 +66,6 @@ export const ProductsTable = () => {
   );
 };
 
-export const ProductsList = () => {
-  return <ProductsTable />;
+export const SitesList = () => {
+  return <SitesTable />;
 };

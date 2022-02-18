@@ -6,9 +6,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.iora.erp.Repostitory.UserRepository;
 import com.iora.erp.model.company.Employee;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired
@@ -16,9 +16,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Override
 	@Transactional
-	public Employee loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Employee user = userRepository.findByUsernameEmployee(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-		return Employee.build(user);
+		return UserDetailsImpl.build(user);
 	}
 }

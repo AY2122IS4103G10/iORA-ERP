@@ -9,12 +9,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.service.EmployeeService;
+import com.iora.erp.service.UserDetailsImpl;
+import com.iora.erp.service.UserDetailsService;
+import com.iora.erp.service.UserDetailsServiceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -24,7 +28,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private EmployeeService employeeService;
+    private UserDetailsServiceImpl userDetailsService;
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     @Override
@@ -34,10 +38,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                Employee employee = employeeService.getEmployeeByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        employee, null, employee.getAuthorities());
+                        userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

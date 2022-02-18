@@ -2,10 +2,7 @@ package com.iora.erp.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import com.iora.erp.enumeration.Country;
-import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.AdminService;
@@ -43,6 +40,50 @@ public class AdminController {
      */
 
     // Employee/JobTitle/Department stuff here
+
+    
+    @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.createEmployee(employee);
+            return ResponseEntity.ok("Employee " + employee.getName() + " is successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/addEmployees", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addAllEmployee(@RequestBody List<Employee> employee) {
+        try {
+            for(Employee e : employee) {
+                employeeService.createEmployee(e);
+            }
+
+            return ResponseEntity.ok("All employees has been successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/viewEmployees", produces = "application/json")
+    public List<Employee> viewEmployees(@RequestParam("search") String search) {
+        try {
+            return employeeService.getEmployeeByFields(search);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    //need do management update
+    @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> editSite(@RequestBody Employee employee) {
+        try {
+            employeeService.updateEmployeeAccount(employee);
+            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " is successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
     @PostMapping(path = "/addSite/{storeType}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> addSite(@RequestBody Site site, @PathVariable String storeType) {
@@ -110,48 +151,6 @@ public class AdminController {
         }
     }
 
-    @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
-        try {
-            employeeService.createEmployee(employee);
-            return ResponseEntity.ok("Employee " + employee.getName() + " is successfully created");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PostMapping(path = "/addEmployees", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addAllEmployee(@RequestBody List<Employee> employee) {
-        try {
-            for(Employee e : employee) {
-                employeeService.createEmployee(e);
-            }
-
-            return ResponseEntity.ok("All employees has been successfully created");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @GetMapping(path = "/viewEmployees", produces = "application/json")
-    public List<Employee> viewEmployees(@RequestParam("search") String search) {
-        try {
-            return employeeService.getEmployeeByFields(search);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    //need do management update
-    @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editSite(@RequestBody Employee employee) {
-        try {
-            employeeService.updateEmployeeAccount(employee);
-            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " is successfully updated.");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
 
 
 

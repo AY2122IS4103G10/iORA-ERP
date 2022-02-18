@@ -17,7 +17,6 @@ import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.ProductField;
-import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;

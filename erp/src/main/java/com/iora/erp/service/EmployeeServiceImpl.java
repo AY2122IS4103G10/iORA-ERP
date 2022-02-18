@@ -1,6 +1,5 @@
 package com.iora.erp.service;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
 
@@ -12,12 +11,8 @@ import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
 import com.iora.erp.enumeration.AccessRights;
-import com.iora.erp.exception.DepartmentException;
 import com.iora.erp.exception.EmployeeException;
-import com.iora.erp.exception.JobTitleException;
-import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
-import com.iora.erp.model.company.JobTitle;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -17,16 +17,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import com.iora.erp.enumeration.AccessRights;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Entity
 public class Employee {
@@ -42,10 +36,8 @@ public class Employee {
     private String username;
     @Column(nullable = false)
     private Boolean availStatus;
-    @JsonIgnore
     @Column(nullable = false)
     private String password;
-    private Collection<? extends GrantedAuthority> authorities;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private JobTitle jobTitle;
@@ -53,19 +45,6 @@ public class Employee {
     private Department department;
 
     public Employee() {
-    }
-
-    public Employee(Long id, String name, String email, Double salary, String username, Boolean availStatus,
-            JobTitle jobTitle, Department department, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.salary = salary;
-        this.username = username;
-        this.availStatus = availStatus;
-        this.jobTitle = jobTitle;
-        this.department = department;
-        this.authorities = authorities;
     }
 
     public Employee(String name, String email, Double salary, String username, String hashPass, Boolean availStatus) {
@@ -90,23 +69,6 @@ public class Employee {
         }
     }
 
-
-    public static Employee build(Employee user) {
-        List<GrantedAuthority> authorities = user.getJobTitle().getResponsibility().stream()
-                .map(role -> new SimpleGrantedAuthority(role.toString())).collect(Collectors.toList());
-
-        return new Employee(
-            user.getId(),
-            user.getName(),
-            user.getEmail(),
-            user.getSalary(),
-            user.getUsername(),
-            user.getAvailStatus(),
-            user.getJobTitle(),
-            user.getDepartment(),
-            authorities);
-
-    }
 
     public Long getId() {
         return id;
@@ -195,23 +157,4 @@ public class Employee {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
-    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
-
-    @Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		Employee user = (Employee) o;
-		return Objects.equals(id, user.id);
-	}
-
 }

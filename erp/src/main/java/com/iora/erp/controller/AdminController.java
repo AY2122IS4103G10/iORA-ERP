@@ -74,12 +74,31 @@ public class AdminController {
         }
     }
 
-    //need do management update
     @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editSite(@RequestBody Employee employee) {
+    public ResponseEntity<Object> editEmployee(@RequestBody Employee employee) {
         try {
             employeeService.updateEmployeeAccount(employee);
             return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " is successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/enableEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> enableEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.unblockEmployee(employee);
+            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " has been activated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/disableEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> disableEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.blockEmployee(employee);
+            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " has been blocked.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

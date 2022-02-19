@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
@@ -12,6 +13,7 @@ import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 
@@ -36,6 +38,8 @@ public class SAMController {
     private CustomerService customerService;
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private ProcurementService procurementService;
 
     /*
      * ---------------------------------------------------------
@@ -346,16 +350,21 @@ public class SAMController {
      * ---------------------------------------------------------
      */
 
-    @GetMapping(path = "/viewSites", produces = "application/json")
-    public List<? extends Site> viewSites(@RequestParam List<String> storeTypes, @RequestParam String country,
-            @RequestParam String company) {
-        return siteService.searchAllSites(storeTypes, country, company);
+    @GetMapping(path = "/viewSites/all", produces = "application/json")
+    public List<? extends Site> viewAllSites() {
+        return siteService.getAllSites();
     }
 
-    @GetMapping(path = "/viewSites/{storeType}", produces = "application/json")
-    public List<? extends Site> viewSitesBySubclass(@PathVariable String storeType, @RequestParam String country,
+    @GetMapping(path = "/viewSites", produces = "application/json")
+    public List<? extends Site> viewSites(@RequestParam List<String> siteTypes, @RequestParam String country,
             @RequestParam String company) {
-        switch (storeType) {
+        return siteService.searchAllSites(siteTypes, country, company);
+    }
+
+    @GetMapping(path = "/viewSites/{siteType}", produces = "application/json")
+    public List<? extends Site> viewSitesBySubclass(@PathVariable String siteType, @RequestParam String country,
+            @RequestParam String company) {
+        switch (siteType) {
             case "Headquarters":
                 return siteService.searchHeadquarters(country, company);
             case "Manufacturing":
@@ -374,5 +383,21 @@ public class SAMController {
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
     public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
+    }
+
+    @GetMapping(path = "/procurementOrder/all", produces = "application/json")
+    public List<ProcurementOrder> getProcurementsOrders() {
+        return procurementService.getProcurementOrders();
+    }
+
+    @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
+    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
+        return procurementService.getProcurementOrder(orderId);
+    }
+
+    @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
+    public List<ProcurementOrder> getProcurementOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return procurementService.getProcurementOrdersOfSite(site);
     }
 }

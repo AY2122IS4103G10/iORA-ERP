@@ -33,9 +33,9 @@ public class WarehouseController {
      */
 
     @GetMapping(path = "/viewStock/sites", produces = "application/json")
-    public List<Site> viewStockOfSites(@RequestParam List<String> storeTypes, @RequestParam String country,
+    public List<Site> viewStockOfSites(@RequestParam List<String> siteTypes, @RequestParam String country,
             @RequestParam String company) {
-        return siteService.searchStockLevels(storeTypes, country, company);
+        return siteService.searchStockLevels(siteTypes, country, company);
     }
 
     @GetMapping(path = "/viewStock/sites/{siteId}", produces = "application/json")

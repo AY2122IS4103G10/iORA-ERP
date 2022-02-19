@@ -8,14 +8,11 @@ import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
 import {
   deleteExistingProduct,
   fetchProducts,
-  selectAllProducts,
   selectProductByCode,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete.js";
-import axios from "axios";
-import { REST_ENDPOINT } from "../../../../constants/restEndpoint";
 
 const fieldSection = ({ fieldName, fields }) => {
   return (
@@ -53,9 +50,10 @@ const ProductDetailsBody = ({
   openModal,
 }) => (
   <div className="py-8 xl:py-10">
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-5xl xl:grid xl:grid-cols-3">
-      <div className="xl:col-span-2 xl:pr-8 xl:border-r xl:border-gray-200">
-        <div>
+    <div className="max-w-3xl mx-auto xl:max-w-5xl">
+      <NavigatePrev page="Products" path="/sm/products" />
+      <div className="px-4 sm:px-6 lg:px-8 xl:grid xl:grid-cols-3">
+        <div className="xl:col-span-2 xl:pr-8 xl:border-r xl:border-gray-200">
           <div>
             <div className="md:flex md:items-center md:justify-between md:space-x-4 xl:border-b xl:pb-6">
               <div>
@@ -159,66 +157,66 @@ const ProductDetailsBody = ({
             </div>
           </div>
         </div>
-      </div>
-      <aside className="hidden xl:block xl:pl-8">
-        <h2 className="sr-only">Details</h2>
-        <div className="space-y-5">
-          <div className="flex items-center space-x-2">
-            <CurrencyDollarIcon
-              className="h-5 w-5 text-gray-400"
-              aria-hidden="true"
-            />
-            <span className="text-gray-900 text-sm font-medium">
-              {`List Price: $${price}`}
-            </span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <CurrencyDollarIconSolid
-              className="h-5 w-5 text-gray-400"
-              aria-hidden="true"
-            />
-            <span className="text-gray-900 text-sm font-medium">
-              {`Discount Price: $${price}`}
-            </span>
-          </div>
-        </div>
-        <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
-          {fieldSection({
-            fieldName: "Colors",
-            fields: colors,
-          })}
-          {fieldSection({
-            fieldName: "Sizes",
-            fields: sizes,
-          })}
-          <div>
-            <h2 className="text-sm font-medium text-gray-500">Category</h2>
-            <div className="mt-2 leading-8">
-              <div className="inline">
-                {Boolean(category) ? (
-                  <div className="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5">
-                    <div className="absolute flex-shrink-0 flex items-center justify-center">
-                      <span
-                        className="h-1.5 w-1.5 rounded-full bg-red-500"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="ml-3.5 text-sm font-medium text-gray-900">
-                      {category.fieldValue}
-                    </div>
-                  </div>
-                ) : (
-                  <p>No category</p>
-                )}
-              </div>
+        <aside className="hidden xl:block xl:pl-8">
+          <h2 className="sr-only">Details</h2>
+          <div className="space-y-5">
+            <div className="flex items-center space-x-2">
+              <CurrencyDollarIcon
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+              <span className="text-gray-900 text-sm font-medium">
+                {`List Price: $${price}`}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CurrencyDollarIconSolid
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+              <span className="text-gray-900 text-sm font-medium">
+                {`Discount Price: $${price}`}
+              </span>
             </div>
           </div>
-          {fieldSection({
-            fieldName: "Tags",
-            fields: tags,
-          })}
-        </div>
-      </aside>
+          <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
+            {fieldSection({
+              fieldName: "Colors",
+              fields: colors,
+            })}
+            {fieldSection({
+              fieldName: "Sizes",
+              fields: sizes,
+            })}
+            <div>
+              <h2 className="text-sm font-medium text-gray-500">Category</h2>
+              <div className="mt-2 leading-8">
+                <div className="inline">
+                  {Boolean(category) ? (
+                    <div className="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5">
+                      <div className="absolute flex-shrink-0 flex items-center justify-center">
+                        <span
+                          className="h-1.5 w-1.5 rounded-full bg-red-500"
+                          aria-hidden="true"
+                        />
+                      </div>
+                      <div className="ml-3.5 text-sm font-medium text-gray-900">
+                        {category.fieldValue}
+                      </div>
+                    </div>
+                  ) : (
+                    <p>No category</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            {fieldSection({
+              fieldName: "Tags",
+              fields: tags,
+            })}
+          </div>
+        </aside>
+      </div>
     </div>
   </div>
 );
@@ -230,7 +228,7 @@ export const ProductDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const prodStatus = useSelector((state) => state.products.status);
-  
+
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
@@ -245,37 +243,34 @@ export const ProductDetails = () => {
   const closeModal = () => setOpenDelete(false);
 
   return (
-    <>
-      <NavigatePrev page="Products" path="/sm/products" />
-      {Boolean(product) && (
-        <>
-          <ProductDetailsBody
-            prodCode={prodCode}
-            name={product.name}
-            description={product.description}
-            price={product.price}
-            colors={product.productFields.filter(
-              (field) => field.fieldName === "COLOUR"
-            )}
-            sizes={product.productFields.filter(
-              (field) => field.fieldName === "SIZE"
-            )}
-            tags={product.productFields.filter(
-              (field) => field.fieldName === "TAG"
-            )}
-            category={product.productFields.find(
-              (field) => field.fieldName === "category"
-            )}
-            openModal={openModal}
-          />
-          <ConfirmDelete
-            item={product.name}
-            open={openDelete}
-            closeModal={closeModal}
-            onConfirm={onDeleteProdClicked}
-          />
-        </>
-      )}
-    </>
+    Boolean(product) && (
+      <>
+        <ProductDetailsBody
+          prodCode={prodCode}
+          name={product.name}
+          description={product.description}
+          price={product.price}
+          colors={product.productFields.filter(
+            (field) => field.fieldName === "COLOUR"
+          )}
+          sizes={product.productFields.filter(
+            (field) => field.fieldName === "SIZE"
+          )}
+          tags={product.productFields.filter(
+            (field) => field.fieldName === "TAG"
+          )}
+          category={product.productFields.find(
+            (field) => field.fieldName === "category"
+          )}
+          openModal={openModal}
+        />
+        <ConfirmDelete
+          item={product.name}
+          open={openDelete}
+          closeModal={closeModal}
+          onConfirm={onDeleteProdClicked}
+        />
+      </>
+    )
   );
 };

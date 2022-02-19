@@ -13,6 +13,7 @@ import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
 import { ADRoute } from "./routes/ADRoute";
 import { ManageSites } from "./views/containers/Sites/ManageSites";
+import { SiteForm } from "./views/containers/Sites/SiteForm";
 
 function App() {
   return (
@@ -48,17 +49,16 @@ function App() {
           path="/ad"
           element={
             //Change to admin route
-            // <Route>
+            // <ADRoute>
               <AdminIndex />
-            /* </Route> */
+            /* </ADRoute> */
           }
         >
           <Route path="sites" element={<Outlet />}>
             <Route index element={<ManageSites />} />
-            {/* <Route path=":prodCode" element={<ProductDetails />} />
-            <Route path="create" element={<ProductForm />} />
-            <Route path="edit/:prodId" element={<ProductForm />} />
-            <Route path="promotions" element={<ManagePromotions />} /> */}
+            <Route path=":siteId" element={<ProductDetails />} />
+            <Route path="create" element={<SiteForm />} />
+            <Route path="edit/:siteId" element={<SiteForm />} />
           </Route>
         </Route>
         <Route

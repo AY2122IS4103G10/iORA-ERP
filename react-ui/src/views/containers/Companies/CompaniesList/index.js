@@ -14,7 +14,7 @@ import {
   selectAllSites,
 } from "../../../../stores/slices/siteSlice";
 
-export const SitesTable = () => {
+export const CompaniesTable = () => {
   const columns = useMemo(
     () => [
       {
@@ -76,6 +76,6 @@ export const SitesTable = () => {
   );
 };
 
-export const SitesList = () => {
-  return <SitesTable />;
+export const CompaniesList = () => {
+  return <CompaniesTable />;
 };

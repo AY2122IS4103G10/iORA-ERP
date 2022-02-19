@@ -4,8 +4,8 @@ import { classNames } from "../../../../utilities/Util";
 import { useState } from "react";
 
 const tabs = [
-  { name: "Sites", href: "/ad/sites", current: true },
-  { name: "Companies", href: "/sm/products/promotions", current: false },
+  { name: "Sites", href: "/ad/sites", current: false },
+  { name: "Companies", href: "/sm/products/promotions", current: true },
 ];
 
 const Header = () => {
@@ -83,7 +83,7 @@ const Header = () => {
   );
 };
 
-export const ManageSites = () => {
+export const ManageCompanies = () => {
   return (
     <>
       {<Header />}

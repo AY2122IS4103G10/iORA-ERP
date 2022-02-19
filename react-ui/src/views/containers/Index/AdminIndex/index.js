@@ -3,19 +3,19 @@ import { Outlet } from "react-router-dom";
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 import {
-  ClockIcon,
   CogIcon,
-  CreditCardIcon,
   DocumentReportIcon,
   HomeIcon,
+  OfficeBuildingIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
+  UsersIcon,
 } from "@heroicons/react/outline";
 
 const navigation = [
   { name: "Home", href: "/", icon: HomeIcon, current: true },
-  { name: "Employees", href: "/ad/employees", icon: ClockIcon, current: false },
-  { name: "Sites", href: "/ad/sites", icon: CreditCardIcon, current: false },
+  { name: "Employees", href: "/ad/employees", icon: UsersIcon, current: false },
+  { name: "Sites", href: "/ad/sites", icon: OfficeBuildingIcon, current: false },
   {
     name: "Reports & Analytics",
     href: "#",

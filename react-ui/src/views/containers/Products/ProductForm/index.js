@@ -8,13 +8,13 @@ import {
 
 import {
   addNewProduct,
-  fetchProducts,
   selectProductByCode,
   updateExistingProduct,
 } from "../../../../stores/slices/productSlice";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
+import { api } from "../../../../environments/Api";
 
 const checkboxState = (allFields, prodFields) => {
   const res = [];
@@ -120,8 +120,6 @@ const AddProductFormBody = ({
   onListPriceChanged,
   available,
   onAvailableChanged,
-  company,
-  onCompanyChanged,
   onlineOnly,
   onOnlineOnlyChanged,
   colors,
@@ -364,86 +362,50 @@ export const ProductForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { prodId } = useParams();
-  const product = useSelector((state) => selectProductByCode(state, prodId));
-  const isEditing = Boolean(product);
-  const [prodCode, setProdCode] = useState(!isEditing ? "" : product.modelCode);
-  const [name, setName] = useState(!isEditing ? "" : product.name);
-  const [description, setDescription] = useState(
-    !isEditing ? "" : product.description
-  );
-  const [price, setDiscPrice] = useState(!isEditing ? "" : product.price);
-  const [company, setCompany] = useState(!isEditing ? "" : product.company);
-  const [onlineOnly, setOnlineOnly] = useState(
-    !isEditing ? false : product.onlineOnly
-  );
-  const [available, setAvailable] = useState(
-    !isEditing ? true : product.available
-  );
+  const [isEditing, setIsEditing] = useState(false);
+  const [prodCode, setProdCode] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [onlineOnly, setOnlineOnly] = useState(false);
+  const [available, setAvailable] = useState(true);
+  const [products, setProducts] = useState([]);
 
-  const fields = useSelector(selectAllProdFields);
+  const allFields = useSelector(selectAllProdFields);
   const prodFieldStatus = useSelector((state) => state.prodFields.status);
   useEffect(() => {
     prodFieldStatus === "idle" && dispatch(fetchProductFields());
   }, [prodFieldStatus, dispatch]);
-  const colors = fields.filter((field) => field.fieldName === "COLOUR");
-  const sizes = fields.filter((field) => field.fieldName === "SIZE");
-  const tags = fields.filter((field) => field.fieldName === "TAG");
-  const companies = fields.filter((field) => field.fieldName === "COMPANY");
-  const categories = fields.filter((field) => field.fieldName === "category");
+  const colors = allFields.filter((field) => field.fieldName === "COLOUR");
+  const sizes = allFields.filter((field) => field.fieldName === "SIZE");
+  const tags = allFields.filter((field) => field.fieldName === "TAG");
+  const companies = allFields.filter((field) => field.fieldName === "COMPANY");
+  const categories = allFields.filter(
+    (field) => field.fieldName === "category"
+  );
   const [colorCheckedState, setColorCheckedState] = useState(
-    !isEditing
-      ? new Array(colors.length).fill(false)
-      : checkboxState(
-          colors.map((field) => field.fieldValue),
-          product.productFields
-            .filter((field) => field.fieldName === "COLOUR")
-            .map((field) => field.fieldValue)
-        )
+    new Array(colors.length).fill(false)
   );
   const [sizeCheckedState, setSizeCheckedState] = useState(
-    !isEditing
-      ? new Array(sizes.length).fill(false)
-      : checkboxState(
-          sizes.map((field) => field.fieldValue),
-          product.productFields
-            .filter((field) => field.fieldName === "SIZE")
-            .map((field) => field.fieldValue)
-        )
+    new Array(sizes.length).fill(false)
   );
   const [tagCheckedState, setTagCheckedState] = useState(
-    !isEditing
-      ? new Array(tags.length).fill(false)
-      : checkboxState(
-          tags.map((field) => field.fieldValue),
-          product.productFields
-            .filter((field) => field.fieldName === "tag")
-            .map((field) => field.fieldValue)
-        )
+    new Array(tags.length).fill(false)
   );
   const [catCheckedState, setCatCheckedState] = useState(
-    !isEditing
-      ? new Array(categories.length).fill(false)
-      : checkboxState(
-          categories.map((field) => field.fieldValue),
-          product.productFields
-            .filter((field) => field.fieldName === "category")
-            .map((field) => field.fieldValue)
-        )
+    new Array(categories.length).fill(false)
   );
-  const prodStatus = useSelector((state) => state.products.status);
-  useEffect(() => {
-    prodStatus === "idle" && dispatch(fetchProducts());
-  }, [prodStatus, dispatch]);
+  // const [company, setCompany] = useState(!isEditing ? "" : product.company);
 
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
-  const onListPriceChanged = (e) => setDiscPrice(e.target.value);
+  const onListPriceChanged = (e) => setPrice(e.target.value);
   const onOnlineOnlyChanged = () => {
     setOnlineOnly(!onlineOnly);
   };
   const onAvailableChanged = () => setAvailable(!available);
-  const onCompanyChanged = (e) => setCompany(e.target.value);
+  // const onCompanyChanged = (e) => setCompany(e.target.value);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
       index === pos ? !item : item
@@ -497,7 +459,6 @@ export const ProductForm = () => {
               modelCode: prodCode,
               name,
               description,
-              company,
               price,
               onlineOnly,
               available,
@@ -514,7 +475,7 @@ export const ProductForm = () => {
               price,
               onlineOnly,
               available,
-              products: product.products,
+              products,
               productFields: fields,
             })
           ).unwrap();
@@ -535,6 +496,62 @@ export const ProductForm = () => {
   const onCancelClicked = () =>
     navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
 
+  useEffect(() => {
+    Boolean(prodId) &&
+      api.get("sam/model", prodId).then((response) => {
+        const {
+          modelCode,
+          name,
+          description,
+          price,
+          onlineOnly,
+          available,
+          productFields,
+          products
+        } = response.data;
+        setIsEditing(true);
+        setProdCode(modelCode);
+        setName(name);
+        setDescription(description);
+        setPrice(price);
+        setOnlineOnly(onlineOnly);
+        setAvailable(available);
+        setColorCheckedState(
+          checkboxState(
+            colors.map((field) => field.fieldValue),
+            productFields
+              .filter((field) => field.fieldName === "COLOUR")
+              .map((field) => field.fieldValue)
+          )
+        );
+        setSizeCheckedState(
+          checkboxState(
+            sizes.map((field) => field.fieldValue),
+            productFields
+              .filter((field) => field.fieldName === "SIZE")
+              .map((field) => field.fieldValue)
+          )
+        );
+        setTagCheckedState(
+          checkboxState(
+            tags.map((field) => field.fieldValue),
+            productFields
+              .filter((field) => field.fieldName === "tag")
+              .map((field) => field.fieldValue)
+          )
+        );
+        setCatCheckedState(
+          checkboxState(
+            categories.map((field) => field.fieldValue),
+            productFields
+              .filter((field) => field.fieldName === "category")
+              .map((field) => field.fieldValue)
+          )
+        );
+        setProducts(products);
+      });
+  }, [prodId]);
+
   return (
     <AddProductFormBody
       isEditing={isEditing}
@@ -548,8 +565,6 @@ export const ProductForm = () => {
       onListPriceChanged={onListPriceChanged}
       available={available}
       onAvailableChanged={onAvailableChanged}
-      company={company}
-      onCompanyChanged={onCompanyChanged}
       onlineOnly={onlineOnly}
       onOnlineOnlyChanged={onOnlineOnlyChanged}
       colors={colors}

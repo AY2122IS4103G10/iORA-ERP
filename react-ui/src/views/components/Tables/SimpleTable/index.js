@@ -92,7 +92,7 @@ export const SelectColumnFilter = ({
 
 export const OptionsCell = ({ options = [] }) => {
   return (
-    <Menu as="div" className="relative inline-block text-left">
+    <Menu as="div" className="relative z-10 inline-block text-left">
       <div>
         <Menu.Button className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500">
           <span className="sr-only">Open options</span>

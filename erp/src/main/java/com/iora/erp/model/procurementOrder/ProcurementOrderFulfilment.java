@@ -36,6 +36,22 @@ public class ProcurementOrderFulfilment {
         this.id = id;
     }
 
+    public List<POFStatus> getStatusHistory() {
+        return this.statusHistory;
+    }
+
+    public void setStatusHistory(List<POFStatus> statusHistory) {
+        this.statusHistory = statusHistory;
+    }
+
+    public ProcurementOrder getProcurementOrder() {
+        return this.procurementOrder;
+    }
+
+    public void setProcurementOrder(ProcurementOrder procurementOrder) {
+        this.procurementOrder = procurementOrder;
+    }
+
     public ProcurementOrderFulfilment id(Long id) {
         setId(id);
         return this;

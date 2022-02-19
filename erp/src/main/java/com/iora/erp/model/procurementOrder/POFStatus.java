@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.iora.erp.enumeration.ProcurementOrderStatus;
+import com.iora.erp.enumeration.ProcurementOrderFulfilmentStatus;
 import com.iora.erp.model.site.Site;
 
 @Embeddable
@@ -21,12 +21,12 @@ public class POFStatus {
     private Date timeStamp;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProcurementOrderStatus status;
+    private ProcurementOrderFulfilmentStatus status;
 
     public POFStatus() {
     }
 
-    public POFStatus(Site actionBy, Date timeStamp, ProcurementOrderStatus status) {
+    public POFStatus(Site actionBy, Date timeStamp, ProcurementOrderFulfilmentStatus status) {
         this.actionBy = actionBy;
         this.timeStamp = timeStamp;
         this.status = status;
@@ -48,11 +48,11 @@ public class POFStatus {
         this.timeStamp = timeStamp;
     }
 
-    public ProcurementOrderStatus getStatus() {
+    public ProcurementOrderFulfilmentStatus getStatus() {
         return this.status;
     }
 
-    public void setStatus(ProcurementOrderStatus status) {
+    public void setStatus(ProcurementOrderFulfilmentStatus status) {
         this.status = status;
     }
 
@@ -66,7 +66,7 @@ public class POFStatus {
         return this;
     }
 
-    public POFStatus status(ProcurementOrderStatus status) {
+    public POFStatus status(ProcurementOrderFulfilmentStatus status) {
         setStatus(status);
         return this;
     }

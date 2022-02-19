@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -137,7 +136,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping(path = "/addSite/{storeType}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/addSite/{storeType}", consumes = "application/json")
     public ResponseEntity<Object> addSite(@RequestBody Site site, @PathVariable String storeType) {
         try {
             siteService.createSite(site, storeType);
@@ -168,15 +167,15 @@ public class AdminController {
     }
 
     @GetMapping(path = "/viewSites", produces = "application/json")
-    public List<? extends Site> viewSites(@RequestParam List<String> storeTypes, @RequestParam String country,
+    public List<? extends Site> viewSites(@RequestParam List<String> siteTypes, @RequestParam String country,
             @RequestParam String company) {
-        return siteService.searchAllSites(storeTypes, country, company);
+        return siteService.searchAllSites(siteTypes, country, company);
     }
 
-    @GetMapping(path = "/viewSites/{storeType}", produces = "application/json")
-    public List<? extends Site> viewSitesBySubclass(@PathVariable String storeType, @RequestParam String country,
+    @GetMapping(path = "/viewSites/{siteType}", produces = "application/json")
+    public List<? extends Site> viewSitesBySubclass(@PathVariable String siteType, @RequestParam String country,
             @RequestParam String company) {
-        switch (storeType) {
+        switch (siteType) {
             case "Headquarters":
                 return siteService.searchHeadquarters(country, company);
             case "Manufacturing":

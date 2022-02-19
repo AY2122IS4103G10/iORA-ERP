@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
+import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +28,8 @@ public class WarehouseController {
 
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private ProcurementService procurementService;
 
     /*
      * ---------------------------------------------------------
@@ -72,6 +77,32 @@ public class WarehouseController {
             return ResponseEntity.ok("Transaction successful");
         } else {
             return ResponseEntity.badRequest().body(String.join("\n", errors));
+        }
+    }
+
+    @GetMapping(path = "/procurementOrder/all", produces = "application/json")
+    public List<ProcurementOrder> getProcurementsOrders() {
+        return procurementService.getProcurementOrders();
+    }
+
+    @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
+    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
+        return procurementService.getProcurementOrder(orderId);
+    }
+
+    @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
+    public List<ProcurementOrder> getProcurementOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return procurementService.getProcurementOrdersOfSite(site);
+    }
+
+    @PutMapping(path = "/procurementOrder/verify/{siteId}")
+    public ResponseEntity<Object> verifyProcurementOrder(@RequestBody ProcurementOrder procurementOrder, @PathVariable Long siteId) {
+        try {
+            procurementService.verifyProcurementOrder(procurementOrder, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + procurementOrder.getId() + " is accepted.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 

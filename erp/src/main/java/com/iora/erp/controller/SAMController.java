@@ -73,8 +73,7 @@ public class SAMController {
     @PostMapping(path = "/productField", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createProductField(@RequestBody ProductField productField) {
         try {
-            productService.createProductField(productField);
-            return ResponseEntity.ok("Product field " + productField.getFieldName() + " : " +  productField.getFieldValue() + " is successfully created");
+            return ResponseEntity.ok(productService.createProductField(productField));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -101,8 +100,7 @@ public class SAMController {
     public ResponseEntity<Object> createProduct(@PathVariable String modelCode,
             @RequestBody List<ProductField> productFields) {
         try {
-            productService.createProduct(modelCode, productFields);
-            return ResponseEntity.ok("Multiple Products are successfully created and linked to Model " + modelCode);
+            return ResponseEntity.ok(productService.createProduct(modelCode, productFields));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -213,10 +211,9 @@ public class SAMController {
     }
 
     @PutMapping(path = "/product", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> updateProduct(@PathVariable Product product) {
+    public ResponseEntity<Object> updateProduct(@RequestBody Product product) {
         try {
-            productService.updateProduct(product);
-            return ResponseEntity.ok("Product with SKU code " + product.getsku() + " is successfully updated.");
+            return ResponseEntity.ok(productService.updateProduct(product));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -276,14 +273,14 @@ public class SAMController {
         }
     }
 
+    // Links a PromotionField to Model.
+    // A new PromotionField will be created if it does not exist.
     @PutMapping(path = "/promo/add/{modelCode}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addPromoCategory(@PathVariable String modelCode,
             @RequestBody Map<String, String> body) {
         try {
-            productService.addPromoCategory(modelCode, body.get("category"),
-                    Double.parseDouble(body.get("discountedPrice")));
-            return ResponseEntity
-                    .ok("Promotion " + body.get("category") + " is successfully added to the Model " + modelCode);
+            return ResponseEntity.ok(productService.addPromoCategory(modelCode, body.get("category"),
+                    Double.parseDouble(body.get("discountedPrice"))));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -303,8 +300,7 @@ public class SAMController {
         try {
             double amount = Double.parseDouble(body.get("amount"));
             int qty = Integer.parseInt(body.get("quantity"));
-            customerService.generateVouchers(amount, qty, body.get("expDate").substring(0, 10));
-            return ResponseEntity.ok(qty + " quantity of S$" + amount + " vouchers have been successfully created.");
+            return ResponseEntity.ok(customerService.generateVouchers(amount, qty, body.get("expDate").substring(0, 10)));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -323,8 +319,8 @@ public class SAMController {
     @PutMapping(path = "/voucher/issue/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode) {
         try {
-            customerService.issueVoucher(voucherCode);
-            return ResponseEntity.ok("Voucher " + voucherCode + " has been marked as issued.");
+            
+            return ResponseEntity.ok(customerService.issueVoucher(voucherCode));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -333,8 +329,7 @@ public class SAMController {
     @PutMapping(path = "/voucher/redeem/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> redeemVouchers(@PathVariable String voucherCode) {
         try {
-            customerService.redeemVoucher(voucherCode);
-            return ResponseEntity.ok("Voucher " + voucherCode + " has been marked as redeemed.");
+            return ResponseEntity.ok(customerService.redeemVoucher(voucherCode));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

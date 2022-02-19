@@ -30,9 +30,7 @@ public class Employee implements Serializable {
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
-    private String hashPass;
-    @Column(nullable = false)
-    private String salt;
+    private String password;
     @Column(nullable = false)
     private Boolean availStatus;
 
@@ -44,14 +42,13 @@ public class Employee implements Serializable {
     public Employee() {
     }
 
-    public Employee(String name, String email, Double salary, String username, String hashPass, String salt,
+    public Employee(String name, String email, Double salary, String username, String password,
             Boolean availStatus) {
         this.name = name;
         this.email = email;
         this.salary = salary;
         this.username = username;
-        this.hashPass = generateProtectedPassword(salt, hashPass);
-        this.salt = salt;
+        this.password = password;
         this.availStatus = availStatus;
     }
 
@@ -69,7 +66,7 @@ public class Employee implements Serializable {
         }
     }
 
-    public Boolean authentication(String authenticate) {
+   /* public Boolean authentication(String authenticate) {
         String tryPassword;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
@@ -86,7 +83,7 @@ public class Employee implements Serializable {
         } catch (Exception ex) {
             return false;
         }
-    }
+    }*/
 
     public Long getId() {
         return id;
@@ -112,21 +109,6 @@ public class Employee implements Serializable {
         this.availStatus = availStatus;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public String getHashPass() {
-        return hashPass;
-    }
-
-    public void setHashPass(String password) {
-        this.hashPass = generateProtectedPassword(this.salt, password);
-    }
 
     public String getUsername() {
         return username;
@@ -182,6 +164,14 @@ public class Employee implements Serializable {
         Set<AccessRights> accessRights = new HashSet<>(department.getResponsibility());
         accessRights.addAll(jobTitle.getResponsibility());
         return accessRights;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 }

@@ -20,6 +20,6 @@ public interface EmployeeService {
     public abstract Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException;
     public abstract Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException;
     
-    public abstract byte[] saltGeneration();
-    public abstract Employee loginAuthentication(Employee employee) throws EmployeeException;
+    //public abstract byte[] saltGeneration();
+    //public abstract Employee loginAuthentication(Employee employee) throws EmployeeException;
 }

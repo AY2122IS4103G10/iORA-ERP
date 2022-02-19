@@ -20,7 +20,7 @@ public interface AdminService {
     public abstract void updateJobTitle(JobTitle jobTitle) throws JobTitleException;
     public abstract void deleteJobTitle(JobTitle jobTitle) throws JobTitleException;
     public abstract List<JobTitle> listOfJobTitles() throws JobTitleException;
-    public abstract List<JobTitle> getJobTitlesByFields(String search);
+    public abstract List<JobTitle> getJobTitlesByFields(String search) throws JobTitleException;
     public abstract JobTitle getJobTitleById(Long id)  throws JobTitleException;
     public abstract JobTitle getJobTitlesByName(String name) throws JobTitleException;
 

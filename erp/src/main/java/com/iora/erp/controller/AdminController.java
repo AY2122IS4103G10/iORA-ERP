@@ -1,8 +1,12 @@
 package com.iora.erp.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
+import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.model.company.Employee;
+import com.iora.erp.model.company.JobTitle;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.EmployeeService;
@@ -38,6 +42,99 @@ public class AdminController {
      */
 
     // Employee/JobTitle/Department stuff here
+
+
+    
+    @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {
+        try {
+            adminService.createJobTitle(jt);
+            return ResponseEntity.ok("Job title has been successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/editJobTitle", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> editJobTitle(@RequestBody JobTitle jt) {
+        try {
+            adminService.updateJobTitle(jt);
+            return ResponseEntity.ok("Job Tiltle with ID " + jt.getId() + " has been successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/viewJobTitles", produces = "application/json")
+    public List<JobTitle> viewJobTitles(@RequestParam("search") String search) {
+        try {
+            return adminService.getJobTitlesByFields(search);
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+        
+    @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.createEmployee(employee);
+            return ResponseEntity.ok("Employee " + employee.getName() + " is successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/addEmployees", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addAllEmployee(@RequestBody List<Employee> employee) {
+        try {
+            for(Employee e : employee) {
+                employeeService.createEmployee(e);
+            }
+            return ResponseEntity.ok("All employees has been successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/viewEmployees", produces = "application/json")
+    public List<Employee> viewEmployees(@RequestParam("search") String search) {
+        try {
+            return employeeService.getEmployeeByFields(search);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> editEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.updateEmployeeAccount(employee);
+            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " is successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/enableEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> enableEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.unblockEmployee(employee);
+            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " has been activated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/disableEmployee", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> disableEmployee(@RequestBody Employee employee) {
+        try {
+            employeeService.blockEmployee(employee);
+            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " has been blocked.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
     @PostMapping(path = "/addSite/{storeType}", consumes = "application/json")
     public ResponseEntity<Object> addSite(@RequestBody Site site, @PathVariable String storeType) {

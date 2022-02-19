@@ -3,6 +3,8 @@ import { api } from "../../environments/Api";
 
 const initialState = {
   products: [],
+  productSL: [],
+  currProduct: null,
   status: "idle",
   error: null,
 };
@@ -17,10 +19,19 @@ export const fetchProducts = createAsyncThunk(
 );
 
 //fetch products
-export const getAllProducts = createAsyncThunk(
-  "products/getAllProducts",
+export const getAllProductSL = createAsyncThunk(
+  "products/getAllProductSL",
   async () => {
-    const response = await api.getAll(`sam/products?sku=`);
+    const response = await api.getAll(`sam/product?sku=`);
+    return response.data;
+  }
+);
+
+//get a product stock level
+export const getAProduct = createAsyncThunk(
+  "products/getAProduct",
+  async (sku) => {
+    const response = await api.get(`sam/product`, sku);
     return response.data;
   }
 );
@@ -64,6 +75,26 @@ const productSlice = createSlice({
     builder.addCase(fetchProducts.rejected, (state, action) => {
       state.status = "failed";
     });
+    builder.addCase(getAllProductSL.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getAllProductSL.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.productSL = state.productSL.concat(action.payload);
+    });
+    builder.addCase(getAllProductSL.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(getAProduct.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getAProduct.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.currProduct = action.payload;
+    });
+    builder.addCase(getAProduct.rejected, (state, action) => {
+      state.status = "failed";
+    });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {
       state.products.push(action.payload)
     });
@@ -105,6 +136,10 @@ const productSlice = createSlice({
 export default productSlice.reducer;
 
 export const selectAllProducts = (state) => state.products.products;
+
+export const selectAllProductSL = (state) => state.products.productSL;
+
+export const selectAProductSL = (state) => state.products.currProduct;
 
 export const selectProductByCode = (state, modelCode) =>
   state.products.products.find((product) => product.modelCode === modelCode);

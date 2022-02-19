@@ -1,39 +1,40 @@
-import { useMemo } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
+import { selectAProductSL } from "../../../../stores/slices/productSlice";
+import { getAProduct } from "../../../../stores/slices/productSlice";
 
-export const getData = () => {
-    
-}
-
-
-
-
-
-
+const columns =[
+  {
+      Header: "Site Code", 
+      accessor: "siteCode"
+  }, 
+  {
+      Header: "Country", 
+      accessor: "country"
+  },
+  {
+      Header: "Quantity", 
+      accessor: "qty",
+  },
+  {
+      Header: "Reserved",
+      accessor: "reserve"
+  }
+]
 
 
 export const AProductStock = () => {
+  const {id} = useParams();
+  const dispatch = useDispatch();
+  const data = useSelector(selectAProductSL);
+  const prodStatus = useSelector((state) => state.products.status);
+  useEffect(() => {
+      prodStatus === "idle" && dispatch(getAProduct(id));
+    }, [prodStatus, dispatch]);
 
-    const columns = useMemo(
-        () => [
-            {
-                Header: "Site Code", 
-                accessor: "siteCode"
-            }, 
-            {
-                Header: "Country", 
-                accessor: "country"
-            },
-            {
-                Header: "Quantity", 
-                accessor: "qty",
-            },
-            {
-                Header: "Reserved",
-                accessor: "reserve"
-            }
-        ]
-    )
+    console.log(data.productFields);
 
     return(
         <div className="min-h-full">
@@ -47,7 +48,7 @@ export const AProductStock = () => {
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Product Name</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Product: {data.sku}</h1>
               </div>
             </div>
           </div>
@@ -66,21 +67,16 @@ export const AProductStock = () => {
                     <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                       <div className="sm:col-span-1">
                         <dt className="text-sm font-medium text-gray-500">SKU</dt>
-                        <dd className="mt-1 text-sm text-gray-900"></dd>
+                        <dd className="mt-1 text-sm text-gray-900">{data.sku}</dd>
                       </div>
-                      <div className="sm:col-span-1">
-                        <dt className="text-sm font-medium text-gray-500">Price</dt>
-                        <dd className="mt-1 text-sm text-gray-900"></dd>
-                      </div>
-                      <div className="sm:col-span-1">
-                        <dt className="text-sm font-medium text-gray-500">Categories</dt>
-                        <dd className="mt-1 text-sm text-gray-900"></dd>
-                      </div>
-                      <div className="sm:col-span-1">
-                        <dt className="text-sm font-medium text-gray-500">Tags</dt>
-                        <dd className="mt-1 text-sm text-gray-900"></dd>
-                      </div>
-                      
+                      {data.productFields.map((field) => {
+                        return (
+                          <div className="sm:col-span-1">
+                            <dt className="text-sm font-medium text-gray-500">{field.fieldName}</dt>
+                            <dd className="mt-1 text-sm text-gray-900">{field.fieldValue}</dd>
+                          </div>
+                          );
+                      })}
                     </dl>
                   </div>
                   

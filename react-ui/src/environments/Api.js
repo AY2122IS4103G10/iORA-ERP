@@ -38,7 +38,6 @@ export const sitesApi = {
   },
 
   getASite(id) {
-    console.log("HELLO GETTING SITE" + id);
     return axios
       .get(`${REST_ENDPOINT}admin/viewSite/${id}`)
   },

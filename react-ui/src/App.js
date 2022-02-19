@@ -40,8 +40,7 @@ function App() {
             <Route path="edit/:prodId" element={<ProductForm />} />
             <Route path="promotions" element={<ManagePromotions />} />
           </Route>
-          <Route path="stocklevels/*" element={<ViewStockLevels />}>
-          </Route>
+          <Route path="stocklevels/*" element={<ViewStockLevels />}/>
           <Route path="vouchers" element={<Outlet />}>
             <Route index element={<ManageVouchers />} />
             <Route path=":voucherCode" element={<VoucherDetails />} />
@@ -52,9 +51,10 @@ function App() {
 
         {/* Store Management Subsystem */}
         <Route path="/str" element={<StoreIndex/>}>
-          <Route path="stocklevels" element={<AsiteStock />}>
-          </Route>
+          <Route path="stocklevels" element={<AsiteStock />}/>
         </Route>
+
+        {/* Admin Subsystem */}
         <Route
           path="/ad"
           element={

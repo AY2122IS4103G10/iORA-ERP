@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-// import { sitesApi } from "../../environments/Api";
+import { sitesApi } from "../../environments/Api";
 
 // const initialState = {
 //     sites: [
@@ -66,9 +66,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 //         },
 //     }
 // })
-// export const selectAllSites = (state) => state.sites.sites;
 
-// export default siteSlice.reducer;
 import { api } from "../../environments/Api";
 
 const initialState = {
@@ -77,6 +75,14 @@ const initialState = {
   error: null,
 };
 
+export const getAllSites = createAsyncThunk(
+    "stocklevels/getAllSites",
+    async () => {
+        const response = await sitesApi.getAll();
+        console.log(response.data);
+        return response.data;
+    }
+)
 export const fetchSites = createAsyncThunk(
   "sites/fetchSites",
   async () => {
@@ -121,6 +127,16 @@ const siteSlice = createSlice({
       state.sites = state.sites.concat(action.payload);
     });
     builder.addCase(fetchSites.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(getAllSites.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getAllSites.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.sites = state.sites.concat(action.payload);
+    });
+    builder.addCase(getAllSites.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewSites.fulfilled, (state, action) => {

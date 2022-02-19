@@ -34,6 +34,6 @@ export const voucherApi = {
 export const sitesApi = {
   getAll() {
     return axios
-      .get(`${REST_ENDPOINT}viewSites`)
+      .get(`${REST_ENDPOINT}/sam/viewSites?storeTypes=&country=&company=`)
   },
 };

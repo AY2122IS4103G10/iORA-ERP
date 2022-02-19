@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSites, selectAllSites } from "../../../../stores/slices/siteSlice";
+import { fetchSites, getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
 import { SelectColumnFilter } from "../../../components/Tables/SelectableTable";
@@ -29,7 +29,7 @@ export const SiteTables = () => {
     const data = useSelector(selectAllSites);
     const siteStatus = useSelector((state) => state.sites.status);
     useEffect(() => {
-        siteStatus === "idle" && dispatch(fetchSites());
+        siteStatus === "idle" && dispatch(getAllSites());
     }, [siteStatus, dispatch])
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

@@ -12,16 +12,16 @@ import {
   fetchProducts,
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
-import { productsApi } from "../../../../environments/Api.js";
 
 const processFields = (fields, selector) => {
   const fieldValues = [];
-  fields
-    .filter((field) => field.fieldName === selector)
-    .forEach((field) => fieldValues.push(field.fieldValue));
+  Boolean(fields) &&
+    fields
+      .filter((field) => field.fieldName === selector)
+      .forEach((field) => fieldValues.push(field.fieldValue));
   return fieldValues.length
     ? fieldValues.join(", ")
-    : `No ${selector.toLowerCase()}`;
+    : `No ${selector.toLowerCase()}s`;
 };
 
 export const ProductsTable = () => {
@@ -29,7 +29,7 @@ export const ProductsTable = () => {
     () => [
       {
         Header: "Product Code",
-        accessor: "prodCode",
+        accessor: "modelCode",
         Cell: (e) => (
           <Link
             to={`/sm/products/${e.value}`}
@@ -43,15 +43,15 @@ export const ProductsTable = () => {
         Header: "Name",
         accessor: "name",
       },
-      {
-        Header: "Category",
-        accessor: "",
-        // Cell: (e) => processFields(e.value, "Category"),
-      },
+      // {
+      //   Header: "Category",
+      //   accessor: "",
+      //   Cell: (e) => processFields(e.value, "Category"),
+      // },
       {
         Header: "Color",
-        accessor: "fields",
-        Cell: (e) => processFields(e.value, "Color"),
+        accessor: "productFields",
+        Cell: (e) => processFields(e.value, "COLOUR"),
       },
       {
         Header: "Size",
@@ -60,8 +60,13 @@ export const ProductsTable = () => {
       },
       {
         Header: "List Price",
-        accessor: "listPrice",
+        accessor: "price",
         Cell: (e) => `$${e.value}`,
+      },
+      {
+        Header: "Available",
+        accessor: "available",
+        Cell: (e) => (e.value ? "Yes" : "No"),
       },
       // {
       //   Header: CogIcon,

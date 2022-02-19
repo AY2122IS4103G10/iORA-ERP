@@ -2,7 +2,6 @@ import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   MenuAlt1Icon,
-  SearchIcon,
   BellIcon,
   ChevronDownIcon,
 } from "@heroicons/react/outline";
@@ -11,19 +10,16 @@ import { classNames } from "../../../utilities/Util";
 import { logout } from "../../../stores/slices/userSlice";
 import { selectUser } from "../../../stores/slices/userSlice";
 
-export const NavBar = ({ setSidebarOpen }) => {
+export const NavBar = ({ setSidebarOpen, badge }) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const handleLogout = (e) => {
     console.log("logout" + user);
     e.preventDefault();
-    dispatch(
-      logout()
-    );
+    dispatch(logout());
 
     console.log(user);
-  }
-
+  };
 
   return (
     <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
@@ -35,30 +31,8 @@ export const NavBar = ({ setSidebarOpen }) => {
         <span className="sr-only">Open sidebar</span>
         <MenuAlt1Icon className="h-6 w-6" aria-hidden="true" />
       </button>
-      {/* Search bar */}
       <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
-        <div className="flex-1 flex">
-          {/* <form className="w-full flex md:ml-0" action="#" method="GET">
-            <label htmlFor="search-field" className="sr-only">
-              Search
-            </label>
-            <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-              <div
-                className="absolute inset-y-0 left-0 flex items-center pointer-events-none"
-                aria-hidden="true"
-              >
-                <SearchIcon className="h-5 w-5" aria-hidden="true" />
-              </div>
-              <input
-                id="search-field"
-                name="search-field"
-                className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
-                placeholder="Search transactions"
-                type="search"
-              />
-            </div>
-          </form> */}
-        </div>
+        {badge}
         <div className="ml-4 flex items-center md:ml-6">
           <button
             type="button"

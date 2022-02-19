@@ -16,9 +16,8 @@ public class ProductItem {
     @Column(nullable = false)
     private boolean available;
 
-    @ManyToOne
-    @XmlTransient
-    private Product product;
+    @Column(nullable = false)
+    private String productSKU;
 
     @ManyToOne
     @XmlTransient
@@ -48,12 +47,12 @@ public class ProductItem {
         this.available = available;
     }
 
-    public Product getProduct() {
-        return this.product;
+    public String getProductSKU() {
+        return this.productSKU;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductSKU(String productSKU) {
+        this.productSKU = productSKU;
     }
 
     public StockLevel getStockLevel() {

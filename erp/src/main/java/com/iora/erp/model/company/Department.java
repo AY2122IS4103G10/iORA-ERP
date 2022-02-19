@@ -2,26 +2,33 @@ package com.iora.erp.model.company;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.iora.erp.enumeration.AccessRights;
+
 @Entity
 public class Department implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true)
+    // temporarily remove unique=true
+    @Column(nullable = false)
     private String deptName;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<JobTitle> jobTitles;
+    @ElementCollection
+    private Set<AccessRights> responsibility;
 
     public Department() {
     }
@@ -65,6 +72,14 @@ public class Department implements Serializable {
 
     public void setDeptName(String deptName) {
         this.deptName = deptName;
+    }
+
+    public Set<AccessRights> getResponsibility() {
+        return this.responsibility;
+    }
+
+    public void setResponsibility(Set<AccessRights> responsibility) {
+        this.responsibility = responsibility;
     }
 
 }

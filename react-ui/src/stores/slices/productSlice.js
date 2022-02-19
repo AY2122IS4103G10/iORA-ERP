@@ -1,43 +1,8 @@
-import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
-import { productsApi } from "../../environments/Api";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { api } from "../../environments/Api";
 
 const initialState = {
-  products: [
-    {
-      prodCode: "ADQ0010406H",
-      name: "Cut-in Dress",
-      description: "Hello!",
-      listPrice: 10.99,
-      discPrice: 8.99,
-      fields: [
-        {
-          fieldId: 1,
-          fieldName: "Color",
-          fieldValue: "RED",
-        },
-        {
-          fieldId: 2,
-          fieldName: "Color",
-          fieldValue: "BLUE",
-        },
-        {
-          fieldId: 3,
-          fieldName: "Color",
-          fieldValue: "YELLOW",
-        },
-        {
-          fieldId: 4,
-          fieldName: "Size",
-          fieldValue: "S",
-        },
-        {
-          fieldId: 5,
-          fieldName: "Size",
-          fieldValue: "M",
-        },
-      ],
-    },
-  ],
+  products: [],
   status: "idle",
   error: null,
 };
@@ -45,8 +10,7 @@ const initialState = {
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const response = await productsApi.getAll();
-    console.log(response.data);
+    const response = await api.getAll(`sam/model?modelCode=`);
     return response.data;
   }
 );
@@ -54,7 +18,23 @@ export const fetchProducts = createAsyncThunk(
 export const addNewProduct = createAsyncThunk(
   "products/addNewPost",
   async (initialProduct) => {
-    const response = await productsApi.create(initialProduct);
+    const response = await api.create("sam/model", initialProduct);
+    return response.data;
+  }
+);
+
+export const updateExistingProduct = createAsyncThunk(
+  "products/updateExistingProduct",
+  async (existingProduct) => {
+    const response = await api.update("sam/model", existingProduct);
+    return response.data;
+  }
+);
+
+export const deleteExistingProduct = createAsyncThunk(
+  "products/deleteExistingProduct",
+  async (existingModelCode) => {
+    const response = await api.delete("sam/model", existingModelCode);
     return response.data;
   }
 );
@@ -62,68 +42,58 @@ export const addNewProduct = createAsyncThunk(
 const productSlice = createSlice({
   name: "products",
   initialState,
-  reducers: {
-    // productAdded: {
-    //   reducer(state, action) {
-    //     state.products.push(action.payload);
-    //   },
-    //   prepare(prodCode, name, description, listPrice, discPrice, fields) {
-    //     return {
-    //       payload: {
-    //         id: nanoid(),
-    //         prodCode,
-    //         name,
-    //         description,
-    //         listPrice: parseFloat(listPrice),
-    //         discPrice: parseFloat(discPrice),
-    //         fields,
-    //       },
-    //     };
-    //   },
-    // },
-    productUpdated(state, action) {
-      const { prodCode, name, description, listPrice, discPrice, fields } =
-        action.payload;
+  extraReducers(builder) {
+    builder.addCase(fetchProducts.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(fetchProducts.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.products = state.products.concat(action.payload);
+    });
+    builder.addCase(fetchProducts.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(addNewProduct.fulfilled, (state, action) => {
+      state.products.push(action.payload)
+    });
+    builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
+      const {
+        modelCode,
+        name,
+        description,
+        price,
+        onlineOnly,
+        available,
+        products,
+        productFields,
+      } = action.payload;
+      console.log(action.payload)
       const existingProd = state.products.find(
-        (prod) => prod.prodCode === prodCode
+        (prod) => prod.modelCode === modelCode
       );
       if (existingProd) {
         existingProd.name = name;
         existingProd.description = description;
-        existingProd.listPrice = listPrice;
-        existingProd.discPrice = discPrice;
-        existingProd.fields = fields;
+        existingProd.price = price;
+        existingProd.onlineOnly = onlineOnly;
+        existingProd.available = available;
+        existingProd.products = products;
+        existingProd.productFields = productFields;
       }
-    },
-    productDeleted(state, action) {
+      // state.status = "idle";
+    });
+    builder.addCase(deleteExistingProduct.fulfilled, (state, action) => {
       state.products = state.products.filter(
         ({ prodCode }) => prodCode !== action.payload.prodCode
       );
-    },
-    extraReducers(builder) {
-      builder.addCase(fetchProducts.pending, (state, action) => {
-        state.status = "loading";
-      });
-      builder.addCase(fetchProducts.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.products = state.products.concat(action.payload);
-      });
-      builder.addCase(fetchProducts.rejected, (state, action) => {
-        state.status = "failed";
-      });
-      builder.addCase(addNewProduct.fulfilled, (state, action) => {
-        state.products.push(action.payload);
-      });
-    },
+      // state.status = "idle"
+    });
   },
 });
-
-export const { productAdded, productUpdated, productDeleted } =
-  productSlice.actions;
 
 export default productSlice.reducer;
 
 export const selectAllProducts = (state) => state.products.products;
 
-export const selectProductByCode = (state, prodCode) =>
-  state.products.products.find((product) => product.prodCode === prodCode);
+export const selectProductByCode = (state, modelCode) =>
+  state.products.products.find((product) => product.modelCode === modelCode);

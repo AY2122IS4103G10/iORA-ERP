@@ -4,22 +4,30 @@
 import axios from "axios";
 import { REST_ENDPOINT } from "../constants/restEndpoint";
 
-export const productsApi = {
-  getAll() {
-    return axios
-      .get(`${REST_ENDPOINT}model`);
+export const api = {
+  getAll(path) {
+    return axios.get(`${REST_ENDPOINT}${path}`);
   },
-  get(modelId) {
-    return axios.get(`${REST_ENDPOINT}model/${modelId}`);
+  get(path, id) {
+    return axios.get(`${REST_ENDPOINT}${path}/${id}`);
   },
-  create(model) {
-    return axios.post(`${REST_ENDPOINT}model`, model);
+  create(path, item) {
+    return axios.post(`${REST_ENDPOINT}${path}`, item);
   },
-  update(model) {
-    return axios.put(`${REST_ENDPOINT}model`, model);
+  update(path, item) {
+    return axios.put(`${REST_ENDPOINT}${path}`, item);
   },
-  delete(modelId) {
-    return axios.delete(`${REST_ENDPOINT}model/${modelId}`);
+  delete(path, id) {
+    return axios.delete(`${REST_ENDPOINT}${path}/${id}`);
+  },
+};
+
+export const voucherApi = {
+  issue(id) {
+    return axios.put(`${REST_ENDPOINT}voucher/issue/${id}`);
+  },
+  redeem(id) {
+    return axios.put(`${REST_ENDPOINT}voucher/redeem/${id}`);
   },
 };
 

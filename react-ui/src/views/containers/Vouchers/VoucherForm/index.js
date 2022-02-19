@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import DatePicker from "react-datepicker";
 import {
-  selectVoucherById,
-  voucherAdded,
+  addNewVouchers,
+  selectVoucherByCode,
 } from "../../../../stores/slices/voucherSlice";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
+import "react-datepicker/dist/react-datepicker.css";
+
 const VoucherFormBody = ({
   isEditing,
-  voucherCode,
-  onVoucherCodeChanged,
+  quantity,
+  onQuanitity,
   value,
   onValueChanged,
   expDate,
@@ -34,25 +37,10 @@ const VoucherFormBody = ({
                   <div>
                     <div>
                       <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        {!isEditing ? "Add New" : "Edit"} Voucher
+                        {!isEditing ? "Add New" : "Edit"} Vouchers
                       </h3>
                     </div>
                     <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                      <SimpleInputGroup
-                        label="Voucher Code"
-                        inputField="voucherCode"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="code"
-                          id="code"
-                          autoComplete="code"
-                          value={voucherCode}
-                          onChange={onVoucherCodeChanged}
-                          required
-                        />
-                      </SimpleInputGroup>
                       <SimpleInputGroup
                         label="Value"
                         inputField="value"
@@ -87,21 +75,26 @@ const VoucherFormBody = ({
                         inputField="expDate"
                         className="sm:mt-0 sm:col-span-2"
                       >
-                        <div className="relative">
-                          {/* {new Datepicker(datepickerEl, {})} */}
-                          {/* <DatePicker
-                            selected={expDate}
-                            onChange={onExpDateChanged}
-                          /> */}
-                          <input
-                            type="text"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Select date"
-                            value={expDate}
-                            onChange={onExpDateChanged}
-                            required
-                          />
-                        </div>
+                        <DatePicker
+                          className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                          selected={expDate}
+                          onChange={onExpDateChanged}
+                        />
+                      </SimpleInputGroup>
+                      <SimpleInputGroup
+                        label="Quanitity"
+                        inputField="quantity"
+                        className="sm:mt-0 sm:col-span-2"
+                      >
+                        <SimpleInputBox
+                          type="number"
+                          name="code"
+                          id="code"
+                          autoComplete="code"
+                          value={quantity}
+                          onChange={onQuanitity}
+                          required
+                        />
                       </SimpleInputGroup>
                     </div>
                   </div>
@@ -121,7 +114,7 @@ const VoucherFormBody = ({
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                       onClick={onAddVoucherClicked}
                     >
-                      {!isEditing ? "Add" : "Save"} voucher
+                      {!isEditing ? "Add" : "Save"} vouchers
                     </button>
                   </div>
                 </div>
@@ -135,12 +128,12 @@ const VoucherFormBody = ({
 );
 
 export const VoucherForm = () => {
-  const { voucherId } = useParams();
+  const { voucherCode } = useParams();
   const voucher = useSelector((state) =>
-    selectVoucherById(state, parseInt(voucherId))
+    selectVoucherByCode(state, voucherCode)
   );
   const isEditing = Boolean(voucher);
-  const [voucherCode, setVoucherCode] = useState(!isEditing ? "" : voucher.code);
+  const [quantity, setQuantity] = useState(!isEditing ? 1 : voucher.code);
   const [value, setValue] = useState(!isEditing ? "" : voucher.value);
   const [expDate, setExpDate] = useState(
     !isEditing ? new Date() : new Date(voucher.expDate)
@@ -149,28 +142,40 @@ export const VoucherForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const onVoucherCodeChanged = (e) => setVoucherCode(e.target.value);
+  const onQuanitity = (e) => setQuantity(e.target.value);
   const onValueChanged = (e) => setValue(e.target.value);
   const onExpDateChanged = (date) => setExpDate(date);
 
+  const [requestStatus, setRequestStatus] = useState("idle");
+  const canAdd =
+    [quantity, value, expDate].every(Boolean) && requestStatus === "idle";
   const onAddVoucherClicked = (evt) => {
     evt.preventDefault();
-    canAdd && dispatch(voucherAdded(voucherCode, value, expDate));
-    setVoucherCode("");
-    setValue("");
-    navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherId}`);
+    if (canAdd)
+      try {
+        setRequestStatus("pending");
+        dispatch(
+          addNewVouchers({ quantity, amount: value, expiry: expDate })
+        ).unwrap();
+        alert("Successfully added vouchers");
+        setQuantity("");
+        setValue("");
+        navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherCode}`);
+      } catch (err) {
+        console.error("Failed to add vouchers: ", err);
+      } finally {
+        setRequestStatus("idle");
+      }
   };
 
-  const canAdd = voucherCode && value && expDate;
-
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherId}`);
+    navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherCode}`);
 
   return (
     <VoucherFormBody
       isEditing={isEditing}
-      voucherCode={voucherCode}
-      onVoucherCodeChanged={onVoucherCodeChanged}
+      quantity={quantity}
+      onQuanitity={onQuanitity}
       value={value}
       onValueChanged={onValueChanged}
       expDate={expDate}

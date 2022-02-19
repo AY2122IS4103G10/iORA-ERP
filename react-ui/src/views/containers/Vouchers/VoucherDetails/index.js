@@ -1,29 +1,36 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   CalendarIcon as CalendarIconSolid,
+  CheckCircleIcon,
   PencilIcon,
 } from "@heroicons/react/solid";
 import moment from "moment";
 import {
-  CalendarIcon,
   CurrencyDollarIcon,
   TrashIcon,
 } from "@heroicons/react/outline";
 import {
-  selectVoucherById,
+  fetchVouchers,
+  issueVoucher,
+  redeemVoucher,
+  selectVoucherByCode,
   voucherDeleted,
 } from "../../../../stores/slices/voucherSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import { useEffect, useState } from "react";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete.js";
+import { classNames } from "../../../../utilities/Util";
 
 const VoucherDetailsBody = ({
-  voucherId,
   voucherCode,
   value,
-  issuedDate,
-  expDate,
-  isRedeemed,
-  onDeleteVoucherClicked,
+  issued,
+  expiry,
+  redeemed,
+  openModal,
+  onIssueClicked,
+  onRedeemClicked,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-5xl xl:grid xl:grid-cols-3">
@@ -34,26 +41,41 @@ const VoucherDetailsBody = ({
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{`$${value} Voucher`}</h1>
                 <p className="mt-2 text-sm text-gray-500">{`${
-                  !isRedeemed && "Not"
+                  !redeemed && "Not"
                 } Redeemed`}</p>
               </div>
               <div className="mt-4 flex space-x-3 md:mt-0">
-                <Link to={`/sm/vouchers/edit/${voucherId}`}>
-                  <button
-                    type="button"
-                    className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
-                  >
-                    <PencilIcon
-                      className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                    <span>Edit</span>
-                  </button>
-                </Link>
                 <button
                   type="button"
-                  className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
-                  onClick={onDeleteVoucherClicked}
+                  className={classNames(
+                    !issued && "hover:bg-gray-50",
+                    "inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
+                  )}
+                  onClick={onIssueClicked}
+                  disabled={issued}
+                >
+                  <PencilIcon
+                    className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  <span>Issue</span>
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
+                  onClick={onRedeemClicked}
+                  disabled={redeemed}
+                >
+                  <PencilIcon
+                    className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  <span>Redeem</span>
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  onClick={openModal}
                 >
                   <TrashIcon
                     className="-ml-1 mr-2 h-5 w-5 text-white"
@@ -76,14 +98,12 @@ const VoucherDetailsBody = ({
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CalendarIcon
+                  <CheckCircleIcon
                     className="h-5 w-5 text-gray-400"
                     aria-hidden="true"
                   />
                   <span className="text-gray-900 text-sm font-medium">
-                    {`Issued Date: ${moment(issuedDate).format(
-                      "DD/MM/YYYY, h:mm a"
-                    )}`}
+                    Issued: {issued ? "Yes" : "No"}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -92,7 +112,7 @@ const VoucherDetailsBody = ({
                     aria-hidden="true"
                   />
                   <span className="text-gray-900 text-sm font-medium">
-                    {`Expiry Date: ${moment(expDate).format(
+                    {`Expiry Date: ${moment(expiry).format(
                       "DD/MM/YYYY, h:mm a"
                     )}`}
                   </span>
@@ -110,30 +130,75 @@ const VoucherDetailsBody = ({
 );
 
 export const VoucherDetails = () => {
-  const { voucherId } = useParams();
+  const { voucherCode } = useParams();
   const voucher = useSelector((state) =>
-    selectVoucherById(state, parseInt(voucherId))
+    selectVoucherByCode(state, voucherCode)
   );
+  const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const voucherStatus = useSelector((state) => state.vouchers.status);
+  useEffect(() => {
+    voucherStatus === "idle" && dispatch(fetchVouchers());
+  }, [voucherStatus, dispatch]);
+
+  const openModal = () => setOpenDelete(true);
+  const closeModal = () => setOpenDelete(false);
+  
+  const [requestStatus, setRequestStatus] = useState("idle");
+
+  const onIssueClicked = () => {
+    if (!voucher.issued && requestStatus === "idle")
+      try {
+        setRequestStatus("pending");
+        dispatch(issueVoucher(voucherCode));
+        alert("Successfully issued voucher");
+      } catch (err) {
+        console.error("Failed to issue voucher: ", err);
+      } finally {
+        setRequestStatus("idle");
+      }
+  };
+  const onRedeemClicked = () => {
+    if (!voucher.redeemed && requestStatus === "idle")
+      try {
+        setRequestStatus("pending");
+        dispatch(redeemVoucher(voucherCode));
+        alert("Successfully redeemed voucher");
+      } catch (err) {
+        console.error("Failed to redeem voucher: ", err);
+      } finally {
+        setRequestStatus("idle");
+      }
+  };
 
   const onDeleteVoucherClicked = () => {
     dispatch(voucherDeleted(voucher));
     navigate("/sm/vouchers");
   };
 
+
   return (
-    <>
-      <NavigatePrev page="Vouchers" path="/sm/vouchers" />
-      <VoucherDetailsBody
-        voucherId={voucherId}
-        voucherCode={voucher.code}
-        value={voucher.value}
-        issuedDate={voucher.issuedDate}
-        expDate={voucher.expDate}
-        isRedeemed={voucher.isRedeemed}
-        onDeleteVoucherClicked={onDeleteVoucherClicked}
-      />
-    </>
+    Boolean(voucher) && (
+      <>
+        <NavigatePrev page="Vouchers" path="/sm/vouchers" />
+        <VoucherDetailsBody
+          voucherCode={voucher.voucherCode}
+          value={voucher.amount}
+          issued={voucher.issued}
+          expiry={voucher.expiry}
+          redeemed={voucher.redeemed}
+          openModal={openModal}
+          onIssueClicked={onIssueClicked}
+          onRedeemClicked={onRedeemClicked}
+        />
+        <ConfirmDelete
+          item={`${voucher.amount} voucher?`}
+          open={openDelete}
+          closeModal={closeModal}
+          onConfirm={onDeleteVoucherClicked}
+        />
+      </>
+    )
   );
 };

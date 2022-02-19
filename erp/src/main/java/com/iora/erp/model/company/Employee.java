@@ -3,15 +3,18 @@ package com.iora.erp.model.company;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+
+import com.iora.erp.enumeration.AccessRights;
 
 @Entity
 public class Employee implements Serializable {
@@ -33,9 +36,9 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     private Boolean availStatus;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     private JobTitle jobTitle;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Department department;
 
     public Employee() {
@@ -83,6 +86,14 @@ public class Employee implements Serializable {
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Department getDepartment() {
@@ -138,10 +149,6 @@ public class Employee implements Serializable {
         this.salary = salary;
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public Double getSalary() {
         return salary;
     }
@@ -171,8 +178,10 @@ public class Employee implements Serializable {
         return "Employee[ id=" + id + " ]";
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Set<AccessRights> getAccessRights() {
+        Set<AccessRights> accessRights = new HashSet<>(department.getResponsibility());
+        accessRights.addAll(jobTitle.getResponsibility());
+        return accessRights;
     }
 
 }

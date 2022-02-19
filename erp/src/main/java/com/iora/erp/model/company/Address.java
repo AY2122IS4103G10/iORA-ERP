@@ -31,6 +31,8 @@ public class Address implements Serializable{
     @Column(nullable = false)
     private String unit;
     @Column(nullable = false)
+    private String road;
+    @Column(nullable = false)
     private String postalCode;
     @Column(nullable = false)
     private Boolean billing;
@@ -41,13 +43,14 @@ public class Address implements Serializable{
     @Max(180)
     private double longitude;
 
-    public Address(String country, String city, String building, String state, String unit, String postalCode,
+    public Address(String country, String city, String building, String state, String unit, String road, String postalCode,
             Boolean billing, double latitude, double longitude) {
         this.country = Country.valueOf(country.toUpperCase());
         this.city = city;
         this.building = building;
         this.state = state;
         this.unit = unit;
+        this.road = road;
         this.postalCode = postalCode;
         this.billing = billing;
         this.latitude = latitude;
@@ -105,6 +108,14 @@ public class Address implements Serializable{
         this.unit = unit;
     }
 
+    public String getRoad() {
+        return this.road;
+    }
+
+    public void setRoad(String road) {
+        this.road = road;
+    }
+
     public String getPostalCode() {
         return postalCode;
     }
@@ -138,7 +149,7 @@ public class Address implements Serializable{
     }
 
     public String getCoordinates() {
-        return String.format("(%d, %d)", latitude, longitude);
+        return String.format("(%6f, %6f)", latitude, longitude);
     }
 
     @Override

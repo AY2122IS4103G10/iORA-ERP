@@ -6,10 +6,16 @@ import {
 } from "@heroicons/react/solid";
 import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
 import {
-  productDeleted,
+  deleteExistingProduct,
+  fetchProducts,
+  selectAllProducts,
   selectProductByCode,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import { useEffect, useState } from "react";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete.js";
+import axios from "axios";
+import { REST_ENDPOINT } from "../../../../constants/restEndpoint";
 
 const fieldSection = ({ fieldName, fields }) => {
   return (
@@ -39,13 +45,12 @@ const ProductDetailsBody = ({
   prodCode,
   name,
   description,
-  listPrice,
-  discPrice,
+  price,
   colors,
   sizes,
   tags,
-  categories,
-  onDeleteProdClicked,
+  category,
+  openModal,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-5xl xl:grid xl:grid-cols-3">
@@ -72,8 +77,8 @@ const ProductDetailsBody = ({
                 </Link>
                 <button
                   type="button"
-                  className="inline-flex justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-700"
-                  onClick={onDeleteProdClicked}
+                  className="inline-flex justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  onClick={openModal}
                 >
                   <TrashIcon
                     className="-ml-1 mr-2 h-5 w-5 text-white"
@@ -92,18 +97,20 @@ const ProductDetailsBody = ({
                     aria-hidden="true"
                   />
                   <span className="text-gray-900 text-sm font-medium">
-                    {`List Price: $${listPrice}`}
+                    {`List Price: $${price}`}
                   </span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <CurrencyDollarIconSolid
-                    className="h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                  <span className="text-gray-900 text-sm font-medium">
-                    {`Discount Price: $${discPrice}`}
-                  </span>
-                </div>
+                {Boolean(category) && (
+                  <div className="flex items-center space-x-2">
+                    <CurrencyDollarIconSolid
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                    <span className="text-gray-900 text-sm font-medium">
+                      {`Discount Price: $${category.discountedPrice}`}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
                 {fieldSection({
@@ -114,10 +121,30 @@ const ProductDetailsBody = ({
                   fieldName: "Sizes",
                   fields: sizes,
                 })}
-                {fieldSection({
-                  fieldName: "Categories",
-                  fields: categories,
-                })}
+                <div>
+                  <h2 className="text-sm font-medium text-gray-500">
+                    Category
+                  </h2>
+                  <div className="mt-2 leading-8">
+                    <div className="inline">
+                      {Boolean(category) ? (
+                        <div className="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5">
+                          <div className="absolute flex-shrink-0 flex items-center justify-center">
+                            <span
+                              className="h-1.5 w-1.5 rounded-full bg-red-500"
+                              aria-hidden="true"
+                            />
+                          </div>
+                          <div className="ml-3.5 text-sm font-medium text-gray-900">
+                            {category.fieldValue}
+                          </div>
+                        </div>
+                      ) : (
+                        <p>No category</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
                 {fieldSection({
                   fieldName: "Tags",
                   fields: tags,
@@ -142,7 +169,7 @@ const ProductDetailsBody = ({
               aria-hidden="true"
             />
             <span className="text-gray-900 text-sm font-medium">
-              {`List Price: $${listPrice}`}
+              {`List Price: $${price}`}
             </span>
           </div>
           <div className="flex items-center space-x-2">
@@ -151,7 +178,7 @@ const ProductDetailsBody = ({
               aria-hidden="true"
             />
             <span className="text-gray-900 text-sm font-medium">
-              {`Discount Price: $${discPrice}`}
+              {`Discount Price: $${price}`}
             </span>
           </div>
         </div>
@@ -164,11 +191,28 @@ const ProductDetailsBody = ({
             fieldName: "Sizes",
             fields: sizes,
           })}
-          {fieldSection({
-            fieldName: "Categories",
-            fields: categories,
-            className: "border-b",
-          })}
+          <div>
+            <h2 className="text-sm font-medium text-gray-500">Category</h2>
+            <div className="mt-2 leading-8">
+              <div className="inline">
+                {Boolean(category) ? (
+                  <div className="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5">
+                    <div className="absolute flex-shrink-0 flex items-center justify-center">
+                      <span
+                        className="h-1.5 w-1.5 rounded-full bg-red-500"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="ml-3.5 text-sm font-medium text-gray-900">
+                      {category.fieldValue}
+                    </div>
+                  </div>
+                ) : (
+                  <p>No category</p>
+                )}
+              </div>
+            </div>
+          </div>
           {fieldSection({
             fieldName: "Tags",
             fields: tags,
@@ -182,36 +226,56 @@ const ProductDetailsBody = ({
 export const ProductDetails = () => {
   const { prodCode } = useParams();
   const product = useSelector((state) => selectProductByCode(state, prodCode));
-
-  const fields = product.fields;
-  const colors = fields.filter((field) => field.fieldName === "Color");
-  const sizes = fields.filter((field) => field.fieldName === "Size");
-  const tags = fields.filter((field) => field.fieldName === "Tag");
-  const categories = fields.filter((field) => field.fieldName === "Category");
-
+  const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const prodStatus = useSelector((state) => state.products.status);
+  
+  useEffect(() => {
+    prodStatus === "idle" && dispatch(fetchProducts());
+  }, [prodStatus, dispatch]);
 
   const onDeleteProdClicked = () => {
-    dispatch(productDeleted(product));
+    dispatch(deleteExistingProduct(product.modelCode));
+    closeModal();
     navigate("/sm/products");
   };
+
+  const openModal = () => setOpenDelete(true);
+  const closeModal = () => setOpenDelete(false);
 
   return (
     <>
       <NavigatePrev page="Products" path="/sm/products" />
-      <ProductDetailsBody
-        prodCode={prodCode}
-        name={product.name}
-        description={product.description}
-        listPrice={product.listPrice}
-        discPrice={product.discPrice}
-        colors={colors}
-        sizes={sizes}
-        tags={tags}
-        categories={categories}
-        onDeleteProdClicked={onDeleteProdClicked}
-      />
+      {Boolean(product) && (
+        <>
+          <ProductDetailsBody
+            prodCode={prodCode}
+            name={product.name}
+            description={product.description}
+            price={product.price}
+            colors={product.productFields.filter(
+              (field) => field.fieldName === "COLOUR"
+            )}
+            sizes={product.productFields.filter(
+              (field) => field.fieldName === "SIZE"
+            )}
+            tags={product.productFields.filter(
+              (field) => field.fieldName === "TAG"
+            )}
+            category={product.productFields.find(
+              (field) => field.fieldName === "category"
+            )}
+            openModal={openModal}
+          />
+          <ConfirmDelete
+            item={product.name}
+            open={openDelete}
+            closeModal={closeModal}
+            onConfirm={onDeleteProdClicked}
+          />
+        </>
+      )}
     </>
   );
 };

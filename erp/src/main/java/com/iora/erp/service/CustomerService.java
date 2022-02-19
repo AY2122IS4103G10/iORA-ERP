@@ -20,9 +20,9 @@ public interface CustomerService {
     public abstract Customer loginAuthentication(Customer customer) throws CustomerException;
     
     public abstract Voucher getVoucher(String voucherCode) throws CustomerException;
-    public abstract void generateVouchers(double amount, int qty, String date);
+    public abstract List<Voucher> generateVouchers(double amount, int qty, String date);
     public abstract List<Voucher> getAllVouchers();
     public abstract List<Voucher> getAvailableVouchersByAmount(double amount);
-    public abstract void issueVoucher(String voucherCode) throws CustomerException;
-    public abstract void redeemVoucher(String voucherCode) throws CustomerException;
+    public abstract Voucher issueVoucher(String voucherCode) throws CustomerException;
+    public abstract Voucher redeemVoucher(String voucherCode) throws CustomerException;
 }

@@ -7,6 +7,7 @@ const initialState = {
   error: null,
 };
 
+//fetch models
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
@@ -14,6 +15,16 @@ export const fetchProducts = createAsyncThunk(
     return response.data;
   }
 );
+
+//fetch products
+export const getAllProducts = createAsyncThunk(
+  "products/getAllProducts",
+  async () => {
+    const response = await api.getAll(`sam/products?sku=`);
+    return response.data;
+  }
+);
+
 
 export const addNewProduct = createAsyncThunk(
   "products/addNewPost",

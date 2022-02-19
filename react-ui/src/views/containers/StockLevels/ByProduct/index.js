@@ -1,37 +1,30 @@
-import { useMemo } from "react";
+import { useMem, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAllProducts } from "../../../../stores/slices/productSlice";
+import { fetchProducts } from "../../../../stores/slices/productSlice";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
 import { SelectColumnFilter } from "../../../components/Tables/SelectableTable";
 
-
-const getData = () => {
-    const data = [
+const columns = [
         {
-            sku: "SKU1231",
-            name: "Sky Blue V-neck Top",
+            Header: "Model Code", 
+            accessor: "modelCode"
+        }, 
+        {
+            Header: "Name", 
+            accessor: "name"
         },
-        {
-            sku: "SKU4321",
-            name: "Black Blue V-neck Top",
-        }
-    ];
-    return data;
-}
+    ]
+
 
 export const ProductTable = () => {
-    const columns = useMemo(
-        () => [
-            {
-                Header: "SKU Code", 
-                accessor: "sku"
-            }, 
-            {
-                Header: "Name", 
-                accessor: "name"
-            },
-        ],
-        []
-    );
-    const data = useMemo(() => getData(), []);
+    const dispatch = useDispatch();
+    const data = useSelector(selectAllProducts);
+    const prodStatus = useSelector((state) => state.products.status);
+    useEffect(() => {
+        prodStatus === "idle" && dispatch(fetchProducts());
+      }, [prodStatus, dispatch]);
+
 
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

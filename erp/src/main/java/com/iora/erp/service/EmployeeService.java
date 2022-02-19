@@ -7,6 +7,9 @@ import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 public interface EmployeeService {
     public abstract void createEmployee(Employee employee) throws EmployeeException;
     public abstract void updateEmployeeAccount(Employee employee) throws EmployeeException;
@@ -19,6 +22,8 @@ public interface EmployeeService {
     public abstract Employee getEmployeeByUsername(String username) throws EmployeeException;
     public abstract Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException;
     public abstract Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException;
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
     
     //public abstract Employee loginAuthentication(Employee employee) throws EmployeeException;
 }

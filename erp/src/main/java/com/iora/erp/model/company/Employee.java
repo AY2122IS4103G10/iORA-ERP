@@ -1,14 +1,7 @@
 package com.iora.erp.model.company;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -47,15 +40,16 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(String name, String email, Double salary, String username, String hashPass, Boolean availStatus) {
+    public Employee(String name, String email, Double salary, String username, String password, Boolean availStatus) {
         this.name = name;
         this.email = email;
         this.salary = salary;
         this.username = username;
+        this.password = password;
         this.availStatus = availStatus;
     }
 
-    private static String generateProtectedPassword(String salt, String password) {
+    /*private static String generateProtectedPassword(String salt, String password) {
         String generatedPassword;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
@@ -67,7 +61,7 @@ public class Employee {
         } catch (Exception ex) {
             return null;
         }
-    }
+    }*/
 
 
     public Long getId() {

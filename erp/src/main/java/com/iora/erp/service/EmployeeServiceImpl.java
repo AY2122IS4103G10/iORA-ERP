@@ -10,10 +10,15 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
+import com.iora.erp.Repostitory.UserRepository;
 import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
+import com.iora.erp.model.company.UserDetailsImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +29,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @PersistenceContext
     private EntityManager em;
 
+    @Autowired
+	private UserRepository userRepository;
+
+    @Autowired
     private AdminService adminService;
 
     @Override
@@ -171,5 +180,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         // TODO Auto-generated method stub
         return null;
     }
-
+    
+    @Override
+	@Transactional
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Employee user = userRepository.findByUsernameEmployee(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		return UserDetailsImpl.build(user);
+	}
 }

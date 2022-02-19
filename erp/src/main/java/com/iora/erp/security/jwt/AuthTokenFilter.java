@@ -7,11 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.iora.erp.model.company.Employee;
-import com.iora.erp.service.EmployeeService;
-import com.iora.erp.service.UserDetailsImpl;
-import com.iora.erp.service.UserDetailsService;
-import com.iora.erp.service.UserDetailsServiceImpl;
+import com.iora.erp.service.EmployeeServiceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +24,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private EmployeeServiceImpl userDetailsService;
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     @Override

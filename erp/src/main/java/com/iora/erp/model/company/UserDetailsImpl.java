@@ -1,4 +1,4 @@
-package com.iora.erp.service;
+package com.iora.erp.model.company;
 
 import java.util.Collection;
 import java.util.List;
@@ -6,16 +6,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iora.erp.model.company.Employee;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-
 public class UserDetailsImpl implements UserDetails {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 	private Long id;
 	private String username;
 	private String email;
@@ -32,55 +30,63 @@ public class UserDetailsImpl implements UserDetails {
 		this.authorities = authorities;
 	}
 
-    public static UserDetailsImpl build(Employee user) {
+	public static UserDetailsImpl build(Employee user) {
 		List<GrantedAuthority> authorities = user.getJobTitle().getResponsibility().stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
+				.map(role -> new SimpleGrantedAuthority(role.name()))
 				.collect(Collectors.toList());
 
 		return new UserDetailsImpl(
-				user.getId(), 
-				user.getUsername(), 
+				user.getId(),
+				user.getUsername(),
 				user.getEmail(),
-				user.getPassword(), 
+				user.getPassword(),
 				authorities);
 	}
 
-   	@Override
+	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
 	}
+
 	public Long getId() {
 		return id;
 	}
+
 	public String getEmail() {
 		return email;
 	}
+
 	@Override
 	public String getPassword() {
 		return password;
 	}
+
 	@Override
 	public String getUsername() {
 		return username;
 	}
+
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
 	}
+
 	@Override
 	public boolean isAccountNonLocked() {
 		return true;
 	}
+
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
+
 	@Override
 	public boolean isEnabled() {
 		return true;
 	}
 
-    @Override
+	@Override
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
@@ -90,5 +96,4 @@ public class UserDetailsImpl implements UserDetails {
 		return Objects.equals(id, user.id);
 	}
 
-    
 }

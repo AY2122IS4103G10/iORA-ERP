@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
@@ -15,34 +16,31 @@ import com.iora.erp.exception.ProductItemException;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
+import com.iora.erp.model.company.Employee;
+import com.iora.erp.model.company.JobTitle;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.site.HeadquartersSite;
-import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
-import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.ProductService;
-import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
 public class DataLoader implements CommandLineRunner {
 
-    @Autowired
-    private AdminService adminService;
+   
     @Autowired
     private CustomerService customerService;
     @Autowired
-    private EmployeeService employeeService;
-    @Autowired
     private ProductService productService;
     @Autowired
-    private SiteService siteService;
+    PasswordEncoder encoder;
     @PersistenceContext
     private EntityManager em;
 
@@ -70,6 +68,18 @@ public class DataLoader implements CommandLineRunner {
 
         HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", iora);
         em.persist(iorahq);
+
+        // create job title
+        Set<AccessRights> ar = new HashSet<>();
+        ar.add(AccessRights.MARKETING_MERCHANDISE);
+        ar.add(AccessRights.MARKETING_PROCUREMENT);
+        JobTitle jt = new JobTitle("Product Distribution Assisstant",
+                "Manage Merchandise as well as procurement orders", ar);
+
+        // Create Employee
+        Employee emp = new Employee("Eric Tham", "productDistributionAssistant1@gmail.com", 2900.0, "ericTham234",
+                encoder.encode("123drt45"), true);
+        em.persist(emp);
 
         // Creating Product Fields
         Set<ProductField> productFields = new HashSet<>();

@@ -1,19 +1,15 @@
 /*package com.iora.erp.controller;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import com.iora.erp.Repostitory.RoleRepository;
 import com.iora.erp.Repostitory.UserRepository;
-import com.iora.erp.enumeration.AccessRights;
-import com.iora.erp.model.company.Employee;
+import com.iora.erp.payload.request.LoginRequest;
+import com.iora.erp.payload.response.JwtResponse;
 import com.iora.erp.security.jwt.JwtUtils;
-import com.iora.erp.service.CustomerService;
-import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.UserDetailsImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.jsonwebtoken.Jwts;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -59,6 +54,7 @@ public class AuthenticationController {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
@@ -67,56 +63,61 @@ public class AuthenticationController {
 
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        }
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
-        }
-
-/*https://www.bezkoder.com/spring-boot-jwt-authentication/
-        // Create new user's account
-        Employee em = new Employee(signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
-        
-        Set<String> strRoles = signUpRequest.getRole();
-        Set<AccessRights> roles = new HashSet<>();
-        
-        if (strRoles == null) {
-            AccessRights userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-                        break;
-                    case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }
-        user.setRoles(roles);
-        userRepository.save(user);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-    }
+    /*
+     * @PostMapping("/signup")
+     * public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest
+     * signUpRequest) {
+     * if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+     * return ResponseEntity
+     * .badRequest()
+     * .body(new MessageResponse("Error: Username is already taken!"));
+     * }
+     * if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+     * return ResponseEntity
+     * .badRequest()
+     * .body(new MessageResponse("Error: Email is already in use!"));
+     * }
+     * 
+     * 
+     * //https://www.bezkoder.com/spring-boot-jwt-authentication/
+     * // Create new user's account
+     * Employee em = new Employee(signUpRequest.getUsername(),
+     * signUpRequest.getEmail(),
+     * encoder.encode(signUpRequest.getPassword()));
+     * 
+     * Set<String> strRoles = signUpRequest.getRole();
+     * Set<AccessRights> roles = new HashSet<>();
+     * 
+     * if (strRoles == null) {
+     * AccessRights userRole = roleRepository.findByName(ERole.ROLE_USER)
+     * .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+     * roles.add(userRole);
+     * 
+     * } else {
+     * strRoles.forEach(role -> {
+     * switch (role) {
+     * case "admin":
+     * Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+     * .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+     * roles.add(adminRole);
+     * break;
+     * case "mod":
+     * Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+     * .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+     * roles.add(modRole);
+     * break;
+     * default:
+     * Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+     * .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+     * roles.add(userRole);
+     * }
+     * });
+     * }
+     * user.setRoles(roles);
+     * userRepository.save(user);
+     * return ResponseEntity.ok(new
+     * MessageResponse("User registered successfully!"));
+     * }
+     
 
 }*/

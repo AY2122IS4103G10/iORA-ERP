@@ -30,8 +30,6 @@ public class AdminController {
     private SiteService siteService;
     @Autowired
     private EmployeeService employeeService;
-    @Autowired
-    private AdminService adminService;
 
     /*
      * ---------------------------------------------------------

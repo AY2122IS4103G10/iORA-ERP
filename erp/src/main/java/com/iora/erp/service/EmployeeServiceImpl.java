@@ -165,19 +165,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         return getEmployeeByUsername(username).getAccessRights();
     }
 
-    @Override
+   /* @Override
     public byte[] saltGeneration() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
         return salt;
     }
-
-    @Override
+*/
+  /*  @Override
     public Employee loginAuthentication(Employee employee) throws EmployeeException {
         try {
             Employee c = getEmployeeByUsername(employee.getUsername());
-            if (c.authentication(employee.getHashPass())) {
+            if (c.authentication(employee.getPassword()))) {
                 return c;
             } else {
                 throw new EmployeeException();
@@ -186,5 +186,5 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EmployeeException("Invalid Username or Password.");
         }
 
-    }
+    }*/
 }

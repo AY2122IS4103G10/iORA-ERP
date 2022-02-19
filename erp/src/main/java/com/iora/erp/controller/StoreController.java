@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
+import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class StoreController {
 
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private ProcurementService procurementService;
 
     /*
      * ---------------------------------------------------------
@@ -73,6 +77,28 @@ public class StoreController {
         } else {
             return ResponseEntity.badRequest().body(String.join("\n", errors));
         }
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * F.3 Store Order Management
+     * ---------------------------------------------------------
+     */
+
+    @GetMapping(path = "/procurementOrder/all", produces = "application/json")
+    public List<ProcurementOrder> getProcurementsOrders() {
+        return procurementService.getProcurementOrders();
+    }
+
+    @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
+    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
+        return procurementService.getProcurementOrder(orderId);
+    }
+
+    @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
+    public List<ProcurementOrder> getProcurementOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return procurementService.getProcurementOrdersOfSite(site);
     }
 
 }

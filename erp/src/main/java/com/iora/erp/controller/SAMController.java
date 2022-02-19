@@ -20,8 +20,10 @@ import com.iora.erp.service.SiteService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -385,6 +387,16 @@ public class SAMController {
         return procurementService.getProcurementOrders();
     }
 
+    @PostMapping(path = "/procurementOrder/create/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> createProcurementOrder(@RequestBody ProcurementOrder procurementOrder, @PathVariable Long siteId) {
+        try {
+            procurementService.createProcurementOrder(procurementOrder, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + procurementOrder.getId() + " is successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
     public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
         return procurementService.getProcurementOrder(orderId);
@@ -394,5 +406,35 @@ public class SAMController {
     public List<ProcurementOrder> getProcurementOrdersOfSite(@PathVariable Long siteId) {
         Site site = siteService.getSite(siteId);
         return procurementService.getProcurementOrdersOfSite(site);
+    }
+
+    @PutMapping(path = "/procurementOrder/update/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> updateProcurementOrder(@RequestBody ProcurementOrder procurementOrder, @PathVariable Long siteId) {
+        try {
+            procurementService.updateProcurementOrder(procurementOrder, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + procurementOrder.getId() + " is successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/procurementOrder/delete/{orderId}/{siteId}")
+    public ResponseEntity<Object> deleteProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            procurementService.deleteProcurementOrder(orderId, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is successfully deleted (cancelled).");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+    
+    @PutMapping(path = "/procurementOrder/complete/{orderId}/{siteId}")
+    public ResponseEntity<Object> completeProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            procurementService.completeProcurementOrder(orderId, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is successfully deleted (cancelled).");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 }

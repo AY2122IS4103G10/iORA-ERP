@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +39,7 @@ public class AdminController {
 
     // Employee/JobTitle/Department stuff here
 
-    @PostMapping(path = "/addSite/{storeType}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/addSite/{storeType}", consumes = "application/json")
     public ResponseEntity<Object> addSite(@RequestBody Site site, @PathVariable String storeType) {
         try {
             siteService.createSite(site, storeType);

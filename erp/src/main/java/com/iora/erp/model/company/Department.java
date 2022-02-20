@@ -27,9 +27,7 @@ public class Department implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<JobTitle> jobTitles;
-    @ElementCollection
-    private Set<AccessRights> responsibility;
-
+   
     public Department() {
     }
 
@@ -72,14 +70,6 @@ public class Department implements Serializable {
 
     public void setDeptName(String deptName) {
         this.deptName = deptName;
-    }
-
-    public Set<AccessRights> getResponsibility() {
-        return this.responsibility;
-    }
-
-    public void setResponsibility(Set<AccessRights> responsibility) {
-        this.responsibility = responsibility;
     }
 
 }

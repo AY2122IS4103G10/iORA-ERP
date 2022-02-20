@@ -146,11 +146,6 @@ public class Employee {
         return "Employee[ id=" + id + " ]";
     }
 
-    public Set<AccessRights> getAccessRights() {
-        Set<AccessRights> accessRights = new HashSet<>(department.getResponsibility());
-        accessRights.addAll(jobTitle.getResponsibility());
-        return accessRights;
-    }
 
     public String getSalt() {
         return salt;

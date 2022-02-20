@@ -18,7 +18,7 @@ public interface AdminService {
     //need fix @role things
     public abstract void createJobTitle(JobTitle jobTitle) throws JobTitleException;
     public abstract void updateJobTitle(JobTitle jobTitle) throws JobTitleException;
-    public abstract void deleteJobTitle(JobTitle jobTitle) throws JobTitleException;
+    public abstract void deleteJobTitle(Long id) throws JobTitleException;
     public abstract List<JobTitle> listOfJobTitles() throws JobTitleException;
     public abstract List<JobTitle> getJobTitlesByFields(String search) throws JobTitleException;
     public abstract JobTitle getJobTitleById(Long id)  throws JobTitleException;

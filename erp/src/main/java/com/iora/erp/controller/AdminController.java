@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.iora.erp.model.company.Address;
+import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
 import com.iora.erp.model.site.Site;
@@ -63,6 +64,16 @@ public class AdminController {
         }
     }
 
+    @DeleteMapping(path = "/deleteJobTitle")
+    public ResponseEntity<Object> deleteJobTitle(@RequestParam Long jobTitleId) {
+        try {
+            adminService.deleteJobTitle(jobTitleId);;
+            return ResponseEntity.ok("Job Tiltle with ID " + jobTitleId + " has been successfully deleted.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
 
     @GetMapping(path = "/viewJobTitles", produces = "application/json")
     public List<JobTitle> viewJobTitles(@RequestParam("search") String search) {
@@ -97,6 +108,30 @@ public class AdminController {
             return null;
         }
     }
+
+    @PostMapping(path = "/addDepartment", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addDepartment(@RequestBody Department d) {
+        try {
+            adminService.createDepartment(d);
+            return ResponseEntity.ok("Deapartment has been successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+      
+    @GetMapping(path = "/viewDepartment", produces = "application/json")
+    public List<Department> viewDeparment(@RequestParam("search") String search) {
+        try {
+            if(search == null) {
+                search = "";
+            }
+            return adminService.getDepartmentsByFields(search);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
         
     @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")

@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -37,9 +38,7 @@ public class AdminServiceImpl implements AdminService {
     public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
         try {
             JobTitle jt = jobTitle;
-            for(AccessRights xx : jobTitle.getResponsibility()) {
-                jt.getResponsibility().add(xx);
-            }
+          
             em.persist(jt);
             
         } catch (Exception ex) {
@@ -66,15 +65,29 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void deleteJobTitle(JobTitle jobTitle) throws JobTitleException {
-        JobTitle j = em.find(JobTitle.class, jobTitle.getId());
+    public void deleteJobTitle(Long id) throws JobTitleException {
+        JobTitle j = em.find(JobTitle.class, id);
 
+
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.jobTitle.id = :jobTitle");
+        q.setParameter("jobTitle", id);
+        Boolean employeeCheck = false;
+        
+        try {
+            Employee e = (Employee) q.getSingleResult();
+        } catch (Exception ex) {
+            employeeCheck = true;
+        }
+        
         if (j == null) {
             throw new JobTitleException("JobTitle not found");
+        } else if (employeeCheck == false) {
+            throw new JobTitleException("JobTitle is currently being used.");
+        } else {
+            em.remove(j);
+            em.flush();
         }
 
-        em.remove(j);
-        em.flush();
     }
 
     @Override
@@ -91,7 +104,6 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<JobTitle> getJobTitlesByFields(String search) throws JobTitleException {
         if(search == null) {
-            
             return listOfJobTitles();
         }
 
@@ -127,8 +139,10 @@ public class AdminServiceImpl implements AdminService {
             Department d = new Department(department.getDeptName());
             em.persist(d);
 
+
             for (JobTitle j : department.getJobTitles()) {
-                d.getJobTitles().add(j);
+                JobTitle jt = getJobTitleById(j.getId());
+                d.getJobTitles().add(jt);
             }
 
         } catch (Exception ex) {
@@ -182,17 +196,19 @@ public class AdminServiceImpl implements AdminService {
     public List<Department> listOfDepartments() throws DepartmentException {
         try {
             Query q = em.createQuery("SELECT e FROM Department e");
-
-            // need run test if query exits timing for large database
             return q.getResultList();
+
         } catch (Exception ex) {
-            throw new DepartmentException();
+            throw new DepartmentException("Department cannot be retrieved");
         }
     }
 
     @Override
-    public List<Department> getDepartmentsByFields(String search) {
-        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) Like :name");
+    public List<Department> getDepartmentsByFields(String search) throws DepartmentException {
+        if(search == null) {
+            return listOfDepartments();
+        }
+        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.deptName) LIKE :name");
         q.setParameter("name", "%" + search.toLowerCase() + "%");
         return q.getResultList();
     }

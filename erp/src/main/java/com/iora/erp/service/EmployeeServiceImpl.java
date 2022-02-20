@@ -147,12 +147,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
-        return getEmployeeById(id).getAccessRights();
+        return getEmployeeById(id).getJobTitle().getResponsibility();
     }
 
     @Override
     public Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
-        return getEmployeeByUsername(username).getAccessRights();
+        return getEmployeeByUsername(username).getJobTitle().getResponsibility();
     }
 
    /* @Override

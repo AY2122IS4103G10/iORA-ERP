@@ -360,7 +360,7 @@ public class AdminServiceImpl implements AdminService {
 
                 old.setName(company.getName());
                 old.setRegisterNumber(company.getRegisterNumber());
-                old.setTelephone(company.getTelephone());
+                old.setphoneNumber(company.getphoneNumber());
                 old.setActive(company.getActive());
 
             } else if (checkUniqueN(company.getName()) == true) {
@@ -372,7 +372,7 @@ public class AdminServiceImpl implements AdminService {
         } else if (company.getName() != old.getName()) {
             if (checkUniqueN(company.getName()) == true) {
                 old.setName(company.getName());
-                old.setTelephone(company.getTelephone());
+                old.setphoneNumber(company.getphoneNumber());
                 old.setActive(company.getActive());
 
             } else {
@@ -382,14 +382,14 @@ public class AdminServiceImpl implements AdminService {
         } else if (company.getRegisterNumber() != old.getRegisterNumber()) {
             if (checkUniqueR(company.getRegisterNumber()) == true) {
                 old.setRegisterNumber(company.getRegisterNumber());
-                old.setTelephone(company.getTelephone());
+                old.setphoneNumber(company.getphoneNumber());
                 old.setActive(company.getActive());
 
             } else {
                 throw new CompanyException("New company registeration number is not unique");
             }
         } else {
-            old.setTelephone(company.getTelephone());
+            old.setphoneNumber(company.getphoneNumber());
             old.setActive(company.getActive());
         }
     }

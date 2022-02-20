@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { api } from "../../../../environments/Api";
 
 import { selectAProductSL } from "../../../../stores/slices/productSlice";
 import { getAProduct } from "../../../../stores/slices/productSlice";
@@ -28,13 +29,16 @@ const columns =[
 export const AProductStock = () => {
   const {id} = useParams();
   const dispatch = useDispatch();
-  const data = useSelector(selectAProductSL);
-  const prodStatus = useSelector((state) => state.products.status);
+  const prod = useSelector(selectAProductSL);
+  
   useEffect(() => {
-      prodStatus === "idle" && dispatch(getAProduct(id));
-    }, [prodStatus, dispatch]);
+      dispatch(getAProduct(id));
+    }, []);
 
-    console.log(data.productFields);
+    console.log(prod);
+  // console.log(id);
+  // console.log(prod.productFields);
+  // console.log(prod);
 
     return(
         <div className="min-h-full">
@@ -48,7 +52,7 @@ export const AProductStock = () => {
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Product: {data.sku}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{prod != null ? prod.sku : "loading"}</h1>
               </div>
             </div>
           </div>
@@ -67,16 +71,18 @@ export const AProductStock = () => {
                     <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                       <div className="sm:col-span-1">
                         <dt className="text-sm font-medium text-gray-500">SKU</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{data.sku}</dd>
+                        <dd className="mt-1 text-sm text-gray-900">{prod.sku}</dd>
                       </div>
-                      {data.productFields.map((field) => {
-                        return (
-                          <div className="sm:col-span-1">
-                            <dt className="text-sm font-medium text-gray-500">{field.fieldName}</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{field.fieldValue}</dd>
-                          </div>
-                          );
-                      })}
+                      {prod != null && prod.productFields != null ? (
+                        prod.productFields.map((field) => {
+                          return (
+                            <div key={field.id}className="sm:col-span-1">
+                              <dt className="text-sm font-medium text-gray-500">{field.fieldName}</dt>
+                              <dd className="mt-1 text-sm text-gray-900">{field.fieldValue}</dd>
+                            </div>
+                            );
+                        })
+                      ) : ""}
                     </dl>
                   </div>
                   

@@ -70,9 +70,11 @@ public class AdminController {
     @GetMapping(path = "/viewJobTitles", produces = "application/json")
     public List<JobTitle> viewJobTitles(@RequestParam("search") String search) {
         try {
+            if(search == null) {
+                search ="";
+            }
             return adminService.getJobTitlesByFields(search);
         } catch (Exception e) {
-            System.out.println(e);
             return null;
         }
     }
@@ -83,7 +85,18 @@ public class AdminController {
         try {
             return adminService.getListAddress();
         } catch (Exception e) {
-            System.out.println(e);
+            return null;
+        }
+    }
+
+    @GetMapping(path = "/viewAddress", produces = "application/json")
+    public List<Address> viewAddress(@RequestParam("search") String search) {
+        try {
+            if(search == null) {
+                search ="";
+            }
+            return adminService.getListAddressFields(search);
+        } catch (Exception e) {
             return null;
         }
     }

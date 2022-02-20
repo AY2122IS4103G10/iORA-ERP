@@ -37,10 +37,10 @@ public class AdminServiceImpl implements AdminService {
     public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
         try {
             JobTitle jt = jobTitle;
-            em.persist(jt);
             for(AccessRights xx : jobTitle.getResponsibility()) {
                 jt.getResponsibility().add(xx);
             }
+            em.persist(jt);
             
         } catch (Exception ex) {
             throw new JobTitleException("Job Title has already been created");
@@ -244,7 +244,6 @@ public class AdminServiceImpl implements AdminService {
         old.setPostalCode(address.getPostalCode());
         old.setState(address.getState());
         old.setBilling(address.getBilling());
-
     }
 
     @Override
@@ -271,8 +270,11 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Address> getListAddressFields(String search) {
+        if(search == "") {
+            return getListAddress();
+        }
         Query q = em.createQuery(
-                "SELECT a FROM Address a WHERE a.getBuilding Like :building OR a.getPostalCode Like :postal OR a.getUnit Like :unit");
+                "SELECT a FROM Address a WHERE a.getBuilding LIKE :building OR a.getPostalCode LIKE :postal OR a.getUnit LIKE :unit");
         q.setParameter("building", "%" + search + "%");
         q.setParameter("postal", "%" + search + "%");
         q.setParameter("unit", "%" + search + "%");

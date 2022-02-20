@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
 import com.iora.erp.model.site.Site;
@@ -44,7 +45,7 @@ public class AdminController {
     // Employee/JobTitle/Department stuff here
 
 
-    
+    //need to edit
     @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {
         try {
@@ -65,6 +66,7 @@ public class AdminController {
         }
     }
 
+
     @GetMapping(path = "/viewJobTitles", produces = "application/json")
     public List<JobTitle> viewJobTitles(@RequestParam("search") String search) {
         try {
@@ -74,6 +76,18 @@ public class AdminController {
             return null;
         }
     }
+
+    
+    @GetMapping(path = "/viewAllAddress", produces = "application/json")
+    public List<Address> viewAllAddress() {
+        try {
+            return adminService.getListAddress();
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
         
     @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {

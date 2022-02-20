@@ -7,8 +7,6 @@ import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface EmployeeService {
     public abstract void createEmployee(Employee employee) throws EmployeeException;

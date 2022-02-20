@@ -34,7 +34,7 @@ public class Site implements Serializable {
     @Column(nullable = false, unique = true)
     private String siteCode;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String phoneNumber;
 
     @Column(nullable = false)
@@ -53,6 +53,7 @@ public class Site implements Serializable {
         this.name = name;
         this.address = address;
         this.siteCode = siteCode;
+        this.phoneNumber = phoneNumber;
         this.company = company;
         this.stockLevel = new StockLevel();
         this.active = true;
@@ -102,7 +103,6 @@ public class Site implements Serializable {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-
 
     public boolean isActive() {
         return active;

@@ -19,6 +19,7 @@ import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
+import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
@@ -51,7 +52,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        loadData();
+        if (em.createQuery("SELECT s FROM Site s", Site.class).getResultList().size() == 0) {
+                loadData();
+        }
     }
 
     private void loadData() throws Exception {

@@ -166,6 +166,11 @@ public class AdminController {
         }
     }
 
+    @GetMapping(path = "/viewSites/all", produces = "application/json")
+    public List<? extends Site> viewAllSites() {
+        return siteService.getAllSites();
+    }
+
     @GetMapping(path = "/viewSites", produces = "application/json")
     public List<? extends Site> viewSites(@RequestParam List<String> siteTypes, @RequestParam String country,
             @RequestParam String company) {

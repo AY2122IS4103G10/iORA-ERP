@@ -16,7 +16,7 @@ import {
 } from "../../../../stores/slices/voucherSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useState } from "react";
-import ConfirmDelete from "../../../components/Modals/ConfirmDelete.js";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
 import { classNames } from "../../../../utilities/Util";
 
 const VoucherDetailsBody = ({

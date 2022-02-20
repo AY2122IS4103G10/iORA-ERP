@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import { SitesList } from "../SitesList";
+import { CompaniesList } from "../CompaniesList";
 import { classNames } from "../../../../utilities/Util";
 import { useState } from "react";
 
 const tabs = [
   { name: "Sites", href: "/ad/sites", current: false },
-  { name: "Companies", href: "/sm/products/promotions", current: true },
+  { name: "Companies", href: "/ad/companies", current: true },
 ];
 
 const Header = () => {
@@ -26,7 +26,7 @@ const Header = () => {
                     alt=""
                   />
                   <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                    Sites
+                    Companies
                   </h1>
                 </div>
               </div>
@@ -38,7 +38,7 @@ const Header = () => {
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
               >
-                Add site
+                Add company
               </button>
             </Link>
           </div>
@@ -87,7 +87,7 @@ export const ManageCompanies = () => {
   return (
     <>
       {<Header />}
-      {<SitesList />}
+      {<CompaniesList />}
     </>
   );
 };

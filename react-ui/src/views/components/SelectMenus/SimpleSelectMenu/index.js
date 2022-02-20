@@ -20,7 +20,7 @@ export default function SimpleSelectMenu({ label = "", options, selected, setSel
             </Listbox.Label>
           )}
           <div className="mt-1 relative">
-            <Listbox.Button className="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <Listbox.Button className="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm">
               <span className="block truncate">{selected.name}</span>
               <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                 <SelectorIcon
@@ -43,7 +43,7 @@ export default function SimpleSelectMenu({ label = "", options, selected, setSel
                     key={person.id}
                     className={({ active }) =>
                       classNames(
-                        active ? "text-white bg-indigo-600" : "text-gray-900",
+                        active ? "text-white bg-cyan-600" : "text-gray-900",
                         "cursor-default select-none relative py-2 pl-3 pr-9"
                       )
                     }
@@ -63,7 +63,7 @@ export default function SimpleSelectMenu({ label = "", options, selected, setSel
                         {selected ? (
                           <span
                             className={classNames(
-                              active ? "text-white" : "text-indigo-600",
+                              active ? "text-white" : "text-cyan-600",
                               "absolute inset-y-0 right-0 flex items-center pr-4"
                             )}
                           >

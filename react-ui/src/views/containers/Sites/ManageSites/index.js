@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const tabs = [
   { name: "Sites", href: "/ad/sites", current: true },
-  { name: "Companies", href: "/sm/products/promotions", current: false },
+  { name: "Companies", href: "/ad/companies", current: false },
 ];
 
 const Header = () => {

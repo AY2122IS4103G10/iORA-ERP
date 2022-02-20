@@ -12,7 +12,7 @@ import {
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useState } from "react";
-import ConfirmDelete from "../../../components/Modals/ConfirmDelete.js";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
 
 const fieldSection = ({ fieldName, fields }) => {
   return (

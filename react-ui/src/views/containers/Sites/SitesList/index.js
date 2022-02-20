@@ -38,6 +38,8 @@ export const SitesTable = () => {
       {
         Header: "Country",
         accessor: (row) => row.address.country,
+        Filter: SelectColumnFilter,
+        filter: "includes",
       },
       // {
       //   Header: CogIcon,

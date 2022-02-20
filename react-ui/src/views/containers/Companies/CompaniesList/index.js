@@ -22,23 +22,27 @@ export const CompaniesTable = () => {
         accessor: "id",
       },
       {
-        Header: "Code",
-        accessor: "siteCode",
-      },
-      {
         Header: "Name",
         accessor: "name",
       },
       {
-        Header: "Company",
-        accessor: (row) => row.company.name,
-        Filter: SelectColumnFilter,
-        filter: "includes",
+        Header: "Register No.",
+        accessor: "registerNumber",
       },
       {
-        Header: "Country",
-        accessor: (row) => row.address.country,
+        Header: "Phone",
+        accessor: "telephone",
       },
+      {
+        Header: "Address",
+        accessor: "road",
+      },
+      {
+        Header: "Active",
+        accessor: "active",
+        Cell: (e) => e.value ? "Yes" : "No"
+      },
+      
       // {
       //   Header: CogIcon,
       //   accessor: "accessor",

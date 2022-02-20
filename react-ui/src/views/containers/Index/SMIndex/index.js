@@ -23,6 +23,7 @@ const navigation = [
     current: false,
   },
   { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },
+  { name: "Procurement Orders", href: "/sm/procurements", icon: CreditCardIcon, current: false },
   {
     name: "Vouchers",
     href: "/sm/vouchers",

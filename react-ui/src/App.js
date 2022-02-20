@@ -14,6 +14,9 @@ import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions
 import { ADRoute } from "./routes/ADRoute";
 import { ManageSites } from "./views/containers/Sites/ManageSites";
 import { SiteForm } from "./views/containers/Sites/SiteForm";
+import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
+import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
+import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
 
 function App() {
   return (
@@ -38,6 +41,12 @@ function App() {
             <Route path="promotions" element={<ManagePromotions />} />
           </Route>
           <Route path="stocklevels/*" element={<ViewStockLevels />} />
+          <Route path="procurements" element={<Outlet />}>
+            <Route index element={<ManageProcurement />} />
+            {/* <Route path=":voucherCode" element={<VoucherDetails />} /> */}
+            <Route path="create" element={<ProcurementForm />} />
+            {/* <Route path="edit/:voucherId" element={<VoucherForm />} /> */}
+          </Route>
           <Route path="vouchers" element={<Outlet />}>
             <Route index element={<ManageVouchers />} />
             <Route path=":voucherCode" element={<VoucherDetails />} />
@@ -56,6 +65,12 @@ function App() {
         >
           <Route path="sites" element={<Outlet />}>
             <Route index element={<ManageSites />} />
+            <Route path=":siteId" element={<ProductDetails />} />
+            <Route path="create" element={<SiteForm />} />
+            <Route path="edit/:siteId" element={<SiteForm />} />
+          </Route>
+          <Route path="companies" element={<Outlet />}>
+            <Route index element={<ManageCompanies />} />
             <Route path=":siteId" element={<ProductDetails />} />
             <Route path="create" element={<SiteForm />} />
             <Route path="edit/:siteId" element={<SiteForm />} />

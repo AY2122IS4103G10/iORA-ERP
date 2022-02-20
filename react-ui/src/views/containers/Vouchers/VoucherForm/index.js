@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import {
   addNewVouchers,
-  selectVoucherByCode,
 } from "../../../../stores/slices/voucherSlice";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
@@ -12,7 +11,6 @@ import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import "react-datepicker/dist/react-datepicker.css";
 
 const VoucherFormBody = ({
-  isEditing,
   quantity,
   onQuanitity,
   value,
@@ -23,9 +21,7 @@ const VoucherFormBody = ({
   onCancelClicked,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-    <h1 className="sr-only">{!isEditing ? "Add" : "Edit"} New Voucher</h1>
-    {/* Main 3 column grid */}
-    <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
+    <h1 className="sr-only">Add New Voucher</h1>
       {/* Left column */}
       <div className="grid grid-cols-1 gap-4 lg:col-span-2">
         {/* Form */}
@@ -37,7 +33,7 @@ const VoucherFormBody = ({
                   <div>
                     <div>
                       <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        {!isEditing ? "Add New" : "Edit"} Vouchers
+                        Add New Vouchers
                       </h3>
                     </div>
                     <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
@@ -114,7 +110,7 @@ const VoucherFormBody = ({
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                       onClick={onAddVoucherClicked}
                     >
-                      {!isEditing ? "Add" : "Save"} vouchers
+                      Add vouchers
                     </button>
                   </div>
                 </div>
@@ -123,21 +119,13 @@ const VoucherFormBody = ({
           </div>
         </section>
       </div>
-    </div>
   </div>
 );
 
 export const VoucherForm = () => {
-  const { voucherCode } = useParams();
-  const voucher = useSelector((state) =>
-    selectVoucherByCode(state, voucherCode)
-  );
-  const isEditing = Boolean(voucher);
-  const [quantity, setQuantity] = useState(!isEditing ? 1 : voucher.code);
-  const [value, setValue] = useState(!isEditing ? "" : voucher.value);
-  const [expDate, setExpDate] = useState(
-    !isEditing ? new Date() : new Date(voucher.expDate)
-  );
+  const [quantity, setQuantity] = useState(1);
+  const [value, setValue] = useState("");
+  const [expDate, setExpDate] = useState(new Date());
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -149,18 +137,23 @@ export const VoucherForm = () => {
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
     [quantity, value, expDate].every(Boolean) && requestStatus === "idle";
+
   const onAddVoucherClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
       try {
         setRequestStatus("pending");
         dispatch(
-          addNewVouchers({ quantity, amount: value, expiry: expDate })
+          addNewVouchers({
+            quantity,
+            amount: value,
+            expDate: expDate.toJSON(),
+          })
         ).unwrap();
         alert("Successfully added vouchers");
         setQuantity("");
         setValue("");
-        navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherCode}`);
+        navigate("/sm/vouchers");
       } catch (err) {
         console.error("Failed to add vouchers: ", err);
       } finally {
@@ -169,11 +162,10 @@ export const VoucherForm = () => {
   };
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/sm/vouchers" : `/sm/vouchers/${voucherCode}`);
+    navigate("/sm/vouchers");
 
   return (
     <VoucherFormBody
-      isEditing={isEditing}
       quantity={quantity}
       onQuanitity={onQuanitity}
       value={value}

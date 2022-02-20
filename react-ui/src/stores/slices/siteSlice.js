@@ -12,9 +12,7 @@ export const fetchSites = createAsyncThunk(
   //storeTypes =["Store", "Headquarters"]
   async ({ storeTypes, country, company }) => {
     const response = await api.getAll(
-      `admin/viewSites?storeTypes=${storeTypes.join(
-        ","
-      )}&country=${country}&company=${company}`
+      "admin/viewSites/all"
     );
     return response.data;
   }

@@ -20,13 +20,13 @@ public class WarehouseSite extends Site {
     public WarehouseSite() {
     }
     
-    public WarehouseSite(String name, Address address, String siteCode, Company company) {
-        super(name, address, siteCode, company);
+    public WarehouseSite(String name, Address address, String siteCode, String phoneNumber, Company company) {
+        super(name, address, siteCode, phoneNumber, company);
         this.procurementOrders = new ArrayList<>();
     }
 
     public WarehouseSite(Site site) {
-        super(site.getName(), site.getAddress(), site.getSiteCode(), site.getCompany());
+        super(site.getName(), site.getAddress(), site.getSiteCode(), site.getPhoneNumber(), site.getCompany());
         this.procurementOrders = new ArrayList<>();
     }
 

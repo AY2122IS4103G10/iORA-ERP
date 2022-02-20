@@ -1,12 +1,18 @@
 package com.iora.erp.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
+import com.iora.erp.enumeration.MembershipTier;
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
@@ -54,6 +60,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public void createCustomerOrder(CustomerOrder customerOrder) {
         em.persist(customerOrder);
+        updateMembershipPoints(customerOrder);
     }
 
     @Override
@@ -182,5 +189,37 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     public void updateRefundLI(RefundLI refundLI) throws CustomerOrderException {
         RefundLI old = getRefundLI(refundLI.getId());
         old.setRefundedItem(refundLI.getRefundedItem());
+    }
+
+    // Helper methods
+    public void updateMembershipPoints(CustomerOrder order) {
+        Customer customer = order.getCustomer();
+        
+        Double spending = em.createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date", Payment.class)
+                .setParameter("id", customer.getId())
+                .setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP)
+                .getResultList()
+                .stream()
+                .mapToDouble(x -> x.getAmount())
+                .sum();
+        MembershipTier membershipTier = MembershipTier.BASIC;
+        for (MembershipTier tier : MembershipTier.values()) {
+            if (spending > tier.sgd) membershipTier = tier;
+        }
+        customer.setMembershipTier(membershipTier);
+
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(customer.getDob());
+        if (currentMonth == cal.get(Calendar.MONTH)) {
+
+        } else {
+            Integer membershipPoints = customer.getMembershipPoints();
+            for (Payment p : order.getPayments()) {
+                membershipPoints = Integer.sum(membershipPoints, (int) (p.getAmount() * membershipTier.multiplier));
+            }
+            customer.setMembershipPoints(membershipPoints);
+        }
+                
     }
 }

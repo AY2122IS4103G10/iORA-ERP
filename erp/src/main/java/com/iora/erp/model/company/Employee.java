@@ -30,7 +30,9 @@ public class Employee implements Serializable {
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
-    private String password;
+    private String salt;
+    @Column(nullable = false)
+    private String hashPass;
     @Column(nullable = false)
     private Boolean availStatus;
 
@@ -42,13 +44,14 @@ public class Employee implements Serializable {
     public Employee() {
     }
 
-    public Employee(String name, String email, Double salary, String username, String password,
+    public Employee(String name, String email, Double salary, String username, String password, String salt, String hashPass,
             Boolean availStatus) {
         this.name = name;
         this.email = email;
         this.salary = salary;
         this.username = username;
-        this.password = password;
+        this.salt = salt;
+        this.hashPass = generateProtectedPassword(salt, password);
         this.availStatus = availStatus;
     }
 
@@ -66,7 +69,7 @@ public class Employee implements Serializable {
         }
     }
 
-   /* public Boolean authentication(String authenticate) {
+    public Boolean authentication(String authenticate) {
         String tryPassword;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
@@ -83,7 +86,7 @@ public class Employee implements Serializable {
         } catch (Exception ex) {
             return false;
         }
-    }*/
+    }
 
     public Long getId() {
         return id;
@@ -166,12 +169,21 @@ public class Employee implements Serializable {
         return accessRights;
     }
 
-    public String getPassword() {
-        return password;
+    public String getSalt() {
+        return salt;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
+
+    public String getHashPass() {
+        return hashPass;
+    }
+
+    public void setHashPass(String hashPass) {
+        this.hashPass = hashPass;
+    }
+
 
 }

@@ -34,6 +34,9 @@ public class Site implements Serializable {
     @Column(nullable = false, unique = true)
     private String siteCode;
 
+    @Column(nullable = false, unique = true)
+    private String phoneNumber;
+
     @Column(nullable = false)
     private boolean active;
 
@@ -46,7 +49,7 @@ public class Site implements Serializable {
     protected Site() {
     }
 
-    public Site(String name, Address address, String siteCode, Company company) {
+    public Site(String name, Address address, String siteCode, String phoneNumber, Company company) {
         this.name = name;
         this.address = address;
         this.siteCode = siteCode;
@@ -91,6 +94,15 @@ public class Site implements Serializable {
     public void setSiteCode(String siteCode) {
         this.siteCode = siteCode;
     }
+
+    public String getPhoneNumber() {
+        return this.phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
 
     public boolean isActive() {
         return active;

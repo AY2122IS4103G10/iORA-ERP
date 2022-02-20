@@ -11,11 +11,11 @@ public class OnlineStoreSite extends Site {
     public OnlineStoreSite() {
     }
     
-    public OnlineStoreSite(String name, Address address, String siteCode, Company company) {
-        super(name, address, siteCode, company);
+    public OnlineStoreSite(String name, Address address, String siteCode, String phoneNumber, Company company) {
+        super(name, address, siteCode, phoneNumber, company);
     }
 
     public OnlineStoreSite(Site site) {
-        super(site.getName(), site.getAddress(), site.getSiteCode(), site.getCompany());
+        super(site.getName(), site.getAddress(), site.getSiteCode(), site.getPhoneNumber(), site.getCompany());
     }
 }

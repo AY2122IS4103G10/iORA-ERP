@@ -9,7 +9,7 @@ import com.iora.erp.model.stockTransfer.StockTransferOrder;
 
 public interface StockTransferService {
     public abstract StockTransferOrder getStockTransferOrder(Long id) throws StockTransferException;
-    public abstract List<StockTransferOrder> getStockTransferOrder() throws StockTransferException;
+    public abstract List<StockTransferOrder> getStockTransferOrders();
     public abstract List<StockTransferOrder> getStockTransferOrderOfSite(Site site);
     public abstract void createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException;
     public abstract void updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;

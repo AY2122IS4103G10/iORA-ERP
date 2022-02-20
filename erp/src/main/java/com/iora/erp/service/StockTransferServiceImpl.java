@@ -37,7 +37,7 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public List<StockTransferOrder> getStockTransferOrder() {
+    public List<StockTransferOrder> getStockTransferOrders() {
         TypedQuery<StockTransferOrder> q = em.createQuery("SELECT sto FROM StockTransferOrder sto",
                 StockTransferOrder.class);
         return q.getResultList();

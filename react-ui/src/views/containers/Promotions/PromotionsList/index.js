@@ -42,11 +42,11 @@ export const PromotionsTable = () => {
         accessor: "discountedPrice",
         Cell: (e) => `$${e.value}`,
       },
-      {
-        Header: "Products",
-        accessor: "fieldValue",
-        // Cell: (e) => axios.get(`${REST_ENDPOINT}sam/model/category/${e.}`),
-      },
+      // {
+      //   Header: "Products",
+      //   accessor: "fieldValue",
+      //   Cell: (e) => axios.get(`${REST_ENDPOINT}sam/model/category/${e.}`),
+      // },
       // {
       //   Header: CogIcon,
       //   accessor: "accessor",
@@ -64,13 +64,13 @@ export const PromotionsTable = () => {
   );
   const dispatch = useDispatch();
   const data = useSelector(selectAllPromotions);
-  const products = useSelector(selectAllProducts);
+  // const products = useSelector(selectAllProducts);
   const promoStatus = useSelector((state) => state.promotions.status);
   const productStatus = useSelector((state) => state.products.status);
 
   useEffect(() => {
     promoStatus === "idle" && dispatch(fetchPromotions());
-    productStatus === "idle" && dispatch(fetchProducts());
+    // productStatus === "idle" && dispatch(fetchProducts());
   }, [promoStatus, productStatus, dispatch]);
 
   return (

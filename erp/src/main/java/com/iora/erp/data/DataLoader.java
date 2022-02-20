@@ -30,7 +30,6 @@ import com.iora.erp.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
@@ -42,8 +41,6 @@ public class DataLoader implements CommandLineRunner {
     private CustomerService customerService;
     @Autowired
     private ProductService productService;
-    @Autowired
-    PasswordEncoder encoder;
     @PersistenceContext
     private EntityManager em;
 

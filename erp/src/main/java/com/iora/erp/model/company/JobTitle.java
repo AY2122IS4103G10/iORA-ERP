@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 import com.iora.erp.enumeration.AccessRights;
 
@@ -27,8 +26,6 @@ public class JobTitle implements Serializable {
     @ElementCollection
     private Set<AccessRights> responsibility;
     
-    @OneToMany(mappedBy = "jobTitle")
-    private Employee employee;
 
     public JobTitle() {
         responsibility = new HashSet<>();

@@ -15,12 +15,13 @@ import {
 
 const processFields = (fields, selector) => {
   const fieldValues = [];
-  fields
-    .filter((field) => field.fieldName === selector)
-    .forEach((field) => fieldValues.push(field.fieldValue));
+  Boolean(fields) &&
+    fields
+      .filter((field) => field.fieldName === selector)
+      .forEach((field) => fieldValues.push(field.fieldValue));
   return fieldValues.length
     ? fieldValues.join(", ")
-    : `No ${selector.toLowerCase()}`;
+    : `No ${selector.toLowerCase()}s`;
 };
 
 export const ProductsTable = () => {
@@ -28,7 +29,7 @@ export const ProductsTable = () => {
     () => [
       {
         Header: "Product Code",
-        accessor: "prodCode",
+        accessor: "modelCode",
         Cell: (e) => (
           <Link
             to={`/sm/products/${e.value}`}
@@ -43,46 +44,49 @@ export const ProductsTable = () => {
         accessor: "name",
       },
       {
-        Header: "Category",
-        accessor: "",
-        // Cell: (e) => processFields(e.value, "Category"),
-      },
-      {
         Header: "Color",
-        accessor: "fields",
-        Cell: (e) => processFields(e.value, "Color"),
+        accessor: (row) => processFields(row.productFields, "COLOUR"),
       },
       {
         Header: "Size",
-        accessor: "",
-        // Cell: (e) => processFields(e.value, "Size"),
+        accessor: (row) => processFields(row.productFields, "SIZE"),
       },
       {
         Header: "List Price",
-        accessor: "listPrice",
+        accessor: "price",
         Cell: (e) => `$${e.value}`,
       },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/products",
-      //       },
-      //     ],
-      //   }),
-      // },
+      {
+        Header: "Available",
+        accessor: "available",
+        Cell: (e) => (e.value ? "Yes" : "No"),
+      },
+      {
+        Header: (
+          <div className="flex items-center">
+            <CogIcon className="h-4 w-4" />
+          </div>
+        ),
+        accessor: "accessor",
+        disableSortBy: true,
+        Cell: OptionsCell({
+          options: [
+            {
+              name: "Delete",
+              navigate: "/products",
+            },
+          ],
+        }),
+      },
     ],
     []
   );
   const dispatch = useDispatch();
   const data = useSelector(selectAllProducts);
   const prodStatus = useSelector((state) => state.products.status);
-  // useEffect(() => {
-  //   prodStatus === "idle" && dispatch(fetchProducts());
-  // }, [prodStatus, dispatch]);
+  useEffect(() => {
+    prodStatus === "idle" && dispatch(fetchProducts());
+  }, [prodStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

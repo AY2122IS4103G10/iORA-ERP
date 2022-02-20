@@ -10,15 +10,11 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
-import com.iora.erp.Repostitory.UserRepository;
 import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
-import com.iora.erp.model.company.UserDetailsImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +24,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @PersistenceContext
     private EntityManager em;
-
-    @Autowired
-	private UserRepository userRepository;
 
     @Autowired
     private AdminService adminService;
@@ -152,13 +145,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-
-/*
     @Override
+    public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
+        return getEmployeeById(id).getAccessRights();
+    }
+
+    @Override
+    public Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
+        return getEmployeeByUsername(username).getAccessRights();
+    }
+
+   /* @Override
+    public byte[] saltGeneration() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return salt;
+    }
+*/
+  /*  @Override
     public Employee loginAuthentication(Employee employee) throws EmployeeException {
         try {
             Employee c = getEmployeeByUsername(employee.getUsername());
-            if (c.authentication(employee.getHashPass())) {
+            if (c.authentication(employee.getPassword()))) {
                 return c;
             } else {
                 throw new EmployeeException();
@@ -168,24 +177,4 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
     }*/
-
-    @Override
-    public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    @Override
-	@Transactional
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Employee user = userRepository.findByUsernameEmployee(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-		return UserDetailsImpl.build(user);
-	}
 }

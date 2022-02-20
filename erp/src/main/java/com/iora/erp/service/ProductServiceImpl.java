@@ -46,6 +46,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<PromotionField> getPromotionFields() {
+        TypedQuery<PromotionField> q = em.createQuery("SELECT prf FROM PromotionField prf", PromotionField.class);
+        return q.getResultList();
+    }
+
+    @Override
     public ProductField getProductFieldByNameValue(String fieldName, String fieldValue) throws ProductFieldException {
         Query q = em.createQuery(
                 "SELECT pf FROM ProductField pf WHERE LOWER(pf.fieldName) LIKE :fieldName AND LOWER(pf.fieldValue) LIKE :fieldValue");
@@ -61,14 +67,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void createProductField(ProductField productField) throws ProductFieldException {
+    public ProductField createProductField(ProductField productField) throws ProductFieldException {
         productField.setFieldName(productField.getFieldName().trim().toUpperCase());
         productField.setFieldValue(productField.getFieldValue().trim().toUpperCase());
         try {
             getProductFieldByNameValue(productField.getFieldName(), productField.getFieldValue());
         } catch (ProductFieldException ex) {
             em.persist(productField);
-            return;
+            return productField;
         }
         throw new ProductFieldException("Product Field with name " + productField.getFieldName() + " and value "
                 + productField.getFieldValue() + " already exist.");
@@ -99,13 +105,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void addPromoCategory(String modelCode, String category, double discountedPrice)
+    public Model addPromoCategory(String modelCode, String category, double discountedPrice)
             throws ModelException {
         Model model = getModel(modelCode);
 
         try {
             ProductField pf = getPromoField("category", category, discountedPrice);
             model.addProductField(pf);
+            return model;
         } catch (ProductFieldException ex) {
             PromotionField prf = new PromotionField();
             prf.setFieldName("category");
@@ -113,20 +120,22 @@ public class ProductServiceImpl implements ProductService {
             prf.setDiscountedPrice(discountedPrice);
             em.persist(prf);
             model.addProductField(prf);
+            return model;
         }
     }
 
     @Override
-    public void createModel(Model model) throws ModelException {
+    public Model createModel(Model model) throws ModelException {
         try {
             em.persist(model);
+            return model;
         } catch (EntityExistsException ex) {
             throw new ModelException("Model with model code " + model.getModelCode() + " already exist.");
         }
     }
 
     @Override
-    public void createProduct(String modelCode, List<ProductField> productFields)
+    public List<Product> createProduct(String modelCode, List<ProductField> productFields)
             throws ProductException, ProductFieldException {
         try {
             List<String> colours = new ArrayList<>();
@@ -162,6 +171,7 @@ public class ProductServiceImpl implements ProductService {
             }
 
             model.setProducts(products);
+            return products;
 
         } catch (ModelException ex) {
             throw new ProductException("Model with model code " + modelCode + " does not exist.");
@@ -203,6 +213,15 @@ public class ProductServiceImpl implements ProductService {
         } else {
             q = em.createQuery("SELECT m FROM Model m", Model.class);
         }
+
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Model> getModelsByPromoField(PromotionField promoField) {
+        TypedQuery<Model> q = em.createQuery("SELECT m FROM Model m WHERE :promoField MEMBER OF m.productFields",
+                Model.class);
+        q.setParameter("promoField", promoField);
 
         return q.getResultList();
     }
@@ -283,7 +302,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateModel(Model model) throws ModelException {
+    public Model updateModel(Model model) throws ModelException {
         Model old = em.find(Model.class, model.getModelCode());
 
         if (old == null) {
@@ -296,6 +315,7 @@ public class ProductServiceImpl implements ProductService {
         old.setOnlineOnly(model.isOnlineOnly());
         old.setPrice(model.getPrice());
         old.setProductFields(model.getProductFields());
+        return old;
     }
 
     @Override
@@ -356,7 +376,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateProduct(Product product) throws ProductException {
+    public Product updateProduct(Product product) throws ProductException {
         Product old = em.find(Product.class, product.getsku());
 
         if (old == null) {
@@ -364,6 +384,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         old.setProductItems(product.getProductItems());
+        old.setProductFields(product.getProductFields());
+        return old;
     }
 
     @Override
@@ -373,7 +395,7 @@ public class ProductServiceImpl implements ProductService {
             ProductItem pi = new ProductItem(rfid);
             pi.setProductSKU(sku);
             em.persist(pi);
-            
+
             p.addProductItem(pi);
         } catch (EntityExistsException ex) {
             throw new ProductItemException("ProductItem with rfid " + rfid + " already exist.");

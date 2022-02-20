@@ -1,4 +1,8 @@
 package com.iora.erp.service;
+
+import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -151,20 +155,26 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void generateVouchers(double amount, int qty) {
+    public List<Voucher> generateVouchers(double amount, int qty, String date) {
+        List<Voucher> vouchers = new ArrayList<>();
+
         IntStream.range(0, qty)
         .forEach( i -> {
-            Voucher voucher1 = new Voucher(amount);
+            Voucher voucher1 = new Voucher(amount, LocalDate.parse(date));
             try {
                 getVoucher(voucher1.getVoucherCode());
                 //Voucher with the generate voucher code already exist
-                Voucher voucher2 = new Voucher(amount);
+                Voucher voucher2 = new Voucher(amount, LocalDate.parse(date));
                 em.persist(voucher2);
+                vouchers.add(voucher2);
             } catch (CustomerException ex) {
                 //Voucher code does not already exist
                 em.persist(voucher1);
+                vouchers.add(voucher1);
             }
         });
+
+        return vouchers;
     }
 
     @Override
@@ -183,15 +193,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void issueVoucher(String voucherCode) throws CustomerException {
+    public Voucher issueVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setIssued(true);
+        return voucher;
     }
 
     @Override
-    public void redeemVoucher(String voucherCode) throws CustomerException {
+    public Voucher redeemVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setRedeemed(true);
+        return voucher;
     }
 
 }

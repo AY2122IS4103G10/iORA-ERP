@@ -1,5 +1,6 @@
 package com.iora.erp.model.customer;
 
+import java.time.LocalDate;
 import java.util.Random;
 
 import javax.persistence.Column;
@@ -15,6 +16,9 @@ public class Voucher {
     private double amount;
 
     @Column(nullable = false)
+    private LocalDate expiry;
+
+    @Column(nullable = false)
     private boolean issued;
 
     @Column(nullable = false)
@@ -23,10 +27,11 @@ public class Voucher {
     public Voucher() {
     }
 
-    public Voucher(double amount) {
+    public Voucher(double amount, LocalDate expiry) {
         this();
         this.voucherCode = generateVoucherCode();
         this.amount = amount;
+        this.expiry = expiry;
         this.issued = false;
         this.redeemed = false;
     }
@@ -46,7 +51,6 @@ public class Voucher {
         return generatedString;
     }
 
-
     public String getVoucherCode() {
         return this.voucherCode;
     }
@@ -61,6 +65,14 @@ public class Voucher {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public LocalDate getExpiry() {
+        return this.expiry;
+    }
+
+    public void setExpiry(LocalDate expiry) {
+        this.expiry = expiry;
     }
 
     public boolean isIssued() {

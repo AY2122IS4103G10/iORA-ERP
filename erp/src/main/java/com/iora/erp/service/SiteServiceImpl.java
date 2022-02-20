@@ -29,8 +29,8 @@ public class SiteServiceImpl implements SiteService {
     private EntityManager em;
 
     @Override
-    public void createSite(Site site, String storeType) {
-        switch (storeType) {
+    public void createSite(Site site, String siteType) {
+        switch (siteType) {
             case "Headquarters":
                 HeadquartersSite headquarters = new HeadquartersSite(site);
                 em.persist(headquarters);
@@ -68,34 +68,17 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public List<Site> searchAllSites(List<String> storeTypes, String country, String company) {
+    public List<Site> getAllSites() {
+        return em.createQuery("SELECT s FROM Site s", Site.class).getResultList();
+    }
+
+    @Override
+    public List<Site> searchAllSites(List<String> siteTypes, String country, String company) {
         List<Site> resultList = em.createQuery(siteQuery("SELECT s FROM Site s", country.toUpperCase(), company),
                 Site.class)
                 .getResultList();
         return resultList;
     };
-
-    // @Override
-    // public List<Site> searchAllSites(List<String> storeTypes, String country,
-    // String company) {
-    // List<Site> resultList = new ArrayList<>();
-    // if (storeTypes.contains("Headquarters")) {
-    // resultList.addAll(searchHeadquarters(country, company));
-    // }
-    // if (storeTypes.contains("Manufacturing")) {
-    // resultList.addAll(searchManufacturing(country, company));
-    // }
-    // if (storeTypes.contains("OnlineStore")) {
-    // resultList.addAll(searchOnlineStores(country, company));
-    // }
-    // if (storeTypes.contains("Store")) {
-    // resultList.addAll(searchStores(country, company));
-    // }
-    // if (storeTypes.contains("Warehouse")) {
-    // resultList.addAll(searchWarehouses(country, company));
-    // }
-    // return resultList;
-    // };
 
     @Override
     public List<? extends Site> searchHeadquarters(String country, String company) {
@@ -143,12 +126,12 @@ public class SiteServiceImpl implements SiteService {
     }
 
     String siteQuery(String mainQuery, String country, String company) {
-        if (country != null && company != null) {
-            return mainQuery + String.format(" WHERE s.country = %s AND s.company = %s", country, company);
-        } else if (country != null) {
-            return mainQuery + String.format(" WHERE s.country = %s", country);
-        } else if (company != null) {
-            return mainQuery + String.format(" WHERE s.company = %s", company);
+        if (!country.equals("") && !company.equals("")) {
+            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country, company);
+        } else if (!country.equals("")) {
+            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country);
+        } else if (!company.equals("")) {
+            return mainQuery + String.format(" WHERE s.company.name = '%s Fashion Pte. Ltd.'", company);
         } else {
             return mainQuery;
         }

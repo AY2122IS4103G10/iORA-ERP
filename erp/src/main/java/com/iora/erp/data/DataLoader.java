@@ -21,6 +21,9 @@ import com.iora.erp.model.company.JobTitle;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.site.HeadquartersSite;
+import com.iora.erp.model.site.StoreSite;
+import com.iora.erp.model.site.WarehouseSite;
+import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
 
@@ -52,22 +55,115 @@ public class DataLoader implements CommandLineRunner {
     private void loadData() throws Exception {
         // Insert Data-Init here
 
-        Address a1 = new Address("Singapore", "Singapore", "iORA HQ", "Singapore", "10Q", "Singapore 629841", false,
-                1.333525, 103.703666688);
-        em.persist(a1);
+        Address a1 = new Address("Singapore", "Singapore", "Enterprise 10", "Singapore", "NIL",
+                "10P Enterprise Road", "Singapore 629840", false, 1.334251, 103.704246);
 
         List<Department> departments = new ArrayList<Department>();
         Department sam = new Department("Sales and Marketing");
         em.persist(sam);
         departments.add(sam);
 
+        List<Department> departments2 = new ArrayList<Department>();
+        Department sam2 = new Department("Sales and Marketing");
+        em.persist(sam2);
+        departments2.add(sam2);
+
+        List<Department> departments3 = new ArrayList<Department>();
+        Department sam3 = new Department("Sales and Marketing");
+        em.persist(sam3);
+        departments3.add(sam3);
+
         Company iora = new Company("iORA Fashion Pte. Ltd.", "199703089W", "63610056");
         iora.setDepartments(departments);
         iora.setAddress(a1);
         em.persist(iora);
+        Company lalu = new Company("LALU Fashion Pte. Ltd.", "201226449M", "63610056");
+        lalu.setDepartments(departments2);
+        lalu.setAddress(a1);
+        em.persist(lalu);
+        Company sora = new Company("SORA Fashion Pte. Ltd.", "199900605W", "63610056");
+        sora.setDepartments(departments3);
+        sora.setAddress(a1);
+        em.persist(sora);
 
+        // Adding Sites
         HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", iora);
         em.persist(iorahq);
+        WarehouseSite wh = new WarehouseSite("Warehouse HQ", a1, "123457", iora);
+        em.persist(wh);
+        StoreSite s1 = new StoreSite("iORA @ Bugis Junction", new Address("Singapore", "Singapore",
+                "Bugis Junction", "Singapore", "#01-04", "200 Victoria Street", "Singapore 188021", true, 1.299497,
+                103.855096), "000001", iora);
+        em.persist(s1);
+        StoreSite s2 = new StoreSite("iORA @ Citylink Mall", new Address("Singapore", "Singapore",
+                "Citylink Mall", "Singapore", "#0B1-26/A/B", "1 Raffles Link", "Singapore 188021", true, 1.292563,
+                103.854874), "000002", iora);
+        em.persist(s2);
+        StoreSite s3 = new StoreSite("iORA @ City Square Mall", new Address("Singapore", "Singapore",
+                "City Square Mall", "Singapore", "#01-05", "180 Kitchener Road", "Singapore 208539", true, 1.311796,
+                103.856399), "000003", iora);
+        em.persist(s3);
+        StoreSite s4 = new StoreSite("iORA @ Compass One", new Address("Singapore", "Singapore",
+                "Compass One", "Singapore", "#01-10", "1 Sengkang Square", "Singapore 545078", true, 1.392318,
+                103.895045), "000004", iora);
+        em.persist(s4);
+        StoreSite s5 = new StoreSite("iORA @ Harbourfront Centre", new Address("Singapore", "Singapore",
+                "Harbourfront Centre", "Singapore", "#02-87/88/89/90/96/98", "1 Maritime Square", "Singapore 099253",
+                true, 1.264279, 103.820543), "000005", iora);
+        em.persist(s5);
+        StoreSite s6 = new StoreSite("iORA @ Hillion Mall", new Address("Singapore", "Singapore",
+                "Hillion Mall", "Singapore", "#B1-11/12/13/14", "17 Petir Road", "Singapore 678278", true, 1.378054,
+                103.763355), "000006", iora);
+        em.persist(s6);
+        StoreSite s7 = new StoreSite("iORA @ Hougang Mall", new Address("Singapore", "Singapore",
+                "Hougang Mall", "Singapore", "#02-02", "90 Hougang Avenue 10", "Singapore 538766", true, 1.372690,
+                103.893967), "000007", iora);
+        em.persist(s7);
+        StoreSite s8 = new StoreSite("iORA @ Isetan Wisma Atria", new Address("Singapore", "Singapore",
+                "Wisma Atria", "Singapore", "#01-01", "435 Orchard Road", "Singapore 238877", true, 1.304311,
+                103.833358), "000008", iora);
+        em.persist(s8);
+        StoreSite s9 = new StoreSite("iORA @ JCube", new Address("Singapore", "Singapore",
+                "JCube", "Singapore", "#01-29/30/31", "2 Jurong Easy Central 1", "Singapore 609731", true, 1.333632,
+                103.740749), "000009", iora);
+        em.persist(s9);
+        StoreSite s10 = new StoreSite("iORA @ Junction 8", new Address("Singapore", "Singapore",
+                "Junction 8", "Singapore", "#01-25/26", "9 Bishan Place", "Singapore 579837", true, 1.350815,
+                103.848783), "000010", iora);
+        em.persist(s10);
+        StoreSite s11 = new StoreSite("iORA @ Northpoint City", new Address("Singapore", "Singapore",
+                "Northpoint City South Wing", "Singapore", "#01-101/102/103", "1 Northpoint Drive", "Singapore 768019",
+                true, 1.429125, 103.835932), "000011", iora);
+        em.persist(s11);
+        StoreSite s12 = new StoreSite("iORA @ Oasis Terraces", new Address("Singapore", "Singapore",
+                "Oasis Terraces", "Singapore", "#02-15/16/17/21/22", "Blk 681 Punggol Drive", "Singapore 820681", true,
+                1.402803, 103.913443), "000012", iora);
+        em.persist(s12);
+        StoreSite s13 = new StoreSite("iORA @ Suntec City", new Address("Singapore", "Singapore",
+                "Suntec City Tower 3", "Singapore", "#02-424/426", "Temasek Boulevard", "Singapore 038983", true,
+                1.296220, 103.859247),
+                "000013", iora);
+        em.persist(s13);
+        StoreSite s14 = new StoreSite("iORA @ The Centrepoint", new Address("Singapore", "Singapore",
+                "The Centrepoint", "Singapore", "#03-37/39", "176 Orchard Road", "Singapore 238846", true, 1.302007,
+                103.839808), "000014", iora);
+        em.persist(s14);
+        StoreSite s15 = new StoreSite("iORA @ West Mall", new Address("Singapore", "Singapore",
+                "West Mall", "Singapore", "#01-20/21/22/23", "1 Bukit Batok Central Link", "Singapore 658713", true,
+                1.350193, 103.750014), "000015", iora);
+        em.persist(s15);
+        StoreSite s16 = new StoreSite("LALU @ Marina Square", new Address("Singapore", "Singapore",
+                "Marina Square", "Singapore", "#02-304/A", "6 Raffles Boulevard", "Singapore 039594", true, 1.291158,
+                103.857897), "000016", lalu);
+        em.persist(s16);
+        StoreSite s17 = new StoreSite("SORA @ Oasis Terraces", new Address("Singapore", "Singapore",
+                "Oasis Terraces", "Singapore", "#02-29/30/31/32/33", "Blk 681 Punggol Drive", "Singapore 820681", true,
+                1.402803, 103.913443), "000017", sora);
+        em.persist(s17);
+        StoreSite s18 = new StoreSite("iORA @ 313 Somerset", new Address("Singapore", "Singapore",
+                "313 Somerset", "Singapore", "#03-01 to 08", "313 Orchard Road", "Singapore 238895", true, 1.300869,
+                103.838461), "000018", iora);
+        em.persist(s18);
 
         // create job title
         Set<AccessRights> ar = new HashSet<>();
@@ -76,10 +172,6 @@ public class DataLoader implements CommandLineRunner {
         JobTitle jt = new JobTitle("Product Distribution Assisstant",
                 "Manage Merchandise as well as procurement orders", ar);
 
-        // Create Employee
-        Employee emp = new Employee("Eric Tham", "productDistributionAssistant1@gmail.com", 2900.0, "ericTham234",
-                encoder.encode("123drt45"), true);
-        em.persist(emp);
 
         // Creating Product Fields
         Set<ProductField> productFields = new HashSet<>();
@@ -162,10 +254,10 @@ public class DataLoader implements CommandLineRunner {
         }
 
         // Generate 10 $10 vouchers
-        customerService.generateVouchers(10, 10);
+        customerService.generateVouchers(10, 10, "2022-02-16");
 
         // Generate 10 $5 vouchers
-        customerService.generateVouchers(5, 10);
+        customerService.generateVouchers(5, 10, "2022-02-16");
     }
 
 }

@@ -10,6 +10,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
+import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.AddressException;
 import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.DepartmentException;
@@ -35,7 +36,12 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
         try {
-            em.persist(jobTitle);
+            JobTitle jt = jobTitle;
+            for(AccessRights xx : jobTitle.getResponsibility()) {
+                jt.getResponsibility().add(xx);
+            }
+            em.persist(jt);
+            
         } catch (Exception ex) {
             throw new JobTitleException("Job Title has already been created");
         }
@@ -75,17 +81,21 @@ public class AdminServiceImpl implements AdminService {
     public List<JobTitle> listOfJobTitles() throws JobTitleException {
         try {
             Query q = em.createQuery("SELECT e FROM JobTitle e");
-
-            // need run test if query exits timing for large database
             return q.getResultList();
+
         } catch (Exception ex) {
-            throw new JobTitleException();
+            throw new JobTitleException("something happen");
         }
     }
 
     @Override
-    public List<JobTitle> getJobTitlesByFields(String search) {
-        Query q = em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.getTitle) Like :title");
+    public List<JobTitle> getJobTitlesByFields(String search) throws JobTitleException {
+        if(search == null) {
+            
+            return listOfJobTitles();
+        }
+
+        Query q = em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.title) LIKE :title");
         q.setParameter("title", "%" + search.toLowerCase() + "%");
         return q.getResultList();
     }
@@ -234,7 +244,6 @@ public class AdminServiceImpl implements AdminService {
         old.setPostalCode(address.getPostalCode());
         old.setState(address.getState());
         old.setBilling(address.getBilling());
-
     }
 
     @Override
@@ -261,8 +270,11 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Address> getListAddressFields(String search) {
+        if(search == "") {
+            return getListAddress();
+        }
         Query q = em.createQuery(
-                "SELECT a FROM Address a WHERE a.getBuilding Like :building OR a.getPostalCode Like :postal OR a.getUnit Like :unit");
+                "SELECT a FROM Address a WHERE a.getBuilding LIKE :building OR a.getPostalCode LIKE :postal OR a.getUnit LIKE :unit");
         q.setParameter("building", "%" + search + "%");
         q.setParameter("postal", "%" + search + "%");
         q.setParameter("unit", "%" + search + "%");
@@ -538,6 +550,8 @@ public class AdminServiceImpl implements AdminService {
         } else {
             return true;
         }
+
     }
+
 
 }

@@ -1,1 +1,1 @@
-  export const REST_ENDPOINT = "localhost8000/sam/";
+  export const REST_ENDPOINT = "http://localhost:8080/";

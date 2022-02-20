@@ -5,20 +5,25 @@ import java.util.List;
 import java.util.Map;
 
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +40,8 @@ public class SAMController {
     private CustomerService customerService;
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private ProcurementService procurementService;
 
     /*
      * ---------------------------------------------------------
@@ -52,12 +59,27 @@ public class SAMController {
         }
     }
 
+    // Returns list of all PromotionFields
+    @GetMapping(path = "/promotionFields", produces = "application/json")
+    public List<PromotionField> getPromotionFields() {
+        return productService.getPromotionFields();
+    }
+
+    // Get Models by supplying PromotionField
+    @GetMapping(path = "/model/promo", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> getModelsByPromoField(@RequestBody PromotionField promoField) {
+        try {
+            return ResponseEntity.ok(productService.getModelsByPromoField(promoField));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     // Creates new ProductField instance with given JSON body
     @PostMapping(path = "/productField", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createProductField(@RequestBody ProductField productField) {
         try {
-            productService.createProductField(productField);
-            return ResponseEntity.ok("Product field " + productField.getFieldName() + " is successfully created");
+            return ResponseEntity.ok(productService.createProductField(productField));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -73,8 +95,7 @@ public class SAMController {
     @PostMapping(path = "/model", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createModel(@RequestBody Model model) {
         try {
-            productService.createModel(model);
-            return ResponseEntity.ok("Model with model code " + model.getModelCode() + " is successfully created.");
+            return ResponseEntity.ok(productService.createModel(model));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -82,10 +103,10 @@ public class SAMController {
 
     // Creates multiple Product instances with given Model Code in URL,
     @PostMapping(path = "/product/{modelCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProduct(@PathVariable String modelCode, @RequestBody List<ProductField> productFields) {
+    public ResponseEntity<Object> createProduct(@PathVariable String modelCode,
+            @RequestBody List<ProductField> productFields) {
         try {
-            productService.createProduct(modelCode, productFields);
-            return ResponseEntity.ok("Multiple Products are successfully created and linked to Model " + modelCode);
+            return ResponseEntity.ok(productService.createProduct(modelCode, productFields));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -101,12 +122,12 @@ public class SAMController {
     }
 
     @GetMapping(path = "/model", produces = "application/json")
-    public List<Model> searchModelsByModelCode(@RequestParam(required = false) String modelCode) {
+    public List<Model> searchModelsByModelCode(@RequestParam String modelCode) {
         return productService.searchModelsByModelCode(modelCode);
     }
 
     @GetMapping(path = "/model/name", produces = "application/json")
-    public List<Model> searchModelsByName(@RequestParam(required = false) String name) {
+    public List<Model> searchModelsByName(@RequestParam String name) {
         return productService.searchModelsByName(name);
     }
 
@@ -156,8 +177,7 @@ public class SAMController {
     @PutMapping(path = "/model", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> updateModel(@RequestBody Model model) {
         try {
-            productService.updateModel(model);
-            return ResponseEntity.ok("Model with model code " + model.getModelCode() + " is successfully updated.");
+            return ResponseEntity.ok(productService.updateModel(model));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -173,7 +193,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/product", produces = "application/json")
-    public List<Product> searchProductsBySKU(@RequestParam(required = false) String sku) {
+    public List<Product> searchProductsBySKU(@RequestParam String sku) {
         return productService.searchProductsBySKU(sku);
     }
 
@@ -197,20 +217,20 @@ public class SAMController {
     }
 
     @PutMapping(path = "/product", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> updateProduct(@PathVariable Product product) {
+    public ResponseEntity<Object> updateProduct(@RequestBody Product product) {
         try {
-            productService.updateProduct(product);
-            return ResponseEntity.ok("Product with SKU code " + product.getsku() + " is successfully updated.");
+            return ResponseEntity.ok(productService.updateProduct(product));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PostMapping(path = "/productItem/{sku}/{rfid}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProductItem(@PathVariable String sku, @PathVariable String rfid, @RequestBody(required = false) Object body) {
+    @PostMapping(path = "/productItem/{sku}/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> createProductItem(@PathVariable String sku, @PathVariable String rfid) {
         try {
             productService.createProductItem(rfid, sku);
-            return ResponseEntity.ok("ProductItem with RFID " + rfid + " is successfully created and linked to product " + sku);
+            return ResponseEntity
+                    .ok("ProductItem with RFID " + rfid + " is successfully created and linked to product " + sku);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -235,13 +255,12 @@ public class SAMController {
     }
 
     @GetMapping(path = "/productItem", produces = "application/json")
-    public List<ProductItem> searchProductItems(@RequestParam(required = false) String rfid) {
+    public List<ProductItem> searchProductItems(@RequestParam String rfid) {
         return productService.searchProductItems(rfid);
     }
 
-    @PutMapping(path = "/productItem/sell/{rfid}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> sellProductItem(@PathVariable String rfid,
-            @RequestBody(required = false) Object body) {
+    @PutMapping(path = "/productItem/sell/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> sellProductItem(@PathVariable String rfid) {
         try {
             productService.sellProductItem(rfid);
             return ResponseEntity.ok("Product Item with RFID " + rfid.trim() + " is successfully marked as sold.");
@@ -250,9 +269,8 @@ public class SAMController {
         }
     }
 
-    @PutMapping(path = "/productItem/return/{rfid}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> returnProductItem(@PathVariable String rfid,
-            @RequestBody(required = false) Object body) {
+    @PutMapping(path = "/productItem/return/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> returnProductItem(@PathVariable String rfid) {
         try {
             productService.returnProductItem(rfid);
             return ResponseEntity.ok("Product Item with RFID " + rfid.trim() + " is successfully marked as unsold.");
@@ -261,14 +279,14 @@ public class SAMController {
         }
     }
 
+    // Links a PromotionField to Model.
+    // A new PromotionField will be created if it does not exist.
     @PutMapping(path = "/promo/add/{modelCode}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addPromoCategory(@PathVariable String modelCode,
             @RequestBody Map<String, String> body) {
         try {
-            productService.addPromoCategory(modelCode, body.get("category"),
-                    Double.parseDouble(body.get("discountedPrice")));
-            return ResponseEntity
-                    .ok("Promotion " + body.get("category") + " is successfully added to the Model " + modelCode);
+            return ResponseEntity.ok(productService.addPromoCategory(modelCode, body.get("category"),
+                    Double.parseDouble(body.get("discountedPrice"))));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -283,12 +301,12 @@ public class SAMController {
         }
     }
 
-    @PutMapping(path = "/voucher/{amount}/{qty}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> generateVouchers(@PathVariable double amount, @PathVariable int qty,
-            @RequestBody(required = false) Object body) {
+    @PostMapping(path = "/voucher", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> generateVouchers(@RequestBody Map<String, String> body) {
         try {
-            customerService.generateVouchers(amount, qty);
-            return ResponseEntity.ok(qty + " quantity of S$" + amount + " vouchers have been successfully created.");
+            double amount = Double.parseDouble(body.get("amount"));
+            int qty = Integer.parseInt(body.get("quantity"));
+            return ResponseEntity.ok(customerService.generateVouchers(amount, qty, body.get("expDate").substring(0, 10)));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -304,23 +322,20 @@ public class SAMController {
         return customerService.getAvailableVouchersByAmount(amount);
     }
 
-    @PutMapping(path = "/voucher/issue/{voucherCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode,
-            @RequestBody(required = false) Object body) {
+    @PutMapping(path = "/voucher/issue/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode) {
         try {
-            customerService.issueVoucher(voucherCode);
-            return ResponseEntity.ok("Voucher " + voucherCode + " has been marked as issued.");
+            
+            return ResponseEntity.ok(customerService.issueVoucher(voucherCode));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PutMapping(path = "/voucher/redeem/{voucherCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> redeemVouchers(@PathVariable String voucherCode,
-            @RequestBody(required = false) Object body) {
+    @PutMapping(path = "/voucher/redeem/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> redeemVouchers(@PathVariable String voucherCode) {
         try {
-            customerService.redeemVoucher(voucherCode);
-            return ResponseEntity.ok("Voucher " + voucherCode + " has been marked as redeemed.");
+            return ResponseEntity.ok(customerService.redeemVoucher(voucherCode));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -332,16 +347,21 @@ public class SAMController {
      * ---------------------------------------------------------
      */
 
-    @GetMapping(path = "/viewSites", produces = "application/json")
-    public List<? extends Site> viewSites(@RequestParam List<String> storeTypes, @RequestParam String country,
-            @RequestParam String company) {
-        return siteService.searchAllSites(storeTypes, country, company);
+    @GetMapping(path = "/viewSites/all", produces = "application/json")
+    public List<? extends Site> viewAllSites() {
+        return siteService.getAllSites();
     }
 
-    @GetMapping(path = "/viewSites/{storeType}", produces = "application/json")
-    public List<? extends Site> viewSitesBySubclass(@PathVariable String storeType, @RequestParam String country,
+    @GetMapping(path = "/viewSites", produces = "application/json")
+    public List<? extends Site> viewSites(@RequestParam List<String> siteTypes, @RequestParam String country,
             @RequestParam String company) {
-        switch (storeType) {
+        return siteService.searchAllSites(siteTypes, country, company);
+    }
+
+    @GetMapping(path = "/viewSites/{siteType}", produces = "application/json")
+    public List<? extends Site> viewSitesBySubclass(@PathVariable String siteType, @RequestParam String country,
+            @RequestParam String company) {
+        switch (siteType) {
             case "Headquarters":
                 return siteService.searchHeadquarters(country, company);
             case "Manufacturing":
@@ -360,5 +380,61 @@ public class SAMController {
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
     public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
+    }
+
+    @GetMapping(path = "/procurementOrder/all", produces = "application/json")
+    public List<ProcurementOrder> getProcurementsOrders() {
+        return procurementService.getProcurementOrders();
+    }
+
+    @PostMapping(path = "/procurementOrder/create/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> createProcurementOrder(@RequestBody ProcurementOrder procurementOrder, @PathVariable Long siteId) {
+        try {
+            procurementService.createProcurementOrder(procurementOrder, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + procurementOrder.getId() + " is successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
+    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
+        return procurementService.getProcurementOrder(orderId);
+    }
+
+    @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
+    public List<ProcurementOrder> getProcurementOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return procurementService.getProcurementOrdersOfSite(site);
+    }
+
+    @PutMapping(path = "/procurementOrder/update/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> updateProcurementOrder(@RequestBody ProcurementOrder procurementOrder, @PathVariable Long siteId) {
+        try {
+            procurementService.updateProcurementOrder(procurementOrder, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + procurementOrder.getId() + " is successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/procurementOrder/delete/{orderId}/{siteId}")
+    public ResponseEntity<Object> deleteProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            procurementService.deleteProcurementOrder(orderId, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is successfully deleted (cancelled).");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+    
+    @PutMapping(path = "/procurementOrder/complete/{orderId}/{siteId}")
+    public ResponseEntity<Object> completeProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            procurementService.completeProcurementOrder(orderId, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is successfully deleted (cancelled).");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 }

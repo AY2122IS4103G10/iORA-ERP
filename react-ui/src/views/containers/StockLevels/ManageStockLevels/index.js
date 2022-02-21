@@ -19,10 +19,10 @@ export const ViewStockLevels = () => {
       <>
         <SectionHeading header="Stock Levels" tabs={tabs}/>
         <Routes>
-            <Route path="sites" element={<SiteStocks/>}/>
-            <Route path="products" element={<ProductStocks/>}/>
+            <Route path="sites" element={<SiteStocks subsys="sm"/>}/>
+            <Route path="products" element={<ProductStocks subsys="sm"/>}/>
             <Route path=":id" element={<AsiteStock/>} />
-            <Route path="products/:id" element={<AProductStock/>}/>
+            <Route path="products/:id" element={<AProductStock subsys="sm"/>}/>
         </Routes>
       </>
     );

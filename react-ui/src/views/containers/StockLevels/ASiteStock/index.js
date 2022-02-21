@@ -68,11 +68,6 @@ export const AsiteStock = () => {
             {/* Page header */}
             <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
               <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="relative">
-                    <span className="absolute inset-0 shadow-inner rounded-full" aria-hidden="true" />
-                  </div>
-                </div>
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">{site != null ? site.name : "loading"}</h1>
                   </div>
@@ -81,7 +76,7 @@ export const AsiteStock = () => {
 
             <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
               <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-                {/* Description list*/}
+                {/* Site Information list*/}
                 <section aria-labelledby="applicant-information-title">
                   <div className="bg-white shadow sm:rounded-lg">
                     <div className="px-4 py-5 sm:px-6">
@@ -111,10 +106,8 @@ export const AsiteStock = () => {
                           <dt className="text-sm font-medium text-gray-500">Telephone</dt>
                           <dd className="mt-1 text-sm text-gray-900">{site.phoneNumber}</dd>
                         </div>
-                        
                       </dl>
                     </div>
-                    
                   </div>
                 </section>
 

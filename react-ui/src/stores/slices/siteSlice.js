@@ -7,7 +7,6 @@ import { api } from "../../environments/Api";
 const initialState = {
   sites: [],
   currSite: [],
-  currStore: null,
   status: "idle",
   error: null,
 };

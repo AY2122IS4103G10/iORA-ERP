@@ -43,7 +43,7 @@ const convertData = (data, sites) =>
   }))
 
 
-export const AProductStock = () => {
+export const AProductStock = (subsys) => {
   const {id} = useParams();
   const dispatch = useDispatch();
   const prod = useSelector(selectAProduct);
@@ -57,7 +57,7 @@ export const AProductStock = () => {
       dispatch(getAllSites());
   }, []);
 
-
+  const path = "/" + subsys.subsys + "/stocklevels";
   return(
       <div className="min-h-full">
       <main className="py-10">
@@ -110,7 +110,7 @@ export const AProductStock = () => {
             <section aria-labelledby="stocks-level">
                 <div className="m-1">
                 {sites == undefined || stocklevel == undefined ? <p>loading</p> : 
-                  <SelectableTable columns={columns} data={convertData(stocklevel, sites)} path="/sm/stocklevels"/>
+                  <SelectableTable columns={columns} data={convertData(stocklevel, sites)} path={path}/>
                 }
                 </div>
             </section>

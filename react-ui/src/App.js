@@ -21,6 +21,7 @@ import { SiteForm } from "./views/containers/Sites/SiteForm";
 import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
 import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
 import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
+import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock ";
 
 function App() {
   return (
@@ -61,7 +62,7 @@ function App() {
 
         {/* Store Management Subsystem */}
         <Route path="/str" element={<StoreIndex/>}>
-          <Route path="stocklevels" element={<AsiteStock />}/>
+          <Route path="stocklevels/*" element={<ViewStoreStock/>}/>
         </Route>
 
         {/* Admin Subsystem */}

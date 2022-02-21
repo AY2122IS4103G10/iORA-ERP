@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 
@@ -16,7 +16,7 @@ export default function SimpleSelectMenu({ label = "", options, selected, setSel
         <>
           {Boolean(label.length) && (
             <Listbox.Label className="block text-sm font-medium text-gray-700">
-              Assigned to
+              {label}
             </Listbox.Label>
           )}
           <div className="mt-1 relative">

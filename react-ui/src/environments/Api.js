@@ -24,21 +24,26 @@ export const api = {
 
 export const voucherApi = {
   issue(id) {
-    return axios.put(`${REST_ENDPOINT}voucher/issue/${id}`);
+    return axios.put(`${REST_ENDPOINT}sam/voucher/issue/${id}`);
   },
   redeem(id) {
-    return axios.put(`${REST_ENDPOINT}voucher/redeem/${id}`);
+    return axios.put(`${REST_ENDPOINT}sam/voucher/redeem/${id}`);
   },
 };
 
 export const sitesApi = {
+  searchByType(siteType) {
+    return axios.get(
+      `${REST_ENDPOINT}sam/viewSites/${siteType}?country=&company=`
+    );
+  },
   getAll() {
-    return axios
-      .get(`${REST_ENDPOINT}sam/viewSites?storeTypes=&country=&company=`)
+    return axios.get(
+      `${REST_ENDPOINT}sam/viewSites?storeTypes=&country=&company=`
+    );
   },
 
   getASite(id) {
-    return axios
-      .get(`${REST_ENDPOINT}admin/viewSite/${id}`)
+    return axios.get(`${REST_ENDPOINT}admin/viewSite/${id}`);
   },
 };

@@ -11,9 +11,9 @@ import com.iora.erp.model.company.Employee;
 public interface EmployeeService {
     public abstract void createEmployee(Employee employee) throws EmployeeException;
     public abstract void updateEmployeeAccount(Employee employee) throws EmployeeException;
-    public abstract void removeEmployee(Employee employee) throws EmployeeException;
-    public abstract void blockEmployee(Employee employee) throws EmployeeException;
-    public abstract void unblockEmployee(Employee employee) throws EmployeeException;
+    public abstract void removeEmployee(Long id) throws EmployeeException;
+    public abstract void blockEmployee(Long id) throws EmployeeException;
+    public abstract void unblockEmployee(Long id) throws EmployeeException;
     public abstract List<Employee> listOfEmployee() throws EmployeeException;
     public abstract List<Employee> getEmployeeByFields(String search) throws EmployeeException;
     public abstract Employee getEmployeeById(Long id)  throws EmployeeException;

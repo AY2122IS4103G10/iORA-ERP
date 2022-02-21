@@ -43,7 +43,7 @@ public interface AdminService {
     public abstract List<Address> getListAddressFields(String search);
     public abstract Boolean checkAddress(Address address) ;
 
-    public abstract void createCompany(Company company, Address address) throws CompanyException;
+    public abstract void createCompany(Company company) throws CompanyException;
     public abstract void addADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException;
     public abstract void addAVendorToCompany(Long cid, Long vid) throws CompanyException, VendorException;
     public abstract void removeADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException;
@@ -62,6 +62,9 @@ public interface AdminService {
     public abstract void deleteVendor(Vendor vendor) throws VendorException;
     public abstract Vendor getVendorById(Long id)  throws VendorException;
     public abstract Boolean uniqueVendorName(String name) throws VendorException;
+
+    public abstract List<String> getCountryCodes();
+    public abstract String convertCodeToCountry(String code);
 
 }
 

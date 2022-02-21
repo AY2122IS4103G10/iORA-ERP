@@ -5,9 +5,11 @@ import java.util.List;
 
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Address;
+import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
+import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.EmployeeService;
@@ -93,6 +95,27 @@ public class AdminController {
             return adminService.getJobTitleById(id);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    @PostMapping(path = "/addVendor", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addCompany(@RequestBody Vendor v) {
+        try {
+            adminService.createVendor(v);
+            return ResponseEntity.ok("Vendor has been successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+
+    @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addCompany(@RequestBody Company company) {
+        try {
+            adminService.createCompany(company);
+            return ResponseEntity.ok("Job title has been successfully created");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
@@ -240,21 +263,31 @@ public class AdminController {
         }
     }
 
-    @PutMapping(path = "/enableEmployee", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> enableEmployee(@RequestBody Employee employee) {
+    @DeleteMapping(path = "/deleteEmployee")
+    public ResponseEntity<Object> deleteEmployee(@RequestParam Long id) {
         try {
-            employeeService.unblockEmployee(employee);
-            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " has been activated.");
+            employeeService.removeEmployee(id);
+            return ResponseEntity.ok("Employee with employee ID " + id + " is successfully deleted.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PutMapping(path = "/disableEmployee", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> disableEmployee(@RequestBody Employee employee) {
+    @PutMapping(path = "/enableEmployee", produces = "application/json")
+    public ResponseEntity<Object> enableEmployee(@RequestParam Long id) {
         try {
-            employeeService.blockEmployee(employee);
-            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " has been blocked.");
+            employeeService.unblockEmployee(id);
+            return ResponseEntity.ok("Employee with employee ID " + id + " has been activated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/disableEmployee", produces = "application/json")
+    public ResponseEntity<Object> disableEmployee(@RequestParam Long id) {
+        try {
+            employeeService.blockEmployee(id);
+            return ResponseEntity.ok("Employee with employee ID " + id + " has been blocked.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

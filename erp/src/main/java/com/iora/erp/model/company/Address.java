@@ -21,8 +21,7 @@ public class Address implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Country country;
+    private String country;
     @Column(nullable = false)
     private String city;
     @Column(nullable = false)
@@ -45,13 +44,13 @@ public class Address implements Serializable{
 
     public Address(String country, String city, String building, String state, String unit, String road, String postalCode,
             Boolean billing, double latitude, double longitude) {
-        this.country = Country.valueOf(country.toUpperCase());
-        this.city = city;
-        this.building = building;
-        this.state = state;
-        this.unit = unit;
-        this.road = road;
-        this.postalCode = postalCode;
+        this.country = country;
+        this.city = city.toUpperCase();
+        this.building = building.toUpperCase();
+        this.state = state.toUpperCase();
+        this.unit = unit.toUpperCase();
+        this.road = road.toUpperCase();
+        this.postalCode = postalCode.toUpperCase();
         this.billing = billing;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -68,11 +67,11 @@ public class Address implements Serializable{
         this.id = id;
     }
 
-    public Country getCountry() {
+    public String getCountry() {
         return country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(String country) {
         this.country = country;
     }
 

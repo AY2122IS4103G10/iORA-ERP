@@ -4,7 +4,6 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -43,6 +42,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 em.persist(e);
                 e.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
                 e.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
+                e.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
             } else {
                 throw new EmployeeException();
             }
@@ -102,8 +102,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void blockEmployee(Employee employee) throws EmployeeException {
-        Employee e = em.find(Employee.class, employee.getId());
+    public void blockEmployee(Long id) throws EmployeeException {
+        Employee e = em.find(Employee.class, id);
 
         if (e == null) {
             throw new EmployeeException("Employee not found");
@@ -112,8 +112,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void unblockEmployee(Employee employee) throws EmployeeException {
-        Employee e = em.find(Employee.class, employee.getId());
+    public void unblockEmployee(Long id) throws EmployeeException {
+        Employee e = em.find(Employee.class, id);
 
         if (e == null) {
             throw new EmployeeException("Employee not found");
@@ -122,9 +122,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void removeEmployee(Employee employee) throws EmployeeException {
+    public void removeEmployee(Long id) throws EmployeeException {
         try {
-            Employee e = em.find(Employee.class, employee.getId());
+            Employee e = em.find(Employee.class, id);
 
             if (e == null) {
                 throw new EmployeeException("Employee not found");
@@ -133,7 +133,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             em.remove(e);
             em.flush();
         } catch (IllegalArgumentException | TransactionRequiredException ex) {
-            blockEmployee(employee);
+            blockEmployee(id);
         }
     }
 

@@ -1,8 +1,10 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -11,7 +13,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
-import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.AddressException;
 import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.DepartmentException;
@@ -70,20 +71,20 @@ public class AdminServiceImpl implements AdminService {
     public void deleteJobTitle(Long id) throws JobTitleException {
         JobTitle j = em.find(JobTitle.class, id);
 
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.jobTitle.id = :jobTitle");
-        q.setParameter("jobTitle", id);
-        Boolean employeeCheck = false;
+        Query p = em.createQuery("SELECT e FROM Department e WHERE e.jobTitle.id = :jobTitle");
+        p.setParameter("jobTitle", id);
+        List<Department> dd = p.getResultList();
+        Boolean departmentCheck = false;
 
-        try {
-            Employee e = (Employee) q.getSingleResult();
-        } catch (Exception ex) {
-            employeeCheck = true;
+        if (dd.size() > 0) {
+            departmentCheck = true;
         }
+
 
         if (j == null) {
             throw new JobTitleException("JobTitle not found");
-        } else if (employeeCheck == false) {
-            throw new JobTitleException("JobTitle is currently being used.");
+        } else if (departmentCheck == true) {
+            throw new JobTitleException("Failure: Department is currently being used.");
         } else {
             em.remove(j);
             em.flush();
@@ -188,9 +189,24 @@ public class AdminServiceImpl implements AdminService {
             if (e == null) {
                 throw new DepartmentException("Department not found");
             }
-            e.setJobTitles(new ArrayList<>());
-            em.remove(e);
-            em.flush();
+
+            Query q = em.createQuery("SELECT e FROM Employee e WHERE e.department.id = :id");
+            q.setParameter("id", id);
+
+            List<Department> d = q.getResultList();
+            Boolean checkDepartment = false;
+
+            if(d.size() > 0) {
+                checkDepartment = true;
+            }
+
+            if (checkDepartment == true) {
+                throw new DepartmentException("Failure: Department is currently being used.");
+            } else {
+                e.setJobTitles(new ArrayList<>());
+                em.remove(e);
+                em.flush();
+            }
         } catch (IllegalArgumentException | TransactionRequiredException ex) {
             throw new DepartmentException("Department cannot be removed");
         }
@@ -347,12 +363,12 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override // address to be persist beforehand, vendor and department and site is seperated
-    public void createCompany(Company company, Address address) throws CompanyException {
+    public void createCompany(Company company) throws CompanyException {
         try {
             em.persist(company);
 
-            Address a = getAddressById(address.getId());
-            company.setAddress(a);
+            //Address a = getAddressById(address.getId());
+            //company.setAddress(a);
 
         } catch (Exception ex) {
             throw new CompanyException("Company has already been created");
@@ -509,11 +525,18 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    // need to add address first
     @Override
     public void createVendor(Vendor vendor) throws VendorException {
         try {
-            em.persist(vendor);
+            Vendor newV = vendor;
+            newV.setAddress(new ArrayList<>());
+            em.persist(newV);
+
+            for(Address aa :  vendor.getAddress()) {
+                em.persist(aa);
+                newV.getAddress().add(aa);
+            }
+
         } catch (Exception ex) {
             throw new VendorException("Vendor has already already been created");
         }
@@ -589,6 +612,19 @@ public class AdminServiceImpl implements AdminService {
             return true;
         }
 
+    }
+
+    @Override
+    public List<String> getCountryCodes() {
+        String[] countryCodes = Locale.getISOCountries();
+        List<String> code = Arrays.asList(countryCodes);
+        return code;
+    }
+
+    @Override
+    public String convertCodeToCountry(String code) {
+        Locale locale = new Locale("english", code);
+        return locale.getCountry();
     }
 
 }

@@ -30,7 +30,7 @@ public class Company implements Serializable {
     @Column(nullable = false)
     private Boolean active;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Address address;
     @ManyToMany
     private List<Department> departments;

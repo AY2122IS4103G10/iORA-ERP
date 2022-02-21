@@ -3,9 +3,7 @@ package com.iora.erp.model.company;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -13,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import com.iora.erp.enumeration.PayType;
 
@@ -41,10 +40,12 @@ public class Employee {
     private JobTitle jobTitle;
     @ManyToOne(fetch = FetchType.EAGER)
     private Department department;
+    @OneToOne(fetch = FetchType.EAGER)
+    private Company company;
 
 
     public Employee(String name, String email, Double salary, String username, String password, Boolean availStatus,
-            PayType payType, JobTitle jobTitle, Department department) {
+            PayType payType, JobTitle jobTitle, Department department, Company company) {
         this.name = name;
         this.email = email;
         this.salary = salary;
@@ -54,6 +55,7 @@ public class Employee {
         this.payType = payType;
         this.jobTitle = jobTitle;
         this.department = department;
+        this.company = company;
     }
 
     public Employee() {
@@ -169,6 +171,14 @@ public class Employee {
 
     public void setPayType(PayType payType) {
         this.payType = payType;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
 }

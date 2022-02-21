@@ -5,24 +5,13 @@ import { CogIcon } from "@heroicons/react/outline";
 
 import {
   SimpleTable,
-  SelectColumnFilter,
   OptionsCell,
+  SelectColumnFilter,
 } from "../../../components/Tables/SimpleTable";
 import {
   fetchProducts,
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
-
-const processFields = (fields, selector) => {
-  const fieldValues = [];
-  Boolean(fields) &&
-    fields
-      .filter((field) => field.fieldName === selector)
-      .forEach((field) => fieldValues.push(field.fieldValue));
-  return fieldValues.length
-    ? fieldValues.join(", ")
-    : `No ${selector.toLowerCase()}s`;
-};
 
 export const ProductsTable = () => {
   const columns = useMemo(
@@ -45,11 +34,19 @@ export const ProductsTable = () => {
       },
       {
         Header: "Color",
-        accessor: (row) => processFields(row.productFields, "COLOUR"),
+        accessor: (row) =>
+          row.productFields
+            .filter((field) => field.fieldName === "COLOUR")
+            .map((field) => field.fieldValue)
+            .join(", "),
       },
       {
         Header: "Size",
-        accessor: (row) => processFields(row.productFields, "SIZE"),
+        accessor: (row) =>
+          row.productFields
+            .filter((field) => field.fieldName === "SIZE")
+            .map((field) => field.fieldValue)
+            .join(", "),
       },
       {
         Header: "List Price",

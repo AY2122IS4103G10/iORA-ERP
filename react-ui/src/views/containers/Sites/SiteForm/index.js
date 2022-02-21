@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { addNewVouchers } from "../../../../stores/slices/voucherSlice";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
-import "react-datepicker/dist/react-datepicker.css";
 import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { addNewSites } from "../../../../stores/slices/siteSlice";
 
 const siteTypes = [
-  { id: 1, name: "Headquarters", value: "Headquarters" },
-  { id: 2, name: "Manufacturing", value: "Manufacturing" },
-  { id: 3, name: "Online Store", value: "Online Store" },
-  { id: 4, name: "Store", value: "Store" },
-  { id: 5, name: "Warehouse", value: "Warehouse" },
+  { id: 1, name: "Headquarters" },
+  { id: 2, name: "Manufacturing" },
+  { id: 3, name: "Online Store" },
+  { id: 4, name: "Store" },
+  { id: 5, name: "Warehouse" },
 ];
+
+const companies = [{ id: 1, name: "iORA Fashion Pte. Ltd." }];
 
 const AddressField = ({
   address1,
@@ -48,7 +49,7 @@ const AddressField = ({
           htmlFor="address"
           className="block text-sm font-medium text-gray-700"
         >
-          Address 1
+          Address
         </label>
         <div className="mt-1">
           <input
@@ -151,7 +152,7 @@ const AddressField = ({
             htmlFor="address"
             className="block text-sm font-medium text-gray-700"
           >
-            State
+            State / Province
           </label>
           <div className="mt-1">
             <input
@@ -172,7 +173,7 @@ const AddressField = ({
           htmlFor="address"
           className="block text-sm font-medium text-gray-700"
         >
-          Postal Code
+          ZIP / Postal code
         </label>
         <div className="mt-1">
           <input
@@ -237,6 +238,10 @@ const SiteFormBody = ({
   isEditing,
   name,
   onNameChanged,
+  siteCode,
+  onSiteCodeChanged,
+  phone,
+  onPhoneChanged,
   address1,
   onAddress1Changed,
   onBuildingChanged,
@@ -255,13 +260,14 @@ const SiteFormBody = ({
   onLatitudeChanged,
   longitude,
   onLongitudeChanged,
-  siteCode,
-  onSiteCodeChanged,
   onAddSiteClicked,
   onCancelClicked,
   siteTypeSelected,
   setSiteTypeSelected,
   siteTypes,
+  companySelected,
+  setCompanySelected,
+  companies,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">{!isEditing ? "Add" : "Edit"} New Site</h1>
@@ -314,9 +320,23 @@ const SiteFormBody = ({
                         type="text"
                         name="siteCode"
                         id="siteCode"
-                        autoComplete="siteCode"
                         value={siteCode}
                         onChange={onSiteCodeChanged}
+                        required
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Phone"
+                      inputField="phone"
+                      className="relative rounded-md sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="phone"
+                        id="phone"
+                        placeholder="+65-"
+                        value={phone}
+                        onChange={onPhoneChanged}
                         required
                       />
                     </SimpleInputGroup>
@@ -346,9 +366,9 @@ const SiteFormBody = ({
                       className="relative rounded-md sm:mt-0 sm:col-span-2"
                     >
                       <SimpleSelectMenu
-                        options={siteTypes}
-                        selected={siteTypeSelected}
-                        setSelected={setSiteTypeSelected}
+                        options={companies}
+                        selected={companySelected}
+                        setSelected={setCompanySelected}
                       />
                     </SimpleInputGroup>
                   </div>
@@ -394,17 +414,19 @@ export const SiteForm = () => {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [siteCode, setSideCode] = useState("");
+  const [phone, setPhone] = useState("");
   const [active, setActive] = useState(false);
-  const [stockLevel, setStockLevel] = useState(null);
   const [company, setCompany] = useState(null);
-  const [procurementOrders, setProcurementOrders] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [siteTypeSelected, setSiteTypeSelected] = useState(siteTypes[1]);
+  const [siteTypeSelected, setSiteTypeSelected] = useState(siteTypes[0]);
+  const [companySelected, setCompanySelected] = useState(companies[0]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const onNameChanged = (e) => setName(e.target.value);
+  const onSiteCodeChanged = (e) => setSideCode(e.target.value);
+  const onPhoneChanged = (e) => setPhone(e.target.value);
   const onAddress1Changed = (e) => setAddress1(e.target.value);
   const onBuildingChanged = (e) => setBuilding(e.target.value);
   const onUnitChanged = (e) => setUnit(e.target.value);
@@ -414,16 +436,53 @@ export const SiteForm = () => {
   const onPostalCodeChanged = (e) => setPostalCode(e.target.value);
   const onLatitudeChanged = (e) => setLatitude(e.target.value);
   const onLongitudeChanged = (e) => setLongitude(e.target.value);
-  const onSiteCodeChanged = (date) => setSideCode(date);
 
   const [requestStatus, setRequestStatus] = useState("idle");
-  const canAdd = [name, siteCode].every(Boolean) && requestStatus === "idle";
+  const canAdd =
+    [
+      name,
+      country,
+      city,
+      building,
+      state,
+      unit,
+      address1,
+      postalCode,
+      latitude,
+      longitude,
+      siteCode,
+      phone,
+    ].every(Boolean) && requestStatus === "idle";
   const onAddSiteClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
       try {
         setRequestStatus("pending");
-        dispatch(addNewVouchers({ name, expiry: siteCode })).unwrap();
+        dispatch(
+          addNewSites(siteTypeSelected.name, {
+            name,
+            address: {
+              country,
+              city,
+              building,
+              state,
+              unit,
+              road: address1,
+              postalCode,
+              billing: false,
+              latitude,
+              longitude,
+              coordinates: `(${latitude}, ${longitude})`,
+            },
+            siteCode,
+            phoneNumber: phone,
+            active: true,
+            company: {
+              id: companySelected.id,
+              name: companySelected.name,
+            },
+          })
+        ).unwrap();
         alert("Successfully added site");
         setName("");
         setAddress1("");
@@ -441,22 +500,14 @@ export const SiteForm = () => {
   useEffect(() => {
     Boolean(siteId) &&
       api.get("admin/viewSite", siteId).then((response) => {
-        const {
-          name,
-          address,
-          siteCode,
-          active,
-          stockLevel,
-          company,
-          procurementOrders,
-        } = response.data;
+        const { name, address, siteCode, active, phone, company } =
+          response.data;
         setIsEditing(true);
         setName(name);
         setSideCode(siteCode);
         setActive(active);
-        setStockLevel(stockLevel);
+        setPhone(phone);
         setCompany(company);
-        setProcurementOrders(procurementOrders);
       });
   }, [siteId]);
 
@@ -465,6 +516,10 @@ export const SiteForm = () => {
       isEditing={isEditing}
       name={name}
       onNameChanged={onNameChanged}
+      siteCode={siteCode}
+      onSiteCodeChanged={onSiteCodeChanged}
+      phone={phone}
+      onPhoneChanged={onPhoneChanged}
       address1={address1}
       onAddress1Changed={onAddress1Changed}
       building={building}
@@ -483,13 +538,14 @@ export const SiteForm = () => {
       onLatitudeChanged={onLatitudeChanged}
       longitude={longitude}
       onLongitudeChanged={onLongitudeChanged}
-      siteCode={siteCode}
-      onSiteCodeChanged={onSiteCodeChanged}
       onAddSiteClicked={onAddSiteClicked}
       onCancelClicked={onCancelClicked}
       siteTypeSelected={siteTypeSelected}
       setSiteTypeSelected={setSiteTypeSelected}
       siteTypes={siteTypes}
+      companySelected={companySelected}
+      setCompanySelected={setCompanySelected}
+      companies={companies}
     />
   );
 };

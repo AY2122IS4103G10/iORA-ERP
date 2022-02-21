@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
 
-export default function ConfirmDelete({ item = "item", open, setOpen, closeModal, onConfirm }) {
+export default function ConfirmDelete({ item = "item", open, closeModal, onConfirm }) {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog

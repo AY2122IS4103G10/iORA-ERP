@@ -14,13 +14,14 @@ import {
   selectAllSites,
 } from "../../../../stores/slices/siteSlice";
 import { selectAllProcurements } from "../../../../stores/slices/procurementSlice";
+import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 
-export const ProcurementTable = () => {
+export const ProcurementTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
         Header: "Id",
-        accessor: "orderId",
+        accessor: "id",
       },
       // {
       //   Header: "Code",
@@ -49,7 +50,7 @@ export const ProcurementTable = () => {
       //     options: [
       //       {
       //         name: "Delete",
-      //         navigate: "/sites",
+      //         navigate: "/procurements",
       //       },
       //     ],
       //   }),
@@ -57,19 +58,6 @@ export const ProcurementTable = () => {
     ],
     []
   );
-  const dispatch = useDispatch();
-  const data = useSelector(selectAllProcurements);
-  // const siteStatus = useSelector((state) => state.sites.status);
-  // useEffect(() => {
-  //   siteStatus === "idle" &&
-  //     dispatch(
-  //       fetchSites({
-  //         storeTypes: ["Store", "Headquarters"],
-  //         country: "Singapore",
-  //         company: "iORA",
-  //       })
-  //     );
-  // }, [siteStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
@@ -80,5 +68,22 @@ export const ProcurementTable = () => {
 };
 
 export const ProcurementList = () => {
-  return <ProcurementTable />;
+  const dispatch = useDispatch();
+  const data = useSelector(selectAllProcurements);
+  // const procurementStatus = useSelector((state) => state.procurements.status);
+  // useEffect(() => {
+  //   procurementStatus === "idle" &&
+  //     dispatch(
+  //       fetchSites({
+  //         storeTypes: ["Store", "Headquarters"],
+  //         country: "Singapore",
+  //         company: "iORA",
+  //       })
+  //     );
+  // }, [procurementStatus, dispatch]);
+  return Boolean(data.length) ? (
+    <ProcurementTable data={data} />
+  ) : (
+    <DashedBorderES item="procurement order"/>
+  );
 };

@@ -330,10 +330,19 @@ public class SAMController {
         return customerService.getAvailableVouchersByAmount(amount);
     }
 
+    @DeleteMapping(path = "/voucher/delete/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> deleteVoucher(@PathVariable String voucherCode) {
+        try {
+            customerService.deleteVoucher(voucherCode);
+            return ResponseEntity.ok("Voucher with voucher code " + voucherCode + " has been deleted successfully.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/voucher/issue/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode) {
         try {
-
             return ResponseEntity.ok(customerService.issueVoucher(voucherCode));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());

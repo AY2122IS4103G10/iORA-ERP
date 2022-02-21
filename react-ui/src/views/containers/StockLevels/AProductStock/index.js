@@ -80,7 +80,6 @@ export const AProductStock = () => {
                     ) : ""}
                   </dl>
                 </div>
-                
               </div>
             </section>
 

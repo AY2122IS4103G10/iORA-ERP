@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.iora.erp.exception.StockTransferException;
-import com.iora.erp.model.procurementOrder.ProcurementOrder;
+import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
-import com.iora.erp.service.ProcurementService;
+import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
 
@@ -32,9 +32,9 @@ public class StoreController {
     @Autowired
     private SiteService siteService;
     @Autowired
-    private ProcurementService procurementService;
-    @Autowired
     private StockTransferService stockTransferService;
+    @Autowired
+    private CustomerOrderService customerOrderService;
 
     /*
      * ---------------------------------------------------------
@@ -86,28 +86,6 @@ public class StoreController {
         }
     }
 
-    /*
-     * ---------------------------------------------------------
-     * F.3 Store Order Management
-     * ---------------------------------------------------------
-     */
-
-    @GetMapping(path = "/procurementOrder/all", produces = "application/json")
-    public List<ProcurementOrder> getProcurementsOrders() {
-        return procurementService.getProcurementOrders();
-    }
-
-    @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
-    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
-        return procurementService.getProcurementOrder(orderId);
-    }
-
-    @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
-    public List<ProcurementOrder> getProcurementOrdersOfSite(@PathVariable Long siteId) {
-        Site site = siteService.getSite(siteId);
-        return procurementService.getProcurementOrdersOfSite(site);
-    }
-
     @GetMapping(path = "/stockTransferOrder/all", produces = "application/json")
     public List<StockTransferOrder> getStockTransferOrders() {
         return stockTransferService.getStockTransferOrders();
@@ -132,4 +110,33 @@ public class StoreController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
+    /*
+     * ---------------------------------------------------------
+     * F.3 Store Order Management
+     * ---------------------------------------------------------
+     */
+
+    @GetMapping(path = "/customerOrder/{siteId}", produces = "application/json")
+    public List<CustomerOrder> getStoreOrders(@PathVariable Long siteId) {
+        return customerOrderService.getInStoreOrdersBySite(siteId);
+    }
+
+    // YYYY-MM-dd
+    @GetMapping(path = "/customerOrder/{siteId}/{date}", produces = "application/json")
+    public List<CustomerOrder> getStoreOrdersByDate(@PathVariable Long siteId, @PathVariable String date) {
+        return customerOrderService.getInStoreOrdersBySiteDate(siteId, date);
+    }
+
+    @GetMapping(path = "/customerOrder/view/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> getCustomerOrder(Long orderId) {
+        try {
+            return ResponseEntity
+                    .ok(customerOrderService.getCustomerOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    
 }

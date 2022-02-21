@@ -22,12 +22,11 @@ import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.RefundLI;
 
-/*
- * ---------------------------------------------------------
- * Methods are not tested yet, for implementation in Second System Release
- * ---------------------------------------------------------
- */
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service("customerOrderServiceImpl")
+@Transactional
 public class CustomerOrderServiceImpl implements CustomerOrderService {
     @PersistenceContext
     private EntityManager em;
@@ -44,19 +43,53 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<OnlineOrder> getOnlineOrders() {
+    public List<OnlineOrder> getAllOnlineOrders() {
         TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo", OnlineOrder.class);
         return q.getResultList();
     }
 
     @Override
-    public List<CustomerOrder> getInStoreOrders() {
+    public List<OnlineOrder> getOnlineOrdersBySite(Long siteId) {
+        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.onlineStoreSiteId = :siteId",
+                OnlineOrder.class);
+        q.setParameter("siteId", siteId);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<OnlineOrder> getOnlineOrdersBySiteDate(Long siteId, String date) {
+        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.storeSiteId = :siteId AND SUBSTRING(oo.dateTime, 0, 10) = :date",
+        OnlineOrder.class);
+        q.setParameter("siteId", siteId);
+        q.setParameter("date", date);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<CustomerOrder> getAllInStoreOrders() {
         TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co", CustomerOrder.class);
         List<CustomerOrder> customerOrders = q.getResultList();
 
-        customerOrders.removeAll(getOnlineOrders());
+        customerOrders.removeAll(getAllOnlineOrders());
 
         return customerOrders;
+    }
+
+    @Override
+    public List<CustomerOrder> getInStoreOrdersBySite(Long siteId) {
+        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId",
+                CustomerOrder.class);
+        q.setParameter("siteId", siteId);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date) {
+        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId AND SUBSTRING(co.dateTime, 0, 10) = :date",
+                CustomerOrder.class);
+        q.setParameter("siteId", siteId);
+        q.setParameter("date", date);
+        return q.getResultList();
     }
 
     @Override
@@ -209,7 +242,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 .stream()
                 .mapToDouble(x -> x.getAmount())
                 .sum();
-
         List<MembershipTier> tiers = em
                 .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
                 .getResultList();
@@ -244,4 +276,5 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         customer.setMembershipPoints(membershipPoints);
 
     }
+
 }

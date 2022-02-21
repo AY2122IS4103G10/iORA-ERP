@@ -181,7 +181,7 @@ public class DataLoader implements CommandLineRunner {
         em.persist(sgd);
 
         Map<Currency,Integer> birthday = Map.of(rm, 500, sgd, 200);
-        BirthdayPoints bday = new BirthdayPoints("STANDARD", birthday, 1);
+        BirthdayPoints bday = new BirthdayPoints("STANDARD", birthday, 1, 2.00);
         em.persist(bday);
 
         MembershipTier basic = new MembershipTier("BASIC", 0.00, Map.of(rm, 0, sgd, 0), bday);

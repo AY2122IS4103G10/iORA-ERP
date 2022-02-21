@@ -2,6 +2,7 @@ package com.iora.erp.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.List;
 
@@ -193,6 +194,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     // Helper methods
+
+    // TODO: update after currency amount added to payments
     public void updateMembershipPoints(CustomerOrder order) {
         Customer customer = order.getCustomer();
 
@@ -218,18 +221,27 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
         customer.setMembershipTier(membershipTier);
 
+        double bdayMultiplier = 1;
         int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
         Calendar cal = Calendar.getInstance();
         cal.setTime(customer.getDob());
         if (currentMonth == cal.get(Calendar.MONTH)) {
-
-        } else {
-            Integer membershipPoints = customer.getMembershipPoints();
-            for (Payment p : order.getPayments()) {
-                membershipPoints = Integer.sum(membershipPoints, (int) (p.getAmount() * membershipTier.getMultiplier()));
+            Integer ordersThisMonth = em
+                    .createQuery("SELECT o FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
+                    CustomerOrder.class)
+                    .setParameter("id", customer.getId())
+                    .setParameter("date", Timestamp.valueOf(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())), TemporalType.TIMESTAMP)
+                    .getResultList()
+                    .size();
+            if (ordersThisMonth == 0) {
+                bdayMultiplier = membershipTier.getBirthday().getMultiplier();
             }
-            customer.setMembershipPoints(membershipPoints);
         }
+        Integer membershipPoints = customer.getMembershipPoints();
+        for (Payment p : order.getPayments()) {
+            membershipPoints = Integer.sum(membershipPoints, (int) (p.getAmount() * bdayMultiplier * membershipTier.getMultiplier()));
+        }
+        customer.setMembershipPoints(membershipPoints);
 
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
 
 public interface CustomerService {
@@ -25,4 +26,7 @@ public interface CustomerService {
     public abstract List<Voucher> getAvailableVouchersByAmount(double amount);
     public abstract Voucher issueVoucher(String voucherCode) throws CustomerException;
     public abstract Voucher redeemVoucher(String voucherCode) throws CustomerException;
+
+    public abstract List<MembershipTier> listOfMembershipTier();
+    public abstract void createMembershipTier(MembershipTier membershipTier);
 }

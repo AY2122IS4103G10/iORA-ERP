@@ -7,6 +7,7 @@ import java.util.Map;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Model;
@@ -522,6 +523,21 @@ public class SAMController {
      * ---------------------------------------------------------
      */
 
+    @GetMapping(path = "/membershipTier/all", produces = "application/json")
+    public List<MembershipTier> getAllMembershipTiers() {
+        return customerService.listOfMembershipTier();
+    }
+
+    @PostMapping(path = "/membershipTier/create", consumes = "application/json")
+    public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {
+        try {
+            customerService.createMembershipTier(tier);
+            return ResponseEntity.ok("Membership Tier (" + tier.getName() + ") was successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/customer/view/all", produces = "application/json")
     public List<Customer> viewAllCustomers() {
         return customerService.listOfCustomer();
@@ -536,6 +552,38 @@ public class SAMController {
     public ResponseEntity<Object> getCustomerById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(customerService.getCustomerById(id));
+        } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customer/create", consumes = "application/json")
+    public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
+        try {
+            customerService.createCustomerAccount(customer);;
+            return ResponseEntity.ok("Customer with id " + customer.getId() + " was successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/customer/block/{id}")
+    public ResponseEntity<Object> blockCustomerById(@PathVariable Long id) {
+        try {
+            Customer customer = customerService.getCustomerById(id);
+            customerService.blockCustomer(customer);
+            return ResponseEntity.ok("Customer with id " + id + " successfully blocked");
+        } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/customer/unblock/{id}")
+    public ResponseEntity<Object> unblockCustomerById(@PathVariable Long id) {
+        try {
+            Customer customer = customerService.getCustomerById(id);
+            customerService.unblockCustomer(customer);
+            return ResponseEntity.ok("Customer with id " + id + " successfully blocked");
         } catch (CustomerException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

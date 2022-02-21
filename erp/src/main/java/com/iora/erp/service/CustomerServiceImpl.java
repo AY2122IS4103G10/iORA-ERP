@@ -3,7 +3,9 @@ package com.iora.erp.service;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import javax.persistence.EntityManager;
@@ -14,7 +16,10 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
+import com.iora.erp.model.Currency;
+import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
 
 import org.springframework.stereotype.Service;
@@ -198,6 +203,19 @@ public class CustomerServiceImpl implements CustomerService {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setRedeemed(true);
         return voucher;
+    }
+
+    @Override
+    public List<MembershipTier> listOfMembershipTier() {
+        return em.createQuery("SELECT m FROM MembershipTier m", MembershipTier.class).getResultList();
+    }
+
+    @Override
+    public void createMembershipTier(MembershipTier membershipTier) {
+        if (membershipTier.getBirthday() == null) {
+            membershipTier.setBirthday(em.find(BirthdayPoints.class, "STANDARD"));
+        }
+        em.merge(membershipTier);
     }
 
 }

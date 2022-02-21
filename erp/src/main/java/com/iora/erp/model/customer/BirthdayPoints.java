@@ -15,10 +15,15 @@ public class BirthdayPoints {
     @ElementCollection
     private Map<Currency,Integer> birthday;
     private int quota;
+    private double multiplier;
 
-    public BirthdayPoints(String name, Map<Currency,Integer> birthday, int quota) {
+    public BirthdayPoints() {
+    }
+
+    public BirthdayPoints(String name, Map<Currency,Integer> birthday, int quota, double multiplier) {
         this.name = name;
         this.birthday = birthday;
+        this.multiplier = multiplier;
     }
 
     public String getName() {
@@ -43,6 +48,14 @@ public class BirthdayPoints {
 
     public void setQuota(int quota) {
         this.quota = quota;
+    }
+
+    public double getMultiplier() {
+        return this.multiplier;
+    }
+
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
     }
     
 }

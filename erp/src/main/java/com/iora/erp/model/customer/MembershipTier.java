@@ -1,33 +1,33 @@
 package com.iora.erp.model.customer;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.iora.erp.model.Currency;
+import com.iora.erp.model.CurrencyDeserializer;
 
 @Entity
 public class MembershipTier {
-    // Tier ( Point Accumulation, RM Threshold, SGD Threshold)
-    // 
-    // private static int birthdayCapRM = 500;
-    // private static int birthdayCapSGD = 200;
-    private static final long serialVersionUID = 1L;
     @Id
     private String name;
     private double multiplier;
     @ElementCollection
-    private Map<Currency,Integer> threshold;
+    @JsonDeserialize(keyUsing = CurrencyDeserializer.class)
+    private Map<Currency, Integer> threshold;
     @ManyToOne
     private BirthdayPoints birthday;
 
-    public MembershipTier(String name, double multiplier, Map<Currency,Integer> threshold, BirthdayPoints birthday) {
+    public MembershipTier() {
+        threshold = new HashMap<>();
+    }
+
+    public MembershipTier(String name, double multiplier, Map<Currency, Integer> threshold, BirthdayPoints birthday) {
         this.name = name;
         this.multiplier = multiplier;
         this.threshold = threshold;
@@ -50,11 +50,11 @@ public class MembershipTier {
         this.multiplier = multiplier;
     }
 
-    public Map<Currency,Integer> getThreshold() {
+    public Map<Currency, Integer> getThreshold() {
         return this.threshold;
     }
 
-    public void setThreshold(Map<Currency,Integer> threshold) {
+    public void setThreshold(Map<Currency, Integer> threshold) {
         this.threshold = threshold;
     }
 

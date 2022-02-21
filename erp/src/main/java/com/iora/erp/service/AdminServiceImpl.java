@@ -136,14 +136,17 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void createDepartment(Department department) throws DepartmentException {
         try {
-            Department d = new Department(department.getDeptName());
+            Department d = new Department();
+            d.setDeptName(department.getDeptName());
+            
             em.persist(d);
-
-
+            
             for (JobTitle j : department.getJobTitles()) {
                 JobTitle jt = getJobTitleById(j.getId());
+                System.out.println(d.getJobTitles());
                 d.getJobTitles().add(jt);
             }
+            System.out.println(d);
 
         } catch (Exception ex) {
             throw new DepartmentException("Department has already been created");
@@ -160,19 +163,17 @@ public class AdminServiceImpl implements AdminService {
 
         try {
             old.setDeptName(department.getDeptName());
+            old.setJobTitles(new ArrayList<>());
+            for (JobTitle j : department.getJobTitles()) {
+                JobTitle newJ = getJobTitleById(j.getId());
+                old.getJobTitles().add(newJ);
+            }
         } catch (Exception ex) {
             throw new DepartmentException("Department " + department.getDeptName() + " has been used!");
         }
 
-        old.setJobTitles(new ArrayList<>());
-        for (JobTitle j : department.getJobTitles()) {
-            try {
-                JobTitle newJ = getJobTitleById(j.getId());
-                old.getJobTitles().add(newJ);
-            } catch (JobTitleException e) {
-                throw new DepartmentException("Error occured while changing Job Title");
-            }
-        }
+
+        System.out.println(old);
     }
 
     @Override
@@ -208,6 +209,7 @@ public class AdminServiceImpl implements AdminService {
         if(search == null) {
             return listOfDepartments();
         }
+
         Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.deptName) LIKE :name");
         q.setParameter("name", "%" + search.toLowerCase() + "%");
         return q.getResultList();

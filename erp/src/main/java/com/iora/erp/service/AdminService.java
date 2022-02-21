@@ -29,7 +29,7 @@ public interface AdminService {
     public abstract void editDepartment(Department department) throws DepartmentException;
     public abstract void deleteDepartment(Department department) throws DepartmentException;
     public abstract List<Department> listOfDepartments() throws DepartmentException;
-    public abstract List<Department> getDepartmentsByFields(String search);
+    public abstract List<Department> getDepartmentsByFields(String search) throws DepartmentException;
     public abstract Department getDepartmentById(Long id)  throws DepartmentException;
     public abstract Department getDepartmentsByName(String name) ;
     public abstract List<Employee> getEmployeesInDepartments(String deparment) throws DepartmentException;

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const tabs = [
   { name: "Sites", href: "/ad/sites", current: true },
-  { name: "Companies", href: "/sm/products/promotions", current: false },
+  { name: "Companies", href: "/ad/companies", current: false },
 ];
 
 const Header = () => {
@@ -33,7 +33,7 @@ const Header = () => {
             </div>
           </div>
           <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-            <Link to="/sm/vouchers/create">
+            <Link to="/ad/sites/create">
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -50,7 +50,7 @@ const Header = () => {
                 key={tabs[0].name}
                 to={tabs[0].href}
                 className={classNames(
-                  currTab === 0
+                  tabs[0].current
                     ? "border-cyan-500 text-cyan-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
                   "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
@@ -65,7 +65,7 @@ const Header = () => {
                 key={tabs[1].name}
                 to={tabs[1].href}
                 className={classNames(
-                  currTab === 1
+                  tabs[1].current
                     ? "border-cyan-500 text-cyan-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
                   "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"

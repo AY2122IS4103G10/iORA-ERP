@@ -29,8 +29,11 @@ export const getASite = createAsyncThunk(
 )
 export const fetchSites = createAsyncThunk(
   "sites/fetchSites",
-  async () => {
-    const response = await api.getAll(`admin/viewSites`);
+  //storeTypes =["Store", "Headquarters"]
+  async ({ storeTypes, country, company }) => {
+    const response = await api.getAll(
+      "admin/viewSites/all"
+    );
     return response.data;
   }
 );
@@ -38,7 +41,10 @@ export const fetchSites = createAsyncThunk(
 export const addNewSites = createAsyncThunk(
   "sites/addNewSites",
   async (storeType, initialSite) => {
-    const response = await api.create(`admin/addSite/${storeType}`, initialSite);
+    const response = await api.create(
+      `admin/addSite/${storeType}`,
+      initialSite
+    );
     return response.data;
   }
 );
@@ -96,37 +102,33 @@ const siteSlice = createSlice({
 
 
     builder.addCase(addNewSites.fulfilled, (state, action) => {
-      state.sites.push(action.payload)
+      state.sites.push(action.payload);
     });
     builder.addCase(updateExistingSite.fulfilled, (state, action) => {
       const {
-        siteId,
+        id,
         name,
-        description,
-        price,
-        onlineOnly,
-        available,
-        sites,
-        productFields,
+        address,
+        siteCode,
+        active,
+        stockLevel,
+        company,
+        procurementOrders,
       } = action.payload;
-      console.log(action.payload)
-      const existingProd = state.sites.find(
-        (prod) => prod.siteId === siteId
-      );
+      const existingProd = state.sites.find((site) => site.id === id);
       if (existingProd) {
         existingProd.name = name;
-        existingProd.description = description;
-        existingProd.price = price;
-        existingProd.onlineOnly = onlineOnly;
-        existingProd.available = available;
-        existingProd.sites = sites;
-        existingProd.productFields = productFields;
+        existingProd.address = address;
+        existingProd.siteCode = siteCode;
+        existingProd.active = active;
+        existingProd.stockLevel = stockLevel;
+        existingProd.company = company;
+        existingProd.procurementOrders = procurementOrders;
       }
-      // state.status = "idle";
     });
     builder.addCase(deleteExistingSite.fulfilled, (state, action) => {
       state.sites = state.sites.filter(
-        ({ siteId }) => siteId !== action.payload.siteId
+        ({ siteId }) => siteId !== action.payload.id
       );
       // state.status = "idle"
     });
@@ -140,4 +142,4 @@ export const selectSite = (state) => state.sites.currSite;
 export const selectAllSites = (state) => state.sites.sites;
 
 export const selectSiteById = (state, siteId) =>
-  state.sites.sites.find((site) => site.siteId === siteId);
+  state.sites.sites.find((site) => site.id === siteId);

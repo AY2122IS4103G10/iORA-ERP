@@ -8,34 +8,38 @@ import {
   SelectColumnFilter,
   OptionsCell,
 } from "../../../components/Tables/SimpleTable";
+
 import {
-  fetchProducts,
-  selectAllProducts,
-} from "../../../../stores/slices/productSlice";
-import { fetchSites, selectAllSites } from "../../../../stores/slices/siteSlice";
+  fetchSites,
+  selectAllSites,
+} from "../../../../stores/slices/siteSlice";
 
 export const SitesTable = () => {
   const columns = useMemo(
     () => [
       {
         Header: "Id",
-        accessor: "siteId",
+        accessor: "id",
       },
       {
-        Header: "Site Code",
+        Header: "Code",
         accessor: "siteCode",
-        Cell: (e) => (
-          <Link
-            to={`/ad/sites/${e.value}`}
-            className="hover:text-gray-700 hover:underline"
-          >
-            {e.value}
-          </Link>
-        ),
       },
       {
         Header: "Name",
         accessor: "name",
+      },
+      {
+        Header: "Company",
+        accessor: (row) => row.company.name,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Country",
+        accessor: (row) => row.address.country,
+        Filter: SelectColumnFilter,
+        filter: "includes",
       },
       // {
       //   Header: CogIcon,
@@ -52,12 +56,19 @@ export const SitesTable = () => {
     ],
     []
   );
-  // const dispatch = useDispatch();
-  const data = useSelector(selectAllProducts);
-  // const siteStatus = useSelector((state) => state.sites.status);
-  // useEffect(() => {
-  //   siteStatus === "idle" && dispatch(fetchSites());
-  // }, [siteStatus, dispatch]);
+  const dispatch = useDispatch();
+  const data = useSelector(selectAllSites);
+  const siteStatus = useSelector((state) => state.sites.status);
+  useEffect(() => {
+    siteStatus === "idle" &&
+      dispatch(
+        fetchSites({
+          storeTypes: ["Store", "Headquarters"],
+          country: "Singapore",
+          company: "iORA",
+        })
+      );
+  }, [siteStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

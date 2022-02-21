@@ -11,8 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 @Entity
 public class Company implements Serializable {
@@ -26,7 +24,7 @@ public class Company implements Serializable {
     @Column(nullable = false, unique = true)
     private String registerNumber;
     @Column(nullable = false)
-    private String telephone;
+    private String phoneNumber;
     @Column(nullable = false)
     private Boolean active;
 
@@ -40,10 +38,10 @@ public class Company implements Serializable {
     public Company() {
     }
 
-    public Company(String name, String registerNumber, String telephone) {
+    public Company(String name, String registerNumber, String phoneNumber) {
         this.name = name;
         this.registerNumber = registerNumber;
-        this.telephone = telephone;
+        this.phoneNumber = phoneNumber;
         this.active = true;
     }
 
@@ -91,12 +89,12 @@ public class Company implements Serializable {
         this.name = name;
     }
 
-    public String getTelephone() {
-        return telephone;
+    public String getphoneNumber() {
+        return phoneNumber;
     }
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
+    public void setphoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getRegisterNumber() {

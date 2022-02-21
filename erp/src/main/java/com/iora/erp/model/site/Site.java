@@ -35,6 +35,9 @@ public class Site implements Serializable {
     private String siteCode;
 
     @Column(nullable = false)
+    private String phoneNumber;
+
+    @Column(nullable = false)
     private boolean active;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -46,10 +49,11 @@ public class Site implements Serializable {
     protected Site() {
     }
 
-    public Site(String name, Address address, String siteCode, Company company) {
+    public Site(String name, Address address, String siteCode, String phoneNumber, Company company) {
         this.name = name;
         this.address = address;
         this.siteCode = siteCode;
+        this.phoneNumber = phoneNumber;
         this.company = company;
         this.stockLevel = new StockLevel();
         this.active = true;
@@ -90,6 +94,14 @@ public class Site implements Serializable {
 
     public void setSiteCode(String siteCode) {
         this.siteCode = siteCode;
+    }
+
+    public String getPhoneNumber() {
+        return this.phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public boolean isActive() {

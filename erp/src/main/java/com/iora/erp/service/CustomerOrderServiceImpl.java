@@ -1,12 +1,20 @@
 package com.iora.erp.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.model.Currency;
+import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
@@ -14,12 +22,11 @@ import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.RefundLI;
 
-    /*
-     * ---------------------------------------------------------
-     * Methods are not tested yet, for implementation in Second System Release
-     * ---------------------------------------------------------
-     */
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service("customerOrderServiceImpl")
+@Transactional
 public class CustomerOrderServiceImpl implements CustomerOrderService {
     @PersistenceContext
     private EntityManager em;
@@ -36,24 +43,59 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<OnlineOrder> getOnlineOrders() {
+    public List<OnlineOrder> getAllOnlineOrders() {
         TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo", OnlineOrder.class);
         return q.getResultList();
     }
 
     @Override
-    public List<CustomerOrder> getInStoreOrders() {
+    public List<OnlineOrder> getOnlineOrdersBySite(Long siteId) {
+        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.onlineStoreSiteId = :siteId",
+                OnlineOrder.class);
+        q.setParameter("siteId", siteId);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<OnlineOrder> getOnlineOrdersBySiteDate(Long siteId, String date) {
+        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.storeSiteId = :siteId AND SUBSTRING(oo.dateTime, 0, 10) = :date",
+        OnlineOrder.class);
+        q.setParameter("siteId", siteId);
+        q.setParameter("date", date);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<CustomerOrder> getAllInStoreOrders() {
         TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co", CustomerOrder.class);
         List<CustomerOrder> customerOrders = q.getResultList();
 
-        customerOrders.removeAll(getOnlineOrders());
+        customerOrders.removeAll(getAllOnlineOrders());
 
         return customerOrders;
     }
 
     @Override
+    public List<CustomerOrder> getInStoreOrdersBySite(Long siteId) {
+        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId",
+                CustomerOrder.class);
+        q.setParameter("siteId", siteId);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date) {
+        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId AND SUBSTRING(co.dateTime, 0, 10) = :date",
+                CustomerOrder.class);
+        q.setParameter("siteId", siteId);
+        q.setParameter("date", date);
+        return q.getResultList();
+    }
+
+    @Override
     public void createCustomerOrder(CustomerOrder customerOrder) {
         em.persist(customerOrder);
+        updateMembershipPoints(customerOrder);
     }
 
     @Override
@@ -183,4 +225,56 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         RefundLI old = getRefundLI(refundLI.getId());
         old.setRefundedItem(refundLI.getRefundedItem());
     }
+
+    // Helper methods
+
+    // TODO: update after currency amount added to payments
+    public void updateMembershipPoints(CustomerOrder order) {
+        Customer customer = order.getCustomer();
+
+        Currency currency = em.find(Currency.class, "SGD");
+        Double spending = em
+                .createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
+                        Payment.class)
+                .setParameter("id", customer.getId())
+                .setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP)
+                .getResultList()
+                .stream()
+                .mapToDouble(x -> x.getAmount())
+                .sum();
+        List<MembershipTier> tiers = em
+                .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
+                .getResultList();
+        MembershipTier membershipTier = tiers.get(0);
+        for (MembershipTier tier : tiers) {
+            if (spending > tier.getThreshold().get(currency)) {
+                membershipTier = tier;
+            }
+        }
+        customer.setMembershipTier(membershipTier);
+
+        double bdayMultiplier = 1;
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(customer.getDob());
+        if (currentMonth == cal.get(Calendar.MONTH)) {
+            Integer ordersThisMonth = em
+                    .createQuery("SELECT o FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
+                    CustomerOrder.class)
+                    .setParameter("id", customer.getId())
+                    .setParameter("date", Timestamp.valueOf(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())), TemporalType.TIMESTAMP)
+                    .getResultList()
+                    .size();
+            if (ordersThisMonth == 0) {
+                bdayMultiplier = membershipTier.getBirthday().getMultiplier();
+            }
+        }
+        Integer membershipPoints = customer.getMembershipPoints();
+        for (Payment p : order.getPayments()) {
+            membershipPoints = Integer.sum(membershipPoints, (int) (p.getAmount() * bdayMultiplier * membershipTier.getMultiplier()));
+        }
+        customer.setMembershipPoints(membershipPoints);
+
+    }
+
 }

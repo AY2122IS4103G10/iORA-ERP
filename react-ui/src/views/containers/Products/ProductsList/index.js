@@ -43,20 +43,13 @@ export const ProductsTable = () => {
         Header: "Name",
         accessor: "name",
       },
-      // {
-      //   Header: "Category",
-      //   accessor: "",
-      //   Cell: (e) => processFields(e.value, "Category"),
-      // },
       {
         Header: "Color",
-        accessor: "productFields",
-        Cell: (e) => processFields(e.value, "COLOUR"),
+        accessor: (row) => processFields(row.productFields, "COLOUR"),
       },
       {
         Header: "Size",
-        accessor: "",
-        // Cell: (e) => processFields(e.value, "Size"),
+        accessor: (row) => processFields(row.productFields, "SIZE"),
       },
       {
         Header: "List Price",
@@ -68,18 +61,23 @@ export const ProductsTable = () => {
         accessor: "available",
         Cell: (e) => (e.value ? "Yes" : "No"),
       },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/products",
-      //       },
-      //     ],
-      //   }),
-      // },
+      {
+        Header: (
+          <div className="flex items-center">
+            <CogIcon className="h-4 w-4" />
+          </div>
+        ),
+        accessor: "accessor",
+        disableSortBy: true,
+        Cell: OptionsCell({
+          options: [
+            {
+              name: "Delete",
+              navigate: "/products",
+            },
+          ],
+        }),
+      },
     ],
     []
   );

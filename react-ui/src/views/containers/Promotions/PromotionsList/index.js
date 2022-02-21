@@ -5,10 +5,18 @@ import { CogIcon } from "@heroicons/react/outline";
 
 import {
   SimpleTable,
-  SelectColumnFilter,
   OptionsCell,
 } from "../../../components/Tables/SimpleTable";
-import { fetchPromotions, selectAllPromotions } from "../../../../stores/slices/promotionsSlice";
+import {
+  fetchPromotions,
+  selectAllPromotions,
+} from "../../../../stores/slices/promotionsSlice";
+import {
+  fetchProducts,
+  selectAllProducts,
+} from "../../../../stores/slices/productSlice";
+import axios from "axios";
+import { REST_ENDPOINT } from "../../../../constants/restEndpoint";
 
 export const PromotionsTable = () => {
   const columns = useMemo(
@@ -28,17 +36,17 @@ export const PromotionsTable = () => {
       {
         Header: "Name",
         accessor: "fieldValue",
-        
       },
       {
         Header: "Discounted Price",
         accessor: "discountedPrice",
         Cell: (e) => `$${e.value}`,
       },
-      {
-        Header: "Products",
-        accessor: "products",
-      },
+      // {
+      //   Header: "Products",
+      //   accessor: "fieldValue",
+      //   Cell: (e) => axios.get(`${REST_ENDPOINT}sam/model/category/${e.}`),
+      // },
       // {
       //   Header: CogIcon,
       //   accessor: "accessor",
@@ -54,12 +62,17 @@ export const PromotionsTable = () => {
     ],
     []
   );
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const data = useSelector(selectAllPromotions);
-  const promoStatus = useSelector((state) => state.promotions.status)
+  // const products = useSelector(selectAllProducts);
+  const promoStatus = useSelector((state) => state.promotions.status);
+  const productStatus = useSelector((state) => state.products.status);
+
   useEffect(() => {
-    promoStatus === "idle" && dispatch(fetchPromotions())
-  }, [promoStatus, dispatch])
+    promoStatus === "idle" && dispatch(fetchPromotions());
+    // productStatus === "idle" && dispatch(fetchProducts());
+  }, [promoStatus, productStatus, dispatch]);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

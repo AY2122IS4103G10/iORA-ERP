@@ -19,13 +19,13 @@ public class ManufacturingSite extends Site {
     public ManufacturingSite() {
     }
     
-    public ManufacturingSite(String name, Address address, String siteCode, Company company) {
-        super(name, address, siteCode, company);
+    public ManufacturingSite(String name, Address address, String siteCode, String phoneNumber, Company company) {
+        super(name, address, siteCode, phoneNumber, company);
         this.procurementOrders = new ArrayList<>();
     }
 
     public ManufacturingSite(Site site) {
-        super(site.getName(), site.getAddress(), site.getSiteCode(), site.getCompany());
+        super(site.getName(), site.getAddress(), site.getSiteCode(), site.getPhoneNumber(), site.getCompany());
         this.procurementOrders = new ArrayList<>();
     }
 

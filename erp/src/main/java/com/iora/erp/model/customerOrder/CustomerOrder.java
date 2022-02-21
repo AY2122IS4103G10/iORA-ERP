@@ -1,6 +1,5 @@
 package com.iora.erp.model.customerOrder;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +9,19 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.iora.erp.model.customer.Customer;
+
 @Entity
-public class CustomerOrder implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class CustomerOrder {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private Long storeSiteId;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime dateTime;
@@ -33,6 +37,9 @@ public class CustomerOrder implements Serializable {
 
     @OneToMany
     private List<ExchangeLI> exhcangedLIs;
+
+    @ManyToOne
+    private Customer customer;
 
     public CustomerOrder() {
         dateTime = LocalDateTime.now();
@@ -104,5 +111,13 @@ public class CustomerOrder implements Serializable {
 
     public void addExchangedLI(ExchangeLI exchangedLI) {
         this.exhcangedLIs.add(exchangedLI);
+    }
+
+    public Customer getCustomer() {
+        return this.customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }

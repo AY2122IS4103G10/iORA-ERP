@@ -14,7 +14,9 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
+import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
 
 import org.springframework.stereotype.Service;
@@ -76,21 +78,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Customer> listOfCustomer() throws CustomerException {
-        try {
-            Query q = em.createQuery("SELECT c FROM Customer c");
-
-            // need run test if query exits timing for large database
-            return q.getResultList();
-        } catch (Exception ex) {
-            throw new CustomerException();
-        }
+    public List<Customer> listOfCustomer() {
+        // need run test if query exits timing for large database
+        return em.createQuery("SELECT c FROM Customer c", Customer.class).getResultList();
     }
 
     @Override
     public List<Customer> getCustomerByFields(String search) {
-        Query q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
-                "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact");
+        TypedQuery<Customer> q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
+                "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact", Customer.class);
         q.setParameter("email", "%" + search.toLowerCase() + "%");
         q.setParameter("last", "%" + search.toLowerCase() + "%");
         q.setParameter("first", "%" + search.toLowerCase() + "%");
@@ -147,7 +143,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Voucher getVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = em.find(Voucher.class, voucherCode);
 
-        if (voucher  == null) {
+        if (voucher == null) {
             throw new CustomerException("Voucher with voucherCode " + voucherCode + " does not exist.");
         } else {
             return voucher;
@@ -159,20 +155,20 @@ public class CustomerServiceImpl implements CustomerService {
         List<Voucher> vouchers = new ArrayList<>();
 
         IntStream.range(0, qty)
-        .forEach( i -> {
-            Voucher voucher1 = new Voucher(amount, LocalDate.parse(date));
-            try {
-                getVoucher(voucher1.getVoucherCode());
-                //Voucher with the generate voucher code already exist
-                Voucher voucher2 = new Voucher(amount, LocalDate.parse(date));
-                em.persist(voucher2);
-                vouchers.add(voucher2);
-            } catch (CustomerException ex) {
-                //Voucher code does not already exist
-                em.persist(voucher1);
-                vouchers.add(voucher1);
-            }
-        });
+                .forEach(i -> {
+                    Voucher voucher1 = new Voucher(amount, LocalDate.parse(date));
+                    try {
+                        getVoucher(voucher1.getVoucherCode());
+                        // Voucher with the generate voucher code already exist
+                        Voucher voucher2 = new Voucher(amount, LocalDate.parse(date));
+                        em.persist(voucher2);
+                        vouchers.add(voucher2);
+                    } catch (CustomerException ex) {
+                        // Voucher code does not already exist
+                        em.persist(voucher1);
+                        vouchers.add(voucher1);
+                    }
+                });
 
         return vouchers;
     }
@@ -193,6 +189,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public void deleteVoucher(String voucherCode) throws CustomerException {
+        Voucher voucher = getVoucher(voucherCode);
+        if (voucher.isIssued() || voucher.isRedeemed()) {
+            throw new CustomerException("Voucher has been issued and cannot be deleted.");
+        } else {
+            em.remove(voucher);
+        }
+    }
+
+    @Override
     public Voucher issueVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setIssued(true);
@@ -204,6 +210,19 @@ public class CustomerServiceImpl implements CustomerService {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setRedeemed(true);
         return voucher;
+    }
+
+    @Override
+    public List<MembershipTier> listOfMembershipTier() {
+        return em.createQuery("SELECT m FROM MembershipTier m", MembershipTier.class).getResultList();
+    }
+
+    @Override
+    public void createMembershipTier(MembershipTier membershipTier) {
+        if (membershipTier.getBirthday() == null) {
+            membershipTier.setBirthday(em.find(BirthdayPoints.class, "STANDARD"));
+        }
+        em.merge(membershipTier);
     }
 
 }

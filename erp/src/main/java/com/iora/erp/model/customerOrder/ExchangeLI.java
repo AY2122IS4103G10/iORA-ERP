@@ -1,7 +1,5 @@
 package com.iora.erp.model.customerOrder;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,10 +9,9 @@ import javax.persistence.OneToOne;
 import com.iora.erp.model.product.ProductItem;
 
 @Entity
-public class ExchangeLI implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class ExchangeLI {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(optional = false)

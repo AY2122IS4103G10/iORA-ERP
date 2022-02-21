@@ -4,22 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.exception.CustomerException;
+import com.iora.erp.exception.StockTransferException;
+import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
+import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
+import com.iora.erp.service.StockTransferService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +45,10 @@ public class SAMController {
     private CustomerService customerService;
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private ProcurementService procurementService;
+    @Autowired
+    private StockTransferService stockTransferService;
 
     /*
      * ---------------------------------------------------------
@@ -74,6 +87,15 @@ public class SAMController {
     public ResponseEntity<Object> createProductField(@RequestBody ProductField productField) {
         try {
             return ResponseEntity.ok(productService.createProductField(productField));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/promoField", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createPromoField(@RequestBody PromotionField promotionField) {
+        try {
+            return ResponseEntity.ok(productService.createPromoField(promotionField));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -300,7 +322,8 @@ public class SAMController {
         try {
             double amount = Double.parseDouble(body.get("amount"));
             int qty = Integer.parseInt(body.get("quantity"));
-            return ResponseEntity.ok(customerService.generateVouchers(amount, qty, body.get("expDate").substring(0, 10)));
+            return ResponseEntity
+                    .ok(customerService.generateVouchers(amount, qty, body.get("expDate").substring(0, 10)));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -316,10 +339,19 @@ public class SAMController {
         return customerService.getAvailableVouchersByAmount(amount);
     }
 
+    @DeleteMapping(path = "/voucher/delete/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> deleteVoucher(@PathVariable String voucherCode) {
+        try {
+            customerService.deleteVoucher(voucherCode);
+            return ResponseEntity.ok("Voucher with voucher code " + voucherCode + " has been deleted successfully.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/voucher/issue/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode) {
         try {
-            
             return ResponseEntity.ok(customerService.issueVoucher(voucherCode));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -341,16 +373,21 @@ public class SAMController {
      * ---------------------------------------------------------
      */
 
-    @GetMapping(path = "/viewSites", produces = "application/json")
-    public List<? extends Site> viewSites(@RequestParam List<String> storeTypes, @RequestParam String country,
-            @RequestParam String company) {
-        return siteService.searchAllSites(storeTypes, country, company);
+    @GetMapping(path = "/viewSites/all", produces = "application/json")
+    public List<? extends Site> viewAllSites() {
+        return siteService.getAllSites();
     }
 
-    @GetMapping(path = "/viewSites/{storeType}", produces = "application/json")
-    public List<? extends Site> viewSitesBySubclass(@PathVariable String storeType, @RequestParam String country,
+    @GetMapping(path = "/viewSites", produces = "application/json")
+    public List<? extends Site> viewSites(@RequestParam List<String> siteTypes, @RequestParam String country,
             @RequestParam String company) {
-        switch (storeType) {
+        return siteService.searchAllSites(siteTypes, country, company);
+    }
+
+    @GetMapping(path = "/viewSites/{siteType}", produces = "application/json")
+    public List<? extends Site> viewSitesBySubclass(@PathVariable String siteType, @RequestParam String country,
+            @RequestParam String company) {
+        switch (siteType) {
             case "Headquarters":
                 return siteService.searchHeadquarters(country, company);
             case "Manufacturing":
@@ -369,5 +406,203 @@ public class SAMController {
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
     public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
+    }
+
+    @GetMapping(path = "/procurementOrder/all", produces = "application/json")
+    public List<ProcurementOrder> getProcurementsOrders() {
+        return procurementService.getProcurementOrders();
+    }
+
+    @PostMapping(path = "/procurementOrder/create/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> createProcurementOrder(@RequestBody ProcurementOrder procurementOrder,
+            @PathVariable Long siteId) {
+        try {
+            procurementService.createProcurementOrder(procurementOrder, siteId);
+            return ResponseEntity
+                    .ok("Procurement Order with ID " + procurementOrder.getId() + " is successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
+    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
+        return procurementService.getProcurementOrder(orderId);
+    }
+
+    @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
+    public List<ProcurementOrder> getProcurementOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return procurementService.getProcurementOrdersOfSite(site);
+    }
+
+    @PutMapping(path = "/procurementOrder/update/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> updateProcurementOrder(@RequestBody ProcurementOrder procurementOrder,
+            @PathVariable Long siteId) {
+        try {
+            procurementService.updateProcurementOrder(procurementOrder, siteId);
+            return ResponseEntity
+                    .ok("Procurement Order with ID " + procurementOrder.getId() + " is successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/procurementOrder/delete/{orderId}/{siteId}")
+    public ResponseEntity<Object> deleteProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            procurementService.deleteProcurementOrder(orderId, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is successfully deleted (cancelled).");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/procurementOrder/complete/{orderId}/{siteId}")
+    public ResponseEntity<Object> completeProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            procurementService.completeProcurementOrder(orderId, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is successfully deleted (cancelled).");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/stockTransferOrder/all", produces = "application/json")
+    public List<StockTransferOrder> getStockTransferOrders() {
+        return stockTransferService.getStockTransferOrders();
+    }
+
+    @PostMapping(path = "/stockTransferOrder/create/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> createStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
+            @PathVariable Long siteId) {
+        try {
+            stockTransferService.createStockTransferOrder(stockTransferOrder, siteId);
+            return ResponseEntity
+                    .ok("Stock Transfer Order with ID " + stockTransferOrder.getId() + " is successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/stockTransferOrder/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> getStockTransferOrderByOrderId(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(stockTransferService.getStockTransferOrder(orderId));
+        } catch (StockTransferException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/stockTransferOrder/site/{siteId}", produces = "application/json")
+    public List<StockTransferOrder> getStockTransferOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return stockTransferService.getStockTransferOrderOfSite(site);
+    }
+
+    @PutMapping(path = "/stockTransferOrder/update/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> updateStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
+            @PathVariable Long siteId) {
+        try {
+            stockTransferService.updateStockTransferOrder(stockTransferOrder, siteId);
+            return ResponseEntity
+                    .ok("Stock Transfer Order with ID " + stockTransferOrder.getId() + " is successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/stockTransferOrder/delete/{orderId}/{siteId}")
+    public ResponseEntity<Object> deleteStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            stockTransferService.deleteStockTransferOrder(orderId, siteId);
+            return ResponseEntity
+                    .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransferOrder/complete/{orderId}/{siteId}")
+    public ResponseEntity<Object> completeStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            stockTransferService.completeStockTransferOrder(orderId, siteId);
+            return ResponseEntity
+                    .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * B.5 CRM
+     * ---------------------------------------------------------
+     */
+
+    @GetMapping(path = "/membershipTier/all", produces = "application/json")
+    public List<MembershipTier> getAllMembershipTiers() {
+        return customerService.listOfMembershipTier();
+    }
+
+    @PostMapping(path = "/membershipTier/create", consumes = "application/json")
+    public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {
+        try {
+            customerService.createMembershipTier(tier);
+            return ResponseEntity.ok("Membership Tier (" + tier.getName() + ") was successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/customer/view/all", produces = "application/json")
+    public List<Customer> viewAllCustomers() {
+        return customerService.listOfCustomer();
+    }
+
+    @GetMapping(path = "/customer/search/{query}", produces = "application/json")
+    public List<Customer> searchCustomers(@PathVariable String query) {
+        return customerService.getCustomerByFields(query);
+    }
+
+    @GetMapping(path = "/customer/view/{id}", produces = "application/json")
+    public ResponseEntity<Object> getCustomerById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.getCustomerById(id));
+        } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customer/create", consumes = "application/json")
+    public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
+        try {
+            customerService.createCustomerAccount(customer);;
+            return ResponseEntity.ok("Customer with id " + customer.getId() + " was successfully created.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/customer/block/{id}")
+    public ResponseEntity<Object> blockCustomerById(@PathVariable Long id) {
+        try {
+            Customer customer = customerService.getCustomerById(id);
+            customerService.blockCustomer(customer);
+            return ResponseEntity.ok("Customer with id " + id + " successfully blocked");
+        } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/customer/unblock/{id}")
+    public ResponseEntity<Object> unblockCustomerById(@PathVariable Long id) {
+        try {
+            Customer customer = customerService.getCustomerById(id);
+            customerService.unblockCustomer(customer);
+            return ResponseEntity.ok("Customer with id " + id + " successfully blocked");
+        } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 }

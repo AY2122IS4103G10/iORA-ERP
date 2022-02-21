@@ -12,6 +12,9 @@ import com.iora.erp.model.site.StoreSite;
 @Entity
 public class OnlineOrder extends CustomerOrder {
     @Column(nullable = false)
+    private Long onlineStoreSiteId;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OnlineOrderStatus status;
 

@@ -105,6 +105,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public PromotionField createPromoField(PromotionField promotionField) throws ProductFieldException{
+        promotionField.setFieldName(promotionField.getFieldName().trim().toUpperCase());
+        promotionField.setFieldValue(promotionField.getFieldValue().trim().toUpperCase());
+        try {
+            getProductFieldByNameValue(promotionField.getFieldName(), promotionField.getFieldValue());
+        } catch (ProductFieldException ex) {
+            em.persist(promotionField);
+            return promotionField;
+        }
+        throw new ProductFieldException("Product Field with name " + promotionField.getFieldName() + " and value "
+                + promotionField.getFieldValue() + " already exist.");
+    }
+
+    @Override
     public Model addPromoCategory(String modelCode, String category, double discountedPrice)
             throws ModelException {
         Model model = getModel(modelCode);

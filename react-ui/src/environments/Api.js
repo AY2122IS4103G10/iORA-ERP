@@ -33,6 +33,17 @@ export const voucherApi = {
 
 export const sitesApi = {
   searchByType(siteType) {
-    return axios.get(`${REST_ENDPOINT}sam/viewSites/${siteType}?country=&company=`)
-  }
-}
+    return axios.get(
+      `${REST_ENDPOINT}sam/viewSites/${siteType}?country=&company=`
+    );
+  },
+  getAll() {
+    return axios.get(
+      `${REST_ENDPOINT}sam/viewSites?storeTypes=&country=&company=`
+    );
+  },
+
+  getASite(id) {
+    return axios.get(`${REST_ENDPOINT}admin/viewSite/${id}`);
+  },
+};

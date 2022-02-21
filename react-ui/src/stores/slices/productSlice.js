@@ -3,10 +3,12 @@ import { api } from "../../environments/Api";
 
 const initialState = {
   products: [],
+  currProduct: null,
   status: "idle",
   error: null,
 };
 
+//fetch models
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
@@ -14,6 +16,17 @@ export const fetchProducts = createAsyncThunk(
     return response.data;
   }
 );
+
+
+//get a product stock level
+export const getAProduct = createAsyncThunk(
+  "products/getAProduct",
+  async (sku) => {
+    const response = await api.get(`sam/product`, sku);
+    return response.data;
+  }
+);
+
 
 export const addNewProduct = createAsyncThunk(
   "products/addNewPost",
@@ -51,6 +64,16 @@ const productSlice = createSlice({
       state.products = state.products.concat(action.payload);
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(getAProduct.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getAProduct.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.currProduct = action.payload;
+    });
+    builder.addCase(getAProduct.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {
@@ -94,6 +117,8 @@ const productSlice = createSlice({
 export default productSlice.reducer;
 
 export const selectAllProducts = (state) => state.products.products;
+
+export const selectAProductSL = (state) => state.products.currProduct;
 
 export const selectProductByCode = (state, modelCode) =>
   state.products.products.find((product) => product.modelCode === modelCode);

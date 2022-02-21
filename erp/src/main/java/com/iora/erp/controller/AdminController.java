@@ -226,6 +226,7 @@ public class AdminController {
         try {
             Site site = siteService.getSite(siteId);
             site.getStockLevel();
+            System.out.println(site);
             return site;
         } catch (Exception e) {
             return null;

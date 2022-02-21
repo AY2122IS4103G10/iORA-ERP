@@ -3,6 +3,7 @@ package com.iora.erp.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
@@ -43,7 +44,6 @@ public class AdminController {
 
     // Employee/JobTitle/Department stuff here
 
-
     @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {
         try {
@@ -67,19 +67,19 @@ public class AdminController {
     @DeleteMapping(path = "/deleteJobTitle")
     public ResponseEntity<Object> deleteJobTitle(@RequestParam Long jobTitleId) {
         try {
-            adminService.deleteJobTitle(jobTitleId);;
+            adminService.deleteJobTitle(jobTitleId);
+            ;
             return ResponseEntity.ok("Job Tiltle with ID " + jobTitleId + " has been successfully deleted.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-
     @GetMapping(path = "/viewJobTitles", produces = "application/json")
     public List<JobTitle> viewJobTitles(@RequestParam("search") String search) {
         try {
-            if(search == null) {
-                search ="";
+            if (search == null) {
+                search = "";
             }
             return adminService.getJobTitlesByFields(search);
         } catch (Exception e) {
@@ -87,7 +87,6 @@ public class AdminController {
         }
     }
 
-    
     @GetMapping(path = "/viewJobTitle", produces = "application/json")
     public JobTitle viewJobTitle(@RequestParam Long id) {
         try {
@@ -97,7 +96,6 @@ public class AdminController {
         }
     }
 
-    
     @GetMapping(path = "/viewAllAddress", produces = "application/json")
     public List<Address> viewAllAddress() {
         try {
@@ -110,8 +108,8 @@ public class AdminController {
     @GetMapping(path = "/viewAddress", produces = "application/json")
     public List<Address> viewAddress(@RequestParam("search") String search) {
         try {
-            if(search == null) {
-                search ="";
+            if (search == null) {
+                search = "";
             }
             return adminService.getListAddressFields(search);
         } catch (Exception e) {
@@ -129,11 +127,10 @@ public class AdminController {
         }
     }
 
-      
     @GetMapping(path = "/viewDepartments", produces = "application/json")
     public List<Department> viewDeparments(@RequestParam("search") String search) {
         try {
-            if(search == null) {
+            if (search == null) {
                 search = "";
             }
             return adminService.getDepartmentsByFields(search);
@@ -154,7 +151,8 @@ public class AdminController {
     @PutMapping(path = "/editDepartment", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editDepartment(@RequestBody Department d) {
         try {
-            adminService.editDepartment(d);;
+            adminService.editDepartment(d);
+            ;
             return ResponseEntity.ok("Department with ID " + d.getId() + " has been successfully updated.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -171,7 +169,6 @@ public class AdminController {
         }
     }
 
-        
     @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
         try {
@@ -185,10 +182,28 @@ public class AdminController {
     @PostMapping(path = "/addEmployees", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addAllEmployee(@RequestBody List<Employee> employee) {
         try {
-            for(Employee e : employee) {
-                employeeService.createEmployee(e);
+            String msg = "Except for employee(s): ";
+            Boolean checkFail = false;
+
+            for (Employee e : employee) {
+                try {
+                    employeeService.createEmployee(e);
+                } catch (EmployeeException ex) {
+                    if (checkFail == false) {
+                        msg += e.getName();
+                        checkFail = true;
+                    } else {
+                        msg += ", " + e.getName();
+                    }
+                }
             }
-            return ResponseEntity.ok("All employees has been successfully created");
+            msg += ", all employees has been created.";
+
+            if (checkFail == false) {
+                return ResponseEntity.ok("All employees has been successfully created");
+            } else {
+                return ResponseEntity.ok(msg);
+            }
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -197,7 +212,19 @@ public class AdminController {
     @GetMapping(path = "/viewEmployees", produces = "application/json")
     public List<Employee> viewEmployees(@RequestParam("search") String search) {
         try {
+            if (search == null) {
+                search = "";
+            }
             return employeeService.getEmployeeByFields(search);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @GetMapping(path = "/viewEmployee", produces = "application/json")
+    public Employee viewEmployee(@RequestParam Long id) {
+        try {
+            return employeeService.getEmployeeById(id);
         } catch (Exception e) {
             return null;
         }
@@ -303,9 +330,5 @@ public class AdminController {
             return null;
         }
     }
-
-
-
-
 
 }

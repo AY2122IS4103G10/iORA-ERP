@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 
@@ -21,7 +22,7 @@ public class Department implements Serializable {
     @Column(nullable = false, unique = true)
     private String deptName;
 
-    @OneToMany
+    @ManyToMany
     private List<JobTitle> jobTitles;
    
     public Department() {

@@ -38,9 +38,9 @@ public class AdminServiceImpl implements AdminService {
     public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
         try {
             JobTitle jt = jobTitle;
-          
+
             em.persist(jt);
-            
+
         } catch (Exception ex) {
             throw new JobTitleException("Job Title has already been created");
         }
@@ -70,17 +70,16 @@ public class AdminServiceImpl implements AdminService {
     public void deleteJobTitle(Long id) throws JobTitleException {
         JobTitle j = em.find(JobTitle.class, id);
 
-
         Query q = em.createQuery("SELECT e FROM Employee e WHERE e.jobTitle.id = :jobTitle");
         q.setParameter("jobTitle", id);
         Boolean employeeCheck = false;
-        
+
         try {
             Employee e = (Employee) q.getSingleResult();
         } catch (Exception ex) {
             employeeCheck = true;
         }
-        
+
         if (j == null) {
             throw new JobTitleException("JobTitle not found");
         } else if (employeeCheck == false) {
@@ -105,7 +104,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<JobTitle> getJobTitlesByFields(String search) throws JobTitleException {
-        if(search == null) {
+        if (search == null) {
             return listOfJobTitles();
         }
 
@@ -140,15 +139,13 @@ public class AdminServiceImpl implements AdminService {
         try {
             Department d = new Department();
             d.setDeptName(department.getDeptName());
-            
+
             em.persist(d);
-            
+
             for (JobTitle j : department.getJobTitles()) {
                 JobTitle jt = getJobTitleById(j.getId());
-                System.out.println(d.getJobTitles());
                 d.getJobTitles().add(jt);
             }
-            System.out.println(d);
 
         } catch (Exception ex) {
             throw new DepartmentException("Department has already been created");
@@ -163,15 +160,14 @@ public class AdminServiceImpl implements AdminService {
             throw new DepartmentException("Department not found");
         }
 
-
         try {
-            if(old.getDeptName() != department.getDeptName()) {
+            if (old.getDeptName() != department.getDeptName()) {
                 old.setDeptName(department.getDeptName());
             }
         } catch (Exception ex) {
             throw new DepartmentException("Department " + department.getDeptName() + " has been used!");
         }
-        
+
         try {
             old.setJobTitles(new ArrayList<>());
             for (JobTitle j : department.getJobTitles()) {
@@ -179,7 +175,7 @@ public class AdminServiceImpl implements AdminService {
                 old.getJobTitles().add(newJ);
             }
         } catch (Exception ex) {
-            throw new DepartmentException("Job Title given for Department is not available!");
+            throw new DepartmentException(ex.getMessage());
         }
 
     }
@@ -187,7 +183,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void deleteDepartment(Long id) throws DepartmentException {
         try {
-            Department e = em.find(Department.class,id);
+            Department e = em.find(Department.class, id);
 
             if (e == null) {
                 throw new DepartmentException("Department not found");
@@ -214,13 +210,29 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Department> getDepartmentsByFields(String search) throws DepartmentException {
-        if(search == null) {
+        if (search == null) {
             return listOfDepartments();
         }
 
         Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.deptName) LIKE :name");
         q.setParameter("name", "%" + search.toLowerCase() + "%");
         return q.getResultList();
+    }
+
+    @Override
+    public Boolean checkJTInDepartment(Long did, Long jid) throws DepartmentException {
+        Department d = getDepartmentById(did);
+        List<JobTitle> jt = d.getJobTitles();
+        Boolean check = false;
+
+        for (JobTitle t : jt) {
+            if (t.getId().equals(jid)) {
+                check = true;
+            }
+        }
+
+        return check;
+
     }
 
     @Override
@@ -296,7 +308,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Address> getListAddressFields(String search) {
-        if(search == "") {
+        if (search == "") {
             return getListAddress();
         }
         Query q = em.createQuery(
@@ -578,6 +590,5 @@ public class AdminServiceImpl implements AdminService {
         }
 
     }
-
 
 }

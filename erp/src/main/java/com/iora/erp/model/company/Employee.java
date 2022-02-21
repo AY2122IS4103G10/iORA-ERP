@@ -2,25 +2,24 @@ package com.iora.erp.model.company;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import com.iora.erp.enumeration.AccessRights;
-
+import com.iora.erp.enumeration.PayType;
 
 @Entity
 public class Employee {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -32,29 +31,32 @@ public class Employee {
     @Column(nullable = false)
     private String salt;
     @Column(nullable = false)
-    private String hashPass;
+    private String password;
     @Column(nullable = false)
     private Boolean availStatus;
-    @Column(nullable = false)
-    private String password;
+    @Enumerated
+    private PayType payType;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     private JobTitle jobTitle;
     @ManyToOne(fetch = FetchType.EAGER)
     private Department department;
 
-    public Employee() {
-    }
 
-    public Employee(String name, String email, Double salary, String username, String password, String salt, String hashPass,
-            Boolean availStatus) {
+    public Employee(String name, String email, Double salary, String username, String password, Boolean availStatus,
+            PayType payType, JobTitle jobTitle, Department department) {
         this.name = name;
         this.email = email;
         this.salary = salary;
         this.username = username;
-        this.salt = salt;
-        this.hashPass = generateProtectedPassword(salt, password);
+        this.password = password;
         this.availStatus = availStatus;
+        this.payType = payType;
+        this.jobTitle = jobTitle;
+        this.department = department;
+    }
+
+    public Employee() {
     }
 
     private static String generateProtectedPassword(String salt, String password) {
@@ -70,7 +72,6 @@ public class Employee {
             return null;
         }
     }
-
 
     public Long getId() {
         return id;
@@ -112,9 +113,25 @@ public class Employee {
         this.email = email;
     }
 
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
     public Employee(String name, Double salary) {
         this.name = name;
         this.salary = salary;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = generateProtectedPassword(this.salt, password);
     }
 
     public Double getSalary() {
@@ -146,22 +163,12 @@ public class Employee {
         return "Employee[ id=" + id + " ]";
     }
 
-
-    public String getSalt() {
-        return salt;
+    public PayType getPayType() {
+        return payType;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
+    public void setPayType(PayType payType) {
+        this.payType = payType;
     }
-
-    public String getHashPass() {
-        return hashPass;
-    }
-
-    public void setHashPass(String hashPass) {
-        this.hashPass = hashPass;
-    }
-
 
 }

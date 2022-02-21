@@ -1,8 +1,10 @@
 package com.iora.erp.service;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -30,8 +32,24 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void createEmployee(Employee employee) throws EmployeeException {
+        Employee e = employee;
+        e.setSalt(saltGeneration().toString());
+        e.setPassword(employee.getPassword());
+
         try {
-            em.persist(employee);
+            if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
+                    employee.getJobTitle().getId()) == true) {
+
+                em.persist(e);
+                e.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
+                e.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
+            } else {
+                throw new EmployeeException();
+            }
+
+        } catch (EmployeeException ex) {
+            throw new EmployeeException("Job Title selected for the Employee: " + e.getName()
+                    + " is not applicable for the choosen department");
         } catch (Exception ex) {
             throw new EmployeeException("Employee has already been created");
         }
@@ -46,15 +64,39 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         try {
-            old.setUsername(employee.getUsername());
-            old.setName(employee.getName());
-            old.setSalary(employee.getSalary());
+            if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
+                    employee.getJobTitle().getId()) == true) {
 
-            old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
-            old.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
+                if ((!old.getUsername().equals(employee.getUsername()) &&
+                        usernameAvailability(employee.getUsername()) == true) ||
+                        old.getUsername().equals(employee.getUsername())) {
 
+
+                    if (old.getEmail().equals(employee.getEmail()) ||
+                            (!old.getEmail().equals(employee.getEmail())
+                                    && emailAvailability(old.getEmail()) == true)) {
+
+                        old.setUsername(employee.getUsername());
+                        old.setEmail(employee.getEmail());
+                        old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
+                        old.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
+                        old.setName(employee.getName());
+                        old.setSalary(employee.getSalary());
+                        old.setPayType(employee.getPayType());
+
+
+                    } else {
+                        throw new EmployeeException("Email has been taken!");
+                    }
+
+                } else {
+                    throw new EmployeeException("Username has been taken!");
+                }
+            } else {
+                throw new EmployeeException("JobTitle is not applicable for selected Department");
+            }
         } catch (Exception ex) {
-            throw new EmployeeException("Username " + employee.getUsername() + " has been used!");
+            throw new EmployeeException(ex.getMessage());
         }
 
     }
@@ -99,9 +141,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<Employee> listOfEmployee() throws EmployeeException {
         try {
             Query q = em.createQuery("SELECT e FROM Employee e");
-
-            // need run test if query exits timing for large database
             return q.getResultList();
+
         } catch (Exception ex) {
             throw new EmployeeException();
         }
@@ -109,17 +150,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<Employee> getEmployeeByFields(String search) throws EmployeeException {
-        if (search == null) {
+        if (search == "") {
             return listOfEmployee();
-        } else {
-            Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
-                    "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary");
-            q.setParameter("email", "%" + search.toLowerCase() + "%");
-            q.setParameter("username", "%" + search.toLowerCase() + "%");
-            q.setParameter("name", "%" + search.toLowerCase() + "%");
-            q.setParameter("salary", "%" + search + "%");
-            return q.getResultList();
         }
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.email) LIKE :email OR " +
+                "LOWER(e.name) LIKE :name OR LOWER(e.username) LIKE :username OR e.salary LIKE :salary");
+        q.setParameter("email", "%" + search.toLowerCase() + "%");
+        q.setParameter("username", "%" + search.toLowerCase() + "%");
+        q.setParameter("name", "%" + search.toLowerCase() + "%");
+        q.setParameter("salary", "%" + search + "%");
+        return q.getResultList();
     }
 
     @Override
@@ -134,7 +174,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee getEmployeeByUsername(String username) throws EmployeeException {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.getUsername = :username");
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
         q.setParameter("username", username);
 
         try {
@@ -155,26 +195,55 @@ public class EmployeeServiceImpl implements EmployeeService {
         return getEmployeeByUsername(username).getJobTitle().getResponsibility();
     }
 
-   /* @Override
+    @Override
     public byte[] saltGeneration() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
         return salt;
     }
-*/
-  /*  @Override
-    public Employee loginAuthentication(Employee employee) throws EmployeeException {
-        try {
-            Employee c = getEmployeeByUsername(employee.getUsername());
-            if (c.authentication(employee.getPassword()))) {
-                return c;
-            } else {
-                throw new EmployeeException();
-            }
-        } catch (Exception ex) {
-            throw new EmployeeException("Invalid Username or Password.");
-        }
 
-    }*/
+    @Override
+    public Boolean usernameAvailability(String username) {
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
+        q.setParameter("username", username);
+        try {
+            Employee e = (Employee) q.getSingleResult();
+            return false;
+            
+        } catch (NoResultException | NonUniqueResultException ex) {
+            return true;
+        }
+    }
+
+    @Override
+    public Boolean emailAvailability(String email) {
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.email = :email");
+        q.setParameter("email", email);
+        try {
+            Employee e = (Employee) q.getSingleResult();
+            return false;
+            
+        } catch (NoResultException | NonUniqueResultException ex) {
+            return true;
+        }
+    }
+
+    /*
+     * @Override
+     * public Employee loginAuthentication(Employee employee) throws
+     * EmployeeException {
+     * try {
+     * Employee c = getEmployeeByUsername(employee.getUsername());
+     * if (c.authentication(employee.getPassword()))) {
+     * return c;
+     * } else {
+     * throw new EmployeeException();
+     * }
+     * } catch (Exception ex) {
+     * throw new EmployeeException("Invalid Username or Password.");
+     * }
+     * 
+     * }
+     */
 }

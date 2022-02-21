@@ -3,8 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { api } from "../../../../environments/Api";
 
-import { selectAProductSL } from "../../../../stores/slices/productSlice";
+import { getProductStockLevel, selectAProduct } from "../../../../stores/slices/productSlice";
 import { getAProduct } from "../../../../stores/slices/productSlice";
+import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
+import { SelectableTable } from "../../../components/Tables/SelectableTable";
 
 const columns =[
   {
@@ -12,28 +14,49 @@ const columns =[
       accessor: "siteCode"
   }, 
   {
-      Header: "Country", 
-      accessor: "country"
+      Header: "Name", 
+      accessor: "siteName"
   },
   {
       Header: "Quantity", 
       accessor: "qty",
-  },
-  {
-      Header: "Reserved",
-      accessor: "reserve"
+  // },
+  // {
+  //     Header: "Reserved",
+  //     accessor: "reserve"
   }
 ]
+
+const stocklevel = {
+    1: 1,
+    2: 5,
+    3: 6,
+    4: 9,
+}
+
+const convertData = (data, sites) => 
+  Object.entries(data).map((pair) => ({
+    id: pair[0],
+    siteCode: sites.filter(site => site.id == pair[0])[0].siteCode,
+    siteName: sites.filter(site => site.id == pair[0])[0].name,
+    qty: pair[1],
+  }))
 
 
 export const AProductStock = () => {
   const {id} = useParams();
   const dispatch = useDispatch();
-  const prod = useSelector(selectAProductSL);
+  const prod = useSelector(selectAProduct);
+  // const stockLevel = useSelector(selectProductSL);
+  const sites = useSelector(selectAllSites);
+  console.log(sites);
   
   useEffect(() => {
       dispatch(getAProduct(id));
+      // dispatch(getProductStockLevel(id));
+      dispatch(getAllSites());
   }, []);
+
 
   return(
       <div className="min-h-full">
@@ -86,7 +109,9 @@ export const AProductStock = () => {
             {/* Stock Levels By Products*/}
             <section aria-labelledby="stocks-level">
                 <div className="m-1">
-                {/* <SimpleTable columns={columns} data={data}/> */}
+                {sites == undefined || stocklevel == undefined ? <p>loading</p> : 
+                  <SelectableTable columns={columns} data={convertData(stocklevel, sites)} path="/sm/stocklevels"/>
+                }
                 </div>
             </section>
           </div>

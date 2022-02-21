@@ -109,7 +109,7 @@ export const AsiteStock = () => {
                         </div>
                         <div className="sm:col-span-1">
                           <dt className="text-sm font-medium text-gray-500">Telephone</dt>
-                          {/* <dd className="mt-1 text-sm text-gray-900">{site.telephone}</dd> */}
+                          <dd className="mt-1 text-sm text-gray-900">{site.phoneNumber}</dd>
                         </div>
                         
                       </dl>
@@ -124,7 +124,9 @@ export const AsiteStock = () => {
                         Stock Levels
                   </h2>
                   <div className="ml-2 mr-2">
-                    <SimpleTable columns={columns} data={convertData(stocklevel)}/>
+                    {stocklevel == undefined ? <p>loading</p> : 
+                      <SimpleTable columns={columns} data={convertData(stocklevel)}/>
+                    }
                   </div>
                 </section>
               </div>

@@ -116,10 +116,13 @@
 
    const navigate = useNavigate();
    const handleRowClick = (row) => {
-       console.log(row.original.id);
-       navigate(`${path}/${row.original.id}`)
+      console.log(row.original.id);
+      if (row.original.id == undefined) {
+        navigate(`${path}/${row.original.sku}`)
+      } else {
+        navigate(`${path}/${row.original.id}`)
+      }
    }
-
 
    return (
      <>

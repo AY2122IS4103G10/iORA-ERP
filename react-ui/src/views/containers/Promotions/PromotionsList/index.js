@@ -42,23 +42,23 @@ export const PromotionsTable = () => {
         accessor: "discountedPrice",
         Cell: (e) => `$${e.value}`,
       },
-      // {
-      //   Header: "Products",
-      //   accessor: "fieldValue",
-      //   Cell: (e) => axios.get(`${REST_ENDPOINT}sam/model/category/${e.}`),
-      // },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/products",
-      //       },
-      //     ],
-      //   }),
-      // },
+      {
+        Header: (
+          <div className="flex items-center">
+            <CogIcon className="h-4 w-4" />
+          </div>
+        ),
+        accessor: "accessor",
+        disableSortBy: true,
+        Cell: OptionsCell({
+          options: [
+            {
+              name: "Delete",
+              navigate: "/products",
+            },
+          ],
+        }),
+      },
     ],
     []
   );

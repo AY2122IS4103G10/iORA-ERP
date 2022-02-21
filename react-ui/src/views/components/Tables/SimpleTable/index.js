@@ -3,7 +3,14 @@
  * React Table Part 1: https://www.samuelliedtke.com/blog/react-table-tutorial-part-1/
  * React Table Part 2: https://www.samuelliedtke.com/blog/react-table-tutorial-part-2/
  */
-import { useState, useMemo, Fragment } from "react";
+import {
+  useState,
+  useMemo,
+  Fragment,
+  forwardRef,
+  useRef,
+  useEffect,
+} from "react";
 import {
   useTable,
   useGlobalFilter,
@@ -11,6 +18,8 @@ import {
   useFilters,
   useSortBy,
   usePagination,
+  useRowSelect,
+  useMountedLayoutEffect,
 } from "react-table";
 import { Menu, Transition } from "@headlessui/react";
 import {
@@ -19,7 +28,7 @@ import {
   ChevronRightIcon,
   ChevronLeftIcon,
 } from "@heroicons/react/outline";
-import { DotsHorizontalIcon } from "@heroicons/react/solid";
+import { DotsHorizontalIcon, XIcon } from "@heroicons/react/solid";
 
 import { SimpleButton } from "../../Buttons/SimpleButton";
 import { PageButton } from "../../Buttons/PageButton";
@@ -43,7 +52,7 @@ const GlobalFilter = ({
       <span className="text-gray-700">Search: </span>
       <input
         type="text"
-        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
         value={value || ""}
         onChange={(e) => {
           setValue(e.target.value);
@@ -71,7 +80,7 @@ export const SelectColumnFilter = ({
     <label className="flex gap-x-2 items-baseline">
       <span className="text-gray-700">{render("Header")}: </span>
       <select
-        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
         name={id}
         id={id}
         value={filterValue}
@@ -94,7 +103,7 @@ export const OptionsCell = ({ options = [] }) => {
   return (
     <Menu as="div" className="relative z-10 inline-block text-left">
       <div>
-        <Menu.Button className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500">
+        <Menu.Button className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500">
           <span className="sr-only">Open options</span>
           <DotsHorizontalIcon className="h-5 w-5" aria-hidden="true" />
         </Menu.Button>
@@ -134,7 +143,67 @@ export const OptionsCell = ({ options = [] }) => {
   );
 };
 
-export const SimpleTable = ({ columns, data }) => {
+export const DeleteCell = ({ onClick }) => {
+  return (
+    <button
+      className="bg-white rounded-full flex items-center text-red-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+      onClick={onClick}
+    >
+      <span className="sr-only">Delete</span>
+      <XIcon className="h-5 w-5" aria-hidden="true" />
+    </button>
+  );
+};
+export const EditableCell = ({
+  value: initialValue,
+  row: { index },
+  column: { id },
+  updateMyData,
+}) => {
+  const [value, setValue] = useState(initialValue)
+
+  const onChange = e => {
+    setValue(e.target.value)
+  }
+
+  const onBlur = () => {
+    updateMyData(index, id, value)
+  }
+
+  useEffect(() => {
+    setValue(initialValue)
+  }, [initialValue])
+
+  return <input value={value} onChange={onChange} onBlur={onBlur} />
+}
+
+const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
+  const defaultRef = useRef();
+  const resolvedRef = ref || defaultRef;
+
+  useEffect(() => {
+    resolvedRef.current.indeterminate = indeterminate;
+  }, [resolvedRef, indeterminate]);
+
+  return (
+    <>
+      <input
+        type="checkbox"
+        ref={resolvedRef}
+        className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+        {...rest}
+      />
+    </>
+  );
+});
+
+export const SimpleTable = ({
+  columns,
+  data,
+  rowSelect = false,
+  selectedRows = [],
+  setSelectedRows,
+}) => {
   const {
     getTableProps,
     getTableBodyProps,
@@ -152,13 +221,38 @@ export const SimpleTable = ({ columns, data }) => {
     state,
     preGlobalFilteredRows,
     setGlobalFilter,
+    state: { selectedRowIds },
   } = useTable(
-    { columns, data },
+    { columns, data, initialState: { selectedRowIds: selectedRows } },
     useFilters,
     useGlobalFilter,
     useSortBy,
-    usePagination
+    usePagination,
+    useRowSelect,
+    (hooks) => {
+      rowSelect &&
+        hooks.visibleColumns.push((columns) => [
+          {
+            id: "selection",
+            Header: ({ getToggleAllRowsSelectedProps }) => (
+              <div>
+                <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+              </div>
+            ),
+            Cell: ({ row }) => (
+              <div>
+                <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+              </div>
+            ),
+          },
+          ...columns,
+        ]);
+    }
   );
+  useMountedLayoutEffect(() => {
+    rowSelect && setSelectedRows(selectedRowIds)
+  }, [rowSelect, setSelectedRows, selectedRowIds])
+  
   return (
     <>
       <div className="sm:flex sm:gap-x-2">

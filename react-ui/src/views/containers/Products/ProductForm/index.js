@@ -8,18 +8,81 @@ import {
 
 import {
   addNewProduct,
-  selectProductByCode,
   updateExistingProduct,
 } from "../../../../stores/slices/productSlice";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
 import { api } from "../../../../environments/Api";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
 const checkboxState = (allFields, prodFields) => {
   const res = [];
   allFields.forEach((field) => res.push(prodFields.includes(field)));
   return res;
+};
+
+const FieldModal = ({
+  open,
+  closeModal,
+  fieldNameSelected,
+  isEditing,
+  name,
+  onNameChanged,
+  onSaveClicked,
+}) => {
+  return (
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        <form>
+          <div className="p-4 space-y-8 divide-y divide-gray-200">
+            <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+              <div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  {`${!isEditing ? "Add New" : "Edit"} ${fieldNameSelected}`}
+                </h3>
+                <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                  <SimpleInputGroup
+                    label="Name"
+                    inputField="name"
+                    className="sm:mt-0 sm:col-span-2"
+                  >
+                    <SimpleInputBox
+                      type="text"
+                      name="name"
+                      id="name"
+                      value={name}
+                      onChange={onNameChanged}
+                      required
+                    />
+                  </SimpleInputGroup>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-5">
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  onClick={closeModal}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  onClick={onSaveClicked}
+                >
+                  {!isEditing ? "Add" : "Save"} field
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </SimpleModal>
+  );
 };
 
 export const FormCheckboxes = ({
@@ -84,29 +147,42 @@ const RadioGroup = ({ options, defaultChecked }) => {
     </fieldset>
   );
 };
-const RightColSection = ({ fieldName, fields, children }) => (
-  <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
-    <div className="rounded-lg bg-white overflow-hidden shadow">
-      <div className="p-6">
-        <h2
-          className="text-base font-medium text-gray-900"
-          id="announcements-title"
-        >
-          {fieldName}
-        </h2>
-        <div className="flow-root mt-6">{children}</div>
-        <div className="mt-6">
-          <a
-            href="#"
-            className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Add {fieldName.toLowerCase()}
-          </a>
+
+const RightColSection = ({
+  fieldName,
+  children,
+  openModal,
+  setFieldNameSelected,
+}) => {
+  return (
+    <>
+      <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
+        <div className="rounded-lg bg-white overflow-hidden shadow">
+          <div className="p-6">
+            <h2
+              className="text-base font-medium text-gray-900"
+              id="announcements-title"
+            >
+              {fieldName}
+            </h2>
+            <div className="flow-root mt-6">{children}</div>
+            <div className="mt-6">
+              <button
+                className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                onClick={() => {
+                  setFieldNameSelected(fieldName);
+                  openModal();
+                }}
+              >
+                Add {fieldName.toLowerCase()}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
-);
+      </section>
+    </>
+  );
+};
 
 const AddProductFormBody = ({
   isEditing,
@@ -137,6 +213,8 @@ const AddProductFormBody = ({
   companies,
   onSaveClicked,
   onCancelClicked,
+  openModal,
+  setFieldNameSelected,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">Add Product</h1>
@@ -145,17 +223,15 @@ const AddProductFormBody = ({
       {/* Left column */}
       <div className="grid grid-cols-1 gap-4 lg:col-span-2">
         {/* Form */}
-        <section aria-labelledby="profile-overview-title">
+        <section aria-labelledby="product-form">
           <div className="rounded-lg bg-white overflow-hidden shadow">
             <form>
               <div className="p-8 space-y-8 divide-y divide-gray-200">
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
-                    <div>
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        {!isEditing ? "Add New" : "Edit"} Product
-                      </h3>
-                    </div>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                      {!isEditing ? "Add New" : "Edit"} Product
+                    </h3>
                     <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
                       <SimpleInputGroup
                         label="Product Code"
@@ -290,7 +366,7 @@ const AddProductFormBody = ({
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                       onClick={onSaveClicked}
                     >
-                      {!isEditing ? "Add" : "Edit"} product
+                      {!isEditing ? "Add" : "Save"} product
                     </button>
                   </div>
                 </div>
@@ -303,7 +379,11 @@ const AddProductFormBody = ({
       {/* Right column */}
       <div className="grid grid-cols-1 gap-4">
         {/* Colors */}
-        <RightColSection fieldName="Colour" fields={colors}>
+        <RightColSection
+          fieldName="Colour"
+          openModal={openModal}
+          setFieldNameSelected={setFieldNameSelected}
+        >
           <FormCheckboxes
             legend="Colour"
             options={colors}
@@ -312,7 +392,11 @@ const AddProductFormBody = ({
             fieldValues={colorCheckedState}
           />
         </RightColSection>
-        <RightColSection fieldName="Size" fields={sizes}>
+        <RightColSection
+          fieldName="Size"
+          openModal={openModal}
+          setFieldNameSelected={setFieldNameSelected}
+        >
           <FormCheckboxes
             legend="Size"
             options={sizes}
@@ -321,7 +405,11 @@ const AddProductFormBody = ({
             fieldValues={sizeCheckedState}
           />
         </RightColSection>
-        <RightColSection fieldName="Category" fields={categories}>
+        <RightColSection
+          fieldName="Category"
+          openModal={openModal}
+          setFieldNameSelected={setFieldNameSelected}
+        >
           <FormCheckboxes
             legend="Category"
             options={categories}
@@ -330,7 +418,11 @@ const AddProductFormBody = ({
             fieldValues={catCheckedState}
           />
         </RightColSection>
-        <RightColSection fieldName="Tag" fields={tags}>
+        <RightColSection
+          fieldName="Tag"
+          openModal={openModal}
+          setFieldNameSelected={setFieldNameSelected}
+        >
           {tags.length ? (
             <FormCheckboxes
               legend="Tag"
@@ -343,7 +435,11 @@ const AddProductFormBody = ({
             `No tag found.`
           )}
         </RightColSection>
-        <RightColSection fieldName="Company">
+        <RightColSection
+          fieldName="Company"
+          openModal={openModal}
+          setFieldNameSelected={setFieldNameSelected}
+        >
           {companies.length ? (
             <RadioGroup
               options={companies}
@@ -507,7 +603,7 @@ export const ProductForm = () => {
           onlineOnly,
           available,
           productFields,
-          products
+          products,
         } = response.data;
         setIsEditing(true);
         setProdCode(modelCode);
@@ -552,36 +648,54 @@ export const ProductForm = () => {
       });
   }, [prodId]);
 
+  const [fieldNameSelected, setFieldNameSelected] = useState("");
+  const [fieldValue, setFieldValue] = useState("");
+  const [openAddField, setOpenAddField] = useState(false);
+
+  const onFieldValueChanged = (e) => setFieldValue(e.target.value);
+  const openModal = () => setOpenAddField(true);
+  const closeModal = () => setOpenAddField(false);
   return (
-    <AddProductFormBody
-      isEditing={isEditing}
-      prodCode={prodCode}
-      onProdChanged={onProdChanged}
-      name={name}
-      onNameChanged={onNameChanged}
-      description={description}
-      onDescChanged={onDescChanged}
-      price={price}
-      onListPriceChanged={onListPriceChanged}
-      available={available}
-      onAvailableChanged={onAvailableChanged}
-      onlineOnly={onlineOnly}
-      onOnlineOnlyChanged={onOnlineOnlyChanged}
-      colors={colors}
-      onColorsChanged={onColorsChanged}
-      colorCheckedState={colorCheckedState}
-      sizes={sizes}
-      onSizesChanged={onSizesChanged}
-      sizeCheckedState={sizeCheckedState}
-      tags={tags}
-      onTagsChanged={onTagsChanged}
-      tagCheckedState={tagCheckedState}
-      categories={categories}
-      onCatChanged={onCatsChanged}
-      catCheckedState={catCheckedState}
-      companies={companies}
-      onSaveClicked={onSaveClicked}
-      onCancelClicked={onCancelClicked}
-    />
+    <>
+      <AddProductFormBody
+        isEditing={isEditing}
+        prodCode={prodCode}
+        onProdChanged={onProdChanged}
+        name={name}
+        onNameChanged={onNameChanged}
+        description={description}
+        onDescChanged={onDescChanged}
+        price={price}
+        onListPriceChanged={onListPriceChanged}
+        available={available}
+        onAvailableChanged={onAvailableChanged}
+        onlineOnly={onlineOnly}
+        onOnlineOnlyChanged={onOnlineOnlyChanged}
+        colors={colors}
+        onColorsChanged={onColorsChanged}
+        colorCheckedState={colorCheckedState}
+        sizes={sizes}
+        onSizesChanged={onSizesChanged}
+        sizeCheckedState={sizeCheckedState}
+        tags={tags}
+        onTagsChanged={onTagsChanged}
+        tagCheckedState={tagCheckedState}
+        categories={categories}
+        onCatChanged={onCatsChanged}
+        catCheckedState={catCheckedState}
+        companies={companies}
+        onSaveClicked={onSaveClicked}
+        onCancelClicked={onCancelClicked}
+        openModal={openModal}
+        setFieldNameSelected={setFieldNameSelected}
+      />
+      <FieldModal
+        open={openAddField}
+        closeModal={closeModal}
+        fieldNameSelected={fieldNameSelected}
+        name={fieldValue}
+        onNameChanged={onFieldValueChanged}
+      />
+    </>
   );
 };

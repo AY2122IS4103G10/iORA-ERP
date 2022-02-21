@@ -16,7 +16,7 @@ import {
 } from "../../../../stores/slices/voucherSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useState } from "react";
-import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 import { classNames } from "../../../../utilities/Util";
 
 const VoucherDetailsBody = ({
@@ -33,14 +33,13 @@ const VoucherDetailsBody = ({
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
       <NavigatePrev page="Vouchers" path="/sm/vouchers" />
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* <div className="xl:col-span-2 xl:pr-8 xl:border-r xl:border-gray-200"> */}
         <div>
           <div className="md:flex md:items-center md:justify-between md:space-x-4 xl:border-b xl:pb-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{`$${value} Voucher`}</h1>
-              <p className="mt-2 text-sm text-gray-500">{`${
-                !redeemed && "Not"
-              } Redeemed`}</p>
+              <p className="mt-2 text-sm text-gray-500">
+                {!redeemed && "Not"} Redeemed
+              </p>
             </div>
             <div className="mt-4 flex space-x-3 md:mt-0">
               <button
@@ -110,18 +109,12 @@ const VoucherDetailsBody = ({
                   aria-hidden="true"
                 />
                 <span className="text-gray-900 text-sm font-medium">
-                  {`Expiry Date: ${moment(expiry).format(
-                    "DD/MM/YYYY"
-                  )}`}
+                  {`Expiry Date: ${moment(expiry).format("DD/MM/YYYY")}`}
                 </span>
               </div>
             </div>
           </aside>
         </div>
-        {/* </div> */}
-        {/* <aside className="hidden xl:block xl:pl-8">
-          <h2 className="sr-only">Details</h2>
-        </aside> */}
       </div>
     </div>
   </div>

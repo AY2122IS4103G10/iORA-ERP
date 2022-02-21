@@ -3,9 +3,7 @@ package com.iora.erp.service;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.IntStream;
 
 import javax.persistence.EntityManager;
@@ -16,7 +14,6 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
-import com.iora.erp.model.Currency;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
@@ -88,8 +85,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<Customer> getCustomerByFields(String search) {
-        Query q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
-                "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact");
+        TypedQuery<Customer> q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
+                "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact", Customer.class);
         q.setParameter("email", "%" + search.toLowerCase() + "%");
         q.setParameter("last", "%" + search.toLowerCase() + "%");
         q.setParameter("first", "%" + search.toLowerCase() + "%");

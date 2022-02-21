@@ -37,11 +37,11 @@ public class AdminServiceImpl implements AdminService {
     public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
         try {
             JobTitle jt = jobTitle;
-            for(AccessRights xx : jobTitle.getResponsibility()) {
+            for (AccessRights xx : jobTitle.getResponsibility()) {
                 jt.getResponsibility().add(xx);
             }
             em.persist(jt);
-            
+
         } catch (Exception ex) {
             throw new JobTitleException("Job Title has already been created");
         }
@@ -80,9 +80,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<JobTitle> listOfJobTitles() throws JobTitleException {
         try {
-            Query q = em.createQuery("SELECT e FROM JobTitle e");
-            return q.getResultList();
-
+            return em.createQuery("SELECT e FROM JobTitle e", JobTitle.class).getResultList();
         } catch (Exception ex) {
             throw new JobTitleException("something happen");
         }
@@ -90,14 +88,11 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<JobTitle> getJobTitlesByFields(String search) throws JobTitleException {
-        if(search == null) {
-            
+        if (search == null) {
             return listOfJobTitles();
         }
-
-        Query q = em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.title) LIKE :title");
-        q.setParameter("title", "%" + search.toLowerCase() + "%");
-        return q.getResultList();
+        return em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.title) LIKE :title", JobTitle.class)
+                .setParameter("title", "%" + search.toLowerCase() + "%").getResultList();
     }
 
     @Override
@@ -181,10 +176,8 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<Department> listOfDepartments() throws DepartmentException {
         try {
-            Query q = em.createQuery("SELECT e FROM Department e");
-
             // need run test if query exits timing for large database
-            return q.getResultList();
+            return em.createQuery("SELECT e FROM Department e", Department.class).getResultList();
         } catch (Exception ex) {
             throw new DepartmentException();
         }
@@ -192,9 +185,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Department> getDepartmentsByFields(String search) {
-        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) Like :name");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        return q.getResultList();
+        return em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) Like :name", Department.class)
+                .setParameter("name", "%" + search.toLowerCase() + "%")
+                .getResultList();
     }
 
     @Override
@@ -209,17 +202,16 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Department getDepartmentsByName(String name) {
-        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) = :name");
-        q.setParameter("name", name.toLowerCase());
-        return (Department) q.getSingleResult();
+        return em.createQuery("SELECT e FROM Department e WHERE LOWER(e.getDeptName) = :name", Department.class)
+                .setParameter("name", name.toLowerCase())
+                .getSingleResult();
     }
 
     @Override
     public List<Employee> getEmployeesInDepartments(String department) throws DepartmentException {
-        Query q = em.createQuery(
-                "SELECT e FROM Employee e, IN (e.department) d WHERE LOWER(d.getDeptName) = :name ORDER BY e.name");
-        q.setParameter("name", department.toLowerCase());
-        return q.getResultList();
+        return em.createQuery(
+                "SELECT e FROM Employee e, IN (e.department) d WHERE LOWER(d.getDeptName) = :name ORDER BY e.name",
+                Employee.class).setParameter("name", department.toLowerCase()).getResultList();
     }
 
     @Override
@@ -264,21 +256,20 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Address> getListAddress() {
-        Query q = em.createQuery("SELECT a FROM Address a");
-        return q.getResultList();
+        return em.createQuery("SELECT a FROM Address a", Address.class).getResultList();
     }
 
     @Override
     public List<Address> getListAddressFields(String search) {
-        if(search == "") {
+        if (search == "") {
             return getListAddress();
         }
-        Query q = em.createQuery(
-                "SELECT a FROM Address a WHERE a.getBuilding LIKE :building OR a.getPostalCode LIKE :postal OR a.getUnit LIKE :unit");
-        q.setParameter("building", "%" + search + "%");
-        q.setParameter("postal", "%" + search + "%");
-        q.setParameter("unit", "%" + search + "%");
-        return q.getResultList();
+        return em.createQuery(
+                "SELECT a FROM Address a WHERE a.getBuilding LIKE :building OR a.getPostalCode LIKE :postal OR a.getUnit LIKE :unit",
+                Address.class).setParameter("building", "%" + search + "%")
+                .setParameter("postal", "%" + search + "%")
+                .setParameter("unit", "%" + search + "%")
+                .getResultList();
     }
 
     @Override
@@ -411,9 +402,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<Company> listOfCompanys() throws CompanyException {
         try {
-            Query q = em.createQuery("SELECT c FROM Company c");
-            return q.getResultList();
-
+            return em.createQuery("SELECT c FROM Company c", Company.class).getResultList();
         } catch (Exception ex) {
             throw new CompanyException();
         }
@@ -421,13 +410,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Company> getCompanysByFields(String search) {
-        Query q = em.createQuery("SELECT c FROM Company c WHERE lOWER(e.getName) Like :name OR " +
-                "LOWER(e.getRegisterNumber) Like :regsNum OR e.getTelephone Like :telephone");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        q.setParameter("regsNum", "%" + search.toLowerCase() + "%");
-        q.setParameter("telephone", "%" + search + "%");
-
-        return q.getResultList();
+        return em.createQuery("SELECT c FROM Company c WHERE lOWER(e.getName) Like :name OR " +
+                "LOWER(e.getRegisterNumber) Like :regsNum OR e.getTelephone Like :telephone", Company.class)
+                .setParameter("name", "%" + search.toLowerCase() + "%")
+                .setParameter("regsNum", "%" + search.toLowerCase() + "%")
+                .setParameter("telephone", "%" + search + "%")
+                .getResultList();
     }
 
     @Override
@@ -552,6 +540,5 @@ public class AdminServiceImpl implements AdminService {
         }
 
     }
-
 
 }

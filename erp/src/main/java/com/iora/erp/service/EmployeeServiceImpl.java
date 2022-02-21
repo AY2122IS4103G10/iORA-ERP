@@ -112,10 +112,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> listOfEmployee() throws EmployeeException {
         try {
-            Query q = em.createQuery("SELECT e FROM Employee e");
-
             // need run test if query exits timing for large database
-            return q.getResultList();
+            return em.createQuery("SELECT e FROM Employee e", Employee.class).getResultList();
         } catch (Exception ex) {
             throw new EmployeeException();
         }
@@ -123,13 +121,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<Employee> getEmployeeByFields(String search) {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
-                "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary");
-        q.setParameter("email", "%" + search.toLowerCase() + "%");
-        q.setParameter("username", "%" + search.toLowerCase() + "%");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        q.setParameter("salary", "%" + search + "%");
-        return q.getResultList();
+        return em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
+                "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary",
+                Employee.class)
+                .setParameter("email", "%" + search.toLowerCase() + "%")
+                .setParameter("username", "%" + search.toLowerCase() + "%")
+                .setParameter("name", "%" + search.toLowerCase() + "%")
+                .setParameter("salary", "%" + search + "%")
+                .getResultList();
     }
 
     @Override
@@ -165,26 +164,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         return getEmployeeByUsername(username).getAccessRights();
     }
 
-   /* @Override
-    public byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
-    }
-*/
-  /*  @Override
-    public Employee loginAuthentication(Employee employee) throws EmployeeException {
-        try {
-            Employee c = getEmployeeByUsername(employee.getUsername());
-            if (c.authentication(employee.getPassword()))) {
-                return c;
-            } else {
-                throw new EmployeeException();
-            }
-        } catch (Exception ex) {
-            throw new EmployeeException("Invalid Username or Password.");
-        }
-
-    }*/
+    /*
+     * @Override
+     * public byte[] saltGeneration() {
+     * SecureRandom random = new SecureRandom();
+     * byte[] salt = new byte[16];
+     * random.nextBytes(salt);
+     * return salt;
+     * }
+     */
+    /*
+     * @Override
+     * public Employee loginAuthentication(Employee employee) throws
+     * EmployeeException {
+     * try {
+     * Employee c = getEmployeeByUsername(employee.getUsername());
+     * if (c.authentication(employee.getPassword()))) {
+     * return c;
+     * } else {
+     * throw new EmployeeException();
+     * }
+     * } catch (Exception ex) {
+     * throw new EmployeeException("Invalid Username or Password.");
+     * }
+     * 
+     * }
+     */
 }

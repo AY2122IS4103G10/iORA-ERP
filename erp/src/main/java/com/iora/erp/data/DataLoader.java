@@ -21,7 +21,6 @@ import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.ProductField;
-import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;

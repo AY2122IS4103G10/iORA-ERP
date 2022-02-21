@@ -3,7 +3,6 @@ package com.iora.erp.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;

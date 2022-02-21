@@ -4,48 +4,47 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { SimpleTable } from '../../../components/Tables/SimpleTable';
 import { getASite, selectSite } from '../../../../stores/slices/siteSlice';
+import { SimpleTable } from '../../../components/Tables/SimpleTable';
 
 
-const data = [
-    {
-        id: 1,
-        productCode: "SKU1231",
-        name: "Sky Blue V-neck Top",
-        qty: 100,
-        reserved: 5,
-        inTransit: 8,
-
+const stocklevel = {
+    id: 4,
+    productItems: [],
+    products: {
+      "ASK0009968A-1": 1,
+      "ASK0009968A-2": 2,
+      "ASK0009968A-3": 3, 
     },
-    {
-        id: 2, 
-        productCode: "SKU4321",
-        name: "Black Blue V-neck Top",
-        qty: 100,
-        reserved: 5,
-        inTransit: 8,
+    models: {
+      "ASK0009968A": 6,
+    },
+    reserveProducts: {
+      "ASK0009968A-1": 1
     }
-];
+}
+
+const convertData = (data) => 
+  Object.entries(data.products).map((key) => ({
+    sku: key[0],
+    qty: key[1],
+    reserve: data.reserveProducts[key[0]] == null ? 0 : stocklevel.reserveProducts[key[0]],
+  }))
 
 const columns = [
-    {
-        Header: "Product Code", 
-        accessor: "productCode"
-    }, 
-    {
-        Header: "Name", 
-        accessor: "name"
-    },
-    {
-        Header: "Quantity", 
-        accessor: "qty",
-    },
-    {
-        Header: "Reserved",
-        accessor: "reserved",
-    },
-];
+  {
+    Header: "SKU Code",
+    accessor: "sku"
+  },
+  {
+    Header: "Qty",
+    accessor: "qty"
+  },
+  {
+    Header: "Reserved Qty",
+    accessor: "reserve"
+  }
+]
 
 const processAddress = (addressObj) => {
   const str = addressObj.city + ", " + addressObj.road + ", " + addressObj.unit + ", " + addressObj.postalCode;
@@ -125,7 +124,7 @@ export const AsiteStock = () => {
                         Stock Levels
                   </h2>
                   <div className="ml-2 mr-2">
-                    <SimpleTable columns={columns} data={data}/>
+                    <SimpleTable columns={columns} data={convertData(stocklevel)}/>
                   </div>
                 </section>
               </div>

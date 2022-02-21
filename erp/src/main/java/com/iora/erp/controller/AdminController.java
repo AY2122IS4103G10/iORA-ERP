@@ -88,6 +88,16 @@ public class AdminController {
     }
 
     
+    @GetMapping(path = "/viewJobTitle", produces = "application/json")
+    public JobTitle viewJobTitle(@RequestParam Long id) {
+        try {
+            return adminService.getJobTitleById(id);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    
     @GetMapping(path = "/viewAllAddress", produces = "application/json")
     public List<Address> viewAllAddress() {
         try {
@@ -120,8 +130,8 @@ public class AdminController {
     }
 
       
-    @GetMapping(path = "/viewDepartment", produces = "application/json")
-    public List<Department> viewDeparment(@RequestParam("search") String search) {
+    @GetMapping(path = "/viewDepartments", produces = "application/json")
+    public List<Department> viewDeparments(@RequestParam("search") String search) {
         try {
             if(search == null) {
                 search = "";
@@ -132,6 +142,34 @@ public class AdminController {
         }
     }
 
+    @GetMapping(path = "/viewDepartment", produces = "application/json")
+    public Department viewDeparment(@RequestParam Long id) {
+        try {
+            return adminService.getDepartmentById(id);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @PutMapping(path = "/editDepartment", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> editDepartment(@RequestBody Department d) {
+        try {
+            adminService.editDepartment(d);;
+            return ResponseEntity.ok("Department with ID " + d.getId() + " has been successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/deleteDepartment")
+    public ResponseEntity<Object> deleteDepartment(@RequestParam Long id) {
+        try {
+            adminService.deleteDepartment(id);
+            return ResponseEntity.ok("Department with ID " + id + " has been successfully deleted.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
         
     @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")

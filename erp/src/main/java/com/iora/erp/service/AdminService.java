@@ -27,7 +27,7 @@ public interface AdminService {
     //vendor
     public abstract void createDepartment(Department department) throws DepartmentException;
     public abstract void editDepartment(Department department) throws DepartmentException;
-    public abstract void deleteDepartment(Department department) throws DepartmentException;
+    public abstract void deleteDepartment(Long id) throws DepartmentException;
     public abstract List<Department> listOfDepartments() throws DepartmentException;
     public abstract List<Department> getDepartmentsByFields(String search) throws DepartmentException;
     public abstract Department getDepartmentById(Long id)  throws DepartmentException;

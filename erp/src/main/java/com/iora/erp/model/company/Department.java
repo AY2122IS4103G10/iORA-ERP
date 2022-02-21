@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +21,7 @@ public class Department implements Serializable {
     @Column(nullable = false, unique = true)
     private String deptName;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     private List<JobTitle> jobTitles;
    
     public Department() {

@@ -55,7 +55,9 @@ public class AdminServiceImpl implements AdminService {
         }
 
         try {
-            old.setTitle(jobTitle.getTitle());
+            if (old.getTitle() != jobTitle.getTitle()) {
+                old.setTitle(jobTitle.getTitle());
+            }
         } catch (Exception ex) {
             throw new JobTitleException("Job Title " + jobTitle.getTitle() + " has been used!");
         }
@@ -161,30 +163,36 @@ public class AdminServiceImpl implements AdminService {
             throw new DepartmentException("Department not found");
         }
 
+
         try {
-            old.setDeptName(department.getDeptName());
+            if(old.getDeptName() != department.getDeptName()) {
+                old.setDeptName(department.getDeptName());
+            }
+        } catch (Exception ex) {
+            throw new DepartmentException("Department " + department.getDeptName() + " has been used!");
+        }
+        
+        try {
             old.setJobTitles(new ArrayList<>());
             for (JobTitle j : department.getJobTitles()) {
                 JobTitle newJ = getJobTitleById(j.getId());
                 old.getJobTitles().add(newJ);
             }
         } catch (Exception ex) {
-            throw new DepartmentException("Department " + department.getDeptName() + " has been used!");
+            throw new DepartmentException("Job Title given for Department is not available!");
         }
 
-
-        System.out.println(old);
     }
 
     @Override
-    public void deleteDepartment(Department department) throws DepartmentException {
+    public void deleteDepartment(Long id) throws DepartmentException {
         try {
-            Department e = em.find(Department.class, department.getId());
+            Department e = em.find(Department.class,id);
 
             if (e == null) {
                 throw new DepartmentException("Department not found");
             }
-
+            e.setJobTitles(new ArrayList<>());
             em.remove(e);
             em.flush();
         } catch (IllegalArgumentException | TransactionRequiredException ex) {

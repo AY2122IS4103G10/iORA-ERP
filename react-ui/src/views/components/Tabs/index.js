@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 export const Tabs = ({tabs}) => {
+    const path = useLocation().pathname;
     const [currTab, setCurrTab] = useState("");  
 
     function changeTab(tabnumber) {
@@ -20,7 +21,7 @@ export const Tabs = ({tabs}) => {
                     key={tabs[i].name}
                     to={tabs[i].href}
                     className={classNames(
-                    currTab == i
+                    path.endsWith(tabs[i].href)
                         ? 'border-indigo-500 text-indigo-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
                     'whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm'

@@ -18,7 +18,7 @@ const navigation = [
   { name: "Products", href: "/sm/products", icon: ClockIcon, current: false },
   {
     name: "Stock Levels",
-    href: "/sm/stocklevels",
+    href: "/sm/stocklevels/sites",
     icon: ScaleIcon,
     current: false,
   },

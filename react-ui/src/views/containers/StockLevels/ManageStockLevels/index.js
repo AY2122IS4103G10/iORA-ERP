@@ -8,7 +8,7 @@ import { AProductStock } from "../AProductStock";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
 
 const tabs = [
-    { name: 'By Site', href: '', current: true},
+    { name: 'By Site', href: 'sites', current: true},
     { name: 'By Products', href: 'products', current: false},
   ]
 
@@ -19,7 +19,7 @@ export const ViewStockLevels = () => {
       <>
         <SectionHeading header="Stock Levels" tabs={tabs}/>
         <Routes>
-            <Route path="/" element={<SiteStocks/>}/>
+            <Route path="sites" element={<SiteStocks/>}/>
             <Route path="products" element={<ProductStocks/>}/>
             <Route path=":id" element={<AsiteStock/>} />
             <Route path="products/:id" element={<AProductStock/>}/>

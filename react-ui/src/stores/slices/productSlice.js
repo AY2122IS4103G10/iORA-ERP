@@ -3,7 +3,6 @@ import { api } from "../../environments/Api";
 
 const initialState = {
   products: [],
-  productSL: [],
   currProduct: null,
   status: "idle",
   error: null,
@@ -18,14 +17,6 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
-//fetch products
-export const getAllProductSL = createAsyncThunk(
-  "products/getAllProductSL",
-  async () => {
-    const response = await api.getAll(`sam/product?sku=`);
-    return response.data;
-  }
-);
 
 //get a product stock level
 export const getAProduct = createAsyncThunk(
@@ -73,16 +64,6 @@ const productSlice = createSlice({
       state.products = state.products.concat(action.payload);
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
-      state.status = "failed";
-    });
-    builder.addCase(getAllProductSL.pending, (state, action) => {
-      state.status = "loading";
-    });
-    builder.addCase(getAllProductSL.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.productSL = state.productSL.concat(action.payload);
-    });
-    builder.addCase(getAllProductSL.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(getAProduct.pending, (state, action) => {
@@ -136,8 +117,6 @@ const productSlice = createSlice({
 export default productSlice.reducer;
 
 export const selectAllProducts = (state) => state.products.products;
-
-export const selectAllProductSL = (state) => state.products.productSL;
 
 export const selectAProductSL = (state) => state.products.currProduct;
 

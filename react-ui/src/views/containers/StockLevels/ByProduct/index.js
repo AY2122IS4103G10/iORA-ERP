@@ -1,9 +1,7 @@
-import { useMem, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts, selectAllProducts, selectAllProductSL } from "../../../../stores/slices/productSlice";
-import { getAllProductSL } from "../../../../stores/slices/productSlice";
+import { fetchProducts, selectAllProducts } from "../../../../stores/slices/productSlice";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
-import { SelectColumnFilter } from "../../../components/Tables/SelectableTable";
 
 const columns = [
         {

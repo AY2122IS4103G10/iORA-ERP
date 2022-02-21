@@ -3,6 +3,7 @@ package com.iora.erp.data;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -12,9 +13,12 @@ import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
+import com.iora.erp.model.Currency;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
+import com.iora.erp.model.customer.BirthdayPoints;
+import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
@@ -168,6 +172,26 @@ public class DataLoader implements CommandLineRunner {
                 "313 Somerset", "Singapore", "#03-01 to 08", "313 Orchard Road", "Singapore 238895", true, 1.300869,
                 103.838461), "000018", "+65-6509 0398", iora);
         em.persist(s18);
+
+        // Adding birthday points and membership tiers
+        // BASIC(0.00, 0, 0), SILVER(0.03, 500, 200), GOLD (0.05, 3000, 1000), DIAMOND (0.07, 7500, 2500);
+        Currency rm = new Currency("RM", "Malaysian Ringgit");
+        Currency sgd = new Currency("SGD", "Singapore Dollar");
+        em.persist(rm);
+        em.persist(sgd);
+
+        Map<Currency,Integer> birthday = Map.of(rm, 500, sgd, 200);
+        BirthdayPoints bday = new BirthdayPoints("STANDARD", birthday, 1);
+        em.persist(bday);
+
+        MembershipTier basic = new MembershipTier("BASIC", 0.00, Map.of(rm, 0, sgd, 0), bday);
+        MembershipTier silver = new MembershipTier("SILVER", 0.03, Map.of(rm, 500, sgd, 200), bday);
+        MembershipTier gold = new MembershipTier("GOLD", 0.05, Map.of(rm, 3000, sgd, 1000), bday);
+        MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, Map.of(rm, 7500, sgd, 2500), bday);
+        em.persist(basic);
+        em.persist(silver);
+        em.persist(gold);
+        em.persist(diamond);
 
         // Creating Product Fields
         Set<ProductField> productFields = new HashSet<>();

@@ -76,15 +76,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Customer> listOfCustomer() throws CustomerException {
-        try {
-            Query q = em.createQuery("SELECT c FROM Customer c");
-
-            // need run test if query exits timing for large database
-            return q.getResultList();
-        } catch (Exception ex) {
-            throw new CustomerException();
-        }
+    public List<Customer> listOfCustomer() {
+        // need run test if query exits timing for large database
+        return em.createQuery("SELECT c FROM Customer c", Customer.class).getResultList();
     }
 
     @Override
@@ -147,7 +141,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Voucher getVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = em.find(Voucher.class, voucherCode);
 
-        if (voucher  == null) {
+        if (voucher == null) {
             throw new CustomerException("Voucher with voucherCode " + voucherCode + " does not exist.");
         } else {
             return voucher;
@@ -159,20 +153,20 @@ public class CustomerServiceImpl implements CustomerService {
         List<Voucher> vouchers = new ArrayList<>();
 
         IntStream.range(0, qty)
-        .forEach( i -> {
-            Voucher voucher1 = new Voucher(amount, LocalDate.parse(date));
-            try {
-                getVoucher(voucher1.getVoucherCode());
-                //Voucher with the generate voucher code already exist
-                Voucher voucher2 = new Voucher(amount, LocalDate.parse(date));
-                em.persist(voucher2);
-                vouchers.add(voucher2);
-            } catch (CustomerException ex) {
-                //Voucher code does not already exist
-                em.persist(voucher1);
-                vouchers.add(voucher1);
-            }
-        });
+                .forEach(i -> {
+                    Voucher voucher1 = new Voucher(amount, LocalDate.parse(date));
+                    try {
+                        getVoucher(voucher1.getVoucherCode());
+                        // Voucher with the generate voucher code already exist
+                        Voucher voucher2 = new Voucher(amount, LocalDate.parse(date));
+                        em.persist(voucher2);
+                        vouchers.add(voucher2);
+                    } catch (CustomerException ex) {
+                        // Voucher code does not already exist
+                        em.persist(voucher1);
+                        vouchers.add(voucher1);
+                    }
+                });
 
         return vouchers;
     }

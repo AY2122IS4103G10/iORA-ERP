@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.StockTransferException;
+import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Model;
@@ -510,6 +512,31 @@ public class SAMController {
             return ResponseEntity
                     .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * B.5 CRM
+     * ---------------------------------------------------------
+     */
+
+    @GetMapping(path = "/customer/view/all", produces = "application/json")
+    public List<Customer> viewAllCustomers() {
+        return customerService.listOfCustomer();
+    }
+
+    @GetMapping(path = "/customer/search/{query}", produces = "application/json")
+    public List<Customer> searchCustomers(@PathVariable String query) {
+        return customerService.getCustomerByFields(query);
+    }
+
+    @GetMapping(path = "/customer/view/{id}", produces = "application/json")
+    public ResponseEntity<Object> getCustomerById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.getCustomerById(id));
+        } catch (CustomerException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

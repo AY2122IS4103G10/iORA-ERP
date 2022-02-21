@@ -11,11 +11,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.iora.erp.enumeration.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 
 @Entity
@@ -34,6 +34,7 @@ public class Customer implements Serializable {
     private Date dob;
     private String contactNumber;
     private Integer membershipPoints;
+    @ManyToOne
     private MembershipTier membershipTier;
     private Double storeCredit;
     @OneToMany(mappedBy = "customer")

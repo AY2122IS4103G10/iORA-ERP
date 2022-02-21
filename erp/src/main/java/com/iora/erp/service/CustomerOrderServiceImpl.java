@@ -10,9 +10,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
-import com.iora.erp.enumeration.MembershipTier;
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.model.Currency;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
@@ -20,11 +21,11 @@ import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.RefundLI;
 
-    /*
-     * ---------------------------------------------------------
-     * Methods are not tested yet, for implementation in Second System Release
-     * ---------------------------------------------------------
-     */
+/*
+ * ---------------------------------------------------------
+ * Methods are not tested yet, for implementation in Second System Release
+ * ---------------------------------------------------------
+ */
 
 public class CustomerOrderServiceImpl implements CustomerOrderService {
     @PersistenceContext
@@ -194,17 +195,26 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     // Helper methods
     public void updateMembershipPoints(CustomerOrder order) {
         Customer customer = order.getCustomer();
-        
-        Double spending = em.createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date", Payment.class)
+
+        Currency currency = em.find(Currency.class, "SGD");
+        Double spending = em
+                .createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
+                        Payment.class)
                 .setParameter("id", customer.getId())
                 .setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP)
                 .getResultList()
                 .stream()
                 .mapToDouble(x -> x.getAmount())
                 .sum();
-        MembershipTier membershipTier = MembershipTier.BASIC;
-        for (MembershipTier tier : MembershipTier.values()) {
-            if (spending > tier.sgd) membershipTier = tier;
+
+        List<MembershipTier> tiers = em
+                .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
+                .getResultList();
+        MembershipTier membershipTier = tiers.get(0);
+        for (MembershipTier tier : tiers) {
+            if (spending > tier.getThreshold().get(currency)) {
+                membershipTier = tier;
+            }
         }
         customer.setMembershipTier(membershipTier);
 
@@ -216,10 +226,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         } else {
             Integer membershipPoints = customer.getMembershipPoints();
             for (Payment p : order.getPayments()) {
-                membershipPoints = Integer.sum(membershipPoints, (int) (p.getAmount() * membershipTier.multiplier));
+                membershipPoints = Integer.sum(membershipPoints, (int) (p.getAmount() * membershipTier.getMultiplier()));
             }
             customer.setMembershipPoints(membershipPoints);
         }
-                
+
     }
 }

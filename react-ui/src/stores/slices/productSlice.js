@@ -4,6 +4,7 @@ import { api } from "../../environments/Api";
 const initialState = {
   products: [],
   currProduct: null,
+  prodStockLevel: null,
   status: "idle",
   error: null,
 };
@@ -17,8 +18,7 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
-
-//get a product stock level
+//get a product
 export const getAProduct = createAsyncThunk(
   "products/getAProduct",
   async (sku) => {
@@ -27,6 +27,14 @@ export const getAProduct = createAsyncThunk(
   }
 );
 
+//get product's stock level
+export const getProductStockLevel = createAsyncThunk(
+  "products/getProductStockLevel",
+  async (sku) => {
+    const response = await api.get(`sam/viewStock/product`, sku);
+    return response.data;
+  }
+)
 
 export const addNewProduct = createAsyncThunk(
   "products/addNewPost",
@@ -61,7 +69,7 @@ const productSlice = createSlice({
     });
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.products = state.products.concat(action.payload);
+      state.products = action.payload;
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
       state.status = "failed";
@@ -74,6 +82,16 @@ const productSlice = createSlice({
       state.currProduct = action.payload;
     });
     builder.addCase(getAProduct.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(getProductStockLevel.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getProductStockLevel.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.prodStockLevel = action.payload;
+    });
+    builder.addCase(getProductStockLevel.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {
@@ -118,7 +136,9 @@ export default productSlice.reducer;
 
 export const selectAllProducts = (state) => state.products.products;
 
-export const selectAProductSL = (state) => state.products.currProduct;
+export const selectAProduct = (state) => state.products.currProduct;
+
+export const selectProductSL = (state) => state.products.prodStockLevel;
 
 export const selectProductByCode = (state, modelCode) =>
   state.products.products.find((product) => product.modelCode === modelCode);

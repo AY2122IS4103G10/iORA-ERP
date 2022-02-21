@@ -38,9 +38,8 @@ export const sitesApi = {
     );
   },
   getAll() {
-    return axios.get(
-      `${REST_ENDPOINT}sam/viewSites?storeTypes=&country=&company=`
-    );
+    return axios
+      .get(`${REST_ENDPOINT}sam/viewSites/all`)
   },
 
   getASite(id) {

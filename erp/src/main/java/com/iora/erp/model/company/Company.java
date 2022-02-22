@@ -6,17 +6,17 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
 
 @Entity
 public class Company implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +41,7 @@ public class Company implements Serializable {
         this.name = name;
         this.registerNumber = registerNumber;
         this.telephone = telephone;
+        this.active = true;
     }
 
     public Company(String name, String registerNumber, String telephone, Boolean active, Address address,
@@ -129,15 +130,4 @@ public class Company implements Serializable {
     public String toString() {
         return "Company [id=" + id + "]";
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
-    // Locale.getISOCountries();
-
 }

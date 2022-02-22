@@ -31,7 +31,7 @@ public interface AdminService {
     public abstract List<Department> listOfDepartments() throws DepartmentException;
     public abstract List<Department> getDepartmentsByFields(String search) throws DepartmentException;
     public abstract Boolean checkJTInDepartment(Long did, Long jid) throws DepartmentException;
-    public abstract Department getDepartmentById(Long id)  throws DepartmentException;
+    public abstract Department getDepartmentById(Long id) throws DepartmentException;
     public abstract Department getDepartmentsByName(String name) ;
     public abstract List<Employee> getEmployeesInDepartments(String deparment) throws DepartmentException;
 
@@ -51,7 +51,7 @@ public interface AdminService {
     public abstract void editCompany(Company company) throws CompanyException;
     public abstract void deleteCompany(Company company) throws CompanyException;
     public abstract List<Company> listOfCompanys() throws CompanyException;
-    public abstract List<Company> getCompanysByFields(String search);
+    public abstract List<Company> getCompanysByFields(String search) throws CompanyException;
     public abstract Company getCompanyById(Long id)  throws CompanyException;
     public abstract Company getCompanysByName(String name) ;
     public abstract Boolean checkUniqueR(String register) ;

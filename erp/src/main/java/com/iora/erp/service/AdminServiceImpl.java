@@ -495,19 +495,28 @@ public class AdminServiceImpl implements AdminService {
             return q.getResultList();
 
         } catch (Exception ex) {
-            throw new CompanyException();
+            throw new CompanyException("Unable to retrieve list of company");
         }
     }
 
     @Override
-    public List<Company> getCompanysByFields(String search) {
-        Query q = em.createQuery("SELECT c FROM Company c WHERE lOWER(e.name) Like :name OR " +
-                "LOWER(e.registerNumber) Like :regsNum OR e.telephone Like :telephone");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        q.setParameter("regsNum", "%" + search.toLowerCase() + "%");
-        q.setParameter("telephone", "%" + search + "%");
+    public List<Company> getCompanysByFields(String search) throws CompanyException {
+        if (search == "") {
+            return listOfCompanys();
+        }
 
-        return q.getResultList();
+        try {
+            Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(c.name) LIKE :name OR " +
+            "LOWER(c.registerNumber) LIKE :regsNum OR c.telephone LIKE :telephone");
+            q.setParameter("name", "%" + search.toLowerCase() + "%");
+            q.setParameter("regsNum", "%" + search.toLowerCase() + "%");
+            q.setParameter("telephone", "%" + search + "%");
+            
+            return q.getResultList();
+            
+        } catch (Exception ex) {
+            throw new CompanyException("Unable to retrieve list from search");
+        }
     }
 
     @Override
@@ -521,7 +530,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Company getCompanysByName(String name) {
-        Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(e.getName) = :name");
+        Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(e.name) = :name");
         q.setParameter("name", name.toLowerCase());
 
         return (Company) q.getSingleResult();
@@ -529,7 +538,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Boolean checkUniqueR(String register) {
-        Query q = em.createQuery("SELECT e FROM Company e WHERE e.getRegisterNumber = :num");
+        Query q = em.createQuery("SELECT e FROM Company e WHERE e.registerNumber = :num");
         q.setParameter("num", register);
 
         if (q.getResultList().size() > 0) {

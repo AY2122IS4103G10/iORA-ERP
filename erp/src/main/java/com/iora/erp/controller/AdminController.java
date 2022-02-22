@@ -145,10 +145,23 @@ public class AdminController {
     @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addCompany(@RequestBody Company company) {
         try {
+            System.out.println("here");
             adminService.createCompany(company);
             return ResponseEntity.ok("Company has been successfully created");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/viewCompanies", produces = "application/json")
+    public List<Company> viewCompanies(@RequestParam("search") String search) {
+        try {
+            if(search == null) {
+                search ="";
+            }
+            return adminService.getCompanysByFields(search);
+        } catch (Exception ex) {
+            return null;
         }
     }
 

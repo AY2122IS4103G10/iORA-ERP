@@ -63,4 +63,7 @@ public class Department implements Serializable {
         this.deptName = deptName;
     }
 
+    public void setJobTitles(Object jobTitle) {
+    }
+
 }

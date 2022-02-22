@@ -108,6 +108,28 @@ public class AdminController {
         }
     }
 
+    @GetMapping(path = "/viewVendors", produces = "application/json")
+    public List<Vendor> viewVendors(@RequestParam("search") String search) {
+        try {
+            if(search == null) {
+                search = "";
+            }
+            return adminService.getListofVendor(search);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @PutMapping(path = "/editVendor", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> editVendor(@RequestBody Vendor v) {
+        try {
+            adminService.updateVendor(v);;
+            return ResponseEntity.ok("Vendor with ID " + v.getId() + " has been successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
 
     @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addCompany(@RequestBody Company company) {

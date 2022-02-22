@@ -80,7 +80,6 @@ public class AdminServiceImpl implements AdminService {
             departmentCheck = true;
         }
 
-
         if (j == null) {
             throw new JobTitleException("JobTitle not found");
         } else if (departmentCheck == true) {
@@ -196,7 +195,7 @@ public class AdminServiceImpl implements AdminService {
             List<Department> d = q.getResultList();
             Boolean checkDepartment = false;
 
-            if(d.size() > 0) {
+            if (d.size() > 0) {
                 checkDepartment = true;
             }
 
@@ -328,10 +327,13 @@ public class AdminServiceImpl implements AdminService {
             return getListAddress();
         }
         Query q = em.createQuery(
-                "SELECT a FROM Address a WHERE a.getBuilding LIKE :building OR a.getPostalCode LIKE :postal OR a.getUnit LIKE :unit");
+                "SELECT a FROM Address a WHERE LOWER(a.building) LIKE :building OR lOWER(a.postalCode) LIKE :postal OR" + 
+                " LOWER(a.unit) LIKE :unit OR LOWER(a.road) LIKE :road OR LOWER(a.city) LIKE :city");
         q.setParameter("building", "%" + search + "%");
         q.setParameter("postal", "%" + search + "%");
         q.setParameter("unit", "%" + search + "%");
+        q.setParameter("road", "%" + search + "%");
+        q.setParameter("city", "%" + search + "%");
         return q.getResultList();
     }
 
@@ -347,8 +349,8 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Boolean checkAddress(Address address) {
         Query q = em.createQuery(
-                "SELECT e FROM Address e WHERE UPPER(e.getCountry) = :country AND LOWER(e.getCity) = :city " +
-                        "AND LOWER(e.getPostalCode) = :postal AND LOWER(e.getUnit) = :unit");
+                "SELECT e FROM Address e WHERE UPPER(e.country) = :country AND LOWER(e.city) = :city " +
+                        "AND LOWER(e.postalCode) = :postal AND LOWER(e.unit) = :unit");
         q.setParameter("country", address.getCountry().toString());
         q.setParameter("city", address.getCity().toLowerCase());
         q.setParameter("postal", address.getPostalCode().toLowerCase());
@@ -367,8 +369,8 @@ public class AdminServiceImpl implements AdminService {
         try {
             em.persist(company);
 
-            //Address a = getAddressById(address.getId());
-            //company.setAddress(a);
+            // Address a = getAddressById(address.getId());
+            // company.setAddress(a);
 
         } catch (Exception ex) {
             throw new CompanyException("Company has already been created");
@@ -475,8 +477,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Company> getCompanysByFields(String search) {
-        Query q = em.createQuery("SELECT c FROM Company c WHERE lOWER(e.getName) Like :name OR " +
-                "LOWER(e.getRegisterNumber) Like :regsNum OR e.getTelephone Like :telephone");
+        Query q = em.createQuery("SELECT c FROM Company c WHERE lOWER(e.name) Like :name OR " +
+                "LOWER(e.registerNumber) Like :regsNum OR e.telephone Like :telephone");
         q.setParameter("name", "%" + search.toLowerCase() + "%");
         q.setParameter("regsNum", "%" + search.toLowerCase() + "%");
         q.setParameter("telephone", "%" + search + "%");
@@ -529,12 +531,19 @@ public class AdminServiceImpl implements AdminService {
     public void createVendor(Vendor vendor) throws VendorException {
         try {
             Vendor newV = vendor;
+            List<Address> list = vendor.getAddress();
+
             newV.setAddress(new ArrayList<>());
             em.persist(newV);
 
-            for(Address aa :  vendor.getAddress()) {
-                em.persist(aa);
-                newV.getAddress().add(aa);
+            for (Address aa : list) {
+                if (aa.getId() !=  null) {
+                    Address a = getAddressById(aa.getId());
+                    newV.getAddress().add(a);
+                } else {
+                    em.persist(aa);
+                    newV.getAddress().add(aa);
+                }
             }
 
         } catch (Exception ex) {
@@ -546,35 +555,27 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void updateVendor(Vendor vendor) throws VendorException, AddressException {
         Vendor v = getVendorById(vendor.getId());
+        Boolean checkUpdate = false;
 
         if (vendor.getCompanyName() != v.getCompanyName()) {
             if (uniqueVendorName(vendor.getCompanyName()) == true) {
-                v.setCompanyName(vendor.getCompanyName());
-                v.setDescription(vendor.getDescription());
-                v.setEmail(vendor.getDescription());
-                v.setTelephone(vendor.getDescription());
-                v.setAddress(new ArrayList<>());
-
-                for (Address a : vendor.getAddress()) {
-                    if (checkAddress(a) == true) {
-                        Address aa = getAddressById(a.getId());
-                        v.getAddress().add(aa);
-                    } else {
-                        em.persist(a);
-                        v.getAddress().add(a);
-                    }
-                }
+                checkUpdate =true;
             } else {
-                throw new VendorException("Vendor Name is not unique");
+                throw new VendorException("Fail: Vendor name is not unique");
             }
         } else {
-            v.setDescription(vendor.getDescription());
-            v.setEmail(vendor.getDescription());
-            v.setTelephone(vendor.getDescription());
+            checkUpdate =true;
+        }
+
+        if (checkUpdate == true) {
+            v.setCompanyName(v.getCompanyName());
+            v.setDescription(v.getDescription());
+            v.setEmail(v.getEmail());
+            v.setTelephone(v.getTelephone());
             v.setAddress(new ArrayList<>());
 
             for (Address a : vendor.getAddress()) {
-                if (checkAddress(a) == true) {
+                if (a.getId() !=  null) {
                     Address aa = getAddressById(a.getId());
                     v.getAddress().add(aa);
                 } else {
@@ -593,6 +594,36 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public List<Vendor> listofVendor() throws VendorException {
+        try {
+            Query q = em.createQuery("SELECT e FROM Vendor e");
+            return q.getResultList();
+
+        } catch (Exception ex) {
+            throw new VendorException("Fail to retrieve vendors");
+        }
+    }
+
+    @Override
+    public List<Vendor> getListofVendor(String search) throws VendorException {
+        if (search == "") {
+            return listofVendor();
+        }
+
+        try {
+            Query q = em.createQuery(
+                    "SELECT e FROM Vendor e WHERE LOWER(e.companyName) LIKE :name OR LOWER(e.email) LIKE :email OR LOWER(e.telephone) LIKE :telephone");
+            q.setParameter("name", "%" + search + "%");
+            q.setParameter("email", "%" + search + "%");
+            q.setParameter("telephone","%" + search + "%");
+            return q.getResultList();
+
+        } catch (Exception ex) {
+            throw new VendorException("Fail to retrieve vendors");
+        }
+    }
+
+    @Override
     public Vendor getVendorById(Long id) throws VendorException {
         Vendor vendor = em.find(Vendor.class, id);
         if (vendor == null) {
@@ -603,8 +634,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Boolean uniqueVendorName(String name) throws VendorException {
-        Query q = em.createQuery("SELECT v FROM Vendor v WHERE Lower(v.getCompanyName) = :name");
-        q.setParameter("name", name);
+        Query q = em.createQuery("SELECT v FROM Vendor v WHERE LOWER(v.companyName) = :name");
+        q.setParameter("name", name.toLowerCase());
 
         if (q.getResultList().size() > 0) {
             return false;
@@ -619,12 +650,6 @@ public class AdminServiceImpl implements AdminService {
         String[] countryCodes = Locale.getISOCountries();
         List<String> code = Arrays.asList(countryCodes);
         return code;
-    }
-
-    @Override
-    public String convertCodeToCountry(String code) {
-        Locale locale = new Locale("english", code);
-        return locale.getCountry();
     }
 
 }

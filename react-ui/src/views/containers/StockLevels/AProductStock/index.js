@@ -34,13 +34,14 @@ const stocklevel = {
     4: 9,
 }
 
-const convertData = (data, sites) => 
-  Object.entries(data).map((pair) => ({
+function convertData(data, sites) {
+  return Object.entries(data).map((pair) => ({
     id: pair[0],
     siteCode: sites.filter(site => site.id == pair[0])[0].siteCode,
     siteName: sites.filter(site => site.id == pair[0])[0].name,
     qty: pair[1],
   }))
+}
 
 
 export const AProductStock = (subsys) => {
@@ -49,7 +50,6 @@ export const AProductStock = (subsys) => {
   const prod = useSelector(selectAProduct);
   // const stockLevel = useSelector(selectProductSL);
   const sites = useSelector(selectAllSites);
-  console.log(sites);
   
   useEffect(() => {
       dispatch(getAProduct(id));
@@ -58,6 +58,7 @@ export const AProductStock = (subsys) => {
   }, []);
 
   const path = "/" + subsys.subsys + "/stocklevels";
+  
   return(
       <div className="min-h-full">
       <main className="py-10">
@@ -109,7 +110,7 @@ export const AProductStock = (subsys) => {
             {/* Stock Levels By Products*/}
             <section aria-labelledby="stocks-level">
                 <div className="m-1">
-                {sites == undefined || stocklevel == undefined ? <p>loading</p> : 
+                {sites.length == 0 || stocklevel == undefined ? <p>loading</p> : 
                   <SelectableTable columns={columns} data={convertData(stocklevel, sites)} path={path}/>
                 }
                 </div>

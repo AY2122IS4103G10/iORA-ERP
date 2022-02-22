@@ -5,9 +5,6 @@ import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ViewStockLevels } from "./views/containers/StockLevels/ManageStockLevels";
-import { SiteStocks } from "./views/containers/StockLevels/BySite";
-import { ProductStocks } from "./views/containers/StockLevels/ByProduct";
-import { AsiteStock } from "./views/containers/StockLevels/ASiteStock";
 import Login from "./views/containers/Login";
 import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
@@ -21,7 +18,8 @@ import { SiteForm } from "./views/containers/Sites/SiteForm";
 import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
 import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
 import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
-import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock ";
+import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
+import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
 
 function App() {
   return (
@@ -46,6 +44,8 @@ function App() {
             <Route path="promotions" element={<ManagePromotions />} />
           </Route>
           <Route path="stocklevels/*" element={<ViewStockLevels />}/>
+          <Route path="stocktransfer" element={<ManageStockTransfer/>}/>
+          
           <Route path="procurements" element={<Outlet />}>
             <Route index element={<ManageProcurement />} />
             {/* <Route path=":voucherCode" element={<VoucherDetails />} /> */}

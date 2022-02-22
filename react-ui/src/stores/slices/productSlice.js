@@ -3,8 +3,8 @@ import { api } from "../../environments/Api";
 
 const initialState = {
   products: [],
-  currProduct: null,
-  prodStockLevel: null,
+  currProduct: null, //selected product for stock level
+  prodStockLevel: null, //view product's stock level
   status: "idle",
   error: null,
 };

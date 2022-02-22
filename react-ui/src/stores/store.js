@@ -5,6 +5,7 @@ import prodFieldReducer from "./slices/prodFieldSlice";
 import procurementReducer from "./slices/procurementSlice";
 import promotionsReducer from "./slices/promotionsSlice";
 import siteReducer from "./slices/siteSlice";
+import stocklevelReducer from "./slices/stocklevelSlice";
 import voucherReducer from "./slices/voucherSlice";
 
 export default configureStore({
@@ -15,6 +16,7 @@ export default configureStore({
     procurements: procurementReducer,
     promotions: promotionsReducer,
     sites: siteReducer,
+    stocklevel: stocklevelReducer,
     vouchers: voucherReducer,
   },
 });

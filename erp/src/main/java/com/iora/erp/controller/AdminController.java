@@ -70,7 +70,6 @@ public class AdminController {
     public ResponseEntity<Object> deleteJobTitle(@RequestParam Long jobTitleId) {
         try {
             adminService.deleteJobTitle(jobTitleId);
-            ;
             return ResponseEntity.ok("Job Tiltle with ID " + jobTitleId + " has been successfully deleted.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -149,8 +148,8 @@ public class AdminController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
-
+    
+    
     @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addCompany(@RequestBody Company company) {
         try {
@@ -173,6 +172,36 @@ public class AdminController {
         }
     }
 
+    @GetMapping(path = "/viewCompany", produces = "application/json")
+    public Company viewCompany(@RequestParam Long id) {
+        try {
+            return adminService.getCompanyById(id);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+    
+    @PutMapping(path = "/editCompany", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> editCompany(@RequestBody Company company) {
+        try {
+            adminService.editCompany(company);
+            return ResponseEntity.ok("Company with ID " + company.getId() + " has been successfully updated.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+    
+    @DeleteMapping(path = "/deleteCompany")
+    public ResponseEntity<Object> deleteCompany(@RequestParam Long id) {
+        try {
+            adminService.deleteCompany(id);
+            return ResponseEntity.ok("Company with ID " + id + " has been successfully deleted.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+    
+
     @GetMapping(path = "/viewAllAddress", produces = "application/json")
     public List<Address> viewAllAddress() {
         try {
@@ -193,6 +222,8 @@ public class AdminController {
             return null;
         }
     }
+
+
 
     @PostMapping(path = "/addDepartment", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addDepartment(@RequestBody Department d) {

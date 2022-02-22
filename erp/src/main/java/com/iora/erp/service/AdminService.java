@@ -49,7 +49,7 @@ public interface AdminService {
     public abstract void removeADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException;
     public abstract void removeAVendorToCompany(Long cid, Long vid) throws CompanyException, VendorException;
     public abstract void editCompany(Company company) throws CompanyException;
-    public abstract void deleteCompany(Company company) throws CompanyException;
+    public abstract void deleteCompany(Long id) throws CompanyException;
     public abstract List<Company> listOfCompanys() throws CompanyException;
     public abstract List<Company> getCompanysByFields(String search) throws CompanyException;
     public abstract Company getCompanyById(Long id)  throws CompanyException;

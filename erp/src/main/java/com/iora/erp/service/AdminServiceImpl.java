@@ -24,6 +24,7 @@ import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
 import com.iora.erp.model.company.Vendor;
+import com.iora.erp.model.site.Site;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +57,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         try {
-            if (old.getTitle() != jobTitle.getTitle()) {
+            if (!old.getTitle().equals(jobTitle.getTitle())) {
                 old.setTitle(jobTitle.getTitle());
             }
         } catch (Exception ex) {
@@ -71,20 +72,26 @@ public class AdminServiceImpl implements AdminService {
     public void deleteJobTitle(Long id) throws JobTitleException {
         JobTitle j = em.find(JobTitle.class, id);
 
-        Query p = em.createQuery("SELECT e FROM Department e WHERE e.jobTitle.id = :jobTitle");
-        p.setParameter("jobTitle", id);
-        List<Department> dd = p.getResultList();
-        Boolean departmentCheck = false;
-
-        if (dd.size() > 0) {
-            departmentCheck = true;
-        }
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.jobTitle.id = :id").setMaxResults(1);
+        q.setParameter("id", id);
 
         if (j == null) {
             throw new JobTitleException("JobTitle not found");
-        } else if (departmentCheck == true) {
+        } else if (q.getResultList().size() > 0) {
             throw new JobTitleException("Failure: Department is currently being used.");
         } else {
+            try {
+                Query p = em.createQuery("SELECT e FROM Department e");
+                List<Department> dd = p.getResultList();
+
+                for (Department d : dd) {
+                    Department dept = getDepartmentById(d.getId());
+                    dept.getJobTitles().remove(j);
+                }
+            } catch (Exception ex) {
+                throw new JobTitleException(ex.toString());
+            }
+
             em.remove(j);
             em.flush();
         }
@@ -161,7 +168,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         try {
-            if (old.getDeptName() != department.getDeptName()) {
+            if (!old.getDeptName().equals(department.getDeptName())) {
                 old.setDeptName(department.getDeptName());
             }
         } catch (Exception ex) {
@@ -189,27 +196,36 @@ public class AdminServiceImpl implements AdminService {
                 throw new DepartmentException("Department not found");
             }
 
-            Query q = em.createQuery("SELECT e FROM Employee e WHERE e.department.id = :id");
+            Query q = em.createQuery("SELECT e FROM Employee e WHERE e.department.id = :id").setMaxResults(1);
             q.setParameter("id", id);
 
-            List<Department> d = q.getResultList();
             Boolean checkDepartment = false;
-
-            if (d.size() > 0) {
+            if (q.getResultList().size() > 0) {
                 checkDepartment = true;
             }
 
             if (checkDepartment == true) {
                 throw new DepartmentException("Failure: Department is currently being used.");
             } else {
-                e.setJobTitles(new ArrayList<>());
+                Query p = em.createQuery("SELECT c FROM Company c");
+
+                List<Company> listC = p.getResultList();
+                System.out.println(listC);
+                if (listC.size() > 0) {
+                    for (Company c : listC) {
+                        Company cc = getCompanyById(c.getId());
+                        cc.getDepartments().remove(e);
+                    }
+                }
+
                 em.remove(e);
                 em.flush();
             }
         } catch (IllegalArgumentException | TransactionRequiredException ex) {
             throw new DepartmentException("Department cannot be removed");
+        } catch (CompanyException ex) {
+            throw new DepartmentException("Company data cannot be retreived");
         }
-
     }
 
     @Override
@@ -245,9 +261,7 @@ public class AdminServiceImpl implements AdminService {
                 check = true;
             }
         }
-
         return check;
-
     }
 
     @Override
@@ -365,7 +379,7 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    @Override 
+    @Override
     public void createCompany(Company company) throws CompanyException {
         try {
             Address a = company.getAddress();
@@ -374,10 +388,10 @@ public class AdminServiceImpl implements AdminService {
             em.persist(company);
 
             company.setDepartments(new ArrayList<>());
-            for(Department d: dep) {
+            for (Department d : dep) {
                 if (d.getId() != null) {
                     company.getDepartments().add(getDepartmentById(d.getId()));
-                } else  {
+                } else {
                     em.persist(d);
                     company.getDepartments().add(d);
                 }
@@ -387,10 +401,10 @@ public class AdminServiceImpl implements AdminService {
             company.setAddress(a);
 
             company.setVendors(new ArrayList<>());
-            for(Vendor v: ven) {
+            for (Vendor v : ven) {
                 if (v.getId() != null) {
                     company.getVendors().add(getVendorById(v.getId()));
-                } else  {
+                } else {
                     em.persist(v);
                     company.getVendors().add(v);
                 }
@@ -435,55 +449,70 @@ public class AdminServiceImpl implements AdminService {
     public void editCompany(Company company) throws CompanyException {
         Company old = getCompanyById(company.getId());
 
-        if (company.getName() != old.getName() && company.getRegisterNumber() != old.getRegisterNumber()) {
-            if (checkUniqueN(company.getName()) == true && checkUniqueR(company.getRegisterNumber()) == true) {
+        if (!company.getName().equals(old.getName()) && checkUniqueN(company.getName()) == false) {
+            throw new CompanyException("Fail: Company name has already been used");
 
-                old.setName(company.getName());
-                old.setRegisterNumber(company.getRegisterNumber());
-                old.setTelephone(company.getTelephone());
-                old.setActive(company.getActive());
+        } else if (!company.getRegisterNumber().equals(old.getRegisterNumber()) &&
+                checkUniqueR(company.getRegisterNumber()) == false) {
+            throw new CompanyException("Fail: Company registeration number has already been used");
 
-            } else if (checkUniqueN(company.getName()) == true) {
-                throw new CompanyException("New company registeration number is not unique");
-            } else {
-                throw new CompanyException("New company Name is not unique");
-            }
-
-        } else if (company.getName() != old.getName()) {
-            if (checkUniqueN(company.getName()) == true) {
-                old.setName(company.getName());
-                old.setTelephone(company.getTelephone());
-                old.setActive(company.getActive());
-
-            } else {
-                throw new CompanyException("New company Name is not unique");
-            }
-
-        } else if (company.getRegisterNumber() != old.getRegisterNumber()) {
-            if (checkUniqueR(company.getRegisterNumber()) == true) {
-                old.setRegisterNumber(company.getRegisterNumber());
-                old.setTelephone(company.getTelephone());
-                old.setActive(company.getActive());
-
-            } else {
-                throw new CompanyException("New company registeration number is not unique");
-            }
         } else {
-            old.setTelephone(company.getTelephone());
-            old.setActive(company.getActive());
+            try {
+
+                old.setName(company.getName());
+                old.setRegisterNumber(company.getRegisterNumber());
+                old.setTelephone(company.getTelephone());
+                old.setActive(company.getActive());
+
+                if (company.getAddress().getId().equals(old.getAddress().getId())) {
+                    updateAddress(company.getAddress());
+                    company.setAddress(getAddressById(company.getAddress().getId()));
+
+                } else {
+                    Address oldAdd = old.getAddress();
+                    Address newAdd = company.getAddress();
+                    em.persist(newAdd);
+                    company.setAddress(newAdd);
+                    em.remove(getAddressById(oldAdd.getId()));
+                }
+
+                List<Department> dep = company.getDepartments();
+                List<Vendor> ven = company.getVendors();
+                old.setDepartments(new ArrayList<>());
+                old.setVendors(new ArrayList<>());
+
+                for (Department d : dep) {
+                    old.getDepartments().add(getDepartmentById(d.getId()));
+                }
+
+                for (Vendor v : ven) {
+                    old.getVendors().add(getVendorById(v.getId()));
+                }
+
+            } catch (Exception ex) {
+                throw new CompanyException(ex.toString());
+            }
+
         }
+
     }
 
     @Override
-    public void deleteCompany(Company company) throws CompanyException {
-        Query q = em.createQuery("SELECT e FROM Site e WHERE e.getCompany.getId = :id");
-        q.setParameter("id", company.getId());
+    public void deleteCompany(Long id) throws CompanyException {
 
-        Company c = getCompanyById(company.getId());
+        Query q = em.createQuery("SELECT e FROM Site e WHERE e.company.id = :id").setMaxResults(1);
+        q.setParameter("id", id);
 
-        if (q.getResultList().size() > 0) {
+        Query p = em.createQuery("SELECT e FROM Employee e WHERE e.company.id = :id").setMaxResults(1);
+        p.setParameter("id", id);
+
+        Company c = getCompanyById(id);
+
+        if (q.getResultList().size() > 0 || p.getResultList().size() > 0) {
             c.setActive(false);
         } else {
+            c.setDepartments(null);
+            c.setVendors(null);
             em.remove(c);
         }
     }
@@ -507,13 +536,13 @@ public class AdminServiceImpl implements AdminService {
 
         try {
             Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(c.name) LIKE :name OR " +
-            "LOWER(c.registerNumber) LIKE :regsNum OR c.telephone LIKE :telephone");
+                    "LOWER(c.registerNumber) LIKE :regsNum OR c.telephone LIKE :telephone");
             q.setParameter("name", "%" + search.toLowerCase() + "%");
             q.setParameter("regsNum", "%" + search.toLowerCase() + "%");
             q.setParameter("telephone", "%" + search + "%");
-            
+
             return q.getResultList();
-            
+
         } catch (Exception ex) {
             throw new CompanyException("Unable to retrieve list from search");
         }
@@ -538,8 +567,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Boolean checkUniqueR(String register) {
-        Query q = em.createQuery("SELECT e FROM Company e WHERE e.registerNumber = :num");
-        q.setParameter("num", register);
+        Query q = em.createQuery("SELECT e FROM Company e WHERE LOWER(e.registerNumber) = :num");
+        q.setParameter("num", register.toLowerCase());
 
         if (q.getResultList().size() > 0) {
             return false;
@@ -550,7 +579,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Boolean checkUniqueN(String name) {
-        Query q = em.createQuery("SELECT e FROM Company e WHERE LOWER(e.getName) = :name ");
+        Query q = em.createQuery("SELECT e FROM Company e WHERE LOWER(e.name) = :name");
         q.setParameter("name", name.toLowerCase());
 
         if (q.getResultList().size() > 0) {
@@ -587,7 +616,7 @@ public class AdminServiceImpl implements AdminService {
 
         List<Address> list = v.getAddress();
 
-        if (vendor.getCompanyName() != v.getCompanyName()) {
+        if (!vendor.getCompanyName().equals(v.getCompanyName())) {
             if (uniqueVendorName(vendor.getCompanyName()) == true) {
                 checkUpdate = true;
             } else {
@@ -628,6 +657,18 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void deleteVendor(Long id) throws VendorException {
         Vendor v = getVendorById(id);
+
+        Query q = em.createQuery("SELECT e FROM Company e");
+        List<Company> cc = q.getResultList();
+
+        try {
+            for (Company c : cc) {
+                Company comp = getCompanyById(c.getId());
+                comp.getVendors().remove(v);
+            }
+        } catch (Exception ex) {
+            throw new VendorException(ex.toString());
+        }
         em.remove(v);
     }
 

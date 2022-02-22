@@ -72,7 +72,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         old.getUsername().equals(employee.getUsername())) {
 
 
-                    if (old.getEmail().equals(employee.getEmail()) ||
+                    if (!old.getEmail().equals(employee.getEmail()) ||
                             (!old.getEmail().equals(employee.getEmail())
                                     && emailAvailability(old.getEmail()) == true)) {
 
@@ -83,6 +83,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                         old.setName(employee.getName());
                         old.setSalary(employee.getSalary());
                         old.setPayType(employee.getPayType());
+
+                        if(!old.getCompany().getId().equals(employee.getCompany().getId())) {
+                            old.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
+                        }
 
 
                     } else {
@@ -129,7 +133,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             if (e == null) {
                 throw new EmployeeException("Employee not found");
             }
-
             em.remove(e);
             em.flush();
         } catch (IllegalArgumentException | TransactionRequiredException ex) {

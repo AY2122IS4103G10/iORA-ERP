@@ -13,8 +13,9 @@ import {
   fetchSites,
   selectAllSites,
 } from "../../../../stores/slices/siteSlice";
+import { selectAllCompanies } from "../../../../stores/slices/companySlice";
 
-export const CompaniesTable = () => {
+export const CompaniesTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
@@ -31,18 +32,18 @@ export const CompaniesTable = () => {
       },
       {
         Header: "Phone",
-        accessor: "telephone",
+        accessor: "phoneNumber",
       },
       {
         Header: "Address",
-        accessor: "road",
+        accessor: (row) => `${row.address.road}, ${row.address.postalCode}`,
       },
       {
         Header: "Active",
         accessor: "active",
-        Cell: (e) => e.value ? "Yes" : "No"
+        Cell: (e) => (e.value ? "Yes" : "No"),
       },
-      
+
       // {
       //   Header: CogIcon,
       //   accessor: "accessor",
@@ -58,19 +59,7 @@ export const CompaniesTable = () => {
     ],
     []
   );
-  const dispatch = useDispatch();
-  const data = useSelector(selectAllSites);
-  const siteStatus = useSelector((state) => state.sites.status);
-  useEffect(() => {
-    siteStatus === "idle" &&
-      dispatch(
-        fetchSites({
-          storeTypes: ["Store", "Headquarters"],
-          country: "Singapore",
-          company: "iORA",
-        })
-      );
-  }, [siteStatus, dispatch]);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
@@ -81,5 +70,18 @@ export const CompaniesTable = () => {
 };
 
 export const CompaniesList = () => {
-  return <CompaniesTable />;
+  const dispatch = useDispatch();
+  const data = useSelector(selectAllCompanies);
+  // const siteStatus = useSelector((state) => state.company.status);
+  // useEffect(() => {
+  //   siteStatus === "idle" &&
+  //     dispatch(
+  //       fetchSites({
+  //         storeTypes: ["Store", "Headquarters"],
+  //         country: "Singapore",
+  //         company: "iORA",
+  //       })
+  //     );
+  // }, [siteStatus, dispatch]);
+  return <CompaniesTable data={data} />;
 };

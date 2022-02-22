@@ -5,6 +5,12 @@ import { classNames } from "../../../../utilities/Util";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
+import { useDispatch } from "react-redux";
+import {
+  addNewPromotion,
+  selectPromotionById,
+  updateExistingPromotion,
+} from "../../../../stores/slices/promotionsSlice";
 
 const tabs = [
   { name: "All Products", href: "/sm/products", current: false },
@@ -35,7 +41,7 @@ const modelListColumns = [
         row.productFields
           .filter((field) => field.fieldName === "COLOUR")
           .map((field) => field.fieldValue)
-          .join(", ")
+          .join(", "),
     },
     {
       Header: "Size",
@@ -43,7 +49,7 @@ const modelListColumns = [
         row.productFields
           .filter((field) => field.fieldName === "SIZE")
           .map((field) => field.fieldValue)
-          .join(", ")
+          .join(", "),
     },
     {
       Header: "List Price",
@@ -61,12 +67,13 @@ const modelListColumns = [
 const PromoModal = ({
   open,
   closeModal,
-  isEditing,
+  modalState,
   name,
   onNameChanged,
   discPrice,
   onDiscPriceChanged,
   onSaveClicked,
+  setModalState,
 }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
@@ -76,7 +83,12 @@ const PromoModal = ({
             <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
               <div>
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  {!isEditing ? "Add New" : "Edit"} Promotion
+                  {modalState === "add"
+                    ? "Add New"
+                    : modalState === "edit"
+                    ? "Edit"
+                    : "View"}{" "}
+                  Promotion
                 </h3>
                 <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
                   <SimpleInputGroup
@@ -91,6 +103,7 @@ const PromoModal = ({
                       value={name}
                       onChange={onNameChanged}
                       required
+                      disabled={modalState === "view"}
                     />
                   </SimpleInputGroup>
                   <SimpleInputGroup
@@ -105,8 +118,8 @@ const PromoModal = ({
                       value={discPrice}
                       onChange={onDiscPriceChanged}
                       required
-                      disabled={isEditing}
-                      className={isEditing && "bg-gray-50 text-gray-400"}
+                      disabled={modalState === "view"}
+                      // className={modalState === "view" && "bg-gray-50 text-gray-400"}
                     />
                   </SimpleInputGroup>
                 </div>
@@ -115,20 +128,32 @@ const PromoModal = ({
 
             <div className="pt-5">
               <div className="flex justify-end">
-                <button
-                  type="button"
-                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                  onClick={closeModal}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                  onClick={onSaveClicked}
-                >
-                  {!isEditing ? "Add" : "Save"} promotion
-                </button>
+                {modalState === "view" ? (
+                  <button
+                    type="submit"
+                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                    onClick={() => setModalState("edit")}
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                      onClick={closeModal}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                      onClick={onSaveClicked}
+                    >
+                      {modalState === "add" ? "Add" : "Save"} promotion
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -138,7 +163,7 @@ const PromoModal = ({
   );
 };
 
-const Header = ({ openModal }) => {
+const Header = ({ openModal, setModalState }) => {
   const [currTab, setCurrTab] = useState(0);
   const changeTab = (tabnumber) => setCurrTab(tabnumber);
   return (
@@ -158,7 +183,10 @@ const Header = ({ openModal }) => {
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={openModal}
+              onClick={() => {
+                setModalState("add");
+                openModal();
+              }}
             >
               Add promotion
             </button>
@@ -205,7 +233,9 @@ const Header = ({ openModal }) => {
 };
 
 export const ManagePromotions = () => {
+  const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
+  const [modalState, setModalState] = useState("view");
   const [name, setName] = useState("");
   const [discPrice, setDiscPrice] = useState("");
   const [openPromo, setOpenPromo] = useState(false);
@@ -214,18 +244,57 @@ export const ManagePromotions = () => {
   const onDiscPriceChanged = (e) => setDiscPrice(e.target.value);
   const openModal = () => setOpenPromo(true);
   const closeModal = () => setOpenPromo(false);
+
+  const [requestStatus, setRequestStatus] = useState("idle");
+  const canSave = name && discPrice && requestStatus === "idle";
+  const onSaveClicked = (evt) => {
+    evt.preventDefault();
+    if (canSave)
+      try {
+        if (modalState === "add")
+          dispatch(
+            addNewPromotion({
+              fieldName: "category",
+              fieldValue: name,
+              discountedPrice: discPrice,
+            })
+          ).unwrap();
+        else if (modalState === "edit")
+          dispatch(
+            updateExistingPromotion({
+              fieldName: "category",
+              fieldValue: name,
+              discountedPrice: discPrice,
+            })
+          ).unwrap();
+        alert("Successfully added promotion");
+        closeModal();
+      } catch (err) {
+        console.error("Failed to add promo: ", err);
+      } finally {
+        setRequestStatus("idle");
+      }
+  };
   return (
     <>
-      <Header openModal={openModal} />
-      <PromotionsList />
+      <Header openModal={openModal} setModalState={setModalState} />
+      <PromotionsList
+        dispatch={dispatch}
+        openModal={openModal}
+        setName={setName}
+        setDiscPrice={setDiscPrice}
+        setModalState={setModalState}
+      />
       <PromoModal
         open={openPromo}
         closeModal={closeModal}
-        isEditing={isEditing}
+        modalState={modalState}
         name={name}
         onNameChanged={onNameChanged}
         discPrice={discPrice}
         onDiscPriceChanged={onDiscPriceChanged}
+        onSaveClicked={onSaveClicked}
+        setModalState={setModalState}
       />
     </>
   );

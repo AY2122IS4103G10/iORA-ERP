@@ -160,22 +160,30 @@ export const EditableCell = ({
   column: { id },
   updateMyData,
 }) => {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState(initialValue);
 
-  const onChange = e => {
-    setValue(e.target.value)
-  }
+  const onChange = (e) => {
+    setValue(e.target.value);
+  };
 
   const onBlur = () => {
-    updateMyData(index, id, value)
-  }
+    updateMyData(index, id, value);
+  };
 
   useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
+    setValue(initialValue);
+  }, [initialValue]);
 
-  return <input value={value} onChange={onChange} onBlur={onBlur} />
-}
+  return (
+    <input
+    type="number"
+      className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+    />
+  );
+};
 
 const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
   const defaultRef = useRef();
@@ -203,6 +211,7 @@ export const SimpleTable = ({
   rowSelect = false,
   selectedRows = [],
   setSelectedRows,
+  skipPageReset,
 }) => {
   const {
     getTableProps,
@@ -223,7 +232,12 @@ export const SimpleTable = ({
     setGlobalFilter,
     state: { selectedRowIds },
   } = useTable(
-    { columns, data, initialState: { selectedRowIds: selectedRows } },
+    {
+      columns,
+      data,
+      autoResetPage: !skipPageReset,
+      initialState: { selectedRowIds: selectedRows },
+    },
     useFilters,
     useGlobalFilter,
     useSortBy,
@@ -250,9 +264,9 @@ export const SimpleTable = ({
     }
   );
   useMountedLayoutEffect(() => {
-    rowSelect && setSelectedRows(selectedRowIds)
-  }, [rowSelect, setSelectedRows, selectedRowIds])
-  
+    rowSelect && setSelectedRows(selectedRowIds);
+  }, [rowSelect, setSelectedRows, selectedRowIds]);
+
   return (
     <>
       <div className="sm:flex sm:gap-x-2">

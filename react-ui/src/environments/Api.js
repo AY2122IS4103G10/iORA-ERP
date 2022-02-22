@@ -45,4 +45,7 @@ export const sitesApi = {
   getASite(id) {
     return axios.get(`${REST_ENDPOINT}admin/viewSite/${id}`);
   },
+  deleteSite(id) {
+    return axios.delete(`${REST_ENDPOINT}admin/deleteSite?siteId=${id}`)
+  }
 };

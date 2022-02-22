@@ -18,7 +18,7 @@ import {
 import axios from "axios";
 import { REST_ENDPOINT } from "../../../../constants/restEndpoint";
 
-export const PromotionsTable = () => {
+export const PromotionsTable = ({ data, openModal, setName, setDiscPrice, setModalState }) => {
   const columns = useMemo(
     () => [
       {
@@ -36,6 +36,21 @@ export const PromotionsTable = () => {
       {
         Header: "Name",
         accessor: "fieldValue",
+        Cell: (e) => {
+          return (
+            <button
+              className="hover:text-gray-700 hover:underline"
+              onClick={() => {
+                setModalState("view")
+                setName(e.value);
+                setDiscPrice(e.row.original.discountedPrice);
+                openModal();
+              }}
+            >
+              {e.value}
+            </button>
+          );
+        },
       },
       {
         Header: "Discounted Price",
@@ -60,19 +75,8 @@ export const PromotionsTable = () => {
         }),
       },
     ],
-    []
+    [openModal,setName, setDiscPrice, setModalState]
   );
-  const dispatch = useDispatch();
-  const data = useSelector(selectAllPromotions);
-  // const products = useSelector(selectAllProducts);
-  const promoStatus = useSelector((state) => state.promotions.status);
-  const productStatus = useSelector((state) => state.products.status);
-
-  useEffect(() => {
-    promoStatus === "idle" && dispatch(fetchPromotions());
-    // productStatus === "idle" && dispatch(fetchProducts());
-  }, [promoStatus, productStatus, dispatch]);
-
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
@@ -82,6 +86,27 @@ export const PromotionsTable = () => {
   );
 };
 
-export const PromotionsList = () => {
-  return <PromotionsTable />;
+export const PromotionsList = ({
+  dispatch,
+  openModal,
+  setName,
+  setDiscPrice,
+  setModalState,
+}) => {
+  const data = useSelector(selectAllPromotions);
+  const promoStatus = useSelector((state) => state.promotions.status);
+  const productStatus = useSelector((state) => state.products.status);
+
+  useEffect(() => {
+    promoStatus === "idle" && dispatch(fetchPromotions());
+  }, [promoStatus, productStatus, dispatch]);
+  return (
+    <PromotionsTable
+      data={data}
+      openModal={openModal}
+      setName={setName}
+      setDiscPrice={setDiscPrice}
+      setModalState={setModalState}
+    />
+  );
 };

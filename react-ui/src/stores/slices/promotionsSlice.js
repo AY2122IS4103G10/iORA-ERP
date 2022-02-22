@@ -18,7 +18,7 @@ export const fetchPromotions = createAsyncThunk(
 export const addNewPromotion = createAsyncThunk(
   "promotions/addNewPromotion",
   async (initialProduct) => {
-    const response = await api.create("promotion", initialProduct);
+    const response = await api.create("sam/promoField", initialProduct);
     return response.data;
   }
 );
@@ -96,5 +96,5 @@ export default promotionsSlice.reducer;
 
 export const selectAllPromotions = (state) => state.promotions.promotions;
 
-export const selectProductByCode = (state, modelCode) =>
-  state.promotions.promotions.find((product) => product.modelCode === modelCode);
+export const selectPromotionById = (state, id) =>
+  state.promotions.promotions.find((promo) => promo.id === id);

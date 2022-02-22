@@ -14,12 +14,20 @@ import {
   selectAllSites,
 } from "../../../../stores/slices/siteSlice";
 
-export const SitesTable = () => {
+export const SitesTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
         Header: "Id",
         accessor: "id",
+        Cell: (e) => (
+          <Link
+            to={`/ad/sites/${e.value}`}
+            className="hover:text-gray-700 hover:underline"
+          >
+            {e.value}
+          </Link>
+        ),
       },
       {
         Header: "Code",
@@ -56,19 +64,7 @@ export const SitesTable = () => {
     ],
     []
   );
-  const dispatch = useDispatch();
-  const data = useSelector(selectAllSites);
-  const siteStatus = useSelector((state) => state.sites.status);
-  useEffect(() => {
-    siteStatus === "idle" &&
-      dispatch(
-        fetchSites({
-          storeTypes: ["Store", "Headquarters"],
-          country: "Singapore",
-          company: "iORA",
-        })
-      );
-  }, [siteStatus, dispatch]);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
@@ -79,5 +75,11 @@ export const SitesTable = () => {
 };
 
 export const SitesList = () => {
-  return <SitesTable />;
+  const dispatch = useDispatch();
+  const data = useSelector(selectAllSites);
+  const siteStatus = useSelector((state) => state.sites.status);
+  useEffect(() => {
+    siteStatus === "idle" && dispatch(fetchSites());
+  }, [siteStatus, dispatch]);
+  return <SitesTable data={data} />;
 };

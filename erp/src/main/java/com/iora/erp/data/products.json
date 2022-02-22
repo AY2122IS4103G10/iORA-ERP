@@ -1,7 +1,7 @@
 [
   {
     "name": "Knitted Crew Top",
-    "sku": "AKV0010057J-OE",
+    "sku": "AKV0010057J",
     "description": "Crew neckline with ribbed trimming. Boxy cut. Fabric: Knit",
     "colours": ["BROWN", "POWDER", "RASPBERRY", "WILLOW"],
     "sizes": ["S", "M", "L"],
@@ -7533,25 +7533,6 @@
     "discountedPrice": {}
   },
   {
-    "name": "Ruffle Mini Skirt",
-    "sku": "BSK0009600H",
-    "description": "Ruffle detail along hemline. Invisible sideseam zipper closure. Material: Cotton linen",
-    "colours": ["BEIGE"],
-    "sizes": ["S", "M", "L", "XL"],
-    "company": "LALU",
-    "tags": ["BOTTOMS", "SKIRT"],
-    "categories": [
-      "2 FOR S$ 49",
-      "LALU",
-      "LALU BOTTOMS",
-      "LALU NEW ARRIVALS",
-      "LALU SKIRTS",
-      "NEW ARRIVALS"
-    ],
-    "price": { "SGD": "39.00" },
-    "discountedPrice": {}
-  },
-  {
     "name": "Button-Down A-Line Skirt",
     "sku": "BSK0009528X",
     "description": "A-Line cutting. Top-stitching details at skirt front. Functional center front tortoise shell button closure. Material: Cotton",
@@ -9173,32 +9154,5 @@
     "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
     "price": { "SGD": "19.00" },
     "discountedPrice": { "SGD": "10.00" }
-  },
-  {
-    "name": "Bead Embellished Tank Top",
-    "sku": "ATV0006483Z",
-    "description": "Round neck. Beads embellishment. Stripes pattern body. Fabric: Jersey",
-    "colours": ["RASPBERRY"],
-    "sizes": ["S", "M", "L", "XL"],
-    "company": "IORA",
-    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
-    "price": { "SGD": "19.00", "RM": "49.00" },
-    "discountedPrice": { "SGD": "10.00", "RM": "49.00" }
-  },
-  {
-    "name": "Collared Zip Jacket",
-    "sku": "BJK0009628X",
-    "description": "Collared jacket\u00a0 with zipper closure. Patch pocket with flap. Material: Cotton",
-    "colours": ["CREAM", "KHAKI", "LIGHT BROWN"],
-    "sizes": ["S", "M", "L", "XL"],
-    "company": "LALU",
-    "categories": [
-      "NEW ARRIVALS",
-      "LALU",
-      "LALU NEW ARRIVALS",
-      "LALU OUTERWEAR"
-    ],
-    "price": { "SGD": "39.00", "RM": "39.00" },
-    "discountedPrice": {}
   }
 ]

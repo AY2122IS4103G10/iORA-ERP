@@ -1,7 +1,10 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
@@ -14,6 +17,7 @@ import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
+import com.iora.erp.model.Currency;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
@@ -54,9 +58,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductField getProductFieldByNameValue(String fieldName, String fieldValue) throws ProductFieldException {
         Query q = em.createQuery(
-                "SELECT pf FROM ProductField pf WHERE LOWER(pf.fieldName) LIKE :fieldName AND LOWER(pf.fieldValue) LIKE :fieldValue");
-        q.setParameter("fieldName", fieldName.trim().toLowerCase());
-        q.setParameter("fieldValue", fieldValue.trim().toLowerCase());
+                "SELECT pf FROM ProductField pf WHERE pf.fieldName LIKE :fieldName AND pf.fieldValue LIKE :fieldValue");
+        q.setParameter("fieldName", fieldName.trim().toUpperCase());
+        q.setParameter("fieldValue", fieldValue.trim().toUpperCase());
 
         try {
             ProductField pf = (ProductField) q.getSingleResult();
@@ -78,6 +82,18 @@ public class ProductServiceImpl implements ProductService {
         }
         throw new ProductFieldException("Product Field with name " + productField.getFieldName() + " and value "
                 + productField.getFieldValue() + " already exist.");
+    }
+
+    @Override
+    public ProductField createProductField(String name, String value) {
+        try {
+            ProductField pf = getProductFieldByNameValue(name, value);
+            return pf;
+        } catch (ProductFieldException e) {
+            ProductField pf = new ProductField(name, value);
+            em.persist(pf);
+            return pf;
+        }
     }
 
     @Override
@@ -105,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PromotionField createPromoField(PromotionField promotionField) throws ProductFieldException{
+    public PromotionField createPromoField(PromotionField promotionField) throws ProductFieldException {
         promotionField.setFieldName(promotionField.getFieldName().trim().toUpperCase());
         promotionField.setFieldValue(promotionField.getFieldValue().trim().toUpperCase());
         try {
@@ -116,6 +132,18 @@ public class ProductServiceImpl implements ProductService {
         }
         throw new ProductFieldException("Product Field with name " + promotionField.getFieldName() + " and value "
                 + promotionField.getFieldValue() + " already exist.");
+    }
+
+    @Override
+    public PromotionField createPromoField(String fieldName, String fieldValue, double price) {
+        try {
+            PromotionField prf = getPromoField(fieldName, fieldValue, price);
+            return prf;
+        } catch (ProductFieldException e) {
+            PromotionField prf = new PromotionField(fieldName, fieldValue, price);
+            em.persist(prf);
+            return prf;
+        }
     }
 
     @Override
@@ -346,8 +374,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> searchProductsBySKU(String sku) {
         TypedQuery<Product> q;
-        sku = sku.trim();
         if (sku != null) {
+            sku = sku.trim();
             q = em.createQuery("SELECT p FROM Product p WHERE LOWER(p.sku) LIKE :sku", Product.class);
             q.setParameter("sku", "%" + sku.toLowerCase() + "%");
         } else {
@@ -409,7 +437,6 @@ public class ProductServiceImpl implements ProductService {
             ProductItem pi = new ProductItem(rfid);
             pi.setProductSKU(sku);
             em.persist(pi);
-
             p.addProductItem(pi);
         } catch (EntityExistsException ex) {
             throw new ProductItemException("ProductItem with rfid " + rfid + " already exist.");
@@ -461,5 +488,117 @@ public class ProductServiceImpl implements ProductService {
         rfid = rfid.trim();
         ProductItem pi = getProductItem(rfid);
         pi.setAvailable(true);
+    }
+
+    private String generateRFID() {
+        int leftLimit = 48;
+        int rightLimit = 122;
+        int targetStringLength = 16;
+        Random random = new Random();
+
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return generatedString;
+    }
+
+    @Override
+    public Currency getCurrency(String code) {
+        return em.find(Currency.class, code);
+    }
+
+    @Override
+    public void loadProducts(List<Object> productsJSON)
+            throws ProductException, ProductFieldException, ProductItemException {
+        // Currency sgd = getCurrency("SGD");
+
+        // for (Object j : productsJSON) {
+        //     LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
+        //     List<Object> json = hashMap.values().stream().collect(Collectors.toList());
+        //     // Decoding JSON Object
+        //     String name = (String) json.get(0);
+        //     String modelCode = (String) json.get(1);
+        //     String description = (String) json.get(2);
+        //     List<String> colours = (ArrayList<String>) json.get(3);
+        //     List<String> sizes = (ArrayList<String>) json.get(4);
+        //     String company = (String) json.get(5);
+        //     List<String> tags = (ArrayList<String>) json.get(6);
+        //     List<String> categories = (ArrayList<String>) json.get(7);
+
+        //     LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
+        //     List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
+        //     double price = Double.parseDouble((String) priceList.get(0));
+
+        //     LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
+        //     List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
+        //             .collect(Collectors.toList());
+
+        //     Model model = new Model(modelCode, name, description, price, sgd,
+        //             categories.contains("SALE FROM $10"), true);
+        //     List<ProductField> productFields = new ArrayList<>();
+
+        //     for (String c : colours) {
+        //         ProductField colour = createProductField("colour", c);
+        //         model.addProductField(colour);
+        //         productFields.add(colour);
+        //     }
+
+        //     for (String s : sizes) {
+        //         ProductField size = createProductField("size", s);
+        //         model.addProductField(size);
+        //         productFields.add(size);
+        //     }
+
+        //     ProductField com = createProductField("company", company);
+        //     model.addProductField(com);
+        //     productFields.add(com);
+
+        //     for (String t : tags) {
+        //         ProductField tag = createProductField("tag", t);
+        //         model.addProductField(tag);
+        //         productFields.add(tag);
+        //     }
+
+        //     for (String cat : categories) {
+        //         ProductField category;
+        //         if (cat.equals("2 FOR S$ 49")) {
+        //             category = createPromoField("category", cat, 24.5);
+        //             model.addProductField(category);
+        //             productFields.add(category);
+        //         } else if (cat.equals("2 FOR S$ 29")) {
+        //             category = createPromoField("category", cat, 14.5);
+        //             model.addProductField(category);
+        //             productFields.add(category);
+        //         } else if (cat.equals("SALE FROM $10")) {
+        //             if (!discountedPriceList.isEmpty()) {
+        //                 category = createPromoField("category", cat,
+        //                         Double.parseDouble((String) discountedPriceList.get(0)));
+        //                 model.addProductField(category);
+        //                 productFields.add(category);
+        //             } else {
+        //                 continue;
+        //             }
+        //         } else {
+        //             category = createProductField("category", cat);
+        //             model.addProductField(category);
+        //             productFields.add(category);
+        //         }
+        //     }
+        //     em.persist(model);
+        //     createProduct(modelCode, productFields);
+        // }
+
+        // List<Product> products = searchProductsBySKU(null);
+        // for (Product p : products) {
+        //     Random r = new Random();
+        //     int stockLevel = r.nextInt(90) + 10;
+
+        //     for (int i = 0; i < stockLevel; i++) {
+        //         createProductItem(generateRFID(), p.getsku());
+        //     }
+        // }
     }
 }

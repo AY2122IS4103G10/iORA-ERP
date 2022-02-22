@@ -9,8 +9,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
+
+import com.iora.erp.model.Currency;
 
 @Entity
 public class Model {
@@ -18,7 +21,7 @@ public class Model {
     @Id
     private String modelCode;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(length = 512)
@@ -27,6 +30,9 @@ public class Model {
 
     @Column(nullable = false, scale = 2)
     private double price;
+
+    @ManyToOne
+    private Currency currency;
 
     @Column(nullable = false)
     private boolean onlineOnly;
@@ -49,12 +55,13 @@ public class Model {
         productFields = new HashSet<>();
     }
 
-    public Model(String modelCode, String name, String description, double price, boolean onlineOnly,
+    public Model(String modelCode, String name, String description, double price, Currency currency, boolean onlineOnly,
             boolean available) {
         this(modelCode);
         this.name = name;
         this.description = description;
         this.price = price;
+        this.currency = currency;
         this.onlineOnly = onlineOnly;
         this.available = available;
     }

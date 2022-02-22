@@ -12,38 +12,33 @@ const initialState = {
 };
 
 export const getAllSites = createAsyncThunk(
-    "stocklevels/getAllSites",
-    async () => {
-        const response = await sitesApi.getAll();
-        console.log(response.data);
-        return response.data;
-    }
-);
-
-export const getASite = createAsyncThunk(
-  "stocklevels/getASite",
-  async (id) => {
-    const response = await sitesApi.getASite(id);
+  "stocklevels/getAllSites",
+  async () => {
+    const response = await sitesApi.getAll();
+    console.log(response.data);
     return response.data;
   }
-)
+);
+
+export const getASite = createAsyncThunk("stocklevels/getASite", async (id) => {
+  const response = await sitesApi.getASite(id);
+  return response.data;
+});
 export const fetchSites = createAsyncThunk(
   "sites/fetchSites",
   //storeTypes =["Store", "Headquarters"]
-  async ({ storeTypes, country, company }) => {
-    const response = await api.getAll(
-      "admin/viewSites/all"
-    );
+  async () => {
+    const response = await api.getAll("admin/viewSites/all");
     return response.data;
   }
 );
 
-export const addNewSites = createAsyncThunk(
+export const addNewSite = createAsyncThunk(
   "sites/addNewSites",
-  async (storeType, initialSite) => {
+  async (initialSite) => {
     const response = await api.create(
-      `admin/addSite/${storeType}`,
-      initialSite
+      `admin/addSite/${initialSite.storeType}`,
+      initialSite.initialSite
     );
     return response.data;
   }
@@ -60,7 +55,7 @@ export const updateExistingSite = createAsyncThunk(
 export const deleteExistingSite = createAsyncThunk(
   "sites/deleteExistingSite",
   async (existingSiteId) => {
-    const response = await api.delete("admin/deleteSite", existingSiteId);
+    const response = await sitesApi.deleteSite(existingSiteId);
     return response.data;
   }
 );
@@ -99,9 +94,7 @@ const siteSlice = createSlice({
     builder.addCase(getASite.rejected, (state, action) => {
       state.status = "failed";
     });
-
-
-    builder.addCase(addNewSites.fulfilled, (state, action) => {
+    builder.addCase(addNewSite.fulfilled, (state, action) => {
       state.sites.push(action.payload);
     });
     builder.addCase(updateExistingSite.fulfilled, (state, action) => {
@@ -110,6 +103,7 @@ const siteSlice = createSlice({
         name,
         address,
         siteCode,
+        phoneNumber,
         active,
         stockLevel,
         company,
@@ -120,6 +114,7 @@ const siteSlice = createSlice({
         existingProd.name = name;
         existingProd.address = address;
         existingProd.siteCode = siteCode;
+        existingProd.phoneNumber = phoneNumber;
         existingProd.active = active;
         existingProd.stockLevel = stockLevel;
         existingProd.company = company;
@@ -127,10 +122,11 @@ const siteSlice = createSlice({
       }
     });
     builder.addCase(deleteExistingSite.fulfilled, (state, action) => {
-      state.sites = state.sites.filter(
-        ({ siteId }) => siteId !== action.payload.id
-      );
-      // state.status = "idle"
+      // console.log(action.payload)
+      // state.sites = state.sites.filter(
+      //   ({ id }) => id !== action.payload.id
+      // );
+      state.status = "idle"
     });
   },
 });

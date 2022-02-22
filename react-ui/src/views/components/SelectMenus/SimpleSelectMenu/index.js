@@ -3,15 +3,19 @@ import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 
-
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function SimpleSelectMenu({ label = "", options, selected, setSelected }) {
+export default function SimpleSelectMenu({
+  label = "",
+  options,
+  selected,
+  setSelected,
+  disabled = false,
+}) {
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selected} onChange={setSelected} disabled={disabled}>
       {({ open }) => (
         <>
           {Boolean(label.length) && (

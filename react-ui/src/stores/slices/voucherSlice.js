@@ -41,7 +41,7 @@ export const redeemVoucher = createAsyncThunk(
 export const deleteExistingVoucher = createAsyncThunk(
   "vouchers/deleteExistingVoucher",
   async (existingVoucherCode) => {
-    const response = await api.delete("sam/voucher", existingVoucherCode);
+    const response = await api.delete("sam/voucher/delete", existingVoucherCode);
     return response.data;
   }
 );
@@ -49,26 +49,6 @@ export const deleteExistingVoucher = createAsyncThunk(
 const voucherSlice = createSlice({
   name: "vouchers",
   initialState,
-  reducers: {
-    // voucherUpdated(state, action) {
-    //   const { id, code, value, isIssued, expDate, isRedeemed } = action.payload;
-    //   const existingVoucher = state.vouchers.find(
-    //     (voucher) => voucher.id === id
-    //   );
-    //   if (existingVoucher) {
-    //     existingVoucher.code = code;
-    //     existingVoucher.value = value;
-    //     existingVoucher.isIssued = isIssued;
-    //     existingVoucher.expDate = expDate;
-    //     existingVoucher.isRedeemed = isRedeemed;
-    //   }
-    // },
-    voucherDeleted(state, action) {
-      state.vouchers = state.vouchers.filter(
-        ({ voucherCode }) => voucherCode !== action.payload.voucherCode
-      );
-    },
-  },
   extraReducers(builder) {
     builder.addCase(fetchVouchers.pending, (state, action) => {
       state.status = "loading";
@@ -93,7 +73,7 @@ const voucherSlice = createSlice({
       state.vouchers = state.vouchers.filter(
         ({ voucherCode }) => voucherCode !== action.payload.voucherCode
       );
-      // state.status = "idle"
+      state.status = "idle"
     });
   },
 });

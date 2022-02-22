@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Dialog } from "@headlessui/react";
-import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
-import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { api, sitesApi } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
@@ -21,6 +19,7 @@ import {
   fetchSites,
   selectAllSites,
 } from "../../../../stores/slices/siteSlice";
+import { addNewProcurement } from "../../../../stores/slices/procurementSlice";
 
 const addModalColumns = [
   {
@@ -50,38 +49,6 @@ const addModalColumns = [
     accessor: (row) =>
       row.productFields.find((field) => field.fieldName === "SIZE").fieldValue,
   },
-];
-
-const itemsListColumns = [
-  {
-    Header: "Product Code",
-    accessor: "modelCode",
-  },
-  {
-    Header: "SKU",
-    accessor: "sku",
-  },
-  {
-    Header: "Name",
-    accessor: "name",
-  },
-  {
-    Header: "Color",
-    accessor: (row) =>
-      row.productFields.find((field) => field.fieldName === "COLOUR")
-        .fieldValue,
-  },
-  {
-    Header: "Size",
-    accessor: (row) =>
-      row.productFields.find((field) => field.fieldName === "SIZE").fieldValue,
-  },
-  // {
-  //   Header: "Quantity",
-  //   accessor: "accessor",
-  //   disableSortBy: true,
-  //   Cell: <EditableCell />,
-  // },
 ];
 
 const storesListColumns = [
@@ -141,6 +108,88 @@ export const ItemsList = ({
   );
 };
 
+const ProcurementItemsList = ({
+  data,
+  setData,
+  rowSelect = false,
+  selectedRows,
+  setRowSelect,
+}) => {
+  const [skipPageReset, setSkipPageReset] = useState(false);
+
+  const columns = useMemo(() => {
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
+    return [
+      {
+        Header: "Product Code",
+        accessor: "modelCode",
+      },
+      {
+        Header: "SKU",
+        accessor: (row) => row.product.sku,
+      },
+      {
+        Header: "Name",
+        accessor: (row) => row.product.name,
+      },
+      {
+        Header: "Color",
+        accessor: (row) =>
+          row.product.productFields.find(
+            (field) => field.fieldName === "COLOUR"
+          ).fieldValue,
+      },
+      {
+        Header: "Size",
+        accessor: (row) =>
+          row.product.productFields.find((field) => field.fieldName === "SIZE")
+            .fieldValue,
+      },
+      {
+        Header: "Quantity",
+        accessor: "requestedQty",
+        disableSortBy: true,
+        Cell: (row) => {
+          return (
+            <EditableCell
+              value={1}
+              row={row.row}
+              column={row.column}
+              updateMyData={updateMyData}
+            />
+          );
+        },
+      },
+    ];
+  }, [setData]);
+
+  return (
+    <div className="mt-4">
+      <SimpleTable
+        columns={columns}
+        data={data}
+        rowSelect={rowSelect}
+        selectedRows={selectedRows}
+        setSelectedRows={setRowSelect}
+        skipPageReset={skipPageReset}
+      />
+    </div>
+  );
+};
+
 const AddProductItemModal = ({
   items,
   open,
@@ -194,6 +243,9 @@ const AddProductItemModal = ({
 
 const ProcurementFormBody = ({
   isEditing,
+  headquarters,
+  hqSelected,
+  setHqSelected,
   factories,
   manufacturingSelected,
   setManufacturingSelected,
@@ -201,7 +253,9 @@ const ProcurementFormBody = ({
   setWarehouseSelected,
   warehouseSelected,
   items,
+  setItems,
   openProducts,
+  onAddOrderClicked,
   onCancelClicked,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -219,7 +273,19 @@ const ProcurementFormBody = ({
                 </h3>
               </div>
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                <div className="sm:col-span-3">
+                <div className="sm:col-span-2">
+                  {[headquarters, hqSelected, setHqSelected].every(Boolean) ? (
+                    <SimpleSelectMenu
+                      label="HQ"
+                      options={headquarters}
+                      selected={hqSelected}
+                      setSelected={setHqSelected}
+                    />
+                  ) : (
+                    <div>No headquarters</div>
+                  )}
+                </div>
+                <div className="sm:col-span-2">
                   {[
                     factories,
                     manufacturingSelected,
@@ -235,7 +301,7 @@ const ProcurementFormBody = ({
                     <div>No factories</div>
                   )}
                 </div>
-                <div className="sm:col-span-3">
+                <div className="sm:col-span-2">
                   {[warehouses, warehouseSelected, setWarehouseSelected].every(
                     Boolean
                   ) ? (
@@ -268,7 +334,7 @@ const ProcurementFormBody = ({
                 </div>
               </div>
               {Boolean(items.length) && (
-                <ItemsList cols={itemsListColumns} data={items} />
+                <ProcurementItemsList data={items} setData={setItems} />
               )}
             </div>
 
@@ -305,8 +371,9 @@ const ProcurementFormBody = ({
               <button
                 type="submit"
                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                onClick={onAddOrderClicked}
               >
-                Save
+                {!isEditing ? "Create" : "Save"} order
               </button>
             </div>
           </div>
@@ -321,9 +388,8 @@ export const ProcurementForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [manufacturing, setManufacturing] = useState(null);
-  const [warehouse, setWarehouse] = useState(null);
   const [lineItems, setLineItems] = useState([]);
+  const [hqSelected, setHqSelected] = useState(null);
   const [manufacturingSelected, setManufacturingSelected] = useState(null);
   const [warehouseSelected, setWarehouseSelected] = useState(null);
   const [openProducts, setOpenProducts] = useState(false);
@@ -340,14 +406,25 @@ export const ProcurementForm = () => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
 
+  const [headquarters, setHeadquarters] = useState([]);
   const [factories, setFactories] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
+  useEffect(() => {
+    sitesApi
+      .searchByType("Headquarters")
+      .then((response) => {
+        setHeadquarters(response.data);
+        setHqSelected(response.data[0]);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
   useEffect(() => {
     sitesApi
       .searchByType("Manufacturing")
       .then((response) => {
         setFactories(response.data);
-        setWarehouseSelected(response.data[0]);
+        setManufacturingSelected(response.data[0]);
       })
       .catch((err) => console.error(err));
   }, []);
@@ -362,43 +439,67 @@ export const ProcurementForm = () => {
       .catch((err) => console.error(err));
   }, []);
 
-  const onManufacturingChanged = (e) => setManufacturing(e.target.value);
-  const onWarehouseChanged = (e) => setWarehouse(e.target.value);
-
   const [selectedRows, setSelectedRows] = useState([]);
-
   const onAddItemsClicked = (evt) => {
     evt.preventDefault();
     const selectedRowKeys = Object.keys(selectedRows).map((key) =>
       parseInt(key)
     );
-    const lineItems = []
-    selectedRowKeys.map((key) => lineItems.push(skus[key]))
-    setLineItems(lineItems);
-    closeModal()
+    const lineItems = [];
+    selectedRowKeys.map((key) => lineItems.push(skus[key]));
+    setLineItems(
+      lineItems.map(({ modelCode, ...item }) => ({
+        modelCode,
+        product: { ...item },
+        requestedQty: 1,
+      }))
+    );
+    closeModal();
   };
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);
 
   const [requestStatus, setRequestStatus] = useState("idle");
+
   const canAdd =
     [manufacturingSelected, warehouseSelected, lineItems].every(Boolean) &&
     requestStatus === "idle";
+
   const onAddOrderClicked = (evt) => {
     evt.preventDefault();
-    // if (canAdd)
-    //   try {
-    //     setRequestStatus("pending");
-    //     dispatch(addNewVouchers({ name, expiry: siteCode })).unwrap();
-    //     alert("Successfully added site");
-    //     setName("");
-    //     setManufacturing("");
-    //     navigate(!isEditing ? "/ad/sites" : `/ad/sites/${orderId}`);
-    //   } catch (err) {
-    //     console.error("Failed to add site: ", err);
-    //   } finally {
-    //     setRequestStatus("idle");
-    //   }
+    console.log({
+      lineItems: lineItems.map(({ product, requestedQty }) => ({
+        product,
+        requestedQty,
+      })),
+      headquarters: hqSelected,
+      manufacturing: manufacturingSelected,
+      warehouse: warehouseSelected,
+    })
+    if (canAdd)
+      try {
+        setRequestStatus("pending");
+        dispatch(
+          addNewProcurement({
+            siteId: hqSelected.id,
+            initialProcurement: {
+              lineItems: lineItems.map(({ product, requestedQty }) => ({
+                product,
+                requestedQty,
+              })),
+              headquarters: hqSelected,
+              manufacturing: manufacturingSelected,
+              warehouse: warehouseSelected,
+            },
+          })
+        ).unwrap();
+        alert("Successfully created procurement order");
+        // navigate(!isEditing ? "/sm/procurements" : `/sm/procurements/${orderId}`);
+      } catch (err) {
+        console.error("Failed to add procurement: ", err);
+      } finally {
+        setRequestStatus("idle");
+      }
   };
 
   const onCancelClicked = () =>
@@ -424,10 +525,9 @@ export const ProcurementForm = () => {
     <>
       <ProcurementFormBody
         isEditing={isEditing}
-        manufacturing={manufacturing}
-        onManufacturingChanged={onManufacturingChanged}
-        warehouse={warehouse}
-        onWarehouseChanged={onWarehouseChanged}
+        headquarters={headquarters}
+        hqSelected={hqSelected}
+        setHqSelected={setHqSelected}
         factories={factories}
         manufacturingSelected={manufacturingSelected}
         setManufacturingSelected={setManufacturingSelected}
@@ -435,7 +535,9 @@ export const ProcurementForm = () => {
         warehouseSelected={warehouseSelected}
         setWarehouseSelected={setWarehouseSelected}
         items={lineItems}
+        setItems={setLineItems}
         openProducts={openModal}
+        onAddOrderClicked={onAddOrderClicked}
         onCancelClicked={onCancelClicked}
       />
       <AddProductItemModal

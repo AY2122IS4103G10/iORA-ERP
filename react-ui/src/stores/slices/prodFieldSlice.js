@@ -17,8 +17,8 @@ export const fetchProductFields = createAsyncThunk(
 
 export const addNewProductField = createAsyncThunk(
   "productFields/addNewProductField",
-  async (initialVoucher) => {
-    const response = await api.create(initialVoucher);
+  async (initialProductField) => {
+    const response = await api.create("sam/productField", initialProductField);
     return response.data;
   }
 );
@@ -46,3 +46,6 @@ const prodFieldSlice = createSlice({
 export default prodFieldSlice.reducer;
 
 export const selectAllProdFields = (state) => state.prodFields.prodFields;
+
+export const selectProdFieldById = (state, id) =>
+  state.prodFields.prodFields.find((prodField) => prodField.id === id);

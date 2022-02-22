@@ -21,7 +21,7 @@ import { SiteForm } from "./views/containers/Sites/SiteForm";
 import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
 import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
 import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
-import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock ";
+import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
 
 function App() {
   return (

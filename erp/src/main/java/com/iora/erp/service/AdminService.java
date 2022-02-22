@@ -59,7 +59,7 @@ public interface AdminService {
 
     public abstract void createVendor(Vendor vendor) throws VendorException;
     public abstract void updateVendor(Vendor vendor) throws VendorException, AddressException;
-    public abstract void deleteVendor(Vendor vendor) throws VendorException;
+    public abstract void deleteVendor(Long id) throws VendorException;
     public abstract List<Vendor> getListofVendor(String search) throws VendorException;
     public abstract List<Vendor> listofVendor() throws VendorException;
     public abstract Vendor getVendorById(Long id)  throws VendorException;

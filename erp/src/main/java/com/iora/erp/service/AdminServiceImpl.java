@@ -327,8 +327,9 @@ public class AdminServiceImpl implements AdminService {
             return getListAddress();
         }
         Query q = em.createQuery(
-                "SELECT a FROM Address a WHERE LOWER(a.building) LIKE :building OR lOWER(a.postalCode) LIKE :postal OR" + 
-                " LOWER(a.unit) LIKE :unit OR LOWER(a.road) LIKE :road OR LOWER(a.city) LIKE :city");
+                "SELECT a FROM Address a WHERE LOWER(a.building) LIKE :building OR lOWER(a.postalCode) LIKE :postal OR"
+                        +
+                        " LOWER(a.unit) LIKE :unit OR LOWER(a.road) LIKE :road OR LOWER(a.city) LIKE :city");
         q.setParameter("building", "%" + search + "%");
         q.setParameter("postal", "%" + search + "%");
         q.setParameter("unit", "%" + search + "%");
@@ -364,13 +365,36 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    @Override // address to be persist beforehand, vendor and department and site is seperated
+    @Override 
     public void createCompany(Company company) throws CompanyException {
         try {
+            Address a = company.getAddress();
+            List<Department> dep = company.getDepartments();
+            List<Vendor> ven = company.getVendors();
             em.persist(company);
 
-            // Address a = getAddressById(address.getId());
-            // company.setAddress(a);
+            company.setDepartments(new ArrayList<>());
+            for(Department d: dep) {
+                if (d.getId() != null) {
+                    company.getDepartments().add(getDepartmentById(d.getId()));
+                } else  {
+                    em.persist(d);
+                    company.getDepartments().add(d);
+                }
+            }
+
+            em.persist(a);
+            company.setAddress(a);
+
+            company.setVendors(new ArrayList<>());
+            for(Vendor v: ven) {
+                if (v.getId() != null) {
+                    company.getVendors().add(getVendorById(v.getId()));
+                } else  {
+                    em.persist(v);
+                    company.getVendors().add(v);
+                }
+            }
 
         } catch (Exception ex) {
             throw new CompanyException("Company has already been created");
@@ -537,13 +561,8 @@ public class AdminServiceImpl implements AdminService {
             em.persist(newV);
 
             for (Address aa : list) {
-                if (aa.getId() !=  null) {
-                    Address a = getAddressById(aa.getId());
-                    newV.getAddress().add(a);
-                } else {
-                    em.persist(aa);
-                    newV.getAddress().add(aa);
-                }
+                em.persist(aa);
+                newV.getAddress().add(aa);
             }
 
         } catch (Exception ex) {
@@ -557,14 +576,16 @@ public class AdminServiceImpl implements AdminService {
         Vendor v = getVendorById(vendor.getId());
         Boolean checkUpdate = false;
 
+        List<Address> list = v.getAddress();
+
         if (vendor.getCompanyName() != v.getCompanyName()) {
             if (uniqueVendorName(vendor.getCompanyName()) == true) {
-                checkUpdate =true;
+                checkUpdate = true;
             } else {
                 throw new VendorException("Fail: Vendor name is not unique");
             }
         } else {
-            checkUpdate =true;
+            checkUpdate = true;
         }
 
         if (checkUpdate == true) {
@@ -574,23 +595,31 @@ public class AdminServiceImpl implements AdminService {
             v.setTelephone(v.getTelephone());
             v.setAddress(new ArrayList<>());
 
+            List<Address> givenList = new ArrayList<>();
             for (Address a : vendor.getAddress()) {
-                if (a.getId() !=  null) {
-                    Address aa = getAddressById(a.getId());
-                    v.getAddress().add(aa);
+                if (a.getId() != null) {
+                    givenList.add(a);
+                    updateAddress(a);
+                    v.getAddress().add(getAddressById(a.getId()));
                 } else {
                     em.persist(a);
                     v.getAddress().add(a);
+                }
+            }
+
+            for (Address x : list) {
+                if (!givenList.contains(x)) {
+                    Address toDelete = getAddressById(x.getId());
+                    em.remove(toDelete);
                 }
             }
         }
     }
 
     @Override
-    public void deleteVendor(Vendor vendor) throws VendorException {
-        Vendor v = getVendorById(vendor.getId());
+    public void deleteVendor(Long id) throws VendorException {
+        Vendor v = getVendorById(id);
         em.remove(v);
-
     }
 
     @Override
@@ -615,7 +644,7 @@ public class AdminServiceImpl implements AdminService {
                     "SELECT e FROM Vendor e WHERE LOWER(e.companyName) LIKE :name OR LOWER(e.email) LIKE :email OR LOWER(e.telephone) LIKE :telephone");
             q.setParameter("name", "%" + search + "%");
             q.setParameter("email", "%" + search + "%");
-            q.setParameter("telephone","%" + search + "%");
+            q.setParameter("telephone", "%" + search + "%");
             return q.getResultList();
 
         } catch (Exception ex) {

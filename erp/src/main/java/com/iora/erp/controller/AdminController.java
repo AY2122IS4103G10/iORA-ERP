@@ -131,11 +131,22 @@ public class AdminController {
     }
 
 
+    @DeleteMapping(path = "/deleteVendor")
+    public ResponseEntity<Object> deleteVendor(@RequestParam Long id) {
+        try {
+            adminService.deleteVendor(id);
+            return ResponseEntity.ok("Vendor with ID " + id + " has been successfully deleted.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+
     @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addCompany(@RequestBody Company company) {
         try {
             adminService.createCompany(company);
-            return ResponseEntity.ok("Job title has been successfully created");
+            return ResponseEntity.ok("Company has been successfully created");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

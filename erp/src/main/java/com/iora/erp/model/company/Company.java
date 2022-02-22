@@ -37,14 +37,32 @@ public class Company implements Serializable {
     @ManyToMany
     private List<Vendor> vendors;
 
-    public Company() {
-    }
-
     public Company(String name, String registerNumber, String telephone) {
         this.name = name;
         this.registerNumber = registerNumber;
         this.telephone = telephone;
-        this.active = true;
+    }
+
+    public Company(String name, String registerNumber, String telephone, Boolean active, Address address,
+            List<Department> departments, List<Vendor> vendors) {
+        this.name = name;
+        this.registerNumber = registerNumber;
+        this.telephone = telephone;
+        this.active = active;
+        this.address = address;
+        this.departments = departments;
+        this.vendors = vendors;
+    }
+
+    public Company(String name, String registerNumber, String telephone, Boolean active, Address address) {
+        this.name = name;
+        this.registerNumber = registerNumber;
+        this.telephone = telephone;
+        this.active = active;
+        this.address = address;
+    }
+
+    public Company() {
     }
 
     public Address getAddress() {
@@ -114,6 +132,10 @@ public class Company implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public static long getSerialversionuid() {
+        return serialVersionUID;
     }
 
     // Locale.getISOCountries();

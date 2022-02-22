@@ -25,6 +25,24 @@ const columns = [
     },
 ]
 
+export const EditStockLevelButton = () => {
+
+    const handleAddStock = () => {
+
+    }
+
+    return (
+        <button 
+        type="button"
+        className="inline-flex items-center mr-3 px-2.5 py-1.5 border border-transparent text-sm leading-4 
+        font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+        onClick={() => handleAddStock()}>
+            Add Stock 
+        </button>
+    );
+}
+
 
 
 export const StockLevelForm = () => {
@@ -63,7 +81,7 @@ export const StockLevelForm = () => {
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{id}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">SKU: {id}</h1>
               </div>
             </div>
           </div>
@@ -123,7 +141,7 @@ export const StockLevelForm = () => {
               <section aria-labelledby="stocks-level">
                   <div className="m-1">
                   {siteStock.length == 0 || siteStock == undefined ? <p>loading</p> : 
-                    <SimpleTable columns={columns} data={getProductItem(siteStock, id)}/>
+                    <SimpleTable columns={columns} data={getProductItem(siteStock, id)} headerButton={<EditStockLevelButton/>}/>
                   }
                   </div>
               </section>

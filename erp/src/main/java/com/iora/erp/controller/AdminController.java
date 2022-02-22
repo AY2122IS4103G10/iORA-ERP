@@ -42,8 +42,7 @@ public class AdminController {
 
     // Employee/JobTitle/Department stuff here
 
-
-    //need to edit
+    // need to edit
     @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {
         try {
@@ -64,12 +63,11 @@ public class AdminController {
         }
     }
 
-
     @GetMapping(path = "/viewJobTitles", produces = "application/json")
     public List<JobTitle> viewJobTitles(@RequestParam("search") String search) {
         try {
-            if(search == null) {
-                search ="";
+            if (search == null) {
+                search = "";
             }
             return adminService.getJobTitlesByFields(search);
         } catch (Exception e) {
@@ -77,7 +75,6 @@ public class AdminController {
         }
     }
 
-    
     @GetMapping(path = "/viewAllAddress", produces = "application/json")
     public List<Address> viewAllAddress() {
         try {
@@ -90,8 +87,8 @@ public class AdminController {
     @GetMapping(path = "/viewAddress", produces = "application/json")
     public List<Address> viewAddress(@RequestParam("search") String search) {
         try {
-            if(search == null) {
-                search ="";
+            if (search == null) {
+                search = "";
             }
             return adminService.getListAddressFields(search);
         } catch (Exception e) {
@@ -99,7 +96,6 @@ public class AdminController {
         }
     }
 
-        
     @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
         try {
@@ -113,7 +109,7 @@ public class AdminController {
     @PostMapping(path = "/addEmployees", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addAllEmployee(@RequestBody List<Employee> employee) {
         try {
-            for(Employee e : employee) {
+            for (Employee e : employee) {
                 employeeService.createEmployee(e);
             }
             return ResponseEntity.ok("All employees has been successfully created");
@@ -161,11 +157,10 @@ public class AdminController {
         }
     }
 
-    @PostMapping(path = "/addSite/{storeType}", consumes = "application/json")
+    @PostMapping(path = "/addSite/{storeType}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addSite(@RequestBody Site site, @PathVariable String storeType) {
         try {
-            siteService.createSite(site, storeType);
-            return ResponseEntity.ok("Site with site ID " + site.getId() + " is successfully created.");
+            return ResponseEntity.ok(siteService.createSite(site, storeType));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

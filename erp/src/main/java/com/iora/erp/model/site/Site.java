@@ -20,7 +20,6 @@ import com.iora.erp.model.company.Company;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Site implements Serializable {
 
-    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

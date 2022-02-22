@@ -29,32 +29,32 @@ public class SiteServiceImpl implements SiteService {
     private EntityManager em;
 
     @Override
-    public void createSite(Site site, String siteType) {
+    public Site createSite(Site site, String siteType) {
         switch (siteType) {
             case "Headquarters":
                 HeadquartersSite headquarters = new HeadquartersSite(site);
                 em.persist(headquarters);
-                break;
+                return headquarters;
 
             case "Manufacturing":
                 ManufacturingSite manufacturing = new ManufacturingSite(site);
                 em.persist(manufacturing);
-                break;
+                return manufacturing;
 
             case "OnlineStore":
                 OnlineStoreSite onlineStore = new OnlineStoreSite(site);
                 em.persist(onlineStore);
-                break;
+                return onlineStore;
 
             case "Store":
                 StoreSite store = new StoreSite(site);
                 em.persist(store);
-                break;
+                return store;
 
             case "Warehouse":
                 WarehouseSite warehouse = new WarehouseSite(site);
                 em.persist(warehouse);
-                break;
+                return warehouse;
 
             default:
                 throw new IllegalArgumentException("Site arguments are invalid");

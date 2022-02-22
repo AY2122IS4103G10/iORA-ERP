@@ -1,13 +1,15 @@
-import { useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import moment from "moment";
 import { CogIcon } from "@heroicons/react/outline";
 
 import {
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
-import { selectAllEmployee } from "../../../../stores/slices/employeeSlice";
+import { 
+  fetchEmployees,
+  selectAllEmployee, 
+} from "../../../../stores/slices/employeeSlice";
 
 export const EmployeeTable = () => {
   const columns = useMemo(
@@ -35,13 +37,13 @@ export const EmployeeTable = () => {
         //Cell: (e) => `$${e.value}`,
       },
       {
-        Header: "Company Code",
-        accessor: "companyCode",
+        Header: "Job Title",
+        accessor: "jobTitle",
         //Cell: (e) => moment(e.value).format("lll"),
       },
       {
         Header: "Status",
-        accessor: "status",
+        accessor: "availStatus",
         //Cell: (e) => moment(e.value).format("lll"),
       },
       {
@@ -66,7 +68,12 @@ export const EmployeeTable = () => {
     ],
     []
   );
+  const dispatch = useDispatch();
   const data = useSelector(selectAllEmployee);
+  const employeeStatus = useSelector((state) => state.employee.status);
+  useEffect(() => {
+    employeeStatus === "idle" && dispatch(fetchEmployees());
+  }, [employeeStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

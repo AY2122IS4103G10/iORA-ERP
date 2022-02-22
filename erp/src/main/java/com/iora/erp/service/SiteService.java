@@ -10,7 +10,7 @@ import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 
 public interface SiteService {
-    public abstract void createSite(Site site, String siteType);
+    public abstract Site createSite(Site site, String siteType);
     public abstract Site getSite(Long id);
     public abstract List<Site> getAllSites();
     public abstract List<Site> searchAllSites(List<String> siteTypes, String country, String company);

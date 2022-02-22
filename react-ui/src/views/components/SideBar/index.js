@@ -94,19 +94,21 @@ export const SideBar = ({
                 </div>
                 <div className="mt-6 pt-6">
                   <div className="px-2 space-y-1">
-                    {secondaryNavigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
-                      >
-                        <item.icon
-                          className="mr-4 h-6 w-6 text-cyan-200"
-                          aria-hidden="true"
-                        />
-                        {item.name}
-                      </Link>
-                    ))}
+                    {secondaryNavigation == undefined ? <br/> : (
+                      secondaryNavigation.map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
+                        >
+                          <item.icon
+                            className="mr-4 h-6 w-6 text-cyan-200"
+                            aria-hidden="true"
+                          />
+                          {item.name}
+                        </Link>
+                      )))
+                    }
                   </div>
                 </div>
               </nav>

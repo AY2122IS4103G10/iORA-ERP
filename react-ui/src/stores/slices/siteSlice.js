@@ -12,10 +12,17 @@ const initialState = {
 };
 
 export const getAllSites = createAsyncThunk(
-  "stocklevels/getAllSites",
-  async () => {
-    const response = await sitesApi.getAll();
-    console.log(response.data);
+    "stocklevels/getAllSites",
+    async () => {
+        const response = await sitesApi.getAll();
+        return response.data;
+    }
+);
+
+export const getASite = createAsyncThunk(
+  "stocklevels/getASite",
+  async (id) => {
+    const response = await sitesApi.getASite(id);
     return response.data;
   }
 );
@@ -69,7 +76,7 @@ const siteSlice = createSlice({
     });
     builder.addCase(fetchSites.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.sites = state.sites.concat(action.payload);
+      state.sites = action.payload;
     });
     builder.addCase(fetchSites.rejected, (state, action) => {
       state.status = "failed";
@@ -79,7 +86,7 @@ const siteSlice = createSlice({
     });
     builder.addCase(getAllSites.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.sites = state.sites.concat(action.payload);
+      state.sites = action.payload;
     });
     builder.addCase(getAllSites.rejected, (state, action) => {
       state.status = "failed";

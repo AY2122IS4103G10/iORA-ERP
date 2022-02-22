@@ -1,34 +1,29 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-
-import {
-    employeeAdded,
-    employeeUpdated,
-    selectEmployeeById,
-} from "../../../../stores/slices/employeeSlice";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
-const checkboxState = (allFields) => {
-    const res = [];
-    allFields.forEach((field) => res.push(field));
-    return res;
-};
+import { api } from "../../../../environments/Api";
+import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { addNewEmployee, updateExistingEmployee, } from "../../../../stores/slices/employeeSlice";
 
-const AddEmployeeFormBody = ({
+const EmployeeFormBody = ({
     isEditing,
     name,
     onNameChanged,
+    salary,
+    onSalaryChanged,
+    payType,
+    onPayTypeChanged,
+    jobTitle,
+    onJobTitleChanged,
     department,
     onDepartmentChanged,
-    companyCode,
-    onCompanyCodeChanged,
-    payrollPerMonth,
-    onPayrollPerMonthChanged,
-    status,
-    onStatusChanged,
+    availStatus,
+    onAvailStatusChanged,
     email,
     onEmailChanged,
     username,
@@ -88,17 +83,17 @@ const AddEmployeeFormBody = ({
                                                 />
                                             </SimpleInputGroup>
                                             <SimpleInputGroup
-                                                label="Status"
-                                                inputField="status"
+                                                label="Available Status"
+                                                inputField="availStatus"
                                                 className="sm:mt-0 sm:col-span-2"
                                             >
                                                 <SimpleInputBox
                                                     type="text"
-                                                    name="status"
-                                                    id="status"
-                                                    autoComplete="status"
-                                                    value={status}
-                                                    onChange={onStatusChanged}
+                                                    name="availStatus"
+                                                    id="availStatus"
+                                                    autoComplete="availStatus"
+                                                    value={availStatus}
+                                                    onChange={onAvailStatusChanged}
                                                     required
                                                 />
                                             </SimpleInputGroup>
@@ -148,22 +143,37 @@ const AddEmployeeFormBody = ({
                                                 />
                                             </SimpleInputGroup>
                                             <SimpleInputGroup
-                                                label="Company Code"
-                                                inputField="companyCode"
+                                                label="Pay Type"
+                                                inputField="payType"
                                                 className="sm:mt-0 sm:col-span-2"
                                             >
-                                                <SimpleTextArea
+                                                <SimpleInputBox
                                                     type="text"
-                                                    id="companyCode"
-                                                    name="companyCode"
-                                                    value={companyCode}
-                                                    onChange={onCompanyCodeChanged}
+                                                    name="payType"
+                                                    id="payType"
+                                                    autoComplete="payType"
+                                                    value={payType}
+                                                    onChange={onPayTypeChanged}
                                                     required
                                                 />
                                             </SimpleInputGroup>
                                             <SimpleInputGroup
-                                                label="Payroll Per Month"
-                                                inputField="payrollPerMonth"
+                                                label="Job Title"
+                                                inputField="jobTitle"
+                                                className="sm:mt-0 sm:col-span-2"
+                                            >
+                                                <SimpleTextArea
+                                                    type="text"
+                                                    id="jobTitle"
+                                                    name="jobTitle"
+                                                    value={jobTitle}
+                                                    onChange={onJobTitleChanged}
+                                                    required
+                                                />
+                                            </SimpleInputGroup>
+                                            <SimpleInputGroup
+                                                label="Salary"
+                                                inputField="salary"
                                                 className="relative rounded-md sm:mt-0 sm:col-span-2"
                                             >
                                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -171,21 +181,21 @@ const AddEmployeeFormBody = ({
                                                 </div>
                                                 <input
                                                     type="number"
-                                                    name="payrollPerMonth"
-                                                    id="payrollPerMonth"
-                                                    autoComplete="payrollPerMonth"
+                                                    name="salary"
+                                                    id="salary"
+                                                    autoComplete="salary"
                                                     className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                                                     placeholder="0.00"
-                                                    value={payrollPerMonth}
-                                                    onChange={onPayrollPerMonthChanged}
+                                                    value={salary}
+                                                    onChange={onSalaryChanged}
                                                     required
                                                     step="0.01"
-                                                    aria-describedby="payrollPerMonth-currency"
+                                                    aria-describedby="salary-currency"
                                                 />
                                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                                     <span
                                                         className="text-gray-500 sm:text-sm"
-                                                        id="payrollPerMonth-currency"
+                                                        id="salary-currency"
                                                     >
                                                         SGD
                                                     </span>
@@ -209,7 +219,7 @@ const AddEmployeeFormBody = ({
                                             className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                                             onClick={onAddEmployeeClicked}
                                         >
-                                            {!isEditing ? "Add" : "Edit"} employee
+                                            {!isEditing ? "Add" : "Save"} employee
                                         </button>
                                     </div>
                                 </div>
@@ -223,87 +233,107 @@ const AddEmployeeFormBody = ({
 );
 
 export const EmployeeForm = () => {
-    const { prodId: employeeId } = useParams();
-    const employee = useSelector((state) =>
-        selectEmployeeById(state, employeeId)
-    );
-    const isEditing = Boolean(employee);
-    const [name, setName] = useState(!isEditing ? "" : employee.name);
-    const [department, setDepartment] = useState(!isEditing ? "" : employee.department);
-    const [companyCode, setCompanyCode] = useState(!isEditing ? "" : employee.companyCode);
-    const [payrollPerMonth, setPayrollPerMonth] = useState(!isEditing ? "" : employee.payrollPerMonth);
-    const [status, setStatus] = useState(!isEditing ? "" : employee.status);
-    const [email, setEmail] = useState(!isEditing ? "" : employee.email);
-    const [username, setUsername] = useState(!isEditing ? "" : employee.username);
-    const [password, setPassword] = useState(!isEditing ? "" : employee.password);
+    const { employeeId } = useParams();
+    const [isEditing, setIsEditing] = useState(false);
+    const [name, setName] = useState("");
+    const [department, setDepartment] = useState("");
+    const [payType, setPayType] = useState("");
+    const [salary, setSalary] = useState("");
+    const [availStatus, setAvailStatus] = useState("");
+    const [email, setEmail] = useState("");
+    const [jobTitle, setJobTitle] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const onNameChanged = (e) => setName(e.target.value);
     const onDepartmentChanged = (e) => setDepartment(e.target.value);
-    const onCompanyCode = (e) => setCompanyCode(e.target.value);
-    const onPayrollPerMonthChanged = (e) => setPayrollPerMonth(e.target.value);
-    const onStatusChanged = (e) => setStatus(e.target.value);
+    const onAvailStatusChanged = (e) => setAvailStatus(e.target.value);
     const onEmailChanged = (e) => setEmail(e.target.value);
     const onUsernameChanged = (e) => setUsername(e.target.value);
     const onPasswordChanged = (e) => setPassword(e.target.value);
+    const onPayTypeChanged = (e) => setPayType(e.target.value);
+    const onSalaryChanged = (e) => setSalary(e.target.value);
+    const onJobTitleChanged = (e) => setJobTitle(e.target.value);
+
+    const [requestStatus, setRequestStatus] = useState("idle");
+    const canAdd =
+    [
+      name,
+      department,
+      availStatus,
+      email,
+      username,
+      password,
+      payType,
+      salary,
+      jobTitle
+    ].every(Boolean) && requestStatus === "idle";
 
     const onAddEmployeeClicked = (evt) => {
         evt.preventDefault();
-        canAdd &&
-            dispatch(
-                !isEditing
-                    ? productAdded(
+        if (canAdd)
+            try {
+                setRequestStatus("pending");
+                if (!isEditing) {
+                    dispatch(
+                      addNewEmployee({
                         name,
                         department,
-                        companyCode,
-                        payrollPerMonth,
-                        status,
+                        availStatus,
                         email,
                         username,
-                        password
-                    )
-                    : productUpdated({
+                        password,
+                        payType,
+                        salary,
+                        jobTitle,
+                      })
+                    ).unwrap();
+                  } else {
+                    dispatch(
+                      updateExistingEmployee({
                         name,
                         department,
-                        companyCode,
-                        payrollPerMonth,
-                        status,
+                        availStatus,
                         email,
                         username,
-                        password
-                    })
-            );
-        setName("");
-        setDepartment("");
-        setCompanyCode("");
-        setPayrollPerMonth("");
-        setStatus("");
-        setEmail("");
-        setUsername("");
-        setPassword("");
-        navigate(!isEditing ? "/admin/employee" : `/admin/employee/${name}`);
-    };
-
-    const canAdd = name && department && companyCode && payrollPerMonth && status && email && username && password;
+                        password,
+                        payType,
+                        salary,
+                        jobTitle,
+                      })
+                    ).unwrap();
+                  }
+                alert("Successfully added employee");
+                setName("");
+                navigate(!isEditing ? "/ad/employee" : `/ad/employee/${employeeId}`);
+            } catch (err) {
+                console.error("Failed to add employee: ", err);
+            } finally {
+                setRequestStatus("idle");
+            }
+        };
 
     const onCancelClicked = () =>
         navigate(!isEditing ? "/admin/employee" : `/admin/employee/${name}`);
 
     return (
-        <AddEmployeeFormBody
+        <EmployeeFormBody
             isEditing={isEditing}
+            payType={payType}
+            onPayTypeChanged={onPayTypeChanged}
+            salary={salary}
+            onSalaryChanged={onSalaryChanged}
+            jobTitle={jobTitle}
+            onJobTitleChanged={onJobTitleChanged}
             name={name}
             onNameChanged={onNameChanged}
             department={department}
             onDepartmentChanged={onDepartmentChanged}
-            companyCode={companyCode}
-            onCompanyCodeChanged={onCompanyCodeChanged}
-            payrollPerMonth={payrollPerMonth}
-            onPayrollPerMonthChanged={onPayrollPerMonthChanged}
-            status={status}
-            onStatusChanged={onStatusChanged}
+            availStatus={availStatus}
+            onAvailStatusChanged={onAvailStatusChanged}
             email={email}
             onEmailChanged={onEmailChanged}
             username={username}

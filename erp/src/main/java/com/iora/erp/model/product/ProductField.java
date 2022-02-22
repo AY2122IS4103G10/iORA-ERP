@@ -22,8 +22,8 @@ public class ProductField {
     }
 
     public ProductField(String fieldName, String fieldValue) {
-        this.fieldName = fieldName;
-        this.fieldValue = fieldValue;
+        this.fieldName = fieldName.toUpperCase();
+        this.fieldValue = fieldValue.toUpperCase();
     }
 
     public Long getId() {

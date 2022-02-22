@@ -15,7 +15,7 @@ const columns = [
     ]
 
 
-export const ProductTable = () => {
+export const ProductTable = (subsys) => {
     const dispatch = useDispatch();
     const data = useSelector(selectAllProducts);
     const prodStatus = useSelector((state) => state.products.status);
@@ -29,18 +29,21 @@ export const ProductTable = () => {
     useEffect(() => {
         prodStatus === "idle" && dispatch(fetchProducts());
       }, [prodStatus, dispatch]);
-
+    console.log(subsys);
+    const path = "/" + subsys.subsys.subsys + "/stocklevels/products";
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="mt-4">
-          <SelectableTable columns={columns} data={products} path="/sm/stocklevels/products" />
+          <SelectableTable columns={columns} data={products} path={path} />
         </div>
       </div>
     );
 }
 
-export const ProductStocks = () => {
+export const ProductStocks = (subsys) => {
+  console.log("ProductStocks");
+  console.log(subsys);
     return (
-        <ProductTable />
+        <ProductTable subsys={subsys} />
     );
 };

@@ -29,32 +29,32 @@ public class SiteServiceImpl implements SiteService {
     private EntityManager em;
 
     @Override
-    public void createSite(Site site, String siteType) {
+    public Site createSite(Site site, String siteType) {
         switch (siteType) {
             case "Headquarters":
                 HeadquartersSite headquarters = new HeadquartersSite(site);
                 em.persist(headquarters);
-                break;
+                return headquarters;
 
             case "Manufacturing":
                 ManufacturingSite manufacturing = new ManufacturingSite(site);
                 em.persist(manufacturing);
-                break;
+                return manufacturing;
 
             case "OnlineStore":
                 OnlineStoreSite onlineStore = new OnlineStoreSite(site);
                 em.persist(onlineStore);
-                break;
+                return onlineStore;
 
             case "Store":
                 StoreSite store = new StoreSite(site);
                 em.persist(store);
-                break;
+                return store;
 
             case "Warehouse":
                 WarehouseSite warehouse = new WarehouseSite(site);
                 em.persist(warehouse);
-                break;
+                return warehouse;
 
             default:
                 throw new IllegalArgumentException("Site arguments are invalid");
@@ -127,7 +127,9 @@ public class SiteServiceImpl implements SiteService {
 
     String siteQuery(String mainQuery, String country, String company) {
         if (!country.equals("") && !company.equals("")) {
-            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country, company);
+            return mainQuery + String.format(
+                    " WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country,
+                    company);
         } else if (!country.equals("")) {
             return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country);
         } else if (!company.equals("")) {
@@ -234,13 +236,13 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public Map<Long, Long> getStockLevelByProduct(String SKUCode) {
-        List<Object[]> resultList = (List<Object[]>) em
-                .createQuery("SELECT s.id, sl FROM Site s JOIN StockLevel sl", Object[].class)
+        List<Site> resultList = em
+                .createQuery("SELECT s FROM Site s", Site.class)
                 .getResultList();
         Map<Long, Long> resultMap = new HashMap<Long, Long>();
-        for (Object[] o : resultList) {
-            Long siteId = (Long) o[0];
-            StockLevel stockLevel = (StockLevel) o[1];
+        for (Site s : resultList) {
+            Long siteId = s.getId();
+            StockLevel stockLevel = s.getStockLevel();
             resultMap.put(siteId, stockLevel.getProducts().getOrDefault(SKUCode, 0L));
         }
         return resultMap;

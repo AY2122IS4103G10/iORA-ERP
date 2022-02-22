@@ -16,6 +16,7 @@ const initialState = {
       name: "iORA Singapore",
     },
   },
+  currStore: 3,
   status: "idle",
   error: "null",
 };
@@ -36,5 +37,7 @@ const userSlice = createSlice({
 export const { login, logout } = userSlice.actions;
 
 export const selectUser = (state) => state.user.user;
+
+export const selectUserStore = (state) => state.user.currStore;
 
 export default userSlice.reducer;

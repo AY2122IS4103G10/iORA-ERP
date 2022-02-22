@@ -28,8 +28,8 @@ export const ProductTable = (subsys) => {
 
     useEffect(() => {
         prodStatus === "idle" && dispatch(fetchProducts());
-      }, [prodStatus, dispatch]);
-    console.log(subsys);
+      }, []);
+    
     const path = "/" + subsys.subsys.subsys + "/stocklevels/products";
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
@@ -41,8 +41,6 @@ export const ProductTable = (subsys) => {
 }
 
 export const ProductStocks = (subsys) => {
-  console.log("ProductStocks");
-  console.log(subsys);
     return (
         <ProductTable subsys={subsys} />
     );

@@ -40,6 +40,7 @@ const GlobalFilter = ({
   preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
+  headerButton
 }) => {
   const count = preGlobalFilteredRows.length;
   const [value, setValue] = useState(globalFilter);
@@ -48,19 +49,22 @@ const GlobalFilter = ({
   }, 200);
 
   return (
-    <label className="flex gap-x-2 items-baseline">
-      <span className="text-gray-700">Search: </span>
-      <input
-        type="text"
-        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
-        value={value || ""}
-        onChange={(e) => {
-          setValue(e.target.value);
-          onChange(e.target.value);
-        }}
-        placeholder={`${count} records...`}
-      />
-    </label>
+    <>
+      <label className="flex gap-x-2 items-baseline">
+        <span className="text-gray-700">Search: </span>
+        <input
+          type="text"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
+          value={value || ""}
+          onChange={(e) => {
+            setValue(e.target.value);
+            onChange(e.target.value);
+          }}
+          placeholder={`${count} records...`}
+        />
+      </label>
+      {headerButton}
+    </>
   );
 };
 
@@ -212,6 +216,7 @@ export const SimpleTable = ({
   selectedRows = [],
   setSelectedRows,
   skipPageReset,
+  headerButton
 }) => {
   const {
     getTableProps,
@@ -269,11 +274,12 @@ export const SimpleTable = ({
 
   return (
     <>
-      <div className="sm:flex sm:gap-x-2">
+      <div className="sm:flex justify-between sm:gap-x-2">
         <GlobalFilter
           preGlobalFilteredRows={preGlobalFilteredRows}
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
+          headerButton={headerButton}
         />
         {headerGroups.map((headerGroup) =>
           headerGroup.headers.map((column) =>

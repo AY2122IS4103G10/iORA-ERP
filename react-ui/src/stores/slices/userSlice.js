@@ -16,7 +16,7 @@ const initialState = {
       name: "iORA Singapore",
     },
   },
-  currStore: 3,
+  currStore: 3, //to be updated when login is finalised
   status: "idle",
   error: "null",
 };

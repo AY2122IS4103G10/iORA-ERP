@@ -2,7 +2,38 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  companies: [],
+  companies: [
+    {
+      id: 1,
+      name: "iORA Fashion Pte. Ltd.",
+      registerNumber: "199703089W",
+      phoneNumber: "+65-63610056",
+      active: true,
+      address: {
+        id: 2,
+        country: "SINGAPORE",
+        city: "Singapore",
+        building: "Enterprise 10",
+        state: "Singapore",
+        unit: "NIL",
+        road: "10P Enterprise Road",
+        postalCode: "Singapore 629840",
+        billing: false,
+        latitude: 1.334251,
+        longitude: 103.704246,
+        coordinates: "(1.334251, 103.704246)",
+      },
+      departments: [
+        {
+          id: 1,
+          deptName: "Sales and Marketing",
+          jobTitles: [],
+          responsibility: [],
+          department: "Sales and Marketing",
+        },
+      ],
+    },
+  ],
   status: "idle",
   error: null,
 };
@@ -12,7 +43,7 @@ export const fetchCompanies = createAsyncThunk(
   //storeTypes =["Store", "Headquarters"]
   async ({ storeTypes, country, company }) => {
     const response = await api.getAll(
-      `admin/viewSites?storeTypes=${storeTypes.join(
+      `admin/viewCompanies?search=${storeTypes.join(
         ","
       )}&country=${country}&company=${company}`
     );
@@ -76,7 +107,9 @@ const companySlice = createSlice({
         productFields,
       } = action.payload;
       console.log(action.payload);
-      const existingProd = state.companies.find((prod) => prod.companyId === companyId);
+      const existingProd = state.companies.find(
+        (prod) => prod.companyId === companyId
+      );
       if (existingProd) {
         existingProd.name = name;
         existingProd.description = description;

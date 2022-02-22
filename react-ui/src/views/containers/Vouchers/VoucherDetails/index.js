@@ -8,6 +8,7 @@ import {
 import moment from "moment";
 import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
 import {
+  deleteExistingVoucher,
   fetchVouchers,
   issueVoucher,
   redeemVoucher,
@@ -142,7 +143,7 @@ export const VoucherDetails = () => {
     if (!voucher.issued && requestStatus === "idle")
       try {
         setRequestStatus("pending");
-        dispatch(issueVoucher(voucherCode));
+        dispatch(issueVoucher(voucherCode)).unwrap();
         alert("Successfully issued voucher");
       } catch (err) {
         console.error("Failed to issue voucher: ", err);
@@ -154,7 +155,7 @@ export const VoucherDetails = () => {
     if (!voucher.redeemed && requestStatus === "idle")
       try {
         setRequestStatus("pending");
-        dispatch(redeemVoucher(voucherCode));
+        dispatch(redeemVoucher(voucherCode)).unwrap();
         alert("Successfully redeemed voucher");
       } catch (err) {
         console.error("Failed to redeem voucher: ", err);
@@ -164,8 +165,13 @@ export const VoucherDetails = () => {
   };
 
   const onDeleteVoucherClicked = () => {
-    dispatch(voucherDeleted(voucher));
-    navigate("/sm/vouchers");
+    try {
+      dispatch(deleteExistingVoucher(voucherCode)).unwrap();
+      alert("Successfully deleted voucher");
+      navigate("/sm/vouchers");
+    } catch (err) {
+      console.error("Failed to delete voucher: ", err);
+    } 
   };
 
   return (

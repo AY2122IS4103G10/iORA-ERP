@@ -6,15 +6,17 @@ import procurementReducer from "./slices/procurementSlice";
 import promotionsReducer from "./slices/promotionsSlice";
 import siteReducer from "./slices/siteSlice";
 import voucherReducer from "./slices/voucherSlice";
+import companyReducer from "./slices/companySlice"
 
 export default configureStore({
   reducer: {
-    user: userReducer,
+    companies: companyReducer,
     products: productReducer,
     prodFields: prodFieldReducer,
     procurements: procurementReducer,
     promotions: promotionsReducer,
     sites: siteReducer,
+    user: userReducer,
     vouchers: voucherReducer,
   },
 });

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+  addNewProductField,
   fetchProductFields,
   selectAllProdFields,
 } from "../../../../stores/slices/prodFieldSlice";
@@ -653,6 +654,28 @@ export const ProductForm = () => {
   const [openAddField, setOpenAddField] = useState(false);
 
   const onFieldValueChanged = (e) => setFieldValue(e.target.value);
+
+  const[fieldRequestStatus, setFieldRequestStatus] = useState("idle")
+  const canAddField = fieldNameSelected && fieldValue && (fieldRequestStatus === "idle")
+  const onAddFieldClicked = (evt) => {
+    evt.preventDefault()
+    if (canAddField)
+      try {
+        dispatch(
+          addNewProductField({
+            fieldName: fieldNameSelected,
+            fieldValue,
+          })
+        );
+        alert(`Successfully added ${fieldNameSelected}`);
+        closeModal();
+      } catch (err) {
+        console.error("Failed to add promo: ", err);
+      } finally {
+        setFieldRequestStatus("idle");
+      }
+  }
+
   const openModal = () => setOpenAddField(true);
   const closeModal = () => setOpenAddField(false);
   return (
@@ -695,6 +718,7 @@ export const ProductForm = () => {
         fieldNameSelected={fieldNameSelected}
         name={fieldValue}
         onNameChanged={onFieldValueChanged}
+        onSaveClicked={onAddFieldClicked}
       />
     </>
   );

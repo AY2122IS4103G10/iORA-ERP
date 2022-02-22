@@ -16,11 +16,11 @@ export const fetchProcurements = createAsyncThunk(
 );
 
 export const addNewProcurement = createAsyncThunk(
-  "procurements/addNewPost",
-  async (siteId, initialProcurement) => {
+  "procurements/addNewProcurement",
+  async (initialProcurement) => {
     const response = await api.create(
-      `sam/procurementOrder/create/${siteId}`,
-      initialProcurement
+      `sam/procurementOrder/create/${initialProcurement.siteId}`,
+      initialProcurement.initialProcurement
     );
     return response.data;
   }

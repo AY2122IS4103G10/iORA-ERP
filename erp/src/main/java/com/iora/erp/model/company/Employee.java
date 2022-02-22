@@ -3,24 +3,24 @@ package com.iora.erp.model.company;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
-import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.enumeration.PayType;
 
 @Entity
 public class Employee implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -32,27 +32,35 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     private String salt;
     @Column(nullable = false)
-    private String hashPass;
+    private String password;
     @Column(nullable = false)
     private Boolean availStatus;
+    @Enumerated
+    private PayType payType;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private JobTitle jobTitle;
     @ManyToOne(fetch = FetchType.EAGER)
     private Department department;
+    @OneToOne(fetch = FetchType.EAGER)
+    private Company company;
 
-    public Employee() {
-    }
 
-    public Employee(String name, String email, Double salary, String username, String password, String salt, String hashPass,
-            Boolean availStatus) {
+    public Employee(String name, String email, Double salary, String username, String password, Boolean availStatus,
+            PayType payType, JobTitle jobTitle, Department department, Company company) {
         this.name = name;
         this.email = email;
         this.salary = salary;
         this.username = username;
-        this.salt = salt;
-        this.hashPass = generateProtectedPassword(salt, password);
+        this.password = password;
         this.availStatus = availStatus;
+        this.payType = payType;
+        this.jobTitle = jobTitle;
+        this.department = department;
+        this.company = company;
+    }
+
+    public Employee() {
     }
 
     private static String generateProtectedPassword(String salt, String password) {
@@ -66,25 +74,6 @@ public class Employee implements Serializable {
             return generatedPassword;
         } catch (Exception ex) {
             return null;
-        }
-    }
-
-    public Boolean authentication(String authenticate) {
-        String tryPassword;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.reset();
-            md.update((this.salt + authenticate).getBytes("utf8"));
-
-            tryPassword = String.format("%0128x", new BigInteger(1, md.digest()));
-
-            if (tryPassword.equals(this.hashPass)) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception ex) {
-            return false;
         }
     }
 
@@ -112,7 +101,6 @@ public class Employee implements Serializable {
         this.availStatus = availStatus;
     }
 
-
     public String getUsername() {
         return username;
     }
@@ -129,9 +117,25 @@ public class Employee implements Serializable {
         this.email = email;
     }
 
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
     public Employee(String name, Double salary) {
         this.name = name;
         this.salary = salary;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = generateProtectedPassword(this.salt, password);
     }
 
     public Double getSalary() {
@@ -163,27 +167,20 @@ public class Employee implements Serializable {
         return "Employee[ id=" + id + " ]";
     }
 
-    public Set<AccessRights> getAccessRights() {
-        Set<AccessRights> accessRights = new HashSet<>(department.getResponsibility());
-        accessRights.addAll(jobTitle.getResponsibility());
-        return accessRights;
+    public PayType getPayType() {
+        return payType;
     }
 
-    public String getSalt() {
-        return salt;
+    public void setPayType(PayType payType) {
+        this.payType = payType;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
+    public Company getCompany() {
+        return company;
     }
 
-    public String getHashPass() {
-        return hashPass;
+    public void setCompany(Company company) {
+        this.company = company;
     }
-
-    public void setHashPass(String hashPass) {
-        this.hashPass = hashPass;
-    }
-
 
 }

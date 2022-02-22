@@ -1,19 +1,16 @@
 package com.iora.erp.model.company;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 
-import com.iora.erp.enumeration.AccessRights;
 
 @Entity
 public class Department implements Serializable {
@@ -21,20 +18,20 @@ public class Department implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // temporarily remove unique=true
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String deptName;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     private List<JobTitle> jobTitles;
-    @ElementCollection
-    private Set<AccessRights> responsibility;
-
+   
     public Department() {
+        this.jobTitles = new ArrayList<>();
+
     }
 
     public Department(String department) {
         this.deptName = department;
+        this.jobTitles = new ArrayList<>();
     }
 
     public List<JobTitle> getJobTitles() {
@@ -47,14 +44,6 @@ public class Department implements Serializable {
 
     public Long getId() {
         return id;
-    }
-
-    public String getDepartment() {
-        return deptName;
-    }
-
-    public void setDepartment(String department) {
-        this.deptName = department;
     }
 
     @Override
@@ -73,13 +62,4 @@ public class Department implements Serializable {
     public void setDeptName(String deptName) {
         this.deptName = deptName;
     }
-
-    public Set<AccessRights> getResponsibility() {
-        return this.responsibility;
-    }
-
-    public void setResponsibility(Set<AccessRights> responsibility) {
-        this.responsibility = responsibility;
-    }
-
 }

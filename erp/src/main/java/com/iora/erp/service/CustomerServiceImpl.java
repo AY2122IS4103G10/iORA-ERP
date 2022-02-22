@@ -1,6 +1,5 @@
 package com.iora.erp.service;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,8 +84,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<Customer> getCustomerByFields(String search) {
-        TypedQuery<Customer> q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
-                "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact", Customer.class);
+        /*TypedQuery<Customer> q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
+                "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact", Customer.class);*/
+        Query q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.email) LIKE :email OR " +
+                "LOWER(c.LastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact");
         q.setParameter("email", "%" + search.toLowerCase() + "%");
         q.setParameter("last", "%" + search.toLowerCase() + "%");
         q.setParameter("first", "%" + search.toLowerCase() + "%");
@@ -105,7 +106,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer getCustomerByEmail(String email) throws CustomerException {
-        Query q = em.createQuery("SELECT c FROM Customer c WHERE c.getEmail = :email");
+        Query q = em.createQuery("SELECT c FROM Customer c WHERE c.email = :email");
         q.setParameter("email", email);
 
         try {
@@ -116,7 +117,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-    @Override
+ /*   @Override
     public byte[] saltGeneration() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
@@ -137,7 +138,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new CustomerException("Invalid Username or Password.");
         }
 
-    }
+    }*/
 
     @Override
     public Voucher getVoucher(String voucherCode) throws CustomerException {

@@ -18,7 +18,7 @@ public interface AdminService {
     //need fix @role things
     public abstract void createJobTitle(JobTitle jobTitle) throws JobTitleException;
     public abstract void updateJobTitle(JobTitle jobTitle) throws JobTitleException;
-    public abstract void deleteJobTitle(JobTitle jobTitle) throws JobTitleException;
+    public abstract void deleteJobTitle(Long id) throws JobTitleException;
     public abstract List<JobTitle> listOfJobTitles() throws JobTitleException;
     public abstract List<JobTitle> getJobTitlesByFields(String search) throws JobTitleException;
     public abstract JobTitle getJobTitleById(Long id)  throws JobTitleException;
@@ -27,10 +27,11 @@ public interface AdminService {
     //vendor
     public abstract void createDepartment(Department department) throws DepartmentException;
     public abstract void editDepartment(Department department) throws DepartmentException;
-    public abstract void deleteDepartment(Department department) throws DepartmentException;
+    public abstract void deleteDepartment(Long id) throws DepartmentException, CompanyException;
     public abstract List<Department> listOfDepartments() throws DepartmentException;
-    public abstract List<Department> getDepartmentsByFields(String search);
-    public abstract Department getDepartmentById(Long id)  throws DepartmentException;
+    public abstract List<Department> getDepartmentsByFields(String search) throws DepartmentException;
+    public abstract Boolean checkJTInDepartment(Long did, Long jid) throws DepartmentException;
+    public abstract Department getDepartmentById(Long id) throws DepartmentException;
     public abstract Department getDepartmentsByName(String name) ;
     public abstract List<Employee> getEmployeesInDepartments(String deparment) throws DepartmentException;
 
@@ -42,15 +43,15 @@ public interface AdminService {
     public abstract List<Address> getListAddressFields(String search);
     public abstract Boolean checkAddress(Address address) ;
 
-    public abstract void createCompany(Company company, Address address) throws CompanyException;
+    public abstract void createCompany(Company company) throws CompanyException;
     public abstract void addADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException;
     public abstract void addAVendorToCompany(Long cid, Long vid) throws CompanyException, VendorException;
     public abstract void removeADepartmentToCompany(Long cid, Long did) throws CompanyException, DepartmentException;
     public abstract void removeAVendorToCompany(Long cid, Long vid) throws CompanyException, VendorException;
     public abstract void editCompany(Company company) throws CompanyException;
-    public abstract void deleteCompany(Company company) throws CompanyException;
+    public abstract void deleteCompany(Long id) throws CompanyException;
     public abstract List<Company> listOfCompanys() throws CompanyException;
-    public abstract List<Company> getCompanysByFields(String search);
+    public abstract List<Company> getCompanysByFields(String search) throws CompanyException;
     public abstract Company getCompanyById(Long id)  throws CompanyException;
     public abstract Company getCompanysByName(String name) ;
     public abstract Boolean checkUniqueR(String register) ;
@@ -58,7 +59,9 @@ public interface AdminService {
 
     public abstract void createVendor(Vendor vendor) throws VendorException;
     public abstract void updateVendor(Vendor vendor) throws VendorException, AddressException;
-    public abstract void deleteVendor(Vendor vendor) throws VendorException;
+    public abstract void deleteVendor(Long id) throws VendorException;
+    public abstract List<Vendor> getListofVendor(String search) throws VendorException;
+    public abstract List<Vendor> listofVendor() throws VendorException;
     public abstract Vendor getVendorById(Long id)  throws VendorException;
     public abstract Boolean uniqueVendorName(String name) throws VendorException;
 

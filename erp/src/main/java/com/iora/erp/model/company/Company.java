@@ -10,75 +10,71 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
-public class Company implements Serializable {
-
+public class Company implements Serializable  {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
     private String name;
     @Column(nullable = false, unique = true)
     private String registerNumber;
     @Column(nullable = false)
-    private String phoneNumber;
+    private String telephone;
     @Column(nullable = false)
     private Boolean active;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Address address;
     @ManyToMany
     private List<Department> departments;
     @ManyToMany
     private List<Vendor> vendors;
 
-    public Company() {
-    }
-
-    public Company(String name, String registerNumber, String phoneNumber) {
+    public Company(String name, String registerNumber, String telephone) {
         this.name = name;
         this.registerNumber = registerNumber;
-        this.phoneNumber = phoneNumber;
+        this.telephone = telephone;
         this.active = true;
     }
 
-    public Address getAddress() {
-        return address;
+    public Company(String name, String registerNumber, String telephone, Boolean active, Address address,
+            List<Department> departments, List<Vendor> vendors) {
+        this.name = name;
+        this.registerNumber = registerNumber;
+        this.telephone = telephone;
+        this.active = active;
+        this.address = address;
+        this.departments = departments;
+        this.vendors = vendors;
     }
 
-    public void setAddress(Address address) {
+    public Company(String name, String registerNumber, String telephone, Boolean active, Address address) {
+        this.name = name;
+        this.registerNumber = registerNumber;
+        this.telephone = telephone;
+        this.active = active;
         this.address = address;
     }
 
-    public List<Vendor> getVendors() {
-        return vendors;
+    public Company() {
     }
 
-    public void setVendors(List<Vendor> vendors) {
-        this.vendors = vendors;
+
+    @Override
+    public String toString() {
+        return "Company [id=" + id + "]";
     }
 
     public Long getId() {
         return id;
     }
 
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public List<Department> getDepartments() {
-        return departments;
-    }
-
-    public void setDepartments(List<Department> departments) {
-        this.departments = departments;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -89,14 +85,6 @@ public class Company implements Serializable {
         this.name = name;
     }
 
-    public String getphoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setphoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
     public String getRegisterNumber() {
         return registerNumber;
     }
@@ -105,15 +93,45 @@ public class Company implements Serializable {
         this.registerNumber = registerNumber;
     }
 
-    @Override
-    public String toString() {
-        return "Company [id=" + id + "]";
+    public String getTelephone() {
+        return telephone;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
-    // Locale.getISOCountries();
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public List<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<Department> departments) {
+        this.departments = departments;
+    }
+
+    public List<Vendor> getVendors() {
+        return vendors;
+    }
+
+    public void setVendors(List<Vendor> vendors) {
+        this.vendors = vendors;
+    }
+
 
 }

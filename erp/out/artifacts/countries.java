@@ -1,6 +1,5 @@
-package com.iora.erp.enumeration;
+public enum COUNTRIES {
 
-public enum Country {
     Afghanistan("AF"),
     Åland_Islands("AX"),
     Albania("AL"),
@@ -28,7 +27,7 @@ public enum Country {
     Bermuda("BM"),
     Bhutan("BT"),
     Bolivia_Plurinational_State_of("BO"),
-    Bonaire_Sint_Eustatius_and_Saba("BQ"),
+    Bonaire, _Sint_Eustatius_and_Saba("BQ"),
     Bosnia_and_Herzegovina("BA"),
     Botswana("BW"),
     Bouvet_Island("BV"),
@@ -104,7 +103,7 @@ public enum Country {
     Iceland("IS"),
     India("IN"),
     Indonesia("ID"),
-    Iran("IR"),
+    Iran, _Islamic_Republic_of("IR"),
     Iraq("IQ"),
     Ireland("IE"),
     Isle_of_Man("IM"),
@@ -168,7 +167,7 @@ public enum Country {
     Oman("OM"),
     Pakistan("PK"),
     Palau("PW"),
-    Palestinef("PS"),
+    Palestine, _State_of("PS"),
     Panama("PA"),
     Papua_New_Guinea("PG"),
     Paraguay("PY"),
@@ -216,9 +215,9 @@ public enum Country {
     Sweden("SE"),
     Switzerland("CH"),
     Syrian_Arab_Republic("SY"),
-    Taiwan("TW"),
+    Taiwan, _Province_of_China("TW"),
     Tajikistan("TJ"),
-    Tanzania("TZ"),
+    Tanzania, _United_Republic_of("TZ"),
     Thailand("TH"),
     Timor_Leste("TL"),
     Togo("TG"),
@@ -239,7 +238,7 @@ public enum Country {
     Uruguay("UY"),
     Uzbekistan("UZ"),
     Vanuatu("VU"),
-    Venezuela("VE"),
+    Venezuela, _Bolivarian_Republic_of("VE"),
     Viet_Nam("VN"),
     Virgin_Islands_British("VG"),
     Virgin_Islands_US("VI"),
@@ -251,11 +250,11 @@ public enum Country {
 
     private final String code;
 
-    Country (String code) {
+    COUNTRIES(String code) {
         this.code = code;
     }
 
-    public String getCode() {
+    public_String_getCode() {
         return this.code;
     }
 }

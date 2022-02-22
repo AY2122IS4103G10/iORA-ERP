@@ -2,9 +2,12 @@ package com.iora.erp.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Locale.IsoCountryCode;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -722,13 +725,6 @@ public class AdminServiceImpl implements AdminService {
             return true;
         }
 
-    }
-
-    @Override
-    public List<String> getCountryCodes() {
-        String[] countryCodes = Locale.getISOCountries();
-        List<String> code = Arrays.asList(countryCodes);
-        return code;
     }
 
 }

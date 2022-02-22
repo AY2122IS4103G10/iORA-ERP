@@ -27,7 +27,7 @@ public interface AdminService {
     //vendor
     public abstract void createDepartment(Department department) throws DepartmentException;
     public abstract void editDepartment(Department department) throws DepartmentException;
-    public abstract void deleteDepartment(Long id) throws DepartmentException;
+    public abstract void deleteDepartment(Long id) throws DepartmentException, CompanyException;
     public abstract List<Department> listOfDepartments() throws DepartmentException;
     public abstract List<Department> getDepartmentsByFields(String search) throws DepartmentException;
     public abstract Boolean checkJTInDepartment(Long did, Long jid) throws DepartmentException;
@@ -64,8 +64,6 @@ public interface AdminService {
     public abstract List<Vendor> listofVendor() throws VendorException;
     public abstract Vendor getVendorById(Long id)  throws VendorException;
     public abstract Boolean uniqueVendorName(String name) throws VendorException;
-
-    public abstract List<String> getCountryCodes();
 
 }
 

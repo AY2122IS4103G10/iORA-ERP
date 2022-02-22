@@ -62,7 +62,7 @@ public class DataLoader implements CommandLineRunner {
                 List<Department> departments = new ArrayList<Department>();
                 Department sam = new Department("Sales and Marketing");
                 em.persist(sam);
-                sam.setJobTitles(new JobTitle("title1", "Incharge of warehouse", s));
+               // sam.setJobTitles(new JobTitle("title1", "Incharge of warehouse", s));
 
                 List<Department> departments2 = new ArrayList<Department>();
                 Department sam2 = new Department("Online Marketing");

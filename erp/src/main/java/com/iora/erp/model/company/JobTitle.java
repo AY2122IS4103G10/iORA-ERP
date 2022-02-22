@@ -25,7 +25,6 @@ public class JobTitle implements Serializable {
     private String description;
     @ElementCollection
     private Set<AccessRights> responsibility;
-    
 
     public JobTitle() {
         responsibility = new HashSet<>();
@@ -45,16 +44,16 @@ public class JobTitle implements Serializable {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     @Override

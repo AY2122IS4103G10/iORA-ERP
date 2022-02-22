@@ -1,5 +1,6 @@
 package com.iora.erp.model.company;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
@@ -16,7 +17,8 @@ import javax.persistence.OneToOne;
 import com.iora.erp.enumeration.PayType;
 
 @Entity
-public class Employee {
+public class Employee implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

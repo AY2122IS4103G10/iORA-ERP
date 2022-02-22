@@ -32,13 +32,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void createEmployee(Employee employee) throws EmployeeException {
         Employee e = employee;
-        e.setSalt(saltGeneration().toString());
-        e.setPassword(employee.getPassword());
-
+        
         try {
             if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
-                    employee.getJobTitle().getId()) == true) {
-
+            employee.getJobTitle().getId()) == true) {
+                
+                e.setSalt(saltGeneration().toString());
+                e.setPassword(employee.getPassword());
                 em.persist(e);
                 e.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
                 e.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
@@ -51,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EmployeeException("Job Title selected for the Employee: " + e.getName()
                     + " is not applicable for the choosen department");
         } catch (Exception ex) {
-            throw new EmployeeException("Employee has already been created");
+            throw new EmployeeException("Employee has already been created" + ex.toString());
         }
     }
 

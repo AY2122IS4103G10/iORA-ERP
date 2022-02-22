@@ -120,6 +120,15 @@ public class AdminController {
         }
     }
 
+    @GetMapping(path = "/viewVendor", produces = "application/json")
+    public Vendor viewVendor(@RequestParam Long id) {
+        try {
+            return adminService.getVendorById(id);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @PutMapping(path = "/editVendor", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editVendor(@RequestBody Vendor v) {
         try {
@@ -145,7 +154,6 @@ public class AdminController {
     @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addCompany(@RequestBody Company company) {
         try {
-            System.out.println("here");
             adminService.createCompany(company);
             return ResponseEntity.ok("Company has been successfully created");
         } catch (Exception ex) {

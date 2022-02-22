@@ -71,5 +71,7 @@ export default stocklevelSlice.reducer;
 
 export const selectCurrSiteStock = (state) => state.stocklevel.currSiteStock;
 
-export const selectProdStock = (state, sku) => 
-    state.stocklevel.currSiteStock.productItems.filter((productItem) => productItem.productSKU == sku);
+export const selectProdStock = (state, sku) => {
+    const siteStock = selectCurrSiteStock();
+    return siteStock.productItems;
+}

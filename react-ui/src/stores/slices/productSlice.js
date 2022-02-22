@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  products: [],
+  products: [], //models
+  model: null,
   currProduct: null, //selected product for stock level
   prodStockLevel: null, //view product's stock level
   status: "idle",
@@ -14,6 +15,14 @@ export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
     const response = await api.getAll(`sam/model?modelCode=`);
+    return response.data;
+  }
+);
+
+export const fetchModel = createAsyncThunk(
+  "products/fetchModel",
+  async (modelCode) => {
+    const response = await api.get("sam/model", modelCode);
     return response.data;
   }
 );
@@ -72,6 +81,16 @@ const productSlice = createSlice({
       state.products = action.payload;
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(fetchModel.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(fetchModel.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.model = action.payload;
+    });
+    builder.addCase(fetchModel.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(getAProduct.pending, (state, action) => {
@@ -139,6 +158,8 @@ export const selectAllProducts = (state) => state.products.products;
 export const selectAProduct = (state) => state.products.currProduct;
 
 export const selectProductSL = (state) => state.products.prodStockLevel;
+
+export const selectModel = (state) => state.products.model;
 
 export const selectProductByCode = (state, modelCode) =>
   state.products.products.find((product) => product.modelCode === modelCode);

@@ -56,7 +56,7 @@ export const MyStoreStock = (subsys) => {
     const dispatch = useDispatch();
     const siteStock = useSelector(selectCurrSiteStock);
 
-
+    //===UNCOMMENT WHEN STOCK LEVEL IS ADDED=====
     useEffect(() => {
       // dispatch(getASiteStock(id)); 
     }, [])

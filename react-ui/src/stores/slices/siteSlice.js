@@ -27,10 +27,6 @@ export const getASite = createAsyncThunk(
   }
 );
 
-export const getASite = createAsyncThunk("stocklevels/getASite", async (id) => {
-  const response = await sitesApi.getASite(id);
-  return response.data;
-});
 export const fetchSites = createAsyncThunk(
   "sites/fetchSites",
   //storeTypes =["Store", "Headquarters"]
@@ -41,7 +37,7 @@ export const fetchSites = createAsyncThunk(
 );
 
 export const addNewSite = createAsyncThunk(
-  "sites/addNewSites",
+  "sites/addNewSite",
   async (initialSite) => {
     const response = await api.create(
       `admin/addSite/${initialSite.storeType}`,

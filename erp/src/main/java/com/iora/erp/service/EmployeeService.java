@@ -24,5 +24,5 @@ public interface EmployeeService {
     public abstract byte[] saltGeneration();
     public abstract Boolean usernameAvailability(String username);
     public abstract Boolean emailAvailability(String email);
-    //public abstract Employee loginAuthentication(Employee employee) throws EmployeeException;
+    public abstract Employee loginAuthentication(String username, String password) throws EmployeeException;
 }

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -33,6 +34,7 @@ import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,10 @@ public class DataLoader implements CommandLineRunner {
         private CustomerService customerService;
         @Autowired
         private ProductService productService;
+        @Autowired
+        private AdminService adminService;
+        @Autowired
+        private EmployeeService employeeService;
         @PersistenceContext
         private EntityManager em;
 
@@ -64,34 +70,76 @@ public class DataLoader implements CommandLineRunner {
                 Address a1 = new Address(Country.Singapore, "Singapore", "Enterprise 10", "Singapore", "NIL",
                                 "10P Enterprise Road", "Singapore 629840", false, 1.334251, 103.704246);
 
+                em.persist(a1);
+
+                //JobTitle
                 Set<AccessRights> s = new HashSet<>();
                 s.add(AccessRights.MARKETING_BASIC);
 
-                List<Department> departments = new ArrayList<Department>();
+                Set<AccessRights> ar = new HashSet<>();
+                ar.add(AccessRights.MARKETING_BASIC);
+                ar.add(AccessRights.MARKETING_CRM);
+                JobTitle jobTitle1 = new JobTitle("Sales", "Sales and Marketing Product", ar);
+                adminService.createJobTitle(jobTitle1);
+
+                Set<AccessRights> ar2 = new HashSet<>();
+                ar2.add(AccessRights.STORE_BASIC);
+                ar2.add(AccessRights.STORE_INVENTORY);
+                JobTitle jobTitle2 = new JobTitle("Store Manager", "Managnig the physical store", ar2);
+                em.persist(jobTitle2);
+                adminService.createJobTitle(jobTitle2);
+
+                Set<AccessRights> ar3 = new HashSet<>();
+                ar2.add(AccessRights.WAREHOUSE_BASIC);
+                ar2.add(AccessRights.WAREHOUSE_ORDER);
+                JobTitle jobTitle3 = new JobTitle("Manufacturing Manager", "Managnig the products production", ar3);
+                em.persist(jobTitle3);
+                adminService.createJobTitle(jobTitle3);
+
+                //Department
                 Department sam = new Department("Sales and Marketing");
-                em.persist(sam);
-                // sam.setJobTitles(new JobTitle("title1", "Incharge of warehouse", s));
+                List<JobTitle> jt = new ArrayList<>();
+                jt.add(adminService.getJobTitleById(Long.valueOf(1)));
+                sam.setJobTitles(jt);
+                adminService.createDepartment(sam);
 
-                List<Department> departments2 = new ArrayList<Department>();
                 Department sam2 = new Department("Online Marketing");
-                em.persist(sam2);
+                sam.setJobTitles(jt);
+                adminService.createDepartment(sam2);
 
-                List<Department> departments3 = new ArrayList<Department>();
                 Department sam3 = new Department("Manufacturing");
-                em.persist(sam3);
+                List<JobTitle> jt3 = new ArrayList<>();
+                jt3.add(adminService.getJobTitleById(Long.valueOf(3)));
+                sam.setJobTitles(jt3);
+                adminService.createDepartment(sam3);
+
+                //Company
+                List<Department> departments = new ArrayList<>();
+                departments.add(adminService.getDepartmentById(Long.valueOf(1)));
+                departments.add(adminService.getDepartmentById(Long.valueOf(2)));
 
                 Company iora = new Company("iORA Fashion Pte. Ltd.", "199703089W", "+65-63610056");
                 iora.setDepartments(departments);
                 iora.setAddress(a1);
-                em.persist(iora);
+                adminService.createCompany(iora);
+
+
                 Company lalu = new Company("LALU Fashion Pte. Ltd.", "201226449M", "+65-63610056");
-                lalu.setDepartments(departments2);
+                lalu.setDepartments(departments);
                 lalu.setAddress(a1);
                 em.persist(lalu);
+
                 Company sora = new Company("SORA Fashion Pte. Ltd.", "199900605W", "+65-63610056");
-                sora.setDepartments(departments3);
+                sora.setDepartments(departments);
                 sora.setAddress(a1);
                 em.persist(sora);
+
+                //Employee 
+                Employee e = new Employee("Sharon KS", "sharonMS.12@gmail.com", 4100.0, "sharonE", "password", 
+                true, PayType.MONTHLY, adminService.getJobTitleById(Long.valueOf(1)), 
+                adminService.getDepartmentById(Long.valueOf(1)), adminService.getCompanyById(Long.valueOf(1)));
+                employeeService.createEmployee(e);
+                
 
                 // Adding Sites
                 HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", "+65-63610056", iora);
@@ -291,38 +339,39 @@ public class DataLoader implements CommandLineRunner {
                 // e.printStackTrace();
                 // }
 
-        //        // Add Products of the Model
-        //         try {
-        //                 productService.createProduct(model.getModelCode(), new ArrayList<>(productFields));
-        //         } catch (ProductException | ProductFieldException ex) {
-        //                 ex.printStackTrace();
-        //                 System.out.println(ex.getMessage());
-        //         }
+                // // Add Products of the Model
+                // try {
+                // productService.createProduct(model.getModelCode(), new
+                // ArrayList<>(productFields));
+                // } catch (ProductException | ProductFieldException ex) {
+                // ex.printStackTrace();
+                // System.out.println(ex.getMessage());
+                // }
 
-        //         // Add Promotion to the Model
-        //         try {
-        //                 productService.addPromoCategory(model.getModelCode(), "2 FOR S$49", 24.5);
-        //         } catch (ModelException ex) {
-        //                 System.out.println(ex.getMessage());
-        //         }
+                // // Add Promotion to the Model
+                // try {
+                // productService.addPromoCategory(model.getModelCode(), "2 FOR S$49", 24.5);
+                // } catch (ModelException ex) {
+                // System.out.println(ex.getMessage());
+                // }
 
                 // Add many productItems of the product
-                try {
-                        productService.createProductItem("T1ZZ3OA60NOBK18H", "ASK0009968A-1");
-                        productService.createProductItem("NJCTRE9HI281F8B7", "ASK0009968A-2");
-                        productService.createProductItem("1HAC5IJD2Y8R2X4G", "ASK0009968A-3");
-                        productService.createProductItem("ANGA64O891NH0WC4", "ASK0009968A-4");
-                        productService.createProductItem("RBKD1XUUTN8ZVO3Z", "ASK0009968A-5");
-                        productService.createProductItem("T5VWY8V1V8QQUVG1", "ASK0009968A-6");
-                        productService.createProductItem("WQ8ED2RQ83VV1HO2", "ASK0009968A-7");
-                        productService.createProductItem("HAPPYM46XOVU766P", "ASK0009968A-8");
-                        productService.createProductItem("1V76V4FAM2NX90IU", "ASK0009968A-9");
-                        productService.createProductItem("1Z3G165G9DMDGQMD", "ASK0009968A-10");
-                        productService.createProductItem("6AND0X6G25KLNVUE", "ASK0009968A-11");
-                        productService.createProductItem("OZ9O75UATQ8P8QS4", "ASK0009968A-12");
-                } catch (ProductItemException e) {
-                        e.printStackTrace();
-                }
+                // try {
+                // productService.createProductItem("T1ZZ3OA60NOBK18H", "ASK0009968A-1");
+                // productService.createProductItem("NJCTRE9HI281F8B7", "ASK0009968A-2");
+                // productService.createProductItem("1HAC5IJD2Y8R2X4G", "ASK0009968A-3");
+                // productService.createProductItem("ANGA64O891NH0WC4", "ASK0009968A-4");
+                // productService.createProductItem("RBKD1XUUTN8ZVO3Z", "ASK0009968A-5");
+                // productService.createProductItem("T5VWY8V1V8QQUVG1", "ASK0009968A-6");
+                // productService.createProductItem("WQ8ED2RQ83VV1HO2", "ASK0009968A-7");
+                // productService.createProductItem("HAPPYM46XOVU766P", "ASK0009968A-8");
+                // productService.createProductItem("1V76V4FAM2NX90IU", "ASK0009968A-9");
+                // productService.createProductItem("1Z3G165G9DMDGQMD", "ASK0009968A-10");
+                // productService.createProductItem("6AND0X6G25KLNVUE", "ASK0009968A-11");
+                // productService.createProductItem("OZ9O75UATQ8P8QS4", "ASK0009968A-12");
+                // } catch (ProductItemException e) {
+                // e.printStackTrace();
+                // }
 
                 // Generate 10 $10 vouchers
                 customerService.generateVouchers(10, 10, "2022-02-16");

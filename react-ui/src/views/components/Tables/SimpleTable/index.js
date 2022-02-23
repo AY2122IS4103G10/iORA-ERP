@@ -20,6 +20,7 @@ import {
   usePagination,
   useRowSelect,
   useMountedLayoutEffect,
+  useFlexLayout,
 } from "react-table";
 import { Menu, Transition } from "@headlessui/react";
 import {
@@ -40,7 +41,7 @@ const GlobalFilter = ({
   preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
-  headerButton
+  headerButton,
 }) => {
   const count = preGlobalFilteredRows.length;
   const [value, setValue] = useState(globalFilter);
@@ -180,7 +181,7 @@ export const EditableCell = ({
 
   return (
     <input
-    type="number"
+      type="number"
       className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
       value={value}
       onChange={onChange}
@@ -216,7 +217,9 @@ export const SimpleTable = ({
   selectedRows = [],
   setSelectedRows,
   skipPageReset,
-  headerButton
+  headerButton,
+  flex = false,
+  handleOnClick,
 }) => {
   const {
     getTableProps,
@@ -248,6 +251,7 @@ export const SimpleTable = ({
     useSortBy,
     usePagination,
     useRowSelect,
+    flex && useFlexLayout,
     (hooks) => {
       rowSelect &&
         hooks.visibleColumns.push((columns) => [
@@ -307,7 +311,14 @@ export const SimpleTable = ({
                           scope="col"
                           className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                           {...column.getHeaderProps(
-                            column.getSortByToggleProps()
+                            column.getSortByToggleProps(),
+                            {
+                              style: {
+                                maxWidth: column.maxWidth,
+                                minWidth: column.minWidth,
+                                width: column.width,
+                              },
+                            }
                           )}
                         >
                           <div className="flex items-center justify-between">
@@ -336,7 +347,16 @@ export const SimpleTable = ({
                     return (
                       <tr
                         {...row.getRowProps()}
-                        className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                        className={[
+                          i % 2 === 0 ? "bg-white" : "bg-gray-50",
+                          Boolean(handleOnClick) &&
+                            "cursor-pointer hover:bg-gray-100",
+                        ].join(" ")}
+                        onClick={
+                          Boolean(handleOnClick)
+                            ? () => handleOnClick(row)
+                            : undefined
+                        }
                       >
                         {row.cells.map((cell) => (
                           <td

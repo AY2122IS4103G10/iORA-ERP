@@ -4,10 +4,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
-import { api } from "../../../../environments/Api";
+import { api, companyApi } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { addNewSite } from "../../../../stores/slices/siteSlice";
 import { AddressField } from "../../Sites/SiteForm";
+import { addNewCompany } from "../../../../stores/slices/companySlice";
 
 const siteTypes = [
   { id: 1, name: "Headquarters" },
@@ -165,7 +166,7 @@ const CompanyFormBody = ({
 );
 
 export const CompanyForm = () => {
-  const { siteId } = useParams();
+  const { companyId } = useParams();
   const [name, setName] = useState("");
   const [address1, setAddress1] = useState("");
   const [building, setBuilding] = useState("");
@@ -179,10 +180,7 @@ export const CompanyForm = () => {
   const [registerNo, setRegisterNo] = useState("");
   const [phone, setPhone] = useState("");
   const [active, setActive] = useState(false);
-  const [company, setCompany] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [siteTypeSelected, setSiteTypeSelected] = useState(siteTypes[0]);
-  const [companySelected, setCompanySelected] = useState(companies[0]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -193,7 +191,7 @@ export const CompanyForm = () => {
   const onAddress1Changed = (e) => setAddress1(e.target.value);
   const onBuildingChanged = (e) => setBuilding(e.target.value);
   const onUnitChanged = (e) => setUnit(e.target.value);
-  const onCountryChanged = (e) => setCountry(e.target.address);
+  const onCountryChanged = (e) => setCountry(e.target.value);
   const onCityChanged = (e) => setCity(e.target.value);
   const onStateChanged = (e) => setState(e.target.value);
   const onPostalCodeChanged = (e) => setPostalCode(e.target.value);
@@ -218,11 +216,29 @@ export const CompanyForm = () => {
     ].every(Boolean) && requestStatus === "idle";
   const onAddSiteClicked = (evt) => {
     evt.preventDefault();
+    console.log({
+      name,
+      address: {
+        country,
+        city,
+        building,
+        state,
+        unit,
+        road: address1,
+        postalCode,
+        billing: false,
+        latitude,
+        longitude,
+      },
+      registerNo,
+      phoneNumber: phone,
+      active: true,
+    });
     if (canAdd)
       try {
         setRequestStatus("pending");
         dispatch(
-          addNewSite(siteTypeSelected.name, {
+          addNewCompany({
             name,
             address: {
               country,
@@ -239,39 +255,44 @@ export const CompanyForm = () => {
             registerNo,
             phoneNumber: phone,
             active: true,
-            company: {
-              id: companySelected.id,
-              name: companySelected.name,
-            },
           })
-        ).unwrap();
-        alert("Successfully added site");
+        )
+          .unwrap()
+          .catch((err) => console.error(err));
+        alert("Successfully added company");
         setName("");
         setAddress1("");
-        navigate(!isEditing ? "/ad/sites" : `/ad/sites/${siteId}`);
+        navigate(!isEditing ? "/ad/companies" : `/ad/companies/${companyId}`);
       } catch (err) {
-        console.error("Failed to add site: ", err);
+        console.error("Failed to add company: ", err);
       } finally {
         setRequestStatus("idle");
       }
   };
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/ad/sites" : `/ad/sites/${siteId}`);
+    navigate(!isEditing ? "/ad/sites" : `/ad/sites/${companyId}`);
 
   useEffect(() => {
-    Boolean(siteId) &&
-      api.get("admin/viewSite", siteId).then((response) => {
-        const { name, address, registerNo, active, phone, company } =
-          response.data;
+    Boolean(companyId) &&
+      companyApi.getCompany(companyId).then((response) => {
+        const { name, address, registerNo, active, phone } = response.data;
         setIsEditing(true);
         setName(name);
         setRegisterNo(registerNo);
+        setAddress1(address.road);
+        setBuilding(address.building);
+        setUnit(address.unit);
+        setCountry(address.country);
+        setCity(address.city);
+        setState(address.state);
+        setPostalCode(address.postalCode);
+        setLatitude(address.latitude);
+        setLongitude(address.longitude);
         setActive(active);
         setPhone(phone);
-        setCompany(company);
       });
-  }, [siteId]);
+  }, [companyId]);
 
   return (
     <CompanyFormBody
@@ -302,11 +323,7 @@ export const CompanyForm = () => {
       onLongitudeChanged={onLongitudeChanged}
       onAddSiteClicked={onAddSiteClicked}
       onCancelClicked={onCancelClicked}
-      siteTypeSelected={siteTypeSelected}
-      setSiteTypeSelected={setSiteTypeSelected}
       siteTypes={siteTypes}
-      companySelected={companySelected}
-      setCompanySelected={setCompanySelected}
       companies={companies}
     />
   );

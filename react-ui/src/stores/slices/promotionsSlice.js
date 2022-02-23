@@ -26,11 +26,7 @@ export const addNewPromotion = createAsyncThunk(
 export const updateExistingPromotion = createAsyncThunk(
   "promotions/updateExistingPromotion",
   async (existingPromotion) => {
-    const response = await api.update(
-      "promotion",
-      existingPromotion.modelCode,
-      existingPromotion
-    );
+    const response = await api.update("sam/promoField", existingPromotion);
     return response.data;
   }
 );
@@ -61,32 +57,19 @@ const promotionsSlice = createSlice({
       state.promotions.push(action.payload);
     });
     builder.addCase(updateExistingPromotion.fulfilled, (state, action) => {
-      const {
-        modelCode,
-        name,
-        description,
-        fashionLine,
-        price,
-        onlineOnly,
-        available,
-        productFields,
-      } = action.payload;
+      const { id, fieldName, fieldValue, discountedPrice } = action.payload;
       const existingProd = state.promotions.find(
-        (promo) => promo.modelCode === modelCode
+        (promo) => promo.id === id
       );
       if (existingProd) {
-        existingProd.name = name;
-        existingProd.description = description;
-        existingProd.fashionLine = fashionLine;
-        existingProd.price = price;
-        existingProd.onlineOnly = onlineOnly;
-        existingProd.available = available;
-        existingProd.productFields = productFields;
+        existingProd.fieldName = fieldName;
+        existingProd.fieldValue = fieldValue;
+        existingProd.discountedPrice = discountedPrice;
       }
     });
     builder.addCase(deleteExistingPromotion.fulfilled, (state, action) => {
       state.promotions = state.promotions.filter(
-        ({ prodCode }) => prodCode !== action.payload.prodCode
+        ({ id }) => id !== action.payload.id
       );
     });
   },

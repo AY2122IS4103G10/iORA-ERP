@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  procurements: [{ id: 1 }],
+  procurements: [],
   status: "idle",
   error: null,
 };
@@ -28,10 +28,10 @@ export const addNewProcurement = createAsyncThunk(
 
 export const updateExistingProcurement = createAsyncThunk(
   "procurements/updateExistingProcurement",
-  async (siteId, existingProcurement) => {
+  async ( existingProcurement) => {
     const response = await api.update(
-      `sam/procurementOrder/update/${siteId}`,
-      existingProcurement
+      `sam/procurementOrder/update/${existingProcurement.siteId}`,
+      existingProcurement.existingProcurement
     );
     return response.data;
   }
@@ -103,5 +103,5 @@ export const selectAllProcurements = (state) => state.procurements.procurements;
 
 export const selectProcurementById = (state, orderId) =>
   state.procurements.procurements.find(
-    (procurement) => procurement.orderId === orderId
+    (procurement) => procurement.id === orderId
   );

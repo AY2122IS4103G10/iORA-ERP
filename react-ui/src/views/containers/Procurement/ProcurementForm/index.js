@@ -6,7 +6,6 @@ import { api, sitesApi } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import {
-  DeleteCell,
   EditableCell,
   SelectColumnFilter,
   SimpleTable,
@@ -15,11 +14,11 @@ import {
   fetchProducts,
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
+
 import {
-  fetchSites,
-  selectAllSites,
-} from "../../../../stores/slices/siteSlice";
-import { addNewProcurement } from "../../../../stores/slices/procurementSlice";
+  addNewProcurement,
+  updateExistingProcurement,
+} from "../../../../stores/slices/procurementSlice";
 
 const addModalColumns = [
   {
@@ -51,42 +50,6 @@ const addModalColumns = [
   },
 ];
 
-const storesListColumns = [
-  {
-    Header: "Product Code",
-    accessor: "modelCode",
-  },
-  {
-    Header: "SKU",
-    accessor: "sku",
-  },
-  {
-    Header: "Name",
-    accessor: "name",
-  },
-  {
-    Header: "Color",
-    accessor: (row) =>
-      row.productFields.find((field) => field.fieldName === "COLOUR")
-        .fieldValue,
-  },
-  {
-    Header: "Size",
-    accessor: (row) =>
-      row.productFields.find((field) => field.fieldName === "SIZE").fieldValue,
-  },
-  {
-    Header: "",
-    accessor: "accessor",
-    disableSortBy: true,
-    Cell: (
-      <div className="items-center">
-        <DeleteCell />
-      </div>
-    ),
-  },
-];
-
 export const ItemsList = ({
   cols,
   data,
@@ -108,13 +71,7 @@ export const ItemsList = ({
   );
 };
 
-const ProcurementItemsList = ({
-  data,
-  setData,
-  rowSelect = false,
-  selectedRows,
-  setRowSelect,
-}) => {
+const ProcurementItemsList = ({ data, setData }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
 
   const columns = useMemo(() => {
@@ -181,9 +138,6 @@ const ProcurementItemsList = ({
       <SimpleTable
         columns={columns}
         data={data}
-        rowSelect={rowSelect}
-        selectedRows={selectedRows}
-        setSelectedRows={setRowSelect}
         skipPageReset={skipPageReset}
       />
     </div>
@@ -347,16 +301,12 @@ const ProcurementFormBody = ({
                   <button
                     type="button"
                     className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                    onClick={openProducts}
                   >
                     Add store
                   </button>
                 </div>
               </div>
             </div>
-            {/* {Boolean(items.length) && (
-            <ItemsList cols={itemsListColumns} data={stores} />
-          )} */}
           </div>
 
           <div className="pt-5">
@@ -467,34 +417,43 @@ export const ProcurementForm = () => {
 
   const onAddOrderClicked = (evt) => {
     evt.preventDefault();
-    console.log({
-      lineItems: lineItems.map(({ product, requestedQty }) => ({
-        product,
-        requestedQty,
-      })),
-      headquarters: hqSelected,
-      manufacturing: manufacturingSelected,
-      warehouse: warehouseSelected,
-    })
     if (canAdd)
       try {
         setRequestStatus("pending");
-        dispatch(
-          addNewProcurement({
-            siteId: hqSelected.id,
-            initialProcurement: {
-              lineItems: lineItems.map(({ product, requestedQty }) => ({
-                product,
-                requestedQty,
-              })),
-              headquarters: hqSelected,
-              manufacturing: manufacturingSelected,
-              warehouse: warehouseSelected,
-            },
-          })
-        ).unwrap();
+        if (!isEditing)
+          dispatch(
+            addNewProcurement({
+              siteId: hqSelected.id,
+              initialProcurement: {
+                lineItems: lineItems.map(({ product, requestedQty }) => ({
+                  product,
+                  requestedQty,
+                })),
+                headquarters: hqSelected,
+                manufacturing: manufacturingSelected,
+                warehouse: warehouseSelected,
+              },
+            })
+          ).unwrap();
+        else
+          dispatch(
+            updateExistingProcurement({
+              siteId: hqSelected.id,
+              existingProcurement: {
+                lineItems: lineItems.map(({ product, requestedQty }) => ({
+                  product,
+                  requestedQty,
+                })),
+                headquarters: hqSelected,
+                manufacturing: manufacturingSelected,
+                warehouse: warehouseSelected,
+              },
+            })
+          ).unwrap();
         alert("Successfully created procurement order");
-        // navigate(!isEditing ? "/sm/procurements" : `/sm/procurements/${orderId}`);
+        navigate(
+          !isEditing ? "/sm/procurements" : `/sm/procurements/${orderId}`
+        );
       } catch (err) {
         console.error("Failed to add procurement: ", err);
       } finally {
@@ -508,16 +467,19 @@ export const ProcurementForm = () => {
   useEffect(() => {
     Boolean(orderId) &&
       api.get("sam/procurementOrder", orderId).then((response) => {
-        const {
-          name,
-          address,
-          siteCode,
-          active,
-          stockLevel,
-          company,
-          procurementOrders,
-        } = response.data;
+        const { lineItems, headquarters, manufacturing, warehouse } =
+          response.data;
         setIsEditing(true);
+        setLineItems(lineItems);
+        api
+          .get("sam/viewSite", headquarters)
+          .then((response) => response.data && setHqSelected(response.data));
+        api
+          .get("sam/viewSite", manufacturing)
+          .then((response) => response.data && setManufacturingSelected(response.data));
+        api
+          .get("sam/viewSite", warehouse)
+          .then((response) => response.data && setWarehouseSelected(response.data));
       });
   }, [orderId]);
 

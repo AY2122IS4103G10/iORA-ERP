@@ -29,7 +29,6 @@ export const getASite = createAsyncThunk(
 
 export const fetchSites = createAsyncThunk(
   "sites/fetchSites",
-  //storeTypes =["Store", "Headquarters"]
   async () => {
     const response = await api.getAll("admin/viewSites/all");
     return response.data;

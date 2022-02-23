@@ -70,7 +70,7 @@ public class WarehouseController {
         for (ProductItem item : toUpdate) {
             try {
                 if (item.getStockLevel() == null) {
-                    siteService.removeProductItemFromSite(siteId, item.getRfid());
+                    siteService.removeProductItemFromSite(item.getRfid());
                 } else {
                     siteService.addToStockLevel(item.getStockLevel(), item);
                     ;

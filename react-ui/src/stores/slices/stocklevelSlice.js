@@ -70,8 +70,3 @@ const stocklevelSlice = createSlice({
 export default stocklevelSlice.reducer;
 
 export const selectCurrSiteStock = (state) => state.stocklevel.currSiteStock;
-
-export const selectProdStock = (state, sku) => {
-    const siteStock = selectCurrSiteStock();
-    return siteStock.productItems;
-}

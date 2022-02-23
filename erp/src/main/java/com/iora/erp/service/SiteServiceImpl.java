@@ -183,11 +183,27 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
+    public Map<Long, Long> getStockLevelByProduct(String SKUCode) {
+        List<Site> resultList = em
+                .createQuery("SELECT s FROM Site s", Site.class)
+                .getResultList();
+        Map<Long, Long> resultMap = new HashMap<Long, Long>();
+        for (Site s : resultList) {
+            Long siteId = s.getId();
+            StockLevel stockLevel = s.getStockLevel();
+            resultMap.put(siteId, stockLevel.getProducts().getOrDefault(SKUCode, 0L));
+        }
+        return resultMap;
+    }
+
+    @Override
     public void addProductItemToSite(Long siteId, String productItemId) throws NoStockLevelException {
         StockLevel stockLevel = getStockLevelOfSite(siteId);
         ProductItem item = em.find(ProductItem.class, productItemId);
         try {
-            removeFromStockLevel(item);
+            if (item.getStockLevel() != null) {
+                removeFromStockLevel(item);
+            }
             addToStockLevel(stockLevel, item);
         } catch (IllegalTransferException ex) {
             System.err.println(ex.getMessage());
@@ -210,7 +226,9 @@ public class SiteServiceImpl implements SiteService {
         for (String productItemId : productItemIds) {
             try {
                 ProductItem item = em.find(ProductItem.class, productItemId);
-                removeFromStockLevel(item);
+                if (item.getStockLevel() != null) {
+                    removeFromStockLevel(item);
+                }
                 addToStockLevel(stockLevel, item);
             } catch (IllegalTransferException ex) {
                 System.err.println(ex.getMessage());
@@ -228,20 +246,6 @@ public class SiteServiceImpl implements SiteService {
                 System.err.println(ex.getMessage());
             }
         }
-    }
-
-    @Override
-    public Map<Long, Long> getStockLevelByProduct(String SKUCode) {
-        List<Site> resultList = em
-                .createQuery("SELECT s FROM Site s", Site.class)
-                .getResultList();
-        Map<Long, Long> resultMap = new HashMap<Long, Long>();
-        for (Site s : resultList) {
-            Long siteId = s.getId();
-            StockLevel stockLevel = s.getStockLevel();
-            resultMap.put(siteId, stockLevel.getProducts().getOrDefault(SKUCode, 0L));
-        }
-        return resultMap;
     }
 
     @Override
@@ -274,36 +278,46 @@ public class SiteServiceImpl implements SiteService {
         em.merge(productItem);
     }
 
-	@Override
-	public void addManyToStockLevel(StockLevel stockLevel, List<ProductItem> productItems) throws IllegalTransferException {
+    @Override
+    public void addManyToStockLevel(StockLevel stockLevel, List<ProductItem> productItems)
+            throws IllegalTransferException {
         int fail = 0;
-		for (ProductItem productItem : productItems) {
-            try {
-                addToStockLevel(stockLevel, productItem);
-            } catch (IllegalTransferException e) {
+        for (int i = 0; i < productItems.size(); i++) {
+            ProductItem productItem = em.find(ProductItem.class, productItems.get(i).getRfid());
+            if (stockLevel.getProductItems().contains(productItem)) {
                 fail++;
                 System.err.println("Error adding: " + productItem.getRfid());
             }
+            productItem.setStockLevel(stockLevel);
+            String SKUCode = productItem.getProductSKU();
+            String modelCode = SKUCode.split("-")[0];
+            stockLevel.getProductItems().add(productItem);
+            stockLevel.getProducts().merge(SKUCode, 1L, (x, y) -> x + y);
+            stockLevel.getModels().merge(modelCode, 1L, (x, y) -> x + y);
         }
         if (fail > 0) {
             throw new IllegalTransferException(String.format("%d transfer(s) failed.", fail));
         }
-	}
+    }
 
-	@Override
-	public void removeManyFromStockLevel(List<ProductItem> productItems) throws IllegalTransferException {
-		int fail = 0;
-		for (ProductItem productItem : productItems) {
-            try {
-                removeFromStockLevel(productItem);
-            } catch (IllegalTransferException e) {
-                fail++;
-                System.err.println("Error removing: " + productItem.getRfid());
+    @Override
+    public void removeManyFromStockLevel(List<ProductItem> productItems) throws IllegalTransferException {
+        int fail = 0;
+        for (int i = 0; i < productItems.size(); i++) {
+            ProductItem productItem = em.find(ProductItem.class, productItems.get(i).getRfid());
+            if (productItem.getStockLevel() == null) {
+                throw new IllegalTransferException("Product Item already detached");
             }
+            StockLevel stockLevel = productItem.getStockLevel();
+            String SKUCode = productItem.getProductSKU();
+            String modelCode = SKUCode.split("-")[0];
+            stockLevel.getProducts().merge(SKUCode, -1L, (x, y) -> x + y);
+            stockLevel.getModels().merge(modelCode, -1L, (x, y) -> x + y);
+            productItem.setStockLevel(null);
         }
         if (fail > 0) {
             throw new IllegalTransferException(String.format("%d transfer(s) failed.", fail));
         }
-	}
+    }
 
 }

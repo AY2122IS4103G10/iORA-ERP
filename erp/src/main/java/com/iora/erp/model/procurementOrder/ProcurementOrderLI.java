@@ -53,8 +53,8 @@ public class ProcurementOrderLI {
         this.id = id;
         this.product = product;
         this.requestedQty = requestedQty;
-        this.fulfilledProductItems = fulfilledProductItems;
-        this.actualProductItems = actualProductItems;
+        this.fulfilledProductItems = new ArrayList<>(fulfilledProductItems);
+        this.actualProductItems = new ArrayList<>(actualProductItems);
     }
     
 

@@ -23,6 +23,15 @@ import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { SiteDetails } from "./views/containers/Sites/SiteDetails";
 import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
+import { ManageEmployee } from "./views/containers/Employee/ManageEmployee";
+import { EmployeeForm } from "./views/containers/Employee/CreateEmployeeForm";
+import { EmployeeDetails } from "./views/containers/Employee/EmployeeDetails/index.js";
+import { ManageDepartment } from "./views/containers/Department/ManageDepartment";
+import { DepartmentForm } from "./views/containers/Department/DepartmentForm";
+import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails/index.js";
+import { ManageJobTitle } from "./views/containers/JobTitle/ManageJobTitle";
+import { JobTitleForm } from "./views/containers/JobTitle/JobTitleForm";
+import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/index.js";
 
 function App() {
   return (
@@ -89,6 +98,24 @@ function App() {
             {/* <Route path=":siteId" element={<ProductDetails />} /> */}
             <Route path="create" element={<CompanyForm />} />
             {/* <Route path="edit/:siteId" element={<SiteForm />} /> */}
+          </Route>
+          <Route path="employee" element={<Outlet />}>
+            <Route index element={<ManageEmployee />} />
+            <Route path=":name" element={<EmployeeDetails />} />
+            <Route path="create" element={<EmployeeForm />} />
+            <Route path="edit/:employeeId" element={<EmployeeForm />} />
+          </Route>
+          <Route path="jobTitle" element={<Outlet />}>
+            <Route index element={<ManageJobTitle />} />
+            <Route path=":title" element={<JobTitleDetails />} />
+            <Route path="create" element={<JobTitleForm />} />
+            <Route path="edit/:jobTitleId" element={<JobTitleForm />} />
+          </Route>
+          <Route path="department" element={<Outlet />}>
+            <Route index element={<ManageDepartment />} />
+            <Route path=":name" element={<DepartmentDetails />} />
+            <Route path="create" element={<DepartmentForm />} />
+            <Route path="edit/:departmentId" element={<DepartmentForm />} />
           </Route>
         </Route>
 

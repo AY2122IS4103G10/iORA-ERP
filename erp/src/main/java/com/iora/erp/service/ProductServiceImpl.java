@@ -147,6 +147,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public PromotionField updatePromoField(PromotionField promotionField) throws ProductFieldException {
+        PromotionField old = em.find(PromotionField.class, promotionField.getId());
+        if (old == null) {
+            throw new ProductFieldException("Promotion Field cannot be found.");
+        }
+        old.setFieldValue(promotionField.getFieldValue());
+        old.setDiscountedPrice(promotionField.getDiscountedPrice());
+        old.setAvailable(promotionField.isAvailable());
+        em.merge(old);
+        return old;
+    }
+
+    @Override
     public Model addPromoCategory(String modelCode, String category, double discountedPrice)
             throws ModelException {
         Model model = getModel(modelCode);

@@ -1,5 +1,6 @@
 package com.iora.erp.service;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 import com.iora.erp.exception.CustomerException;
@@ -17,10 +18,10 @@ public interface CustomerService {
     public abstract List<Customer> getCustomerByFields(String search);
     public abstract Customer getCustomerById(Long id)  throws CustomerException;
     public abstract Customer getCustomerByEmail(String Email) throws CustomerException;
-   /* 
+   
     public abstract byte[] saltGeneration();
-    public abstract Customer loginAuthentication(Customer customer) throws CustomerException;
-*/
+    public abstract Customer loginAuthentication(String email, String password) throws CustomerException;
+
     public abstract Voucher getVoucher(String voucherCode) throws CustomerException;
     public abstract List<Voucher> generateVouchers(double amount, int qty, String date);
     public abstract List<Voucher> getAllVouchers();
@@ -30,5 +31,6 @@ public interface CustomerService {
     public abstract Voucher redeemVoucher(String voucherCode) throws CustomerException;
 
     public abstract List<MembershipTier> listOfMembershipTier();
+    public abstract MembershipTier findMembershipTierById(String name);
     public abstract void createMembershipTier(MembershipTier membershipTier);
 }

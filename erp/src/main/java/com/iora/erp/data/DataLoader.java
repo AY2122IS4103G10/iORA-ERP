@@ -26,6 +26,7 @@ import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
+import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.site.HeadquartersSite;
@@ -114,6 +115,17 @@ public class DataLoader implements CommandLineRunner {
                 sam.setJobTitles(jt3);
                 adminService.createDepartment(sam3);
 
+                //Vendor
+                Address a2 = new Address(Country.Singapore, "Singapore", "Kewalram House", "Singapore", "02-01",
+                "8 Jln Kilang Timor", "Singapore 159305", false, 1.334251, 103.704246);
+                em.persist(a2);
+                
+                List<Address> listAdd = new ArrayList<>();
+                listAdd.add(a2);
+                Vendor v1 = new Vendor("Ninja Van", "+65 66028271", "Singapore domestic delivery", "");
+                em.persist(v1);
+                v1.setAddress(listAdd);
+
                 //Company
                 List<Department> departments = new ArrayList<>();
                 departments.add(adminService.getDepartmentById(Long.valueOf(1)));
@@ -140,6 +152,8 @@ public class DataLoader implements CommandLineRunner {
                 true, PayType.MONTHLY, adminService.getJobTitleById(Long.valueOf(1)), 
                 adminService.getDepartmentById(Long.valueOf(1)), adminService.getCompanyById(Long.valueOf(1)));
                 employeeService.createEmployee(e);
+
+                //Customer
                 
 
                 // Adding Sites

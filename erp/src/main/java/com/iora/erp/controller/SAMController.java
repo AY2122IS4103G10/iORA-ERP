@@ -562,6 +562,16 @@ public class SAMController {
         return customerService.listOfMembershipTier();
     }
 
+    @GetMapping(path = "/membershipTier", produces = "application/json")
+    public MembershipTier viewMembershipTier(@RequestParam String name) {
+        try {
+            return customerService.findMembershipTierById(name);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+
     @PostMapping(path = "/membershipTier/create", consumes = "application/json")
     public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {
         try {

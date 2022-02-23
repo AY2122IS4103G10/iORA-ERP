@@ -1,6 +1,7 @@
 package com.iora.erp.model.company;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -34,6 +35,7 @@ public class Vendor implements Serializable {
         this.telephone = telephone;
         this.description = description;
         this.email = email;
+        this.address = new ArrayList<>();
     }
 
     public Long getId() {

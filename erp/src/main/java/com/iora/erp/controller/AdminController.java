@@ -2,7 +2,10 @@ package com.iora.erp.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.iora.erp.enumeration.Country;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
@@ -446,6 +449,19 @@ public class AdminController {
             return null;
         }
     }
+
+    @GetMapping(path = "/countries", produces = "application/json")
+    public List<String> getCountries() {
+        try {
+            List<String> country = Stream.of(Country.values()).map( 
+                Country::name).collect(Collectors.toList());
+
+            return country;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 
 }

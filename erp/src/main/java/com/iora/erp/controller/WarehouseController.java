@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.ProductItem;
@@ -65,15 +66,14 @@ public class WarehouseController {
     }
 
     @PostMapping(path = "/editStock/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> editStock(@RequestBody List<ProductItem> toUpdate, @PathVariable Long siteId) {
+    public ResponseEntity<Object> editStock(@RequestBody Map<String,Long> toUpdate, @PathVariable Long siteId) {
         List<String> errors = new ArrayList<>();
-        for (int i = 0; i < toUpdate.size(); i++) {
-            ProductItem item = toUpdate.get(i);
+        for (Map.Entry<String,Long> entry : toUpdate.entrySet()) {
             try {
-                if (item.getStockLevel() == null) {
-                    siteService.removeProductItemFromSite(item.getRfid());
+                if (entry.getValue().equals(0L)) {
+                    siteService.removeProductItemFromSite(entry.getKey());;
                 } else {
-                    siteService.addProductItemToSite(item.getStockLevel().getId(), item.getRfid());
+                    siteService.addProductItemToSite(entry.getValue(), entry.getKey());
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());

@@ -250,6 +250,7 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public void addToStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException {
+        stockLevel = em.find(StockLevel.class, stockLevel.getId());
         if (stockLevel.getProductItems().contains(productItem)) {
             throw new IllegalTransferException("Product Item already added");
         }
@@ -257,8 +258,8 @@ public class SiteServiceImpl implements SiteService {
         String SKUCode = productItem.getProductSKU();
         String modelCode = SKUCode.split("-")[0];
         stockLevel.getProductItems().add(productItem);
-        stockLevel.getProducts().merge(SKUCode, 1L, (x, y) -> x + y);
-        stockLevel.getModels().merge(modelCode, 1L, (x, y) -> x + y);
+        stockLevel.getProducts().put(SKUCode, stockLevel.getProducts().get(SKUCode) != null ? stockLevel.getProducts().get(SKUCode) + 1 : 1);
+        stockLevel.getModels().put(modelCode, stockLevel.getModels().get(modelCode) != null ? stockLevel.getModels().get(modelCode) + 1 : 1);
         em.merge(stockLevel);
         em.merge(productItem);
     }

@@ -49,3 +49,8 @@ export const sitesApi = {
     return axios.delete(`${REST_ENDPOINT}admin/deleteSite?siteId=${id}`)
   }
 };
+export const companyApi = {
+  getCompany(id) {
+    return axios.get(`${REST_ENDPOINT}admin/viewCompanies?id=${id}`);
+  },
+}

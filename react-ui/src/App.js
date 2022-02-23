@@ -6,7 +6,7 @@ import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ViewStockLevels } from "./views/containers/StockLevels/ManageStockLevels";
-import Login from "./views/containers/Login";
+import Login from "./views/containers/Auth/Login/Login";
 import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
@@ -23,6 +23,8 @@ import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { SiteDetails } from "./views/containers/Sites/SiteDetails";
 import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
+import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
+import { ProcurementDetails } from "./views/containers/Procurement/ProcurementDetails";
 import { ManageEmployee } from "./views/containers/Employee/ManageEmployee";
 import { EmployeeForm } from "./views/containers/Employee/CreateEmployeeForm";
 import { EmployeeDetails } from "./views/containers/Employee/EmployeeDetails/index.js";
@@ -60,9 +62,9 @@ function App() {
           
           <Route path="procurements" element={<Outlet />}>
             <Route index element={<ManageProcurement />} />
-            {/* <Route path=":voucherCode" element={<VoucherDetails />} /> */}
+            <Route path=":procurementId" element={<ProcurementDetails />} />
             <Route path="create" element={<ProcurementForm />} />
-            {/* <Route path="edit/:voucherId" element={<VoucherForm />} /> */}
+            <Route path="edit/:orderId" element={<ProcurementForm />} />
           </Route>
           <Route path="vouchers" element={<Outlet />}>
             <Route index element={<ManageVouchers />} />
@@ -95,9 +97,9 @@ function App() {
           </Route>
           <Route path="companies" element={<Outlet />}>
             <Route index element={<ManageCompanies />} />
-            {/* <Route path=":siteId" element={<ProductDetails />} /> */}
+            <Route path=":companyId" element={<CompanyDetails />} />
             <Route path="create" element={<CompanyForm />} />
-            {/* <Route path="edit/:siteId" element={<SiteForm />} /> */}
+            <Route path="edit/:companyId" element={<CompanyForm />} />
           </Route>
           <Route path="employee" element={<Outlet />}>
             <Route index element={<ManageEmployee />} />
@@ -123,9 +125,9 @@ function App() {
         <Route path="/mf" element={<MFIndex />}>
           <Route path="procurements" element={<Outlet />}>
             <Route index element={<ManageProcurement />} />
-            {/* <Route path=":voucherCode" element={<VoucherDetails />} /> */}
+            <Route path=":procurementId" element={<ProcurementDetails />} />
             <Route path="create" element={<ProcurementForm />} />
-            {/* <Route path="edit/:voucherId" element={<VoucherForm />} /> */}
+            <Route path="edit/:orderId" element={<VoucherForm />} />
           </Route>
         </Route>
         <Route

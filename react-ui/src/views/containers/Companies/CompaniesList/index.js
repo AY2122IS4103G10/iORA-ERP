@@ -1,19 +1,13 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import { CogIcon } from "@heroicons/react/outline";
 
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
-  SimpleTable,
-  SelectColumnFilter,
-  OptionsCell,
-} from "../../../components/Tables/SimpleTable";
-
-import {
-  fetchSites,
-  selectAllSites,
-} from "../../../../stores/slices/siteSlice";
-import { selectAllCompanies } from "../../../../stores/slices/companySlice";
+  fetchCompanies,
+  selectAllCompanies,
+} from "../../../../stores/slices/companySlice";
+import { Link } from "react-router-dom";
 
 export const CompaniesTable = ({ data }) => {
   const columns = useMemo(
@@ -21,6 +15,14 @@ export const CompaniesTable = ({ data }) => {
       {
         Header: "Id",
         accessor: "id",
+        Cell: (e) => (
+          <Link
+            to={`/ad/companies/${e.value}`}
+            className="hover:text-gray-700 hover:underline"
+          >
+            {e.value}
+          </Link>
+        ),
       },
       {
         Header: "Name",
@@ -32,7 +34,7 @@ export const CompaniesTable = ({ data }) => {
       },
       {
         Header: "Phone",
-        accessor: "phoneNumber",
+        accessor: "telephone",
       },
       {
         Header: "Address",
@@ -72,16 +74,9 @@ export const CompaniesTable = ({ data }) => {
 export const CompaniesList = () => {
   const dispatch = useDispatch();
   const data = useSelector(selectAllCompanies);
-  // const siteStatus = useSelector((state) => state.company.status);
-  // useEffect(() => {
-  //   siteStatus === "idle" &&
-  //     dispatch(
-  //       fetchSites({
-  //         storeTypes: ["Store", "Headquarters"],
-  //         country: "Singapore",
-  //         company: "iORA",
-  //       })
-  //     );
-  // }, [siteStatus, dispatch]);
+  const companyStatus = useSelector((state) => state.companies.status);
+  useEffect(() => {
+    companyStatus === "idle" && dispatch(fetchCompanies());
+  }, [companyStatus, dispatch]);
   return <CompaniesTable data={data} />;
 };

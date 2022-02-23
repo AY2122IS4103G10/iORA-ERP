@@ -18,7 +18,7 @@ export const SitesTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
+        Header: "#",
         accessor: "id",
         Cell: (e) => (
           <Link

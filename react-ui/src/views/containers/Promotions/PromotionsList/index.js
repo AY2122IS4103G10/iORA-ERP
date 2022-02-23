@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { CogIcon } from "@heroicons/react/outline";
 
 import {
@@ -15,23 +14,13 @@ import {
   fetchProducts,
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
-import axios from "axios";
-import { REST_ENDPOINT } from "../../../../constants/restEndpoint";
 
-export const PromotionsTable = ({ data, openModal, setName, setDiscPrice, setModalState }) => {
+export const PromotionsTable = ({ data, openModal, setName, setDiscPrice, setPromoId, setModalState }) => {
   const columns = useMemo(
     () => [
       {
         Header: "Id",
         accessor: "id",
-        // Cell: (e) => (
-        //   <Link
-        //     to={`/sm/promotions/${e.value}`}
-        //     className="hover:text-gray-700 hover:underline"
-        //   >
-        //     {e.value}
-        //   </Link>
-        // ),
       },
       {
         Header: "Name",
@@ -44,6 +33,7 @@ export const PromotionsTable = ({ data, openModal, setName, setDiscPrice, setMod
                 setModalState("view")
                 setName(e.value);
                 setDiscPrice(e.row.original.discountedPrice);
+                setPromoId(e.row.original.id)
                 openModal();
               }}
             >
@@ -91,6 +81,7 @@ export const PromotionsList = ({
   openModal,
   setName,
   setDiscPrice,
+  setPromoId,
   setModalState,
 }) => {
   const data = useSelector(selectAllPromotions);
@@ -106,6 +97,7 @@ export const PromotionsList = ({
       openModal={openModal}
       setName={setName}
       setDiscPrice={setDiscPrice}
+      setPromoId={setPromoId}
       setModalState={setModalState}
     />
   );

@@ -8,7 +8,6 @@ import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { useDispatch } from "react-redux";
 import {
   addNewPromotion,
-  selectPromotionById,
   updateExistingPromotion,
 } from "../../../../stores/slices/promotionsSlice";
 
@@ -109,18 +108,33 @@ const PromoModal = ({
                   <SimpleInputGroup
                     label="Discounted Price"
                     inputField="discPrice"
-                    className="sm:mt-0 sm:col-span-2"
+                    className="relative rounded-md sm:mt-0 sm:col-span-2"
                   >
-                    <SimpleInputBox
-                      type="text"
-                      name="discPrice"
-                      id="discPrice"
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-500 sm:text-sm">$</span>
+                    </div>
+                    <input
+                      type="number"
+                      name="price"
+                      id="price"
+                      autoComplete="price"
+                      className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                      placeholder="0.00"
                       value={discPrice}
                       onChange={onDiscPriceChanged}
                       required
+                      step="0.01"
+                      aria-describedby="price-currency"
                       disabled={modalState === "view"}
-                      // className={modalState === "view" && "bg-gray-50 text-gray-400"}
                     />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <span
+                        className="text-gray-500 sm:text-sm"
+                        id="price-currency"
+                      >
+                        SGD
+                      </span>
+                    </div>
                   </SimpleInputGroup>
                 </div>
               </div>
@@ -234,8 +248,8 @@ const Header = ({ openModal, setModalState }) => {
 
 export const ManagePromotions = () => {
   const dispatch = useDispatch();
-  const [isEditing, setIsEditing] = useState(false);
   const [modalState, setModalState] = useState("view");
+  const [promoId, setPromoId] = useState(null);
   const [name, setName] = useState("");
   const [discPrice, setDiscPrice] = useState("");
   const [openPromo, setOpenPromo] = useState(false);
@@ -262,12 +276,13 @@ export const ManagePromotions = () => {
         else if (modalState === "edit")
           dispatch(
             updateExistingPromotion({
+              id: promoId,
               fieldName: "category",
               fieldValue: name,
               discountedPrice: discPrice,
             })
           ).unwrap();
-        alert("Successfully added promotion");
+        alert(`Successfully ${modalState === "add" ? "added" : "saved"} promotion`);
         closeModal();
       } catch (err) {
         console.error("Failed to add promo: ", err);
@@ -283,6 +298,7 @@ export const ManagePromotions = () => {
         openModal={openModal}
         setName={setName}
         setDiscPrice={setDiscPrice}
+        setPromoId={setPromoId}
         setModalState={setModalState}
       />
       <PromoModal
@@ -293,6 +309,7 @@ export const ManagePromotions = () => {
         onNameChanged={onNameChanged}
         discPrice={discPrice}
         onDiscPriceChanged={onDiscPriceChanged}
+        setPromoId={setPromoId}
         onSaveClicked={onSaveClicked}
         setModalState={setModalState}
       />

@@ -156,32 +156,32 @@ const RightColSection = ({
   setFieldNameSelected,
 }) => {
   return (
-    <>
-      <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
-        <div className="rounded-lg bg-white overflow-hidden shadow">
-          <div className="p-6">
-            <h2
-              className="text-base font-medium text-gray-900"
-              id="announcements-title"
+    <section
+      aria-labelledby={`${fieldName.toLowerCase()}-title`}
+    >
+      <div className="rounded-lg bg-white  shadow">
+        <div className="p-6">
+          <h2
+            className="text-base font-medium text-gray-900"
+            id="announcements-title"
+          >
+            {fieldName}
+          </h2>
+          <div className="flow-root max-h-60 overflow-y-auto mt-6">{children}</div>
+          <div className="mt-6">
+            <button
+              className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              onClick={() => {
+                setFieldNameSelected(fieldName);
+                openModal();
+              }}
             >
-              {fieldName}
-            </h2>
-            <div className="flow-root mt-6">{children}</div>
-            <div className="mt-6">
-              <button
-                className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                onClick={() => {
-                  setFieldNameSelected(fieldName);
-                  openModal();
-                }}
-              >
-                Add {fieldName.toLowerCase()}
-              </button>
-            </div>
+              Add {fieldName.toLowerCase()}
+            </button>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 
@@ -478,7 +478,7 @@ export const ProductForm = () => {
   const tags = allFields.filter((field) => field.fieldName === "TAG");
   const companies = allFields.filter((field) => field.fieldName === "COMPANY");
   const categories = allFields.filter(
-    (field) => field.fieldName === "category"
+    (field) => field.fieldName === "CATEGORY"
   );
   const [colorCheckedState, setColorCheckedState] = useState(
     new Array(colors.length).fill(false)
@@ -633,7 +633,7 @@ export const ProductForm = () => {
           checkboxState(
             tags.map((field) => field.fieldValue),
             productFields
-              .filter((field) => field.fieldName === "tag")
+              .filter((field) => field.fieldName === "TAG")
               .map((field) => field.fieldValue)
           )
         );
@@ -641,7 +641,7 @@ export const ProductForm = () => {
           checkboxState(
             categories.map((field) => field.fieldValue),
             productFields
-              .filter((field) => field.fieldName === "category")
+              .filter((field) => field.fieldName === "CATEGORY")
               .map((field) => field.fieldValue)
           )
         );
@@ -655,10 +655,11 @@ export const ProductForm = () => {
 
   const onFieldValueChanged = (e) => setFieldValue(e.target.value);
 
-  const[fieldRequestStatus, setFieldRequestStatus] = useState("idle")
-  const canAddField = fieldNameSelected && fieldValue && (fieldRequestStatus === "idle")
+  const [fieldRequestStatus, setFieldRequestStatus] = useState("idle");
+  const canAddField =
+    fieldNameSelected && fieldValue && fieldRequestStatus === "idle";
   const onAddFieldClicked = (evt) => {
-    evt.preventDefault()
+    evt.preventDefault();
     if (canAddField)
       try {
         dispatch(
@@ -674,7 +675,7 @@ export const ProductForm = () => {
       } finally {
         setFieldRequestStatus("idle");
       }
-  }
+  };
 
   const openModal = () => setOpenAddField(true);
   const closeModal = () => setOpenAddField(false);

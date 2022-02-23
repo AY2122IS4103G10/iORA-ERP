@@ -132,7 +132,7 @@ export const AddressField = ({
         </div>
         <div className="sm:col-span-2">
           <label
-            htmlFor="address"
+            htmlFor="city"
             className="block text-sm font-medium text-gray-700"
           >
             City
@@ -140,10 +140,10 @@ export const AddressField = ({
           <div className="mt-1">
             <input
               type="text"
-              name="address"
-              id="address"
+              name="city"
+              id="city"
               className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-              autoComplete="address"
+              autoComplete="city"
               value={city}
               onChange={onCityChanged}
               required
@@ -152,7 +152,7 @@ export const AddressField = ({
         </div>
         <div className="sm:col-span-2">
           <label
-            htmlFor="address"
+            htmlFor="state"
             className="block text-sm font-medium text-gray-700"
           >
             State / Province
@@ -160,10 +160,10 @@ export const AddressField = ({
           <div className="mt-1">
             <input
               type="text"
-              name="address"
-              id="address"
+              name="state"
+              id="state"
               className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-              autoComplete="address"
+              autoComplete="state"
               value={state}
               onChange={onStateChanged}
               required
@@ -493,7 +493,7 @@ export const SiteForm = () => {
               initialSite: {
                 name,
                 address: {
-                  country: country.toUpperCase(),
+                  country: country.charAt(0).toUpperCase() + country.slice(1),
                   city,
                   building,
                   state,
@@ -520,7 +520,7 @@ export const SiteForm = () => {
               id: siteId,
               name,
               address: {
-                country: country.toUpperCase(),
+                country,
                 city,
                 building,
                 state,

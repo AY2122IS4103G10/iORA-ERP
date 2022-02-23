@@ -28,7 +28,7 @@ public class MembershipTier {
     }
 
     public MembershipTier(String name, double multiplier, Map<Currency, Integer> threshold, BirthdayPoints birthday) {
-        this.name = name;
+        this.name = name.toUpperCase();
         this.multiplier = multiplier;
         this.threshold = threshold;
         this.birthday = birthday;
@@ -39,7 +39,7 @@ public class MembershipTier {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.toUpperCase();
     }
 
     public double getMultiplier() {

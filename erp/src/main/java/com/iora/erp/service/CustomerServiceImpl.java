@@ -1,5 +1,7 @@
 package com.iora.erp.service;
 
+import java.lang.reflect.Member;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +14,14 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +29,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CustomerServiceImpl implements CustomerService {
 
+    @Autowired
+    
     @PersistenceContext
     private EntityManager em;
 
     @Override
     public void createCustomerAccount(Customer customer) throws CustomerException {
         try {
+            
+            Customer c = customer;
+            try {
+                Customer cc = getCustomerByEmail(customer.getEmail());
+            } catch (Exception ex) {
+                throw new CustomerException("Account with " +  customer.getEmail() + " has already been created");
+            }
+            c.setSalt(saltGeneration().toString());
+            c.sethashPass(customer.gethashPass());
+            c.setMembershipTier(findMembershipTierById("BASIC"));
             em.persist(customer);
+
         } catch (Exception ex) {
             throw new CustomerException("Customer has been already been created");
         }
@@ -117,7 +134,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
- /*   @Override
+    @Override
     public byte[] saltGeneration() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
@@ -125,20 +142,6 @@ public class CustomerServiceImpl implements CustomerService {
         return salt;
     }
 
-    @Override
-    public Customer loginAuthentication(Customer customer) throws CustomerException {
-        try {
-            Customer c = getCustomerByEmail(customer.getEmail());
-            if (c.authentication(customer.gethashPass())) {
-                return c;
-            } else {
-                throw new CustomerException();
-            }
-        } catch (Exception ex) {
-            throw new CustomerException("Invalid Username or Password.");
-        }
-
-    }*/
 
     @Override
     public Voucher getVoucher(String voucherCode) throws CustomerException {
@@ -219,11 +222,34 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public MembershipTier findMembershipTierById(String name) {
+        return em.find(MembershipTier.class, name.toUpperCase());
+    }
+
+
+    @Override
     public void createMembershipTier(MembershipTier membershipTier) {
         if (membershipTier.getBirthday() == null) {
             membershipTier.setBirthday(em.find(BirthdayPoints.class, "STANDARD"));
         }
         em.merge(membershipTier);
     }
+
+    @Override
+    public Customer loginAuthentication(String email, String password) throws CustomerException {
+        try {
+            Customer c = getCustomerByEmail(email);
+
+            if (c.authentication(password)) {
+                return c;
+            } else {
+                throw new CustomerException();
+            }
+        } catch (Exception ex) {
+            throw new CustomerException("Authentication Fail. Invalid Username or Password.");
+        }
+
+    }
+
 
 }

@@ -52,16 +52,16 @@ public class Customer implements Serializable {
     }
 
     public Customer(String firstName, String lastName, String email, Date dob, String contactNumber,
-            Integer membershipPoints, MembershipTier membershipTier, Double storeCredit, String pass, String salt,
+            MembershipTier membershipTier, String pass, String salt,
             Boolean availStatus) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.dob = dob;
         this.contactNumber = contactNumber;
-        this.membershipPoints = membershipPoints;
+        this.membershipPoints = 0;
         this.membershipTier = membershipTier;
-        this.storeCredit = storeCredit;
+        this.storeCredit = 0.0;
         this.hashPass = generateProtectedPassword(salt, pass);
         this.salt = salt;
         this.availStatus = availStatus;
@@ -78,25 +78,6 @@ public class Customer implements Serializable {
             return generatedPassword;
         } catch (Exception ex) {
             return null;
-        }
-    }
-
-    public Boolean authentication(String authenticate) {
-        String tryPassword;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.reset();
-            md.update((this.salt + authenticate).getBytes("utf8"));
-
-            tryPassword = String.format("%0128x", new BigInteger(1, md.digest()));
-
-            if (tryPassword.equals(this.hashPass)) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception ex) {
-            return false;
         }
     }
 
@@ -214,6 +195,13 @@ public class Customer implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean authentication(String password2) {
+        if(generateProtectedPassword(this.salt, password2).equals(this.hashPass)) {
+            return true;
+        }
+        return false;
     }
 
 }

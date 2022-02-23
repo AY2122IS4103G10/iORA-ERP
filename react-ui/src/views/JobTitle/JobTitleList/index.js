@@ -7,11 +7,11 @@ import {
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 import { 
-  fetchEmployees,
-  selectAllEmployee, 
-} from "../../../../stores/slices/employeeSlice";
+  fetchJobTitles,
+  selectAllJobTitle, 
+} from "../../../../stores/slices/jobTitleSlice";
 
-export const EmployeeTable = () => {
+export const JobTitleTable = () => {
   const columns = useMemo(
     () => [
       {
@@ -27,31 +27,19 @@ export const EmployeeTable = () => {
         // ),name, department, companyCode, status, email
       },
       {
-        Header: "Employee Name",
-        accessor: "name",
+        Header: "Job Title",
+        accessor: "title",
         
       },
       {
-        Header: "Department",
-        accessor: "department",
+        Header: "Description",
+        accessor: "description",
         //Cell: (e) => `$${e.value}`,
       },
       {
-        Header: "Job Title",
-        accessor: "jobTitle",
+        Header: "Responsibility",
+        accessor: "responsibility",
         //Cell: (e) => moment(e.value).format("lll"),
-      },
-      {
-        Header: "Status",
-        accessor: "availStatus",
-        //Cell: (e) => moment(e.value).format("lll"),
-      },
-      {
-        Header: "Email",
-        accessor: "email",
-        // Cell: (e) => (e.value ? "Yes" : "No"),
-        // Filter: SelectColumnFilter,
-        // filter: "includes",
       },
       // {
       //   Header: CogIcon,
@@ -60,7 +48,7 @@ export const EmployeeTable = () => {
       //     options: [
       //       {
       //         name: "Delete",
-      //         navigate: "/employee",
+      //         navigate: "/jobTitle",
       //       },
       //     ],
       //   }),
@@ -69,11 +57,11 @@ export const EmployeeTable = () => {
     []
   );
   const dispatch = useDispatch();
-  const data = useSelector(selectAllEmployee);
-  const employeeStatus = useSelector((state) => state.employee.status);
+  const data = useSelector(selectAllJobTitle);
+  const jobTitleStatus = useSelector((state) => state.jobTitle.status);
   useEffect(() => {
-    employeeStatus === "idle" && dispatch(fetchEmployees());
-  }, [employeeStatus, dispatch]);
+    jobTitleStatus === "idle" && dispatch(fetchJobTitles());
+  }, [jobTitleStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
@@ -83,6 +71,6 @@ export const EmployeeTable = () => {
   );
 };
 
-export const EmployeeList = () => {
-  return <EmployeeTable />;
+export const JobTitleList = () => {
+  return <JobTitleTable />;
 };

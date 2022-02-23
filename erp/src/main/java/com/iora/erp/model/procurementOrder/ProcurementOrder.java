@@ -27,8 +27,6 @@ public class ProcurementOrder {
     private Long id;
     @ElementCollection
     private List<POStatus> statusHistory;
-    @OneToOne(cascade = CascadeType.ALL)
-    private ProcurementOrderFulfilment procurementOrderFulfilment;
     @OneToMany(cascade = CascadeType.ALL)
     private List<ProcurementOrderLI> lineItems;
 
@@ -51,12 +49,10 @@ public class ProcurementOrder {
         this.statusHistory = new ArrayList<>();
     }
 
-    public ProcurementOrder(Long id, List<POStatus> statusHistory,
-            ProcurementOrderFulfilment procurementOrderFulfilment, List<ProcurementOrderLI> lineItems,
+    public ProcurementOrder(Long id, List<POStatus> statusHistory, List<ProcurementOrderLI> lineItems,
             Site manufacturing, Site headquarters, Site warehouse) {
         this.id = id;
         this.statusHistory = statusHistory;
-        this.procurementOrderFulfilment = procurementOrderFulfilment;
         this.lineItems = lineItems;
         this.manufacturing = manufacturing;
         this.headquarters = headquarters;
@@ -90,14 +86,6 @@ public class ProcurementOrder {
 
     public void addStatus(POStatus status) {
         this.statusHistory.add(status);
-    }
-
-    public ProcurementOrderFulfilment getProcurementOrderFulfilment() {
-        return this.procurementOrderFulfilment;
-    }
-
-    public void setProcurementOrderFulfilment(ProcurementOrderFulfilment procurementOrderFulfilment) {
-        this.procurementOrderFulfilment = procurementOrderFulfilment;
     }
 
     public List<ProcurementOrderLI> getLineItems() {

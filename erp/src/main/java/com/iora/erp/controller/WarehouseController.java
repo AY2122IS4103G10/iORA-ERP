@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.ProductItem;
@@ -65,15 +66,14 @@ public class WarehouseController {
     }
 
     @PostMapping(path = "/editStock/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> editStock(@RequestBody List<ProductItem> toUpdate, @PathVariable Long siteId) {
+    public ResponseEntity<Object> editStock(@RequestBody Map<String,Long> toUpdate, @PathVariable Long siteId) {
         List<String> errors = new ArrayList<>();
-        for (ProductItem item : toUpdate) {
+        for (Map.Entry<String,Long> entry : toUpdate.entrySet()) {
             try {
-                if (item.getStockLevel() == null) {
-                    siteService.removeProductItemFromSite(siteId, item.getRfid());
+                if (entry.getValue().equals(0L)) {
+                    siteService.removeProductItemFromSite(entry.getKey());;
                 } else {
-                    siteService.addToStockLevel(item.getStockLevel(), item);
-                    ;
+                    siteService.addProductItemToSite(entry.getValue(), entry.getKey());
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());
@@ -83,6 +83,7 @@ public class WarehouseController {
         if (errors.isEmpty()) {
             return ResponseEntity.ok("Transaction successful");
         } else {
+            System.err.println(errors);
             return ResponseEntity.badRequest().body(String.join("\n", errors));
         }
     }

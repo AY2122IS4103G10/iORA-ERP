@@ -183,4 +183,11 @@ public class Employee implements Serializable {
         this.company = company;
     }
 
+    public boolean authentication(String password2) {
+        if(generateProtectedPassword(this.salt, password2).equals(this.password)) {
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -47,6 +47,7 @@ public class Site implements Serializable {
     private Company company;
 
     protected Site() {
+        this.stockLevel = new StockLevel();
     }
 
     public Site(String name, Address address, String siteCode, String phoneNumber, Company company) {

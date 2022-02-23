@@ -2,8 +2,11 @@ package com.iora.erp.enumeration;
 
 public enum ProcurementOrderStatus implements StatusEnum {
     PENDING("Pending confirmation from factory."),
-    CONFIRMED("Procurement Order confirmed by factory."),
+    ACCEPTED("Procurement Order accepted by factory."),
     READY("Procurement Order satisfied by factory."),
+    SHIPPED("Stock has been shipped to warehouse"),
+    VERIFIED("Warehouse has verified the Procurement Order"),
+    COMPLETED("Procurement Order has been fulfilled"),
     CANCELLED("Procurement Order cancelled.");
 
     private String description;

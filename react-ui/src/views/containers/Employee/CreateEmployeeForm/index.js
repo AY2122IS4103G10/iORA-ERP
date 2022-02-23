@@ -10,6 +10,10 @@ import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { addNewEmployee, updateExistingEmployee, } from "../../../../stores/slices/employeeSlice";
 
+const departments = [{ id:1, name:"Sales"}];
+
+const jobTitles = [{ id:1, title:"Sales Executive"}];
+
 const EmployeeFormBody = ({
     isEditing,
     name,
@@ -18,10 +22,6 @@ const EmployeeFormBody = ({
     onSalaryChanged,
     payType,
     onPayTypeChanged,
-    jobTitle,
-    onJobTitleChanged,
-    department,
-    onDepartmentChanged,
     availStatus,
     onAvailStatusChanged,
     email,
@@ -32,6 +32,12 @@ const EmployeeFormBody = ({
     onPasswordChanged,
     onAddEmployeeClicked,
     onCancelClicked,
+    departmentSelected,
+    setDepartmentSelected,
+    departments,
+    jobTitleSelected,
+    setJobTitleSelected,
+    jobTitles,
 }) => (
     <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 className="sr-only">Create New Employee</h1>
@@ -64,21 +70,6 @@ const EmployeeFormBody = ({
                                                     autoComplete="name"
                                                     value={name}
                                                     onChange={onNameChanged}
-                                                    required
-                                                />
-                                            </SimpleInputGroup>
-                                            <SimpleInputGroup
-                                                label="Department"
-                                                inputField="department"
-                                                className="sm:mt-0 sm:col-span-2"
-                                            >
-                                                <SimpleInputBox
-                                                    type="text"
-                                                    name="department"
-                                                    id="department"
-                                                    autoComplete="department"
-                                                    value={department}
-                                                    onChange={onDepartmentChanged}
                                                     required
                                                 />
                                             </SimpleInputGroup>
@@ -158,20 +149,6 @@ const EmployeeFormBody = ({
                                                 />
                                             </SimpleInputGroup>
                                             <SimpleInputGroup
-                                                label="Job Title"
-                                                inputField="jobTitle"
-                                                className="sm:mt-0 sm:col-span-2"
-                                            >
-                                                <SimpleTextArea
-                                                    type="text"
-                                                    id="jobTitle"
-                                                    name="jobTitle"
-                                                    value={jobTitle}
-                                                    onChange={onJobTitleChanged}
-                                                    required
-                                                />
-                                            </SimpleInputGroup>
-                                            <SimpleInputGroup
                                                 label="Salary"
                                                 inputField="salary"
                                                 className="relative rounded-md sm:mt-0 sm:col-span-2"
@@ -200,6 +177,28 @@ const EmployeeFormBody = ({
                                                         SGD
                                                     </span>
                                                 </div>
+                                            </SimpleInputGroup>
+                                            <SimpleInputGroup
+                                                label="Job Title"
+                                                inputField="jobTitle"
+                                                className="relative rounded-md sm:mt-0 sm:col-span-2"
+                                            >
+                                            <SimpleSelectMenu
+                                                options={jobTitles}
+                                                selected={jobTitleSelected}
+                                                setSelected={setJobTitleSelected}
+                                            />
+                                            </SimpleInputGroup>
+                                            <SimpleInputGroup
+                                                label="Department"
+                                                inputField="department"
+                                                className="relative rounded-md sm:mt-0 sm:col-span-2"
+                                            >
+                                            <SimpleSelectMenu
+                                                options={departments}
+                                                selected={departmentSelected}
+                                                setSelected={setDepartmentSelected}
+                                            />
                                             </SimpleInputGroup>
                                         </div>
                                     </div>
@@ -236,27 +235,26 @@ export const EmployeeForm = () => {
     const { employeeId } = useParams();
     const [isEditing, setIsEditing] = useState(false);
     const [name, setName] = useState("");
-    const [department, setDepartment] = useState("");
     const [payType, setPayType] = useState("");
     const [salary, setSalary] = useState("");
     const [availStatus, setAvailStatus] = useState("");
     const [email, setEmail] = useState("");
-    const [jobTitle, setJobTitle] = useState("");
+    const [active, setActive] = useState(false);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [jobTitleSelected, setJobTitleSelected] = useState(jobTitles[0]);
+    const [departmentSelected, setDepartmentSelected] = useState(departments[0]);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const onNameChanged = (e) => setName(e.target.value);
-    const onDepartmentChanged = (e) => setDepartment(e.target.value);
     const onAvailStatusChanged = (e) => setAvailStatus(e.target.value);
     const onEmailChanged = (e) => setEmail(e.target.value);
     const onUsernameChanged = (e) => setUsername(e.target.value);
     const onPasswordChanged = (e) => setPassword(e.target.value);
     const onPayTypeChanged = (e) => setPayType(e.target.value);
     const onSalaryChanged = (e) => setSalary(e.target.value);
-    const onJobTitleChanged = (e) => setJobTitle(e.target.value);
 
     const [requestStatus, setRequestStatus] = useState("idle");
     const canAdd =
@@ -281,28 +279,34 @@ export const EmployeeForm = () => {
                     dispatch(
                       addNewEmployee({
                         name,
-                        department,
                         availStatus,
                         email,
                         username,
                         password,
                         payType,
                         salary,
-                        jobTitle,
+                        department: {
+                            id: departmentSelected.id,
+                            name: departmentSelected.name,
+                        },
+                        jobTitle: {
+                            id: jobTitleSelected.id,
+                            name: jobTitleSelected.title,
+                        },
                       })
                     ).unwrap();
                   } else {
                     dispatch(
                       updateExistingEmployee({
                         name,
-                        department,
+                        department: departmentSelected,
                         availStatus,
                         email,
                         username,
                         password,
                         payType,
                         salary,
-                        jobTitle,
+                        jobTitle: jobTitleSelected,
                       })
                     ).unwrap();
                   }
@@ -317,7 +321,35 @@ export const EmployeeForm = () => {
         };
 
     const onCancelClicked = () =>
-        navigate(!isEditing ? "/admin/employee" : `/admin/employee/${name}`);
+        navigate(!isEditing ? "/admin/employee" : `/admin/employee/${employeeId}`);
+
+    useEffect(() => {
+        Boolean(employeeId) &&
+            api.get("admin/viewEmployee", employeeId).then((response) => {
+            const {
+                name,
+                department,
+                availStatus,
+                email,
+                username,
+                password,
+                payType,
+                salary,
+                jobTitle,
+            } = response.data;
+            setIsEditing(true);
+            setName(name);
+            setDepartmentSelected(department);
+            setAvailStatus(availStatus);
+            setEmail(email);
+            setUsername(username);
+            setPassword(password);
+            setPayType(payType);
+            setSalary(salary);
+            setJobTitleSelected(jobTitle);
+            setActive(active);
+            });
+        }, [employeeId]);
 
     return (
         <EmployeeFormBody
@@ -326,12 +358,14 @@ export const EmployeeForm = () => {
             onPayTypeChanged={onPayTypeChanged}
             salary={salary}
             onSalaryChanged={onSalaryChanged}
-            jobTitle={jobTitle}
-            onJobTitleChanged={onJobTitleChanged}
             name={name}
             onNameChanged={onNameChanged}
-            department={department}
-            onDepartmentChanged={onDepartmentChanged}
+            departmentSelected={departmentSelected}
+            setDepartmentSelected={setDepartmentSelected}
+            departments={departments}
+            jobTitleSelected={jobTitleSelected}
+            setJobTitleSelected={setJobTitleSelected}
+            jobTitles={jobTitles}
             availStatus={availStatus}
             onAvailStatusChanged={onAvailStatusChanged}
             email={email}

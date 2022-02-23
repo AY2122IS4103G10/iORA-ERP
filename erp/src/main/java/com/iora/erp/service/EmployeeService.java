@@ -9,8 +9,8 @@ import com.iora.erp.model.company.Employee;
 
 
 public interface EmployeeService {
-    public abstract void createEmployee(Employee employee) throws EmployeeException;
-    public abstract void updateEmployeeAccount(Employee employee) throws EmployeeException;
+    public abstract Employee createEmployee(Employee employee) throws EmployeeException;
+    public abstract Employee updateEmployeeAccount(Employee employee) throws EmployeeException;
     public abstract void removeEmployee(Long id) throws EmployeeException;
     public abstract void blockEmployee(Long id) throws EmployeeException;
     public abstract void unblockEmployee(Long id) throws EmployeeException;
@@ -24,5 +24,5 @@ public interface EmployeeService {
     public abstract byte[] saltGeneration();
     public abstract Boolean usernameAvailability(String username);
     public abstract Boolean emailAvailability(String email);
-    //public abstract Employee loginAuthentication(Employee employee) throws EmployeeException;
+    public abstract Employee loginAuthentication(String username, String password) throws EmployeeException;
 }

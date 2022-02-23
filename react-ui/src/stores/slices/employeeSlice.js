@@ -2,15 +2,15 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  employees: [],
+  employee: [],
   status: "idle",
   error: null,
 };
 
 export const fetchEmployees = createAsyncThunk(
-  "employees/fetchEmployees",
+  "employee/fetchEmployees",
   async () => {
-    const response = await api.getAll("admin/employee");
+    const response = await api.getAll("admin/viewEmployees/all");
     return response.data;
   }
 );
@@ -18,7 +18,7 @@ export const fetchEmployees = createAsyncThunk(
 export const addNewEmployee = createAsyncThunk(
   "employee/addNewEmployee",
   async (initialEmployee) => {
-    const response = await api.create("admin/employee", initialEmployee);
+    const response = await api.create("admin/addEmployee", initialEmployee);
     return response.data;
   }
 );
@@ -34,7 +34,7 @@ export const updateExistingEmployee = createAsyncThunk(
 export const deleteExistingEmployee = createAsyncThunk(
   "employee/deleteExistingEmployee",
   async (existingEmployeeId) => {
-    const response = await api.delete("admin/employee", existingEmployeeId);
+    const response = await api.delete("admin/deleteEmployee", existingEmployeeId);
     return response.data;
   }
 );

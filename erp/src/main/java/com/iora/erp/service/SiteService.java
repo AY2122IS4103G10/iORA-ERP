@@ -28,10 +28,12 @@ public interface SiteService {
     public abstract StockLevel getStockLevelOfSite(Long siteId) throws NoStockLevelException;
     public abstract Map<Long,Long> getStockLevelByProduct(String SKUCode);
     public abstract void addProductItemToSite(Long siteId, String productItemId) throws NoStockLevelException;
-    public abstract void removeProductItemFromSite(Long siteId, String productItemId) throws NoStockLevelException;
+    public abstract void removeProductItemFromSite(String productItemId) throws NoStockLevelException;
     public abstract void addStockLevelToSite(Long siteId, List<String> productItemIds) throws NoStockLevelException;
-    public abstract void removeStockLevelFromSite(Long siteId, List<String> productItemIds) throws NoStockLevelException;
+    public abstract void removeStockLevelFromSite(List<String> productItemIds) throws NoStockLevelException;
 
     public abstract void addToStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException;
-    public abstract void removeFromStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException;
+    public abstract void removeFromStockLevel(ProductItem productItem) throws IllegalTransferException;
+    public abstract void addManyToStockLevel(StockLevel stockLevel, List<ProductItem> productItems) throws IllegalTransferException;
+    public abstract void removeManyFromStockLevel(List<ProductItem> productItems) throws IllegalTransferException;
 }

@@ -40,10 +40,11 @@ public class AdminServiceImpl implements AdminService {
     private EntityManager em;
 
     @Override
-    public void createJobTitle(JobTitle jobTitle) throws JobTitleException {
+    public JobTitle createJobTitle(JobTitle jobTitle) throws JobTitleException {
         try {
             JobTitle jt = jobTitle;
             em.persist(jt);
+            return jt;
 
         } catch (Exception ex) {
             throw new JobTitleException("Job Title has already been created");
@@ -51,7 +52,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void updateJobTitle(JobTitle jobTitle) throws JobTitleException {
+    public JobTitle updateJobTitle(JobTitle jobTitle) throws JobTitleException {
         JobTitle old = em.find(JobTitle.class, jobTitle.getId());
 
         if (old == null) {
@@ -68,6 +69,7 @@ public class AdminServiceImpl implements AdminService {
 
         old.setDescription(jobTitle.getDescription());
         old.setResponsibility(jobTitle.getResponsibility());
+        return old;
     }
 
     @Override
@@ -140,7 +142,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void createDepartment(Department department) throws DepartmentException {
+    public Department createDepartment(Department department) throws DepartmentException {
         try {
             Department d = new Department();
             d.setDeptName(department.getDeptName());
@@ -151,6 +153,7 @@ public class AdminServiceImpl implements AdminService {
                 JobTitle jt = getJobTitleById(j.getId());
                 d.getJobTitles().add(jt);
             }
+            return d;
 
         } catch (Exception ex) {
             throw new DepartmentException("Department has already been created");
@@ -158,7 +161,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void editDepartment(Department department) throws DepartmentException {
+    public Department editDepartment(Department department) throws DepartmentException {
         Department old = em.find(Department.class, department.getId());
 
         if (old == null) {
@@ -182,7 +185,8 @@ public class AdminServiceImpl implements AdminService {
         } catch (Exception ex) {
             throw new DepartmentException(ex.getMessage());
         }
-
+        
+        return old;
     }
 
     @Override
@@ -287,11 +291,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void createAddress(Address address) throws AddressException {
+    public Address createAddress(Address address) throws AddressException {
         try {
             if (checkAddress(address) == false) {
                 em.persist(address);
             }
+
+            return address;
 
         } catch (Exception ex) {
             throw new AddressException("Address has already been created");
@@ -299,7 +305,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void updateAddress(Address address) throws AddressException {
+    public Address updateAddress(Address address) throws AddressException {
         Address old = getAddressById(address.getId());
         old.setCountry(address.getCountry());
         old.setBuilding(address.getBuilding());
@@ -308,6 +314,8 @@ public class AdminServiceImpl implements AdminService {
         old.setPostalCode(address.getPostalCode());
         old.setState(address.getState());
         old.setBilling(address.getBilling());
+
+        return old;
     }
 
     @Override
@@ -376,7 +384,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void createCompany(Company company) throws CompanyException {
+    public Company createCompany(Company company) throws CompanyException {
         try {
             Address a = company.getAddress();
             List<Department> dep = company.getDepartments();
@@ -384,28 +392,38 @@ public class AdminServiceImpl implements AdminService {
             em.persist(company);
 
             company.setDepartments(new ArrayList<>());
-            for (Department d : dep) {
-                if (d.getId() != null) {
-                    company.getDepartments().add(getDepartmentById(d.getId()));
-                } else {
-                    em.persist(d);
-                    company.getDepartments().add(d);
+            if (dep != null) {
+                for (Department d : dep) {
+                    if (d.getId() != null) {
+                        company.getDepartments().add(getDepartmentById(d.getId()));
+                    } else {
+                        em.persist(d);
+                        company.getDepartments().add(d);
+                    }
                 }
             }
 
-            em.persist(a);
-            company.setAddress(a);
+            if (a.getId() != null) {
+                company.setAddress(getAddressById(a.getId()));
+            } else {
+                em.persist(a);
+                company.setAddress(a);
+            }
 
             company.setVendors(new ArrayList<>());
-            for (Vendor v : ven) {
-                if (v.getId() != null) {
-                    company.getVendors().add(getVendorById(v.getId()));
-                } else {
-                    em.persist(v);
-                    company.getVendors().add(v);
+            if (ven != null) {
+                for (Vendor v : ven) {
+                    if (v.getId() != null) {
+                        company.getVendors().add(getVendorById(v.getId()));
+                    } else {
+                        em.persist(v);
+                        company.getVendors().add(v);
+                    }
                 }
-            }
+            } 
 
+            return company;
+            
         } catch (Exception ex) {
             throw new CompanyException("Company has already been created");
         }
@@ -442,7 +460,7 @@ public class AdminServiceImpl implements AdminService {
 
     // need add vendor, Department and site mapping
     @Override
-    public void editCompany(Company company) throws CompanyException {
+    public Company editCompany(Company company) throws CompanyException {
         Company old = getCompanyById(company.getId());
 
         if (!company.getName().equals(old.getName()) && checkUniqueN(company.getName()) == false) {
@@ -461,6 +479,7 @@ public class AdminServiceImpl implements AdminService {
                 old.setActive(company.getActive());
 
                 if (company.getAddress().getId().equals(old.getAddress().getId())) {
+
                     updateAddress(company.getAddress());
                     company.setAddress(getAddressById(company.getAddress().getId()));
 
@@ -469,7 +488,13 @@ public class AdminServiceImpl implements AdminService {
                     Address newAdd = company.getAddress();
                     em.persist(newAdd);
                     company.setAddress(newAdd);
-                    em.remove(getAddressById(oldAdd.getId()));
+
+                    Query q = em.createQuery("SELECT c FROM Company c WHERE c.address.id =: id").setMaxResults(1);
+                    q.setParameter("id", oldAdd.getId());
+
+                    if (q.getResultList().size() == 0) {
+                        em.remove(getAddressById(oldAdd.getId()));
+                    }
                 }
 
                 List<Department> dep = company.getDepartments();
@@ -484,6 +509,8 @@ public class AdminServiceImpl implements AdminService {
                 for (Vendor v : ven) {
                     old.getVendors().add(getVendorById(v.getId()));
                 }
+
+                return old;
 
             } catch (Exception ex) {
                 throw new CompanyException(ex.toString());
@@ -508,6 +535,21 @@ public class AdminServiceImpl implements AdminService {
         } else {
             c.setDepartments(null);
             c.setVendors(null);
+            Long aid = c.getAddress().getId();
+            c.setAddress(null);
+
+            try {
+
+                Query x = em.createQuery("SELECT e FROM Company e WHERE e.address.id = :id").setMaxResults(1);
+                x.setParameter("id", aid);
+                if (x.getResultList().size() == 0) {
+                    deleteAddress(getAddressById(aid));
+                }
+
+            } catch (Exception ex) {
+                throw new CompanyException(ex.toString());
+            }
+
             em.remove(c);
         }
     }
@@ -583,7 +625,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void createVendor(Vendor vendor) throws VendorException {
+    public Vendor createVendor(Vendor vendor) throws VendorException {
         try {
             Vendor newV = vendor;
             List<Address> list = vendor.getAddress();
@@ -596,6 +638,8 @@ public class AdminServiceImpl implements AdminService {
                 newV.getAddress().add(aa);
             }
 
+            return newV;
+
         } catch (Exception ex) {
             throw new VendorException("Vendor has already already been created");
         }
@@ -603,7 +647,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void updateVendor(Vendor vendor) throws VendorException, AddressException {
+    public Vendor updateVendor(Vendor vendor) throws VendorException, AddressException {
         Vendor v = getVendorById(vendor.getId());
         Boolean checkUpdate = false;
 
@@ -644,6 +688,10 @@ public class AdminServiceImpl implements AdminService {
                     em.remove(toDelete);
                 }
             }
+
+            return v;
+        } else {
+            throw new VendorException("Fail: Vendor are able to be updated");
         }
     }
 

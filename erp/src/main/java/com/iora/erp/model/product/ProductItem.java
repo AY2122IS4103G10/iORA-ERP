@@ -6,6 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.iora.erp.model.site.StockLevel;
 
 @Entity
@@ -19,8 +21,8 @@ public class ProductItem {
     @Column(nullable = false)
     private String productSKU;
 
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ManyToOne
-    @XmlTransient
     private StockLevel stockLevel;
 
     public ProductItem() {
@@ -71,10 +73,7 @@ public class ProductItem {
             return false;
         }
         ProductItem productItem = (ProductItem) o;
-        if ((this.rfid == null && productItem.rfid == null) || (this.rfid == null && !this.rfid.equals(productItem.rfid))) {
-            return false;
-        }
-        return true;
+        return this.rfid == productItem.rfid;
     }
 
     @Override

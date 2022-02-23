@@ -14,6 +14,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.ModelException;
+import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
@@ -25,6 +26,7 @@ import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 
 import org.hibernate.NonUniqueResultException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProductServiceImpl implements ProductService {
 
+    @Autowired
+    private SiteService siteService;
     @PersistenceContext
     private EntityManager em;
 
@@ -444,13 +448,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void createProductItem(String rfid, String sku) throws ProductItemException {
+    public ProductItem createProductItem(String rfid, String sku) throws ProductItemException {
         try {
             Product p = getProduct(sku);
             ProductItem pi = new ProductItem(rfid);
             pi.setProductSKU(sku);
             em.persist(pi);
             p.addProductItem(pi);
+            return pi;
         } catch (EntityExistsException ex) {
             throw new ProductItemException("ProductItem with rfid " + rfid + " already exist.");
         } catch (ProductException ex) {
@@ -610,7 +615,13 @@ public class ProductServiceImpl implements ProductService {
             int stockLevel = r.nextInt(27) + 3;
 
             for (int i = 0; i < stockLevel; i++) {
-                createProductItem(generateRFID(), p.getsku());
+                String rfid = generateRFID();
+                createProductItem(rfid, p.getsku());
+                // try {
+                //     siteService.addProductItemToSite(r.nextLong(20), rfid);
+                // } catch (NoStockLevelException ex) {
+                //     // do nothing
+                // }
             }
         }
     }

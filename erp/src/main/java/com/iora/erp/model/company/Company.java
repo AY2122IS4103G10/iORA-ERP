@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Company implements Serializable  {
@@ -27,7 +27,7 @@ public class Company implements Serializable  {
     @Column(nullable = false)
     private Boolean active;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Address address;
     @ManyToMany
     private List<Department> departments;

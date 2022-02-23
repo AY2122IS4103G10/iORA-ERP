@@ -403,6 +403,17 @@ public class SAMController {
         }
     }
 
+    @GetMapping(path = "/viewSite/{siteId}", produces = "application/json")
+    public Site viewSite(@PathVariable Long siteId) {
+        try {
+            Site site = siteService.getSite(siteId);
+            site.getStockLevel();
+            return site;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
     public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);

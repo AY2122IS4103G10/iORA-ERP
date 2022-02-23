@@ -22,7 +22,7 @@ public class ProcurementOrder {
     private Long id;
     @ElementCollection
     private List<POStatus> statusHistory;
-    @OneToOne
+    @OneToOne(cascade=CascadeType.ALL)
     private ProcurementOrderFulfilment procurementOrderFulfilment;
     @OneToMany(cascade = CascadeType.ALL)
     private List<ProcurementOrderLI> lineItems;

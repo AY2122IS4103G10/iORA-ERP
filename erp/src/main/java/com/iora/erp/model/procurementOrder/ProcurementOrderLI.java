@@ -3,6 +3,7 @@ package com.iora.erp.model.procurementOrder;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,7 +27,7 @@ public class ProcurementOrderLI {
 
     @Column
     private int requestedQty;
-    @OneToMany
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private List<ProductItem> fulfilledProductItems;
     @Transient
     private int fulfilledQty;

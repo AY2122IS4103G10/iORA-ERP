@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,5 +67,13 @@ public class ManufacturingController {
         }
     }
 
-    // Fulfil
+    @PutMapping(path = "/procurementOrder/fulfil/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> fulfilProcurementOrder(@RequestBody ProcurementOrder order, @PathVariable Long siteId) {
+        try {
+            procurementService.fulfilProcurementOrder(order, siteId);
+            return ResponseEntity.ok("Procurement Order with ID " + order.getId() + " fulfilled.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }

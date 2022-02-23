@@ -513,92 +513,92 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void loadProducts(List<Object> productsJSON)
             throws ProductException, ProductFieldException, ProductItemException {
-        // Currency sgd = getCurrency("SGD");
+        Currency sgd = getCurrency("SGD");
 
-        // for (Object j : productsJSON) {
-        //     LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
-        //     List<Object> json = hashMap.values().stream().collect(Collectors.toList());
-        //     // Decoding JSON Object
-        //     String name = (String) json.get(0);
-        //     String modelCode = (String) json.get(1);
-        //     String description = (String) json.get(2);
-        //     List<String> colours = (ArrayList<String>) json.get(3);
-        //     List<String> sizes = (ArrayList<String>) json.get(4);
-        //     String company = (String) json.get(5);
-        //     List<String> tags = (ArrayList<String>) json.get(6);
-        //     List<String> categories = (ArrayList<String>) json.get(7);
+        for (Object j : productsJSON) {
+            LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
+            List<Object> json = hashMap.values().stream().collect(Collectors.toList());
+            // Decoding JSON Object
+            String name = (String) json.get(0);
+            String modelCode = (String) json.get(1);
+            String description = (String) json.get(2);
+            List<String> colours = (ArrayList<String>) json.get(3);
+            List<String> sizes = (ArrayList<String>) json.get(4);
+            String company = (String) json.get(5);
+            List<String> tags = (ArrayList<String>) json.get(6);
+            List<String> categories = (ArrayList<String>) json.get(7);
 
-        //     LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
-        //     List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
-        //     double price = Double.parseDouble((String) priceList.get(0));
+            LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
+            List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
+            double price = Double.parseDouble((String) priceList.get(0));
 
-        //     LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
-        //     List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
-        //             .collect(Collectors.toList());
+            LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
+            List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
+                    .collect(Collectors.toList());
 
-        //     Model model = new Model(modelCode, name, description, price, sgd,
-        //             categories.contains("SALE FROM $10"), true);
-        //     List<ProductField> productFields = new ArrayList<>();
+            Model model = new Model(modelCode, name, description, price, sgd,
+                    categories.contains("SALE FROM $10"), true);
+            List<ProductField> productFields = new ArrayList<>();
 
-        //     for (String c : colours) {
-        //         ProductField colour = createProductField("colour", c);
-        //         model.addProductField(colour);
-        //         productFields.add(colour);
-        //     }
+            for (String c : colours) {
+                ProductField colour = createProductField("colour", c);
+                model.addProductField(colour);
+                productFields.add(colour);
+            }
 
-        //     for (String s : sizes) {
-        //         ProductField size = createProductField("size", s);
-        //         model.addProductField(size);
-        //         productFields.add(size);
-        //     }
+            for (String s : sizes) {
+                ProductField size = createProductField("size", s);
+                model.addProductField(size);
+                productFields.add(size);
+            }
 
-        //     ProductField com = createProductField("company", company);
-        //     model.addProductField(com);
-        //     productFields.add(com);
+            ProductField com = createProductField("company", company);
+            model.addProductField(com);
+            productFields.add(com);
 
-        //     for (String t : tags) {
-        //         ProductField tag = createProductField("tag", t);
-        //         model.addProductField(tag);
-        //         productFields.add(tag);
-        //     }
+            for (String t : tags) {
+                ProductField tag = createProductField("tag", t);
+                model.addProductField(tag);
+                productFields.add(tag);
+            }
 
-        //     for (String cat : categories) {
-        //         ProductField category;
-        //         if (cat.equals("2 FOR S$ 49")) {
-        //             category = createPromoField("category", cat, 24.5);
-        //             model.addProductField(category);
-        //             productFields.add(category);
-        //         } else if (cat.equals("2 FOR S$ 29")) {
-        //             category = createPromoField("category", cat, 14.5);
-        //             model.addProductField(category);
-        //             productFields.add(category);
-        //         } else if (cat.equals("SALE FROM $10")) {
-        //             if (!discountedPriceList.isEmpty()) {
-        //                 category = createPromoField("category", cat,
-        //                         Double.parseDouble((String) discountedPriceList.get(0)));
-        //                 model.addProductField(category);
-        //                 productFields.add(category);
-        //             } else {
-        //                 continue;
-        //             }
-        //         } else {
-        //             category = createProductField("category", cat);
-        //             model.addProductField(category);
-        //             productFields.add(category);
-        //         }
-        //     }
-        //     em.persist(model);
-        //     createProduct(modelCode, productFields);
-        // }
+            for (String cat : categories) {
+                ProductField category;
+                if (cat.equals("2 FOR S$ 49")) {
+                    category = createPromoField("category", cat, 24.5);
+                    model.addProductField(category);
+                    productFields.add(category);
+                } else if (cat.equals("2 FOR S$ 29")) {
+                    category = createPromoField("category", cat, 14.5);
+                    model.addProductField(category);
+                    productFields.add(category);
+                } else if (cat.equals("SALE FROM $10")) {
+                    if (!discountedPriceList.isEmpty()) {
+                        category = createPromoField("category", cat,
+                                Double.parseDouble((String) discountedPriceList.get(0)));
+                        model.addProductField(category);
+                        productFields.add(category);
+                    } else {
+                        continue;
+                    }
+                } else {
+                    category = createProductField("category", cat);
+                    model.addProductField(category);
+                    productFields.add(category);
+                }
+            }
+            em.persist(model);
+            createProduct(modelCode, productFields);
+        }
 
-        // List<Product> products = searchProductsBySKU(null);
-        // for (Product p : products) {
-        //     Random r = new Random();
-        //     int stockLevel = r.nextInt(90) + 10;
+        List<Product> products = searchProductsBySKU(null);
+        for (Product p : products) {
+            Random r = new Random();
+            int stockLevel = r.nextInt(27) + 3;
 
-        //     for (int i = 0; i < stockLevel; i++) {
-        //         createProductItem(generateRFID(), p.getsku());
-        //     }
-        // }
+            for (int i = 0; i < stockLevel; i++) {
+                createProductItem(generateRFID(), p.getsku());
+            }
+        }
     }
 }

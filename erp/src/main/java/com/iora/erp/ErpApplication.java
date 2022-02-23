@@ -33,7 +33,7 @@ public class ErpApplication {
 			ObjectMapper mapper = new ObjectMapper();
 			TypeReference<List<Object>> typeReference = new TypeReference<List<Object>>() {
 			};
-			Resource resource = resourceLoader.getResource("classpath:com/iora/erp/data/products.json");
+			Resource resource = resourceLoader.getResource("classpath:com/iora/erp/data/products_test.json");
 			InputStream inputStream = resource.getInputStream();
 			try {
 				List<Object> productsJSON = mapper.readValue(inputStream, typeReference);

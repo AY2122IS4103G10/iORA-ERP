@@ -1,0 +1,1989 @@
+[
+  {
+    "name": "Knitted Crew Top",
+    "sku": "AKV0010057J",
+    "description": "Crew neckline with ribbed trimming. Boxy cut. Fabric: Knit",
+    "colours": ["BROWN", "POWDER", "RASPBERRY", "WILLOW"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "B",
+      "FB LIVE 12 JAN 2022",
+      "ONLINE EXCLUSIVE",
+      "NEW ARRIVALS",
+      "2 FOR S$ 49",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS",
+      "iORA KNITS & SWEATERS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Colour Block Blouse",
+    "sku": "AT0009786D",
+    "description": "Rounded neckline. Colour blocking detail. Boxy cutting. Fabric: Jersey",
+    "colours": ["BLACK", "KHAKI GREEN"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOP"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Boxy Flare Blouse",
+    "sku": "AT0009784D",
+    "description": "Rounded neckline. Dropped shoulder. Side slit detail. Fabric: Jersey",
+    "colours": ["BLACK", "KHAKI GREEN", "MINT"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOP"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Magyar Blouse",
+    "sku": "AT0009787Z",
+    "description": "Wide rounded neckline. Magyar cutting with relaxed fit. Thick sleeve cuffs detail. Fabric: Jersey",
+    "colours": ["BLACK", "KHAKI GREEN", "MINT"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOP"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Contrast Fabric Blouse",
+    "sku": "AT0009785D",
+    "description": "Rounded neckline. Folded cuffs with button tab detail. Contrast front and back fabric panel. Fabric: Jersey, Cotton",
+    "colours": ["HUE GREY", "MINT"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOP"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Folded Magyar Blouse",
+    "sku": "AT0010247D",
+    "description": "V-neckline. Folded sleeve cuffs. Boxy relaxed cutting. Fabric: Jersey",
+    "colours": ["BLACK", "MINT"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOP"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Panelled Dress",
+    "sku": "ATD0009788Z",
+    "description": "Rounded neckline. Oversized cutting. Centreback zip closure. Fabric: Jersey",
+    "colours": ["BLACK", "KHAKI GREEN"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["DRESS"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA DRESS/ONE PIECE"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Lace Trim Blouse",
+    "sku": "AB0009828H",
+    "description": "Rounded neckline. Lace trimming detail around upper body and centre front. Boxy cutting with relaxed fit. Fabric: Rayon",
+    "colours": ["GREY BLUE", "KHAKI"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 49",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Pintuck Laces Top",
+    "sku": "ABV0009827H",
+    "description": "Rounded neckline with collar stand. Front pintuck series and lace trim detail. Centre back button closure. Fabric: Rayon",
+    "colours": ["GREY BLUE", "KHAKI"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "2 FOR S$ 49",
+      "B",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Basic Boxy Blouse",
+    "sku": "AB0009829Y",
+    "description": "Rounded neckline. Dropped shoulder. Asymmetrical hem length. Fabric: Rayon",
+    "colours": ["BLACK", "GREY BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "2 FOR S$ 49",
+      "B",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Scrunchie Neck Top",
+    "sku": "ABV0009830Y",
+    "description": "Rounded neckline with scrunch detail and raw edges. Boxy cutting with relaxed fit. Fabric: knit",
+    "colours": ["GREY BLUE", "KHAKI"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "2 FOR S$ 49",
+      "B",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Tri-Color Sweater",
+    "sku": "AK0008554J",
+    "description": "Crew neckline. Tri-color stripe weaving body. Ribbed cuffs and hem finishing. Fabric: knit",
+    "colours": ["BEIGE", "GREY BLUE", "KHAKI GREEN"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["IORA", "KNIT", "TOP"],
+    "categories": [
+      "2 FOR S$ 49",
+      "iORA",
+      "iORA KNITS & SWEATERS",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Centre Scrunched Knit Blouse",
+    "sku": "AK0009858J",
+    "description": "Wide v- neckline. Centre scrunch detail with drawstring. Contrast thick hem band. Fabric: Knit",
+    "colours": ["BLACK", "GREY BLUE", "KHAKI"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "KNIT", "TOPS"],
+    "categories": [
+      "B",
+      "iORA",
+      "iORA KNITS & SWEATERS",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Textured Knitted Blouse",
+    "sku": "AK0009857J",
+    "description": "Rounded neckline. Puffy sleeves. Texture on fabric. Fabric: Knit",
+    "colours": ["BLACK", "GREY BLUE"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "KNIT", "TOP"],
+    "categories": [
+      "B",
+      "iORA",
+      "iORA KNITS & SWEATERS",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Folder Sleeves Blouse",
+    "sku": "ABB0009826H",
+    "description": "V-neckline with collar. Front patch pocket. Folded sleeves with button tab. Fabric: Rayon",
+    "colours": ["BLACK", "KHAKI"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "B",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Double Pleated Shorts",
+    "sku": "APS0009832A",
+    "description": "Front button and zip closure. Front pants pockets. Flare cutting. Fabric: Polyester",
+    "colours": ["KHAKI", "LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BOTTOMS", "SHORTS"],
+    "categories": [
+      "B",
+      "iORA",
+      "iORA BOTTOMS",
+      "iORA NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "DOUBLE PLEATS CULOTTES",
+    "sku": "APL0009833A",
+    "description": "Front pleats detail. Sideseam pockets. Straight drapey cutting. Fabric: Polyester",
+    "colours": ["BLACK", "KHAKI"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BOTTOMS", "CULOTTES"],
+    "categories": [
+      "B",
+      "iORA",
+      "iORA BOTTOMS",
+      "iORA NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Scrunchie Neck Dress",
+    "sku": "ADQ0009831Y",
+    "description": "Rounded neckline with scrunch detail and raw edges. A-line cutting with relaxed fit. Gathers detail on front panel. Fabric: Rayon",
+    "colours": ["BLACK", "KHAKI"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["DRESS"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA DRESS/ONE PIECE"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "A-Line Textured Blouse",
+    "sku": "AT0010055D",
+    "description": "Rounded neckline. Bottom ruffle flare panel detail. Fabric: Jersey",
+    "colours": ["HUE GREY", "MINT", "PINK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOP"],
+    "categories": [
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00", "RM": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Boxy Textured Blouse",
+    "sku": "AT0010054D",
+    "description": "Rounded neckline with centre slit. Contrast fabric panel. Fabric: Jersey",
+    "colours": ["BLACK", "CREAM", "MINT", "PINK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00", "RM": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Boxy Cut Blouse",
+    "sku": "AT0010051Z",
+    "description": "Rounded neckline. Centre back metal zip closure. Fabric: Jersey",
+    "colours": ["BLACK", "HUE GREY", "PINK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00", "RM": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Three-Quarter Sleeved Blouse",
+    "sku": "ATB0008735D",
+    "description": "Round neck. Drop shoulder. Three-quarter puff sleeves. Elasticated back waist. Fabric: Interlock jersey",
+    "colours": ["BLACK", "CREAM", "PINK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["IORA", "TOP"],
+    "categories": [
+      "2 FOR S$ 29",
+      "BACK IN STOCK",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00", "RM": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Magyar Blouse",
+    "sku": "AT0010052Z",
+    "description": "Round neckline with centre slit. Front pleat detail. Fabric: Jersey",
+    "colours": ["BLACK", "PINK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00", "RM": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Contrast Textured Dress",
+    "sku": "ATD0010056D",
+    "description": "Rounded neckline. Boxy cutting. Centre back metal zip closure. Bottom ruffle flare panel detail. Fabric: Jersey",
+    "colours": ["BLACK", "PINK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["DRESS"],
+    "categories": [
+      "NEW ARRIVALS",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA DRESS/ONE PIECE"
+    ],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "V-Surpliced Tee",
+    "sku": "AT0008097Z",
+    "description": "Round neckline. Turned-up cuffs. Side slits detailing. Fabric: Single jersey",
+    "colours": ["BLACK", "BLUSH", "CREAM", "NAVY", "PINK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["TOPS"],
+    "categories": [
+      "BACK IN STOCK",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00", "RM": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Spaghetti Straps Tank Top",
+    "sku": "ABV0010506I",
+    "description": "Adjustable straps. V-neckline. Overlap front panel. Fabric: Rayon",
+    "colours": ["DARK BEIGE", "YELLOW"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["TANK TOP", "TOPS"],
+    "categories": [
+      "2 FOR S$ 49",
+      "B",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Magyar Cut Knitted Blouse",
+    "sku": "AK0009090J",
+    "description": "Cowl neckline. Relaxed fit. Fabric: Knit",
+    "colours": ["BLACK", "CREAM", "MUSTARD", "YELLOW"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "KNITS", "TOP"],
+    "categories": [
+      "2 FOR S$ 49",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS",
+      "iORA KNITS & SWEATERS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Wing Magyar Blouse",
+    "sku": "AB0009039H",
+    "description": "V-neckline with wing collar. Centrefront button closure. Drop back hem line. Fabric: Rayon",
+    "colours": ["GREEN TEA", "KHAKI", "MUSTARD", "YELLOW"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOP"],
+    "categories": ["2 FOR S$ 49", "iORA NEW ARRIVALS", "iORA", "iORA TOPS"],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Wing Collared Blouse",
+    "sku": "ABB0009384Y",
+    "description": "Overlap front panel stitching detail. Centreback box pleat detail. Fabric: Polyester",
+    "colours": ["CREAM", "GREEN TEA", "NAVY", "YELLOW"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["2 FOR S$ 49", "iORA", "iORA NEW ARRIVALS", "iORA TOPS"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Printed Centre Ruched Top",
+    "sku": "AB0010503H",
+    "description": "V-neckline. Front ruching detail. Fabric: Printed poly",
+    "colours": ["YELLOW FLORAL-"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 49",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Magyar Knit Blouse",
+    "sku": "AKB0010527J",
+    "description": "3/4 sleeves with thick cuffs detail. Thick hemline panel detail. Fabric: Knit",
+    "colours": ["CREAM", "KHAKI", "YELLOW"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "KNIT", "TOPS"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS",
+      "iORA KNITS & SWEATERS"
+    ],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Printed Smocked Top",
+    "sku": "ABL0010504H",
+    "description": "High neckline. Smocked detail on front panel. Smocked sleeve cuffs. Fabric: Printed poly",
+    "colours": ["YELLOW FLORAL-"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "F",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Cinched Waist Top",
+    "sku": "AJK0010513I",
+    "description": "Collared neckline. Front buttons closure. Adjustable drawstring around waist. Fabric: Rayon",
+    "colours": ["BLACK", "KHAKI"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "JACKET", "OUTERWEAR", "TOP"],
+    "categories": [
+      "F",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA OUTERWEAR",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Belted Bermuda",
+    "sku": "APS0009773A",
+    "description": "Front pleats detail. Front pants pockets. Detachable belt. Fabric: Cotton nylon",
+    "colours": ["BEIGE", "BLACK", "CREAM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BERMUDA", "BOTTOMS", "SHORTS"],
+    "categories": ["iORA", "iORA BOTTOMS", "iORA NEW ARRIVALS", "NEW ARRIVALS"],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Spaghetti Straps Sundress",
+    "sku": "ADQ0010507I",
+    "description": "Adjustable straps. Overlap front panel. Decorative side panel. Fabric: Rayon",
+    "colours": ["DARK BEIGE", "YELLOW"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["DRESS", "SUNDRESS"],
+    "categories": [
+      "B",
+      "iORA",
+      "iORA DRESS/ONE PIECE",
+      "iORA NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Printed Smocked Waist Dress",
+    "sku": "ADQ0010505I",
+    "description": "Rounded neckline with centre slit. Elasticated smocked waist. Fabric: Printed poly",
+    "colours": ["YELLOW FLORAL-"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["DRESS"],
+    "categories": [
+      "B",
+      "iORA",
+      "iORA DRESS/ONE PIECE",
+      "iORA NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Asymmetrical Ruffle Blouse",
+    "sku": "ATV0009860Z",
+    "description": "Rounded neckline. Asymmetrical ruffle detail. Fabric: Jersey",
+    "colours": ["CREAM", "LAVENDER"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Butterfly Sleeves Blouse",
+    "sku": "AT0009859D",
+    "description": "Rounded neckline. Ruffle detail around armhole. Fabric: Jersey",
+    "colours": ["BEIGE", "CREAM", "LAVENDER"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Twist Knotted Blouse",
+    "sku": "AT0009861Z",
+    "description": "Rounded neckline. Front knot detail. Fabric: Jersey",
+    "colours": ["BEIGE", "CREAM", "LAVENDER"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "B",
+      "NEW ARRIVALS",
+      "2 FOR S$ 29",
+      "iORA NEW ARRIVALS",
+      "iORA",
+      "iORA TOPS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Ruched Blouse",
+    "sku": "AT0009862Z",
+    "description": "Rounded neckline. Front ruched detail. Fabric: Jersey",
+    "colours": ["BEIGE", "CREAM", "LAVENDER"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": [
+      "2 FOR S$ 29",
+      "B",
+      "iORA",
+      "iORA NEW ARRIVALS",
+      "iORA TOPS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Halter Neck Knit",
+    "sku": "AKV0008731J",
+    "description": "Halter neckline. Ribbed armholes and hem detailing. Fabric: Knit",
+    "colours": ["YELLOW"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["IORA", "KNIT", "TOP"],
+    "categories": [
+      "iORA",
+      "iORA KNITS & SWEATERS",
+      "iORA TOPS",
+      "SALE FROM $10"
+    ],
+    "price": { "SGD": "39.00", "RM": "69.00" },
+    "discountedPrice": { "SGD": "10.00", "RM": "69.00" }
+  },
+  {
+    "name": "Striped Tank Top",
+    "sku": "ATV0006619Z",
+    "description": "Contrasting outline details",
+    "colours": ["PINK"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["TANK TOP", "TOP"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "19.00" },
+    "discountedPrice": { "SGD": "10.00" }
+  },
+  {
+    "name": "Gathered Neckline Blouse",
+    "sku": "AB0009153W",
+    "description": "Wide neckline with gathers detail. Puffy sleeves with elastic band. Relaxed fit. Fabric: Cotton rayon",
+    "colours": ["BLUSH"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Gathered Neckline Blouse",
+    "sku": "AB0009152W",
+    "description": "Wide neckline with gathers detail. Puffy sleeves with elastic band. Relaxed fit. Fabric: Printed cotton rayon",
+    "colours": ["BLUSH"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Puffy Gathered Sleeves Blouse",
+    "sku": "AB0009151W",
+    "description": "Rounded neckline. Gathered puffy sleeves. Zip closure on centreback. Fabric: Cotton rayon",
+    "colours": ["BLUSH"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "A-Line Tank Top",
+    "sku": "ABV0009147H",
+    "description": "Rounded wide neckline. Flare bottom. Fabric: Polyester",
+    "colours": ["BLACK", "BLUSH"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Classic Basic Top",
+    "sku": "AK0009209J",
+    "description": "Rounded neckline. Relaxed fit. Fabric: Cotton",
+    "colours": ["BLACK", "BLUSH"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Knitted Pattern Tank Top",
+    "sku": "AKV0009106J",
+    "description": "Rounded neckline. Scallop hem and armhole detail. Comfortable fit. Fabric: Knit",
+    "colours": ["BLUSH", "CREAM"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Polka Ruched Blouse",
+    "sku": "AB0009092H",
+    "description": "V-neckline. Front ruched detail with adjustable ribbon tie. Comfortable fit. Fabric: Printed rayon",
+    "colours": ["BEIGE", "BLACK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOP"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Halter Neck Drape Top",
+    "sku": "ABV0009235H",
+    "description": "Drape puffy top. Back self-tie ribbon closure. Fabric:\u00a0Polyester",
+    "colours": ["BEIGE", "PINE GREEN", "TURQUOISE"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["TOPS"],
+    "categories": ["iORA", "iORA COLLECTION", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Asymmetrical Neckline Top",
+    "sku": "AK0009301J",
+    "description": "Asymmetrical neckline. Body hugging fit. Fabric: Knit",
+    "colours": ["BLACK", "PINE GREEN", "TURQUOISE"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["KNITS", "TOPS"],
+    "categories": [
+      "iORA",
+      "iORA COLLECTION",
+      "iORA KNITS & SWEATERS",
+      "iORA TOPS",
+      "SALE FROM $10"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Drawstring Blouse",
+    "sku": "AB0009286H",
+    "description": "Wide round neckline. Boxy cutting. Front drawstring detail. Fabric: Polyester",
+    "colours": ["BLACK"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA COLLECTION", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Contrast Trim Knit",
+    "sku": "AKB0009441J",
+    "description": "Rounded neckline. Contrast ribbed trimming along neckline, sleeves and hemline. Buttons detail on sleeves. Fabric: Knit",
+    "colours": ["CREAM", "DARK BEIGE"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["KNITS", "TOPS"],
+    "categories": [
+      "iORA",
+      "iORA KNITS & SWEATERS",
+      "iORA TOPS",
+      "SALE FROM $10"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Contrast Lace Tank Top",
+    "sku": "ABV0009442W",
+    "description": "Lace trimming on rounded neckline. Front lace panel detail. Back button & loop closure. Fabric: Cotton",
+    "colours": ["CREAM", "LAVENDER"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["TANK TOP", "TOP"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Body-Fitted Knit",
+    "sku": "AKL0009450J",
+    "description": "Boat neckline. Raglan sleeves cut. Fabric: Knit",
+    "colours": ["BLACK", "KHAKI"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["KNIT", "TOP"],
+    "categories": [
+      "iORA",
+      "iORA KNITS & SWEATERS",
+      "iORA TOPS",
+      "SALE FROM $10"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Shoulder Button Knit",
+    "sku": "AKB0009159J",
+    "description": "Rounded neckline. Shoulder buttons detail. Fabric: Stripes knit pattern",
+    "colours": ["CREAM", "NUDE"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["KNIT", "TOPS"],
+    "categories": [
+      "SALE FROM $10",
+      "iORA",
+      "iORA TOPS",
+      "iORA KNITS & SWEATERS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Knotted Knit Top",
+    "sku": "AK0009158J",
+    "description": "V-neckline. Front knot detail. Fabric: Knit",
+    "colours": ["CREAM", "NUDE"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["KNITS", "TOPS"],
+    "categories": [
+      "iORA",
+      "iORA KNITS & SWEATERS",
+      "iORA TOPS",
+      "SALE FROM $10"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Self-Tie Knot Blouse",
+    "sku": "AB0009226H",
+    "description": "Rounded neckline. Invisible zip closure. Front self-tie knot detail. Fabric: Polyester",
+    "colours": ["CREAM", "NUDE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Lantern Puffed Sleeves Sweater",
+    "sku": "AKB0008955J",
+    "description": "Crew neckline. Cuffs with decorative buttons. Big ribbed cuffs and hem. Fabric: Knit",
+    "colours": ["CREAM", "MINT", "MUSTARD"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["SWEATER", "TOPS"],
+    "categories": [
+      "iORA",
+      "iORA KNITS & SWEATERS",
+      "iORA TOPS",
+      "SALE FROM $10"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Boxy Checks Tee",
+    "sku": "AB0009644H",
+    "description": "Back metal zip closure. Asymmetrical hemline. Comfortable fit. Material: Jersey",
+    "colours": ["BLACK", "BROWN"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BLOUSE", "TOPS"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Buttondown Tank Top",
+    "sku": "ABV0009457H",
+    "description": "Adjustable spaghetti straps. Centre front buttons closure. Fabric: Cotton",
+    "colours": ["BLACK"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["TANK TOP", "TOP"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "10.00" }
+  },
+  {
+    "name": "Buttondown Tank Top",
+    "sku": "ABV0009456H",
+    "description": "Adjustable spaghetti straps. Centre front buttons closure. Fabric: Printed cotton",
+    "colours": ["BLACK PRINT"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["TANK TOP", "TOP"],
+    "categories": ["iORA", "iORA TOPS", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "10.00" }
+  },
+  {
+    "name": "Pocket Skort",
+    "sku": "BPS0008249X",
+    "description": "Two side pockets. Side zip closure. Inner shorts attached. Fabric: Cotton Twill",
+    "colours": ["BEIGE", "CREAM", "DENIM", "JADE", "KHAKI", "NUDE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["SKIRTS"],
+    "categories": [
+      "2 FOR S$ 49",
+      "BACK IN STOCK",
+      "DENIM",
+      "LALU",
+      "LALU NEW ARRIVALS",
+      "LALU SKIRTS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Collared Button Down Magyar Blouse",
+    "sku": "BB0010459H",
+    "description": "Collar with front button down fastening. Magyar cut with folded cuff sleeve detail. Front patch pocket detail. Curved hem. Material: Cotton denim",
+    "colours": ["LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BLOUSES", "DENIM TOPS", "TOPS"],
+    "categories": [
+      "B",
+      "DENIM",
+      "NEW ARRIVALS",
+      "LALU",
+      "LALU NEW ARRIVALS",
+      "LALU TOPS"
+    ],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Square Neck Button Romper",
+    "sku": "BPD0010489A",
+    "description": "Square neckline with thick shoulder straps. Front button opening. Adjustable D ring waist sash. Material: Cotton",
+    "colours": ["LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "DENIM DRESSES", "DRESSES"],
+    "categories": [
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Double Buttoned Jeans",
+    "sku": "BPL0010107M",
+    "description": "Straight cut. Button and zip closure. Front pants pocket. Back diagonal yoke detail. Back patch pocket detail. Fraying along hemline. Material: Denim",
+    "colours": ["LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOMS", "DENIM", "DENIM JEANS", "JEANS"],
+    "categories": [
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Denim Long Sleeve Top",
+    "sku": "BJK0010103X",
+    "description": "Cropped and boxy top. Round neckline. Panelled detail. Metallic front zip closure. Long sleeve with button opening at cuff. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "DENIM JACKETS", "JACKETS", "OUTERWEAR"],
+    "categories": [
+      "DENIM",
+      "F",
+      "LALU",
+      "LALU NEW ARRIVALS",
+      "LALU OUTERWEAR",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Pleated Puff Sleeve Dress",
+    "sku": "BDQ0010105X",
+    "description": "A-line cutting. Round neckline. Front diagonal yoke detail. Panelled sleeve with pleat detail armhole. Long sleeve with button opening at cuff. Sideseam pockets. Back metallic zip closure. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "DENIM DRESSES", "DRESSES"],
+    "categories": [
+      "DENIM",
+      "F",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "High-Neck Sleeveless Dress",
+    "sku": "BDQ0010104X",
+    "description": "A-line cutting. High neck collar with snap button closure. Front zipper closure with placket detail. Adjustable drawcords at waistline. Front patch pockets with pocket flap. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L"],
+    "company": "LALU",
+    "tags": ["DENIM", "DENIM DRESSES", "DRESSES"],
+    "categories": [
+      "DENIM",
+      "F",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Overlapped Paperbag Skorts",
+    "sku": "BPS0009808X",
+    "description": "Overlapping panel with button detail. Elasticated waistband with ruffle detail. Material: Denim",
+    "colours": ["CREAM", "LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOMS", "DENIM SHORTS", "DENIM SKORTS", "SHORTS", "SKORTS"],
+    "categories": [
+      "DENIM",
+      "F",
+      "FB LIVE 19 JAN 2022",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Ruffled Hem Baby Doll Dress",
+    "sku": "BDQ0010181I",
+    "description": "Sweetheart neckline. Center front button closure with placket detail. Back smocked panel detail. Ruffle and gather detail along flared hem. Material: Denim",
+    "colours": ["LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DRESSES", "ONE PIECE"],
+    "categories": [
+      "DENIM",
+      "F",
+      "FB LIVE 19 JAN 2022",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00", "RM": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Bell Bottom Denim Jeans",
+    "sku": "BPL0010008M",
+    "description": "Button and zip closure. Pants pocket detail. Washed effect detail at front. Wide-legged opening. Back patch pocket. Material: Denim",
+    "colours": ["DARK DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOMS", "DENIM", "DENIM JEANS", "JEANS"],
+    "categories": [
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Denim Pleated A-Line Skirt",
+    "sku": "BSK0009530X",
+    "description": "A-Line cutting. Zipper closure at skirt front. Functional front pants pocket. Material:Cotton",
+    "colours": ["DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOM", "SKIRT"],
+    "categories": [
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "LALU SKIRTS",
+      "Uncategorized"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Wide Legged Pleated Bermudas",
+    "sku": "BPS0010388X",
+    "description": "Flare cutting. Front button and zipper opening. Front pleat detail. Front pants pocket detail. Fabric: Denim",
+    "colours": ["CREAM", "DEEP DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOMS", "DENIM", "DENIM SHORTS", "SHORTS"],
+    "categories": [
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "High Waisted Double Button Shorts",
+    "sku": "BPS0010383X",
+    "description": "Elasticated waistband with ruffle detail. Front button and zipper opening. Front and back patch pocket detail. Folded hemcuff detail. Fabric: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOMS", "DENIM", "DENIM SHORTS", "SHORTS"],
+    "categories": [
+      "DENIM",
+      "F",
+      "FB LIVE 12 JAN 2022",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Washed Denim Jeans",
+    "sku": "BPL0010452M",
+    "description": "Front button and zipper opening. Front pocket flap detail. Back patch pocket detail. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOMS", "DENIM", "JEANS"],
+    "categories": ["DENIM", "F", "LALU", "LALU BOTTOMS", "LALU NEW ARRIVALS"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Square Neckline Dungaree",
+    "sku": "BPD0010304X",
+    "description": "Relaxed cutting. Square neckline with adjustable thick shoulder straps and metal clasp fastening. Front patch pocket detail. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "DUNGAREES", "ONE PIECE"],
+    "categories": [
+      "DENIM",
+      "F",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Oversized Square Neckline Pinafore",
+    "sku": "BDQ0010453I",
+    "description": "Relaxed cutting. Sqaure neckline with thick shoulder straps. Front dart detail. Side seam pocket detail. Single back patch pocket detail. Material: Denim",
+    "colours": ["DENIM BLUE", "DENIM RED"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["ONE PIECE", "PINAFORES"],
+    "categories": [
+      "CNY COLLECTION",
+      "DENIM",
+      "F",
+      "FB LIVE 12 JAN 2022",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Elasticated Denim Shorts",
+    "sku": "BPS0009076X",
+    "description": "Elasticated back and side waistband. Front and back pockets. Front button and zip closure. Fabric: Denim cotton",
+    "colours": ["DENIM BLUE", "LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOM", "SHORTS"],
+    "categories": [
+      "BACK IN STOCK",
+      "DENIM",
+      "NEW ARRIVALS",
+      "2 FOR S$ 49",
+      "LALU",
+      "LALU NEW ARRIVALS",
+      "LALU BOTTOMS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Militarian Denim Jacket",
+    "sku": "BJK0009247X",
+    "description": "Front open darts detail. Functional front pockets with flap detail. Material: denim",
+    "colours": ["BLUE ACID", "CREAM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM JACKET"],
+    "categories": ["DENIM", "LALU", "LALU NEW ARRIVALS", "LALU OUTERWEAR"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Straight Cut Denim Jeans",
+    "sku": "BP0009671L",
+    "description": "Front metal button and zip closure. Straight-cut pants. Front welt pocket detail. Material: denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "JEANS", "PANTS"],
+    "categories": [
+      "BACK IN STOCK",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Washed Ripped Tapered Jeans",
+    "sku": "BPL0009803M",
+    "description": "Tapered cutting. Button and zip closure. Tattered detail on front panel. Front pants pocket detail. Back patch pocket. Material: Denim",
+    "colours": ["DENIM GREY"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOMS", "DENIM", "JEANS"],
+    "categories": [
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Hoodie Jacket",
+    "sku": "BJK0010243W",
+    "description": "Hooded neckline with zipper front fastening. Long sleeves with elasticated cuffs. Two large front pockets. Fabric: Denim",
+    "colours": ["DENIM BLACK", "LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "DENIM JACKETS", "JACKETS", "OUTERWEAR"],
+    "categories": [
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU COLLECTION",
+      "LALU NEW ARRIVALS",
+      "LALU OUTERWEAR",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Asymmetrical A-Line Dress",
+    "sku": "BDQ0010017H",
+    "description": "Rounded neckline. Centre back invisible zip closure. Asymmetrical hem line. Material: cotton",
+    "colours": ["DEEP DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DRESS", "ONE PIECE"],
+    "categories": [
+      "DENIM",
+      "NEW ARRIVALS",
+      "LALU",
+      "LALU NEW ARRIVALS",
+      "LALU DRESS/ONE PIECE"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Washed Denim Jeans",
+    "sku": "BPL0009633M",
+    "description": "Front metal button & zip closure. Tappered cutting. Pants pockets. Material: denim",
+    "colours": ["DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "JEANS", "PANTS"],
+    "categories": [
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "LALU Try Ons",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Frayed Wide Leg Jeans",
+    "sku": "BP0009221M",
+    "description": "Front metal button and zip closure. Front pants pocket. Brushed ripped texture on pants. Material: denim",
+    "colours": ["LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "JEANS", "PANTS"],
+    "categories": [
+      "BACK IN STOCK",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Denim Jeans",
+    "sku": "BPL0009369M",
+    "description": "Button and zip fastening. Side and back pockets",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["JEANS", "PANTS"],
+    "categories": ["DENIM", "LALU", "LALU BOTTOMS", "LALU NEW ARRIVALS"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Ripped Denim Shorts",
+    "sku": "BPS0009632M",
+    "description": "Button and front zip closure. Front pants pocket. Ripped detail at pants front. Folded hemline. Material: Denim",
+    "colours": ["DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "SHORTS"],
+    "categories": [
+      "2 FOR S$ 49",
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Pencil Denim Jeans",
+    "sku": "BPL0009225M",
+    "description": "Slim fitting. Front pants pocket. Back patch pocket. Material: Denim",
+    "colours": ["BLACK", "DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "JEANS", "PANTS"],
+    "categories": [
+      "BACK IN STOCK",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Denim Flare Skirt",
+    "sku": "BSK0008936X",
+    "description": "A-line flare. Sideseam pockets. Material: cotton denim",
+    "colours": ["DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOM", "SKIRT"],
+    "categories": [
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU SKIRTS",
+      "SALE FROM $10"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": { "SGD": "19.00" }
+  },
+  {
+    "name": "Elasticated A-Line Skirt",
+    "sku": "BSK0009711X",
+    "description": "Button and zip closure. Front pants pocket detail. Fabric: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "DENIM SKIRTS", "SKIRTS"],
+    "categories": [
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "LALU SKIRTS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "High-Waisted Elasticated Shorts",
+    "sku": "BPS0009822M",
+    "description": "Button and zip closure. Front pleat detail. Sideseam pocket detail. Back patch pocket. Fabric: Denim",
+    "colours": ["CREAM", "DEEP DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM SHORTS", "SHORTS"],
+    "categories": [
+      "B",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Double Button Shorts",
+    "sku": "BPS0009508L",
+    "description": "Front metal buttons and zip closure. Folded Hemline. Front pants pockets. Material: Denim",
+    "colours": ["CREAM", "LIGHT DENIM", "RED"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["BOTTOM", "DENIM", "JEANS"],
+    "categories": [
+      "CNY COLLECTION",
+      "FB LIVE 12 JAN 2022",
+      "FB LIVE 5 JAN 2022",
+      "BACK IN STOCK",
+      "DENIM",
+      "NEW ARRIVALS",
+      "2 FOR S$ 49",
+      "LALU",
+      "LALU NEW ARRIVALS",
+      "LALU COLLECTION",
+      "LALU BOTTOMS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Blue Denim Shorts",
+    "sku": "BPS0009637M",
+    "description": "Metal button and zipper closure. Functional front pants pocket. Material:Denim",
+    "colours": ["LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "SHORTS"],
+    "categories": [
+      "2 FOR S$ 49",
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Cross-Back Dungaree Skirt",
+    "sku": "BDQ0009578X",
+    "description": "Boxy silhouette. Scoop neckline. Patch pockets at front. Metal details along front and back of dungaree. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "DUNGAREE", "SKIRT"],
+    "categories": [
+      "DENIM",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "LALU Try Ons",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Pleated Denim Shorts",
+    "sku": "BPS0009892M",
+    "description": "Button and front zip closure. Pleat detail at pants front. Front pants pocket. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "PANTS", "SHORTS"],
+    "categories": [
+      "DENIM",
+      "NEW ARRIVALS",
+      "LALU",
+      "LALU NEW ARRIVALS",
+      "LALU BOTTOMS"
+    ],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Pleated Denim Jeans",
+    "sku": "BPL0009893M",
+    "description": "Button and front zip closure. Front pants pocket. Front pleat detail. Back patch pocket. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "JEANS"],
+    "categories": [
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Spaghetti Jumpsuit",
+    "sku": "BPD0010065A",
+    "description": "Adjustable spaghetti straps. Boxy cutting. Material: cotton denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["JUMPSUIT", "ONE PIECE"],
+    "categories": ["DENIM", "LALU", "LALU DRESS/ONE PIECE", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "19.00" }
+  },
+  {
+    "name": "Panelled Washed Jeans",
+    "sku": "BPL0009804M",
+    "description": "Button and zip closure. Tappered cutting. Front pants pocket detail. Back patch pocket detail. Material: Denim",
+    "colours": ["DENIM BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "JEANS", "PANTS"],
+    "categories": [
+      "DENIM",
+      "LALU",
+      "LALU BOTTOMS",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Light Washed Denim Jeans",
+    "sku": "BPL0009895M",
+    "description": "Button and front zip closure. Front pants pocket. Straight cut. Back patch pocket. Material: Denim",
+    "colours": ["LIGHT DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DENIM", "JEANS"],
+    "categories": [
+      "LALU Try Ons",
+      "DENIM",
+      "NEW ARRIVALS",
+      "SALE FROM $10",
+      "LALU",
+      "LALU BOTTOMS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": { "SGD": "19.00" }
+  },
+  {
+    "name": "Asymmetric Sleeveless Denim Dress",
+    "sku": "BDQ0008766X",
+    "description": "Asymmetric hem design. Round neckline. Back concealed zip closure. Fabric: Denim Rayon",
+    "colours": ["DENIM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DRESS"],
+    "categories": [
+      "BACK IN STOCK",
+      "DENIM",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Printed A-Line Skirt",
+    "sku": "ASK0009454H",
+    "description": "Front buttons closure. Elasticated back waistband. Length: below knee. Fabric: Printed cotton",
+    "colours": ["BLACK PRINT"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["SKIRTS"],
+    "categories": ["iORA", "iORA SKIRTS", "SALE FROM $10"],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Pleated Midi Skirt",
+    "sku": "ASK0009101D",
+    "description": "Elastic waistband. Contrast colour panel. Fabric: Suedette",
+    "colours": ["BEIGE", "GREY BLUE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["SKIRT"],
+    "categories": ["iORA", "iORA SKIRTS", "SALE FROM $10"],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": { "SGD": "15.00" }
+  },
+  {
+    "name": "Printed Sundress",
+    "sku": "ADQ0009458H",
+    "description": "Adjustable spaghetti straps. Front buttons closure. Fabric: Printed cotton",
+    "colours": ["BLACK PRINT"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["DRESS"],
+    "categories": ["SALE FROM $10", "iORA", "iORA DRESS/ONE PIECE"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "19.00" }
+  },
+  {
+    "name": "Flare Cut Culottes",
+    "sku": "APL0009197A",
+    "description": "Sideseam pockets. Fabric: Polyester",
+    "colours": ["BLACK", "NUDE"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["BOTTOM", "CULOTTES"],
+    "categories": ["SALE FROM $10", "iORA", "iORA BOTTOMS"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "19.00" }
+  },
+  {
+    "name": "Gingham Pattern Jersey Dress",
+    "sku": "ATD0008784D",
+    "description": "Gingham pattern. Crew neck. Short sleeves. Single welt pockets front. Center back metal zipper fastening. Fabric: Interlock jersey",
+    "colours": ["BLUSH", "NAVY"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["DRESS"],
+    "categories": ["SALE FROM $10", "iORA", "iORA DRESS/ONE PIECE"],
+    "price": { "SGD": "29.00", "RM": "29.00" },
+    "discountedPrice": { "SGD": "19.00" }
+  },
+  {
+    "name": "Stripes Knit Dress",
+    "sku": "AKD0009160J",
+    "description": "Wide rounded neckline. Comfortable fit. Fabric: Knit",
+    "colours": ["BLACK", "BROWN"],
+    "sizes": ["S", "M", "L"],
+    "company": "IORA",
+    "tags": ["DRESS"],
+    "categories": ["iORA", "iORA DRESS/ONE PIECE", "SALE FROM $10"],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": { "SGD": "19.00" }
+  },
+  {
+    "name": "Pleated Maxi Skirt",
+    "sku": "ASK0009136A",
+    "description": "Zipper closure. Flared hem line. Fabric: Printed cotton rayon",
+    "colours": ["BLUSH"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "IORA",
+    "tags": ["SKIRTS"],
+    "categories": ["iORA", "iORA SKIRTS", "SALE FROM $10"],
+    "price": { "SGD": "29.00" },
+    "discountedPrice": { "SGD": "19.00" }
+  },
+  {
+    "name": "V-Neck Oversized Romper",
+    "sku": "BPD0010528A",
+    "description": "Loose fitting. V-neckline with thin shoulder straps. Wide-legged opening. Material: Cotton linen",
+    "colours": ["BLACK", "KHAKI BROWN"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["ONE PIECE", "ROMPERS"],
+    "categories": [
+      "F",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00", "RM": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Printed A-line Smocked Dress",
+    "sku": "BDQ0010220H",
+    "description": "Square neckline. Smocking detail along waistline. Gather detail along waistline. Material: Printed cotton",
+    "colours": ["YELLOW FLORAL"],
+    "sizes": ["S", "M", "L"],
+    "company": "LALU",
+    "tags": ["A-LINE DRESSES", "DRESSES"],
+    "categories": [
+      "F",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Puff Sleeve Smocked Dress",
+    "sku": "BDQ0010294Y",
+    "description": "Square neckline. A-line cutting. Puffed sleeve with elasticated shoulder and sleeve opening. Smocking detail at front and back. Gather detail along waistline. Material: Cotton",
+    "colours": ["MINT"],
+    "sizes": ["S", "M", "L"],
+    "company": "LALU",
+    "tags": ["DRESSES"],
+    "categories": [
+      "F",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Cross-back Button Pinafore",
+    "sku": "BDQ0010497X",
+    "description": "A-line cutting. Scoop neckline. Adjustable shoulder strap with button fastening. Cross back detail. Front patch pocket detail. Fabric: Cotton twill",
+    "colours": ["BLACK", "CREAM"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["ONE PIECE", "PINAFORE", "PINAFORES"],
+    "categories": [
+      "F",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Tiered A-line Sleeveless Dress",
+    "sku": "BDQ0010526Y",
+    "description": "A-line cutting. Round neckline. Tier panel detail with gather details. Center back zipper fastening. Fabric: Cotton",
+    "colours": ["NAVY", "YELLOW"],
+    "sizes": ["S", "M", "L"],
+    "company": "LALU",
+    "tags": ["DRESSES", "ONE PIECE"],
+    "categories": [
+      "B",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Collared Shift Dress",
+    "sku": "BDQ0010043X",
+    "description": "Front patch pocket. Button down with hidden placket. Curved hem. Material:Cotton",
+    "colours": ["KHAKI BROWN"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DRESS", "ONE PIECE"],
+    "categories": [
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Pocket Shirt Dress",
+    "sku": "BDQ0009116Y",
+    "description": "Shirt collar with button front fastening. Front patch pockets with flaps. Long sleeves. Curved hem with a longer back. Fabric: Cotton",
+    "colours": ["KHAKI", "NAVY"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DRESS", "ONEPIECE"],
+    "categories": [
+      "BACK IN STOCK",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS"
+    ],
+    "price": { "SGD": "39.00", "RM": "39.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Square Neck Button Romper",
+    "sku": "BPD0010488A",
+    "description": "Square necklne with thick shoulder straps. Front button opening. Adjustable D ring waist sash. Material: Cotton",
+    "colours": ["GREEN FLORAL"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["FLORAL ROMPERS", "FLORALS", "ONE PIECE", "ROMPERS"],
+    "categories": [
+      "B",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "49.00", "RM": "49.00" },
+    "discountedPrice": {}
+  },
+  {
+    "name": "Basic Straight Cut Dress",
+    "sku": "BTD0010509D",
+    "description": "Comfortable fit. Straight cut. Round neckline. Side seam pocket detail. Fabric: Jersey",
+    "colours": ["BLACK", "KHAKI"],
+    "sizes": ["S", "M", "L", "XL"],
+    "company": "LALU",
+    "tags": ["DRESSES", "ONE PIECE"],
+    "categories": [
+      "B",
+      "LALU",
+      "LALU DRESS/ONE PIECE",
+      "LALU NEW ARRIVALS",
+      "NEW ARRIVALS"
+    ],
+    "price": { "SGD": "33.00", "RM": "33.00" },
+    "discountedPrice": {}
+  }
+]

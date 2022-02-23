@@ -52,8 +52,7 @@ public class AdminController {
     @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {
         try {
-            adminService.createJobTitle(jt);
-            return ResponseEntity.ok("Job title has been successfully created");
+            return ResponseEntity.ok(adminService.createJobTitle(jt));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -62,8 +61,7 @@ public class AdminController {
     @PutMapping(path = "/editJobTitle", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editJobTitle(@RequestBody JobTitle jt) {
         try {
-            adminService.updateJobTitle(jt);
-            return ResponseEntity.ok("Job Tiltle with ID " + jt.getId() + " has been successfully updated.");
+            return ResponseEntity.ok(adminService.updateJobTitle(jt));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -103,8 +101,7 @@ public class AdminController {
     @PostMapping(path = "/addVendor", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addCompany(@RequestBody Vendor v) {
         try {
-            adminService.createVendor(v);
-            return ResponseEntity.ok("Vendor has been successfully created");
+            return ResponseEntity.ok(adminService.createVendor(v));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -134,8 +131,7 @@ public class AdminController {
     @PutMapping(path = "/editVendor", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editVendor(@RequestBody Vendor v) {
         try {
-            adminService.updateVendor(v);;
-            return ResponseEntity.ok("Vendor with ID " + v.getId() + " has been successfully updated.");
+            return ResponseEntity.ok(adminService.updateVendor(v));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -156,8 +152,7 @@ public class AdminController {
     @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addCompany(@RequestBody Company company) {
         try {
-            adminService.createCompany(company);
-            return ResponseEntity.ok("Company has been successfully created");
+            return ResponseEntity.ok(adminService.createCompany(company));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -187,8 +182,8 @@ public class AdminController {
     @PutMapping(path = "/editCompany", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editCompany(@RequestBody Company company) {
         try {
-            adminService.editCompany(company);
-            return ResponseEntity.ok("Company with ID " + company.getId() + " has been successfully updated.");
+            
+            return ResponseEntity.ok(adminService.editCompany(company));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -231,8 +226,7 @@ public class AdminController {
     @PostMapping(path = "/addDepartment", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addDepartment(@RequestBody Department d) {
         try {
-            adminService.createDepartment(d);
-            return ResponseEntity.ok("Deapartment has been successfully created");
+            return ResponseEntity.ok(adminService.createDepartment(d));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -262,9 +256,7 @@ public class AdminController {
     @PutMapping(path = "/editDepartment", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editDepartment(@RequestBody Department d) {
         try {
-            adminService.editDepartment(d);
-            ;
-            return ResponseEntity.ok("Department with ID " + d.getId() + " has been successfully updated.");
+            return ResponseEntity.ok(adminService.editDepartment(d));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -283,8 +275,7 @@ public class AdminController {
     @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
         try {
-            employeeService.createEmployee(employee);
-            return ResponseEntity.ok("Employee " + employee.getName() + " is successfully created");
+            return ResponseEntity.ok(employeeService.createEmployee(employee));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -344,8 +335,8 @@ public class AdminController {
     @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editEmployee(@RequestBody Employee employee) {
         try {
-            employeeService.updateEmployeeAccount(employee);
-            return ResponseEntity.ok("Employee with employee ID " + employee.getId() + " is successfully updated.");
+            
+            return ResponseEntity.ok(employeeService.updateEmployeeAccount(employee));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

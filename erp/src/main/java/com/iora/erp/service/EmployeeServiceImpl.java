@@ -30,7 +30,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private AdminService adminService;
 
     @Override
-    public void createEmployee(Employee employee) throws EmployeeException {
+    public Employee createEmployee(Employee employee) throws EmployeeException {
         Employee e = employee;
 
         try {
@@ -47,6 +47,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 throw new EmployeeException();
             }
 
+            return e;
+
         } catch (EmployeeException ex) {
             throw new EmployeeException("Job Title selected for the Employee: " + e.getName()
                     + " is not applicable for the choosen department");
@@ -56,7 +58,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void updateEmployeeAccount(Employee employee) throws EmployeeException {
+    public Employee updateEmployeeAccount(Employee employee) throws EmployeeException {
         Employee old = em.find(Employee.class, employee.getId());
 
         if (old == null) {
@@ -86,6 +88,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                         if (!old.getCompany().getId().equals(employee.getCompany().getId())) {
                             old.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
                         }
+
+                        return old;
 
                     } else {
                         throw new EmployeeException("Email has been taken!");

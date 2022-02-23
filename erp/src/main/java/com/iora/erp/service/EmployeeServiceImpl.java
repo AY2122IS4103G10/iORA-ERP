@@ -32,11 +32,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void createEmployee(Employee employee) throws EmployeeException {
         Employee e = employee;
-        
+
         try {
             if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
-            employee.getJobTitle().getId()) == true) {
-                
+                    employee.getJobTitle().getId()) == true) {
+
                 e.setSalt(saltGeneration().toString());
                 e.setPassword(employee.getPassword());
                 em.persist(e);
@@ -71,7 +71,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                         usernameAvailability(employee.getUsername()) == true) ||
                         old.getUsername().equals(employee.getUsername())) {
 
-
                     if (!old.getEmail().equals(employee.getEmail()) ||
                             (!old.getEmail().equals(employee.getEmail())
                                     && emailAvailability(old.getEmail()) == true)) {
@@ -84,10 +83,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                         old.setSalary(employee.getSalary());
                         old.setPayType(employee.getPayType());
 
-                        if(!old.getCompany().getId().equals(employee.getCompany().getId())) {
+                        if (!old.getCompany().getId().equals(employee.getCompany().getId())) {
                             old.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
                         }
-
 
                     } else {
                         throw new EmployeeException("Email has been taken!");
@@ -213,7 +211,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee e = (Employee) q.getSingleResult();
             return false;
-            
+
         } catch (NoResultException | NonUniqueResultException ex) {
             return true;
         }
@@ -226,27 +224,25 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee e = (Employee) q.getSingleResult();
             return false;
-            
+
         } catch (NoResultException | NonUniqueResultException ex) {
             return true;
         }
     }
 
-    /*
-     * @Override
-     * public Employee loginAuthentication(Employee employee) throws
-     * EmployeeException {
-     * try {
-     * Employee c = getEmployeeByUsername(employee.getUsername());
-     * if (c.authentication(employee.getPassword()))) {
-     * return c;
-     * } else {
-     * throw new EmployeeException();
-     * }
-     * } catch (Exception ex) {
-     * throw new EmployeeException("Invalid Username or Password.");
-     * }
-     * 
-     * }
-     */
+    @Override
+    public Employee loginAuthentication(String username, String password) throws EmployeeException {
+        try {
+            Employee c = getEmployeeByUsername(username);
+
+            if (c.authentication(password)) {
+                return c;
+            } else {
+                throw new EmployeeException();
+            }
+        } catch (Exception ex) {
+            throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
+        }
+
+    }
 }

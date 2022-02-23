@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,6 +35,7 @@ import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,10 @@ public class DataLoader implements CommandLineRunner {
         private CustomerService customerService;
         @Autowired
         private ProductService productService;
+        @Autowired
+        private AdminService adminService;
+        @Autowired
+        private EmployeeService employeeService;
         @PersistenceContext
         private EntityManager em;
 
@@ -65,34 +71,76 @@ public class DataLoader implements CommandLineRunner {
                 Address a1 = new Address(Country.Singapore, "Singapore", "Enterprise 10", "Singapore", "NIL",
                                 "10P Enterprise Road", "Singapore 629840", false, 1.334251, 103.704246);
 
+                em.persist(a1);
+
+                //JobTitle
                 Set<AccessRights> s = new HashSet<>();
                 s.add(AccessRights.MARKETING_BASIC);
 
-                List<Department> departments = new ArrayList<Department>();
+                Set<AccessRights> ar = new HashSet<>();
+                ar.add(AccessRights.MARKETING_BASIC);
+                ar.add(AccessRights.MARKETING_CRM);
+                JobTitle jobTitle1 = new JobTitle("Sales", "Sales and Marketing Product", ar);
+                adminService.createJobTitle(jobTitle1);
+
+                Set<AccessRights> ar2 = new HashSet<>();
+                ar2.add(AccessRights.STORE_BASIC);
+                ar2.add(AccessRights.STORE_INVENTORY);
+                JobTitle jobTitle2 = new JobTitle("Store Manager", "Managnig the physical store", ar2);
+                em.persist(jobTitle2);
+                adminService.createJobTitle(jobTitle2);
+
+                Set<AccessRights> ar3 = new HashSet<>();
+                ar2.add(AccessRights.WAREHOUSE_BASIC);
+                ar2.add(AccessRights.WAREHOUSE_ORDER);
+                JobTitle jobTitle3 = new JobTitle("Manufacturing Manager", "Managnig the products production", ar3);
+                em.persist(jobTitle3);
+                adminService.createJobTitle(jobTitle3);
+
+                //Department
                 Department sam = new Department("Sales and Marketing");
-                em.persist(sam);
-                // sam.setJobTitles(new JobTitle("title1", "Incharge of warehouse", s));
+                List<JobTitle> jt = new ArrayList<>();
+                jt.add(adminService.getJobTitleById(Long.valueOf(1)));
+                sam.setJobTitles(jt);
+                adminService.createDepartment(sam);
 
-                List<Department> departments2 = new ArrayList<Department>();
                 Department sam2 = new Department("Online Marketing");
-                em.persist(sam2);
+                sam.setJobTitles(jt);
+                adminService.createDepartment(sam2);
 
-                List<Department> departments3 = new ArrayList<Department>();
                 Department sam3 = new Department("Manufacturing");
-                em.persist(sam3);
+                List<JobTitle> jt3 = new ArrayList<>();
+                jt3.add(adminService.getJobTitleById(Long.valueOf(3)));
+                sam.setJobTitles(jt3);
+                adminService.createDepartment(sam3);
+
+                //Company
+                List<Department> departments = new ArrayList<>();
+                departments.add(adminService.getDepartmentById(Long.valueOf(1)));
+                departments.add(adminService.getDepartmentById(Long.valueOf(2)));
 
                 Company iora = new Company("iORA Fashion Pte. Ltd.", "199703089W", "+65-63610056");
                 iora.setDepartments(departments);
                 iora.setAddress(a1);
-                em.persist(iora);
+                adminService.createCompany(iora);
+
+
                 Company lalu = new Company("LALU Fashion Pte. Ltd.", "201226449M", "+65-63610056");
-                lalu.setDepartments(departments2);
+                lalu.setDepartments(departments);
                 lalu.setAddress(a1);
                 em.persist(lalu);
+
                 Company sora = new Company("SORA Fashion Pte. Ltd.", "199900605W", "+65-63610056");
-                sora.setDepartments(departments3);
+                sora.setDepartments(departments);
                 sora.setAddress(a1);
                 em.persist(sora);
+
+                //Employee 
+                Employee e = new Employee("Sharon KS", "sharonMS.12@gmail.com", 4100.0, "sharonE", "password", 
+                true, PayType.MONTHLY, adminService.getJobTitleById(Long.valueOf(1)), 
+                adminService.getDepartmentById(Long.valueOf(1)), adminService.getCompanyById(Long.valueOf(1)));
+                employeeService.createEmployee(e);
+                
 
                 // Adding Sites
                 HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", "+65-63610056", iora);

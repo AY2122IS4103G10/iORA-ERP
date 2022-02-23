@@ -67,13 +67,13 @@ public class WarehouseController {
     @PostMapping(path = "/editStock/{siteId}", consumes = "application/json")
     public ResponseEntity<Object> editStock(@RequestBody List<ProductItem> toUpdate, @PathVariable Long siteId) {
         List<String> errors = new ArrayList<>();
-        for (ProductItem item : toUpdate) {
+        for (int i = 0; i < toUpdate.size(); i++) {
+            ProductItem item = toUpdate.get(i);
             try {
                 if (item.getStockLevel() == null) {
                     siteService.removeProductItemFromSite(item.getRfid());
                 } else {
-                    siteService.addToStockLevel(item.getStockLevel(), item);
-                    ;
+                    siteService.addProductItemToSite(item.getStockLevel().getId(), item.getRfid());
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());
@@ -83,6 +83,7 @@ public class WarehouseController {
         if (errors.isEmpty()) {
             return ResponseEntity.ok("Transaction successful");
         } else {
+            System.err.println(errors);
             return ResponseEntity.badRequest().body(String.join("\n", errors));
         }
     }

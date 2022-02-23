@@ -74,7 +74,7 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public List<Site> searchAllSites(List<String> siteTypes, String country, String company) {
-        List<Site> resultList = em.createQuery(siteQuery("SELECT s FROM Site s", country.toUpperCase(), company),
+        List<Site> resultList = em.createQuery(siteQuery("SELECT s FROM Site s", country, company),
                 Site.class)
                 .getResultList();
         return resultList;
@@ -83,7 +83,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchHeadquarters(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM HeadquartersSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM HeadquartersSite s", country, company),
                         HeadquartersSite.class)
                 .getResultList();
         return resultList;
@@ -92,7 +92,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchManufacturing(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM ManufacturingSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM ManufacturingSite s", country, company),
                         ManufacturingSite.class)
                 .getResultList();
         return resultList;
@@ -101,7 +101,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchOnlineStores(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM OnlineStoreSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM OnlineStoreSite s", country, company),
                         OnlineStoreSite.class)
                 .getResultList();
         return resultList;
@@ -110,7 +110,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchStores(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM StoreSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM StoreSite s", country, company),
                         StoreSite.class)
                 .getResultList();
         return resultList;
@@ -119,7 +119,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchWarehouses(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM WarehouseSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM WarehouseSite s", country, company),
                         WarehouseSite.class)
                 .getResultList();
         return resultList;
@@ -128,10 +128,10 @@ public class SiteServiceImpl implements SiteService {
     String siteQuery(String mainQuery, String country, String company) {
         if (!country.equals("") && !company.equals("")) {
             return mainQuery + String.format(
-                    " WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country,
+                    " WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country.toUpperCase(),
                     company);
         } else if (!country.equals("")) {
-            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country);
+            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country.toUpperCase());
         } else if (!company.equals("")) {
             return mainQuery + String.format(" WHERE s.company.name = '%s Fashion Pte. Ltd.'", company);
         } else {

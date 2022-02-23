@@ -1,5 +1,6 @@
 package com.iora.erp.model.procurementOrder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,6 +14,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.iora.erp.enumeration.ProcurementOrderStatus;
 import com.iora.erp.model.site.Site;
 
 @Entity
@@ -22,23 +27,40 @@ public class ProcurementOrder {
     private Long id;
     @ElementCollection
     private List<POStatus> statusHistory;
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private ProcurementOrderFulfilment procurementOrderFulfilment;
     @OneToMany(cascade = CascadeType.ALL)
     private List<ProcurementOrderLI> lineItems;
 
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ManyToOne
     private Site manufacturing;
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ManyToOne
     private Site headquarters;
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ManyToOne
     private Site warehouse;
 
     public ProcurementOrder() {
+        this.statusHistory = new ArrayList<>();
     }
 
     public ProcurementOrder(Long id) {
         this.id = id;
+        this.statusHistory = new ArrayList<>();
+    }
+
+    public ProcurementOrder(Long id, List<POStatus> statusHistory,
+            ProcurementOrderFulfilment procurementOrderFulfilment, List<ProcurementOrderLI> lineItems,
+            Site manufacturing, Site headquarters, Site warehouse) {
+        this.id = id;
+        this.statusHistory = statusHistory;
+        this.procurementOrderFulfilment = procurementOrderFulfilment;
+        this.lineItems = lineItems;
+        this.manufacturing = manufacturing;
+        this.headquarters = headquarters;
+        this.warehouse = warehouse;
     }
 
     public Long getId() {
@@ -55,6 +77,19 @@ public class ProcurementOrder {
 
     public void setStatusHistory(List<POStatus> statusHistory) {
         this.statusHistory = statusHistory;
+    }
+
+    @JsonIgnore
+    public ProcurementOrderStatus getLastStatus() {
+        try {
+            return this.statusHistory.get(this.statusHistory.size() - 1).getStatus();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public void addStatus(POStatus status) {
+        this.statusHistory.add(status);
     }
 
     public ProcurementOrderFulfilment getProcurementOrderFulfilment() {
@@ -121,8 +156,8 @@ public class ProcurementOrder {
     @Override
     public String toString() {
         return "{" +
-            " id='" + getId() + "'" +
-            "}";
+                " id='" + getId() + "'" +
+                "}";
     }
 
 }

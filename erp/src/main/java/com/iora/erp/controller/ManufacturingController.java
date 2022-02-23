@@ -50,8 +50,7 @@ public class ManufacturingController {
     @PutMapping(path = "/procurementOrder/accept/{orderId}/{siteId}", consumes = "application/json")
     public ResponseEntity<Object> acceptProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            procurementService.confirmProcurementOrder(orderId, siteId);
-            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is accepted.");
+            return ResponseEntity.ok(procurementService.confirmProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -60,8 +59,7 @@ public class ManufacturingController {
     @PutMapping(path = "/procurementOrder/cancel/{orderId}/{siteId}", consumes = "application/json")
     public ResponseEntity<Object> cancelProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            procurementService.rejectProcurementOrder(orderId, siteId);
-            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is rejected.");
+            return ResponseEntity.ok(procurementService.rejectProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -70,8 +68,7 @@ public class ManufacturingController {
     @PutMapping(path = "/procurementOrder/fulfil/{siteId}", consumes = "application/json")
     public ResponseEntity<Object> fulfilProcurementOrder(@RequestBody ProcurementOrder order, @PathVariable Long siteId) {
         try {
-            procurementService.fulfilProcurementOrder(order, siteId);
-            return ResponseEntity.ok("Procurement Order with ID " + order.getId() + " fulfilled.");
+            return ResponseEntity.ok(procurementService.fulfilProcurementOrder(order, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

@@ -10,11 +10,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.iora.erp.enumeration.ProcurementOrderStatus;
 import com.iora.erp.model.site.Site;
 
 @Embeddable
 public class POStatus {
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ManyToOne
     private Site actionBy;
     @Temporal(TemporalType.TIMESTAMP)

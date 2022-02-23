@@ -1,6 +1,7 @@
 package com.iora.erp.model.site;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -125,6 +126,17 @@ public class Site implements Serializable {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Site)) {
+            return false;
+        }
+        Site site = (Site) o;
+        return Objects.equals(id, site.id) && Objects.equals(name, site.name);
     }
 
 }

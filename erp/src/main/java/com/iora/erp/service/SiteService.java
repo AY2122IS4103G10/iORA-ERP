@@ -19,7 +19,7 @@ public interface SiteService {
     public abstract List<? extends Site> searchOnlineStores(String country, String company);
     public abstract List<? extends Site> searchStores(String country, String company);
     public abstract List<? extends Site> searchWarehouses(String country, String company);
-    public abstract void updateSite(Site site);
+    public abstract Site updateSite(Site site);
     public abstract void deleteSite(Long id);
 
     public abstract Site getSiteFromStockLevel(Long stockLevelId);

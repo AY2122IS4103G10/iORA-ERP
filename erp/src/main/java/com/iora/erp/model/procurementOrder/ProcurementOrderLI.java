@@ -1,5 +1,6 @@
 package com.iora.erp.model.procurementOrder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,11 +38,25 @@ public class ProcurementOrderLI {
     private int actualQty;
 
     public ProcurementOrderLI() {
+        fulfilledProductItems = new ArrayList<>();
+        actualProductItems = new ArrayList<>();
     }
 
     public ProcurementOrderLI(Long id) {
         this.id = id;
+        fulfilledProductItems = new ArrayList<>();
+        actualProductItems = new ArrayList<>();
     }
+
+
+    public ProcurementOrderLI(Long id, Product product, int requestedQty, List<ProductItem> fulfilledProductItems, List<ProductItem> actualProductItems) {
+        this.id = id;
+        this.product = product;
+        this.requestedQty = requestedQty;
+        this.fulfilledProductItems = fulfilledProductItems;
+        this.actualProductItems = actualProductItems;
+    }
+    
 
     public Long getId() {
         return this.id;
@@ -57,14 +72,6 @@ public class ProcurementOrderLI {
 
     public void setProduct(Product product) {
         this.product = product;
-    }
-
-    public void setFulfilledQty(int fulfilledQty) {
-        this.fulfilledQty = fulfilledQty;
-    }
-
-    public void setActualQty(int actualQty) {
-        this.actualQty = actualQty;
     }
 
     public int getRequestedQty() {

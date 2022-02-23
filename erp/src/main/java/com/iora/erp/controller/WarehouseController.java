@@ -107,8 +107,7 @@ public class WarehouseController {
     public ResponseEntity<Object> verifyProcurementOrder(@RequestBody ProcurementOrder procurementOrder,
             @PathVariable Long siteId) {
         try {
-            procurementService.verifyProcurementOrder(procurementOrder, siteId);
-            return ResponseEntity.ok("Procurement Order with ID " + procurementOrder.getId() + " is accepted.");
+            return ResponseEntity.ok(procurementService.verifyProcurementOrder(procurementOrder, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

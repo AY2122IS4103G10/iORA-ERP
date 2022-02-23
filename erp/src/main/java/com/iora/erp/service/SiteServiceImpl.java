@@ -140,12 +140,13 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public void updateSite(Site site) {
+    public Site updateSite(Site site) {
         Site old = em.find(Site.class, site.getId());
         old.setName(site.getName());
         old.setAddress(site.getAddress());
         old.setSiteCode(site.getSiteCode());
         old.setActive(site.isActive());
+        return old;
     }
 
     @Override

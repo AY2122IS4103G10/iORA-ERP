@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
@@ -13,6 +15,7 @@ import com.iora.erp.model.procurementOrder.ProcurementOrder;
 @Entity
 public class ManufacturingSite extends Site {
 
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @OneToMany(mappedBy = "manufacturing")
     private List<ProcurementOrder> procurementOrders;
 

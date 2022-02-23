@@ -390,8 +390,7 @@ public class AdminController {
     @PutMapping(path = "/editSite", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editSite(@RequestBody Site site) {
         try {
-            siteService.updateSite(site);
-            return ResponseEntity.ok("Site with site ID " + site.getId() + " is successfully updated.");
+            return ResponseEntity.ok(siteService.updateSite(site));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

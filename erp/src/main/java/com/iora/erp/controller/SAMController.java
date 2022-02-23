@@ -428,9 +428,8 @@ public class SAMController {
     public ResponseEntity<Object> createProcurementOrder(@RequestBody ProcurementOrder procurementOrder,
             @PathVariable Long siteId) {
         try {
-            procurementService.createProcurementOrder(procurementOrder, siteId);
             return ResponseEntity
-                    .ok("Procurement Order with ID " + procurementOrder.getId() + " is successfully created.");
+                    .ok(procurementService.createProcurementOrder(procurementOrder, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -451,9 +450,9 @@ public class SAMController {
     public ResponseEntity<Object> updateProcurementOrder(@RequestBody ProcurementOrder procurementOrder,
             @PathVariable Long siteId) {
         try {
-            procurementService.updateProcurementOrder(procurementOrder, siteId);
+
             return ResponseEntity
-                    .ok("Procurement Order with ID " + procurementOrder.getId() + " is successfully updated.");
+                    .ok(procurementService.updateProcurementOrder(procurementOrder, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -462,8 +461,7 @@ public class SAMController {
     @DeleteMapping(path = "/procurementOrder/delete/{orderId}/{siteId}")
     public ResponseEntity<Object> deleteProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            procurementService.deleteProcurementOrder(orderId, siteId);
-            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is successfully deleted (cancelled).");
+            return ResponseEntity.ok(procurementService.deleteProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -472,8 +470,7 @@ public class SAMController {
     @PutMapping(path = "/procurementOrder/complete/{orderId}/{siteId}")
     public ResponseEntity<Object> completeProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            procurementService.completeProcurementOrder(orderId, siteId);
-            return ResponseEntity.ok("Procurement Order with ID " + orderId + " is successfully deleted (cancelled).");
+            return ResponseEntity.ok(procurementService.completeProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -588,7 +585,8 @@ public class SAMController {
     @PostMapping(path = "/customer/create", consumes = "application/json")
     public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
         try {
-            customerService.createCustomerAccount(customer);;
+            customerService.createCustomerAccount(customer);
+            ;
             return ResponseEntity.ok("Customer with id " + customer.getId() + " was successfully created.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());

@@ -57,223 +57,214 @@ public class ProcurementServiceImpl implements ProcurementService {
     }
 
     @Override
-    public void createProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
+    public ProcurementOrder createProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
             throws SiteConfirmationException {
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof HeadquartersSite) {
-            List<POStatus> statusHistory = new ArrayList<>();
-            statusHistory.add(new POStatus(actionBy, new Date(), ProcurementOrderStatus.PENDING));
-            procurementOrder.setStatusHistory(statusHistory);
-            procurementOrder.setHeadquarters((HeadquartersSite) actionBy);
-
+        HeadquartersSite actionBy = em.find(HeadquartersSite.class, siteId);
+        if (actionBy != null) {
+            procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.PENDING));
+            procurementOrder.setHeadquarters(actionBy);
             procurementOrder.setProcurementOrderFulfilment(new ProcurementOrderFulfilment());
+
             em.persist(procurementOrder);
+            return procurementOrder;
         } else {
-            throw new SiteConfirmationException("Site is not authorised to creat Procurement Order.");
+            throw new SiteConfirmationException("Site is not authorised to create Procurement Order.");
         }
     }
 
     @Override
-    public void updateProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
-            throws SiteConfirmationException, IllegalPOModificationException {
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof HeadquartersSite) {
-            List<POStatus> statusHistory = procurementOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != ProcurementOrderStatus.PENDING) {
-                throw new IllegalPOModificationException(
-                        "Procurement Order has already been confirmed and cannot be updated.");
-            }
-            statusHistory.add(new POStatus(actionBy, new Date(), ProcurementOrderStatus.PENDING));
-            procurementOrder.setStatusHistory(statusHistory);
-            em.merge(procurementOrder);
-        } else {
+    public ProcurementOrder updateProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
+            throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
+
+        ProcurementOrder oldOrder = em.find(ProcurementOrder.class, procurementOrder.getId());
+        HeadquartersSite actionBy = em.find(HeadquartersSite.class, siteId);
+
+        if (oldOrder == null) {
+            throw new ProcurementOrderException("Procurement Order not found");
+        } else if (oldOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+            throw new IllegalPOModificationException(
+                    "Procurement Order has already been confirmed and cannot be updated.");
+        } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to update Procurement Order.");
         }
+
+        procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.PENDING));
+        procurementOrder.setHeadquarters(actionBy);
+
+        return em.merge(procurementOrder);
     }
 
     @Override
-    public void rejectProcurementOrder(Long id, Long siteId)
+    public ProcurementOrder rejectProcurementOrder(Long id, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
+
         ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
+        ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
+
         if (procurementOrder == null) {
             throw new ProcurementOrderException("Procurement Order not found");
-        }
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof ManufacturingSite) {
-            List<POStatus> statusHistory = procurementOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != ProcurementOrderStatus.PENDING) {
-                throw new IllegalPOModificationException(
-                        "Procurement Order has already been confirmed and cannot be rejected.");
-            }
-            statusHistory.add(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CANCELLED));
-            procurementOrder.setStatusHistory(statusHistory);
-            procurementOrder.setManufacturing((ManufacturingSite) actionBy);
-
-            ProcurementOrderFulfilment pof = procurementOrder.getProcurementOrderFulfilment();
-            List<POFStatus> fulfilmentStatusHistory = new ArrayList<>();
-            fulfilmentStatusHistory
-                    .add(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.CANCELLED));
-            pof.setStatusHistory(fulfilmentStatusHistory);
-
-            em.merge(procurementOrder);
-            em.merge(pof);
-        } else {
+        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+            throw new IllegalPOModificationException(
+                    "Procurement Order has already been confirmed and cannot be rejected.");
+        } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to reject Procurement Order.");
         }
+
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CANCELLED));
+        procurementOrder.setManufacturing(actionBy);
+        procurementOrder.getProcurementOrderFulfilment()
+                .addStatus(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.CANCELLED));
+
+        return em.merge(procurementOrder);
     }
 
     @Override
-    public void deleteProcurementOrder(Long id, Long siteId)
+    public ProcurementOrder deleteProcurementOrder(Long id, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
+
         ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
+        HeadquartersSite actionBy = em.find(HeadquartersSite.class, siteId);
+
         if (procurementOrder == null) {
             throw new ProcurementOrderException("Procurement Order not found");
-        }
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof HeadquartersSite) {
-            List<POStatus> statusHistory = procurementOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != ProcurementOrderStatus.PENDING) {
-                throw new IllegalPOModificationException(
-                        "Procurement Order has already been confirmed and cannot be deleted.");
-            }
-            statusHistory.add(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CANCELLED));
-            procurementOrder.setStatusHistory(statusHistory);
-
-            ProcurementOrderFulfilment pof = procurementOrder.getProcurementOrderFulfilment();
-            List<POFStatus> fulfilmentStatusHistory = new ArrayList<>();
-            fulfilmentStatusHistory
-                    .add(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.CANCELLED));
-            pof.setStatusHistory(fulfilmentStatusHistory);
-
-            em.merge(procurementOrder);
-            em.merge(pof);
-        } else {
+        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+            throw new IllegalPOModificationException(
+                    "Procurement Order has already been confirmed and cannot be deleted.");
+        } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to delete Procurement Order.");
         }
+
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CANCELLED));
+        procurementOrder.setHeadquarters(actionBy);
+        procurementOrder.getProcurementOrderFulfilment()
+                .addStatus(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.CANCELLED));
+
+        return em.merge(procurementOrder);
     }
 
     @Override
-    public void confirmProcurementOrder(Long id, Long siteId)
+    public ProcurementOrder confirmProcurementOrder(Long id, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
+
         ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
+        ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
+
         if (procurementOrder == null) {
             throw new ProcurementOrderException("Procurement Order not found");
-        }
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof ManufacturingSite) {
-            List<POStatus> statusHistory = procurementOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != ProcurementOrderStatus.PENDING) {
-                throw new IllegalPOModificationException("Procurement Order is not pending.");
-            }
-            statusHistory.add(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CONFIRMED));
-            procurementOrder.setStatusHistory(statusHistory);
-            procurementOrder.setManufacturing((ManufacturingSite) actionBy);
-
-            ProcurementOrderFulfilment pof = procurementOrder.getProcurementOrderFulfilment();
-            List<POFStatus> fulfilmentStatusHistory = new ArrayList<>();
-            fulfilmentStatusHistory.add(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.PENDING));
-            pof.setStatusHistory(fulfilmentStatusHistory);
-
-            em.merge(procurementOrder);
-            em.merge(pof);
-        } else {
+        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+            throw new IllegalPOModificationException("Procurement Order is not pending.");
+        } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to confirm Procurement Order.");
         }
+
+        procurementOrder.setManufacturing(actionBy);
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CONFIRMED));
+        procurementOrder.getProcurementOrderFulfilment()
+                .addStatus(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.PENDING));
+
+        return em.merge(procurementOrder);
     }
 
     @Override
-    public void fulfilProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
-            throws SiteConfirmationException, IllegalPOModificationException {
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof ManufacturingSite) {
-            List<POStatus> statusHistory = procurementOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != ProcurementOrderStatus.CONFIRMED) {
-                throw new IllegalPOModificationException("Procurement Order is not confirmed.");
-            }
-            statusHistory.add(new POStatus(actionBy, new Date(), ProcurementOrderStatus.READY));
-            procurementOrder.setStatusHistory(statusHistory);
+    public ProcurementOrder fulfilProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
+            throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
 
-            ProcurementOrderFulfilment pof = procurementOrder.getProcurementOrderFulfilment();
-            List<POFStatus> fulfilmentStatusHistory = pof.getStatusHistory();
-            if (fulfilmentStatusHistory.get(fulfilmentStatusHistory.size() - 1)
-                    .getStatus() != ProcurementOrderFulfilmentStatus.PENDING) {
-                throw new IllegalPOModificationException("Procurement Order Fulfilment is not pending.");
-            }
-            fulfilmentStatusHistory
-                    .add(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.CONFIRMED));
-            pof.setStatusHistory(fulfilmentStatusHistory);
+        ProcurementOrder oldOrder = em.find(ProcurementOrder.class, procurementOrder.getId());
+        ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
 
-            em.merge(procurementOrder);
-            em.merge(pof);
-        } else {
+        if (oldOrder == null) {
+            throw new ProcurementOrderException("Procurement Order not found");
+        } else if (oldOrder.getLastStatus() != ProcurementOrderStatus.CONFIRMED) {
+            throw new IllegalPOModificationException("Procurement Order is not confirmed.");
+        } else if (oldOrder.getProcurementOrderFulfilment()
+                .getLastStatus() != ProcurementOrderFulfilmentStatus.PENDING) {
+            throw new IllegalPOModificationException("Procurement Order Fulfilment is not pending.");
+        } else if (actionBy == null || actionBy.getId() != siteId) {
             throw new SiteConfirmationException("Site is not authorised to fulfil Procurement Order.");
         }
+
+        procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.READY));
+        procurementOrder.getProcurementOrderFulfilment()
+                .setStatusHistory(oldOrder.getProcurementOrderFulfilment().getStatusHistory());
+        procurementOrder.getProcurementOrderFulfilment()
+                .addStatus(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.CONFIRMED));
+
+        return em.merge(procurementOrder);
+
     }
 
     @Override
-    public void shipProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
-            throws SiteConfirmationException, IllegalPOModificationException {
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof ManufacturingSite) {
-            ProcurementOrderFulfilment pof = procurementOrder.getProcurementOrderFulfilment();
-            List<POFStatus> fulfilmentStatusHistory = pof.getStatusHistory();
-            if (fulfilmentStatusHistory.get(fulfilmentStatusHistory.size() - 1)
-                    .getStatus() != ProcurementOrderFulfilmentStatus.CONFIRMED) {
-                throw new IllegalPOModificationException("Procurement Order Fulfilment is not confirmed.");
-            }
-            fulfilmentStatusHistory
-                    .add(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.SHIPPED));
-            pof.setStatusHistory(fulfilmentStatusHistory);
+    public ProcurementOrder shipProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
+            throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
 
-            em.merge(pof);
-        } else {
+        ProcurementOrder oldOrder = em.find(ProcurementOrder.class, procurementOrder.getId());
+        ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
+
+        if (oldOrder == null) {
+            throw new ProcurementOrderException("Procurement Order not found");
+        } else if (oldOrder.getProcurementOrderFulfilment()
+                .getLastStatus() != ProcurementOrderFulfilmentStatus.CONFIRMED) {
+            throw new IllegalPOModificationException("Procurement Order Fulfilment is not confirmed.");
+        } else if (actionBy == null || actionBy.getId() != siteId) {
             throw new SiteConfirmationException("Site is not authorised to ship Procurement Order.");
         }
+
+        procurementOrder.getProcurementOrderFulfilment()
+                .setStatusHistory(oldOrder.getProcurementOrderFulfilment().getStatusHistory());
+        procurementOrder.getProcurementOrderFulfilment()
+                .addStatus(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.SHIPPED));
+
+        return em.merge(procurementOrder);
     }
 
     @Override
-    public void verifyProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
-            throws SiteConfirmationException, IllegalPOModificationException {
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof WarehouseSite) {
-            ProcurementOrderFulfilment pof = procurementOrder.getProcurementOrderFulfilment();
-            List<POFStatus> fulfilmentStatusHistory = pof.getStatusHistory();
-            if (fulfilmentStatusHistory.get(fulfilmentStatusHistory.size() - 1)
-                    .getStatus() != ProcurementOrderFulfilmentStatus.SHIPPED) {
-                throw new IllegalPOModificationException("Procurement Order Fulfilment is not shipped.");
-            }
-            fulfilmentStatusHistory.add(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.VERIFIED));
-            pof.setStatusHistory(fulfilmentStatusHistory);
+    public ProcurementOrder verifyProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
+            throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
 
-            em.merge(pof);
-        } else {
+        ProcurementOrder oldOrder = em.find(ProcurementOrder.class, procurementOrder.getId());
+        WarehouseSite actionBy = em.find(WarehouseSite.class, siteId);
+
+        if (oldOrder == null) {
+            throw new ProcurementOrderException("Procurement Order not found");
+        } else if (oldOrder.getProcurementOrderFulfilment()
+                .getLastStatus() != ProcurementOrderFulfilmentStatus.SHIPPED) {
+            throw new IllegalPOModificationException("Procurement Order Fulfilment is not shipped.");
+        } else if (actionBy == null || actionBy.getId() != siteId) {
             throw new SiteConfirmationException("Site is not authorised to verify Procurement Order.");
         }
+
+        procurementOrder.getProcurementOrderFulfilment()
+                .setStatusHistory(oldOrder.getProcurementOrderFulfilment().getStatusHistory());
+        procurementOrder.getProcurementOrderFulfilment()
+                .addStatus(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.VERIFIED));
+
+        return em.merge(procurementOrder);
     }
 
     @Override
-    public void completeProcurementOrder(Long id, Long siteId)
+    public ProcurementOrder completeProcurementOrder(Long id, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
+
         ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
+        HeadquartersSite actionBy = em.find(HeadquartersSite.class, siteId);
+
         if (procurementOrder == null) {
             throw new ProcurementOrderException("Procurement Order not found");
-        }
-        Site actionBy = em.find(Site.class, siteId);
-        if (actionBy != null && actionBy instanceof HeadquartersSite) {
-            ProcurementOrderFulfilment pof = procurementOrder.getProcurementOrderFulfilment();
-            List<POFStatus> fulfilmentStatusHistory = pof.getStatusHistory();
-            if (fulfilmentStatusHistory.get(fulfilmentStatusHistory.size() - 1)
-                    .getStatus() != ProcurementOrderFulfilmentStatus.VERIFIED) {
-                throw new IllegalPOModificationException("Procurement Order Fulfilment is not verified.");
-            }
-            fulfilmentStatusHistory
-                    .add(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.COMPLETED));
-            pof.setStatusHistory(fulfilmentStatusHistory);
-
-            em.merge(pof);
-        } else {
+        } else if (procurementOrder.getProcurementOrderFulfilment()
+                .getLastStatus() != ProcurementOrderFulfilmentStatus.VERIFIED) {
+            throw new IllegalPOModificationException("Procurement Order Fulfilment is not verified.");
+        } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to complete Procurement Order.");
         }
+
+        procurementOrder.getProcurementOrderFulfilment()
+                .setStatusHistory(procurementOrder.getProcurementOrderFulfilment().getStatusHistory());
+        procurementOrder.getProcurementOrderFulfilment()
+                .addStatus(new POFStatus(actionBy, new Date(), ProcurementOrderFulfilmentStatus.COMPLETED));
+
+        return em.merge(procurementOrder);
     }
 
 }

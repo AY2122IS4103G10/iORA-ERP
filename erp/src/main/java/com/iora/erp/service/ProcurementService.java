@@ -12,13 +12,13 @@ public interface ProcurementService {
     public abstract ProcurementOrder getProcurementOrder(Long id);
     public abstract List<ProcurementOrder> getProcurementOrders();
     public abstract List<ProcurementOrder> getProcurementOrdersOfSite(Site site);
-    public abstract void createProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException;
-    public abstract void updateProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException;
-    public abstract void deleteProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
-    public abstract void rejectProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
-    public abstract void confirmProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
-    public abstract void fulfilProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException;
-    public abstract void shipProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException;
-    public abstract void verifyProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException;
-    public abstract void completeProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder createProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException;
+    public abstract ProcurementOrder updateProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder deleteProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder rejectProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder confirmProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder fulfilProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder shipProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder verifyProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder completeProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
 }

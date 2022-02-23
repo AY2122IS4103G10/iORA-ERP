@@ -189,8 +189,6 @@ public class DataLoader implements CommandLineRunner {
                 em.persist(s18);
 
                 // Adding birthday points and membership tiers
-                // BASIC(0.00, 0, 0), SILVER(0.03, 500, 200), GOLD (0.05, 3000, 1000), DIAMOND
-                // (0.07, 7500, 2500);
                 Currency rm = new Currency("RM", "Malaysian Ringgit");
                 Currency sgd = new Currency("SGD", "Singapore Dollar");
                 em.persist(rm);
@@ -209,6 +207,7 @@ public class DataLoader implements CommandLineRunner {
                 em.persist(gold);
                 em.persist(diamond);
 
+                /*
                 // Creating Product Fields
                 Set<ProductField> productFields = new HashSet<>();
                 ProductField pf1 = new ProductField("COLOUR", "BLACK");
@@ -256,41 +255,7 @@ public class DataLoader implements CommandLineRunner {
                 System.out.println(ex.getMessage());
                 }
 
-                // // Add Products of the Model
-                // try {
-                // productService.createProduct(model.getModelCode(), new
-                // ArrayList<>(productFields));
-                // } catch (ProductException | ProductFieldException ex) {
-                // ex.printStackTrace();
-                // System.out.println(ex.getMessage());
-                // }
-
-                // // Add Promotion to the Model
-                // try {
-                // productService.addPromoCategory(model.getModelCode(), "2 FOR S$49", 24.5);
-                // } catch (ModelException ex) {
-                // System.out.println(ex.getMessage());
-                // }
-
-                // // Add many productItems of the product
-                // try {
-                // productService.createProductItem("T1ZZ3OA60NOBK18H", "ASK0009968A-1");
-                // productService.createProductItem("NJCTRE9HI281F8B7", "ASK0009968A-2");
-                // productService.createProductItem("1HAC5IJD2Y8R2X4G", "ASK0009968A-3");
-                // productService.createProductItem("ANGA64O891NH0WC4", "ASK0009968A-4");
-                // productService.createProductItem("RBKD1XUUTN8ZVO3Z", "ASK0009968A-5");
-                // productService.createProductItem("T5VWY8V1V8QQUVG1", "ASK0009968A-6");
-                // productService.createProductItem("WQ8ED2RQ83VV1HO2", "ASK0009968A-7");
-                // productService.createProductItem("HAPPYM46XOVU766P", "ASK0009968A-8");
-                // productService.createProductItem("1V76V4FAM2NX90IU", "ASK0009968A-9");
-                // productService.createProductItem("1Z3G165G9DMDGQMD", "ASK0009968A-10");
-                // productService.createProductItem("6AND0X6G25KLNVUE", "ASK0009968A-11");
-                // productService.createProductItem("OZ9O75UATQ8P8QS4", "ASK0009968A-12");
-                // } catch (ProductItemException e) {
-                // e.printStackTrace();
-                // }
-
-               // Add Products of the Model
+                // Add Products of the Model
                 try {
                         productService.createProduct(model.getModelCode(), new ArrayList<>(productFields));
                 } catch (ProductException | ProductFieldException ex) {
@@ -305,23 +270,24 @@ public class DataLoader implements CommandLineRunner {
                         System.out.println(ex.getMessage());
                 }
 
-                // // Add many productItems of the product
-                // try {
-                //         productService.createProductItem("T1ZZ3OA60NOBK18H", "ASK0009968A-1");
-                //         productService.createProductItem("NJCTRE9HI281F8B7", "ASK0009968A-2");
-                //         productService.createProductItem("1HAC5IJD2Y8R2X4G", "ASK0009968A-3");
-                //         productService.createProductItem("ANGA64O891NH0WC4", "ASK0009968A-4");
-                //         productService.createProductItem("RBKD1XUUTN8ZVO3Z", "ASK0009968A-5");
-                //         productService.createProductItem("T5VWY8V1V8QQUVG1", "ASK0009968A-6");
-                //         productService.createProductItem("WQ8ED2RQ83VV1HO2", "ASK0009968A-7");
-                //         productService.createProductItem("HAPPYM46XOVU766P", "ASK0009968A-8");
-                //         productService.createProductItem("1V76V4FAM2NX90IU", "ASK0009968A-9");
-                //         productService.createProductItem("1Z3G165G9DMDGQMD", "ASK0009968A-10");
-                //         productService.createProductItem("6AND0X6G25KLNVUE", "ASK0009968A-11");
-                //         productService.createProductItem("OZ9O75UATQ8P8QS4", "ASK0009968A-12");
-                // } catch (ProductItemException e) {
-                //         e.printStackTrace();
-                // }
+                // Add many productItems of the product
+                try {
+                        productService.createProductItem("T1ZZ3OA60NOBK18H", "ASK0009968A-1");
+                        productService.createProductItem("NJCTRE9HI281F8B7", "ASK0009968A-2");
+                        productService.createProductItem("1HAC5IJD2Y8R2X4G", "ASK0009968A-3");
+                        productService.createProductItem("ANGA64O891NH0WC4", "ASK0009968A-4");
+                        productService.createProductItem("RBKD1XUUTN8ZVO3Z", "ASK0009968A-5");
+                        productService.createProductItem("T5VWY8V1V8QQUVG1", "ASK0009968A-6");
+                        productService.createProductItem("WQ8ED2RQ83VV1HO2", "ASK0009968A-7");
+                        productService.createProductItem("HAPPYM46XOVU766P", "ASK0009968A-8");
+                        productService.createProductItem("1V76V4FAM2NX90IU", "ASK0009968A-9");
+                        productService.createProductItem("1Z3G165G9DMDGQMD", "ASK0009968A-10");
+                        productService.createProductItem("6AND0X6G25KLNVUE", "ASK0009968A-11");
+                        productService.createProductItem("OZ9O75UATQ8P8QS4", "ASK0009968A-12");
+                } catch (ProductItemException e) {
+                        e.printStackTrace();
+                }
+                */
 
                 // Generate 10 $10 vouchers
                 customerService.generateVouchers(10, 10, "2022-02-16");

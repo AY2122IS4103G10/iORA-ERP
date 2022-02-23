@@ -101,6 +101,15 @@ public class SAMController {
         }
     }
 
+    @PutMapping(path = "/promoField", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> updatePromoField(@RequestBody PromotionField promotionField) {
+        try {
+            return ResponseEntity.ok(productService.updatePromoField(promotionField));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     // Retrieves all ProductField instances
     @GetMapping(path = "/productField", produces = "application/json")
     public List<ProductField> getAllProductFields() {

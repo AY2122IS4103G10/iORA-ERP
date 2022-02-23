@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 @Entity
 public class PromotionField extends ProductField {
     private double discountedPrice;
+    private boolean available = true;
 
     public PromotionField() {
         super();
@@ -21,5 +22,13 @@ public class PromotionField extends ProductField {
 
     public void setDiscountedPrice(double discountedPrice) {
         this.discountedPrice = discountedPrice;
+    }
+
+    public boolean isAvailable() {
+        return this.available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 }

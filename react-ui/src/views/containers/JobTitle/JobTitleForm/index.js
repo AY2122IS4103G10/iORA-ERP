@@ -6,7 +6,7 @@ import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
 import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
-import { addNewJobTitle } from "../../../../stores/slices/jobTitleSlice";
+import { addNewJobTitle, updateExistingJobTitle } from "../../../../stores/slices/jobTitleSlice";
 
 const JobTitleFormBody = ({
   isEditing,
@@ -153,8 +153,6 @@ export const JobTitleForm = () => {
                     ).unwrap();
                   }
         alert("Successfully added job title");
-        setName("");
-        setAddress1("");
         navigate(!isEditing ? "/ad/jobTitle" : `/ad/jobTitle/${jobTitleId}`);
       } catch (err) {
         console.error("Failed to add job title: ", err);

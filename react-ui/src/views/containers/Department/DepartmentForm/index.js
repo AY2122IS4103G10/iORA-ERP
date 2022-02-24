@@ -7,7 +7,7 @@ import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { addNewDepartment } from "../../../../stores/slices/departmentSlice";
-import { updateExistingDepartment } from "../../../stores/slices/departmentSlice";
+import { updateExistingDepartment } from "../../../../stores/slices/departmentSlice";
 
 const DepartmentFormBody = ({
   isEditing,
@@ -113,7 +113,6 @@ export const DepartmentForm = () => {
                   }
         alert("Successfully added department");
         setName("");
-        setAddress1("");
         navigate(!isEditing ? "/ad/department" : `/ad/department/${departmentId}`);
       } catch (err) {
         console.error("Failed to add department: ", err);
@@ -140,7 +139,6 @@ export const DepartmentForm = () => {
       isEditing={isEditing}
       name={name}
       onNameChanged={onNameChanged}
-      description={description}
       onAddDepartmentClicked={onAddDepartmentClicked}
       onCancelClicked={onCancelClicked}
     />

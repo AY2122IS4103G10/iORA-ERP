@@ -102,7 +102,7 @@ public class Customer implements Serializable {
     }
 
     public String getLastName() {
-        return firstName;
+        return lastName;
     }
 
     public void setLastName(String lastName) {

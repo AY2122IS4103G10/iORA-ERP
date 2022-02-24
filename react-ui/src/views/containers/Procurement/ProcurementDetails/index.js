@@ -1,11 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
 import { TrashIcon } from "@heroicons/react/outline";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useMemo, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
 import {
+  acceptProcurement,
+  cancelProcurement,
   deleteExistingProcurement,
   fetchProcurements,
   selectProcurementById,
@@ -15,7 +17,14 @@ import {
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 
-const Header = ({ procurementId, status, openModal }) => {
+const Header = ({
+  pathname,
+  procurementId,
+  status,
+  openModal,
+  onAcceptClicked,
+  onCancelOrderClicked,
+}) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <div className="flex items-center space-x-3">
@@ -23,50 +32,80 @@ const Header = ({ procurementId, status, openModal }) => {
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${procurementId}`}</h1>
         </div>
       </div>
-      {status === "PENDING" && (
-        <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-          <Link to={`/sm/procurements/edit/${procurementId}`}>
+      {status === "PENDING" &&
+        (pathname.includes("/sm/procurements") ? (
+          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+            <Link to={`/sm/procurements/edit/${procurementId}`}>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+                disabled={status !== "PENDING"}
+              >
+                <PencilIcon
+                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+                <span>Edit</span>
+              </button>
+            </Link>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+              onClick={openModal}
+              disabled={status !== "PENDING"}
+            >
+              <TrashIcon
+                className="-ml-1 mr-2 h-5 w-5 text-white"
+                aria-hidden="true"
+              />
+              <span>Delete</span>
+            </button>
+          </div>
+        ) : (
+          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+              onClick={onAcceptClicked}
+              disabled={status !== "PENDING"}
+            >
+              <span>Accept order</span>
+            </button>
             <button
               type="button"
               className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+              onClick={onCancelOrderClicked}
+              disabled={status !== "PENDING"}
             >
-              <PencilIcon
-                className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              <span>Edit</span>
+              <span>Cancel order</span>
             </button>
-          </Link>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
-          >
-            <TrashIcon
-              className="-ml-1 mr-2 h-5 w-5 text-white"
-              aria-hidden="true"
-            />
-            <span>Delete</span>
-          </button>
-        </div>
-      )}
+          </div>
+        ))}
     </div>
   );
 };
 
-const ItemsSummary = ({ data }) => {
+const ItemsSummary = ({ data, status, setData }) => {
+  const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
     return [
-      {
-        Header: "Product Code",
-        accessor: "modelCode",
-      },
       {
         Header: "SKU",
         accessor: (row) => row.product.sku,
-      },
-      {
-        Header: "Name",
-        accessor: (row) => row.product.name,
       },
       {
         Header: "Color",
@@ -82,28 +121,49 @@ const ItemsSummary = ({ data }) => {
             .fieldValue,
       },
       {
-        Header: "Quantity",
+        Header: "Qty Requested",
         accessor: "requestedQty",
       },
+      {
+        Header: "Actual Qty",
+        accessor: "",
+        disableSortBy: true,
+        Cell: (row) => {
+          return status === "ACCEPTED" ? (
+            <EditableCell
+              value={1}
+              row={row.row}
+              column={row.column}
+              updateMyData={updateMyData}
+            />
+          ) : "-";
+        },
+      },
     ];
-  }, []);
+  }, [setData, status]);
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
         <h3 className="text-lg leading-6 font-medium text-gray-900">Summary</h3>
         <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-          <button
-            type="button"
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-            // onClick={openProducts}
-          >
-            Verify items
-          </button>
+          {status === "ACCEPTED" && (
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              // onClick={openProducts}
+            >
+              Verify items
+            </button>
+          )}
         </div>
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable columns={columns} data={data} />
+          <SimpleTable
+            columns={columns}
+            data={data}
+            skipPageReset={skipPageReset}
+          />
         </div>
       )}
     </div>
@@ -157,20 +217,22 @@ const ProcurementDetailsBody = ({
         </div>
       </section>
       <section aria-labelledby="order-summary">
-        <ItemsSummary data={lineItems} />
+        <ItemsSummary data={lineItems} status={status} />
       </section>
     </div>
   </div>
 );
 
 export const ProcurementDetails = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { procurementId } = useParams();
   const procurement = useSelector((state) =>
     selectProcurementById(state, parseInt(procurementId))
   );
+  const [poLineItems, setPoLineItems] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const procurementsStatus = useSelector((state) => state.procurements.status);
   useEffect(() => {
     procurementsStatus === "idle" && dispatch(fetchProcurements());
@@ -178,13 +240,48 @@ export const ProcurementDetails = () => {
 
   const onDeleteSiteClicked = () => {
     try {
-      dispatch(deleteExistingProcurement(procurementId));
-      alert("Successfully deleted procurement");
-      closeModal();
-      navigate("/ad/sites");
+      dispatch(deleteExistingProcurement(procurementId))
+        .unwrap()
+        .then(() => {
+          alert("Successfully deleted procurement");
+          closeModal();
+          navigate("/sm/procurements");
+        });
     } catch (err) {
-      console.error("Failed to add promo: ", err);
+      console.error("Failed to add procurement: ", err);
     }
+  };
+
+  const onAcceptClicked = () => {
+    dispatch(
+      acceptProcurement({
+        orderId: procurementId,
+        siteId: procurement.manufacturing,
+      })
+    )
+      .unwrap()
+      .then(() => {
+        alert("Successfully accepted procurement");
+      })
+      .catch((error) =>
+        console.error("Failed to accept procurement: ", error.message)
+      );
+  };
+
+  const onCancelOrderClicked = () => {
+    dispatch(
+      cancelProcurement({
+        orderId: procurementId,
+        siteId: procurement.manufacturing,
+      })
+    )
+      .unwrap()
+      .then(() => {
+        alert("Successfully canceled procurement");
+      })
+      .catch((error) =>
+        console.error("Failed to cancel procurement: ", error.message)
+      );
   };
 
   const openModal = () => setOpenDelete(true);
@@ -194,13 +291,17 @@ export const ProcurementDetails = () => {
     Boolean(procurement) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="Procurement Orders" path="/sm/procurements" />
+          <NavigatePrev page="Procurement Orders" path={-1} />
           <Header
+            pathname={pathname}
             procurementId={procurementId}
             status={
               procurement.statusHistory[procurement.statusHistory.length - 1]
                 .status
             }
+            openModal={openModal}
+            onAcceptClicked={onAcceptClicked}
+            onCancelOrderClicked={onCancelOrderClicked}
           />
           <ProcurementDetailsBody
             procurementId={procurementId}
@@ -212,7 +313,6 @@ export const ProcurementDetails = () => {
             headquarters={procurement.headquarters}
             warehouse={procurement.warehouse}
             lineItems={procurement.lineItems}
-            openModal={openModal}
           />
         </div>
         <ConfirmDelete

@@ -434,7 +434,12 @@ export const ProcurementForm = () => {
                 warehouse: warehouseSelected,
               },
             })
-          ).unwrap();
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully created procurement order");
+              navigate("/sm/procurements");
+            });
         else
           dispatch(
             updateExistingProcurement({
@@ -449,11 +454,12 @@ export const ProcurementForm = () => {
                 warehouse: warehouseSelected,
               },
             })
-          ).unwrap();
-        alert("Successfully created procurement order");
-        navigate(
-          !isEditing ? "/sm/procurements" : `/sm/procurements/${orderId}`
-        );
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully updated procurement order");
+              navigate(`/sm/procurements/${orderId}`);
+            });
       } catch (err) {
         console.error("Failed to add procurement: ", err);
       } finally {
@@ -476,10 +482,15 @@ export const ProcurementForm = () => {
           .then((response) => response.data && setHqSelected(response.data));
         api
           .get("sam/viewSite", manufacturing)
-          .then((response) => response.data && setManufacturingSelected(response.data));
+          .then(
+            (response) =>
+              response.data && setManufacturingSelected(response.data)
+          );
         api
           .get("sam/viewSite", warehouse)
-          .then((response) => response.data && setWarehouseSelected(response.data));
+          .then(
+            (response) => response.data && setWarehouseSelected(response.data)
+          );
       });
   }, [orderId]);
 

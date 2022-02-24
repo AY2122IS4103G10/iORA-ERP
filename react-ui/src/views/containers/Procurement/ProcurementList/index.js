@@ -56,10 +56,12 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
     ],
     []
   );
-  return <SimpleTable columns={columns} data={data} handleOnClick={handleOnClick} />;
+  return (
+    <SimpleTable columns={columns} data={data} handleOnClick={handleOnClick} />
+  );
 };
 
-export const ProcurementList = () => {
+export const ProcurementList = ({pathname}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const data = useSelector(selectAllProcurements);
@@ -70,7 +72,8 @@ export const ProcurementList = () => {
     procurementStatus === "idle" && dispatch(fetchProcurements());
   }, [procurementStatus, dispatch]);
 
-  const handleOnClick = (row) => navigate(`/sm/procurements/${row.original.id}`);
+  const handleOnClick = (row) =>
+    navigate(`${pathname}/${row.original.id}`);
   let content;
 
   if (procurementStatus === "loading") {
@@ -86,7 +89,9 @@ export const ProcurementList = () => {
           {Boolean(data.length) ? (
             <ProcurementTable data={data} handleOnClick={handleOnClick} />
           ) : (
-            <DashedBorderES item="procurement order" />
+            <Link to="/sm/procurements/create">
+              <DashedBorderES item="procurement order" />
+            </Link>
           )}
         </div>
       </div>

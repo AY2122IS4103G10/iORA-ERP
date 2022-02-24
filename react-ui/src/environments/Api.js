@@ -51,7 +51,20 @@ export const sitesApi = {
 
 export const companyApi = {
   getCompany(id) {
-    return axios.get(`${REST_ENDPOINT}admin/viewCompanies?id=${id}`);
+    return axios.get(`${REST_ENDPOINT}admin/viewCompany?id=${id}`);
+  },
+};
+
+export const procurementApi = {
+  acceptOrder(orderId, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/accept/${orderId}/${siteId}`
+    );
+  },
+  cancelOrder(orderId, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`
+    );
   },
 };
 

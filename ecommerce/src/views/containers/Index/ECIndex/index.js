@@ -266,7 +266,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function ECIndex() {
+export const ECIndex = () => {
   const [open, setOpen] = useState(false)
 
   return (

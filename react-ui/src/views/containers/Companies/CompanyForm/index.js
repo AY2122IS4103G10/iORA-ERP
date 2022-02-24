@@ -4,11 +4,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
-import { api, companyApi } from "../../../../environments/Api";
+import { companyApi } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
-import { addNewSite } from "../../../../stores/slices/siteSlice";
 import { AddressField } from "../../Sites/SiteForm";
-import { addNewCompany } from "../../../../stores/slices/companySlice";
+import {
+  addNewCompany,
+  updateExistingCompany,
+} from "../../../../stores/slices/companySlice";
 
 const siteTypes = [
   { id: 1, name: "Headquarters" },
@@ -46,7 +48,7 @@ const CompanyFormBody = ({
   onLatitudeChanged,
   longitude,
   onLongitudeChanged,
-  onAddSiteClicked,
+  onAddCompanyClicked,
   onCancelClicked,
   siteTypeSelected,
   setSiteTypeSelected,
@@ -151,7 +153,7 @@ const CompanyFormBody = ({
                   <button
                     type="submit"
                     className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                    onClick={onAddSiteClicked}
+                    onClick={onAddCompanyClicked}
                   >
                     {!isEditing ? "Add" : "Save"} company
                   </button>
@@ -179,7 +181,6 @@ export const CompanyForm = () => {
   const [longitude, setLongitude] = useState("");
   const [registerNo, setRegisterNo] = useState("");
   const [phone, setPhone] = useState("");
-  const [active, setActive] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   const dispatch = useDispatch();
@@ -214,7 +215,7 @@ export const CompanyForm = () => {
       registerNo,
       phone,
     ].every(Boolean) && requestStatus === "idle";
-  const onAddSiteClicked = (evt) => {
+  const onAddCompanyClicked = (evt) => {
     evt.preventDefault();
     console.log({
       name,
@@ -237,32 +238,62 @@ export const CompanyForm = () => {
     if (canAdd)
       try {
         setRequestStatus("pending");
-        dispatch(
-          addNewCompany({
-            name,
-            address: {
-              country,
-              city,
-              building,
-              state,
-              unit,
-              road: address1,
-              postalCode,
-              billing: false,
-              latitude,
-              longitude,
-            },
-            registerNo,
-            phoneNumber: phone,
-            active: true,
-          })
-        )
-          .unwrap()
-          .catch((err) => console.error(err));
-        alert("Successfully added company");
-        setName("");
-        setAddress1("");
-        navigate(!isEditing ? "/ad/companies" : `/ad/companies/${companyId}`);
+        if (!isEditing)
+          dispatch(
+            addNewCompany({
+              name,
+              address: {
+                country:
+                  country.charAt(0).toUpperCase() +
+                  country.slice(1).toLowerCase(),
+                city,
+                building,
+                state,
+                unit,
+                road: address1,
+                postalCode,
+                billing: false,
+                latitude,
+                longitude,
+              },
+              registerNumber: registerNo,
+              telephone: phone,
+              active: true,
+            })
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully added company");
+              navigate("/ad/companies");
+            })
+            .catch((err) => console.error(err));
+        else
+          dispatch(
+            updateExistingCompany({
+              name,
+              address: {
+                country,
+                city,
+                building,
+                state,
+                unit,
+                road: address1,
+                postalCode,
+                billing: false,
+                latitude,
+                longitude,
+              },
+              registerNumber: registerNo,
+              telephone: phone,
+              active: true,
+            })
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully updated company");
+              navigate(`/ad/companies/${companyId}`);
+            })
+            .catch((err) => console.error(err));
       } catch (err) {
         console.error("Failed to add company: ", err);
       } finally {
@@ -271,15 +302,16 @@ export const CompanyForm = () => {
   };
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/ad/sites" : `/ad/sites/${companyId}`);
+    navigate(!isEditing ? "/ad/companies" : `/ad/companies/${companyId}`);
 
   useEffect(() => {
     Boolean(companyId) &&
       companyApi.getCompany(companyId).then((response) => {
-        const { name, address, registerNo, active, phone } = response.data;
+        const { name, address, registerNumber, active, telephone } =
+          response.data;
         setIsEditing(true);
         setName(name);
-        setRegisterNo(registerNo);
+        setRegisterNo(registerNumber);
         setAddress1(address.road);
         setBuilding(address.building);
         setUnit(address.unit);
@@ -289,8 +321,7 @@ export const CompanyForm = () => {
         setPostalCode(address.postalCode);
         setLatitude(address.latitude);
         setLongitude(address.longitude);
-        setActive(active);
-        setPhone(phone);
+        setPhone(telephone);
       });
   }, [companyId]);
 
@@ -321,7 +352,7 @@ export const CompanyForm = () => {
       onLatitudeChanged={onLatitudeChanged}
       longitude={longitude}
       onLongitudeChanged={onLongitudeChanged}
-      onAddSiteClicked={onAddSiteClicked}
+      onAddCompanyClicked={onAddCompanyClicked}
       onCancelClicked={onCancelClicked}
       siteTypes={siteTypes}
       companies={companies}

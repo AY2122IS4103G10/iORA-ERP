@@ -155,8 +155,6 @@ public class DataLoader implements CommandLineRunner {
                 e.setCompany(adminService.getCompanyById(Long.valueOf(1)));
                 employeeService.createEmployee(e);
 
-                //Customer
-                
 
                 // Adding Sites
                 HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", "+65-63610056", iora);

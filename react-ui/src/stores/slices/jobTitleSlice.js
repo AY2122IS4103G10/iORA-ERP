@@ -22,8 +22,8 @@ export const fetchJobTitles = createAsyncThunk(
   }
 );
 
-export const addJobTitle = createAsyncThunk(
-    "jobTitle/addJobTitle",
+export const addNewJobTitle = createAsyncThunk(
+    "jobTitle/addNewJobTitle",
     async (initialJobTitle) => {
       const response = await api.create("admin/addJobTitle", initialJobTitle);
       return response.data;
@@ -74,10 +74,10 @@ const jobTitleSlice = createSlice({
       const existingJobTitle = state.jobTitle.find(
         (jobTitle) => jobTitle.jobTitleId === jobTitleId
       );
-      if (existingProd) {
+      if (existingJobTitle) {
         existingJobTitle.title = title;
-        existingProd.description = description;
-        existingProd.responsibility = responsibility;
+        existingJobTitle.description = description;
+        existingJobTitle.responsibility = responsibility;
       }
       // state.status = "idle";
     });

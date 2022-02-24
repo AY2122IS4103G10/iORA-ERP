@@ -47,7 +47,6 @@ public class AdminController {
      * ---------------------------------------------------------
      */
 
-    // Employee/JobTitle/Department stuff here
 
     @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {

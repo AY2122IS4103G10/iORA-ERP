@@ -10,19 +10,19 @@ const initialState = {
               "rfid": "T1ZZ3OA60NOBK18H",
               "available": true,
               "productSKU": "AKV0010057J-1",
-              // "stockLevel": null
+              "stockLevel": null
           },
           {
             "rfid": "NJCTRE9HI281F8B7",
             "available": true,
             "productSKU": "AKV0010057J-2",
-            // "stockLevel": null
+            "stockLevel": null
           },
           {
             "rfid": "1HAC5IJD2Y8R2X4G",
             "available": true,
             "productSKU": "AKV0010057J-3",
-            // "stockLevel": null/
+            "stockLevel": null
           },
         ],
         products: {

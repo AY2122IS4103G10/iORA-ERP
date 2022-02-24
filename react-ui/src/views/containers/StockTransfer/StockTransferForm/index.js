@@ -4,12 +4,13 @@ import { XIcon } from "@heroicons/react/outline";
 import { ExclamationCircleIcon } from "@heroicons/react/outline";
 
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import { ClickableRowTable, SelectColumnFilter } from "../../../components/Tables/ClickableRowTable";
+import { ClickableRowTable, SelectColumnFilter, EditableCell } from "../../../components/Tables/ClickableRowTable";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
-import { getASiteStock } from "../../../../stores/slices/stocklevelSlice";
+import { getASiteStock, selectCurrSiteStock } from "../../../../stores/slices/stocklevelSlice";
 import ErrorModal from "../../../components/Modals/ErrorModal";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 
 
@@ -41,7 +42,7 @@ function isObjectEmpty(obj) {
     return Object.keys(obj).length === 0
 }
 
-export const SelectSiteModal = ({open, closeModal, data, from, to, setFrom, setTo }) => {
+export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, setTo }) => {
 
     const columns = useMemo(() => cols, []);
     const fromRef = useRef(null);
@@ -58,16 +59,13 @@ export const SelectSiteModal = ({open, closeModal, data, from, to, setFrom, setT
     } else {
         disableTo = true;
     }
-    console.log("rerendering");
     const onRowClick = (row) => {
         if (!isObjectEmpty(to) && to.id === from.id) {
             setError(true);
-            console.log("errorrrr")
         } else {
             setError(false);
         }
 
-        console.log(error);
         if (isObjectEmpty(from)) {
             //check if from and to sites are the same
             if (row.id == to.id) {
@@ -205,7 +203,73 @@ export const SelectSiteModal = ({open, closeModal, data, from, to, setFrom, setT
 
 }
 
-const AddItemsModal = ({ items, open, closeModal, data, selectedRows, setRowSelect, onAddItemsClick }) => {
+
+const convertData = (data) =>
+    Object.entries(data.products).map((key) => ({
+        sku: key[0],
+        qty: key[1],
+        requestedQty: 0,
+    }))
+
+const ItemsList = ({ cols, data, rowSelect = false, selectedRows, setRowSelect }) => {
+    
+    return (
+        <SimpleTable
+            columns={cols}
+            data={data}
+            rowSelect={rowSelect}
+            selectedRows={selectedRows}
+            setSelectedRows={setRowSelect}
+        />
+    )
+}
+
+const AddItemsModal = ({ items, open, closeModal, data, setData, selectedRows, setRowSelect, onAddItemsClick }) => {
+    
+    const itemCols = useMemo(() => {
+        const updateMyData = (rowIndex, columnId, value) => {
+            setData((old) =>
+                old.map((row, index) => {
+                    if (index === rowIndex) {
+                        return {
+                            ...old[rowIndex],
+                            [columnId]: value,
+                        };
+                    }
+                    return row;
+                })
+            );
+        };
+        return [
+            {
+                Header: "SKU Code",
+                accessor: "sku"
+            },
+            {
+                Header: "In Stock",
+                accessor: "qty"
+            },
+            {
+                Header: "Request Qty",
+                accessor: "requestedQty",
+                disableSortBy: true,
+                Cell: (row) => {
+                    return (
+                        <EditableCell
+                            value={0}
+                            row={row.row}
+                            column={row.column}
+                            updateMyData={updateMyData}
+                        />
+                    );
+                },
+            }
+        ]
+    }, [data])
+    
+    
+    
+    
     return (
         <SimpleModal open={open} closeModal={closeModal}>
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
@@ -217,13 +281,13 @@ const AddItemsModal = ({ items, open, closeModal, data, selectedRows, setRowSele
                         >
                             Add Items
                         </Dialog.Title>
-                        {/* <ItemsList
-                            cols={addModalColumns}
-                            data={items}
+                        <ItemsList
+                            cols={itemCols}
+                            data={data}
                             rowSelect={true}
                             selectedRows={selectedRows}
                             setRowSelect={setRowSelect}
-                        /> */}
+                        />
                     </div>
                 </div>
                 <div className="pt-5">
@@ -238,7 +302,7 @@ const AddItemsModal = ({ items, open, closeModal, data, selectedRows, setRowSele
                         <button
                             type="submit"
                             className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                            // onClick={onAddItemsClicked}
+                        // onClick={onAddItemsClicked}
                         >
                             {/* {!Boolean(items.length) ? "Add" : "Save"} items */}
                         </button>
@@ -250,36 +314,42 @@ const AddItemsModal = ({ items, open, closeModal, data, selectedRows, setRowSele
 }
 
 export const StockTransferForm = () => {
+    const dispatch = useDispatch();
     const [from, setFrom] = useState({});
     const [to, setTo] = useState({});
     const [openSites, setOpenSites] = useState(false);
     const [openItems, setOpenItems] = useState(false);
     const [openErrorModal, setErrorModal] = useState(false);
+    const [lineItems, setLineItems] = useState([]);
 
-    const [selectedRows, setSelectedRows] = useState([]);
-
-    const dispatch = useDispatch();
+    //selecting sites
     const sites = useSelector(selectAllSites);
-
     const openSitesModal = () => setOpenSites(true);
     const closeSitesModal = () => setOpenSites(false);
+    useEffect(() => {
+        dispatch(getAllSites());
+    }, [openSites])
 
-    const closeErrorModal = () => setErrorModal(false);
-
+    //add items
+    const stocklevel = useSelector(selectCurrSiteStock);
     const openItemsModal = () => {
         if (isObjectEmpty(from)) {
             setErrorModal(true);
         } else {
             setOpenItems(true);
+            // dispatch(getASiteStock(from.id));
         }
-    
     }
-    
     const closeItemsModal = () => setOpenItems(false);
+    const closeErrorModal = () => setErrorModal(false);
 
-    useEffect(() => {
-        dispatch(getAllSites());
-    }, [openSites])
+    // useEffect(() => {
+    //     dispatch(getASiteStock(from.id));
+    // }, [openItems])
+
+    //==Handle add line items
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [rawItems, setRawItems] = useState([]);
 
     return (
         <>
@@ -314,6 +384,7 @@ export const StockTransferForm = () => {
                                                             value={isObjectEmpty(from) ? "" : from.name}
                                                             className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
                                                             placeholder="Select"
+                                                            readOnly
                                                         >
                                                         </input>
                                                         <button
@@ -364,7 +435,7 @@ export const StockTransferForm = () => {
 
                                     <div className="pt-8">
                                         <div className="md:flex md:items-center md:justify-between">
-                                            <h3 className="text-lg leading-6 font-medium text-gray-900">
+                                            <h3 className="text-md leading-6  font-bold text-gray-900">
                                                 Items List
                                             </h3>
                                             <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
@@ -386,23 +457,27 @@ export const StockTransferForm = () => {
                 </div>
             </div>
 
-            <SelectSiteModal 
-            open={openSites}
-            closeModal={closeSitesModal}
-            from={from}
-            to={to}
-            setFrom={setFrom}
-            setTo={setTo}
-            data={sites} />
+            <SelectSiteModal
+                open={openSites}
+                closeModal={closeSitesModal}
+                from={from}
+                to={to}
+                setFrom={setFrom}
+                setTo={setTo}
+                data={sites} />
 
-            <AddItemsModal 
-            open={openItems} 
-            closeModal={closeItemsModal}
+            <AddItemsModal
+                data={convertData(stocklevel)}
+                setData={setRawItems}
+                open={openItems}
+                closeModal={closeItemsModal}
+                selectedRows={selectedRows}
+                setRowSelect={setSelectedRows}
             />
 
-            <ErrorModal open={openErrorModal} closeModal={closeErrorModal} 
+            <ErrorModal open={openErrorModal} closeModal={closeErrorModal}
                 title="From Site Not Selected"
-                message="Please choose a from site before adding items."/> 
+                message="Please choose a from site before adding items." />
 
         </>
     );

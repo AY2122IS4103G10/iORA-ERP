@@ -7,18 +7,17 @@ import {
 } from "@heroicons/react/outline";
 import { Menu, Transition } from "@headlessui/react";
 import { classNames } from "../../../utilities/Util";
-import { logout } from "../../../stores/slices/userSlice";
-import { selectUser } from "../../../stores/slices/userSlice";
+import { logout, selectUser } from "../../../stores/slices/userSlice";
+import { useNavigate } from "react-router-dom";
 
 export const NavBar = ({ setSidebarOpen, badge }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector(selectUser);
   const handleLogout = (e) => {
-    console.log("logout" + user);
     e.preventDefault();
     dispatch(logout());
-
-    console.log(user);
+    navigate("/");
   };
 
   return (
@@ -52,8 +51,7 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
                   alt=""
                 />
                 <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-                  <span className="sr-only">Open user menu for </span>Emilia
-                  Birch
+                  <span className="sr-only">Open user menu for </span>{user.name}
                 </span>
                 <ChevronDownIcon
                   className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"

@@ -1,43 +1,91 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { authApi } from "../../environments/Api";
+
+const guest = {
+  id: -1,
+  name: "Guest",
+  email: "NA",
+  salary: 0,
+  username: "guest",
+  salt: "",
+  password: "",
+  availStatus: "true",
+  department: {
+    id: 1,
+    name: "Sales and Marketing",
+    jobTitles: [],
+  },
+  company: {
+    id: 1,
+    name: "iORA Singapore",
+  },
+};
+
+const initialUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : guest;
 
 const initialState = {
-  user: {
-    id: 1,
-    name: "Ben Stone",
-    email: "benstone828@gmail.com",
-    username: "BenStone828",
-    availStatus: "true",
-    department: {
-      id: 1,
-      name: "Sales and Marketing",
-    },
-    company: {
-      id: 1,
-      name: "iORA Singapore",
-    },
-  },
-  currStore: 3, //to be updated when login is finalised
+  user: { ...initialUser },
+  loggedIn: localStorage.getItem("user") ? true : false,
+  currStore: 0, //to be updated when login is finalised
   status: "idle",
   error: "null",
 };
+
+export const login = createAsyncThunk(
+  "auth/login",
+  async (credentials) => {
+      const response = await authApi.login(
+        credentials.username,
+        credentials.password
+      );
+      if (response.data === "") {
+        return Promise.reject(response.error);
+      }
+      return response.data;
+  }
+);
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    login(state, action) {
-      state.user = action.payload;
+    logout(state) {
+      localStorage.removeItem("user");
+      state.loggedIn = false;
+      state.user = { ...guest };
     },
-    logout(state, action) {
-      state.user = null;
-    },
+  },
+  extraReducers(builder) {
+    builder.addCase(login.fulfilled, (state, action) => {
+      action.payload.department.jobTitles !== undefined && delete action.payload.department.jobTitles;
+      action.payload.company.departments !== undefined && delete action.payload.company.departments;
+      action.payload.company.vendors !== undefined && delete action.payload.company.vendors;
+      action.payload.salt !== undefined && delete action.payload.salt;
+      action.payload.password !== undefined && delete action.payload.password;
+      state = {
+        ...state,
+        user: { ...action.payload },
+        status: "succeeded",
+        loggedIn: true,
+      };
+    });
+    builder.addCase(login.rejected, (state, action) => {
+      state.error = "Login failed";
+    });
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { logout } = userSlice.actions;
+
+export const selectUserLoggedIn = (state) => state.user.loggedIn;
 
 export const selectUser = (state) => state.user.user;
 
+export const selectUserId = (state) => state.user.user.id;
+
 export const selectUserStore = (state) => state.user.currStore;
+
+export const selectUserAccess = (state) =>
+  state.user.user.jobTitle.responsibility;
 
 export default userSlice.reducer;

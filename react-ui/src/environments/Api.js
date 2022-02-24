@@ -48,6 +48,7 @@ export const sitesApi = {
     return axios.delete(`${REST_ENDPOINT}admin/deleteSite?siteId=${id}`);
   },
 };
+
 export const companyApi = {
   getCompany(id) {
     return axios.get(`${REST_ENDPOINT}admin/viewCompany?id=${id}`);
@@ -63,6 +64,14 @@ export const procurementApi = {
   cancelOrder(orderId, siteId) {
     return axios.put(
       `${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`
+    );
+  },
+};
+
+export const authApi = {
+  login(username, password) {
+    return axios.get(
+      `${REST_ENDPOINT}auth/empLogin?username=${username}&password=${password}`
     );
   },
 };

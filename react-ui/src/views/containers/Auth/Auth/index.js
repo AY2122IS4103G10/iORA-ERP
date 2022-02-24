@@ -1,21 +1,18 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   login,
-  selectUser,
-  selectUserLoggedIn,
 } from "../../../../stores/slices/userSlice";
 
 export function Auth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const user = useSelector(selectUser);
-  const loggedIn = useSelector(selectUserLoggedIn);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    if (loggedIn) {
+    if (user && user.username !== "" && user.password !== "") {
       dispatch(login({ username: user.username, password: user.password }))
         .unwrap()
         .then((data) => {

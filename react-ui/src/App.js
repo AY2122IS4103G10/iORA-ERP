@@ -23,6 +23,7 @@ import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { SiteDetails } from "./views/containers/Sites/SiteDetails";
 import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
+import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
 
 function App() {
   return (
@@ -47,7 +48,10 @@ function App() {
             <Route path="promotions" element={<ManagePromotions />} />
           </Route>
           <Route path="stocklevels/*" element={<ViewStockLevels />}/>
-          <Route path="stocktransfer" element={<ManageStockTransfer/>}/>
+          <Route path="stocktransfer" element={<Outlet/>}>
+            <Route index element={<ManageStockTransfer/>}/>
+            <Route path="create" element={<StockTransferForm/>}/>
+          </Route>
           
           <Route path="procurements" element={<Outlet />}>
             <Route index element={<ManageProcurement />} />

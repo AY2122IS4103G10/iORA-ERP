@@ -82,6 +82,7 @@ public class StoreController {
         if (errors.isEmpty()) {
             return ResponseEntity.ok("Transaction successful");
         } else {
+            System.out.println("Error" + String.join("\n", errors));
             return ResponseEntity.badRequest().body(String.join("\n", errors));
         }
     }

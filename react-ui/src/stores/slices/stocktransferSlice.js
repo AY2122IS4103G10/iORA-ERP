@@ -27,7 +27,7 @@ const stocktransferSlice = createSlice({
           });
         builder.addCase(fetchSites.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.orders = action.payload;
+        state.currOrder = action.payload;
         });
         builder.addCase(fetchSites.rejected, (state, action) => {
         state.status = "failed";

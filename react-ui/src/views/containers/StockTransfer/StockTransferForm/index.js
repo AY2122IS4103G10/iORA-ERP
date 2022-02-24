@@ -8,6 +8,8 @@ import { ClickableRowTable, SelectColumnFilter } from "../../../components/Table
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
+import { getASiteStock } from "../../../../stores/slices/stocklevelSlice";
+import ErrorModal from "../../../components/Modals/ErrorModal";
 
 
 
@@ -39,7 +41,7 @@ function isObjectEmpty(obj) {
     return Object.keys(obj).length === 0
 }
 
-export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, setTo }) => {
+export const SelectSiteModal = ({open, closeModal, data, from, to, setFrom, setTo }) => {
 
     const columns = useMemo(() => cols, []);
     const fromRef = useRef(null);
@@ -203,12 +205,57 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
 
 }
 
+const AddItemsModal = ({ items, open, closeModal, data, selectedRows, setRowSelect, onAddItemsClick }) => {
+    return (
+        <SimpleModal open={open} closeModal={closeModal}>
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+                <div>
+                    <div className="mt-3 sm:mt-5">
+                        <Dialog.Title
+                            as="h3"
+                            className="text-center text-lg leading-6 font-medium text-gray-900"
+                        >
+                            Add Items
+                        </Dialog.Title>
+                        {/* <ItemsList
+                            cols={addModalColumns}
+                            data={items}
+                            rowSelect={true}
+                            selectedRows={selectedRows}
+                            setRowSelect={setRowSelect}
+                        /> */}
+                    </div>
+                </div>
+                <div className="pt-5">
+                    <div className="flex justify-end">
+                        <button
+                            type="button"
+                            className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                            onClick={closeModal}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                            // onClick={onAddItemsClicked}
+                        >
+                            {/* {!Boolean(items.length) ? "Add" : "Save"} items */}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </SimpleModal>
+    );
+}
 
 export const StockTransferForm = () => {
     const [from, setFrom] = useState({});
     const [to, setTo] = useState({});
     const [openSites, setOpenSites] = useState(false);
     const [openItems, setOpenItems] = useState(false);
+    const [openErrorModal, setErrorModal] = useState(false);
+
     const [selectedRows, setSelectedRows] = useState([]);
 
     const dispatch = useDispatch();
@@ -217,9 +264,19 @@ export const StockTransferForm = () => {
     const openSitesModal = () => setOpenSites(true);
     const closeSitesModal = () => setOpenSites(false);
 
-    const openItemsModal = () => setOpenItems(true);
+    const closeErrorModal = () => setErrorModal(false);
+
+    const openItemsModal = () => {
+        if (isObjectEmpty(from)) {
+            setErrorModal(true);
+        } else {
+            setOpenItems(true);
+        }
+    
+    }
+    
     const closeItemsModal = () => setOpenItems(false);
- 
+
     useEffect(() => {
         dispatch(getAllSites());
     }, [openSites])
@@ -316,11 +373,11 @@ export const StockTransferForm = () => {
                                                     className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                                                     onClick={openItemsModal}
                                                 >
-                                                   Add Items
+                                                    Add Items
                                                 </button>
                                             </div>
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -329,14 +386,23 @@ export const StockTransferForm = () => {
                 </div>
             </div>
 
-            <SelectSiteModal open={openSites}
-                closeModal={closeSitesModal}
-                from={from}
-                to={to}
-                setFrom={setFrom}
-                setTo={setTo}
-                data={sites} />
+            <SelectSiteModal 
+            open={openSites}
+            closeModal={closeSitesModal}
+            from={from}
+            to={to}
+            setFrom={setFrom}
+            setTo={setTo}
+            data={sites} />
 
+            <AddItemsModal 
+            open={openItems} 
+            closeModal={closeItemsModal}
+            />
+
+            <ErrorModal open={openErrorModal} closeModal={closeErrorModal} 
+                title="From Site Not Selected"
+                message="Please choose a from site before adding items."/> 
 
         </>
     );

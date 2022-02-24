@@ -1,27 +1,29 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../../../../environments/authApi";
 
-import { selectUser } from "../../../../stores/slices/userSlice";
 import { login } from "../../../../stores/slices/userSlice";
 
-export default function Login() {
+export function Login() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const user = useSelector(selectUser);
-
-  const dispatch = useDispatch();
 
   const handleLogin = (e) => {
     e.preventDefault();
-
-    authApi.login(username, password).then(() => {
-      navigate();
-    });
-
-    console.log(username + user);
+    dispatch(login({ username: username, password: password }))
+      .unwrap()
+      .then((data) => {
+        data.password = password;
+        localStorage.setItem("user", JSON.stringify(data));
+        setUsername("");
+        setPassword("");
+        data.id !== -1 && navigate("/home");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   return (
@@ -30,8 +32,8 @@ export default function Login() {
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <img
             className="mx-auto h-12 w-auto"
-            src="https://tailwindui.com/img/logos/workflow-mark-cyan-600.svg"
-            alt="Workflow"
+            src="android-chrome-512x512.png"
+            alt="iORA"
           />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             iORA ERP
@@ -100,7 +102,7 @@ export default function Login() {
 
                 <div className="text-sm">
                   <a
-                    href="#"
+                    href="/"
                     className="font-medium text-cyan-600 hover:text-cyan-500"
                   >
                     Forgot your password?

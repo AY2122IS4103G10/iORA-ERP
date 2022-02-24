@@ -1,5 +1,7 @@
 package com.iora.erp.service;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
@@ -31,14 +33,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee createEmployee(Employee employee) throws EmployeeException {
+        String password = employee.getPassword();
         Employee e = employee;
 
         try {
             if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
                     employee.getJobTitle().getId()) == true) {
 
-                e.setSalt(saltGeneration().toString());
-                e.setPassword(employee.getPassword());
+                String salt = saltGeneration().toString();
+                e.setSalt(salt);
+                e.setPassword(generateProtectedPassword(salt, password));
                 em.persist(e);
                 e.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
                 e.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
@@ -60,6 +64,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee updateEmployeeAccount(Employee employee) throws EmployeeException {
         Employee old = em.find(Employee.class, employee.getId());
+        String salt = old.getSalt();
 
         if (old == null) {
             throw new EmployeeException("Employee not found");
@@ -79,6 +84,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                         old.setUsername(employee.getUsername());
                         old.setEmail(employee.getEmail());
+                        old.setPassword(generateProtectedPassword(salt, employee.getPassword()));
                         old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
                         old.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
                         old.setName(employee.getName());
@@ -200,14 +206,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return getEmployeeByUsername(username).getJobTitle().getResponsibility();
     }
 
-    @Override
-    public byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
-    }
-
+    
     @Override
     public Boolean usernameAvailability(String username) {
         Query q = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
@@ -215,7 +214,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee e = (Employee) q.getSingleResult();
             return false;
-
+            
         } catch (NoResultException | NonUniqueResultException ex) {
             return true;
         }
@@ -228,18 +227,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee e = (Employee) q.getSingleResult();
             return false;
-
+            
         } catch (NoResultException | NonUniqueResultException ex) {
             return true;
         }
     }
-
+    
     @Override
     public Employee loginAuthentication(String username, String password) throws EmployeeException {
         try {
             Employee c = getEmployeeByUsername(username);
-
-            if (c.authentication(password)) {
+            
+            if (c.authentication(generateProtectedPassword(c.getSalt(), password))) {
                 return c;
             } else {
                 throw new EmployeeException();
@@ -247,6 +246,28 @@ public class EmployeeServiceImpl implements EmployeeService {
         } catch (Exception ex) {
             throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
         }
-
+        
+    }
+    
+    private String generateProtectedPassword(String salt, String password) {
+        String generatedPassword;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.reset();
+            md.update((salt + password).getBytes("utf8"));
+            
+            generatedPassword = String.format("%0129x", new BigInteger(1, md.digest()));
+            return generatedPassword;
+            
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+    
+    private byte[] saltGeneration() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return salt;
     }
 }

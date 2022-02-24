@@ -21,8 +21,7 @@ public interface EmployeeService {
     public abstract Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException;
     public abstract Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException;
 
-    public abstract byte[] saltGeneration();
+    public abstract Employee loginAuthentication(String username, String password) throws EmployeeException;
     public abstract Boolean usernameAvailability(String username);
     public abstract Boolean emailAvailability(String email);
-    public abstract Employee loginAuthentication(String username, String password) throws EmployeeException;
 }

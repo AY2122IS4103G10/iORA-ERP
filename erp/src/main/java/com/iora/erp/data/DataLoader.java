@@ -146,13 +146,15 @@ public class DataLoader implements CommandLineRunner {
                 em.persist(sora);
 
                 //Employee 
-                Employee e = new Employee("Sharon KS", "sharonMS.12@gmail.com", 4100.0, "sharonE", "password", 
-                true, PayType.MONTHLY, adminService.getJobTitleById(Long.valueOf(1)), 
-                adminService.getDepartmentById(Long.valueOf(1)), adminService.getCompanyById(Long.valueOf(1)));
+                Employee e = new Employee("Sharon KS", "sharonE", "password");
+                e.setEmail("sharonMS.12@gmail.com");
+                e.setSalary(4100.0);
+                e.setPayType(PayType.MONTHLY);
+                e.setJobTitle(adminService.getJobTitleById(Long.valueOf(1))); 
+                e.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
+                e.setCompany(adminService.getCompanyById(Long.valueOf(1)));
                 employeeService.createEmployee(e);
 
-                //Customer
-                
 
                 // Adding Sites
                 HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", "+65-63610056", iora);

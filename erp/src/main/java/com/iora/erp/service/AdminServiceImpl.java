@@ -27,7 +27,6 @@ import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
 import com.iora.erp.model.company.Vendor;
-import com.iora.erp.model.site.Site;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

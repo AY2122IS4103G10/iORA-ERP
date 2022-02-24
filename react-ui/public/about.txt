@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: EB Garamond
+- Font Author: Copyright 2017 The EB Garamond Project Authors (https://github.com/octaviopardo/EBGaramond12)
+- Font Source: http://fonts.gstatic.com/s/ebgaramond/v24/SlGDmQSNjdsmc35JDF1K5E55YMjF_7DPuGi-6_RUA4V-e6yHgQ.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))

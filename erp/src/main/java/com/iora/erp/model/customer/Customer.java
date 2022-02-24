@@ -3,6 +3,7 @@ package com.iora.erp.model.customer;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class Customer implements Serializable {
 
     @Column(nullable = false)
     private String hashPass;
-    @Column(nullable = false)
+    @Column
     private String salt;
 
     public Customer() {
@@ -52,8 +53,7 @@ public class Customer implements Serializable {
     }
 
     public Customer(String firstName, String lastName, String email, Date dob, String contactNumber,
-            MembershipTier membershipTier, String pass, String salt,
-            Boolean availStatus) {
+            MembershipTier membershipTier, String hashPass, String salt) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -62,23 +62,14 @@ public class Customer implements Serializable {
         this.membershipPoints = 0;
         this.membershipTier = membershipTier;
         this.storeCredit = 0.0;
-        this.hashPass = generateProtectedPassword(salt, pass);
         this.salt = salt;
-        this.availStatus = availStatus;
+        this.hashPass = hashPass;
+        this.availStatus = true;
     }
 
-    private static String generateProtectedPassword(String passwordSalt, String plainPassword) {
-        String generatedPassword;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.reset();
-            md.update((passwordSalt + plainPassword).getBytes("utf8"));
-
-            generatedPassword = String.format("%0128x", new BigInteger(1, md.digest()));
-            return generatedPassword;
-        } catch (Exception ex) {
-            return null;
-        }
+    public Customer(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public String getSalt() {
@@ -94,13 +85,9 @@ public class Customer implements Serializable {
     }
 
     public void sethashPass(String password) {
-        this.hashPass = generateProtectedPassword(this.salt, password);
+        this.hashPass = password;
     }
 
-    public Customer(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
 
     public Long getId() {
         return id;
@@ -115,7 +102,7 @@ public class Customer implements Serializable {
     }
 
     public String getLastName() {
-        return firstName;
+        return lastName;
     }
 
     public void setLastName(String lastName) {
@@ -198,7 +185,7 @@ public class Customer implements Serializable {
     }
 
     public boolean authentication(String password2) {
-        if(generateProtectedPassword(this.salt, password2).equals(this.hashPass)) {
+        if (password2.equals(this.hashPass)) {
             return true;
         }
         return false;

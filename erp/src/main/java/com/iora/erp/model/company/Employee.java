@@ -29,7 +29,7 @@ public class Employee implements Serializable {
     private Double salary;
     @Column(nullable = false, unique = true)
     private String username;
-    @Column(nullable = false)
+    @Column
     private String salt;
     @Column(nullable = false)
     private String password;
@@ -46,7 +46,29 @@ public class Employee implements Serializable {
     private Company company;
 
 
-    public Employee(String name, String email, Double salary, String username, String password, Boolean availStatus,
+    public Employee(String name, String username, String password) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.availStatus = true;
+    }
+
+    public Employee(String name, String email, Double salary, String username, String salt, String password,
+            Boolean availStatus, PayType payType, JobTitle jobTitle, Department department, Company company) {
+        this.name = name;
+        this.email = email;
+        this.salary = salary;
+        this.username = username;
+        this.salt = salt;
+        this.password = password;
+        this.availStatus = availStatus;
+        this.payType = payType;
+        this.jobTitle = jobTitle;
+        this.department = department;
+        this.company = company;
+    }
+
+    public Employee(String name, String email, Double salary, String username,String password, Boolean availStatus,
             PayType payType, JobTitle jobTitle, Department department, Company company) {
         this.name = name;
         this.email = email;
@@ -61,20 +83,6 @@ public class Employee implements Serializable {
     }
 
     public Employee() {
-    }
-
-    private static String generateProtectedPassword(String salt, String password) {
-        String generatedPassword;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.reset();
-            md.update((salt + password).getBytes("utf8"));
-
-            generatedPassword = String.format("%0129x", new BigInteger(1, md.digest()));
-            return generatedPassword;
-        } catch (Exception ex) {
-            return null;
-        }
     }
 
     public Long getId() {
@@ -135,7 +143,7 @@ public class Employee implements Serializable {
     }
 
     public void setPassword(String password) {
-        this.password = generateProtectedPassword(this.salt, password);
+        this.password = password;
     }
 
     public Double getSalary() {
@@ -184,7 +192,7 @@ public class Employee implements Serializable {
     }
 
     public boolean authentication(String password2) {
-        if(generateProtectedPassword(this.salt, password2).equals(this.password)) {
+        if(password2.equals(this.password)) {
             return true;
         }
         return false;

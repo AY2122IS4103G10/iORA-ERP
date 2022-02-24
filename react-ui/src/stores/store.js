@@ -8,10 +8,12 @@ import siteReducer from "./slices/siteSlice";
 import stocklevelReducer from "./slices/stocklevelSlice";
 import voucherReducer from "./slices/voucherSlice";
 import companyReducer from "./slices/companySlice"
+import employeeReducer from "./slices/employeeSlice"
 
 export default configureStore({
   reducer: {
     companies: companyReducer,
+    employee: employeeReducer,
     products: productReducer,
     prodFields: prodFieldReducer,
     procurements: procurementReducer,

@@ -5,6 +5,7 @@ import { classNames } from "../../../../utilities/Util";
 
 const tabs = [
   { name: "All Employee", href: "/ad/employee", current: true },
+  { name: "All Employee", href: "/ad/employee", current: true },
 ];
 
 const Header = () => {

@@ -14,7 +14,7 @@ import {
 
 const navigation = [
   { name: "Home", href: "/", icon: HomeIcon, current: true },
-  { name: "Employees", href: "/ad/employees", icon: UsersIcon, current: false },
+  { name: "Employees", href: "/ad/employee", icon: UsersIcon, current: false },
   { name: "Sites", href: "/ad/sites", icon: OfficeBuildingIcon, current: false },
   {
     name: "Reports & Analytics",

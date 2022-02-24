@@ -48,7 +48,7 @@ const promotionsSlice = createSlice({
     });
     builder.addCase(fetchPromotions.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.promotions = state.promotions.concat(action.payload);
+      state.promotions = action.payload;
     });
     builder.addCase(fetchPromotions.rejected, (state, action) => {
       state.status = "failed";

@@ -272,7 +272,12 @@ export const ManagePromotions = () => {
               fieldValue: name,
               discountedPrice: discPrice,
             })
-          ).unwrap();
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully added promotion");
+              closeModal();
+            });
         else if (modalState === "edit")
           dispatch(
             updateExistingPromotion({
@@ -281,9 +286,12 @@ export const ManagePromotions = () => {
               fieldValue: name,
               discountedPrice: discPrice,
             })
-          ).unwrap();
-        alert(`Successfully ${modalState === "add" ? "added" : "saved"} promotion`);
-        closeModal();
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully saved promotion");
+              closeModal();
+            });
       } catch (err) {
         console.error("Failed to add promo: ", err);
       } finally {

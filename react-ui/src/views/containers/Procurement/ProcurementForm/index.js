@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Dialog } from "@headlessui/react";
-import { api, sitesApi } from "../../../../environments/Api";
+import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import {
@@ -19,6 +19,14 @@ import {
   addNewProcurement,
   updateExistingProcurement,
 } from "../../../../stores/slices/procurementSlice";
+import {
+  fetchHeadquarters,
+  fetchManufacturing,
+  fetchWarehouse,
+  selectAllHeadquarters,
+  selectAllManufacturing,
+  selectAllWarehouse,
+} from "../../../../stores/slices/siteSlice";
 
 const addModalColumns = [
   {
@@ -266,7 +274,7 @@ const ProcurementFormBody = ({
                       setSelected={setWarehouseSelected}
                     />
                   ) : (
-                    <div>No factories</div>
+                    <div>No warehouses</div>
                   )}
                 </div>
               </div>
@@ -356,38 +364,41 @@ export const ProcurementForm = () => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
 
-  const [headquarters, setHeadquarters] = useState([]);
-  const [factories, setFactories] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
+  const headquarters = useSelector(selectAllHeadquarters);
+  const hq = headquarters[0];
+  const hqStatus = useSelector((state) => state.sites.hqStatus);
   useEffect(() => {
-    sitesApi
-      .searchByType("Headquarters")
-      .then((response) => {
-        setHeadquarters(response.data);
-        setHqSelected(response.data[0]);
-      })
-      .catch((err) => console.error(err));
-  }, []);
+    hqStatus === "idle" &&
+      dispatch(fetchHeadquarters()).catch((err) => console.error(err));
+  }, [hqStatus, dispatch]);
 
   useEffect(() => {
-    sitesApi
-      .searchByType("Manufacturing")
-      .then((response) => {
-        setFactories(response.data);
-        setManufacturingSelected(response.data[0]);
-      })
-      .catch((err) => console.error(err));
-  }, []);
+    setHqSelected(hq);
+  }, [hq]);
+
+  const factories = useSelector(selectAllManufacturing);
+  const factory = factories[0];
+  const factoryStatus = useSelector((state) => state.sites.manStatus);
+  useEffect(() => {
+    factoryStatus === "idle" &&
+      dispatch(fetchManufacturing()).catch((err) => console.error(err));
+  }, [factoryStatus, dispatch]);
 
   useEffect(() => {
-    sitesApi
-      .searchByType("Warehouse")
-      .then((response) => {
-        setWarehouses(response.data);
-        setWarehouseSelected(response.data[0]);
-      })
-      .catch((err) => console.error(err));
-  }, []);
+    setManufacturingSelected(factory);
+  }, [factory]);
+
+  const warehouses = useSelector(selectAllWarehouse);
+  const warehouse = warehouses[0];
+  const warehouseStatus = useSelector((state) => state.sites.warStatus);
+  useEffect(() => {
+    warehouseStatus === "idle" &&
+      dispatch(fetchWarehouse()).catch((err) => console.error(err));
+  }, [warehouseStatus, dispatch]);
+
+  useEffect(() => {
+    setWarehouseSelected(warehouse);
+  }, [warehouse]);
 
   const [selectedRows, setSelectedRows] = useState([]);
   const onAddItemsClicked = (evt) => {

@@ -20,20 +20,16 @@ public class AuthenticationController {
     @Autowired
     private CustomerService customerService;
     
+    /*
+     * ---------------------------------------------------------
+     * A.1 Account
+     * ---------------------------------------------------------
+     */
 
     @GetMapping(path = "/empLogin", produces = "application/json")
     public Employee employeeLogin(@RequestParam String username, @RequestParam String password) {
         try {
             return employeeService.loginAuthentication(username, password);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @GetMapping(path = "/login", produces = "application/json")
-    public Customer customerLogin(@RequestParam String email, @RequestParam String password) {
-        try {
-            return customerService.loginAuthentication(email, password);
         } catch (Exception e) {
             return null;
         }

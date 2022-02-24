@@ -1,6 +1,8 @@
 package com.iora.erp.service;
 
 import java.lang.reflect.Member;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,7 +16,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
@@ -30,32 +31,32 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
-    
+
     @PersistenceContext
     private EntityManager em;
 
     @Override
     public void createCustomerAccount(Customer customer) throws CustomerException {
+        String password = customer.gethashPass();
+        Customer newC = customer;
+
         try {
-            
-            Customer c = customer;
-            try {
-                Customer cc = getCustomerByEmail(customer.getEmail());
-            } catch (Exception ex) {
-                throw new CustomerException("Account with " +  customer.getEmail() + " has already been created");
-            }
-            c.setSalt(saltGeneration().toString());
-            c.sethashPass(customer.gethashPass());
-            c.setMembershipTier(findMembershipTierById("BASIC"));
-            em.persist(customer);
+            Customer cc = getCustomerByEmail(customer.getEmail());
+            throw new CustomerException("Account with " + customer.getEmail() + " has already been created");
 
         } catch (Exception ex) {
-            throw new CustomerException("Customer has been already been created");
+            newC.setMembershipTier(findMembershipTierById("BASIC"));
+            newC.setAvailStatus(true);
+            byte[] salt = saltGeneration();
+            newC.setSalt(salt.toString());
+            newC.sethashPass(generateProtectedPassword(salt.toString(), customer.gethashPass()));
+            em.persist(newC);
         }
+
     }
 
     @Override
-    public void updateCustomerAccount(Customer customer) throws CustomerException {
+    public Customer updateCustomerAccount(Customer customer) throws CustomerException {
         Customer old = em.find(Customer.class, customer.getId());
 
         if (old == null) {
@@ -69,8 +70,11 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         old.setContactNumber(customer.getContactNumber());
+        old.setDob(customer.getDob());
         old.setFirstName(customer.getFirstName());
-        old.setFirstName(customer.getLastName());
+        old.setLastName(customer.getLastName());
+
+        return old;
     }
 
     @Override
@@ -101,8 +105,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<Customer> getCustomerByFields(String search) {
-        /*TypedQuery<Customer> q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR " +
-                "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact", Customer.class);*/
+        /*
+         * TypedQuery<Customer> q = em.
+         * createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR "
+         * +
+         * "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact"
+         * , Customer.class);
+         */
         Query q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.email) LIKE :email OR " +
                 "LOWER(c.LastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact");
         q.setParameter("email", "%" + search.toLowerCase() + "%");
@@ -125,23 +134,29 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer getCustomerByEmail(String email) throws CustomerException {
         Query q = em.createQuery("SELECT c FROM Customer c WHERE c.email = :email");
         q.setParameter("email", email);
-
         try {
-            Customer c = (Customer) q.getSingleResult();
-            return c;
+            return (Customer) q.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new CustomerException("Customer email " + email + " does not exist.");
         }
     }
 
     @Override
-    public byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
-    }
+    public Customer loginAuthentication(String email, String password) throws CustomerException {
+        try {
 
+            Customer c = getCustomerByEmail(email);
+
+            if (c.authentication(generateProtectedPassword(c.getSalt(), password))) {
+                return c;
+            } else {
+                throw new CustomerException("Authentication Fail");
+            }
+        } catch (Exception ex) {
+            throw new CustomerException("Authentication Fail. Invalid Username or Password.");
+        }
+
+    }
 
     @Override
     public Voucher getVoucher(String voucherCode) throws CustomerException {
@@ -226,7 +241,6 @@ public class CustomerServiceImpl implements CustomerService {
         return em.find(MembershipTier.class, name.toUpperCase());
     }
 
-
     @Override
     public void createMembershipTier(MembershipTier membershipTier) {
         if (membershipTier.getBirthday() == null) {
@@ -235,20 +249,26 @@ public class CustomerServiceImpl implements CustomerService {
         em.merge(membershipTier);
     }
 
-    @Override
-    public Customer loginAuthentication(String email, String password) throws CustomerException {
+    private byte[] saltGeneration() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return salt;
+    }
+    
+    private String generateProtectedPassword(String salt, String password) {
+        String generatedPassword;
         try {
-            Customer c = getCustomerByEmail(email);
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.reset();
+            md.update((salt + password).getBytes("utf8"));
 
-            if (c.authentication(password)) {
-                return c;
-            } else {
-                throw new CustomerException();
-            }
+            generatedPassword = String.format("%0129x", new BigInteger(1, md.digest()));
+            return generatedPassword;
+
         } catch (Exception ex) {
-            throw new CustomerException("Authentication Fail. Invalid Username or Password.");
+            return null;
         }
-
     }
 
 

@@ -43,7 +43,7 @@ export const getProductStockLevel = createAsyncThunk(
     const response = await api.get(`sam/viewStock/product`, sku);
     return response.data;
   }
-)
+);
 
 export const addNewProduct = createAsyncThunk(
   "products/addNewPost",
@@ -82,6 +82,7 @@ const productSlice = createSlice({
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
       state.status = "failed";
+      state.error = action.error.message;
     });
     builder.addCase(fetchModel.pending, (state, action) => {
       state.status = "loading";
@@ -114,7 +115,7 @@ const productSlice = createSlice({
       state.status = "failed";
     });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {
-      state.products.push(action.payload)
+      state.products.push(action.payload);
     });
     builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
       const {
@@ -127,7 +128,7 @@ const productSlice = createSlice({
         products,
         productFields,
       } = action.payload;
-      console.log(action.payload)
+      console.log(action.payload);
       const existingProd = state.products.find(
         (prod) => prod.modelCode === modelCode
       );

@@ -73,10 +73,7 @@ public class ProductItem {
             return false;
         }
         ProductItem productItem = (ProductItem) o;
-        if ((this.rfid == null && productItem.rfid == null) || (this.rfid == null && !this.rfid.equals(productItem.rfid))) {
-            return false;
-        }
-        return true;
+        return this.rfid == productItem.rfid;
     }
 
     @Override

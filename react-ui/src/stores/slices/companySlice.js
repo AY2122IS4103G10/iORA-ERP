@@ -2,78 +2,42 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  companies: [
-    {
-      id: 1,
-      name: "iORA Fashion Pte. Ltd.",
-      registerNumber: "199703089W",
-      phoneNumber: "+65-63610056",
-      active: true,
-      address: {
-        id: 2,
-        country: "SINGAPORE",
-        city: "Singapore",
-        building: "Enterprise 10",
-        state: "Singapore",
-        unit: "NIL",
-        road: "10P Enterprise Road",
-        postalCode: "Singapore 629840",
-        billing: false,
-        latitude: 1.334251,
-        longitude: 103.704246,
-        coordinates: "(1.334251, 103.704246)",
-      },
-      departments: [
-        {
-          id: 1,
-          deptName: "Sales and Marketing",
-          jobTitles: [],
-          responsibility: [],
-          department: "Sales and Marketing",
-        },
-      ],
-    },
-  ],
+  companies: [],
   status: "idle",
   error: null,
 };
 
 export const fetchCompanies = createAsyncThunk(
   "companies/fetchCompanies",
-  //storeTypes =["Store", "Headquarters"]
-  async ({ storeTypes, country, company }) => {
-    const response = await api.getAll(
-      `admin/viewCompanies?search=${storeTypes.join(
-        ","
-      )}&country=${country}&company=${company}`
-    );
+  async () => {
+    const response = await api.getAll("admin/viewCompanies?search=");
     return response.data;
   }
 );
 
 export const addNewCompany = createAsyncThunk(
   "companies/addNewCompany",
-  async (storeType, initialSite) => {
-    const response = await api.create(
-      `admin/addSite/${storeType}`,
-      initialSite
-    );
+  async (initialCompany) => {
+    const response = await api.create("admin/addCompany", initialCompany);
     return response.data;
   }
 );
 
 export const updateExistingCompany = createAsyncThunk(
   "companies/updateExistingCompany",
-  async (existingSite) => {
-    const response = await api.update("admin/editSite", existingSite);
+  async (existingCompany) => {
+    const response = await api.update("admin/editCompany", existingCompany);
     return response.data;
   }
 );
 
 export const deleteExistingCompany = createAsyncThunk(
   "companies/deleteExistingCompany",
-  async (existingSiteId) => {
-    const response = await api.delete("admin/deleteSite", existingSiteId);
+  async (existingCompanyId) => {
+    const response = await api.delete(
+      "admin/deleteCompany?id=",
+      existingCompanyId
+    );
     return response.data;
   }
 );
@@ -87,7 +51,7 @@ const companySlice = createSlice({
     });
     builder.addCase(fetchCompanies.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.companies = state.companies.concat(action.payload);
+      state.companies = action.payload;
     });
     builder.addCase(fetchCompanies.rejected, (state, action) => {
       state.status = "failed";
@@ -106,7 +70,6 @@ const companySlice = createSlice({
         companies,
         productFields,
       } = action.payload;
-      console.log(action.payload);
       const existingProd = state.companies.find(
         (prod) => prod.companyId === companyId
       );
@@ -135,4 +98,4 @@ export default companySlice.reducer;
 export const selectAllCompanies = (state) => state.companies.companies;
 
 export const selectCompanyById = (state, companyId) =>
-  state.companies.companies.find((company) => company.companyId === companyId);
+  state.companies.companies.find((company) => company.id === companyId);

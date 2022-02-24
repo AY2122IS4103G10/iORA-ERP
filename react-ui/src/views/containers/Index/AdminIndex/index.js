@@ -32,11 +32,8 @@ const secondaryNavigation = [
 
 export const AdminIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  // const [currPage, setCurrPage] = useState(0);
-
-  // const changePage = (tabnumber) => setCurrPage(tabnumber);
   return (
-    <div className="min-h-full ">
+    <div className="min-h-screen bg-gray-100">
       <SideBar
         navigation={navigation}
         secondaryNavigation={secondaryNavigation}

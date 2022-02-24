@@ -47,7 +47,7 @@ const secondaryNavigation = [
 export const SMIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
-    <div className="min-h-full">
+    <div className="min-h-screen bg-gray-100">
       <SideBar
         navigation={navigation}
         secondaryNavigation={secondaryNavigation}
@@ -65,7 +65,7 @@ export const SMIndex = () => {
             </div>
           }
         />
-        <main className="flex-1 pb-8 bg-gray-100">
+        <main className="flex-1 pb-8 ">
           <Outlet />
         </main>
       </div>

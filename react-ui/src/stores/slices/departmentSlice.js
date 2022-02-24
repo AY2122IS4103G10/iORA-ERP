@@ -20,7 +20,7 @@ export const fetchDepartments = createAsyncThunk(
   }
 );
 
-export const addDepartment = createAsyncThunk(
+export const addNewDepartment = createAsyncThunk(
     "department/addDepartment",
     async (initialDepartment) => {
       const response = await api.create("admin/addDepartment", initialDepartment);

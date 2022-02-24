@@ -74,7 +74,7 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public List<Site> searchAllSites(List<String> siteTypes, String country, String company) {
-        List<Site> resultList = em.createQuery(siteQuery("SELECT s FROM Site s", country.toUpperCase(), company),
+        List<Site> resultList = em.createQuery(siteQuery("SELECT s FROM Site s", country, company),
                 Site.class)
                 .getResultList();
         return resultList;
@@ -83,7 +83,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchHeadquarters(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM HeadquartersSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM HeadquartersSite s", country, company),
                         HeadquartersSite.class)
                 .getResultList();
         return resultList;
@@ -92,7 +92,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchManufacturing(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM ManufacturingSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM ManufacturingSite s", country, company),
                         ManufacturingSite.class)
                 .getResultList();
         return resultList;
@@ -101,7 +101,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchOnlineStores(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM OnlineStoreSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM OnlineStoreSite s", country, company),
                         OnlineStoreSite.class)
                 .getResultList();
         return resultList;
@@ -110,7 +110,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchStores(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM StoreSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM StoreSite s", country, company),
                         StoreSite.class)
                 .getResultList();
         return resultList;
@@ -119,7 +119,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<? extends Site> searchWarehouses(String country, String company) {
         List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM WarehouseSite s", country.toUpperCase(), company),
+                .createQuery(siteQuery("SELECT s FROM WarehouseSite s", country, company),
                         WarehouseSite.class)
                 .getResultList();
         return resultList;
@@ -128,10 +128,10 @@ public class SiteServiceImpl implements SiteService {
     String siteQuery(String mainQuery, String country, String company) {
         if (!country.equals("") && !company.equals("")) {
             return mainQuery + String.format(
-                    " WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country,
+                    " WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country.toUpperCase(),
                     company);
         } else if (!country.equals("")) {
-            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country);
+            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country.toUpperCase());
         } else if (!company.equals("")) {
             return mainQuery + String.format(" WHERE s.company.name = '%s Fashion Pte. Ltd.'", company);
         } else {
@@ -183,11 +183,27 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
+    public Map<Long, Long> getStockLevelByProduct(String SKUCode) {
+        List<Site> resultList = em
+                .createQuery("SELECT s FROM Site s", Site.class)
+                .getResultList();
+        Map<Long, Long> resultMap = new HashMap<Long, Long>();
+        for (Site s : resultList) {
+            Long siteId = s.getId();
+            StockLevel stockLevel = s.getStockLevel();
+            resultMap.put(siteId, stockLevel.getProducts().getOrDefault(SKUCode, 0L));
+        }
+        return resultMap;
+    }
+
+    @Override
     public void addProductItemToSite(Long siteId, String productItemId) throws NoStockLevelException {
         StockLevel stockLevel = getStockLevelOfSite(siteId);
         ProductItem item = em.find(ProductItem.class, productItemId);
         try {
-            removeFromStockLevel(item);
+            if (item.getStockLevel() != null) {
+                removeFromStockLevel(item);
+            }
             addToStockLevel(stockLevel, item);
         } catch (IllegalTransferException ex) {
             System.err.println(ex.getMessage());
@@ -210,7 +226,9 @@ public class SiteServiceImpl implements SiteService {
         for (String productItemId : productItemIds) {
             try {
                 ProductItem item = em.find(ProductItem.class, productItemId);
-                removeFromStockLevel(item);
+                if (item.getStockLevel() != null) {
+                    removeFromStockLevel(item);
+                }
                 addToStockLevel(stockLevel, item);
             } catch (IllegalTransferException ex) {
                 System.err.println(ex.getMessage());
@@ -231,21 +249,8 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public Map<Long, Long> getStockLevelByProduct(String SKUCode) {
-        List<Site> resultList = em
-                .createQuery("SELECT s FROM Site s", Site.class)
-                .getResultList();
-        Map<Long, Long> resultMap = new HashMap<Long, Long>();
-        for (Site s : resultList) {
-            Long siteId = s.getId();
-            StockLevel stockLevel = s.getStockLevel();
-            resultMap.put(siteId, stockLevel.getProducts().getOrDefault(SKUCode, 0L));
-        }
-        return resultMap;
-    }
-
-    @Override
     public void addToStockLevel(StockLevel stockLevel, ProductItem productItem) throws IllegalTransferException {
+        stockLevel = em.find(StockLevel.class, stockLevel.getId());
         if (stockLevel.getProductItems().contains(productItem)) {
             throw new IllegalTransferException("Product Item already added");
         }
@@ -253,8 +258,8 @@ public class SiteServiceImpl implements SiteService {
         String SKUCode = productItem.getProductSKU();
         String modelCode = SKUCode.split("-")[0];
         stockLevel.getProductItems().add(productItem);
-        stockLevel.getProducts().merge(SKUCode, 1L, (x, y) -> x + y);
-        stockLevel.getModels().merge(modelCode, 1L, (x, y) -> x + y);
+        stockLevel.getProducts().put(SKUCode, stockLevel.getProducts().get(SKUCode) != null ? stockLevel.getProducts().get(SKUCode) + 1 : 1);
+        stockLevel.getModels().put(modelCode, stockLevel.getModels().get(modelCode) != null ? stockLevel.getModels().get(modelCode) + 1 : 1);
         em.merge(stockLevel);
         em.merge(productItem);
     }
@@ -274,36 +279,46 @@ public class SiteServiceImpl implements SiteService {
         em.merge(productItem);
     }
 
-	@Override
-	public void addManyToStockLevel(StockLevel stockLevel, List<ProductItem> productItems) throws IllegalTransferException {
+    @Override
+    public void addManyToStockLevel(StockLevel stockLevel, List<ProductItem> productItems)
+            throws IllegalTransferException {
         int fail = 0;
-		for (ProductItem productItem : productItems) {
-            try {
-                addToStockLevel(stockLevel, productItem);
-            } catch (IllegalTransferException e) {
+        for (int i = 0; i < productItems.size(); i++) {
+            ProductItem productItem = em.find(ProductItem.class, productItems.get(i).getRfid());
+            if (stockLevel.getProductItems().contains(productItem)) {
                 fail++;
                 System.err.println("Error adding: " + productItem.getRfid());
             }
+            productItem.setStockLevel(stockLevel);
+            String SKUCode = productItem.getProductSKU();
+            String modelCode = SKUCode.split("-")[0];
+            stockLevel.getProductItems().add(productItem);
+            stockLevel.getProducts().merge(SKUCode, 1L, (x, y) -> x + y);
+            stockLevel.getModels().merge(modelCode, 1L, (x, y) -> x + y);
         }
         if (fail > 0) {
             throw new IllegalTransferException(String.format("%d transfer(s) failed.", fail));
         }
-	}
+    }
 
-	@Override
-	public void removeManyFromStockLevel(List<ProductItem> productItems) throws IllegalTransferException {
-		int fail = 0;
-		for (ProductItem productItem : productItems) {
-            try {
-                removeFromStockLevel(productItem);
-            } catch (IllegalTransferException e) {
-                fail++;
-                System.err.println("Error removing: " + productItem.getRfid());
+    @Override
+    public void removeManyFromStockLevel(List<ProductItem> productItems) throws IllegalTransferException {
+        int fail = 0;
+        for (int i = 0; i < productItems.size(); i++) {
+            ProductItem productItem = em.find(ProductItem.class, productItems.get(i).getRfid());
+            if (productItem.getStockLevel() == null) {
+                throw new IllegalTransferException("Product Item already detached");
             }
+            StockLevel stockLevel = productItem.getStockLevel();
+            String SKUCode = productItem.getProductSKU();
+            String modelCode = SKUCode.split("-")[0];
+            stockLevel.getProducts().merge(SKUCode, -1L, (x, y) -> x + y);
+            stockLevel.getModels().merge(modelCode, -1L, (x, y) -> x + y);
+            productItem.setStockLevel(null);
         }
         if (fail > 0) {
             throw new IllegalTransferException(String.format("%d transfer(s) failed.", fail));
         }
-	}
+    }
 
 }

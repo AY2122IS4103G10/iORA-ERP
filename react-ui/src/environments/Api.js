@@ -38,14 +38,31 @@ export const sitesApi = {
     );
   },
   getAll() {
-    return axios
-      .get(`${REST_ENDPOINT}sam/viewSites/all`)
+    return axios.get(`${REST_ENDPOINT}sam/viewSites/all`);
   },
 
   getASite(id) {
     return axios.get(`${REST_ENDPOINT}admin/viewSite/${id}`);
   },
   deleteSite(id) {
-    return axios.delete(`${REST_ENDPOINT}admin/deleteSite?siteId=${id}`)
-  }
+    return axios.delete(`${REST_ENDPOINT}admin/deleteSite?siteId=${id}`);
+  },
+};
+export const companyApi = {
+  getCompany(id) {
+    return axios.get(`${REST_ENDPOINT}admin/viewCompany?id=${id}`);
+  },
+};
+
+export const procurementApi = {
+  acceptOrder(orderId, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/accept/${orderId}/${siteId}`
+    );
+  },
+  cancelOrder(orderId, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`
+    );
+  },
 };

@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { api, procurementApi } from "../../environments/Api";
 
 const initialState = {
-  procurements: [{ id: 1 }],
+  procurements: [],
   status: "idle",
   error: null,
 };
@@ -28,10 +28,10 @@ export const addNewProcurement = createAsyncThunk(
 
 export const updateExistingProcurement = createAsyncThunk(
   "procurements/updateExistingProcurement",
-  async (siteId, existingProcurement) => {
+  async (existingProcurement) => {
     const response = await api.update(
-      `sam/procurementOrder/update/${siteId}`,
-      existingProcurement
+      `sam/procurementOrder/update/${existingProcurement.siteId}`,
+      existingProcurement.existingProcurement
     );
     return response.data;
   }
@@ -39,8 +39,27 @@ export const updateExistingProcurement = createAsyncThunk(
 
 export const deleteExistingProcurement = createAsyncThunk(
   "procurements/deleteExistingProcurement",
-  async (siteId, orderId, existingModelCode) => {
-    const response = await api.delete("sam/model", existingModelCode);
+  async ({ orderId, siteId }) => {
+    const response = await api.delete(
+      `sam/procurementOrder/delete/${orderId}`,
+      siteId
+    );
+    return response.data;
+  }
+);
+
+export const acceptProcurement = createAsyncThunk(
+  "procurements/acceptProcurement",
+  async ({ orderId, siteId }) => {
+    const response = await procurementApi.acceptOrder(orderId, siteId);
+    return response.data;
+  }
+);
+
+export const cancelProcurement = createAsyncThunk(
+  "procurements/cancelProcurement",
+  async ({ orderId, siteId }) => {
+    const response = await procurementApi.cancelOrder(orderId, siteId);
     return response.data;
   }
 );
@@ -64,7 +83,7 @@ const procurementSlice = createSlice({
     });
     builder.addCase(updateExistingProcurement.fulfilled, (state, action) => {
       const {
-        orderId,
+        id,
         name,
         description,
         price,
@@ -73,26 +92,48 @@ const procurementSlice = createSlice({
         procurements,
         productFields,
       } = action.payload;
-      console.log(action.payload);
-      const existingProd = state.procurements.find(
-        (prod) => prod.orderId === orderId
+      const existingProcurement = state.procurements.find(
+        (procurement) => procurement.id === id
       );
-      if (existingProd) {
-        existingProd.name = name;
-        existingProd.description = description;
-        existingProd.price = price;
-        existingProd.onlineOnly = onlineOnly;
-        existingProd.available = available;
-        existingProd.procurements = procurements;
-        existingProd.productFields = productFields;
+      if (existingProcurement) {
+        existingProcurement.name = name;
+        existingProcurement.description = description;
+        existingProcurement.price = price;
+        existingProcurement.onlineOnly = onlineOnly;
+        existingProcurement.available = available;
+        existingProcurement.procurements = procurements;
+        existingProcurement.productFields = productFields;
       }
-      // state.status = "idle";
     });
     builder.addCase(deleteExistingProcurement.fulfilled, (state, action) => {
       state.procurements = state.procurements.filter(
         ({ prodCode }) => prodCode !== action.payload.prodCode
       );
       // state.status = "idle"
+    });
+    builder.addCase(acceptProcurement.fulfilled, (state, action) => {
+      const {
+        id,
+        statusHistory,
+      } = action.payload;
+      const existingProcurement = state.procurements.find(
+        (procurement) => procurement.id === id
+      );
+      if (existingProcurement) {
+        existingProcurement.statusHistory = statusHistory
+      }
+    });
+    builder.addCase(cancelProcurement.fulfilled, (state, action) => {
+      const {
+        id,
+        statusHistory,
+      } = action.payload;
+      const existingProcurement = state.procurements.find(
+        (procurement) => procurement.id === id
+      );
+      if (existingProcurement) {
+        existingProcurement.statusHistory = statusHistory
+      }
     });
   },
 });
@@ -103,5 +144,5 @@ export const selectAllProcurements = (state) => state.procurements.procurements;
 
 export const selectProcurementById = (state, orderId) =>
   state.procurements.procurements.find(
-    (procurement) => procurement.orderId === orderId
+    (procurement) => procurement.id === orderId
   );

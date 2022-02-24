@@ -3,10 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { selectUser } from "../../stores/slices/userSlice";
 import { login } from "../../stores/slices/userSlice";
-import Api from "../../environments/Api";
-import logo from "../../assets/images/iORAlogo.png";
 
-export default function Login() {
+export default function ECLogin() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const user = useSelector(selectUser);
@@ -28,18 +26,8 @@ export default function Login() {
       console.log(username + user);
 
     };
-
-
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-gray-50">
-        <body class="h-full">
-        ```
-      */}
       <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <img
@@ -47,7 +35,7 @@ export default function Login() {
             src="https://tailwindui.com/img/logos/workflow-mark-cyan-600.svg"
             alt="Workflow"
           />
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">iORA ERP</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Login</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
           </p>
         </div>

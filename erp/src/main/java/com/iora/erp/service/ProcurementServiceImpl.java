@@ -13,6 +13,7 @@ import com.iora.erp.enumeration.ProcurementOrderStatus;
 import com.iora.erp.exception.IllegalPOModificationException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.ProcurementOrderException;
+import com.iora.erp.exception.ProductItemException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.model.procurementOrder.POStatus;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
@@ -31,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProcurementServiceImpl implements ProcurementService {
 
+    @Autowired
+    private ProductService productService;
     @Autowired
     private SiteService siteService;
     @PersistenceContext
@@ -182,6 +185,13 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
                 .flatMap(Collection::stream).collect(Collectors.toList());
+        for (int i = 0; i < productItems.size(); i++) {
+            try {
+                productService.createProductItem(productItems.get(i).getRfid(), productItems.get(i).getProductSKU());
+            } catch (ProductItemException e) {
+                System.err.println(e.getMessage());
+            }
+        }
         siteService.addManyToStockLevel(actionBy.getStockLevel(), productItems);
         procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.READY));

@@ -21,7 +21,6 @@ export const ProductsTable = ({ data }) => {
       {
         Header: "Product Code",
         accessor: "modelCode",
-
         Cell: (e) => (
           <Link
             to={`/sm/products/${e.value}`}

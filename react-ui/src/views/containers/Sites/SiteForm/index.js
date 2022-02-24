@@ -493,7 +493,9 @@ export const SiteForm = () => {
               initialSite: {
                 name,
                 address: {
-                  country: country.charAt(0).toUpperCase() + country.slice(1),
+                  country:
+                    country.charAt(0).toUpperCase() +
+                    country.slice(1).toLowerCase(),
                   city,
                   building,
                   state,
@@ -513,7 +515,12 @@ export const SiteForm = () => {
                 },
               },
             })
-          ).unwrap();
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully added site");
+              navigate("/ad/sites");
+            });
         else
           dispatch(
             updateExistingSite({
@@ -538,9 +545,12 @@ export const SiteForm = () => {
               company: companySelected,
               procurementOrders,
             })
-          ).unwrap();
-        alert(`Successfully ${!isEditing ? "added" : "updated"} site`);
-        navigate(!isEditing ? "/ad/sites" : `/ad/sites/${siteId}`);
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully updated site");
+              navigate(`/ad/sites/${siteId}`);
+            });
       } catch (err) {
         console.error("Failed to add/edit site: ", err);
       } finally {

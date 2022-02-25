@@ -24,7 +24,7 @@ const secondaryNavigation = [
 export const HomeIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-full">
       <SideBar
         navigation={navigation}
         secondaryNavigation={secondaryNavigation}

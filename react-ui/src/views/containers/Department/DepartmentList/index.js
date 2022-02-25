@@ -50,7 +50,7 @@ export const DepartmentTable = () => {
   const data = useSelector(selectAllDepartment);
   const departmentStatus = useSelector((state) => state.department.status);
   useEffect(() => {
-    departmentStatus === "idle" && dispatch(fetchDepartments());
+    departmentStatus === "idle" && dispatch(fetchDepartment());
   }, [departmentStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

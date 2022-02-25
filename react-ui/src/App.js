@@ -46,9 +46,6 @@ import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/ind
 import Error from "./views/containers/Auth/Error";
 import { Auth } from "./views/containers/Auth/Auth";
 import { StockLevelForm } from "./views/containers/StockLevels/StockLevelForm";
-import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
-import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
-import { VendorForm } from "./views/containers/Vendor/VendorForm";
 
 function App() {
   return (
@@ -131,23 +128,17 @@ function App() {
               <Route path="create" element={<EmployeeForm />} />
               <Route path="edit/:employeeId" element={<EmployeeForm />} />
             </Route>
-            <Route path="jobTitles" element={<Outlet />}>
+            <Route path="jobTitle" element={<Outlet />}>
               <Route index element={<ManageJobTitle />} />
               <Route path=":title" element={<JobTitleDetails />} />
               <Route path="create" element={<JobTitleForm />} />
               <Route path="edit/:jobTitleId" element={<JobTitleForm />} />
             </Route>
-            <Route path="departments" element={<Outlet />}>
+            <Route path="department" element={<Outlet />}>
               <Route index element={<ManageDepartment />} />
               <Route path=":name" element={<DepartmentDetails />} />
               <Route path="create" element={<DepartmentForm />} />
               <Route path="edit/:departmentId" element={<DepartmentForm />} />
-            </Route>
-            <Route path="vendors" element={<Outlet />}>
-              <Route index element={<ManageVendors />} />
-              <Route path=":vendorId" element={<VendorDetails />} />
-              <Route path="create" element={<VendorForm />} />
-              <Route path="edit/:vendorId" element={<VendorForm />} />
             </Route>
           </Route>
 

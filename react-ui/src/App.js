@@ -1,10 +1,4 @@
-import {
-  Routes,
-  Route,
-  Outlet,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import { SMIndex } from "./views/containers/Index/SMIndex";
 import { AdminIndex } from "./views/containers/Index/AdminIndex";
 import { MFIndex } from "./views/containers/Index/MFIndex";

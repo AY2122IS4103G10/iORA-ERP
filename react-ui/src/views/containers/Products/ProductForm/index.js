@@ -492,7 +492,6 @@ export const ProductForm = () => {
   const [catCheckedState, setCatCheckedState] = useState(
     new Array(categories.length).fill(false)
   );
-  // const [company, setCompany] = useState(!isEditing ? "" : product.company);
 
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
@@ -502,7 +501,6 @@ export const ProductForm = () => {
     setOnlineOnly(!onlineOnly);
   };
   const onAvailableChanged = () => setAvailable(!available);
-  // const onCompanyChanged = (e) => setCompany(e.target.value);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
       index === pos ? !item : item

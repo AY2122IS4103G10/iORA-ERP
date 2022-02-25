@@ -99,16 +99,8 @@ const ProcurementItemsList = ({ data, setData }) => {
     };
     return [
       {
-        Header: "Product Code",
-        accessor: "modelCode",
-      },
-      {
         Header: "SKU",
         accessor: (row) => row.product.sku,
-      },
-      {
-        Header: "Name",
-        accessor: (row) => row.product.name,
       },
       {
         Header: "Color",
@@ -369,7 +361,7 @@ export const ProcurementForm = () => {
   const hqStatus = useSelector((state) => state.sites.hqStatus);
   useEffect(() => {
     hqStatus === "idle" &&
-      dispatch(fetchHeadquarters()).catch((err) => console.error(err));
+      dispatch(fetchHeadquarters())
   }, [hqStatus, dispatch]);
 
   useEffect(() => {
@@ -381,7 +373,7 @@ export const ProcurementForm = () => {
   const factoryStatus = useSelector((state) => state.sites.manStatus);
   useEffect(() => {
     factoryStatus === "idle" &&
-      dispatch(fetchManufacturing()).catch((err) => console.error(err));
+      dispatch(fetchManufacturing())
   }, [factoryStatus, dispatch]);
 
   useEffect(() => {
@@ -393,7 +385,7 @@ export const ProcurementForm = () => {
   const warehouseStatus = useSelector((state) => state.sites.warStatus);
   useEffect(() => {
     warehouseStatus === "idle" &&
-      dispatch(fetchWarehouse()).catch((err) => console.error(err));
+      dispatch(fetchWarehouse())
   }, [warehouseStatus, dispatch]);
 
   useEffect(() => {
@@ -420,62 +412,49 @@ export const ProcurementForm = () => {
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-
-  const canAdd =
-    [manufacturingSelected, warehouseSelected, lineItems].every(Boolean) &&
-    requestStatus === "idle";
+  const canAdd = [manufacturingSelected, warehouseSelected, lineItems].every(
+    Boolean
+  );
 
   const onAddOrderClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
-      try {
-        setRequestStatus("pending");
-        if (!isEditing)
-          dispatch(
-            addNewProcurement({
-              siteId: hqSelected.id,
-              initialProcurement: {
-                lineItems: lineItems.map(({ product, requestedQty }) => ({
-                  product,
-                  requestedQty,
-                })),
-                headquarters: hqSelected,
-                manufacturing: manufacturingSelected,
-                warehouse: warehouseSelected,
+      if (!isEditing)
+        api
+          .create(`sam/procurementOrder/create/${hqSelected.id}`, {
+            lineItems: lineItems.map(({ product, requestedQty }) => ({
+              product: {
+                sku: product.sku,
+                productFields: product.productFields,
               },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully created procurement order");
-              navigate("/sm/procurements");
-            });
-        else
-          dispatch(
-            updateExistingProcurement({
-              siteId: hqSelected.id,
-              existingProcurement: {
-                lineItems: lineItems.map(({ product, requestedQty }) => ({
-                  product,
-                  requestedQty,
-                })),
-                headquarters: hqSelected,
-                manufacturing: manufacturingSelected,
-                warehouse: warehouseSelected,
-              },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully updated procurement order");
-              navigate(`/sm/procurements/${orderId}`);
-            });
-      } catch (err) {
-        console.error("Failed to add procurement: ", err);
-      } finally {
-        setRequestStatus("idle");
-      }
+              requestedQty,
+            })),
+            headquarters: { id: hqSelected.id },
+            manufacturing: { id: manufacturingSelected.id },
+            warehouse: { id: warehouseSelected.id },
+          })
+          .then(() => {
+            alert("Successfully created procurement order");
+            navigate("/sm/procurements");
+          })
+          .catch((error) =>
+            console.error("Failed to create procurement: ", error.message)
+          );
+      else
+        api
+          .update(`sam/procurementOrder/update/${hqSelected.id}`, {
+            lineItems: lineItems.map(({ product, requestedQty }) => ({
+              product,
+              requestedQty,
+            })),
+          })
+          .then(() => {
+            alert("Successfully updated procurement order");
+            navigate(`/sm/procurements/${orderId}`);
+          })
+          .catch((error) =>
+            console.error("Failed to update procurement: ", error.message)
+          );
   };
 
   const onCancelClicked = () =>

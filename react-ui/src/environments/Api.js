@@ -66,6 +66,17 @@ export const procurementApi = {
       `${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`
     );
   },
+  fulfillOrder(siteId, order) {
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`,
+      order
+    );
+  },
+  generateItems(sku, quantity) {
+    return axios.post(
+      `${REST_ENDPOINT}sam/productItem/generate/${sku}/${quantity}`
+    );
+  },
 };
 
 export const authApi = {

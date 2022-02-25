@@ -1,42 +1,48 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../../../stores/slices/userSlice";
 
-import { selectUser } from "../../stores/slices/userSlice";
-import { login } from "../../stores/slices/userSlice";
+export const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-export default function ECLogin() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const user = useSelector(selectUser);
+  const handleLogin = (e) => {
+    e.preventDefault();
+    dispatch(login({ username: username, password: password }))
+      .unwrap()
+      .then((data) => {
+        data.password = password;
+        localStorage.setItem("user", JSON.stringify(data));
+        setUsername("");
+        setPassword("");
+        data.id !== -1 && navigate("/home");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
-    const dispatch = useDispatch();
-
-    const handleLogin = (e) => {
-      e.preventDefault();
-      console.log("login");
-      
-      dispatch(
-        login({
-          username: username,
-          password: password,
-          loggedIn: true,
-        })
-      );
-      
-      console.log(username + user);
-
-    };
   return (
     <>
-      <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <img
             className="mx-auto h-12 w-auto"
-            src="https://tailwindui.com/img/logos/workflow-mark-cyan-600.svg"
-            alt="Workflow"
+            src="android-chrome-512x512.png"
+            alt="iORA"
           />
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Login</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Login
+          </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
+            Or{' '}
+            <Link to="/register" className="font-medium text-cyan-600 hover:text-cyan-500">
+              create an account
+            </Link>
           </p>
         </div>
 
@@ -44,7 +50,10 @@ export default function ECLogin() {
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <form className="space-y-6" onSubmit={handleLogin}>
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Username
                 </label>
                 <div className="mt-1">
@@ -61,7 +70,10 @@ export default function ECLogin() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Password
                 </label>
                 <div className="mt-1">
@@ -85,13 +97,19 @@ export default function ECLogin() {
                     type="checkbox"
                     className="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  <label
+                    htmlFor="remember-me"
+                    className="ml-2 block text-sm text-gray-900"
+                  >
                     Remember me
                   </label>
                 </div>
 
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-cyan-600 hover:text-cyan-500">
+                  <a
+                    href="/"
+                    className="font-medium text-cyan-600 hover:text-cyan-500"
+                  >
                     Forgot your password?
                   </a>
                 </div>
@@ -107,11 +125,10 @@ export default function ECLogin() {
               </div>
             </form>
 
-            <div className="mt-6">
-            </div>
+            <div className="mt-6"></div>
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }

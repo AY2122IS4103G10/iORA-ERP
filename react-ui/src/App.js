@@ -42,6 +42,8 @@ import { DepartmentDetails } from "./views/containers/Department/DepartmentDetai
 import { ManageJobTitle } from "./views/containers/JobTitle/ManageJobTitle";
 import { JobTitleForm } from "./views/containers/JobTitle/JobTitleForm";
 import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/index.js";
+import { FrontPage } from "./views/containers/SelfService/FrontPage";
+import { Order } from "./views/containers/SelfService/Order";
 import Error from "./views/containers/Auth/Error";
 import { Auth } from "./views/containers/Auth/Auth";
 
@@ -145,12 +147,14 @@ function App() {
               <Route path="edit/:orderId" element={<VoucherForm />} />
             </Route>
           </Route>
-
-          {/* Self Service Kiosk*/}
-          <Route path="ss" element={<MFIndex />}>
-
-          </Route>
         </Route>
+
+        {/* Self Service Kiosk*/}
+        <Route path="ss" element={<Outlet />}>
+          <Route index element={<FrontPage />} />
+          <Route path="order" element={<Order />} />
+        </Route>
+
         <Route path="*" element={<Error />} />
       </Routes>
     </div>

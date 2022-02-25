@@ -6,6 +6,7 @@ const initialState = {
   model: null,
   currProduct: null, //selected product for stock level
   prodStockLevel: null, //view product's stock level
+  prodItem: null, 
   status: "idle",
   error: null,
 };
@@ -65,6 +66,14 @@ export const deleteExistingProduct = createAsyncThunk(
   "products/deleteExistingProduct",
   async (existingModelCode) => {
     const response = await api.delete("sam/model", existingModelCode);
+    return response.data;
+  }
+);
+
+export const getProductItem = createAsyncThunk(
+  "products/getProductItem",
+  async (rfid) => {
+    const response = await api.get("sam/productItem", rfid);
     return response.data;
   }
 );
@@ -148,6 +157,16 @@ const productSlice = createSlice({
         ({ prodCode }) => prodCode !== action.payload.prodCode
       );
       // state.status = "idle"
+    });
+    builder.addCase(getProductItem.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getProductItem.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.prodItem = action.payload;
+    });
+    builder.addCase(getProductItem.rejected, (state, action) => {
+      state.status = "failed";
     });
   },
 });

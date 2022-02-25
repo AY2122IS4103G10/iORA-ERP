@@ -25,7 +25,7 @@ public interface CustomerService {
     public abstract List<Voucher> generateVouchers(double amount, int qty, String date);
     public abstract List<Voucher> getAllVouchers();
     public abstract List<Voucher> getAvailableVouchersByAmount(double amount);
-    public abstract void deleteVoucher(String voucherCode) throws CustomerException;
+    public abstract String deleteVoucher(String voucherCode) throws CustomerException;
     public abstract Voucher issueVoucher(String voucherCode) throws CustomerException;
     public abstract Voucher redeemVoucher(String voucherCode) throws CustomerException;
 

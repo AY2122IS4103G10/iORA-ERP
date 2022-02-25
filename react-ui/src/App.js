@@ -145,6 +145,11 @@ function App() {
               <Route path="edit/:orderId" element={<VoucherForm />} />
             </Route>
           </Route>
+
+          {/* Self Service Kiosk*/}
+          <Route path="ss" element={<MFIndex />}>
+
+          </Route>
         </Route>
         <Route path="*" element={<Error />} />
       </Routes>

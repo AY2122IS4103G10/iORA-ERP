@@ -663,10 +663,10 @@ public class AdminServiceImpl implements AdminService {
         }
 
         if (checkUpdate == true) {
-            v.setCompanyName(vendor.getCompanyName());
-            v.setDescription(vendor.getDescription());
-            v.setEmail(vendor.getEmail());
-            v.setTelephone(vendor.getTelephone());
+            v.setCompanyName(v.getCompanyName());
+            v.setDescription(v.getDescription());
+            v.setEmail(v.getEmail());
+            v.setTelephone(v.getTelephone());
             v.setAddress(new ArrayList<>());
 
             List<Address> givenList = new ArrayList<>();

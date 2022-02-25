@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   MenuAlt1Icon,
   BellIcon,
@@ -7,13 +7,13 @@ import {
 } from "@heroicons/react/outline";
 import { Menu, Transition } from "@headlessui/react";
 import { classNames } from "../../../utilities/Util";
-import { logout, selectUser } from "../../../stores/slices/userSlice";
+import { logout } from "../../../stores/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 
 export const NavBar = ({ setSidebarOpen, badge }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector(selectUser);
+  const user = JSON.parse(localStorage.getItem("user"));
   const handleLogout = (e) => {
     e.preventDefault();
     dispatch(logout());

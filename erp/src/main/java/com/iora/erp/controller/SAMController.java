@@ -494,7 +494,6 @@ public class SAMController {
     public ResponseEntity<Object> createStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
             @PathVariable Long siteId) {
         try {
-            System.out.println("Requested Qty" + stockTransferOrder.getLineItems().get(0).getRequestedQty());
             stockTransferService.createStockTransferOrder(stockTransferOrder, siteId);
             return ResponseEntity
                     .ok("Stock Transfer Order with ID " + stockTransferOrder.getId() + " is successfully created.");

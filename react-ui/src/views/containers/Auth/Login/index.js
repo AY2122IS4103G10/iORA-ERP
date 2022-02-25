@@ -19,7 +19,10 @@ export function Login() {
         localStorage.setItem("user", JSON.stringify(data));
         setUsername("");
         setPassword("");
-        data.id !== -1 && navigate("/home");
+        return data.id
+      })
+      .then((id) => {
+        id !== -1 && navigate("/home");
       })
       .catch((err) => {
         console.error(err);

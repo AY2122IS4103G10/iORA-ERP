@@ -85,6 +85,8 @@ export const selectUserId = (state) => state.user.user.id;
 
 export const selectUserStore = (state) => state.user.currStore;
 
+export const selectUserSite = (state) => state.user.user.department.id;
+
 export const selectUserAccess = (state) =>
   state.user.user.jobTitle.responsibility;
 

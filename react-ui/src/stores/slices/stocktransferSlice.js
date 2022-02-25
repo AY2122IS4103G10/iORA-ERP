@@ -1,3 +1,4 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api, sitesApi } from "../../environments/Api"
 
 
@@ -13,7 +14,15 @@ export const getAllStockTransfer = createAsyncThunk(
     "stocktransfer/getAllOrders",
     async () => {
         const response = await api.getAll("/sam/stockTransferOrder/all");
-        return response.data
+        return response.data;
+    }
+)
+
+export const createStockTransfer = createAsyncThunk(
+    "stocktransfer/create",
+    async (order, siteId) => {
+        const response = await api.create(`sam/stockTransferOrder/create/1`, order)
+        return response.data;
     }
 )
 
@@ -22,14 +31,13 @@ const stocktransferSlice = createSlice({
     name: "stocktransfer",
     initialState,
     extraReducers(builder) {
-        builder.addCase(fetchSites.pending, (state, action) => {
+        builder.addCase(createStockTransfer.pending, (state, action) => {
             state.status = "loading";
           });
-        builder.addCase(fetchSites.fulfilled, (state, action) => {
+        builder.addCase(createStockTransfer.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.currOrder = action.payload;
         });
-        builder.addCase(fetchSites.rejected, (state, action) => {
+        builder.addCase(createStockTransfer.rejected, (state, action) => {
         state.status = "failed";
         });
     }

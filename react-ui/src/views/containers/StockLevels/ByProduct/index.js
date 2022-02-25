@@ -28,7 +28,7 @@ export const ProductTable = (subsys) => {
 
     useEffect(() => {
         prodStatus === "idle" && dispatch(fetchProducts());
-      }, []);
+      }, [prodStatus]);
     
     const path = "/" + subsys.subsys.subsys + "/stocklevels/products";
     return (

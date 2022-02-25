@@ -11,6 +11,12 @@ import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice
 import { getASiteStock, selectCurrSiteStock } from "../../../../stores/slices/stocklevelSlice";
 import ErrorModal from "../../../components/Modals/ErrorModal";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { fetchProducts, selectAllProducts, selectProductByCode, selectProductBySkuList } from "../../../../stores/slices/productSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { api } from "../../../../environments/Api";
+import { selectUserStore } from "../../../../stores/slices/userSlice";
+import { createStockTransfer } from "../../../../stores/slices/stocktransferSlice";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -208,11 +214,10 @@ const convertData = (data) =>
     Object.entries(data.products).map((key) => ({
         sku: key[0],
         qty: key[1],
-        requestedQty: 0,
     }))
 
 const ItemsList = ({ cols, data, rowSelect = false, selectedRows, setRowSelect }) => {
-    
+
     return (
         <SimpleTable
             columns={cols}
@@ -224,55 +229,40 @@ const ItemsList = ({ cols, data, rowSelect = false, selectedRows, setRowSelect }
     )
 }
 
-const AddItemsModal = ({ items, open, closeModal, data, setData, selectedRows, setRowSelect, onAddItemsClick }) => {
-    
+const AddItemsModal = ({ items, open, closeModal, data, setData,
+    selectedRows, setRowSelect, onAddItemsClicked }) => {
+
     const itemCols = useMemo(() => {
-        const updateMyData = (rowIndex, columnId, value) => {
-            setData((old) =>
-                old.map((row, index) => {
-                    if (index === rowIndex) {
-                        return {
-                            ...old[rowIndex],
-                            [columnId]: value,
-                        };
-                    }
-                    return row;
-                })
-            );
-        };
         return [
             {
                 Header: "SKU Code",
                 accessor: "sku"
             },
             {
+                Header: "Name",
+                accessor: "name"
+            },
+            {
+                Header: "Color",
+                accessor: (row) =>
+                    row.product.productFields.find((field) => field.fieldName === "COLOUR").fieldValue,
+            },
+            {
+                Header: "Size",
+                accessor: (row) =>
+                    row.product.productFields.find((field) => field.fieldName === "SIZE").fieldValue,
+            },
+            {
                 Header: "In Stock",
                 accessor: "qty"
             },
-            {
-                Header: "Request Qty",
-                accessor: "requestedQty",
-                disableSortBy: true,
-                Cell: (row) => {
-                    return (
-                        <EditableCell
-                            value={0}
-                            row={row.row}
-                            column={row.column}
-                            updateMyData={updateMyData}
-                        />
-                    );
-                },
-            }
         ]
-    }, [data])
-    
-    
-    
-    
+    }, [])
+
+
     return (
         <SimpleModal open={open} closeModal={closeModal}>
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-max">
                 <div>
                     <div className="mt-3 sm:mt-5">
                         <Dialog.Title
@@ -302,9 +292,9 @@ const AddItemsModal = ({ items, open, closeModal, data, setData, selectedRows, s
                         <button
                             type="submit"
                             className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                        // onClick={onAddItemsClicked}
+                            onClick={onAddItemsClicked}
                         >
-                            {/* {!Boolean(items.length) ? "Add" : "Save"} items */}
+                            Save{/* {!Boolean(items.length) ? "Add" : "Save"} items */}
                         </button>
                     </div>
                 </div>
@@ -313,8 +303,86 @@ const AddItemsModal = ({ items, open, closeModal, data, setData, selectedRows, s
     );
 }
 
+function prepareStockLevel(stocklevel, allModels) {
+    stocklevel.map((stock) => {
+        let model = allModels?.find((model) => model.modelCode === stock.sku.slice(0, -2));
+        stock.name = model?.name;
+        stock.product = model?.products.find((prod) => prod.sku === stock.sku);
+    })
+    return stocklevel;
+}
+
+const LineItemsTable = ({ data, setLineItems }) => {
+    const [skipPageReset, setSkipPageReset] = useState(false);
+
+    const columns = useMemo(() => {
+        const updateMyData = (rowIndex, columnId, value) => {
+            setSkipPageReset(true);
+            setLineItems((old) =>
+                old.map((row, index) => {
+                    if (index === rowIndex) {
+                        return {
+                            ...old[rowIndex],
+                            [columnId]: value,
+                        };
+                    }
+                    return row;
+                })
+            );
+        };
+        return [
+            {
+                Header: "SKU",
+                accessor: "product.sku",
+            },
+            {
+                Header: "Name",
+                accessor: "name",
+            },
+            {
+                Header: "Color",
+                accessor: (row) =>
+                    row.product.productFields.find(
+                        (field) => field.fieldName === "COLOUR"
+                    ).fieldValue,
+            },
+            {
+                Header: "Size",
+                accessor: (row) =>
+                    row.product.productFields.find((field) => field.fieldName === "SIZE")
+                        .fieldValue,
+            },
+            {
+                Header: "In Stock",
+                accessor: "qty",
+            },
+            {
+                Header: "Request Qty",
+                accessor: "requestedQty",
+                disableSortBy: true,
+                Cell: (row) => {
+                    return (
+                        <EditableCell
+                            value={0}
+                            row={row.row}
+                            column={row.column}
+                            updateMyData={updateMyData}
+                        />
+                    );
+                },
+            },
+        ];
+    }, [setLineItems]);
+
+    return (
+        <SimpleTable columns={columns} data={data} skipPageReset={skipPageReset} />
+    );
+
+}
+
 export const StockTransferForm = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [from, setFrom] = useState({});
     const [to, setTo] = useState({});
     const [openSites, setOpenSites] = useState(false);
@@ -322,16 +390,28 @@ export const StockTransferForm = () => {
     const [openErrorModal, setErrorModal] = useState(false);
     const [lineItems, setLineItems] = useState([]);
 
+    useEffect(() => {
+        dispatch(getAllSites());
+        dispatch(fetchProducts());
+    }, [])
+
+
+    // useEffect(() => {
+    //     dispatch(getASiteStock(from?.id));
+    // }, [openItems])
+
+
     //selecting sites
     const sites = useSelector(selectAllSites);
     const openSitesModal = () => setOpenSites(true);
     const closeSitesModal = () => setOpenSites(false);
-    useEffect(() => {
-        dispatch(getAllSites());
-    }, [openSites])
 
-    //add items
+    //get stock level and product information
     const stocklevel = useSelector(selectCurrSiteStock);
+    const allModels = useSelector(selectAllProducts);
+    const prodTableData = prepareStockLevel(convertData(stocklevel), allModels);
+
+    //open items modal
     const openItemsModal = () => {
         if (isObjectEmpty(from)) {
             setErrorModal(true);
@@ -343,13 +423,51 @@ export const StockTransferForm = () => {
     const closeItemsModal = () => setOpenItems(false);
     const closeErrorModal = () => setErrorModal(false);
 
-    // useEffect(() => {
-    //     dispatch(getASiteStock(from.id));
-    // }, [openItems])
-
-    //==Handle add line items
+    //Handle add line items
     const [selectedRows, setSelectedRows] = useState([]);
-    const [rawItems, setRawItems] = useState([]);
+    const onAddItemsClicked = (e) => {
+        e.preventDefault();
+        const selectedRowKeys = Object.keys(selectedRows).map((key) => parseInt(key));
+        const lineItems = [];
+        selectedRowKeys.map((key) => lineItems.push((prodTableData[key])));
+        setLineItems(
+            lineItems.map((item) => ({
+                ...item,
+                requestedQty: 1,
+            }))
+        )
+        closeItemsModal();
+    }
+    console.log(lineItems);
+    const currSite = useSelector(selectUserSite);
+
+    //Handle Create Order product
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const stockTransferLI = 
+            lineItems.map((item) => ({
+                product: item.product,
+                requestedQty: parseInt(item.requestedQty)
+            })
+        );
+        console.log(stockTransferLI);
+        const stockTransferForm = {
+            lineItems: stockTransferLI,
+            fromSite: from,
+            toSite: to
+        }
+        console.log(JSON.stringify(stockTransferForm));
+        dispatch(createStockTransfer(stockTransferForm, currSite))
+            .unwrap()
+            .then(() => {
+                alert("Successfully created stock transfer order");
+                navigate(`/sm/stocktransfer`);
+            })
+            .catch((error) => {
+                alert(error.message);
+            })
+    }
+
 
     return (
         <>
@@ -448,8 +566,20 @@ export const StockTransferForm = () => {
                                                 </button>
                                             </div>
                                         </div>
-
+                                        <div className="m-2">
+                                            <LineItemsTable data={lineItems} setLineItems={setLineItems} />
+                                        </div>
+                                        <div className="flex justify-end">
+                                            <button
+                                                type="submit"
+                                                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                                onClick={handleSubmit}
+                                            >
+                                                Create 
+                                            </button>
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -467,12 +597,13 @@ export const StockTransferForm = () => {
                 data={sites} />
 
             <AddItemsModal
-                data={convertData(stocklevel)}
-                setData={setRawItems}
+                data={prodTableData}
+                setData={setLineItems}
                 open={openItems}
                 closeModal={closeItemsModal}
                 selectedRows={selectedRows}
                 setRowSelect={setSelectedRows}
+                onAddItemsClicked={onAddItemsClicked}
             />
 
             <ErrorModal open={openErrorModal} closeModal={closeErrorModal}

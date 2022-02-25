@@ -20,8 +20,8 @@ export const getAllStockTransfer = createAsyncThunk(
 
 export const createStockTransfer = createAsyncThunk(
     "stocktransfer/create",
-    async (order, siteId) => {
-        const response = await api.create(`sam/stockTransferOrder/create/1`, order)
+    async (data) => {
+        const response = await api.create(`sam/stockTransferOrder/create/${data.siteId}`, data.order)
         return response.data;
     }
 )

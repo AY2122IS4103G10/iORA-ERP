@@ -245,12 +245,12 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
             {
                 Header: "Color",
                 accessor: (row) =>
-                    row.product.productFields.find((field) => field.fieldName === "COLOUR").fieldValue,
+                    row.product?.productFields.find((field) => field.fieldName === "COLOUR").fieldValue,
             },
             {
                 Header: "Size",
                 accessor: (row) =>
-                    row.product.productFields.find((field) => field.fieldName === "SIZE").fieldValue,
+                    row.product?.productFields.find((field) => field.fieldName === "SIZE").fieldValue,
             },
             {
                 Header: "In Stock",
@@ -451,13 +451,13 @@ export const StockTransferForm = () => {
             })
         );
         console.log(stockTransferLI);
-        const stockTransferForm = {
+        const stockTransferOrder = {
             lineItems: stockTransferLI,
             fromSite: from,
             toSite: to
         }
-        console.log(JSON.stringify(stockTransferForm));
-        dispatch(createStockTransfer(stockTransferForm, currSite))
+        console.log(stockTransferOrder);
+        dispatch(createStockTransfer({order: stockTransferOrder, siteId: currSite}))
             .unwrap()
             .then(() => {
                 alert("Successfully created stock transfer order");

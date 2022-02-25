@@ -6,22 +6,33 @@ import {
   CogIcon,
   DocumentReportIcon,
   HomeIcon,
+  LibraryIcon,
   OfficeBuildingIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
+  TruckIcon,
+  UserGroupIcon,
   UsersIcon,
 } from "@heroicons/react/outline";
 
-const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
-  { name: "Employees", href: "/ad/employee", icon: UsersIcon, current: false },
+export const tabs = [
+  { name: "Employees", href: "/ad/employees", icon: UsersIcon, current: false },
   { name: "Sites", href: "/ad/sites", icon: OfficeBuildingIcon, current: false },
+  { name: "Companies", href: "/ad/companies", icon: LibraryIcon, current: false },
+  { name: "Departments", href: "/ad/departments", icon: UserGroupIcon, current: false },
+  { name: "Job Titles", href: "/ad/jobTitles", icon: UserGroupIcon, current: false },
+  { name: "Vendors", href: "/ad/vendors", icon: TruckIcon, current: false },
   {
     name: "Reports & Analytics",
     href: "#",
     icon: DocumentReportIcon,
     current: false,
   },
+]
+
+const navigation = [
+  { name: "Home", href: "/", icon: HomeIcon, current: true },
+  ...tabs
 ];
 
 const secondaryNavigation = [

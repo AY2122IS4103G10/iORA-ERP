@@ -10,7 +10,7 @@ const initialState = {
 export const fetchEmployees = createAsyncThunk(
   "employee/fetchEmployees",
   async () => {
-    const response = await api.getAll("admin/viewEmployees/all");
+    const response = await api.getAll("admin/viewEmployees?search=");
     return response.data;
   }
 );
@@ -43,14 +43,14 @@ const employeeSlice = createSlice({
   name: "employee",
   initialState,
   extraReducers(builder) {
-    builder.addCase(fetchEmployee.pending, (state, action) => {
+    builder.addCase(fetchEmployees.pending, (state, action) => {
       state.status = "loading";
     });
-    builder.addCase(fetchEmployee.fulfilled, (state, action) => {
+    builder.addCase(fetchEmployees.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.employee = state.employee.concat(action.payload);
     });
-    builder.addCase(fetchEmployee.rejected, (state, action) => {
+    builder.addCase(fetchEmployees.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewEmployee.fulfilled, (state, action) => {
@@ -84,7 +84,7 @@ const employeeSlice = createSlice({
       }
       // state.status = "idle";
     });
-    builder.addCase(deleteExistingCompany.fulfilled, (state, action) => {
+    builder.addCase(deleteExistingEmployee.fulfilled, (state, action) => {
       state.employee = state.employee.filter(
         ({ employeeId }) => employeeId !== action.payload.employeeId
       );

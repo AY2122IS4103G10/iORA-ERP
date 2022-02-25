@@ -61,7 +61,7 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
   );
 };
 
-export const ProcurementList = ({pathname}) => {
+export const ProcurementList = ({ pathname }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const data = useSelector(selectAllProcurements);
@@ -72,8 +72,8 @@ export const ProcurementList = ({pathname}) => {
     procurementStatus === "idle" && dispatch(fetchProcurements());
   }, [procurementStatus, dispatch]);
 
-  const handleOnClick = (row) =>
-    navigate(`${pathname}/${row.original.id}`);
+  const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
+  
   let content;
 
   if (procurementStatus === "loading") {

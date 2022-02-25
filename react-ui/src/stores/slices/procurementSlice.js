@@ -73,7 +73,7 @@ const procurementSlice = createSlice({
     });
     builder.addCase(fetchProcurements.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.procurements = state.procurements.concat(action.payload);
+      state.procurements = action.payload;
     });
     builder.addCase(fetchProcurements.rejected, (state, action) => {
       state.status = "failed";

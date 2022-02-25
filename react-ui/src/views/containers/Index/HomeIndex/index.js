@@ -4,24 +4,15 @@ import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 import {
   CogIcon,
-  DocumentReportIcon,
+  UserIcon,
   HomeIcon,
-  OfficeBuildingIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
-  UsersIcon,
 } from "@heroicons/react/outline";
 
 const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
-  { name: "Employees", href: "/ad/employee", icon: UsersIcon, current: false },
-  { name: "Sites", href: "/ad/sites", icon: OfficeBuildingIcon, current: false },
-  {
-    name: "Reports & Analytics",
-    href: "#",
-    icon: DocumentReportIcon,
-    current: false,
-  },
+  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Account", href: "/account", icon: UserIcon, current: false },
 ];
 
 const secondaryNavigation = [
@@ -30,10 +21,10 @@ const secondaryNavigation = [
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];
 
-export const AdminIndex = () => {
+export const HomeIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-full">
       <SideBar
         navigation={navigation}
         secondaryNavigation={secondaryNavigation}
@@ -45,13 +36,11 @@ export const AdminIndex = () => {
           setSidebarOpen={setSidebarOpen}
           badge={
             <div className="flex-1 flex py-4">
-              <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-pink-100 text-pink-800">
-                Administrative
-              </span>
+              
             </div>
           }
         />
-        <main className="flex-1 pb-8 h-screen bg-gray-100">
+        <main className="flex-1 pb-8 bg-gray-100">
           <Outlet />
         </main>
       </div>

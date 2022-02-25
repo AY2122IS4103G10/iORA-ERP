@@ -28,8 +28,9 @@ import {
   ChevronDoubleLeftIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
+  TrashIcon,
 } from "@heroicons/react/outline";
-import { DotsHorizontalIcon, XIcon } from "@heroicons/react/solid";
+import { DotsHorizontalIcon } from "@heroicons/react/solid";
 
 import { SimpleButton } from "../../Buttons/SimpleButton";
 import { PageButton } from "../../Buttons/PageButton";
@@ -151,11 +152,11 @@ export const OptionsCell = ({ options = [] }) => {
 export const DeleteCell = ({ onClick }) => {
   return (
     <button
-      className="bg-white rounded-full flex items-center text-red-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+      className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
       onClick={onClick}
     >
       <span className="sr-only">Delete</span>
-      <XIcon className="h-5 w-5" aria-hidden="true" />
+      <TrashIcon className="h-5 w-5" aria-hidden="true" />
     </button>
   );
 };

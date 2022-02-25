@@ -1,17 +1,15 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CogIcon } from "@heroicons/react/outline";
 
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
-  SimpleTable,
-} from "../../../components/Tables/SimpleTable";
-import { 
   fetchEmployees,
-  selectAllEmployee, 
+  selectAllEmployee,
 } from "../../../../stores/slices/employeeSlice";
 
-export const EmployeeTable = () => {
+export const EmployeeTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
@@ -29,22 +27,21 @@ export const EmployeeTable = () => {
       {
         Header: "Employee Name",
         accessor: "name",
-        
       },
       {
         Header: "Department",
-        accessor: "department",
+        accessor: (row) => row.department.deptName,
         //Cell: (e) => `$${e.value}`,
       },
       {
         Header: "Job Title",
-        accessor: "jobTitle",
+        accessor: (row) => row.jobTitle.title,
         //Cell: (e) => moment(e.value).format("lll"),
       },
       {
         Header: "Status",
         accessor: "availStatus",
-        //Cell: (e) => moment(e.value).format("lll"),
+        Cell: (e) => (e.value ? "Available" : "Not available"),
       },
       {
         Header: "Email",
@@ -68,21 +65,30 @@ export const EmployeeTable = () => {
     ],
     []
   );
-  const dispatch = useDispatch();
-  const data = useSelector(selectAllEmployee);
-  const employeeStatus = useSelector((state) => state.employee.status);
-  useEffect(() => {
-    employeeStatus === "idle" && dispatch(fetchEmployees());
-  }, [employeeStatus, dispatch]);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        <SimpleTable columns={columns} data={data} />
+        <SimpleTable
+          columns={columns}
+          data={data}
+          handleOnClick={handleOnClick}
+        />
       </div>
     </div>
   );
 };
 
 export const EmployeeList = () => {
-  return <EmployeeTable />;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const data = useSelector(selectAllEmployee);
+  const employeeStatus = useSelector((state) => state.employee.status);
+  useEffect(() => {
+    employeeStatus === "idle" && dispatch(fetchEmployees());
+  }, [employeeStatus, dispatch]);
+  
+  const handleOnClick = (row) => navigate(`/ad/employee/${row.original.id}`);
+
+  return <EmployeeTable data={data} handleOnClick={handleOnClick} />;
 };

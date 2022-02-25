@@ -1,4 +1,10 @@
-import { Routes, Route, Outlet } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Outlet,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { SMIndex } from "./views/containers/Index/SMIndex";
 import { AdminIndex } from "./views/containers/Index/AdminIndex";
 import { MFIndex } from "./views/containers/Index/MFIndex";
@@ -6,7 +12,9 @@ import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ViewStockLevels } from "./views/containers/StockLevels/ManageStockLevels";
-import Login from "./views/containers/Auth/Login/Login";
+import { Login } from "./views/containers/Auth/Login";
+import { Home } from "./views/containers/Auth/Home";
+import { HomeIndex } from "./views/containers/Index/HomeIndex";
 import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
@@ -35,113 +43,111 @@ import { DepartmentDetails } from "./views/containers/Department/DepartmentDetai
 import { ManageJobTitle } from "./views/containers/JobTitle/ManageJobTitle";
 import { JobTitleForm } from "./views/containers/JobTitle/JobTitleForm";
 import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/index.js";
+import Error from "./views/containers/Auth/Error";
+import { Auth } from "./views/containers/Auth/Auth";
 
 function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Auth />}>
+          {/* Common Infrastructure */}
+          <Route index element={<Login />} />
+          <Route path="home" element={<HomeIndex />}>
+            <Route index element={<Home />} />
+          </Route>
 
-        {/* Sales and Marketing Subsystem */}
-        <Route
-          path="/sm"
-          element={
-            <SMRoute>
-              <SMIndex />
-            </SMRoute>
-          }
-        >
-          <Route path="products" element={<Outlet />}>
-            <Route index element={<ManageProducts />} />
-            <Route path=":prodCode" element={<ProductDetails />} />
-            <Route path="create" element={<ProductForm />} />
-            <Route path="edit/:prodId" element={<ProductForm />} />
-            <Route path="promotions" element={<ManagePromotions />} />
+          {/* Sales and Marketing Subsystem */}
+          <Route
+            path="sm"
+            element={
+              <SMRoute>
+                <SMIndex />
+              </SMRoute>
+            }
+          >
+            <Route path="products" element={<Outlet />}>
+              <Route index element={<ManageProducts />} />
+              <Route path=":prodCode" element={<ProductDetails />} />
+              <Route path="create" element={<ProductForm />} />
+              <Route path="edit/:prodId" element={<ProductForm />} />
+              <Route path="promotions" element={<ManagePromotions />} />
+            </Route>
+            <Route path="stocklevels/*" element={<ViewStockLevels />} />
+            <Route path="stocktransfer" element={<ManageStockTransfer />} />
+
+            <Route path="procurements" element={<Outlet />}>
+              <Route index element={<ManageProcurement />} />
+              <Route path=":procurementId" element={<ProcurementDetails />} />
+              <Route path="create" element={<ProcurementForm />} />
+              <Route path="edit/:orderId" element={<ProcurementForm />} />
+            </Route>
+            <Route path="vouchers" element={<Outlet />}>
+              <Route index element={<ManageVouchers />} />
+              <Route path=":voucherCode" element={<VoucherDetails />} />
+              <Route path="create" element={<VoucherForm />} />
+              <Route path="edit/:voucherId" element={<VoucherForm />} />
+            </Route>
           </Route>
-          <Route path="stocklevels/*" element={<ViewStockLevels />}/>
-          <Route path="stocktransfer" element={<Outlet/>}>
-            <Route index element={<ManageStockTransfer/>}/>
-            <Route path="create" element={<StockTransferForm/>}/>
+
+          {/* Store Management Subsystem */}
+          <Route path="str" element={<StoreIndex />}>
+            <Route path="stocklevels/*" element={<ViewStoreStock />} />
           </Route>
-          
-          <Route path="procurements" element={<Outlet />}>
-            <Route index element={<ManageProcurement />} />
-            <Route path=":procurementId" element={<ProcurementDetails />} />
-            <Route path="create" element={<ProcurementForm />} />
-            <Route path="edit/:orderId" element={<ProcurementForm />} />
+
+          {/* Admin Subsystem */}
+          <Route
+            path="ad"
+            element={
+              //Change to admin route
+              // <ADRoute>
+              <AdminIndex />
+              /* </ADRoute> */
+            }
+          >
+            <Route path="sites" element={<Outlet />}>
+              <Route index element={<ManageSites />} />
+              <Route path=":siteId" element={<SiteDetails />} />
+              <Route path="create" element={<SiteForm />} />
+              <Route path="edit/:siteId" element={<SiteForm />} />
+            </Route>
+            <Route path="companies" element={<Outlet />}>
+              <Route index element={<ManageCompanies />} />
+              <Route path=":companyId" element={<CompanyDetails />} />
+              <Route path="create" element={<CompanyForm />} />
+              <Route path="edit/:companyId" element={<CompanyForm />} />
+            </Route>
+            <Route path="employees" element={<Outlet />}>
+              <Route index element={<ManageEmployee />} />
+              <Route path=":name" element={<EmployeeDetails />} />
+              <Route path="create" element={<EmployeeForm />} />
+              <Route path="edit/:employeeId" element={<EmployeeForm />} />
+            </Route>
+            <Route path="jobTitle" element={<Outlet />}>
+              <Route index element={<ManageJobTitle />} />
+              <Route path=":title" element={<JobTitleDetails />} />
+              <Route path="create" element={<JobTitleForm />} />
+              <Route path="edit/:jobTitleId" element={<JobTitleForm />} />
+            </Route>
+            <Route path="department" element={<Outlet />}>
+              <Route index element={<ManageDepartment />} />
+              <Route path=":name" element={<DepartmentDetails />} />
+              <Route path="create" element={<DepartmentForm />} />
+              <Route path="edit/:departmentId" element={<DepartmentForm />} />
+            </Route>
           </Route>
-          <Route path="vouchers" element={<Outlet />}>
-            <Route index element={<ManageVouchers />} />
-            <Route path=":voucherCode" element={<VoucherDetails />} />
-            <Route path="create" element={<VoucherForm />} />
-            <Route path="edit/:voucherId" element={<VoucherForm />} />
+
+          {/* Manufacturing */}
+          <Route path="mf" element={<MFIndex />}>
+            <Route path="procurements" element={<Outlet />}>
+              <Route index element={<ManageProcurement />} />
+              <Route path=":procurementId" element={<ProcurementDetails />} />
+              <Route path="create" element={<ProcurementForm />} />
+              <Route path="edit/:orderId" element={<VoucherForm />} />
+            </Route>
           </Route>
         </Route>
-
-        {/* Store Management Subsystem */}
-        <Route path="/str" element={<StoreIndex/>}>
-          <Route path="stocklevels/*" element={<ViewStoreStock/>}/>
-        </Route>
-
-        {/* Admin Subsystem */}
-        <Route
-          path="/ad"
-          element={
-            //Change to admin route
-            // <ADRoute>
-            <AdminIndex />
-            /* </ADRoute> */
-          }
-        >
-          <Route path="sites" element={<Outlet />}>
-            <Route index element={<ManageSites />} />
-            <Route path=":siteId" element={<SiteDetails />} />
-            <Route path="create" element={<SiteForm />} />
-            <Route path="edit/:siteId" element={<SiteForm />} />
-          </Route>
-          <Route path="companies" element={<Outlet />}>
-            <Route index element={<ManageCompanies />} />
-            <Route path=":companyId" element={<CompanyDetails />} />
-            <Route path="create" element={<CompanyForm />} />
-            <Route path="edit/:companyId" element={<CompanyForm />} />
-          </Route>
-          <Route path="employee" element={<Outlet />}>
-            <Route index element={<ManageEmployee />} />
-            <Route path=":name" element={<EmployeeDetails />} />
-            <Route path="create" element={<EmployeeForm />} />
-            <Route path="edit/:employeeId" element={<EmployeeForm />} />
-          </Route>
-          <Route path="jobTitle" element={<Outlet />}>
-            <Route index element={<ManageJobTitle />} />
-            <Route path=":title" element={<JobTitleDetails />} />
-            <Route path="create" element={<JobTitleForm />} />
-            <Route path="edit/:jobTitleId" element={<JobTitleForm />} />
-          </Route>
-          <Route path="department" element={<Outlet />}>
-            <Route index element={<ManageDepartment />} />
-            <Route path=":name" element={<DepartmentDetails />} />
-            <Route path="create" element={<DepartmentForm />} />
-            <Route path="edit/:departmentId" element={<DepartmentForm />} />
-          </Route>
-        </Route>
-
-        {/* Manufacturing */}
-        <Route path="/mf" element={<MFIndex />}>
-          <Route path="procurements" element={<Outlet />}>
-            <Route index element={<ManageProcurement />} />
-            <Route path=":procurementId" element={<ProcurementDetails />} />
-            <Route path="create" element={<ProcurementForm />} />
-            <Route path="edit/:orderId" element={<VoucherForm />} />
-          </Route>
-        </Route>
-        <Route
-          path="*"
-          element={
-            <main style={{ padding: "1rem" }}>
-              <p>There's nothing here!</p>
-            </main>
-          }
-        />
+        <Route path="*" element={<Error />} />
       </Routes>
     </div>
   );

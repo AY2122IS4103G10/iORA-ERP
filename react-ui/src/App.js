@@ -47,6 +47,8 @@ import { Auth } from "./views/containers/Auth/Auth";
 import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
 import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
+import { PosMain } from "./views/containers/POS/Main";
+import { PosOrder } from "./views/containers/POS/Order";
 
 function App() {
   return (
@@ -156,6 +158,11 @@ function App() {
           </Route>
         </Route>
         <Route path="*" element={<Error />} />
+
+        {/* POS */}
+        <Route path="pos" element={<PosMain />}>
+          <Route path="order" element={<PosOrder />} />
+        </Route>
       </Routes>
     </div>
   );

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Dialog } from "@headlessui/react";
 import {
   CogIcon,
   FolderOpenIcon,
@@ -5,6 +7,8 @@ import {
   TruckIcon,
   UsersIcon,
 } from "@heroicons/react/outline";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 
 const actions = [
   {
@@ -69,7 +73,71 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
+export const EnterStoreModal = ({ open, closeModal, siteCode, setSiteCode, handleEnterStore }) => {
+
+  return (
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+        <div>
+          <div className="m-2">
+            <Dialog.Title
+              as="h3"
+              className="text-center text-lg leading-6 font-medium text-gray-900"
+            >
+              Enter Store's Site Code
+            </Dialog.Title>
+          </div>
+        </div>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            className="flex-grow shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+            placeholder="0000000"
+            value={siteCode}
+            onChange={(e) => setSiteCode(e.target.value)}
+          />
+        <div className="pt-5">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              onClick={closeModal}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              onClick={handleEnterStore}
+            >
+              Enter
+            </button>
+          </div>
+        </div>
+      </div>
+    </SimpleModal>
+  );
+
+}
+
+
+
 export function Home() {
+  const [openEnterStore, setOpenEnterStore] = useState(false);
+  const [siteCode, setSiteCode] = useState("");
+
+  const handleEnterStore = () => {
+    console.log("SiteCode: " + siteCode);
+    //need to api to get site from sitecode + store in localstorage
+    closeEnterStoreModal();
+  }
+
+  const openEnterStoreModal = () => setOpenEnterStore(true);
+  const closeEnterStoreModal = () => setOpenEnterStore(false);
+
+
+
   return (
     <>
       <div className="rounded-lg bg-white overflow-hidden shadow">
@@ -147,11 +215,18 @@ export function Home() {
             </div>
             <div className="mt-8">
               <h3 className="text-lg font-medium">
-                <a href={action.href} className="focus:outline-none">
-                  {/* Extend touch target to entire panel */}
-                  <span className="absolute inset-0" aria-hidden="true" />
-                  {action.title}
-                </a>
+                {action.href === "/str" ?
+                  <button className="focus:outline-none" onClick={() => openEnterStoreModal()}>
+                    {/* Extend touch target to entire panel */}
+                    <span className="absolute inset-0" aria-hidden="true" />
+                    {action.title}
+                  </button>
+                  : <a href={action.href} className="focus:outline-none">
+                    {/* Extend touch target to entire panel */}
+                    <span className="absolute inset-0" aria-hidden="true" />
+                    {action.title}
+                  </a>
+                }
               </h3>
               <p className="mt-2 text-sm text-gray-500">{action.description}</p>
             </div>
@@ -171,6 +246,12 @@ export function Home() {
           </div>
         ))}
       </div>
+      <EnterStoreModal 
+        open={openEnterStore} 
+        closeModal={closeEnterStoreModal} 
+        siteCode={siteCode} 
+        setSiteCode={setSiteCode}
+        handleEnterStore={handleEnterStore}/>
     </>
   );
 }

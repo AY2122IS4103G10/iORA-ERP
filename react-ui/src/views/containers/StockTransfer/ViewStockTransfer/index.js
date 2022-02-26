@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
 
 import { getStockTransfer, selectStockTransferOrder, cancelStockTransfer, rejectStockTransfer, confirmStockTransfer } from "../../../../stores/slices/stocktransferSlice";
@@ -211,6 +211,7 @@ export const ViewStockTransfer = (subsys) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
+    const {pathname} = useLocation();
     const userSiteId = useSelector(selectUserSite);
     const userStatus = useSelector((state) => state.user.status);
     const order = useSelector(selectStockTransferOrder);
@@ -222,6 +223,16 @@ export const ViewStockTransfer = (subsys) => {
     const [openReject, setOpenReject] = useState(false);
     const openRejectModal = () => setOpenReject(true);
     const closeRejectModal = () => setOpenReject(false);
+
+    //get user site id
+    if (userSiteId === 0) {
+        if (pathname.includes("sm")) {
+            userSiteId = 1
+        } else if (pathname.includes("wh")) {
+            userSiteId = 2
+        } 
+    }
+    
 
     const handleConfirmCancel = () => {
         dispatch(cancelStockTransfer({ orderId: id, siteId: userSiteId }))

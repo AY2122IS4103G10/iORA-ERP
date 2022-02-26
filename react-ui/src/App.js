@@ -70,7 +70,7 @@ function App() {
               <Route path="edit/:prodId" element={<ProductForm />} />
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
-            <Route path="stocklevels/*" element={<ViewStockLevels />} />
+            <Route path="stocklevels/*" element={<ViewStockLevels subsys="sm"/>} />
            
             <Route path="stocktransfer" element={<Outlet/>} >
               <Route index element={<ManageStockTransfer subsys="sm"/>}/>
@@ -96,6 +96,11 @@ function App() {
           {/* Store Management Subsystem */}
           <Route path="str" element={<StoreIndex />}>
             <Route path="stocklevels/*" element={<ViewStoreStock />} />
+            <Route path="stocktransfer" element={<Outlet/>} >
+              <Route index element={<ManageStockTransfer subsys="str"/>}/>
+              <Route path=":id" element={<ViewStockTransfer subsys="str"/>}/>
+              <Route path="edit/:id" element={<StockTransferForm subsys="str"/>}/>
+            </Route>
           </Route>
 
           {/* Admin Subsystem */}
@@ -152,6 +157,7 @@ function App() {
 
           {/* Warehouse Subsystem */}
           <Route path="wh" element={<WHIndex />}>
+            <Route path="stocklevels/*" element={<ViewStoreStock subsys="wh"/>} />
             <Route path="procurements" element={<Outlet />}>
               <Route index element={<ManageProcurement />} />
               <Route path=":procurementId" element={<ProcurementDetails />} />

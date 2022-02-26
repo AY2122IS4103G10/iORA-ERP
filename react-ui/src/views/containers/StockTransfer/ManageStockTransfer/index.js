@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { StockTransferList } from "../StockTransferList";
 
@@ -32,12 +32,11 @@ const Header = () => {
 };
 
 export const ManageStockTransfer = (subsys) => {
-  const currSite = useSelector(selectUserSite);
 
   return (
     <>
       {<Header />}
-      {currSite === undefined ? "" : <StockTransferList subsys={subsys} siteId={currSite}/>}
+      {<StockTransferList subsys={subsys}/>}
     </>
   );
 };

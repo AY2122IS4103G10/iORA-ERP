@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { getProductItem, getAProduct, selectProductItem, selectAProduct, addNewProduct, getProductDetails } from "../../../../stores/slices/productSlice";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getProductItem, getProductDetails } from "../../../../stores/slices/productSlice";
 
 const OrderList = ({
     products,
     amount,
     rfid,
     onRfidChanged,
-    addRFIDClicked
+    addRFIDClicked,
+    Remove,
+    navigate
 }) => (
     <main>
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-0">
@@ -37,15 +39,16 @@ const OrderList = ({
                                                 <p className="ml-4 text-sm font-medium text-gray-900">${product.price}</p>
                                                 :
                                                 <div>
-                                                    <p className="ml-4 text-sm font-medium text-gray-900 text-decoration-line: line-through;" class="line-through" >${product.price}</p>
+                                                    <p className="line-through text-gray-500" >${product.price}</p>
                                                     ${product.discountedPrice}
                                                 </div>
                                             }
                                         </div>
-                                        <p className="mt-1 text-sm text-gray-500">{product.colour}</p>
-                                        <p className="mt-1 text-sm text-gray-500">{product.size}</p>
-                                        {product.promotion !== null && <p className="mt-1 text-sm text-gray-500">{product.promotion}</p>}
+                                        <p className="mt-1 text-sm text-gray-500">Colour: {product.colour}</p>
+                                        <p className="mt-1 text-sm text-gray-500">Size: {product.size}</p>
+                                        {product.promotion !== null && <p className="mt-1 text-sm text-gray-500">Promotion: {product.promotion}</p>}
                                     </div>
+                                            <Remove product={product}/>
                                 </div>
                             </li>
                         ))}
@@ -61,28 +64,29 @@ const OrderList = ({
                     <div>
                         <dl className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <dt className="text-base font-medium text-gray-900">Total Amount</dt>
-                                <dd className="ml-4 text-base font-medium text-gray-900">${amount}</dd>
+                                <dt className="text-2xl font-bold text-gray-900">Total Amount</dt>
+                                <dd className="ml-4 text-2xl font-bold font-medium text-gray-900">${amount}</dd>
                             </div>
                         </dl>
-                        <p className="mt-1 text-sm text-gray-500">Some instructional text here.</p>
+                        <p className="mt-1 text-sm text-gray-500">Please proceed to our friendly staff for assistance if there is an issue with your order.</p>
                     </div>
 
                     <div className="mt-10">
                         <button
-                            type="submit"
+                            type="button"
                             className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                         >
                             Checkout
                         </button>
-                        <Link to={`/ss`}>
                             <button
                                 type="button"
                                 className="w-full mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                                onClick={() => {
+                                    window.confirm('Are you sure you want to cancel?') && navigate("/ss")
+                                }}
                             >
                                 Cancel
                             </button>
-                        </Link>
                     </div>
                 </section>
             </form>
@@ -135,6 +139,7 @@ export function Order() {
     const [rfid, setRfid] = useState("");
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const onRfidChanged = (e) => setRfid(e.target.value);
 
@@ -143,18 +148,13 @@ export function Order() {
             .unwrap()
             .then((data) => {
                 products.push(data);
-                setProducts([...products]);
+                setProducts(products);
+                data.discountedPrice !== null ? setAmount(amount + data.discountedPrice) : setAmount(amount + data.price);
             })
             .catch((err) => {
-                console.error(err);
+                console.log(err);
             });
     }
-
-    // const removeProduct = (product) => {
-    //     const index = products.indexOf(product)
-    //     products.splice(index, 1)
-    //     setProducts(products)
-    // }
 
     const addRFIDClicked = (evt) => {
         evt.preventDefault();
@@ -166,19 +166,41 @@ export function Order() {
                 addProduct(rfid);
             })
             .catch((err) => {
-                console.error(err);
+                console.log(err);
             });
-        console.log(productItems)
-        console.log(products)
         setRfid("");
     }
 
-    return (
-        <OrderList
-            products={products}
-            amount={amount}
-            rfid={rfid}
-            onRfidChanged={onRfidChanged}
-            addRFIDClicked={addRFIDClicked} />
-    )
+    function Remove(props) {
+        const product = props.product;
+        
+        const removeProduct = (product) => {
+            const index = products.indexOf(product);
+            products.splice(index, 1);
+            setProducts(products);
+            product.discountedPrice !== null ? setAmount(amount - product.discountedPrice) : setAmount(amount - product.price);
+        }
+
+        return (
+            <div className="">
+                <button type="button"
+                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                    onClick = {() => removeProduct(product)}>
+                    <span>Remove</span>
+                </button>
+            </div>
+        )
+    }
+
+return (
+    <OrderList
+        products={products}
+        amount={amount}
+        rfid={rfid}
+        onRfidChanged={onRfidChanged}
+        addRFIDClicked={addRFIDClicked}
+        Remove = {Remove}
+        navigate = {navigate}
+    />
+)
 }

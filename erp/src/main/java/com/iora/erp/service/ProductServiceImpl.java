@@ -578,7 +578,6 @@ public class ProductServiceImpl implements ProductService {
         Product p = getProduct(pi.getProductSKU());
         Model m = getModelByProduct(p);
         JSONObject jo = new JSONObject();
-        jo.put("hi", "value");
         jo.put("name", m.getName());
         jo.put("price", m.getPrice());
         jo.put("colour", getProductFieldValue(p, "COLOUR"));

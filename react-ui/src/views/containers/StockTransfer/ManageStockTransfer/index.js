@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { StockTransferList } from "../StockTransferList";
 
 const Header = () => {
   return (
@@ -32,6 +33,7 @@ export const ManageStockTransfer = () => {
   return (
     <>
       {<Header />}
+      <StockTransferList/>
     </>
   );
 };

@@ -25,6 +25,7 @@ import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { SiteDetails } from "./views/containers/Sites/SiteDetails";
 import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
+import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
 import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
 import { ProcurementDetails } from "./views/containers/Procurement/ProcurementDetails";
 import { ManageEmployee } from "./views/containers/Employee/ManageEmployee";
@@ -38,6 +39,7 @@ import { JobTitleForm } from "./views/containers/JobTitle/JobTitleForm";
 import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/index.js";
 import Error from "./views/containers/Auth/Error";
 import { Auth } from "./views/containers/Auth/Auth";
+import { StockLevelForm } from "./views/containers/StockLevels/StockLevelForm";
 
 function App() {
   return (
@@ -67,8 +69,12 @@ function App() {
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
             <Route path="stocklevels/*" element={<ViewStockLevels />} />
-            <Route path="stocktransfer" element={<ManageStockTransfer />} />
-
+           
+            <Route path="stocktransfer" element={<Outlet/>} >
+              <Route index element={<ManageStockTransfer/>}/>
+              <Route path="create" element={<StockTransferForm/>}/>
+            </Route>
+            
             <Route path="procurements" element={<Outlet />}>
               <Route index element={<ManageProcurement />} />
               <Route path=":procurementId" element={<ProcurementDetails />} />

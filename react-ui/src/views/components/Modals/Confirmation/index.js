@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
 
-export default function ConfirmCancel({ item = "item", open, closeModal, onConfirm }) {
+export default function Confirmation({ title, body, open, closeModal, onConfirm }) {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
@@ -63,12 +63,11 @@ export default function ConfirmCancel({ item = "item", open, closeModal, onConfi
                     as="h3"
                     className="text-lg leading-6 font-medium text-gray-900"
                   >
-                    {`Cancel "${item}"`}
+                    {title}
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      {`Are you sure you want to cancel "${item}"? This action cannot be
-                      undone.`}
+                      {body}
                     </p>
                   </div>
                 </div>

@@ -5,13 +5,14 @@ import { PencilIcon } from "@heroicons/react/solid";
 
 import { getStockTransfer, selectStockTransferOrder, cancelStockTransfer } from "../../../../stores/slices/stocktransferSlice";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
-import ConfirmCancel from "../../../components/Modals/ConfirmCancel";
+import Confirmation from "../../../components/Modals/Confirmation";
 import { SortDownIcon, SortUpIcon, SortIcon } from "../../../components/Tables/Icons";
+import { XIcon } from "@heroicons/react/solid";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 
 
-export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, toSiteId, orderMadeBy, openDeleteModal }) => {
+export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, toSiteId, orderMadeBy, openDeleteModal, openRejectModal }) => {
 
 
     return (
@@ -33,7 +34,7 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                                     aria-hidden="true"
                                 />
                             </button>
-                        </Link> 
+                        </Link>
                         : ""}
 
                     {userSiteId === orderMadeBy && status === "PENDING" ?
@@ -49,12 +50,27 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                         1) By FROM site if order created by SM
                         2) By TO site if order created by FROM store itself */}
                     {((userSiteId === fromSiteId && userSiteId !== orderMadeBy) || (userSiteId === toSiteId && fromSiteId === orderMadeBy)) && status === "PENDING" ?
-                        <button
-                            type="button"
-                            className="inline-flex items-center px-3 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                        >
-                            <span>Confirm </span>
-                        </button> : ""}
+                        <>
+                            <button
+                                type="button"
+                                className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                            >
+                                <span>Confirm </span>
+                            </button>
+                            <button
+                                type="button"
+                                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+                                onClick={openRejectModal}
+                                disabled={status !== "PENDING"}
+                            >
+                                <XIcon
+                                    className="-ml-1 mr-2 h-5 w-5 text-white"
+                                    aria-hidden="true"
+                                />
+                                <span>Reject</span>
+                            </button>
+                        </>
+                        : ""}
 
                 </div>
             </div>
@@ -137,10 +153,6 @@ export const LineItems = (lineItems) => {
 
 export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, fromSitePhone, toSite, toSiteCode, toSitePhone, orderMadeBy }) => {
 
-
-
-
-
     return (
         <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
             <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -182,8 +194,6 @@ export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, f
                                     <dd className="mt-1 text-sm text-gray-900">Name: {toSite}</dd>
                                     <dd className="mt-1 text-sm text-gray-900">Phone: {toSitePhone}</dd>
                                 </div>
-
-
                             </dl>
                         </div>
                     </div>
@@ -208,6 +218,10 @@ export const ViewStockTransfer = () => {
     const openDeleteModal = () => setOpenDelete(true);
     const closeDeleteModal = () => setOpenDelete(false);
 
+    const [openReject, setOpenReject] = useState(false);
+    const openRejectModal = () => setOpenReject(true);
+    const closeRejectModal = () => setOpenReject(false);
+
     const handleConfirmCancel = () => {
         dispatch(cancelStockTransfer({ orderId: id, siteId: userSiteId }))
             .unwrap()
@@ -219,6 +233,10 @@ export const ViewStockTransfer = () => {
             .catch((error) => {
                 alert(error.message);
             })
+    }
+
+    const handleRejectOrder = () => {
+        
     }
 
 
@@ -238,6 +256,7 @@ export const ViewStockTransfer = () => {
                     status={order.statusHistory[order.statusHistory.length - 1].status}
                     orderMadeBy={order.statusHistory[0].actionBy.id}
                     openDeleteModal={openDeleteModal}
+                    openRejectModal={openRejectModal}
                 />
                 <StockTransferBody
                     lineItems={order.lineItems}
@@ -252,12 +271,21 @@ export const ViewStockTransfer = () => {
                     toSitePhone={order.toSite.phoneNumber}
                     orderMadeBy={order.statusHistory[0].actionBy.name}
                 />
-                <ConfirmCancel
-                    item={`Stock Transfer Order #${id}`}
+                <Confirmation
+                    title={`Cancel Stock Transfer Order #${id}`}
+                    body="Are you sure you want to cancel stock transfer order? This action cannot be undone."
                     open={openDelete}
                     closeModal={closeDeleteModal}
                     onConfirm={handleConfirmCancel}
                 />
+                 <Confirmation
+                    title={`Reject Stock Transfer Order #${id}`}
+                    body="Are you sure you want to reject stock transfer order? This action cannot be undone."
+                    open={openReject}
+                    closeModal={closeRejectModal}
+                    onConfirm={handleRejectOrder}
+                />
+                
             </>
         )
     );

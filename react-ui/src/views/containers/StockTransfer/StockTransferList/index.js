@@ -47,7 +47,8 @@ export const StockTransferList = ({subsys}) => {
     const sto = useSelector(selectAllOrders);
     const columns = useMemo(() => cols, [cols] )
 
-    const path = `/${subsys.subsys.subsys}/stocktransfer`;
+    console.log(subsys);
+    const path = `/${subsys.subsys}/stocktransfer`;
     useEffect(() => {
         dispatch(getAllStockTransfer(currSiteId));
     }, [])

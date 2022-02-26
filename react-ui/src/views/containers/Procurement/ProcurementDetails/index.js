@@ -1,21 +1,16 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
 import { TrashIcon } from "@heroicons/react/outline";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useMemo, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
-import {
-  acceptProcurement,
-  cancelProcurement,
-  deleteExistingProcurement,
-  fetchProcurements,
-  selectProcurementById,
-} from "../../../../stores/slices/procurementSlice";
+import { deleteExistingProcurement } from "../../../../stores/slices/procurementSlice";
 import {
   EditableCell,
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
+import { api, procurementApi } from "../../../../environments/Api";
 
 const Header = ({
   pathname,
@@ -65,7 +60,7 @@ const Header = ({
           <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
             <button
               type="button"
-              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
               onClick={onAcceptClicked}
               disabled={status !== "PENDING"}
             >
@@ -85,7 +80,14 @@ const Header = ({
   );
 };
 
-const ItemsSummary = ({ data, status, setData }) => {
+const ItemsSummary = ({
+  data,
+  status,
+  setData,
+  pathname,
+  onVerifyItemsClicked,
+  onVerifyReceivedClicked,
+}) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
     const updateMyData = (rowIndex, columnId, value) => {
@@ -121,39 +123,74 @@ const ItemsSummary = ({ data, status, setData }) => {
             .fieldValue,
       },
       {
-        Header: "Qty Requested",
+        Header: "Requested Qty",
         accessor: "requestedQty",
       },
       {
         Header: "Actual Qty",
-        accessor: "",
+        accessor: "actualQty",
         disableSortBy: true,
         Cell: (row) => {
-          return status === "ACCEPTED" ? (
+          return status === "ACCEPTED" && pathname.includes("mf") ? (
             <EditableCell
-              value={1}
+              value={0}
               row={row.row}
               column={row.column}
               updateMyData={updateMyData}
             />
-          ) : "-";
+          ) : (
+            "-"
+          );
+        },
+      },
+      {
+        Header: "Qty Shipped",
+        accessor: (row) => row.fulfilledProductItems.length,
+        Cell: (row) => {
+          return status === "SHIPPED" && pathname.includes("mf") ? row : "-";
+        },
+      },
+      {
+        Header: "Qty Received",
+        accessor: (row) => row.actualProductItems.length,
+        Cell: (row) => {
+          return status === "SHIPPED" && pathname.includes("wh") ? (
+            <EditableCell
+              value={0}
+              row={row.row}
+              column={row.column}
+              updateMyData={updateMyData}
+            />
+          ) : (
+            "-"
+          );
         },
       },
     ];
-  }, [setData, status]);
+  }, [setData, status, pathname]);
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
         <h3 className="text-lg leading-6 font-medium text-gray-900">Summary</h3>
         <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-          {status === "ACCEPTED" && (
+          {status === "ACCEPTED" && pathname.includes("mf") ? (
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              // onClick={openProducts}
+              onClick={onVerifyItemsClicked}
             >
               Verify items
             </button>
+          ) : status === "SHIPPED" && pathname.includes("wh") ? (
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              onClick={onVerifyReceivedClicked}
+            >
+              Verify items
+            </button>
+          ) : (
+            <div></div>
           )}
         </div>
       </div>
@@ -163,6 +200,7 @@ const ItemsSummary = ({ data, status, setData }) => {
             columns={columns}
             data={data}
             skipPageReset={skipPageReset}
+            // hiddenColumns={["actualQty"]}
           />
         </div>
       )}
@@ -176,6 +214,10 @@ const ProcurementDetailsBody = ({
   manufacturing,
   headquarters,
   warehouse,
+  setLineItems,
+  pathname,
+  onVerifyItemsClicked,
+  onVerifyReceivedClicked
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -217,7 +259,14 @@ const ProcurementDetailsBody = ({
         </div>
       </section>
       <section aria-labelledby="order-summary">
-        <ItemsSummary data={lineItems} status={status} />
+        <ItemsSummary
+          data={lineItems}
+          status={status}
+          setData={setLineItems}
+          pathname={pathname}
+          onVerifyItemsClicked={onVerifyItemsClicked}
+          onVerifyReceivedClicked={onVerifyReceivedClicked}
+        />
       </section>
     </div>
   </div>
@@ -228,15 +277,35 @@ export const ProcurementDetails = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { procurementId } = useParams();
-  const procurement = useSelector((state) =>
-    selectProcurementById(state, parseInt(procurementId))
-  );
-  const [poLineItems, setPoLineItems] = useState([]);
+  const [headquarters, setHeadquarters] = useState(null);
+  const [manufacturing, setManufacturing] = useState(null);
+  const [warehouse, setWarehouse] = useState(null);
+  const [lineItems, setLineItems] = useState([]);
+  const [status, setStatus] = useState("");
+  const [productItems, setProductItems] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
-  const procurementsStatus = useSelector((state) => state.procurements.status);
+
   useEffect(() => {
-    procurementsStatus === "idle" && dispatch(fetchProcurements());
-  }, [procurementsStatus, dispatch]);
+    api.get("sam/procurementOrder", procurementId).then((response) => {
+      const {
+        headquarters,
+        manufacturing,
+        warehouse,
+        lineItems,
+        statusHistory,
+      } = response.data;
+      setHeadquarters(headquarters);
+      setManufacturing(manufacturing);
+      setWarehouse(warehouse);
+      setLineItems(
+        lineItems.map((item) => ({
+          ...item,
+          // actualQuantity: 0,
+        }))
+      );
+      setStatus(statusHistory[statusHistory.length - 1].status);
+    });
+  }, [procurementId]);
 
   const onDeleteSiteClicked = () => {
     try {
@@ -253,13 +322,12 @@ export const ProcurementDetails = () => {
   };
 
   const onAcceptClicked = () => {
-    dispatch(
-      acceptProcurement({
-        orderId: procurementId,
-        siteId: procurement.manufacturing,
+    procurementApi
+      .acceptOrder(procurementId, manufacturing)
+      .then((response) => {
+        const { statusHistory } = response.data;
+        setStatus(statusHistory[statusHistory.length - 1].status);
       })
-    )
-      .unwrap()
       .then(() => {
         alert("Successfully accepted procurement");
       })
@@ -269,54 +337,109 @@ export const ProcurementDetails = () => {
   };
 
   const onCancelOrderClicked = () => {
-    dispatch(
-      cancelProcurement({
-        orderId: procurementId,
-        siteId: procurement.manufacturing,
+    procurementApi
+      .cancelOrder(procurementId, manufacturing)
+      .then((response) => {
+        const { statusHistory } = response.data;
+        setStatus(statusHistory[statusHistory.length - 1].status);
       })
-    )
-      .unwrap()
       .then(() => {
-        alert("Successfully canceled procurement");
+        alert("Successfully cancelled procurement");
       })
       .catch((error) =>
-        console.error("Failed to cancel procurement: ", error.message)
+        console.error("Failed to cancelled procurement: ", error.message)
       );
   };
 
+  const onVerifyItemsClicked = () => {
+    lineItems.forEach((item) => {
+      const { product, actualQty } = item;
+      procurementApi
+        .generateItems(product.sku, actualQty)
+        .then((response) => {
+          setProductItems(productItems.concat(response.data));
+        })
+        .catch((error) =>
+          console.error("Failed to cancelled procurement: ", error.message)
+        );
+    });
+    console.log(productItems);
+    // procurementApi
+    //   .fulfillOrder(manufacturing, {
+    //     id: procurementId,
+    //     lineItems: lineItems.map(({ id, product, requestedQty }) => ({
+    //       id,
+    //       product: {
+    //         sku: product.sku,
+    //       },
+    //       requestedQty,
+    //       fulfilledProductItems: productItems,
+    //     })),
+    //   })
+    //   .then((response) => {
+    //     const {
+    //       headquarters,
+    //       manufacturing,
+    //       warehouse,
+    //       fulfilledProductItems,
+    //       statusHistory,
+    //     } = response.data;
+    //     setHeadquarters(headquarters);
+    //     setManufacturing(manufacturing);
+    //     setWarehouse(warehouse);
+    //     setLineItems(
+    //       lineItems.map((item) => ({
+    //         ...item,
+    //         actualQuantity: fulfilledProductItems.length,
+    //       }))
+    //     );
+    //     setStatus(statusHistory[statusHistory.length - 1].status);
+    //   })
+    //   .catch((error) =>
+    //     console.error("Failed to cancelled procurement: ", error.message)
+    //   );
+  };
+  const onVerifyReceivedClicked = () => {}
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 
   return (
-    Boolean(procurement) && (
+    Boolean(procurementId) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="Procurement Orders" path={-1} />
+          <NavigatePrev
+            page="Procurement Orders"
+            path={
+              pathname.includes("mf")
+                ? "/mf/procurements"
+                : pathname.includes("wh")
+                ? "/wh/procurements"
+                : "/sm/procurements"
+            }
+          />
           <Header
             pathname={pathname}
             procurementId={procurementId}
-            status={
-              procurement.statusHistory[procurement.statusHistory.length - 1]
-                .status
-            }
+            status={status}
             openModal={openModal}
             onAcceptClicked={onAcceptClicked}
             onCancelOrderClicked={onCancelOrderClicked}
           />
           <ProcurementDetailsBody
             procurementId={procurementId}
-            status={
-              procurement.statusHistory[procurement.statusHistory.length - 1]
-                .status
-            }
-            manufacturing={procurement.manufacturing}
-            headquarters={procurement.headquarters}
-            warehouse={procurement.warehouse}
-            lineItems={procurement.lineItems}
+            status={status}
+            manufacturing={manufacturing}
+            headquarters={headquarters}
+            warehouse={warehouse}
+            lineItems={lineItems}
+            setLineItems={setLineItems}
+            pathname={pathname}
+            onVerifyItemsClicked={onVerifyItemsClicked}
+            onVerifyReceivedClicked={onVerifyReceivedClicked}
           />
         </div>
         <ConfirmDelete
-          item={`Order #${procurement.id}`}
+          item={`Order #${procurementId}`}
           open={openDelete}
           closeModal={closeModal}
           onConfirm={onDeleteSiteClicked}

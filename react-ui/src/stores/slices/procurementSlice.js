@@ -109,7 +109,6 @@ const procurementSlice = createSlice({
       state.procurements = state.procurements.filter(
         ({ prodCode }) => prodCode !== action.payload.prodCode
       );
-      // state.status = "idle"
     });
     builder.addCase(acceptProcurement.fulfilled, (state, action) => {
       const {

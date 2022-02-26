@@ -42,6 +42,14 @@ export const cancelStockTransfer = createAsyncThunk(
     }
 )
 
+export const editStockTransfer = createAsyncThunk(
+    "stocktransfer/edit",
+    async (data) => {
+        const response = await stockTransferApi.editOrder(data.order, data.siteId);
+        return response.data;
+    }
+)
+
 
 const stocktransferSlice = createSlice({
     name: "stocktransfer",

@@ -84,6 +84,12 @@ export const stockTransferApi = {
     return axios.delete(
       `${REST_ENDPOINT}sam/stockTransferOrder/delete/${orderId}/${siteId}`
     )
+  },
+  editOrder(order, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}sam/stockTransferOrder/update/${siteId}`,
+      order
+    );
   }
 }
 

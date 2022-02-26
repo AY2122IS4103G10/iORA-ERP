@@ -23,7 +23,9 @@ const cols = [
     },
     {
         Header: "Status",
-        accessor: (row) => row?.statusHistory?.slice(-1)[0].status
+        accessor: (row) => row?.statusHistory?.slice(-1)[0].status,
+        Filter: SelectColumnFilter,
+        filter: "includes",
     },
     {
         Header: "Last Updated",

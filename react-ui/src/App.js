@@ -74,8 +74,9 @@ function App() {
            
             <Route path="stocktransfer" element={<Outlet/>} >
               <Route index element={<ManageStockTransfer subsys="sm"/>}/>
-              <Route path="create" element={<StockTransferForm/>}/>
+              <Route path="create" element={<StockTransferForm subsys="sm"/>}/>
               <Route path=":id" element={<ViewStockTransfer/>}/>
+              <Route path="edit/:id" element={<StockTransferForm subsys="sm"/>}/>
             </Route>
             
             <Route path="procurements" element={<Outlet />}>

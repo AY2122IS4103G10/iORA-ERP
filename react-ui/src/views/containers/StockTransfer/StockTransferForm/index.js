@@ -15,8 +15,8 @@ import { fetchProducts, selectAllProducts, selectProductByCode, selectProductByS
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { api } from "../../../../environments/Api";
 import { selectUserStore } from "../../../../stores/slices/userSlice";
-import { createStockTransfer } from "../../../../stores/slices/stocktransferSlice";
-import { useNavigate } from "react-router-dom";
+import { createStockTransfer, editStockTransfer } from "../../../../stores/slices/stocktransferSlice";
+import { useNavigate, useParams } from "react-router-dom";
 
 
 
@@ -217,7 +217,6 @@ const convertData = (data) =>
     }))
 
 const ItemsList = ({ cols, data, rowSelect = false, selectedRows, setRowSelect }) => {
-
     return (
         <SimpleTable
             columns={cols}
@@ -380,25 +379,62 @@ const LineItemsTable = ({ data, setLineItems }) => {
 
 }
 
-export const StockTransferForm = () => {
+export const StockTransferForm = (subsys) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { id } = useParams();
     const [from, setFrom] = useState({});
     const [to, setTo] = useState({});
     const [openSites, setOpenSites] = useState(false);
     const [openItems, setOpenItems] = useState(false);
     const [openErrorModal, setErrorModal] = useState(false);
     const [lineItems, setLineItems] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [originalOrder, setOriginalOrder] = useState({});
+
+    //get stock level and product information
+    const stocklevel = useSelector(selectCurrSiteStock);
+    const allModels = useSelector(selectAllProducts);
+    const prodTableData = prepareStockLevel(convertData(stocklevel), allModels);
 
     useEffect(() => {
         dispatch(getAllSites());
+        //dispatch(getASiteStock(from?.id));
         dispatch(fetchProducts());
     }, [])
 
+    //editing 
+    function mapLineItemsToSelectedRows(data) {
+        let selectedRows = {};
+        data.map((item) => {
+            let product = prodTableData.find((data) => data.sku === item.product.sku);
+            item.name = product.name;
+            item.qty = product.qty;
 
-    // useEffect(() => {
-    //     dispatch(getASiteStock(from?.id));
-    // }, [openItems])
+            //update selectedRows
+            let index = prodTableData.findIndex((data) => data.sku === item.product.sku);
+            selectedRows[index] = true;
+        })
+        setSelectedRows(selectedRows);
+        return data;
+    }
+
+    useEffect(() => {
+        Boolean(id) &&
+            api.get("sam/stockTransferOrder", id)
+                .then((response) => {
+                    const { lineItems, fromSite, toSite } = response.data;
+                    setOriginalOrder(response.data)
+                    setIsEditing(true);
+                    setLineItems(mapLineItemsToSelectedRows(lineItems));
+                    setFrom(fromSite);
+                    setTo(toSite);
+                })
+                .catch((error) => {
+                    alert(error.message);
+                })
+    }, [])
 
 
     //selecting sites
@@ -406,10 +442,6 @@ export const StockTransferForm = () => {
     const openSitesModal = () => setOpenSites(true);
     const closeSitesModal = () => setOpenSites(false);
 
-    //get stock level and product information
-    const stocklevel = useSelector(selectCurrSiteStock);
-    const allModels = useSelector(selectAllProducts);
-    const prodTableData = prepareStockLevel(convertData(stocklevel), allModels);
 
     //open items modal
     const openItemsModal = () => {
@@ -424,9 +456,10 @@ export const StockTransferForm = () => {
     const closeErrorModal = () => setErrorModal(false);
 
     //Handle add line items
-    const [selectedRows, setSelectedRows] = useState([]);
+
     const onAddItemsClicked = (e) => {
         e.preventDefault();
+        console.log(selectedRows);
         const selectedRowKeys = Object.keys(selectedRows).map((key) => parseInt(key));
         const lineItems = [];
         selectedRowKeys.map((key) => lineItems.push((prodTableData[key])));
@@ -438,50 +471,63 @@ export const StockTransferForm = () => {
         )
         closeItemsModal();
     }
-    console.log(lineItems);
+
     const currSite = useSelector(selectUserSite);
 
     //Handle Create Order product
     const handleSubmit = (e) => {
         e.preventDefault();
-        const stockTransferLI = 
+        const stockTransferLI =
             lineItems.map((item) => ({
                 product: item.product,
                 requestedQty: parseInt(item.requestedQty)
             })
-        );
-        console.log(stockTransferLI);
+            );
         const stockTransferOrder = {
             lineItems: stockTransferLI,
             fromSite: from,
             toSite: to
         }
-        console.log(stockTransferOrder);
-        dispatch(createStockTransfer({order: stockTransferOrder, siteId: currSite}))
+        dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
             .then(() => {
                 alert("Successfully created stock transfer order");
-                navigate(`/sm/stocktransfer`);
+                navigate(`/${subsys.subsys}/stocktransfer`);
             })
             .catch((error) => {
                 alert(error.message);
             })
     }
-
+    const handleSaveEdit = (e) => {
+        e.preventDefault();
+        const stockTransferLI =
+        lineItems.map((item) => ({
+            product: item.product,
+            requestedQty: parseInt(item.requestedQty)
+        })
+        );
+        originalOrder.lineItems = stockTransferLI;
+        originalOrder.fromSite = from;
+        originalOrder.toSite = to;
+        dispatch(editStockTransfer({order: originalOrder, siteId: currSite}))
+            .unwrap()
+            .then(() => {
+                alert("Successfully edited stock transfer order");
+                navigate(`/${subsys.subsys}/stocktransfer/${id}`);
+            })
+            .catch((error) => alert(error.message))
+    }
 
     return (
         <>
             <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                {/* <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                Create Stock Transfer Order
-            </h1> */}
                 <div className="mt-4 grid grid-cols-1 gap-4 items-start lg:gap-8">
                     <section aria-labelledby="stocktransfer-form">
                         <div className="rounded-lg bg-white overflow-hidden shadow">
                             <div className="p-8 space-y-8 divide-y divide-gray-200">
                                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                                     <h3 className="text-lg leading-6 font-medium text-gray-900">
-                                        Create Stock Transfer Order
+                                        {isEditing ? "Edit" : "Create"} Stock Transfer Order
                                     </h3>
                                     <div className="grid grid-cols-2">
                                         <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
@@ -570,13 +616,20 @@ export const StockTransferForm = () => {
                                             <LineItemsTable data={lineItems} setLineItems={setLineItems} />
                                         </div>
                                         <div className="flex justify-end">
-                                            <button
+                                            {!isEditing ? <button
                                                 type="submit"
                                                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                                                 onClick={handleSubmit}
                                             >
-                                                Create 
-                                            </button>
+                                                Create
+                                            </button> :
+                                                <button
+                                                    type="submit"
+                                                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                                    onClick={handleSaveEdit}
+                                                >
+                                                    Save Edit
+                                                </button>}
                                         </div>
                                     </div>
 

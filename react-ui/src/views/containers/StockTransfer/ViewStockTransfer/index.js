@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
 
 import { getStockTransfer, selectStockTransferOrder, cancelStockTransfer } from "../../../../stores/slices/stocktransferSlice";
@@ -21,16 +21,20 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                     <h1 className="text-2xl font-bold text-gray-900">{`Stock Transfer Order #${orderId}`}</h1>
                 </div>
                 <div className="mt-6 absolute right-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-                    <button
-                        type="button"
-                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none"
-                    >
-                        <span>Edit order</span>
-                        <PencilIcon
-                            className="ml-2 h-5 w-5 text-white"
-                            aria-hidden="true"
-                        />
-                    </button>
+                    {status !== "CANCELLED" && userSiteId === orderMadeBy ?
+                        <Link to={`/sm/stocktransfer/edit/${orderId}`}>
+                            <button
+                                type="button"
+                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none"
+                            >
+                                <span>Edit order</span>
+                                <PencilIcon
+                                    className="ml-2 h-5 w-5 text-white"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                        </Link> 
+                        : ""}
 
                     {userSiteId === orderMadeBy && status === "PENDING" ?
                         <button
@@ -40,7 +44,7 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                         >
                             <span>Cancel order</span>
                         </button> : ""}
-                    
+
                     {/* Accept order if status is pending:
                         1) By FROM site if order created by SM
                         2) By TO site if order created by FROM store itself */}
@@ -49,7 +53,7 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                             type="button"
                             className="inline-flex items-center px-3 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
                         >
-                            <span>Accept </span>
+                            <span>Confirm </span>
                         </button> : ""}
 
                 </div>
@@ -147,7 +151,7 @@ export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, f
                                 Order Information
                             </h2>
                             <div className="flex justify-end">
-                                <dt className="text-sm font-medium text-black-500">Status:  {status}</dt>
+                                {/* <dt className="text-sm font-medium text-black-500">Status:  {status}</dt> */}
 
                                 {/* <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 {status}
@@ -165,7 +169,7 @@ export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, f
                                     <dt className="text-sm font-medium text-gray-500">Created By</dt>
                                     <dd className="mt-1 text-sm text-gray-900">{orderMadeBy}</dd>
                                 </div>
-                                
+
                                 <div className="sm:col-span-1">
                                     <dt className="text-sm font-medium text-gray-500">From</dt>
                                     <dd className="mt-1 text-sm text-gray-900">Site Code: {fromSiteCode}</dd>
@@ -178,8 +182,8 @@ export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, f
                                     <dd className="mt-1 text-sm text-gray-900">Name: {toSite}</dd>
                                     <dd className="mt-1 text-sm text-gray-900">Phone: {toSitePhone}</dd>
                                 </div>
-                    
-                                
+
+
                             </dl>
                         </div>
                     </div>
@@ -227,8 +231,8 @@ export const ViewStockTransfer = () => {
     return (
         Boolean(Object.keys(order) != 0) && (
             <>
-                <StockTransferHeader 
-                    orderId={id} 
+                <StockTransferHeader
+                    orderId={id}
                     userSiteId={userSiteId}
                     fromSiteId={order.fromSite.id}
                     toSiteId={order.toSite.id}

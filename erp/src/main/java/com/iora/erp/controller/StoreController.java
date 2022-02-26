@@ -6,11 +6,13 @@ import java.util.Map;
 
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerOrderService;
+import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
 
@@ -35,6 +37,8 @@ public class StoreController {
     private StockTransferService stockTransferService;
     @Autowired
     private CustomerOrderService customerOrderService;
+    @Autowired
+    private ProductService productService;
 
     /*
      * ---------------------------------------------------------
@@ -129,7 +133,7 @@ public class StoreController {
     }
 
     @GetMapping(path = "/customerOrder/view/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> getCustomerOrder(Long orderId) {
+    public ResponseEntity<Object> getCustomerOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity
                     .ok(customerOrderService.getCustomerOrder(orderId));
@@ -137,6 +141,21 @@ public class StoreController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
     
+    /*
+     * ---------------------------------------------------------
+     * F.4 Store Order Management
+     * ---------------------------------------------------------
+     */
+    
+    @GetMapping(path = "/productDetails/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> getProductDetails(@PathVariable String rfid) {
+        try {
+            return ResponseEntity
+                    .ok(productService.getProductCartDetails(rfid).toString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }

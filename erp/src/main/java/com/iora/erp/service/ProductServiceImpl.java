@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
@@ -26,6 +27,8 @@ import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 
 import org.hibernate.NonUniqueResultException;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +78,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public String getProductFieldValue(Product product, String fieldName) throws ProductFieldException {
+        Set<ProductField> pFields = product.getProductFields();
+        for (ProductField pf : pFields) {
+            if (pf.getFieldName().equals(fieldName.toUpperCase())) {
+                return pf.getFieldValue();
+            }
+        }
+
+        throw new ProductFieldException("Field value cannot be found with the given Product and Field Name.");
+    }
+
+    @Override
     public ProductField createProductField(ProductField productField) throws ProductFieldException {
         productField.setFieldName(productField.getFieldName().trim().toUpperCase());
         productField.setFieldValue(productField.getFieldValue().trim().toUpperCase());
@@ -121,6 +136,22 @@ public class ProductServiceImpl implements ProductService {
             return prf;
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new ProductFieldException("PromotionField does not exist.");
+        }
+    }
+
+    @Override
+    public PromotionField getPromoFieldOfModel(Model model) throws ProductFieldException {
+        PromotionField promotionField = null;
+        for (ProductField pf : model.getProductFields()) {
+            if (pf instanceof PromotionField) {
+                promotionField = (PromotionField) pf;
+            }
+        }
+
+        if (promotionField != null) {
+            return promotionField;
+        } else {
+            throw new ProductFieldException("There is no promotion going on for this product.");
         }
     }
 
@@ -247,6 +278,18 @@ public class ProductServiceImpl implements ProductService {
             throw new ModelException("Model with model code " + modelCode + " does not exist.");
         } else {
             return model;
+        }
+    }
+
+    @Override
+    public Model getModelByProduct(Product product) throws ModelException {
+        TypedQuery<Model> q = em.createQuery("SELECT m FROM Model m WHERE :product MEMBER OF m.products", Model.class);
+        q.setParameter("product", product);
+        try {
+            return q.getSingleResult();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new ModelException(ex.getMessage());
         }
     }
 
@@ -526,6 +569,28 @@ public class ProductServiceImpl implements ProductService {
         rfid = rfid.trim();
         ProductItem pi = getProductItem(rfid);
         pi.setAvailable(true);
+    }
+
+    @Override
+    public JSONObject getProductCartDetails(String rfid)
+            throws ProductItemException, ProductException, ModelException, JSONException, ProductFieldException {
+        ProductItem pi = getProductItem(rfid);
+        Product p = getProduct(pi.getProductSKU());
+        Model m = getModelByProduct(p);
+        JSONObject jo = new JSONObject();
+        jo.put("hi", "value");
+        jo.put("name", m.getName());
+        jo.put("price", m.getPrice());
+        jo.put("colour", getProductFieldValue(p, "COLOUR"));
+        jo.put("size", getProductFieldValue(p, "SIZE"));
+        try {
+            PromotionField prf = getPromoFieldOfModel(m);
+            jo.put("discountedPrice", prf.getDiscountedPrice());
+            jo.put("promotion", prf.getFieldValue());
+        } catch (ProductFieldException ex) {
+            // do nothing
+        }
+        return jo;
     }
 
     @Override

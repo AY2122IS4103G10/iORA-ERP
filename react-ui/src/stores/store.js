@@ -6,10 +6,10 @@ import procurementReducer from "./slices/procurementSlice";
 import promotionsReducer from "./slices/promotionsSlice";
 import siteReducer from "./slices/siteSlice";
 import stocklevelReducer from "./slices/stocklevelSlice";
+import stocktransferReducer from "./slices/stocktransferSlice";
 import voucherReducer from "./slices/voucherSlice";
-import companyReducer from "./slices/companySlice";
-import employeeReducer from "./slices/employeeSlice";
-import vendorReducer from "./slices/vendorSlice";
+import companyReducer from "./slices/companySlice"
+import employeeReducer from "./slices/employeeSlice"
 
 export default configureStore({
   reducer: {
@@ -22,7 +22,7 @@ export default configureStore({
     sites: siteReducer,
     user: userReducer,
     stocklevel: stocklevelReducer,
-    vendors: vendorReducer,
+    stocktransfer: stocktransferReducer,
     vouchers: voucherReducer,
   },
 });

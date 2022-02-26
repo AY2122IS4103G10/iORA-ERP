@@ -208,13 +208,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public String deleteVoucher(String voucherCode) throws CustomerException {
+    public void deleteVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
         if (voucher.isIssued() || voucher.isRedeemed()) {
             throw new CustomerException("Voucher has been issued and cannot be deleted.");
         } else {
             em.remove(voucher);
-            return voucherCode;
         }
     }
 

@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { Profiler } from "react";
 import { api } from "../../environments/Api";
 
 const initialState = {
@@ -164,3 +165,6 @@ export const selectModel = (state) => state.products.model;
 
 export const selectProductByCode = (state, modelCode) =>
   state.products.products.find((product) => product.modelCode === modelCode);
+
+
+  

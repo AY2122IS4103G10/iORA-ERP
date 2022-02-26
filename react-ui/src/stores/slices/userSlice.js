@@ -34,14 +34,14 @@ const initialState = {
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials) => {
-    const response = await authApi.login(
-      credentials.username,
-      credentials.password
-    );
-    if (response.data === "") {
-      return Promise.reject(response.error);
-    }
-    return response.data;
+      const response = await authApi.login(
+        credentials.username,
+        credentials.password
+      );
+      if (response.data === "") {
+        return Promise.reject(response.error);
+      }
+      return response.data;
   }
 );
 
@@ -79,11 +79,13 @@ export const { logout } = userSlice.actions;
 
 export const selectUserLoggedIn = (state) => state.user.loggedIn;
 
-export const selectUser = (state) => { return { ...state.user.user } };
+export const selectUser = (state) => state.user.user;
 
 export const selectUserId = (state) => state.user.user.id;
 
 export const selectUserStore = (state) => state.user.currStore;
+
+export const selectUserSite = (state) => state.user.user.department.id;
 
 export const selectUserAccess = (state) =>
   state.user.user.jobTitle.responsibility;

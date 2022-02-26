@@ -31,6 +31,7 @@ import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { SiteDetails } from "./views/containers/Sites/SiteDetails";
 import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
+import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
 import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
 import { ProcurementDetails } from "./views/containers/Procurement/ProcurementDetails";
 import { ManageEmployee } from "./views/containers/Employee/ManageEmployee";
@@ -49,6 +50,7 @@ import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
 import { PosMain } from "./views/containers/POS/Main";
 import { PosOrder } from "./views/containers/POS/Order";
+import { StockLevelForm } from "./views/containers/StockLevels/StockLevelForm";
 
 function App() {
   return (
@@ -78,8 +80,12 @@ function App() {
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
             <Route path="stocklevels/*" element={<ViewStockLevels />} />
-            <Route path="stocktransfer" element={<ManageStockTransfer />} />
-
+           
+            <Route path="stocktransfer" element={<Outlet/>} >
+              <Route index element={<ManageStockTransfer/>}/>
+              <Route path="create" element={<StockTransferForm/>}/>
+            </Route>
+            
             <Route path="procurements" element={<Outlet />}>
               <Route index element={<ManageProcurement />} />
               <Route path=":procurementId" element={<ProcurementDetails />} />
@@ -127,23 +133,17 @@ function App() {
               <Route path="create" element={<EmployeeForm />} />
               <Route path="edit/:employeeId" element={<EmployeeForm />} />
             </Route>
-            <Route path="jobTitles" element={<Outlet />}>
+            <Route path="jobTitle" element={<Outlet />}>
               <Route index element={<ManageJobTitle />} />
               <Route path=":title" element={<JobTitleDetails />} />
               <Route path="create" element={<JobTitleForm />} />
               <Route path="edit/:jobTitleId" element={<JobTitleForm />} />
             </Route>
-            <Route path="departments" element={<Outlet />}>
+            <Route path="department" element={<Outlet />}>
               <Route index element={<ManageDepartment />} />
               <Route path=":name" element={<DepartmentDetails />} />
               <Route path="create" element={<DepartmentForm />} />
               <Route path="edit/:departmentId" element={<DepartmentForm />} />
-            </Route>
-            <Route path="vendors" element={<Outlet />}>
-              <Route index element={<ManageVendors />} />
-              <Route path=":vendorId" element={<VendorDetails />} />
-              <Route path="create" element={<VendorForm />} />
-              <Route path="edit/:vendorId" element={<VendorForm />} />
             </Route>
           </Route>
 

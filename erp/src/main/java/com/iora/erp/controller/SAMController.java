@@ -261,15 +261,6 @@ public class SAMController {
         }
     }
 
-    @PostMapping(path = "/productItem/generate/{sku}/{qty}", produces = "application/json")
-    public ResponseEntity<Object> generateProductItems(@PathVariable String sku, @PathVariable int qty) {
-        try {
-            return ResponseEntity.ok(productService.generateProductItems(sku, qty));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
     @GetMapping(path = "/productItem/{rfid}", produces = "application/json")
     public ResponseEntity<Object> getProductItem(@PathVariable String rfid) {
         try {
@@ -360,7 +351,8 @@ public class SAMController {
     @DeleteMapping(path = "/voucher/delete/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> deleteVoucher(@PathVariable String voucherCode) {
         try {
-            return ResponseEntity.ok(customerService.deleteVoucher(voucherCode));
+            customerService.deleteVoucher(voucherCode);
+            return ResponseEntity.ok("Voucher with voucher code " + voucherCode + " has been deleted successfully.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -578,6 +570,7 @@ public class SAMController {
             return null;
         }
     }
+
 
     @PostMapping(path = "/membershipTier/create", consumes = "application/json")
     public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {

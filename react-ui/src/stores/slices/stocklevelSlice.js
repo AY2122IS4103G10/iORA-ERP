@@ -9,32 +9,32 @@ const initialState = {
             {
               "rfid": "T1ZZ3OA60NOBK18H",
               "available": true,
-              "productSKU": "ASK0009968A-1",
-              // "stockLevel": null
+              "productSKU": "AKV0010057J-1",
+              "stockLevel": null
           },
           {
             "rfid": "NJCTRE9HI281F8B7",
             "available": true,
-            "productSKU": "ASK0009968A-2",
-            // "stockLevel": null
+            "productSKU": "AKV0010057J-2",
+            "stockLevel": null
           },
           {
             "rfid": "1HAC5IJD2Y8R2X4G",
             "available": true,
-            "productSKU": "ASK0009968A-3",
-            // "stockLevel": null/
+            "productSKU": "AKV0010057J-3",
+            "stockLevel": null
           },
         ],
         products: {
-          "ASK0009968A-1": 1,
-          "ASK0009968A-2": 2,
-          "ASK0009968A-3": 3, 
+          "AKV0010057J-1": 1,
+          "AKV0010057J-2": 2,
+          "AKV0010057J-3": 3, 
         },
         models: {
-          "ASK0009968A": 6,
+          "AKV0010057J": 6,
         },
         reserveProducts: {
-          "ASK0009968A-1": 1
+          "AKV0010057J-2": 1
         }
     },
     status: "idle",
@@ -70,8 +70,3 @@ const stocklevelSlice = createSlice({
 export default stocklevelSlice.reducer;
 
 export const selectCurrSiteStock = (state) => state.stocklevel.currSiteStock;
-
-export const selectProdStock = (state, sku) => {
-    const siteStock = selectCurrSiteStock();
-    return siteStock.productItems;
-}

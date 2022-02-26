@@ -10,8 +10,8 @@ export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const handleLogin = (evt) => {
+    evt.preventDefault();
     dispatch(login({ email, password }))
       .unwrap()
       .then((data) => {
@@ -37,7 +37,7 @@ export const Login = () => {
             alt="iORA"
           />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Login
+            Login to iORA
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}

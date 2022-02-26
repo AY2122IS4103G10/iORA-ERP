@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { ExclamationCircleIcon, XCircleIcon } from "@heroicons/react/solid";
+import { useDispatch } from "react-redux";
 import DatePicker from "react-datepicker";
-
-import "react-datepicker/dist/react-datepicker.css";
-import { authApi } from "../../../../environments/Api";
 import { classNames } from "../../../../utilities/Util";
+import "react-datepicker/dist/react-datepicker.css";
+import { register } from "../../../../stores/slices/userSlice";
 
 export const Register = () => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -28,58 +29,67 @@ export const Register = () => {
   const onContactNoChanged = (e) => setContactNo(e.target.value);
   const onDobChanged = (date) => setDob(date);
 
+  const canRegister = [
+    email,
+    password,
+    confirmPassword,
+    firstName,
+    lastName,
+    contactNo,
+    dob,
+  ].every(Boolean);
   const onSaveClicked = (evt) => {
     evt.preventDefault();
-    if (password !== confirmPassword)
-      setError(new Error("Passwords do not match."));
-    // else if (
-    //   !password.match(
-    //     "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
-    //   )
-    // )
-    //   setError(
-    //     new Error(
-    //       "Passwords must be minimum eight characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character."
-    //     )
-    //   );
-    else register();
+    if (canRegister) {
+      if (password !== confirmPassword)
+        setError(new Error("Passwords do not match."));
+      // else if (
+      //   !password.match(
+      //     "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
+      //   )
+      // )
+      //   setError(
+      //     new Error(
+      //       "Passwords must be minimum eight characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character."
+      //     )
+      //   );
+      else
+        dispatch(
+          register({
+            firstName,
+            lastName,
+            email,
+            dob,
+            contactNumber: contactNo,
+            hashPass: password,
+          })
+        )
+          .unwrap()
+          .then((data) => {
+            localStorage.setItem("user", JSON.stringify(data));
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+            setFirstName("");
+            setLastName("");
+            setContactNo("");
+            setDob("");
+            alert("Successfully created account.");
+            data.id !== -1 && navigate("/");
+          })
+          .then(() => navigate("/"))
+          .catch((error) => {
+            if (!error.response)
+              setSubmitError(new Error("Failed to connect to server"));
+            if (error.response.status === 404)
+              setSubmitError(new Error("Account already exists"));
+            else
+              setSubmitError(
+                new Error("Something went wrong. Please try again later.")
+              );
+          });
+    }
   };
-
-  function register() {
-    authApi
-      .register({
-        firstName,
-        lastName,
-        email,
-        dob,
-        contactNumber: contactNo,
-        hashPass: password,
-      })
-      .then((data) => {
-        data.password = password;
-        localStorage.setItem("user", JSON.stringify(data));
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-        setFirstName("");
-        setLastName("");
-        setContactNo("");
-        setDob("");
-        alert("Successfully created account.");
-        data.id !== -1 && navigate("/");
-      })
-      .then(() => navigate("/"))
-      .catch((error) => {
-        if (!error.response)
-          setSubmitError(new Error("Failed to connect to server"));
-        if (error.response.status === 404)
-          setSubmitError(new Error("Account already exists"));
-        else
-          setSubmitError(
-            new Error("Something went wrong. Please try again later.")
-          );
-      });
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -140,7 +150,7 @@ export const Register = () => {
                     htmlFor="input"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Email
+                    Email address
                   </label>
                   <div className="mt-1 relative rounded-md">
                     <input
@@ -245,7 +255,7 @@ export const Register = () => {
                       htmlFor="firstName"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      First Name
+                      First name
                     </label>
                     <div className="mt-1 relative rounded-md">
                       <input
@@ -265,7 +275,7 @@ export const Register = () => {
                       htmlFor="lastName"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Last Name
+                      Last name
                     </label>
                     <div className="mt-1">
                       <input
@@ -285,7 +295,7 @@ export const Register = () => {
                       htmlFor="contactNo"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Contact Number
+                      Contact number
                     </label>
                     <div className="mt-1">
                       <input
@@ -305,7 +315,7 @@ export const Register = () => {
                       htmlFor="dob"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Date of Birth
+                      Date of birth
                     </label>
                     <div className="mt-1">
                       <DatePicker

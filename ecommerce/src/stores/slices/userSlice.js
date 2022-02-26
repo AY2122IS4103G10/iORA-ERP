@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { api } from "../../environments/Api";
 import { authApi } from "../../environments/Api";
 
 const guest = {
@@ -38,6 +39,14 @@ export const login = createAsyncThunk(
 
 export const register = createAsyncThunk("auth/register", async (user) => {
   const response = await authApi.register(user);
+  if (response.data === "") {
+    return Promise.reject(response.error);
+  }
+  return response.data;
+});
+
+export const updateAccount = createAsyncThunk("auth/updateAccount", async (user) => {
+  const response = await api.create("/online/profile/edit", user);
   if (response.data === "") {
     return Promise.reject(response.error);
   }

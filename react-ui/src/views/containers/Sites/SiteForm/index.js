@@ -40,6 +40,8 @@ export const AddressField = ({
   onLatitudeChanged,
   longitude,
   onLongitudeChanged,
+  billing,
+  onBillingChanged,
 }) => {
   return (
     <SimpleInputGroup
@@ -248,6 +250,8 @@ export const AddressField = ({
                 name="candidates"
                 type="checkbox"
                 className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                value={billing}
+                onChange={onBillingChanged}
               />
             </div>
           </div>
@@ -283,6 +287,8 @@ const SiteFormBody = ({
   onLatitudeChanged,
   longitude,
   onLongitudeChanged,
+  billing,
+  onBillingChanged,
   onAddSiteClicked,
   onCancelClicked,
   siteTypeSelected,
@@ -385,6 +391,8 @@ const SiteFormBody = ({
                         onLatitudeChanged={onLatitudeChanged}
                         longitude={longitude}
                         onLongitudeChanged={onLongitudeChanged}
+                        billing={billing}
+                        onBillingChanged={onBillingChanged}
                       />
                       <SimpleInputGroup
                         label="Company"
@@ -440,6 +448,7 @@ export const SiteForm = () => {
   const [postalCode, setPostalCode] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [billing, setBilling] = useState(false)
   const [siteCode, setSiteCode] = useState("");
   const [phone, setPhone] = useState("");
   const [active, setActive] = useState(false);
@@ -464,6 +473,7 @@ export const SiteForm = () => {
   const onPostalCodeChanged = (e) => setPostalCode(e.target.value);
   const onLatitudeChanged = (e) => setLatitude(e.target.value);
   const onLongitudeChanged = (e) => setLongitude(e.target.value);
+  const onBillingChanged = () => setBilling(!billing);
 
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
@@ -502,7 +512,7 @@ export const SiteForm = () => {
                   unit,
                   road: address1,
                   postalCode: `Singapore ${postalCode}`,
-                  billing: false,
+                  billing,
                   latitude,
                   longitude,
                 },
@@ -534,7 +544,7 @@ export const SiteForm = () => {
                 unit,
                 road: address1,
                 postalCode,
-                billing: false,
+                billing,
                 latitude,
                 longitude,
               },
@@ -585,6 +595,7 @@ export const SiteForm = () => {
         setPostalCode(address.postalCode);
         setLatitude(address.latitude);
         setLongitude(address.longitude);
+        setBilling(address.billing);
         setSiteCode(siteCode);
         setPhone(phoneNumber);
         setCompanySelected(company);
@@ -620,6 +631,8 @@ export const SiteForm = () => {
       onLatitudeChanged={onLatitudeChanged}
       longitude={longitude}
       onLongitudeChanged={onLongitudeChanged}
+      billing={billing}
+      onBillingChanged={onBillingChanged}
       onAddSiteClicked={onAddSiteClicked}
       onCancelClicked={onCancelClicked}
       siteTypeSelected={siteTypeSelected}

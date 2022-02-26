@@ -15,10 +15,10 @@ export const getAllStockTransfer = createAsyncThunk(
     async (currSiteId) => {
         console.log(currSiteId);
         if (currSiteId === 1) { //if by hq then get all stock transfer
-            const response = await api.getAll("/sam/stockTransferOrder/all");
+            const response = await api.getAll("store/stockTransfer/all");
             return response.data;
         } else {
-            const response = await api.getAll(`/sam/stockTransferOrder/site/${currSiteId}`);
+            const response = await api.getAll(`store/stockTransfer/site/${currSiteId}`);
             return response.data;
         }
     }
@@ -27,7 +27,7 @@ export const getAllStockTransfer = createAsyncThunk(
 export const getStockTransfer = createAsyncThunk(
     "stocktransfer/getStockTransfer",
     async (id) => {
-        const response = await api.get(`sam/stockTransferOrder`, id)
+        const response = await api.get(`store/stockTransfer`, id)
         return response.data
     }
 )
@@ -35,7 +35,7 @@ export const getStockTransfer = createAsyncThunk(
 export const createStockTransfer = createAsyncThunk(
     "stocktransfer/create",
     async (data) => {
-        const response = await api.create(`sam/stockTransferOrder/create/${data.siteId}`, data.order)
+        const response = await api.create(`store/stockTransfer/create/${data.siteId}`, data.order)
         return response.data;
     }
 )
@@ -56,6 +56,46 @@ export const editStockTransfer = createAsyncThunk(
     }
 )
 
+
+export const rejectStockTransfer = createAsyncThunk(
+    "stocktransfer/reject",
+    async (data) => {
+        const response = await stockTransferApi.rejectOrder(data.orderId, data.siteId);
+        return response.data;
+    }
+)
+
+export const confirmStockTransfer = createAsyncThunk(
+    "stocktransfer/confirm",
+    async (data) => {
+        const response = await stockTransferApi.confirmOrder(data.orderId, data.siteId);
+        return response.data;
+    }
+)
+
+export const readyStockTransfer = createAsyncThunk(
+    "stocktransfer/ready",
+    async (data) => {
+        const response = await stockTransferApi.readyOrder(data.order, data.siteId);
+        return response.data;
+    }
+)
+
+export const deliverStockTransfer = createAsyncThunk(
+    "stocktransfer/deliver",
+    async (data) => {
+        const response = await stockTransferApi.deliverOrder(data.order, data.siteId);
+        return response.data;
+    }
+)
+
+export const completeStockTransfer = createAsyncThunk(
+    "stocktransfer/complete",
+    async (data) => {
+        const response = await stockTransferApi.completeOrder(data.orderId, data.siteId);
+        return response.data;
+    }
+)
 
 const stocktransferSlice = createSlice({
     name: "stocktransfer",
@@ -106,6 +146,51 @@ const stocktransferSlice = createSlice({
             state.status = "succeeded";
         });
         builder.addCase(editStockTransfer.rejected, (state, action) => {
+            state.status = "failed";
+        });
+        builder.addCase(rejectStockTransfer.pending, (state, action) => {
+            state.status = "loading";
+        });
+        builder.addCase(rejectStockTransfer.fulfilled, (state, action) => {
+            state.status = "succeeded";
+        });
+        builder.addCase(rejectStockTransfer.rejected, (state, action) => {
+            state.status = "failed";
+        });
+        builder.addCase(confirmStockTransfer.pending, (state, action) => {
+            state.status = "loading";
+        });
+        builder.addCase(confirmStockTransfer.fulfilled, (state, action) => {
+            state.status = "succeeded";
+        });
+        builder.addCase(confirmStockTransfer.rejected, (state, action) => {
+            state.status = "failed";
+        });
+        builder.addCase(readyStockTransfer.pending, (state, action) => {
+            state.status = "loading";
+        });
+        builder.addCase(readyStockTransfer.fulfilled, (state, action) => {
+            state.status = "succeeded";
+        });
+        builder.addCase(readyStockTransfer.rejected, (state, action) => {
+            state.status = "failed";
+        });
+        builder.addCase(deliverStockTransfer.pending, (state, action) => {
+            state.status = "loading";
+        });
+        builder.addCase(deliverStockTransfer.fulfilled, (state, action) => {
+            state.status = "succeeded";
+        });
+        builder.addCase(deliverStockTransfer.rejected, (state, action) => {
+            state.status = "failed";
+        });
+        builder.addCase(completeStockTransfer.pending, (state, action) => {
+            state.status = "loading";
+        });
+        builder.addCase(completeStockTransfer.fulfilled, (state, action) => {
+            state.status = "succeeded";
+        });
+        builder.addCase(completeStockTransfer.rejected, (state, action) => {
             state.status = "failed";
         });
     }

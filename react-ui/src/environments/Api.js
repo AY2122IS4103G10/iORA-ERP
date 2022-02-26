@@ -82,15 +82,42 @@ export const procurementApi = {
 export const stockTransferApi = {
   cancelOrder(orderId, siteId) {
     return axios.delete(
-      `${REST_ENDPOINT}sam/stockTransferOrder/delete/${orderId}/${siteId}`
+      `${REST_ENDPOINT}store/stockTransfer/cancel/${orderId}/${siteId}`
     )
   },
   editOrder(order, siteId) {
     return axios.put(
-      `${REST_ENDPOINT}sam/stockTransferOrder/update/${siteId}`,
+      `${REST_ENDPOINT}store/stockTransfer/update/${siteId}`,
       order
     );
-  }
+  },
+  confirmOrder(orderId, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/confirm/${orderId}/${siteId}`
+    )
+  },
+  rejectOrder(orderId, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/reject/${orderId}/${siteId}`
+    )
+  },
+  readyOrder(order, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/ready/${siteId}`,
+      order
+    )
+  },
+  deliverOrder(order, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/deliver/${siteId}`, 
+      order
+    )
+  },
+  completeOrder(orderId, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/complete/${orderId}/${siteId}`
+    )
+  },
 }
 
 export const authApi = {

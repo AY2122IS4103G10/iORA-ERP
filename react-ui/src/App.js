@@ -75,7 +75,7 @@ function App() {
             <Route path="stocktransfer" element={<Outlet/>} >
               <Route index element={<ManageStockTransfer subsys="sm"/>}/>
               <Route path="create" element={<StockTransferForm subsys="sm"/>}/>
-              <Route path=":id" element={<ViewStockTransfer/>}/>
+              <Route path=":id" element={<ViewStockTransfer subsys="sm"/>}/>
               <Route path="edit/:id" element={<StockTransferForm subsys="sm"/>}/>
             </Route>
             
@@ -161,7 +161,7 @@ function App() {
 
             <Route path="stocktransfer" element={<Outlet/>} >
               <Route index element={<ManageStockTransfer subsys="wh"/>}/>
-              <Route path=":id" element={<ViewStockTransfer/>}/>
+              <Route path=":id" element={<ViewStockTransfer subsys="wh"/>}/>
               <Route path="edit/:id" element={<StockTransferForm subsys="wh"/>}/>
             </Route>
             

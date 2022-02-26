@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
 
-import { getStockTransfer, selectStockTransferOrder, cancelStockTransfer } from "../../../../stores/slices/stocktransferSlice";
+import { getStockTransfer, selectStockTransferOrder, cancelStockTransfer, rejectStockTransfer, confirmStockTransfer } from "../../../../stores/slices/stocktransferSlice";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import Confirmation from "../../../components/Modals/Confirmation";
 import { SortDownIcon, SortUpIcon, SortIcon } from "../../../components/Tables/Icons";
@@ -12,7 +12,7 @@ import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 
 
-export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, toSiteId, orderMadeBy, openDeleteModal, openRejectModal }) => {
+export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, toSiteId, orderMadeBy, openDeleteModal, openRejectModal, handleConfirmOrder }) => {
 
 
     return (
@@ -22,7 +22,7 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                     <h1 className="text-2xl font-bold text-gray-900">{`Stock Transfer Order #${orderId}`}</h1>
                 </div>
                 <div className="mt-6 absolute right-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-                    {status !== "CANCELLED" && userSiteId === orderMadeBy ?
+                    {status === "PENDING" && userSiteId === orderMadeBy ?
                         <Link to={`/sm/stocktransfer/edit/${orderId}`}>
                             <button
                                 type="button"
@@ -54,6 +54,7 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                             <button
                                 type="button"
                                 className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                                onClick={handleConfirmOrder}
                             >
                                 <span>Confirm </span>
                             </button>
@@ -206,7 +207,7 @@ export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, f
 
 
 
-export const ViewStockTransfer = () => {
+export const ViewStockTransfer = (subsys) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
@@ -228,7 +229,7 @@ export const ViewStockTransfer = () => {
             .then(() => {
                 alert("Successfully cancelled stock transfer order");
                 closeDeleteModal();
-                navigate('/sm/stocktransfer');
+                navigate(`/${subsys.subsys}/stocktransfer`);
             })
             .catch((error) => {
                 alert(error.message);
@@ -236,7 +237,29 @@ export const ViewStockTransfer = () => {
     }
 
     const handleRejectOrder = () => {
-        
+        dispatch(rejectStockTransfer({ orderId: id, siteId: userSiteId }))
+            .unwrap()
+            .then(() => {
+                alert("Successfully rejected stock transfer order");
+                closeDeleteModal();
+                navigate(`/${subsys.subsys}/stocktransfer`);
+            })
+            .catch((error) => {
+                alert(error.message);
+            })
+    }
+
+    const handleConfirmOrder = () => {
+        dispatch(confirmStockTransfer({ orderId: id, siteId: userSiteId }))
+            .unwrap()
+            .then(() => {
+                alert("Successfully confirmed stock transfer order");
+                closeDeleteModal();
+                navigate(`/${subsys.subsys}/stocktransfer`);
+            })
+            .catch((error) => {
+                alert(error.message);
+            })
     }
 
 
@@ -257,6 +280,7 @@ export const ViewStockTransfer = () => {
                     orderMadeBy={order.statusHistory[0].actionBy.id}
                     openDeleteModal={openDeleteModal}
                     openRejectModal={openRejectModal}
+                    handleConfirmOrder={handleConfirmOrder}
                 />
                 <StockTransferBody
                     lineItems={order.lineItems}

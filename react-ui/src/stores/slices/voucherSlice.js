@@ -71,9 +71,8 @@ const voucherSlice = createSlice({
     });
     builder.addCase(deleteExistingVoucher.fulfilled, (state, action) => {
       state.vouchers = state.vouchers.filter(
-        ({ voucherCode }) => voucherCode !== action.payload.voucherCode
+        ({ voucherCode }) => voucherCode !== action.payload
       );
-      state.status = "idle"
     });
   },
 });

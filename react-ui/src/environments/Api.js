@@ -68,6 +68,14 @@ export const procurementApi = {
   },
 };
 
+export const stockTransferApi = {
+  cancelOrder(orderId, siteId) {
+    return axios.delete(
+      `${REST_ENDPOINT}sam/stockTransferOrder/delete/${orderId}/${siteId}`
+    )
+  }
+}
+
 export const authApi = {
   login(username, password) {
     return axios.get(

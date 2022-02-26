@@ -3,13 +3,79 @@ import {
   MenuIcon,
   SearchIcon,
   ShoppingBagIcon,
+  UserIcon,
   XIcon as XIconOutline,
 } from "@heroicons/react/outline";
-import { Transition, Popover, Dialog, Tab } from "@headlessui/react";
+import { Transition, Popover, Dialog, Tab, Menu } from "@headlessui/react";
 import { classNames } from "../../../../../ecommerce/src/utilities/Util";
 import { Link } from "react-router-dom";
 
-export const NavBar = ({ navigation }) => {
+const ProfileDropdown = ({ handleLogout }) => {
+  return (
+    <Menu as="div" className="ml-3 relative">
+      <div>
+        <Menu.Button className="p-2 text-gray-400 hover:text-gray-500 lg:ml-4">
+          <span className="sr-only">Account</span>
+          <UserIcon className="w-6 h-6" aria-hidden="true" />
+        </Menu.Button>
+      </div>
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <Menu.Item>
+            {({ active }) => (
+              <Link
+                to="/profile"
+                className={classNames(
+                  active ? "bg-gray-100" : "",
+                  "block px-4 py-2 text-sm text-gray-700"
+                )}
+              >
+                Your Profile
+              </Link>
+            )}
+          </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <a
+                href="#"
+                className={classNames(
+                  active ? "bg-gray-100" : "",
+                  "block px-4 py-2 text-sm text-gray-700"
+                )}
+              >
+                Settings
+              </a>
+            )}
+          </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <a
+                href="/"
+                onClick={handleLogout}
+                className={classNames(
+                  active ? "bg-gray-100" : "",
+                  "block px-4 py-2 text-sm text-gray-700"
+                )}
+              >
+                Logout
+              </a>
+            )}
+          </Menu.Item>
+        </Menu.Items>
+      </Transition>
+    </Menu>
+  );
+};
+
+export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -153,26 +219,28 @@ export const NavBar = ({ navigation }) => {
                 ))}
               </div>
 
-              <div className="border-t border-gray-200 py-6 px-4 space-y-6">
-                <div className="flow-root">
-                  <Link
-                    to="/login"
-                    className="-m-2 p-2 block font-medium text-gray-900"
-                  >
-                    Sign in
-                  </Link>
+              {!loggedIn && (
+                <div className="border-t border-gray-200 py-6 px-4 space-y-6">
+                  <div className="flow-root">
+                    <Link
+                      to="/login"
+                      className="-m-2 p-2 block font-medium text-gray-900"
+                    >
+                      Sign in
+                    </Link>
+                  </div>
+                  <div className="flow-root">
+                    <Link
+                      to="/register"
+                      className="-m-2 p-2 block font-medium text-gray-900"
+                    >
+                      Create account
+                    </Link>
+                  </div>
                 </div>
-                <div className="flow-root">
-                  <Link
-                    to="/register"
-                    className="-m-2 p-2 block font-medium text-gray-900"
-                  >
-                    Create account
-                  </Link>
-                </div>
-              </div>
+              )}
 
-              <div className="border-t border-gray-200 py-6 px-4">
+              {/* <div className="border-t border-gray-200 py-6 px-4">
                 <a href="#" className="-m-2 p-2 flex items-center">
                   <img
                     src="https://tailwindui.com/img/flags/flag-canada.svg"
@@ -184,7 +252,7 @@ export const NavBar = ({ navigation }) => {
                   </span>
                   <span className="sr-only">, change currency</span>
                 </a>
-              </div>
+              </div> */}
             </div>
           </Transition.Child>
         </Dialog>
@@ -203,14 +271,14 @@ export const NavBar = ({ navigation }) => {
 
             {/* Logo */}
             <div className="ml-4 flex lg:ml-0">
-              <a href="#">
-                <span className="sr-only">Workflow</span>
+              <Link to="/">
+                <span className="sr-only">iORA</span>
                 <img
-                  className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/workflow-mark.svg?color=indigo&shade=600"
-                  alt=""
+                  className="mx-auto h-8 w-auto"
+                  src="android-chrome-512x512.png"
+                  alt="iORA"
                 />
-              </a>
+              </Link>
             </div>
 
             {/* Flyout menus */}
@@ -291,7 +359,6 @@ export const NavBar = ({ navigation }) => {
                                           {section.name}
                                         </p>
                                         <ul
-                                          role="list"
                                           aria-labelledby={`${section.name}-heading`}
                                           className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
                                         >
@@ -335,23 +402,25 @@ export const NavBar = ({ navigation }) => {
             </Popover.Group>
 
             <div className="ml-auto flex items-center">
-              <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                <Link
-                  to="/login"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                >
-                  Sign in
-                </Link>
-                <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
-                <Link
-                  to="/register"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                >
-                  Create account
-                </Link>
-              </div>
+              {!loggedIn && (
+                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                  <Link
+                    to="/login"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                  >
+                    Sign in
+                  </Link>
+                  <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
+                  <Link
+                    to="/register"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                  >
+                    Create account
+                  </Link>
+                </div>
+              )}
 
-              <div className="hidden lg:ml-8 lg:flex">
+              {/* <div className="hidden lg:ml-8 lg:flex">
                 <a
                   href="#"
                   className="text-gray-700 hover:text-gray-800 flex items-center"
@@ -364,7 +433,7 @@ export const NavBar = ({ navigation }) => {
                   <span className="ml-3 block text-sm font-medium">CAD</span>
                   <span className="sr-only">, change currency</span>
                 </a>
-              </div>
+              </div> */}
 
               {/* Search */}
               <div className="flex lg:ml-6">
@@ -373,6 +442,8 @@ export const NavBar = ({ navigation }) => {
                   <SearchIcon className="w-6 h-6" aria-hidden="true" />
                 </a>
               </div>
+              {/* Account */}
+              {loggedIn && <ProfileDropdown handleLogout={handleLogout} />}
 
               {/* Cart */}
               <div className="ml-4 flow-root lg:ml-6">

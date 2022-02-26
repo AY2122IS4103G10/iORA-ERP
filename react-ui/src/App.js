@@ -2,6 +2,7 @@ import { Routes, Route, Outlet } from "react-router-dom";
 import { SMIndex } from "./views/containers/Index/SMIndex";
 import { AdminIndex } from "./views/containers/Index/AdminIndex";
 import { MFIndex } from "./views/containers/Index/MFIndex";
+import { WHIndex } from "./views/containers/Index/WHIndex";
 import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
@@ -136,8 +137,17 @@ function App() {
             </Route>
           </Route>
 
-          {/* Manufacturing */}
+          {/* Manufacturing Subsystem*/}
           <Route path="mf" element={<MFIndex />}>
+            <Route path="procurements" element={<Outlet />}>
+              <Route index element={<ManageProcurement />} />
+              <Route path=":procurementId" element={<ProcurementDetails />} />
+              <Route path="create" element={<ProcurementForm />} />
+              <Route path="edit/:orderId" element={<VoucherForm />} />
+            </Route>
+          </Route>
+          {/* Warehouse Subsystem */}
+          <Route path="wh" element={<WHIndex />}>
             <Route path="procurements" element={<Outlet />}>
               <Route index element={<ManageProcurement />} />
               <Route path=":procurementId" element={<ProcurementDetails />} />

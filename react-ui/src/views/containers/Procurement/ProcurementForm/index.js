@@ -14,11 +14,6 @@ import {
   fetchProducts,
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
-
-import {
-  addNewProcurement,
-  updateExistingProcurement,
-} from "../../../../stores/slices/procurementSlice";
 import {
   fetchHeadquarters,
   fetchManufacturing,
@@ -218,7 +213,7 @@ const ProcurementFormBody = ({
         <h1 className="sr-only">
           {!isEditing ? "New" : "Edit"} Procurement Order
         </h1>
-        <form className="p-8 space-y-8 divide-y divide-gray-200">
+        <form className="p-8 space-y-8 divide-y divide-gray-200" onSubmit={onAddOrderClicked}>
           <div className="space-y-8 divide-y divide-gray-200">
             <div>
               <div>
@@ -321,7 +316,6 @@ const ProcurementFormBody = ({
               <button
                 type="submit"
                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                onClick={onAddOrderClicked}
               >
                 {!isEditing ? "Create" : "Save"} order
               </button>
@@ -351,14 +345,15 @@ export const ProcurementForm = () => {
       name: model.name,
     }))
   );
-  const prodStatus = useSelector((state) => state.products.status);
+
   useEffect(() => {
-    prodStatus === "idle" && dispatch(fetchProducts());
-  }, [prodStatus, dispatch]);
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   const headquarters = useSelector(selectAllHeadquarters);
   const hq = headquarters[0];
   const hqStatus = useSelector((state) => state.sites.hqStatus);
+  
   useEffect(() => {
     hqStatus === "idle" &&
       dispatch(fetchHeadquarters())

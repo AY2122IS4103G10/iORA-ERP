@@ -221,6 +221,7 @@ export const SimpleTable = ({
   headerButton,
   flex = false,
   handleOnClick,
+  hiddenColumns = [],
 }) => {
   const {
     getTableProps,
@@ -245,7 +246,10 @@ export const SimpleTable = ({
       columns,
       data,
       autoResetPage: !skipPageReset,
-      initialState: { selectedRowIds: selectedRows },
+      initialState: {
+        selectedRowIds: selectedRows,
+        hiddenColumns: hiddenColumns,
+      },
     },
     useFilters,
     useGlobalFilter,

@@ -73,6 +73,7 @@ export const ProcurementList = ({ pathname }) => {
         {Boolean(data.length) ? (
           <ProcurementTable data={data} handleOnClick={handleOnClick} />
         ) : (
+          pathname.includes("sm") &&
           <Link to="/sm/procurements/create">
             <DashedBorderES item="procurement order" />
           </Link>

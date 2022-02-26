@@ -57,14 +57,15 @@ const promotionsSlice = createSlice({
       state.promotions.push(action.payload);
     });
     builder.addCase(updateExistingPromotion.fulfilled, (state, action) => {
-      const { id, fieldName, fieldValue, discountedPrice } = action.payload;
-      const existingProd = state.promotions.find(
+      const { id, fieldName, fieldValue, discountedPrice, available } = action.payload;
+      const existingPromo = state.promotions.find(
         (promo) => promo.id === id
       );
-      if (existingProd) {
-        existingProd.fieldName = fieldName;
-        existingProd.fieldValue = fieldValue;
-        existingProd.discountedPrice = discountedPrice;
+      if (existingPromo) {
+        existingPromo.fieldName = fieldName;
+        existingPromo.fieldValue = fieldValue;
+        existingPromo.discountedPrice = discountedPrice;
+        existingPromo.available = available;
       }
     });
     builder.addCase(deleteExistingPromotion.fulfilled, (state, action) => {

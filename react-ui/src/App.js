@@ -119,7 +119,7 @@ function App() {
               <Route path="create" element={<CompanyForm />} />
               <Route path="edit/:companyId" element={<CompanyForm />} />
             </Route>
-            <Route path="employees" element={<Outlet />}>
+            <Route path="employee" element={<Outlet />}>
               <Route index element={<ManageEmployee />} />
               <Route path=":name" element={<EmployeeDetails />} />
               <Route path="create" element={<EmployeeForm />} />

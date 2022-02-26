@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllStockTransfer, selectAllOrders } from "../../../../stores/slices/stocktransferSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { SelectableTable, SelectColumnFilter } from "../../../components/Tables/SelectableTable";
 
 
@@ -40,14 +41,15 @@ const cols = [
 
 
 
-export const StockTransferList = (subsys) => {
+export const StockTransferList = ({subsys}) => {
     const dispatch = useDispatch();
+    const currSiteId = useSelector(selectUserSite);
     const sto = useSelector(selectAllOrders);
     const columns = useMemo(() => cols, [cols] )
 
     const path = `/${subsys.subsys.subsys}/stocktransfer`;
     useEffect(() => {
-        dispatch(getAllStockTransfer());
+        dispatch(getAllStockTransfer(currSiteId));
     }, [])
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

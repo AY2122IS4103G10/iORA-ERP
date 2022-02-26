@@ -12,9 +12,15 @@ const initialState = {
 
 export const getAllStockTransfer = createAsyncThunk(
     "stocktransfer/getAllOrders",
-    async () => {
-        const response = await api.getAll("/sam/stockTransferOrder/all");
-        return response.data;
+    async (currSiteId) => {
+        console.log(currSiteId);
+        if (currSiteId === 1) { //if by hq then get all stock transfer
+            const response = await api.getAll("/sam/stockTransferOrder/all");
+            return response.data;
+        } else {
+            const response = await api.getAll(`/sam/stockTransferOrder/site/${currSiteId}`);
+            return response.data;
+        }
     }
 )
 
@@ -91,6 +97,15 @@ const stocktransferSlice = createSlice({
             state.status = "succeeded";
         });
         builder.addCase(cancelStockTransfer.rejected, (state, action) => {
+            state.status = "failed";
+        });
+        builder.addCase(editStockTransfer.pending, (state, action) => {
+            state.status = "loading";
+        });
+        builder.addCase(editStockTransfer.fulfilled, (state, action) => {
+            state.status = "succeeded";
+        });
+        builder.addCase(editStockTransfer.rejected, (state, action) => {
             state.status = "failed";
         });
     }

@@ -149,6 +149,7 @@ function App() {
               <Route path="edit/:orderId" element={<VoucherForm />} />
             </Route>
           </Route>
+
           {/* Warehouse Subsystem */}
           <Route path="wh" element={<WHIndex />}>
             <Route path="procurements" element={<Outlet />}>
@@ -157,6 +158,13 @@ function App() {
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<VoucherForm />} />
             </Route>
+
+            <Route path="stocktransfer" element={<Outlet/>} >
+              <Route index element={<ManageStockTransfer subsys="wh"/>}/>
+              <Route path=":id" element={<ViewStockTransfer/>}/>
+              <Route path="edit/:id" element={<StockTransferForm subsys="wh"/>}/>
+            </Route>
+            
           </Route>
         </Route>
 

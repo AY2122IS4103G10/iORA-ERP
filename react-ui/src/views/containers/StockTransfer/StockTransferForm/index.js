@@ -498,24 +498,35 @@ export const StockTransferForm = (subsys) => {
                 alert(error.message);
             })
     }
+
+    //save edit
     const handleSaveEdit = (e) => {
         e.preventDefault();
         const stockTransferLI =
-        lineItems.map((item) => ({
-            product: item.product,
-            requestedQty: parseInt(item.requestedQty)
-        })
-        );
+            lineItems.map((item) => ({
+                product: item.product,
+                requestedQty: parseInt(item.requestedQty)
+            })
+            );
         originalOrder.lineItems = stockTransferLI;
         originalOrder.fromSite = from;
         originalOrder.toSite = to;
-        dispatch(editStockTransfer({order: originalOrder, siteId: currSite}))
+        dispatch(editStockTransfer({ order: originalOrder, siteId: currSite }))
             .unwrap()
             .then(() => {
                 alert("Successfully edited stock transfer order");
                 navigate(`/${subsys.subsys}/stocktransfer/${id}`);
             })
             .catch((error) => alert(error.message))
+    }
+
+    //cancel 
+    const onCancelClicked = () => {
+        if (isEditing) {
+            navigate(`/${subsys.subsys}/stocktransfer/${id}`);
+        } else {
+            navigate(`/${subsys.subsys}/stocktransfer`);
+        }
     }
 
     return (
@@ -616,6 +627,13 @@ export const StockTransferForm = (subsys) => {
                                             <LineItemsTable data={lineItems} setLineItems={setLineItems} />
                                         </div>
                                         <div className="flex justify-end">
+                                            <button
+                                                type="button"
+                                                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                                onClick={onCancelClicked}
+                                            >
+                                                Cancel
+                                            </button>
                                             {!isEditing ? <button
                                                 type="submit"
                                                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"

@@ -362,7 +362,7 @@ const LineItemsTable = ({ data, setLineItems }) => {
                 Cell: (row) => {
                     return (
                         <EditableCell
-                            value={0}
+                            value={row.row.original.requestedQty}
                             row={row.row}
                             column={row.column}
                             updateMyData={updateMyData}

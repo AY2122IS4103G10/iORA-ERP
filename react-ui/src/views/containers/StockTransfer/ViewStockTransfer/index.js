@@ -187,7 +187,6 @@ export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, f
                             </dl>
                         </div>
                     </div>
-
                     <LineItems lineItems={lineItems} />
                 </section>
             </div>

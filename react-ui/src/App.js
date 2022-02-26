@@ -41,6 +41,7 @@ import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/ind
 import Error from "./views/containers/Auth/Error";
 import { Auth } from "./views/containers/Auth/Auth";
 import { StockLevelForm } from "./views/containers/StockLevels/StockLevelForm";
+import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTransfer";
 
 function App() {
   return (
@@ -72,8 +73,9 @@ function App() {
             <Route path="stocklevels/*" element={<ViewStockLevels />} />
            
             <Route path="stocktransfer" element={<Outlet/>} >
-              <Route index element={<ManageStockTransfer/>}/>
+              <Route index element={<ManageStockTransfer subsys="sm"/>}/>
               <Route path="create" element={<StockTransferForm/>}/>
+              <Route path=":id" element={<ViewStockTransfer/>}/>
             </Route>
             
             <Route path="procurements" element={<Outlet />}>

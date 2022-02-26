@@ -29,11 +29,11 @@ const Header = () => {
   );
 };
 
-export const ManageStockTransfer = () => {
+export const ManageStockTransfer = (subsys) => {
   return (
     <>
       {<Header />}
-      <StockTransferList/>
+      <StockTransferList subsys={subsys}/>
     </>
   );
 };

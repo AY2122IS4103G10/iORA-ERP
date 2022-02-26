@@ -11,12 +11,12 @@ public interface StockTransferService {
     public abstract StockTransferOrder getStockTransferOrder(Long id) throws StockTransferException;
     public abstract List<StockTransferOrder> getStockTransferOrders();
     public abstract List<StockTransferOrder> getStockTransferOrderOfSite(Site site);
-    public abstract void createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException;
-    public abstract void updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
-    public abstract void deleteStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException;
-    public abstract void rejectStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException;
-    public abstract void confirmStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException;
-    public abstract void fulfilStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
-    public abstract void deliverStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
-    public abstract void completeStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException;
+    public abstract StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException;
+    public abstract StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
+    public abstract StockTransferOrder cancelStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException;
+    public abstract StockTransferOrder rejectStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException;
+    public abstract StockTransferOrder confirmStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException;
+    public abstract StockTransferOrder fulfilStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
+    public abstract StockTransferOrder deliverStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
+    public abstract StockTransferOrder completeStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException;
 }

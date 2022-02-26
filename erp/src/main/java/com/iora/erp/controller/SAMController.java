@@ -485,72 +485,6 @@ public class SAMController {
         }
     }
 
-    @GetMapping(path = "/stockTransferOrder/all", produces = "application/json")
-    public List<StockTransferOrder> getStockTransferOrders() {
-        return stockTransferService.getStockTransferOrders();
-    }
-
-    @PostMapping(path = "/stockTransferOrder/create/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> createStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
-            @PathVariable Long siteId) {
-        try {
-            stockTransferService.createStockTransferOrder(stockTransferOrder, siteId);
-            return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + stockTransferOrder.getId() + " is successfully created.");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @GetMapping(path = "/stockTransferOrder/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> getStockTransferOrderByOrderId(@PathVariable Long orderId) {
-        try {
-            return ResponseEntity.ok(stockTransferService.getStockTransferOrder(orderId));
-        } catch (StockTransferException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @GetMapping(path = "/stockTransferOrder/site/{siteId}", produces = "application/json")
-    public List<StockTransferOrder> getStockTransferOrdersOfSite(@PathVariable Long siteId) {
-        Site site = siteService.getSite(siteId);
-        return stockTransferService.getStockTransferOrderOfSite(site);
-    }
-
-    @PutMapping(path = "/stockTransferOrder/update/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> updateStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
-            @PathVariable Long siteId) {
-        try {
-            stockTransferService.updateStockTransferOrder(stockTransferOrder, siteId);
-            return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + stockTransferOrder.getId() + " is successfully updated.");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @DeleteMapping(path = "/stockTransferOrder/delete/{orderId}/{siteId}")
-    public ResponseEntity<Object> deleteStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
-        try {
-            stockTransferService.deleteStockTransferOrder(orderId, siteId);
-            return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PutMapping(path = "/stockTransferOrder/complete/{orderId}/{siteId}")
-    public ResponseEntity<Object> completeStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
-        try {
-            stockTransferService.completeStockTransferOrder(orderId, siteId);
-            return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
     /*
      * ---------------------------------------------------------
      * B.5 CRM
@@ -570,7 +504,6 @@ public class SAMController {
             return null;
         }
     }
-
 
     @PostMapping(path = "/membershipTier/create", consumes = "application/json")
     public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {

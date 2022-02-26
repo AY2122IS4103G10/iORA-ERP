@@ -53,7 +53,7 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public void createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
+    public StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
             throws SiteConfirmationException {
         Site actionBy = em.find(Site.class, siteId);
         if (actionBy == null) {
@@ -63,12 +63,13 @@ public class StockTransferServiceImpl implements StockTransferService {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDING));
             stockTransferOrder.setStatusHistory(statusHistory);
             em.persist(stockTransferOrder);
+            return stockTransferOrder;
         }
 
     }
 
     @Override
-    public void updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
+    public StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
             throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
         if (actionBy == null) {
@@ -82,11 +83,12 @@ public class StockTransferServiceImpl implements StockTransferService {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDING));
             stockTransferOrder.setStatusHistory(statusHistory);
             em.merge(stockTransferOrder);
+            return stockTransferOrder;
         }
     }
 
     @Override
-    public void deleteStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder cancelStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
@@ -104,11 +106,12 @@ public class StockTransferServiceImpl implements StockTransferService {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
             stOrder.setStatusHistory(statusHistory);
             em.merge(stOrder);
+            return stOrder;
         }
     }
 
     @Override
-    public void rejectStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException {
+    public StockTransferOrder rejectStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
@@ -124,11 +127,12 @@ public class StockTransferServiceImpl implements StockTransferService {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
             stOrder.setStatusHistory(statusHistory);
             em.merge(stOrder);
+            return stOrder;
         }
     }
 
     @Override
-    public void confirmStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder confirmStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
@@ -144,11 +148,12 @@ public class StockTransferServiceImpl implements StockTransferService {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CONFIRMED));
             stOrder.setStatusHistory(statusHistory);
             em.merge(stOrder);
+            return stOrder;
         }
     }
 
     @Override
-    public void fulfilStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder fulfilStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null) {
@@ -166,11 +171,12 @@ public class StockTransferServiceImpl implements StockTransferService {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.READY));
             stockTransferOrder.setStatusHistory(statusHistory);
             em.merge(stockTransferOrder);
+            return stockTransferOrder;
         }
     }
 
     @Override
-    public void deliverStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder deliverStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null) {
@@ -188,11 +194,12 @@ public class StockTransferServiceImpl implements StockTransferService {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.DELIVERING));
             stockTransferOrder.setStatusHistory(statusHistory);
             em.merge(stockTransferOrder);
+            return stockTransferOrder;
         }
     }
 
     @Override
-    public void completeStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException {
+    public StockTransferOrder completeStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException {
         StockTransferOrder stockTransferOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
@@ -211,6 +218,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.COMPLETED));
             stockTransferOrder.setStatusHistory(statusHistory);
             em.merge(stockTransferOrder);
+            return stockTransferOrder;
         }
     }
 }

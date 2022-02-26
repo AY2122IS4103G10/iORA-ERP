@@ -12,10 +12,7 @@ import {
   fetchProcurements,
   selectProcurementById,
 } from "../../../../stores/slices/procurementSlice";
-import {
-  EditableCell,
-  SimpleTable,
-} from "../../../components/Tables/SimpleTable";
+import { EditableCell, SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const Header = ({
   pathname,
@@ -39,12 +36,8 @@ const Header = ({
               <button
                 type="button"
                 className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-                disabled={status !== "PENDING"}
-              >
-                <PencilIcon
-                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
+                disabled={status !== "PENDING"}>
+                <PencilIcon className="-ml-1 mr-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                 <span>Edit</span>
               </button>
             </Link>
@@ -52,12 +45,8 @@ const Header = ({
               type="button"
               className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
               onClick={openModal}
-              disabled={status !== "PENDING"}
-            >
-              <TrashIcon
-                className="-ml-1 mr-2 h-5 w-5 text-white"
-                aria-hidden="true"
-              />
+              disabled={status !== "PENDING"}>
+              <TrashIcon className="-ml-1 mr-2 h-5 w-5 text-white" aria-hidden="true" />
               <span>Delete</span>
             </button>
           </div>
@@ -67,16 +56,14 @@ const Header = ({
               type="button"
               className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
               onClick={onAcceptClicked}
-              disabled={status !== "PENDING"}
-            >
+              disabled={status !== "PENDING"}>
               <span>Accept order</span>
             </button>
             <button
               type="button"
               className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
               onClick={onCancelOrderClicked}
-              disabled={status !== "PENDING"}
-            >
+              disabled={status !== "PENDING"}>
               <span>Cancel order</span>
             </button>
           </div>
@@ -110,15 +97,12 @@ const ItemsSummary = ({ data, status, setData }) => {
       {
         Header: "Color",
         accessor: (row) =>
-          row.product.productFields.find(
-            (field) => field.fieldName === "COLOUR"
-          ).fieldValue,
+          row.product.productFields.find((field) => field.fieldName === "COLOUR").fieldValue,
       },
       {
         Header: "Size",
         accessor: (row) =>
-          row.product.productFields.find((field) => field.fieldName === "SIZE")
-            .fieldValue,
+          row.product.productFields.find((field) => field.fieldName === "SIZE").fieldValue,
       },
       {
         Header: "Qty Requested",
@@ -130,13 +114,10 @@ const ItemsSummary = ({ data, status, setData }) => {
         disableSortBy: true,
         Cell: (row) => {
           return status === "ACCEPTED" ? (
-            <EditableCell
-              value={1}
-              row={row.row}
-              column={row.column}
-              updateMyData={updateMyData}
-            />
-          ) : "-";
+            <EditableCell value={1} row={row.row} column={row.column} updateMyData={updateMyData} />
+          ) : (
+            "-"
+          );
         },
       },
     ];
@@ -159,24 +140,14 @@ const ItemsSummary = ({ data, status, setData }) => {
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable
-            columns={columns}
-            data={data}
-            skipPageReset={skipPageReset}
-          />
+          <SimpleTable columns={columns} data={data} skipPageReset={skipPageReset} />
         </div>
       )}
     </div>
   );
 };
 
-const ProcurementDetailsBody = ({
-  status,
-  lineItems,
-  manufacturing,
-  headquarters,
-  warehouse,
-}) => (
+const ProcurementDetailsBody = ({ status, lineItems, manufacturing, headquarters, warehouse }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
       {/* Site Information*/}
@@ -185,8 +156,7 @@ const ProcurementDetailsBody = ({
           <div className="px-4 py-5 sm:px-6">
             <h2
               id="warehouse-information-title"
-              className="text-lg leading-6 font-medium text-gray-900"
-            >
+              className="text-lg leading-6 font-medium text-gray-900">
               Order Information
             </h2>
           </div>
@@ -201,9 +171,7 @@ const ProcurementDetailsBody = ({
                 <dd className="mt-1 text-sm text-gray-900">{headquarters}</dd>
               </div>
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Manufacturing
-                </dt>
+                <dt className="text-sm font-medium text-gray-500">Manufacturing</dt>
                 <dd className="mt-1 text-sm text-gray-900">
                   {manufacturing ? manufacturing : "-"}
                 </dd>
@@ -228,9 +196,7 @@ export const ProcurementDetails = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { procurementId } = useParams();
-  const procurement = useSelector((state) =>
-    selectProcurementById(state, parseInt(procurementId))
-  );
+  const procurement = useSelector((state) => selectProcurementById(state, parseInt(procurementId)));
   const [poLineItems, setPoLineItems] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
   const procurementsStatus = useSelector((state) => state.procurements.status);
@@ -263,9 +229,7 @@ export const ProcurementDetails = () => {
       .then(() => {
         alert("Successfully accepted procurement");
       })
-      .catch((error) =>
-        console.error("Failed to accept procurement: ", error.message)
-      );
+      .catch((error) => console.error("Failed to accept procurement: ", error.message));
   };
 
   const onCancelOrderClicked = () => {
@@ -279,9 +243,7 @@ export const ProcurementDetails = () => {
       .then(() => {
         alert("Successfully canceled procurement");
       })
-      .catch((error) =>
-        console.error("Failed to cancel procurement: ", error.message)
-      );
+      .catch((error) => console.error("Failed to cancel procurement: ", error.message));
   };
 
   const openModal = () => setOpenDelete(true);
@@ -295,20 +257,14 @@ export const ProcurementDetails = () => {
           <Header
             pathname={pathname}
             procurementId={procurementId}
-            status={
-              procurement.statusHistory[procurement.statusHistory.length - 1]
-                .status
-            }
+            status={procurement.statusHistory[procurement.statusHistory.length - 1].status}
             openModal={openModal}
             onAcceptClicked={onAcceptClicked}
             onCancelOrderClicked={onCancelOrderClicked}
           />
           <ProcurementDetailsBody
             procurementId={procurementId}
-            status={
-              procurement.statusHistory[procurement.statusHistory.length - 1]
-                .status
-            }
+            status={procurement.statusHistory[procurement.statusHistory.length - 1].status}
             manufacturing={procurement.manufacturing}
             headquarters={procurement.headquarters}
             warehouse={procurement.warehouse}

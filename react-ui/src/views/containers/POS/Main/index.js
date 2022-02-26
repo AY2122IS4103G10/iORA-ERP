@@ -1,8 +1,7 @@
-import { SideBar } from "../../../components/SideBar";
-import { HeaderWithAction } from "../../../components/HeaderWithAcction";
-import { Link, useLocation, useMatch } from "react-router-dom";
-import { useState } from "react";
-import { Tabs } from "../../../components/Tabs";
+import {Link, useLocation, useMatch} from "react-router-dom";
+import {useState} from "react";
+import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
+import {EditableCell, SimpleTable} from "../../../components/Tables/SimpleTable";
 
 const exitButton = () => {
   return (
@@ -60,11 +59,11 @@ const header = () => {
         </ul>
       </div>
       <div class="ml-12 py-6">
-        <Link to={`/pos/main`}>
+        <Link to={`#`}>
           <button
             type="button"
             class="ml-10 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-700 hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Main Page
+            Logout
           </button>
         </Link>
       </div>
@@ -72,10 +71,84 @@ const header = () => {
   );
 };
 
+const orderTable = (siteId) => {
+  const data = useSelector(fetchSiteOrders);
+  const posStatus = useSelector((state) => state.pos.status);
+  const error = useSelector((state) => state.site.error);
+
+  useEffect(() => {
+    procurementsStatus === "idle" && dispatch(fetchProcurements());
+  }, [procurementsStatus, dispatch]);
+
+  return (
+    <div class="flex flex-col">
+      <div class="-my-2 overflow-x-auto sm:-mx-4 lg:-mx-6">
+        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+          <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    OrderId
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    DateTime
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Amount
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    CustomerNumber
+                  </th>
+                  <th scope="col" class="relative px-6 py-3">
+                    <span class="sr-only"></span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-white">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Jane Cooper
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    Regional Paradigm Technician
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    jane.cooper@example.com
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Admin</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="#" class="text-indigo-600 hover:text-indigo-900">
+                      View
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const PosMain = () => {
+  const [siteId, setSiteId] = useState();
+
   return (
     <>
       <div className="bg-white shadow">{header()}</div>
+      <div class="w-10/12 md:container md:mx-auto">
+        <div className="pt-10">{orderTable()}</div>
+      </div>
     </>
   );
 };

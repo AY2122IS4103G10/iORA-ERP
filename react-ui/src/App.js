@@ -158,6 +158,8 @@ function App() {
             </Route>
           </Route>
         </Route>
+
+       
         <Route path="*" element={<Error />} />
       </Routes>
     </div>

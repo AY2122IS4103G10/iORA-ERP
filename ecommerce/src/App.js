@@ -1,10 +1,11 @@
-import { Outlet } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
 import { Login } from "./views/containers/Auth/Login";
-import { Profile } from "./views/containers/Auth/Profile";
+import { Profile } from "./views/containers/Auth/Settings/Profile";
 import { Register } from "./views/containers/Auth/Register";
 import { Cart } from "./views/containers/Cart";
 import { ECIndex } from "./views/containers/Index/ECIndex";
+import { SettingsIndex } from "./views/containers/Index/SettingsIndex";
+import { Account } from "./views/containers/Auth/Settings/Account";
 
 function App() {
   return (
@@ -15,7 +16,10 @@ function App() {
 
         <Route path="/" element={<ECIndex />}>
           <Route index element={<Cart />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path="settings" element={<SettingsIndex />} >
+            <Route path="profile" element={<Profile />}/ >
+            <Route path="account" element={<Account />}/ >
+          </Route>
         </Route>
         <Route
           path="*"

@@ -2,12 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  department: [
-    {
-      id: 1,
-      name: "Sales",
-    },
-  ],
+  department: [],
   status: "idle",
   error: null,
 };
@@ -15,34 +10,40 @@ const initialState = {
 export const fetchDepartments = createAsyncThunk(
   "department/fetchDepartments",
   async () => {
-    const response = await api.getAll("admin/viewDepartments/all");
+    const response = await api.getAll("admin/viewDepartments?search=");
     return response.data;
   }
 );
 
 export const addNewDepartment = createAsyncThunk(
-    "department/addDepartment",
-    async (initialDepartment) => {
-      const response = await api.create("admin/addDepartment", initialDepartment);
-      return response.data;
-    }
-  );
-  
-  export const updateExistingDepartment = createAsyncThunk(
-    "department/updateExistingDepartment",
-    async (existingDepartment) => {
-      const response = await api.update("admin/editDepartment", existingDepartment);
-      return response.data;
-    }
-  );
-  
-  export const deleteExistingDepartment = createAsyncThunk(
-    "department/deleteExistingDepartment",
-    async (existingDepartmentId) => {
-      const response = await api.delete("admin/deleteDepartment", existingDepartmentId);
-      return response.data;
-    }
-  );
+  "department/addDepartment",
+  async (initialDepartment) => {
+    const response = await api.create("admin/addDepartment", initialDepartment);
+    return response.data;
+  }
+);
+
+export const updateExistingDepartment = createAsyncThunk(
+  "department/updateExistingDepartment",
+  async (existingDepartment) => {
+    const response = await api.update(
+      "admin/editDepartment",
+      existingDepartment
+    );
+    return response.data;
+  }
+);
+
+export const deleteExistingDepartment = createAsyncThunk(
+  "department/deleteExistingDepartment",
+  async (existingDepartmentId) => {
+    const response = await api.delete(
+      "admin/deleteDepartment",
+      existingDepartmentId
+    );
+    return response.data;
+  }
+);
 
 const departmentSlice = createSlice({
   name: "department",
@@ -53,7 +54,7 @@ const departmentSlice = createSlice({
     });
     builder.addCase(fetchDepartments.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.department = state.department.concat(action.payload);
+      state.department = action.payload;
     });
     builder.addCase(fetchDepartments.rejected, (state, action) => {
       state.status = "failed";
@@ -62,10 +63,7 @@ const departmentSlice = createSlice({
       state.department.push(action.payload);
     });
     builder.addCase(updateExistingDepartment.fulfilled, (state, action) => {
-      const {
-        departmentId,
-        name,
-      } = action.payload;
+      const { departmentId, name } = action.payload;
       console.log(action.payload);
       const existingDepartment = state.department.find(
         (department) => department.departmentId === departmentId
@@ -89,4 +87,6 @@ export default departmentSlice.reducer;
 export const selectAllDepartment = (state) => state.department.department;
 
 export const selectDepartmentById = (state, departmentId) =>
-  state.department.department.find((dpartment) => dpartment.departmentId === departmentId);
+  state.department.department.find(
+    (dpartment) => dpartment.departmentId === departmentId
+  );

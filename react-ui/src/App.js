@@ -1,10 +1,4 @@
-import {
-  Routes,
-  Route,
-  Outlet,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { SMIndex } from "./views/containers/Index/SMIndex";
 import { AdminIndex } from "./views/containers/Index/AdminIndex";
 import { MFIndex } from "./views/containers/Index/MFIndex";
@@ -67,8 +61,7 @@ function App() {
               <SMRoute>
                 <SMIndex />
               </SMRoute>
-            }
-          >
+            }>
             <Route path="products" element={<Outlet />}>
               <Route index element={<ManageProducts />} />
               <Route path=":prodCode" element={<ProductDetails />} />
@@ -77,12 +70,12 @@ function App() {
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
             <Route path="stocklevels/*" element={<ViewStockLevels />} />
-           
-            <Route path="stocktransfer" element={<Outlet/>} >
-              <Route index element={<ManageStockTransfer/>}/>
-              <Route path="create" element={<StockTransferForm/>}/>
+
+            <Route path="stocktransfer" element={<Outlet />}>
+              <Route index element={<ManageStockTransfer />} />
+              <Route path="create" element={<StockTransferForm />} />
             </Route>
-            
+
             <Route path="procurements" element={<Outlet />}>
               <Route index element={<ManageProcurement />} />
               <Route path=":procurementId" element={<ProcurementDetails />} />
@@ -110,8 +103,7 @@ function App() {
               // <ADRoute>
               <AdminIndex />
               /* </ADRoute> */
-            }
-          >
+            }>
             <Route path="sites" element={<Outlet />}>
               <Route index element={<ManageSites />} />
               <Route path=":siteId" element={<SiteDetails />} />
@@ -157,7 +149,8 @@ function App() {
         <Route path="*" element={<Error />} />
 
         {/* POS */}
-        <Route path="pos" element={<PosMain />}>
+        <Route path="pos">
+          <Route path="main" element={<PosMain />}></Route>
           <Route path="order" element={<PosOrder />} />
         </Route>
       </Routes>

@@ -102,6 +102,9 @@ function App() {
               <Route path=":id" element={<ViewStockTransfer subsys="str" />} />
               <Route path="edit/:id" element={<StockTransferForm subsys="str" />} />
             </Route>
+            <Route path="pos" element={<PosMain />}>
+              <Route path="order" element={<PosOrder />} />
+            </Route>
           </Route>
 
           {/* Admin Subsystem */}
@@ -174,12 +177,6 @@ function App() {
         </Route>
 
         <Route path="*" element={<Error />} />
-
-        {/* POS */}
-        <Route path="pos">
-          <Route path="main" element={<PosMain />}></Route>
-          <Route path="order" element={<PosOrder />} />
-        </Route>
       </Routes>
     </div>
   );

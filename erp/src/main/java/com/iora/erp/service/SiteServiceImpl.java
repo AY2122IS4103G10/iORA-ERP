@@ -128,7 +128,8 @@ public class SiteServiceImpl implements SiteService {
     String siteQuery(String mainQuery, String country, String company) {
         if (!country.equals("") && !company.equals("")) {
             return mainQuery + String.format(
-                    " WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'", country.toUpperCase(),
+                    " WHERE UPPER(s.address.country) = '%s' AND s.company.name = '%s Fashion Pte. Ltd.'",
+                    country.toUpperCase(),
                     company);
         } else if (!country.equals("")) {
             return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country.toUpperCase());
@@ -157,6 +158,13 @@ public class SiteServiceImpl implements SiteService {
         } else {
             site.setActive(false);
         }
+    }
+
+    @Override
+    public StoreSite storeLogin(Long id, String siteCode) {
+        StoreSite store = em.createQuery("SELECT s FROM StoreSite s WHERE s.id = :id AND s.siteCode = :siteCode", StoreSite.class)
+                .setParameter("id", id).setParameter("siteCode", siteCode).getSingleResult();
+        return store;
     }
 
     @Override
@@ -258,8 +266,10 @@ public class SiteServiceImpl implements SiteService {
         String SKUCode = productItem.getProductSKU();
         String modelCode = SKUCode.split("-")[0];
         stockLevel.getProductItems().add(productItem);
-        stockLevel.getProducts().put(SKUCode, stockLevel.getProducts().get(SKUCode) != null ? stockLevel.getProducts().get(SKUCode) + 1 : 1);
-        stockLevel.getModels().put(modelCode, stockLevel.getModels().get(modelCode) != null ? stockLevel.getModels().get(modelCode) + 1 : 1);
+        stockLevel.getProducts().put(SKUCode,
+                stockLevel.getProducts().get(SKUCode) != null ? stockLevel.getProducts().get(SKUCode) + 1 : 1);
+        stockLevel.getModels().put(modelCode,
+                stockLevel.getModels().get(modelCode) != null ? stockLevel.getModels().get(modelCode) + 1 : 1);
         em.merge(stockLevel);
         em.merge(productItem);
     }

@@ -80,38 +80,68 @@ public class DataLoader implements CommandLineRunner {
                 ar.add(AccessRights.MARKETING_BASIC);
                 ar.add(AccessRights.MARKETING_CRM);
                 JobTitle jobTitle1 = new JobTitle("Sales", "Sales and Marketing Product", ar);
-                adminService.createJobTitle(jobTitle1);
+                em.persist(jobTitle1);
 
                 Set<AccessRights> ar2 = new HashSet<>();
                 ar2.add(AccessRights.STORE_BASIC);
                 ar2.add(AccessRights.STORE_INVENTORY);
-                JobTitle jobTitle2 = new JobTitle("Store Manager", "Managnig the physical store", ar2);
+                JobTitle jobTitle2 = new JobTitle("Store Manager", "Managing the physical store", ar2);
                 em.persist(jobTitle2);
-                adminService.createJobTitle(jobTitle2);
 
                 Set<AccessRights> ar3 = new HashSet<>();
                 ar2.add(AccessRights.WAREHOUSE_BASIC);
                 ar2.add(AccessRights.WAREHOUSE_ORDER);
-                JobTitle jobTitle3 = new JobTitle("Manufacturing Manager", "Managnig the products production", ar3);
+                JobTitle jobTitle3 = new JobTitle("Manufacturing Manager", "Managing the products production", ar3);
                 em.persist(jobTitle3);
-                adminService.createJobTitle(jobTitle3);
+
+                Set<AccessRights> ar4 = new HashSet<>();
+                ar4.add(AccessRights.MARKETING_BASIC);
+                ar4.add(AccessRights.MARKETING_CRM);
+                ar4.add(AccessRights.STORE_BASIC);
+                ar4.add(AccessRights.STORE_INVENTORY);
+                ar4.add(AccessRights.WAREHOUSE_BASIC);
+                ar4.add(AccessRights.WAREHOUSE_ORDER);
+                ar4.add(AccessRights.MANUFACTURING_BASIC);
+                ar4.add(AccessRights.SYSADMIN_BASIC);
+                ar4.add(AccessRights.SYSADMIN_COMPANY);
+                ar4.add(AccessRights.SYSADMIN_EMPLOYEE);
+                JobTitle jobTitle4 = new JobTitle("IT Admin", "Managing all IT", ar4);
+                em.persist(jobTitle4);
 
                 //Department
                 Department sam = new Department("Sales and Marketing");
                 List<JobTitle> jt = new ArrayList<>();
-                jt.add(adminService.getJobTitleById(Long.valueOf(1)));
+                jt.add(jobTitle1);
                 sam.setJobTitles(jt);
                 adminService.createDepartment(sam);
 
                 Department sam2 = new Department("Online Marketing");
-                sam.setJobTitles(jt);
+                sam2.setJobTitles(jt);
                 adminService.createDepartment(sam2);
 
-                Department sam3 = new Department("Manufacturing");
+                Department store1 = new Department("Storefront");
+                List<JobTitle> jt2 = new ArrayList<>();
+                jt2.add(jobTitle2);
+                store1.setJobTitles(jt2);
+                adminService.createDepartment(store1);
+
+                Department mf1 = new Department("Manufacturing");
                 List<JobTitle> jt3 = new ArrayList<>();
-                jt3.add(adminService.getJobTitleById(Long.valueOf(3)));
-                sam.setJobTitles(jt3);
-                adminService.createDepartment(sam3);
+                jt3.add(jobTitle3);
+                mf1.setJobTitles(jt3);
+                adminService.createDepartment(mf1);
+
+                Department wh1 = new Department("Warehouse");
+                List<JobTitle> jt4 = new ArrayList<>();
+                jt4.add(jobTitle3);
+                wh1.setJobTitles(jt4);
+                adminService.createDepartment(wh1);
+
+                Department adm = new Department("IT");
+                List<JobTitle> jt5 = new ArrayList<>();
+                jt5.add(jobTitle4);
+                adm.setJobTitles(jt5);
+                adminService.createDepartment(adm);
 
                 //Vendor
                 Address a2 = new Address(Country.Singapore, "Singapore", "Kewalram House", "Singapore", "02-01",
@@ -155,6 +185,14 @@ public class DataLoader implements CommandLineRunner {
                 e.setCompany(adminService.getCompanyById(Long.valueOf(1)));
                 employeeService.createEmployee(e);
 
+                Employee e2 = new Employee("Darth Vader", "darthV", "password");
+                e2.setEmail("darth.vader@gmail.com");
+                e2.setSalary(5678.90);
+                e2.setPayType(PayType.MONTHLY);
+                e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(4))); 
+                e2.setDepartment(adminService.getDepartmentById(Long.valueOf(6)));
+                e2.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+                employeeService.createEmployee(e2);
 
                 // Adding Sites
                 HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", "+65-63610056", iora);

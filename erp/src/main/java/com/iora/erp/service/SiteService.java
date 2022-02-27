@@ -8,6 +8,7 @@ import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
+import com.iora.erp.model.site.StoreSite;
 
 public interface SiteService {
     public abstract Site createSite(Site site, String siteType);
@@ -21,6 +22,7 @@ public interface SiteService {
     public abstract List<? extends Site> searchWarehouses(String country, String company);
     public abstract Site updateSite(Site site);
     public abstract void deleteSite(Long id);
+    public abstract StoreSite storeLogin(Long id, String password);
 
     public abstract Site getSiteFromStockLevel(Long stockLevelId);
 

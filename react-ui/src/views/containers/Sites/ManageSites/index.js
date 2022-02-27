@@ -2,11 +2,7 @@ import { Link } from "react-router-dom";
 import { SitesList } from "../SitesList";
 import { classNames } from "../../../../utilities/Util";
 import { useState } from "react";
-
-const tabs = [
-  { name: "Sites", href: "/ad/sites", current: true },
-  { name: "Companies", href: "/ad/companies", current: false },
-];
+import { tabs } from "../../Index/AdminIndex";
 
 const Header = () => {
   const [currTab, setCurrTab] = useState(0);
@@ -46,35 +42,21 @@ const Header = () => {
         <div className="ml-3">
           <div className="sm:block">
             <nav className="-mb-px flex space-x-8">
-              <Link
-                key={tabs[0].name}
-                to={tabs[0].href}
-                className={classNames(
-                  tabs[0].current
-                    ? "border-cyan-500 text-cyan-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-                  "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
-                )}
-                aria-current={tabs[0].current ? "page" : undefined}
-                onClick={() => changeTab(0)}
-              >
-                {tabs[0].name}
-              </Link>
-
-              <Link
-                key={tabs[1].name}
-                to={tabs[1].href}
-                className={classNames(
-                  tabs[1].current
-                    ? "border-cyan-500 text-cyan-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-                  "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
-                )}
-                aria-current={tabs[1].current ? "page" : undefined}
-                onClick={() => changeTab(1)}
-              >
-                {tabs[1].name}
-              </Link>
+              {tabs.map(tab =>
+                <Link
+                  key={tab.name}
+                  to={tab.href}
+                  className={classNames(
+                    tab.current
+                      ? "border-cyan-500 text-cyan-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
+                    "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
+                  )}
+                  aria-current={tabs[0].current ? "page" : undefined}
+                  onClick={() => changeTab(0)}
+                >
+                  {tab.name}
+                </Link>)}
             </nav>
           </div>
         </div>

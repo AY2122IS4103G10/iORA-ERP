@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { DepartmentList } from "../DepartmentList";
+import { VendorList } from "../VendorList";
 import { classNames } from "../../../../utilities/Util";
+import { useState } from "react";
 import { tabs } from "../../Index/AdminIndex";
 
 const Header = () => {
@@ -22,19 +22,19 @@ const Header = () => {
                     alt=""
                   />
                   <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                    Departments
+                    Vendors
                   </h1>
                 </div>
               </div>
             </div>
           </div>
           <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-            <Link to="/ad/department/create">
+            <Link to="/ad/vendors/create">
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
               >
-                Create New Department
+                Add vendor
               </button>
             </Link>
           </div>
@@ -65,11 +65,11 @@ const Header = () => {
   );
 };
 
-export const ManageDepartment = () => {
+export const ManageVendors = () => {
   return (
     <>
       {<Header />}
-      {<DepartmentList />}
+      {<VendorList />}
     </>
   );
 };

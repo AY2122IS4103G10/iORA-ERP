@@ -77,13 +77,15 @@ const OrderList = ({
                             type="button"
                             className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                         >
-                            Checkout
+                            {localStorage.getItem("customer") === null ? <>Checkout as Guest</> : <>Checkout as {JSON.parse(localStorage.customer).firstName}</>}
                         </button>
                         <button
                             type="button"
                             className="w-full mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                             onClick={() => {
-                                window.confirm('Are you sure you want to cancel?') && navigate("/ss")
+                                window.confirm('Are you sure you want to cancel?') && 
+                                localStorage.clear()
+                                navigate("/ss")
                             }}
                         >
                             Cancel

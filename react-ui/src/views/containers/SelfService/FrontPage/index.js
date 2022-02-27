@@ -1,12 +1,16 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from '@headlessui/react'
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { getCustomerByPhone } from "../../../../stores/slices/customerSlice";
 
 const MemberModal = ({
     cancelButtonRef,
     openMemberModal,
-    setOpenMemberModal
+    setOpenMemberModal,
+    phone,
+    onPhoneChanged,
+    memberClicked
 }) => (
     <Transition.Root show={openMemberModal} as={Fragment}>
         <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={cancelButtonRef} onClose={() => setOpenMemberModal(false)}>
@@ -24,7 +28,7 @@ const MemberModal = ({
                 </Transition.Child>
 
                 {/* This element is to trick the browser into centering the modal contents. */}
-                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+                <span className="hidden sm:align-middle sm:h-screen" aria-hidden="true">
                     &#8203;
                 </span>
                 <Transition.Child
@@ -50,6 +54,7 @@ const MemberModal = ({
                                                     type="text"
                                                     name="phone"
                                                     id="phone"
+                                                    autoComplete="phone"
                                                     className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                                     placeholder="91234567"
                                                     value={phone}
@@ -64,7 +69,7 @@ const MemberModal = ({
                             </div>
                             <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                 <button
-                                    type="button"
+                                    type="submit"
                                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
                                     onClick={memberClicked}
                                 >
@@ -93,7 +98,7 @@ const Page = ({
     <div className="grid gap-5 mt-20">
         <div className="max-w-3xl mx-auto">
             <img
-                className="mx-auto h-12 w-auto mb-5"
+                className="mx-auto h-20 w-50 mb-5"
                 src="android-chrome-512x512.png"
                 alt="iORA"
             />
@@ -124,25 +129,42 @@ export function FrontPage() {
     const [openMemberModal, setOpenMemberModal] = useState(false);
     const [phone, setPhone] = useState("");
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const cancelButtonRef = useRef(null);
 
     const onPhoneChanged = (e) => setPhone(e.target.value);
 
     const memberClicked = (evt) => {
         evt.preventDefault();
-        dispatchEvent(getCustomerByPhone(phone))
+        dispatch(getCustomerByPhone(phone))
             .unwrap()
-            .then(//.....)
+            .then((data) => {
+                window.localStorage.setItem("customer", JSON.stringify(data));
+            })
+            .then(wait())
+
+        function wait() {
+            if (localStorage.getItem("customer") !== null) {
+                navigate("order")
+            } else {
+                setTimeout(wait, 0);
+            }
+        }
     }
 
     return (
         <>
             <Page
-                setOpenMemberModal={setOpenMemberModal} />
+                setOpenMemberModal={setOpenMemberModal}
+            />
             <MemberModal
                 cancelButtonRef={cancelButtonRef}
                 openMemberModal={openMemberModal}
-                setOpenMemberModal={setOpenMemberModal} />
+                setOpenMemberModal={setOpenMemberModal}
+                phone={phone}
+                onPhoneChanged={onPhoneChanged}
+                memberClicked={memberClicked} />
         </>
     )
 }

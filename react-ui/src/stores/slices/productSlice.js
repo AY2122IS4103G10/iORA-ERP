@@ -142,7 +142,6 @@ const productSlice = createSlice({
         existingProd.products = products;
         existingProd.productFields = productFields;
       }
-      // state.status = "idle";
     });
     builder.addCase(deleteExistingProduct.fulfilled, (state, action) => {
       state.products = state.products.filter(

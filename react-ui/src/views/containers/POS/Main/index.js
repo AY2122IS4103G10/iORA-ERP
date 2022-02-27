@@ -1,6 +1,6 @@
 import {Link, useLocation, useMatch} from "react-router-dom";
-import {useState} from "react";
-import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
+import {useState, useSelector, useEffect, useMemo} from "react";
+import {posApi} from "../../../../environments/Api";
 import {EditableCell, SimpleTable} from "../../../components/Tables/SimpleTable";
 
 const exitButton = () => {
@@ -71,14 +71,33 @@ const header = () => {
   );
 };
 
-const orderTable = (siteId) => {
-  const data = useSelector(fetchSiteOrders);
-  const posStatus = useSelector((state) => state.pos.status);
-  const error = useSelector((state) => state.site.error);
-
-  useEffect(() => {
-    procurementsStatus === "idle" && dispatch(fetchProcurements());
-  }, [procurementsStatus, dispatch]);
+export const OrderTable = ({data}) => {
+  //const [site, setSite] = u
+  /*const columns = useMemo(
+    () => [
+      {
+        Header: "OrderId",
+        accessor: "",
+      },
+      {
+        Header: "Name",
+        accessor: "name",
+      },
+      {
+        Header: "Company",
+        accessor: (row) => row.company.name,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Country",
+        accessor: (row) => row.address.country,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+    ],
+    []
+  );*/
 
   return (
     <div class="flex flex-col">
@@ -140,14 +159,21 @@ const orderTable = (siteId) => {
   );
 };
 
-export const PosMain = () => {
-  const [siteId, setSiteId] = useState();
+export const PosMain = (site) => {
+  const siteId = useState(site);
+  const [order, setOrder] = useState([]);
+
+  useEffect(() => {
+    posApi.getOrders("/store/customerOrder/", siteId).then((response) => {
+      setOrder(response.data);
+    });
+  }, [siteId]);
 
   return (
     <>
       <div className="bg-white shadow">{header()}</div>
-      <div class="w-10/12 md:container md:mx-auto">
-        <div className="pt-10">{orderTable()}</div>
+      <div class="w-10/12 py-10 md:container md:mx-auto">
+        <OrderTable data={order} />
       </div>
     </>
   );

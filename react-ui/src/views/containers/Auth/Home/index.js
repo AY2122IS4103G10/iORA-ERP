@@ -68,6 +68,7 @@ const stats = [
   { label: "Sick days left", value: 4 },
   { label: "Personal days left", value: 2 },
 ];
+import accessRightsMap from "../../../../constants/accessRightsPaths";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -138,8 +139,8 @@ export function Home() {
 
 
 
+const Header = ({ name, jobTitle, stats }) => {
   return (
-    <>
       <div className="rounded-lg bg-white overflow-hidden shadow">
         <h2 className="sr-only" id="profile-overview-title">
           Profile Overview
@@ -150,7 +151,7 @@ export function Home() {
               <div className="flex-shrink-0">
                 <img
                   className="mx-auto h-20 w-20 rounded-full"
-                  src={user.imageUrl}
+                  src={"https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
                   alt=""
                 />
               </div>
@@ -159,9 +160,9 @@ export function Home() {
                   Welcome back,
                 </p>
                 <p className="text-xl font-bold text-gray-900 sm:text-2xl">
-                  {user.name}
+                  {name}
                 </p>
-                <p className="text-sm font-medium text-gray-600">{user.role}</p>
+                <p className="text-sm font-medium text-gray-600">{jobTitle}</p>
               </div>
             </div>
             <div className="mt-5 flex justify-center sm:mt-0">
@@ -174,19 +175,25 @@ export function Home() {
             </div>
           </div>
         </div>
-        <div className="border-t border-gray-200 bg-gray-50 grid grid-cols-1 divide-y divide-gray-200 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+        <div className="border-t border-gray-200 bg-gray-100 grid grid-cols-1 divide-y divide-gray-200 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
           {stats.map((stat) => (
             <div
               key={stat.label}
               className="px-6 py-5 text-sm font-medium text-center"
             >
-              <span className="text-gray-900">{stat.value}</span>{" "}
-              <span className="text-gray-600">{stat.label}</span>
+              <span className="text-gray-900">{stat.label}</span>{": "}
+              <span className="text-gray-600">{stat.value}</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="rounded-lg bg-gray-200 overflow-hidden shadow divide-y divide-gray-200 sm:divide-y-0 sm:grid sm:grid-cols-2 sm:gap-px">
+  );
+}
+
+const Tiles = ({actions}) => {
+  return (
+    <>
+    <div className="rounded-lg bg-gray-100 overflow-hidden divide-y divide-gray-200 sm:divide-y-0 sm:grid sm:grid-cols-2 sm:gap-px">
         {actions.map((action, actionIdx) => (
           <div
             key={action.title}
@@ -199,7 +206,7 @@ export function Home() {
               actionIdx === actions.length - 1
                 ? "rounded-bl-lg rounded-br-lg sm:rounded-bl-none"
                 : "",
-              "relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500"
+              "relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 m-4 "
             )}
           >
             <div>
@@ -254,4 +261,69 @@ export function Home() {
         handleEnterStore={handleEnterStore}/>
     </>
   );
+  )
+}
+
+const paths = [
+  {
+    title: "Sales and Marketing",
+    href: "/sm",
+    icon: UsersIcon,
+    iconForeground: "text-indigo-700",
+    iconBackground: "bg-indigo-50",
+    description:
+      "View and modify product inventories. Access Customer Relations Management. Launch Procurement Orders.",
+  },
+  {
+    title: "Administrator",
+    href: "/ad",
+    icon: FolderOpenIcon,
+    iconForeground: "text-pink-700",
+    iconBackground: "bg-pink-50",
+    description:
+      "Access and edit business profiles of companies, departments, vendors, job titles and access rights.",
+  },
+  {
+    title: "Manufacturing",
+    href: "/mf",
+    icon: CogIcon,
+    iconForeground: "text-yellow-700",
+    iconBackground: "bg-yellow-50",
+    description: "Assist procurement orders and view all updates.",
+  },
+  {
+    title: "Warehouse",
+    href: "#",
+    icon: TruckIcon,
+    iconForeground: "text-teal-700",
+    iconBackground: "bg-teal-50",
+    description:
+      "Search product inventories and stock levels to assist in logistics and movement as well as deliveries.",
+  },
+  {
+    title: "Store",
+    href: "/str",
+    icon: ShoppingBagIcon,
+    iconForeground: "text-rose-700",
+    iconBackground: "bg-rose-50",
+    description:
+      "Click here for the Point-of-Sale system and pages to view the store's stock.",
+  },
+];
+
+export function Home() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const stats = [
+    { label: "Company", value: user.company.name },
+    { label: "Department", value: user.department.deptName },
+    { label: `${user.payType.slice(0,1)}${user.payType.slice(1).toLowerCase()} Salary`, value: user.salary },
+  ];
+  const availablePaths = accessRightsMap(user.jobTitle.responsibility).map(x => paths[x]);
+
+  return (
+    <>
+      <Header jobTitle={user.jobTitle.description} name={user.name} stats={stats}/>
+      <Tiles actions={availablePaths}/>
+    </>
+  )
 }

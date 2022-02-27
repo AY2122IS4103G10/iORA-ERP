@@ -23,11 +23,13 @@ public class StockTransferOrderLI {
     @ManyToOne
     private Product product;
 
-    private Integer requestedQty;
+    @Transient
+    private int requestedQty;
     @OneToMany
     private List<ProductItem> requestedProductItems;
 
-    private Integer actualQty;
+    @Transient
+    private int actualQty;
     @OneToMany
     private List<ProductItem> actualProductItems;
 
@@ -47,11 +49,11 @@ public class StockTransferOrderLI {
         this.product = product;
     }
 
-    public Integer getRequestedQty() {
+    public int getRequestedQty() {
         return this.requestedQty;
     }
 
-    public void setRequestedQty(Integer requestedQty) {
+    public void setRequestedQty(int requestedQty) {
         this.requestedQty = requestedQty;
     }
 
@@ -63,11 +65,11 @@ public class StockTransferOrderLI {
         this.requestedProductItems = requestedProductItems;
     }
 
-    public Integer getActualQty() {
+    public int getActualQty() {
         return this.actualQty;
     }
 
-    public void setActualQty(Integer actualQty) {
+    public void setActualQty(int actualQty) {
         this.actualQty = actualQty;
     }
 

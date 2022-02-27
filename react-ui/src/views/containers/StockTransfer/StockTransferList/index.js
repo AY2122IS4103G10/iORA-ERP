@@ -6,22 +6,18 @@ import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { SelectableTable, SelectColumnFilter } from "../../../components/Tables/SelectableTable";
 
 
-const cols = [
+const columns = [
     {
         Header: "Id",
         accessor: "id",
     },
     {
         Header: "From",
-        accessor: "fromSite.name",
-        Filter: SelectColumnFilter,
-        filter: "includes"
+        accessor: "from",
     },
     {
         Header: "To",
-        accessor: "toSite.name",
-        Filter: SelectColumnFilter,
-        filter: "includes",
+        accessor: "to",
     },
     {
         Header: "Status",

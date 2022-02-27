@@ -62,11 +62,11 @@ export const PosOrder = () => {
   return (
     <>
       <div className="bg-white shadow">{header()}</div>
-      <main className="max-w-10xl mx-auto pt-8 pb-24 sm:pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
+      <main className="w-10/12 pt-8 pb-24">
         <button
           type="button"
-          className="inline-flex items-right px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-          Button text
+          className="justify-end items-right px-10 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Add
         </button>
       </main>
     </>

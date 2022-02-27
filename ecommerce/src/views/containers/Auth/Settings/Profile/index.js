@@ -2,44 +2,62 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser, updateAccount } from "../../../../../stores/slices/userSlice";
-import { useEffect } from "react";
+import {
+  selectUser,
+  updateAccount,
+} from "../../../../../stores/slices/userSlice";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export const Profile = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const user = useSelector(selectUser);
-  const [firstName, setFirstName] = useState(user.firstName);
-  const [lastName, setLastName] = useState(user.lastName);
-  const [contactNo, setContactNo] = useState(user.contactNumber);
-  const [dob, setDob] = useState(user.dob);
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [contactNo, setContactNo] = useState("");
+  const [dob, setDob] = useState(null);
 
   const onFirstNameChanged = (e) => setFirstName(e.target.value);
   const onLastNameChanged = (e) => setLastName(e.target.value);
   const onContactNoChanged = (e) => setContactNo(e.target.value);
   const onDobChanged = (date) => setDob(date);
 
-  const onSaveClicked = () => {
-    dispatch(updateAccount({
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName);
+      setLastName(user.lastName);
+      setContactNo(user.contactNumber);
+      setDob(user.dob);
+    }
+  }, [user]);
+
+  const onSaveClicked = (evt) => {
+    evt.preventDefault();
+    console.log({
       ...user,
       firstName,
       lastName,
       dob,
       contactNumber: contactNo,
-    }))
+    });
+    dispatch(
+      updateAccount({
+        ...user,
+        firstName,
+        lastName,
+        dob,
+        contactNumber: contactNo,
+      })
+    )
       .then((data) => {
-        // data.password = password;
-        localStorage.setItem("user", JSON.stringify(data));
-        setFirstName("");
-        setLastName("");
-        setContactNo("");
-        setDob("");
-        alert("Successfully created account.");
+        alert("Successfully updated account details.");
         data.id !== -1 && navigate("/");
       })
-      // .then(() => navigate("/"))
-  }
+      .catch((err) => console.error(err));
+    // .then(() => navigate("/"))
+  };
   return (
     <div className="space-y-6 sm:px-6 lg:px-0 lg:col-span-9">
       <section aria-labelledby="payment-details-heading">
@@ -132,7 +150,7 @@ export const Profile = () => {
             <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
               <button
                 type="submit"
-                className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Save
               </button>

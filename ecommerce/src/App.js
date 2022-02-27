@@ -6,6 +6,7 @@ import { Cart } from "./views/containers/Cart";
 import { ECIndex } from "./views/containers/Index/ECIndex";
 import { SettingsIndex } from "./views/containers/Index/SettingsIndex";
 import { Account } from "./views/containers/Auth/Settings/Account";
+import { Auth } from "./views/containers/Auth/Auth";
 
 function App() {
   return (
@@ -14,11 +15,18 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/" element={<ECIndex />}>
+        <Route
+          path="/"
+          element={
+            <Auth>
+              <ECIndex />
+            </Auth>
+          }
+        >
           <Route index element={<Cart />} />
-          <Route path="settings" element={<SettingsIndex />} >
-            <Route path="profile" element={<Profile />}/ >
-            <Route path="account" element={<Account />}/ >
+          <Route path="settings" element={<SettingsIndex />}>
+            <Route path="profile" element={<Profile />} />
+            <Route path="account" element={<Account />} />
           </Route>
         </Route>
         <Route

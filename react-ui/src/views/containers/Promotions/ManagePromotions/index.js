@@ -16,53 +16,6 @@ const tabs = [
   { name: "Promotions", href: "/sm/products/promotions", current: true },
 ];
 
-const modelListColumns = [
-  [
-    {
-      Header: "Product Code",
-      accessor: "modelCode",
-      Cell: (e) => (
-        <Link
-          to={`/sm/products/${e.value}`}
-          className="hover:text-gray-700 hover:underline"
-        >
-          {e.value}
-        </Link>
-      ),
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-    },
-    {
-      Header: "Color",
-      accessor: (row) =>
-        row.productFields
-          .filter((field) => field.fieldName === "COLOUR")
-          .map((field) => field.fieldValue)
-          .join(", "),
-    },
-    {
-      Header: "Size",
-      accessor: (row) =>
-        row.productFields
-          .filter((field) => field.fieldName === "SIZE")
-          .map((field) => field.fieldValue)
-          .join(", "),
-    },
-    {
-      Header: "List Price",
-      accessor: "price",
-      Cell: (e) => `$${e.value}`,
-    },
-    {
-      Header: "Available",
-      accessor: "available",
-      Cell: (e) => (e.value ? "Yes" : "No"),
-    },
-  ],
-];
-
 const PromoModal = ({
   open,
   closeModal,

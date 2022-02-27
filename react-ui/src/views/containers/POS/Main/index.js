@@ -72,13 +72,13 @@ const header = () => {
 };
 
 const orderTable = (siteId) => {
-  const data = useSelector(fetchSiteOrders);
+  /*const data = useSelector(fetchSiteOrders);
   const posStatus = useSelector((state) => state.pos.status);
   const error = useSelector((state) => state.site.error);
 
   useEffect(() => {
     procurementsStatus === "idle" && dispatch(fetchProcurements());
-  }, [procurementsStatus, dispatch]);
+  }, [procurementsStatus, dispatch]);*/
 
   return (
     <div class="flex flex-col">

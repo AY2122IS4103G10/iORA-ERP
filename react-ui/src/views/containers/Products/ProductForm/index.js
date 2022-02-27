@@ -226,7 +226,7 @@ const AddProductFormBody = ({
         {/* Form */}
         <section aria-labelledby="product-form">
           <div className="rounded-lg bg-white overflow-hidden shadow">
-            <form>
+            <form onSubmit={onSaveClicked}>
               <div className="p-8 space-y-8 divide-y divide-gray-200">
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
@@ -365,7 +365,6 @@ const AddProductFormBody = ({
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={onSaveClicked}
                     >
                       {!isEditing ? "Add" : "Save"} product
                     </button>
@@ -492,7 +491,6 @@ export const ProductForm = () => {
   const [catCheckedState, setCatCheckedState] = useState(
     new Array(categories.length).fill(false)
   );
-  // const [company, setCompany] = useState(!isEditing ? "" : product.company);
 
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
@@ -502,7 +500,6 @@ export const ProductForm = () => {
     setOnlineOnly(!onlineOnly);
   };
   const onAvailableChanged = () => setAvailable(!available);
-  // const onCompanyChanged = (e) => setCompany(e.target.value);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
       index === pos ? !item : item

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import {
   addNewVouchers,
@@ -27,7 +27,7 @@ const VoucherFormBody = ({
         {/* Form */}
         <section aria-labelledby="profile-overview-title">
           <div className="rounded-lg bg-white overflow-hidden shadow">
-            <form>
+            <form onSubmit={onAddVoucherClicked}>
               <div className="p-8 space-y-8 divide-y divide-gray-200">
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
@@ -108,7 +108,6 @@ const VoucherFormBody = ({
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={onAddVoucherClicked}
                     >
                       Add vouchers
                     </button>

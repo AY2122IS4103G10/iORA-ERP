@@ -1,4 +1,7 @@
-import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link, useLocation } from "react-router-dom";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { StockTransferList } from "../StockTransferList";
 
 const Header = () => {
   return (
@@ -28,10 +31,12 @@ const Header = () => {
   );
 };
 
-export const ManageStockTransfer = () => {
+export const ManageStockTransfer = (subsys) => {
+
   return (
     <>
       {<Header />}
+      {<StockTransferList subsys={subsys}/>}
     </>
   );
 };

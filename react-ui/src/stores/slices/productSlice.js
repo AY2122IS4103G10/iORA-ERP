@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { Profiler } from "react";
 import { api } from "../../environments/Api";
 
 const initialState = {

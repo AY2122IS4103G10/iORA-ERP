@@ -61,7 +61,7 @@ export const MyStoreStock = (subsys) => {
       // dispatch(getASiteStock(id)); 
     }, [])
     
-    const path = `/${subsys.subsys}/stocklevels/my`;
+    const path = `/${subsys.subsys.subsys}/stocklevels/my`;
 
     return(
       <>

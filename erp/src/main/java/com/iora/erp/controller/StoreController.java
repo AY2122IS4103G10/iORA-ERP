@@ -18,6 +18,7 @@ import com.iora.erp.service.StockTransferService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -86,16 +87,17 @@ public class StoreController {
         if (errors.isEmpty()) {
             return ResponseEntity.ok("Transaction successful");
         } else {
+            System.out.println("Error" + String.join("\n", errors));
             return ResponseEntity.badRequest().body(String.join("\n", errors));
         }
     }
 
-    @GetMapping(path = "/stockTransferOrder/all", produces = "application/json")
+    @GetMapping(path = "/stockTransfer/all", produces = "application/json")
     public List<StockTransferOrder> getStockTransferOrders() {
         return stockTransferService.getStockTransferOrders();
     }
 
-    @GetMapping(path = "/stockTransferOrder/{orderId}", produces = "application/json")
+    @GetMapping(path = "/stockTransfer/{orderId}", produces = "application/json")
     public ResponseEntity<Object> getStockTransferOrderByOrderId(@PathVariable Long orderId) {
         try {
             return ResponseEntity.ok(stockTransferService.getStockTransferOrder(orderId));
@@ -104,12 +106,91 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransferOrder/complete/{orderId}/{siteId}")
+    @GetMapping(path = "/stockTransfer/site/{siteId}", produces = "application/json")
+    public List<StockTransferOrder> getStockTransferOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return stockTransferService.getStockTransferOrderOfSite(site);
+    }
+
+    @PostMapping(path = "/stockTransfer/create/{siteId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
+            @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.createStockTransferOrder(stockTransferOrder, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/update/{siteId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> updateStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
+            @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.updateStockTransferOrder(stockTransferOrder, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/stockTransfer/cancel/{orderId}/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> cancelStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.cancelStockTransferOrder(orderId, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/reject/{orderId}/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> rejectStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.rejectStockTransferOrder(orderId, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/confirm/{orderId}/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> confirmStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.confirmStockTransferOrder(orderId, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/ready/{siteId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> fulfilStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
+            @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.fulfilStockTransferOrder(stockTransferOrder, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/deliver/{siteId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> deliverStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
+            @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.deliverStockTransferOrder(stockTransferOrder, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/complete/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> completeStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            stockTransferService.completeStockTransferOrder(orderId, siteId);
             return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
+                    .ok(stockTransferService.completeStockTransferOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

@@ -13,16 +13,16 @@ const tabs = [
   ]
 
 
-export const ViewStockLevels = () => {
+export const ViewStockLevels = (subsys) => {
 
     return (
       <>
         <SectionHeading header="Stock Levels" tabs={tabs}/>
         <Routes>
-            <Route path="sites" element={<SiteStocks subsys="sm"/>}/>
-            <Route path="products" element={<ProductStocks subsys="sm"/>}/>
+            <Route path="sites" element={<SiteStocks subsys={subsys}/>}/>
+            <Route path="products" element={<ProductStocks subsys={subsys}/>}/>
             <Route path=":id" element={<AsiteStock/>} />
-            <Route path="products/:id" element={<AProductStock subsys="sm"/>}/>
+            <Route path="products/:id" element={<AProductStock subsys={subsys}/>}/>
         </Routes>
       </>
     );

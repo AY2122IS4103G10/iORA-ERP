@@ -42,16 +42,16 @@ export default function SimpleSelectMenu({
               leaveTo="opacity-0"
             >
               <Listbox.Options className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                {options.map((person) => (
+                {options.map((option) => (
                   <Listbox.Option
-                    key={person.id}
+                    key={option.id}
                     className={({ active }) =>
                       classNames(
                         active ? "text-white bg-cyan-600" : "text-gray-900",
                         "cursor-default select-none relative py-2 pl-3 pr-9"
                       )
                     }
-                    value={person}
+                    value={option}
                   >
                     {({ selected, active }) => (
                       <>
@@ -61,7 +61,7 @@ export default function SimpleSelectMenu({
                             "block truncate"
                           )}
                         >
-                          {person.name}
+                          {option.name}
                         </span>
 
                         {selected ? (

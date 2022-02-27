@@ -48,14 +48,10 @@ const CompanyFormBody = ({
   onLatitudeChanged,
   longitude,
   onLongitudeChanged,
+  billing,
+  onBillingChanged,
   onAddCompanyClicked,
   onCancelClicked,
-  siteTypeSelected,
-  setSiteTypeSelected,
-  siteTypes,
-  companySelected,
-  setCompanySelected,
-  companies,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">{!isEditing ? "Add" : "Edit"} New Company</h1>
@@ -136,6 +132,8 @@ const CompanyFormBody = ({
                       onLatitudeChanged={onLatitudeChanged}
                       longitude={longitude}
                       onLongitudeChanged={onLongitudeChanged}
+                      billing={billing}
+                      onBillingChanged={onBillingChanged}
                     />
                   </div>
                 </div>
@@ -179,6 +177,7 @@ export const CompanyForm = () => {
   const [postalCode, setPostalCode] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [billing, setBilling] = useState(false);
   const [registerNo, setRegisterNo] = useState("");
   const [phone, setPhone] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -198,6 +197,7 @@ export const CompanyForm = () => {
   const onPostalCodeChanged = (e) => setPostalCode(e.target.value);
   const onLatitudeChanged = (e) => setLatitude(e.target.value);
   const onLongitudeChanged = (e) => setLongitude(e.target.value);
+  const onBillingChanged = () => setBilling(!billing);
 
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
@@ -220,7 +220,9 @@ export const CompanyForm = () => {
     console.log({
       name,
       address: {
-        country,
+        country:
+          country.charAt(0).toUpperCase() +
+          country.slice(1).toLowerCase(),
         city,
         building,
         state,
@@ -228,12 +230,14 @@ export const CompanyForm = () => {
         road: address1,
         postalCode,
         billing: false,
-        latitude,
-        longitude,
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
       },
-      registerNo,
-      phoneNumber: phone,
+      registerNumber: registerNo,
+      telephone: phone,
       active: true,
+      departments: [],
+      vendors: [],
     });
     if (canAdd)
       try {
@@ -253,12 +257,14 @@ export const CompanyForm = () => {
                 road: address1,
                 postalCode,
                 billing: false,
-                latitude,
-                longitude,
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude),
               },
               registerNumber: registerNo,
               telephone: phone,
               active: true,
+              departments: [],
+              vendors: [],
             })
           )
             .unwrap()
@@ -286,6 +292,8 @@ export const CompanyForm = () => {
               registerNumber: registerNo,
               telephone: phone,
               active: true,
+              departments: [],
+              vendors: [],
             })
           )
             .unwrap()
@@ -352,6 +360,8 @@ export const CompanyForm = () => {
       onLatitudeChanged={onLatitudeChanged}
       longitude={longitude}
       onLongitudeChanged={onLongitudeChanged}
+      billing={billing}
+      onBillingChanged={onBillingChanged}
       onAddCompanyClicked={onAddCompanyClicked}
       onCancelClicked={onCancelClicked}
       siteTypes={siteTypes}

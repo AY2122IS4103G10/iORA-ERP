@@ -50,7 +50,7 @@ export const AProductStock = (subsys) => {
   const prod = useSelector(selectAProduct);
   // const stockLevel = useSelector(selectProductSL);
   const sites = useSelector(selectAllSites);
-  
+
   useEffect(() => {
       dispatch(getAProduct(id));
       // dispatch(getProductStockLevel(id));

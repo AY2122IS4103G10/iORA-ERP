@@ -14,11 +14,6 @@ import {
   fetchProducts,
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
-
-import {
-  addNewProcurement,
-  updateExistingProcurement,
-} from "../../../../stores/slices/procurementSlice";
 import {
   fetchHeadquarters,
   fetchManufacturing,
@@ -99,16 +94,8 @@ const ProcurementItemsList = ({ data, setData }) => {
     };
     return [
       {
-        Header: "Product Code",
-        accessor: "modelCode",
-      },
-      {
         Header: "SKU",
         accessor: (row) => row.product.sku,
-      },
-      {
-        Header: "Name",
-        accessor: (row) => row.product.name,
       },
       {
         Header: "Color",
@@ -226,7 +213,7 @@ const ProcurementFormBody = ({
         <h1 className="sr-only">
           {!isEditing ? "New" : "Edit"} Procurement Order
         </h1>
-        <form className="p-8 space-y-8 divide-y divide-gray-200">
+        <form className="p-8 space-y-8 divide-y divide-gray-200" onSubmit={onAddOrderClicked}>
           <div className="space-y-8 divide-y divide-gray-200">
             <div>
               <div>
@@ -329,7 +316,6 @@ const ProcurementFormBody = ({
               <button
                 type="submit"
                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                onClick={onAddOrderClicked}
               >
                 {!isEditing ? "Create" : "Save"} order
               </button>
@@ -359,17 +345,18 @@ export const ProcurementForm = () => {
       name: model.name,
     }))
   );
-  const prodStatus = useSelector((state) => state.products.status);
+
   useEffect(() => {
-    prodStatus === "idle" && dispatch(fetchProducts());
-  }, [prodStatus, dispatch]);
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   const headquarters = useSelector(selectAllHeadquarters);
   const hq = headquarters[0];
   const hqStatus = useSelector((state) => state.sites.hqStatus);
+  
   useEffect(() => {
     hqStatus === "idle" &&
-      dispatch(fetchHeadquarters()).catch((err) => console.error(err));
+      dispatch(fetchHeadquarters())
   }, [hqStatus, dispatch]);
 
   useEffect(() => {
@@ -381,7 +368,7 @@ export const ProcurementForm = () => {
   const factoryStatus = useSelector((state) => state.sites.manStatus);
   useEffect(() => {
     factoryStatus === "idle" &&
-      dispatch(fetchManufacturing()).catch((err) => console.error(err));
+      dispatch(fetchManufacturing())
   }, [factoryStatus, dispatch]);
 
   useEffect(() => {
@@ -393,7 +380,7 @@ export const ProcurementForm = () => {
   const warehouseStatus = useSelector((state) => state.sites.warStatus);
   useEffect(() => {
     warehouseStatus === "idle" &&
-      dispatch(fetchWarehouse()).catch((err) => console.error(err));
+      dispatch(fetchWarehouse())
   }, [warehouseStatus, dispatch]);
 
   useEffect(() => {
@@ -420,62 +407,49 @@ export const ProcurementForm = () => {
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-
-  const canAdd =
-    [manufacturingSelected, warehouseSelected, lineItems].every(Boolean) &&
-    requestStatus === "idle";
+  const canAdd = [manufacturingSelected, warehouseSelected, lineItems].every(
+    Boolean
+  );
 
   const onAddOrderClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
-      try {
-        setRequestStatus("pending");
-        if (!isEditing)
-          dispatch(
-            addNewProcurement({
-              siteId: hqSelected.id,
-              initialProcurement: {
-                lineItems: lineItems.map(({ product, requestedQty }) => ({
-                  product,
-                  requestedQty,
-                })),
-                headquarters: hqSelected,
-                manufacturing: manufacturingSelected,
-                warehouse: warehouseSelected,
+      if (!isEditing)
+        api
+          .create(`sam/procurementOrder/create/${hqSelected.id}`, {
+            lineItems: lineItems.map(({ product, requestedQty }) => ({
+              product: {
+                sku: product.sku,
+                productFields: product.productFields,
               },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully created procurement order");
-              navigate("/sm/procurements");
-            });
-        else
-          dispatch(
-            updateExistingProcurement({
-              siteId: hqSelected.id,
-              existingProcurement: {
-                lineItems: lineItems.map(({ product, requestedQty }) => ({
-                  product,
-                  requestedQty,
-                })),
-                headquarters: hqSelected,
-                manufacturing: manufacturingSelected,
-                warehouse: warehouseSelected,
-              },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully updated procurement order");
-              navigate(`/sm/procurements/${orderId}`);
-            });
-      } catch (err) {
-        console.error("Failed to add procurement: ", err);
-      } finally {
-        setRequestStatus("idle");
-      }
+              requestedQty,
+            })),
+            headquarters: { id: hqSelected.id },
+            manufacturing: { id: manufacturingSelected.id },
+            warehouse: { id: warehouseSelected.id },
+          })
+          .then(() => {
+            alert("Successfully created procurement order");
+            navigate("/sm/procurements");
+          })
+          .catch((error) =>
+            console.error("Failed to create procurement: ", error.message)
+          );
+      else
+        api
+          .update(`sam/procurementOrder/update/${hqSelected.id}`, {
+            lineItems: lineItems.map(({ product, requestedQty }) => ({
+              product,
+              requestedQty,
+            })),
+          })
+          .then(() => {
+            alert("Successfully updated procurement order");
+            navigate(`/sm/procurements/${orderId}`);
+          })
+          .catch((error) =>
+            console.error("Failed to update procurement: ", error.message)
+          );
   };
 
   const onCancelClicked = () =>

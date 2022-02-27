@@ -261,15 +261,6 @@ public class SAMController {
         }
     }
 
-    @PostMapping(path = "/productItem/generate/{sku}/{qty}", produces = "application/json")
-    public ResponseEntity<Object> generateProductItems(@PathVariable String sku, @PathVariable int qty) {
-        try {
-            return ResponseEntity.ok(productService.generateProductItems(sku, qty));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
     @GetMapping(path = "/productItem/{rfid}", produces = "application/json")
     public ResponseEntity<Object> getProductItem(@PathVariable String rfid) {
         try {
@@ -360,7 +351,8 @@ public class SAMController {
     @DeleteMapping(path = "/voucher/delete/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> deleteVoucher(@PathVariable String voucherCode) {
         try {
-            return ResponseEntity.ok(customerService.deleteVoucher(voucherCode));
+            customerService.deleteVoucher(voucherCode);
+            return ResponseEntity.ok("Voucher with voucher code " + voucherCode + " has been deleted successfully.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -488,72 +480,6 @@ public class SAMController {
     public ResponseEntity<Object> completeProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
             return ResponseEntity.ok(procurementService.completeProcurementOrder(orderId, siteId));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @GetMapping(path = "/stockTransferOrder/all", produces = "application/json")
-    public List<StockTransferOrder> getStockTransferOrders() {
-        return stockTransferService.getStockTransferOrders();
-    }
-
-    @PostMapping(path = "/stockTransferOrder/create/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> createStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
-            @PathVariable Long siteId) {
-        try {
-            stockTransferService.createStockTransferOrder(stockTransferOrder, siteId);
-            return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + stockTransferOrder.getId() + " is successfully created.");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @GetMapping(path = "/stockTransferOrder/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> getStockTransferOrderByOrderId(@PathVariable Long orderId) {
-        try {
-            return ResponseEntity.ok(stockTransferService.getStockTransferOrder(orderId));
-        } catch (StockTransferException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @GetMapping(path = "/stockTransferOrder/site/{siteId}", produces = "application/json")
-    public List<StockTransferOrder> getStockTransferOrdersOfSite(@PathVariable Long siteId) {
-        Site site = siteService.getSite(siteId);
-        return stockTransferService.getStockTransferOrderOfSite(site);
-    }
-
-    @PutMapping(path = "/stockTransferOrder/update/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> updateStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
-            @PathVariable Long siteId) {
-        try {
-            stockTransferService.updateStockTransferOrder(stockTransferOrder, siteId);
-            return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + stockTransferOrder.getId() + " is successfully updated.");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @DeleteMapping(path = "/stockTransferOrder/delete/{orderId}/{siteId}")
-    public ResponseEntity<Object> deleteStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
-        try {
-            stockTransferService.deleteStockTransferOrder(orderId, siteId);
-            return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PutMapping(path = "/stockTransferOrder/complete/{orderId}/{siteId}")
-    public ResponseEntity<Object> completeStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
-        try {
-            stockTransferService.completeStockTransferOrder(orderId, siteId);
-            return ResponseEntity
-                    .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

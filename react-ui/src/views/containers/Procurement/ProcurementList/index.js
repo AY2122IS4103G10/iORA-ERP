@@ -1,18 +1,13 @@
-import { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CogIcon } from "@heroicons/react/outline";
-import { TailSpin } from "react-loader-spinner";
+
 import {
   SimpleTable,
   SelectColumnFilter,
   OptionsCell,
 } from "../../../components/Tables/SimpleTable";
-import {
-  fetchProcurements,
-  selectAllProcurements,
-} from "../../../../stores/slices/procurementSlice";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
+import { api } from "../../../../environments/Api";
 
 export const ProcurementTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
@@ -62,43 +57,28 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
 };
 
 export const ProcurementList = ({ pathname }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const data = useSelector(selectAllProcurements);
-  const procurementStatus = useSelector((state) => state.procurements.status);
-  const error = useSelector((state) => state.products.error);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    procurementStatus === "idle" && dispatch(fetchProcurements());
-  }, [procurementStatus, dispatch]);
-
+    api.getAll(`sam/procurementOrder/all`).then((response) => {
+      setData(response.data);
+    });
+  }, []);
   const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
-  
-  let content;
 
-  if (procurementStatus === "loading") {
-    content = (
-      <div className="items-center">
-        <TailSpin color="#00BFFF" height={50} width={50} />
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+      <div className="mt-4">
+        {Boolean(data.length) ? (
+          <ProcurementTable data={data} handleOnClick={handleOnClick} />
+        ) : (
+          pathname.includes("sm") &&
+          <Link to="/sm/procurements/create">
+            <DashedBorderES item="procurement order" />
+          </Link>
+        )}
       </div>
-    );
-  } else if (procurementStatus === "succeeded") {
-    content = (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <div className="mt-4">
-          {Boolean(data.length) ? (
-            <ProcurementTable data={data} handleOnClick={handleOnClick} />
-          ) : (
-            <Link to="/sm/procurements/create">
-              <DashedBorderES item="procurement order" />
-            </Link>
-          )}
-        </div>
-      </div>
-    );
-  } else {
-    content = <div>{error}</div>;
-  }
-
-  return content;
+    </div>
+  );
 };

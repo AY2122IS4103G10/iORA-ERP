@@ -538,10 +538,10 @@ public class SAMController {
         }
     }
 
-    @DeleteMapping(path = "/stockTransferOrder/delete/{orderId}/{siteId}")
-    public ResponseEntity<Object> deleteStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+    @DeleteMapping(path = "/stockTransferOrder/cancel/{orderId}/{siteId}")
+    public ResponseEntity<Object> cancelStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            stockTransferService.deleteStockTransferOrder(orderId, siteId);
+            stockTransferService.cancelStockTransferOrder(orderId, siteId);
             return ResponseEntity
                     .ok("Stock Transfer Order with ID " + orderId + " is successfully deleted (cancelled).");
         } catch (Exception ex) {

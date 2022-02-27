@@ -6,7 +6,7 @@ import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { SelectableTable, SelectColumnFilter } from "../../../components/Tables/SelectableTable";
 
 
-const columns = [
+const cols = [
     {
         Header: "Id",
         accessor: "id",

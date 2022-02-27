@@ -120,13 +120,6 @@ export const stockTransferApi = {
   },
 }
 
-export const vendorApi = {
-  search(keyword) {
-    return axios.get(
-      `${REST_ENDPOINT}admin/viewVendors?search=${keyword}`
-    );
-  }
-}
 
 export const authApi = {
   login(username, password) {

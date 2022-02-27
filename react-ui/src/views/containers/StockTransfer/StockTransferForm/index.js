@@ -484,7 +484,7 @@ export const StockTransferForm = (subsys) => {
             })
         );
         console.log(stockTransferLI);
-        const stockTransferForm = {
+        const stockTransferOrder = {
             lineItems: stockTransferLI,
             fromSite: from,
             toSite: to

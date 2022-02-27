@@ -9,6 +9,7 @@ import {
 } from "@heroicons/react/outline";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
+import accessRightsMap from "../../../../constants/accessRightsPaths";
 
 const actions = [
   {
@@ -68,7 +69,6 @@ const stats = [
   { label: "Sick days left", value: 4 },
   { label: "Personal days left", value: 2 },
 ];
-import accessRightsMap from "../../../../constants/accessRightsPaths";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -124,20 +124,7 @@ export const EnterStoreModal = ({ open, closeModal, siteCode, setSiteCode, handl
 
 
 
-export function Home() {
-  const [openEnterStore, setOpenEnterStore] = useState(false);
-  const [siteCode, setSiteCode] = useState("");
-
-  const handleEnterStore = () => {
-    console.log("SiteCode: " + siteCode);
-    //need to api to get site from sitecode + store in localstorage
-    closeEnterStoreModal();
-  }
-
-  const openEnterStoreModal = () => setOpenEnterStore(true);
-  const closeEnterStoreModal = () => setOpenEnterStore(false);
-
-
+ 
 
 const Header = ({ name, jobTitle, stats }) => {
   return (
@@ -223,7 +210,7 @@ const Tiles = ({actions}) => {
             <div className="mt-8">
               <h3 className="text-lg font-medium">
                 {action.href === "/str" ?
-                  <button className="focus:outline-none" onClick={() => openEnterStoreModal()}>
+                  <button className="focus:outline-none">
                     {/* Extend touch target to entire panel */}
                     <span className="absolute inset-0" aria-hidden="true" />
                     {action.title}
@@ -253,15 +240,8 @@ const Tiles = ({actions}) => {
           </div>
         ))}
       </div>
-      <EnterStoreModal 
-        open={openEnterStore} 
-        closeModal={closeEnterStoreModal} 
-        siteCode={siteCode} 
-        setSiteCode={setSiteCode}
-        handleEnterStore={handleEnterStore}/>
     </>
   );
-  )
 }
 
 const paths = [

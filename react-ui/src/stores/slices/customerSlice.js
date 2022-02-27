@@ -15,6 +15,14 @@ export const fetchCustomers = createAsyncThunk(
   }
 );
 
+export const getCustomerByPhone = createAsyncThunk(
+  "customer/getCustomerByPhone",
+  async (phone) => {
+    const response = await api.get("store/member", phone);
+    return response.data;
+  }
+);
+
 export const addNewCustomer = createAsyncThunk(
   "customer/addNewCustomer",
   async (initialCustomer) => {

@@ -36,7 +36,7 @@ public class CustomerServiceImpl implements CustomerService {
     private EntityManager em;
 
     @Override
-    public void createCustomerAccount(Customer customer) throws CustomerException {
+    public Customer createCustomerAccount(Customer customer) throws CustomerException {
         String password = customer.gethashPass();
         Customer newC = customer;
 
@@ -51,6 +51,8 @@ public class CustomerServiceImpl implements CustomerService {
             newC.setSalt(salt.toString());
             newC.sethashPass(generateProtectedPassword(salt.toString(), customer.gethashPass()));
             em.persist(newC);
+
+            return newC;
         }
 
     }
@@ -255,7 +257,7 @@ public class CustomerServiceImpl implements CustomerService {
         random.nextBytes(salt);
         return salt;
     }
-    
+
     private String generateProtectedPassword(String salt, String password) {
         String generatedPassword;
         try {
@@ -270,6 +272,5 @@ public class CustomerServiceImpl implements CustomerService {
             return null;
         }
     }
-
 
 }

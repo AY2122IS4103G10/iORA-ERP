@@ -1,6 +1,8 @@
 import { useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllStockTransfer, selectAllOrders } from "../../../../stores/slices/stocktransferSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { SelectableTable, SelectColumnFilter } from "../../../components/Tables/SelectableTable";
 
 
@@ -23,7 +25,9 @@ const cols = [
     },
     {
         Header: "Status",
-        accessor: (row) => row?.statusHistory?.slice(-1)[0].status
+        accessor: (row) => row?.statusHistory?.slice(-1)[0].status,
+        Filter: SelectColumnFilter,
+        filter: "includes",
     },
     {
         Header: "Last Updated",
@@ -38,14 +42,24 @@ const cols = [
 
 
 
-export const StockTransferList = (subsys) => {
+export const StockTransferList = ({subsys}) => {
     const dispatch = useDispatch();
+    let currSiteId = useSelector(selectUserSite);
     const sto = useSelector(selectAllOrders);
-    const columns = useMemo(() => cols, [cols] )
+    const {pathname} = useLocation();
 
-    const path = `/${subsys.subsys.subsys}/stocktransfer`;
+    if (currSiteId === 0) {
+        if (pathname.includes("sm")) {
+            currSiteId = 1;
+        } else if (pathname.includes("wh")) {
+            currSiteId = 2;
+        } 
+    }
+
+    const columns = useMemo(() => cols, [cols] )
+    const path = `/${subsys.subsys}/stocktransfer`;
     useEffect(() => {
-        dispatch(getAllStockTransfer());
+        dispatch(getAllStockTransfer(currSiteId));
     }, [])
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

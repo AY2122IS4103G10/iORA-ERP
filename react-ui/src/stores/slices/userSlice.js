@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, createAction } from "@reduxjs/toolkit";
 import { authApi } from "../../environments/Api";
 
 const guest = {
@@ -26,7 +26,7 @@ const initialUser = localStorage.getItem("user") ? JSON.parse(localStorage.getIt
 const initialState = {
   user: { ...initialUser },
   loggedIn: localStorage.getItem("user") ? true : false,
-  currStore: 0, //to be updated when login is finalised
+  currSite: 0, //to be updated when login is finalised
   status: "idle",
   error: "null",
 };
@@ -34,16 +34,18 @@ const initialState = {
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials) => {
-      const response = await authApi.login(
-        credentials.username,
-        credentials.password
-      );
-      if (response.data === "") {
-        return Promise.reject(response.error);
-      }
-      return response.data;
+    const response = await authApi.login(
+      credentials.username,
+      credentials.password
+    );
+    if (response.data === "") {
+      return Promise.reject(response.error);
+    }
+    return response.data;
   }
 );
+
+export const updateCurrSite = createAction('updateCurrSite');
 
 const userSlice = createSlice({
   name: "user",
@@ -54,6 +56,7 @@ const userSlice = createSlice({
       state.loggedIn = false;
       state.user = { ...guest };
     },
+
   },
   extraReducers(builder) {
     builder.addCase(login.fulfilled, (state, action) => {
@@ -72,6 +75,9 @@ const userSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.error = "Login failed";
     });
+    builder.addCase(updateCurrSite, (state, action) => {
+      state.currSite = action.payload;
+    });
   },
 });
 
@@ -79,13 +85,13 @@ export const { logout } = userSlice.actions;
 
 export const selectUserLoggedIn = (state) => state.user.loggedIn;
 
-export const selectUser = (state) => state.user.user;
+export const selectUser = (state) => { return { ...state.user.user } };
 
 export const selectUserId = (state) => state.user.user.id;
 
 export const selectUserStore = (state) => state.user.currStore;
 
-export const selectUserSite = (state) => state.user.user.department.id;
+export const selectUserSite = (state) => state.user.currSite;
 
 export const selectUserAccess = (state) =>
   state.user.user.jobTitle.responsibility;

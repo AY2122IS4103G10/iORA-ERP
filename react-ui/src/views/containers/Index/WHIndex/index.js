@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 import {
@@ -9,10 +11,13 @@ import {
   ShieldCheckIcon,
   TruckIcon,
 } from "@heroicons/react/outline";
+import { updateCurrSite } from "../../../../stores/slices/userSlice";
 
 const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
+  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Stock Levels", href: "/wh/stocklevels/my", icon: TruckIcon, current: false },
   { name: "Procurement Orders", href: "/wh/procurements", icon: TruckIcon, current: false },
+  { name: "Stock Transfer Order", href: "/wh/stocktransfer", icon: TruckIcon, current: true}
 ];
 
 const secondaryNavigation = [
@@ -23,6 +28,12 @@ const secondaryNavigation = [
 
 export const WHIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(updateCurrSite(2));
+  },[])
+
   return (
     <div className="min-h-screen bg-gray-100">
       <SideBar

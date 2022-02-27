@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
 
-export default function ConfirmCancel({ item = "item", open, closeModal, onConfirm }) {
+export default function Confirmation({ title, body, open, closeModal, onConfirm }) {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
@@ -44,7 +44,7 @@ export default function ConfirmCancel({ item = "item", open, closeModal, onConfi
               <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
                 <button
                   type="button"
-                  className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="bg-white rounded-md text-gray-400 hover:text-gray-500"
                   onClick={closeModal}
                 >
                   <span className="sr-only">Close</span>
@@ -63,12 +63,11 @@ export default function ConfirmCancel({ item = "item", open, closeModal, onConfi
                     as="h3"
                     className="text-lg leading-6 font-medium text-gray-900"
                   >
-                    {`Cancel "${item}"`}
+                    {title}
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      {`Are you sure you want to cancel "${item}"? This action cannot be
-                      undone.`}
+                      {body}
                     </p>
                   </div>
                 </div>
@@ -79,11 +78,11 @@ export default function ConfirmCancel({ item = "item", open, closeModal, onConfi
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={onConfirm}
                 >
-                  Cancel
+                  Confirm
                 </button>
                 <button
                   type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:w-auto sm:text-sm"
                   onClick={closeModal}
                 >
                   Cancel

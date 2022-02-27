@@ -13,7 +13,7 @@ import MainWrapper from "../../components/MainWrapper";
 
 
 const navigation = [
-    { name: "Home", href: "/", icon: HomeIcon, current: true },
+    { name: "Home", href: "/home", icon: HomeIcon, current: true },
     { name: "POS", href: "/str/pos", icon: ClockIcon, current: false },
     { name: "Stock Levels", href: "/str/stocklevels/my", icon: ScaleIcon, current: false },
     { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },

@@ -102,6 +102,12 @@ public class StoreController {
         }
     }
 
+    @GetMapping(path = "/stockTransfer/site/{siteId}", produces = "application/json")
+    public List<StockTransferOrder> getStockTransferOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return stockTransferService.getStockTransferOrderOfSite(site);
+    }
+
     @PostMapping(path = "/stockTransfer/create/{siteId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
             @PathVariable Long siteId) {
@@ -155,7 +161,7 @@ public class StoreController {
     }
 
     @PutMapping(path = "/stockTransfer/ready/{siteId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> fulfilStockTransferOrder(@PathVariable StockTransferOrder stockTransferOrder,
+    public ResponseEntity<Object> fulfilStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
             @PathVariable Long siteId) {
         try {
             return ResponseEntity
@@ -166,7 +172,7 @@ public class StoreController {
     }
 
     @PutMapping(path = "/stockTransfer/deliver/{siteId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> deliverStockTransferOrder(@PathVariable StockTransferOrder stockTransferOrder,
+    public ResponseEntity<Object> deliverStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
             @PathVariable Long siteId) {
         try {
             return ResponseEntity

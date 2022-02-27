@@ -6,7 +6,7 @@ import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
-import { api } from "../../../../environments/Api";
+import { api, employeeApi } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import {
   addNewEmployee,
@@ -323,26 +323,34 @@ export const EmployeeForm = () => {
   useEffect(() => {
     companyStatus === "idle" && dispatch(fetchCompanies());
   }, [companyStatus, dispatch]);
-  console.log(companySelected)
+
   useEffect(() => {
     company && setCompanySelected(company);
   }, [company]);
 
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
-    [
-      name,
-      departmentSelected,
-      // availStatus,
-      email,
-      password,
-      payTypeSelected,
-      salary,
-      jobTitles,
-    ].every(Boolean) && requestStatus === "idle";
+    [name, departmentSelected, email, payTypeSelected, salary, jobTitles].every(
+      Boolean
+    ) && requestStatus === "idle";
 
   const onAddEmployeeClicked = (evt) => {
     evt.preventDefault();
+    console.log({
+      name,
+      availStatus: true,
+      email,
+      username: Boolean(username.length) ? username : email,
+      password,
+      payType: payTypeSelected.value,
+      salary,
+      department: {
+        id: departmentSelected.id,
+      },
+      jobTitle: {
+        id: jobTitleSelected.id,
+      },
+    });
     if (canAdd)
       try {
         setRequestStatus("pending");
@@ -362,11 +370,18 @@ export const EmployeeForm = () => {
               jobTitle: {
                 id: jobTitleSelected.id,
               },
+              company: { id: companySelected.id },
             })
-          ).unwrap();
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully added employee");
+              navigate("/ad/employees");
+            });
         } else {
           dispatch(
             updateExistingEmployee({
+              id: employeeId,
               name,
               availStatus: true,
               email,
@@ -380,12 +395,15 @@ export const EmployeeForm = () => {
               jobTitle: {
                 id: jobTitleSelected.id,
               },
+              company: { id: companySelected.id },
             })
-          ).unwrap();
+          )
+            .unwrap()
+            .then(() => {
+              alert("Successfully added employee");
+              navigate(`/ad/employees/${employeeId}`);
+            });
         }
-        alert("Successfully added employee");
-        setName("");
-        navigate(!isEditing ? "/ad/employees" : `/ad/employees/${employeeId}`);
       } catch (err) {
         console.error("Failed to add employee: ", err);
       } finally {
@@ -398,28 +416,33 @@ export const EmployeeForm = () => {
 
   useEffect(() => {
     Boolean(employeeId) &&
-      api.get("admin/viewEmployee", employeeId).then((response) => {
+      employeeApi.getEmployee(employeeId).then((response) => {
         const {
           name,
           department,
-          availStatus,
           email,
           username,
-          password,
           payType,
           salary,
           jobTitle,
+          company,
         } = response.data;
         setIsEditing(true);
         setName(name);
-        setDepartmentSelected(department);
-        // setAvailStatus(availStatus);
+        setDepartmentSelected({
+          id: department.id,
+          name: department.deptName,
+          jobTitles: department.jobTitles,
+        });
         setEmail(email);
         setUsername(username);
-        setPassword(password);
         setPayTypeSelected(payTypes.find((type) => type.value === payType));
         setSalary(salary);
-        setJobTitleSelected(jobTitle);
+        setJobTitleSelected({
+          id: jobTitle.id,
+          name: jobTitle.title,
+        });
+        setCompanySelected(company);
       });
   }, [employeeId]);
 
@@ -439,7 +462,7 @@ export const EmployeeForm = () => {
       jobTitleSelected={jobTitleSelected}
       setJobTitleSelected={onJobTitleChanged}
       jobTitles={jobTitles}
-      company={company}
+      companies={companies}
       companySelected={companySelected}
       setCompanySelected={setCompanySelected}
       email={email}

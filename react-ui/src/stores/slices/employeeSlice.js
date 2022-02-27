@@ -48,7 +48,7 @@ const employeeSlice = createSlice({
     });
     builder.addCase(fetchEmployees.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.employee = state.employee.concat(action.payload);
+      state.employee = action.payload;
     });
     builder.addCase(fetchEmployees.rejected, (state, action) => {
       state.status = "failed";

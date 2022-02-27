@@ -1,9 +1,9 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CogIcon } from "@heroicons/react/outline";
 
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { SelectColumnFilter, SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
   fetchEmployees,
   selectAllEmployee,
@@ -15,14 +15,6 @@ export const EmployeeTable = ({ data, handleOnClick }) => {
       {
         Header: "Id",
         accessor: "id",
-        // Cell: (e) => (
-        //   <Link
-        //     to={`/admin/employee/${e.value}`}
-        //     className="hover:text-gray-700 hover:underline"
-        //   >
-        //     {e.value}
-        //   </Link>
-        // ),name, department, companyCode, status, email
       },
       {
         Header: "Employee Name",
@@ -31,12 +23,14 @@ export const EmployeeTable = ({ data, handleOnClick }) => {
       {
         Header: "Department",
         accessor: (row) => row.department.deptName,
-        //Cell: (e) => `$${e.value}`,
+        Filter: SelectColumnFilter,
+        filter: 'includes',
       },
       {
         Header: "Job Title",
         accessor: (row) => row.jobTitle.title,
-        //Cell: (e) => moment(e.value).format("lll"),
+        Filter: SelectColumnFilter,
+        filter: 'includes',
       },
       {
         Header: "Status",
@@ -46,9 +40,6 @@ export const EmployeeTable = ({ data, handleOnClick }) => {
       {
         Header: "Email",
         accessor: "email",
-        // Cell: (e) => (e.value ? "Yes" : "No"),
-        // Filter: SelectColumnFilter,
-        // filter: "includes",
       },
       // {
       //   Header: CogIcon,
@@ -88,7 +79,7 @@ export const EmployeeList = () => {
     employeeStatus === "idle" && dispatch(fetchEmployees());
   }, [employeeStatus, dispatch]);
   
-  const handleOnClick = (row) => navigate(`/ad/employee/${row.original.id}`);
+  const handleOnClick = (row) => navigate(`/ad/employees/${row.original.id}`);
 
   return <EmployeeTable data={data} handleOnClick={handleOnClick} />;
 };

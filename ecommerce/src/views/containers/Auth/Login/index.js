@@ -15,7 +15,7 @@ export const Login = () => {
     dispatch(login({ email, password }))
       .unwrap()
       .then((data) => {
-        if (data.id !== -1) {
+        if (data.id !== -1 && data.availStatus) {
           localStorage.setItem("user", JSON.stringify(data.id));
           setEmail("");
           setPassword("");

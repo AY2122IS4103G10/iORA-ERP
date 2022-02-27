@@ -422,7 +422,7 @@ export const StockTransferForm = (subsys) => {
 
     useEffect(() => {
         Boolean(id) &&
-            api.get("sam/stockTransferOrder", id)
+            api.get("store/stockTransfer", id)
                 .then((response) => {
                     const { lineItems, fromSite, toSite } = response.data;
                     setOriginalOrder(response.data)

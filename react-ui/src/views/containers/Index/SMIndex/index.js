@@ -16,7 +16,7 @@ import {
 import { updateCurrSite } from "../../../../stores/slices/userSlice";
 
 const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
+  { name: "Home", href: "/home", icon: HomeIcon, current: true },
   { name: "Products", href: "/sm/products", icon: ClockIcon, current: false },
   {
     name: "Stock Levels",

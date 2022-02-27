@@ -30,7 +30,7 @@ export const tabs = [
   },
 ]
 const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
+  { name: "Home", href: "/home", icon: HomeIcon, current: true },
   ...tabs
 ];
 

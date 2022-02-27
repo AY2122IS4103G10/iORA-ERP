@@ -1,16 +1,13 @@
-import { useDispatch } from "react-redux";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { PencilIcon } from "@heroicons/react/solid";
-import { TrashIcon } from "@heroicons/react/outline";
-import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useEffect, useMemo, useState } from "react";
+import {useDispatch} from "react-redux";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
+import {PencilIcon} from "@heroicons/react/solid";
+import {TrashIcon} from "@heroicons/react/outline";
+import {NavigatePrev} from "../../../components/Breadcrumbs/NavigatePrev";
+import {useEffect, useMemo, useState} from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
-import { deleteExistingProcurement } from "../../../../stores/slices/procurementSlice";
-import {
-  EditableCell,
-  SimpleTable,
-} from "../../../components/Tables/SimpleTable";
-import { api, procurementApi } from "../../../../environments/Api";
+import {deleteExistingProcurement} from "../../../../stores/slices/procurementSlice";
+import {EditableCell, SimpleTable} from "../../../components/Tables/SimpleTable";
+import {api, procurementApi} from "../../../../environments/Api";
 
 const Header = ({
   pathname,
@@ -34,12 +31,8 @@ const Header = ({
               <button
                 type="button"
                 className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-                disabled={status !== "PENDING"}
-              >
-                <PencilIcon
-                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
+                disabled={status !== "PENDING"}>
+                <PencilIcon className="-ml-1 mr-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                 <span>Edit</span>
               </button>
             </Link>
@@ -47,12 +40,8 @@ const Header = ({
               type="button"
               className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
               onClick={openModal}
-              disabled={status !== "PENDING"}
-            >
-              <TrashIcon
-                className="-ml-1 mr-2 h-5 w-5 text-white"
-                aria-hidden="true"
-              />
+              disabled={status !== "PENDING"}>
+              <TrashIcon className="-ml-1 mr-2 h-5 w-5 text-white" aria-hidden="true" />
               <span>Delete</span>
             </button>
           </div>
@@ -62,16 +51,14 @@ const Header = ({
               type="button"
               className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
               onClick={onAcceptClicked}
-              disabled={status !== "PENDING"}
-            >
+              disabled={status !== "PENDING"}>
               <span>Accept order</span>
             </button>
             <button
               type="button"
               className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
               onClick={onCancelOrderClicked}
-              disabled={status !== "PENDING"}
-            >
+              disabled={status !== "PENDING"}>
               <span>Cancel order</span>
             </button>
           </div>
@@ -112,15 +99,12 @@ const ItemsSummary = ({
       {
         Header: "Color",
         accessor: (row) =>
-          row.product.productFields.find(
-            (field) => field.fieldName === "COLOUR"
-          ).fieldValue,
+          row.product.productFields.find((field) => field.fieldName === "COLOUR").fieldValue,
       },
       {
         Header: "Size",
         accessor: (row) =>
-          row.product.productFields.find((field) => field.fieldName === "SIZE")
-            .fieldValue,
+          row.product.productFields.find((field) => field.fieldName === "SIZE").fieldValue,
       },
       {
         Header: "Requested Qty",
@@ -132,12 +116,7 @@ const ItemsSummary = ({
         disableSortBy: true,
         Cell: (row) => {
           return status === "ACCEPTED" && pathname.includes("mf") ? (
-            <EditableCell
-              value={0}
-              row={row.row}
-              column={row.column}
-              updateMyData={updateMyData}
-            />
+            <EditableCell value={0} row={row.row} column={row.column} updateMyData={updateMyData} />
           ) : (
             "-"
           );
@@ -155,12 +134,7 @@ const ItemsSummary = ({
         accessor: (row) => row.actualProductItems.length,
         Cell: (row) => {
           return status === "SHIPPED" && pathname.includes("wh") ? (
-            <EditableCell
-              value={0}
-              row={row.row}
-              column={row.column}
-              updateMyData={updateMyData}
-            />
+            <EditableCell value={0} row={row.row} column={row.column} updateMyData={updateMyData} />
           ) : (
             "-"
           );
@@ -177,16 +151,14 @@ const ItemsSummary = ({
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={onVerifyItemsClicked}
-            >
+              onClick={onVerifyItemsClicked}>
               Verify items
             </button>
           ) : status === "SHIPPED" && pathname.includes("wh") ? (
             <button
               type="button"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={onVerifyReceivedClicked}
-            >
+              onClick={onVerifyReceivedClicked}>
               Verify items
             </button>
           ) : (
@@ -217,7 +189,7 @@ const ProcurementDetailsBody = ({
   setLineItems,
   pathname,
   onVerifyItemsClicked,
-  onVerifyReceivedClicked
+  onVerifyReceivedClicked,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -227,8 +199,7 @@ const ProcurementDetailsBody = ({
           <div className="px-4 py-5 sm:px-6">
             <h2
               id="warehouse-information-title"
-              className="text-lg leading-6 font-medium text-gray-900"
-            >
+              className="text-lg leading-6 font-medium text-gray-900">
               Order Information
             </h2>
           </div>
@@ -243,9 +214,7 @@ const ProcurementDetailsBody = ({
                 <dd className="mt-1 text-sm text-gray-900">{headquarters}</dd>
               </div>
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Manufacturing
-                </dt>
+                <dt className="text-sm font-medium text-gray-500">Manufacturing</dt>
                 <dd className="mt-1 text-sm text-gray-900">
                   {manufacturing ? manufacturing : "-"}
                 </dd>
@@ -275,8 +244,8 @@ const ProcurementDetailsBody = ({
 export const ProcurementDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { procurementId } = useParams();
+  const {pathname} = useLocation();
+  const {procurementId} = useParams();
   const [headquarters, setHeadquarters] = useState(null);
   const [manufacturing, setManufacturing] = useState(null);
   const [warehouse, setWarehouse] = useState(null);
@@ -287,13 +256,7 @@ export const ProcurementDetails = () => {
 
   useEffect(() => {
     api.get("sam/procurementOrder", procurementId).then((response) => {
-      const {
-        headquarters,
-        manufacturing,
-        warehouse,
-        lineItems,
-        statusHistory,
-      } = response.data;
+      const {headquarters, manufacturing, warehouse, lineItems, statusHistory} = response.data;
       setHeadquarters(headquarters);
       setManufacturing(manufacturing);
       setWarehouse(warehouse);
@@ -325,43 +288,37 @@ export const ProcurementDetails = () => {
     procurementApi
       .acceptOrder(procurementId, manufacturing)
       .then((response) => {
-        const { statusHistory } = response.data;
+        const {statusHistory} = response.data;
         setStatus(statusHistory[statusHistory.length - 1].status);
       })
       .then(() => {
         alert("Successfully accepted procurement");
       })
-      .catch((error) =>
-        console.error("Failed to accept procurement: ", error.message)
-      );
+      .catch((error) => console.error("Failed to accept procurement: ", error.message));
   };
 
   const onCancelOrderClicked = () => {
     procurementApi
       .cancelOrder(procurementId, manufacturing)
       .then((response) => {
-        const { statusHistory } = response.data;
+        const {statusHistory} = response.data;
         setStatus(statusHistory[statusHistory.length - 1].status);
       })
       .then(() => {
         alert("Successfully cancelled procurement");
       })
-      .catch((error) =>
-        console.error("Failed to cancelled procurement: ", error.message)
-      );
+      .catch((error) => console.error("Failed to cancelled procurement: ", error.message));
   };
 
   const onVerifyItemsClicked = () => {
     lineItems.forEach((item) => {
-      const { product, actualQty } = item;
+      const {product, actualQty} = item;
       procurementApi
         .generateItems(product.sku, actualQty)
         .then((response) => {
           setProductItems(productItems.concat(response.data));
         })
-        .catch((error) =>
-          console.error("Failed to cancelled procurement: ", error.message)
-        );
+        .catch((error) => console.error("Failed to cancelled procurement: ", error.message));
     });
     console.log(productItems);
     // procurementApi
@@ -399,7 +356,7 @@ export const ProcurementDetails = () => {
     //     console.error("Failed to cancelled procurement: ", error.message)
     //   );
   };
-  const onVerifyReceivedClicked = () => {}
+  const onVerifyReceivedClicked = () => {};
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 

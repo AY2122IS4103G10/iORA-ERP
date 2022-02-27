@@ -33,9 +33,7 @@ export const voucherApi = {
 
 export const sitesApi = {
   searchByType(siteType) {
-    return axios.get(
-      `${REST_ENDPOINT}sam/viewSites/${siteType}?country=&company=`
-    );
+    return axios.get(`${REST_ENDPOINT}sam/viewSites/${siteType}?country=&company=`);
   },
   getAll() {
     return axios.get(`${REST_ENDPOINT}sam/viewSites/all`);
@@ -57,14 +55,16 @@ export const companyApi = {
 
 export const procurementApi = {
   acceptOrder(orderId, siteId) {
-    return axios.put(
-      `${REST_ENDPOINT}manufacturing/procurementOrder/accept/${orderId}/${siteId}`
-    );
+    return axios.put(`${REST_ENDPOINT}manufacturing/procurementOrder/accept/${orderId}/${siteId}`);
   },
   cancelOrder(orderId, siteId) {
-    return axios.put(
-      `${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`
-    );
+    return axios.put(`${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`);
+  },
+};
+
+export const vendorApi = {
+  search(keyword) {
+    return axios.get(`${REST_ENDPOINT}admin/viewVendors?search=${keyword}`);
   },
   fulfillOrder(siteId, order) {
     return axios.put(
@@ -122,8 +122,12 @@ export const stockTransferApi = {
 
 export const authApi = {
   login(username, password) {
-    return axios.get(
-      `${REST_ENDPOINT}auth/empLogin?username=${username}&password=${password}`
-    );
+    return axios.get(`${REST_ENDPOINT}auth/empLogin?username=${username}&password=${password}`);
+  },
+};
+
+export const posApi = {
+  getOrders(siteId) {
+    return axios.get(`${REST_ENDPOINT}/store/customerOrder/${siteId}`);
   },
 };

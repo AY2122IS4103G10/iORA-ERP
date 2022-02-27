@@ -2,17 +2,67 @@ import { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
+import { Dialog } from "@headlessui/react";
 
-import { getStockTransfer, selectStockTransferOrder, cancelStockTransfer, rejectStockTransfer, confirmStockTransfer } from "../../../../stores/slices/stocktransferSlice";
+import { 
+    getStockTransfer, 
+    selectStockTransferOrder, 
+    cancelStockTransfer, 
+    rejectStockTransfer, 
+    confirmStockTransfer, 
+    readyStockTransfer, 
+    completeStockTransfer } from "../../../../stores/slices/stocktransferSlice";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import Confirmation from "../../../components/Modals/Confirmation";
-import { SortDownIcon, SortUpIcon, SortIcon } from "../../../components/Tables/Icons";
+import { EditableCell } from "../../../components/Tables/SimpleTable";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { XIcon } from "@heroicons/react/solid";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
+export const VerifyItemsModal = ({ open, closeModal, lineItems, status, userSiteId, 
+    fromSiteId, toSiteId, setLineItems,handleReadyOrder, handleCompleteOrder }) => {
+    return (
+        <SimpleModal open={open} closeModal={closeModal}>
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-max">
+                <div>
+                    <div className="mt-3 sm:mt-5">
+                        <Dialog.Title
+                            as="h3"
+                            className="text-center text-lg leading-6 font-medium text-gray-900"
+                        >
+                            Add Items
+                        </Dialog.Title>
+                        <LineItems lineItems={lineItems} status={status} userSiteId={userSiteId} fromSiteId={fromSiteId} toSiteId={toSiteId} setLineItems={setLineItems} />
+                    </div>
+                </div>
+                <div className="pt-5">
+                    <div className="flex justify-end">
+                        <button
+                            type="button"
+                            className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                            onClick={closeModal}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                            onClick={userSiteId === fromSiteId && status === "CONFIRMED" ? handleReadyOrder : handleCompleteOrder }
+                        >
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </SimpleModal>
+    );
+}
 
 
-export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, toSiteId, orderMadeBy, openDeleteModal, openRejectModal, handleConfirmOrder }) => {
+
+
+export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, toSiteId, orderMadeBy,
+    openDeleteModal, openRejectModal, handleConfirmOrder, openVerifyItemsModal }) => {
 
 
     return (
@@ -77,17 +127,17 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                         (<button
                             type="button"
                             className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                            onClick={handleConfirmOrder}
+                            onClick={openVerifyItemsModal}
                         >
-                            {/* Enter actual qty sent */}
+                            {/* Enter qty sent */}                                                                                                                                                                                                                                                                                                                                                                                 
                             <span>Ready for Delivery</span>
                         </button>) : ""}
 
-                    {userSiteId === fromSiteId && status === "READYFORDELIVERY" ?
+                    {userSiteId === fromSiteId && (status === "READY" || status === "DELIVERING") ?
                         (<button
                             type="button"
                             className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                            onClick={handleConfirmOrder}
+                            onClick={openVerifyItemsModal}
                         >
                             {/* Enter actual qty received */}
                             <span>Complete Order</span>
@@ -100,31 +150,25 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
     )
 }
 
-export const LineItems = (lineItems) => {
+export const LineItems = (lineItems, status, userSiteId, fromSiteId, toSiteId, setLineItems) => {
+    const [skipPageReset, setSkipPageReset] = useState(false);
 
-    const columns = useMemo(
-        () => ([
-            // {
-            //     id: "expander", 
-            //     Header: ({getToggleAllRowsExpandedProps, isAllRowsExpanded}) => (
-            //         <span {...getToggleAllRowsExpandedProps()}>
-            //             {isAllRowsExpanded ?  
-            //                 <SortUpIcon className="w-4 h-4 text-gray-400" /> 
-            //                 : <SortDownIcon className="w-4 h-4 text-gray-400" /> }
-            //         </span>
-            //     ), 
-            //     Cell : ({row}) => 
-            //     row.canExpand ? (
-            //         <span
-            //             {...row.getToggleAllRowsExpandedProps({
-            //                 style: {
-            //                     paddingLeft: "2rem"
-            //                 }
-            //             })}>
-
-            //         </span>
-            //     ) : null
-            // }, 
+    const columns = useMemo(() => {
+        const updateMyData = (rowIndex, columnId, value) => {
+            setSkipPageReset(true);
+            setLineItems((old) =>
+                old.map((row, index) => {
+                    if (index === rowIndex) {
+                        return {
+                            ...old[rowIndex],
+                            [columnId]: value,
+                        };
+                    }
+                    return row;
+                })
+            );
+        };
+        return [
             {
                 Header: "SKU",
                 accessor: (row) => row.product.sku,
@@ -148,13 +192,26 @@ export const LineItems = (lineItems) => {
             },
             {
                 Header: "Sent Qty",
-                accessor: "sentQty"
+                accessor: "sentQty",
+                disableSortBy: true,
+                Cell: (row) => {
+                    return status === "CONFIRMED" && userSiteId === fromSiteId ? (
+                        <EditableCell value={0} row={row.row} column={row.column} updateMyData={updateMyData} />
+                    ) : ("-");
+                }
             },
             {
                 Header: "Received Qty",
-                accessor: "actualQty"
+                accessor: "actualQty",
+                disableSortBy: true,
+                Cell: (row) => {
+                    return (status === "READY" || status === "DELIVERING") && userSiteId === toSiteId ? (
+                        <EditableCell value={0} row={row.row} column={row.column} updateMyData={updateMyData} />
+                    ) : ("-");
+                }
             },
-        ]), []);
+        ]
+    }, []);
 
     return (
         <div className="mt-8 p-2">
@@ -222,7 +279,7 @@ export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, f
                             </dl>
                         </div>
                     </div>
-                    <LineItems lineItems={lineItems} />
+                    <LineItems lineItems={lineItems} status={status} />
                 </section>
             </div>
         </div>
@@ -236,9 +293,19 @@ export const ViewStockTransfer = (subsys) => {
     const navigate = useNavigate();
     const { id } = useParams();
     const { pathname } = useLocation();
-    const userSiteId = useSelector(selectUserSite);
+    let userSiteId = useSelector(selectUserSite);
+     //get user site id
+     if (userSiteId === 0) {
+        if (pathname.includes("sm")) {
+            userSiteId = 1
+        } else if (pathname.includes("wh")) {
+            userSiteId = 2
+        }
+    }
+
     const userStatus = useSelector((state) => state.user.status);
     const order = useSelector(selectStockTransferOrder);
+    const [lineItems, setLineItems] = useState([]);
 
     const [openDelete, setOpenDelete] = useState(false);
     const openDeleteModal = () => setOpenDelete(true);
@@ -248,16 +315,41 @@ export const ViewStockTransfer = (subsys) => {
     const openRejectModal = () => setOpenReject(true);
     const closeRejectModal = () => setOpenReject(false);
 
-    //get user site id
-    if (userSiteId === 0) {
-        if (pathname.includes("sm")) {
-            userSiteId = 1
-        } else if (pathname.includes("wh")) {
-            userSiteId = 2
+    const [openVerifyItems, setOpenVerifyItems] = useState(true);
+    const openVerifyItemsModal = () => {
+        order.lineItems.map((item) => {
+            item.sentQty = item.requestedQty;
+        })
+        if (order.status === "DELIVERING" || order.status==="READY") {
+            order.lineItems.map((item) => {
+                item.actualQty = item.sentQty;
+            })
         }
+        setOpenVerifyItems(true);
+    }
+    const closeVerifyItemsModal = () => setOpenVerifyItems(false);
+    const handleReadyOrder = () => {
+        order.lineItems = lineItems;
+        dispatch(readyStockTransfer({order: order, siteId: userSiteId}))
+            .unwrap()
+            .then(() => alert("Order is ready for delivery"))
+            .catch((err) => alert(err.message));
+
+        navigate(pathname);
+    }
+
+    const handleCompleteOrder = () => {
+        order.lineItems = lineItems;
+        dispatch(completeStockTransfer({order: order, siteId: userSiteId}))
+            .unwrap()
+            .then(() => alert("Order is ready for delivery"))
+            .catch((err) => alert(err.message));
+
+        navigate(pathname);
     }
 
 
+  
     const handleConfirmCancel = () => {
         dispatch(cancelStockTransfer({ orderId: id, siteId: userSiteId }))
             .unwrap()
@@ -297,9 +389,15 @@ export const ViewStockTransfer = (subsys) => {
             })
     }
 
-
+    
     useEffect(() => {
         dispatch(getStockTransfer(id))
+            .unwrap()
+            .then((response) => {
+                order = response.data;
+                setLineItems(order.lineItems);
+            })
+            .catch((err) => alert(err.message))
     }, [userStatus])
 
 
@@ -316,6 +414,7 @@ export const ViewStockTransfer = (subsys) => {
                     openDeleteModal={openDeleteModal}
                     openRejectModal={openRejectModal}
                     handleConfirmOrder={handleConfirmOrder}
+                    openVerifyItemsModal={openVerifyItemsModal}
                 />
                 <StockTransferBody
                     lineItems={order.lineItems}
@@ -344,7 +443,18 @@ export const ViewStockTransfer = (subsys) => {
                     closeModal={closeRejectModal}
                     onConfirm={handleRejectOrder}
                 />
-
+                <VerifyItemsModal
+                    open={openVerifyItems}
+                    closeModal={closeVerifyItemsModal}
+                    handleReadyOrder={handleReadyOrder}
+                    handleCompleteOrder={handleCompleteOrder}
+                    lineItems={order.lineItems}
+                    setLineItems={setLineItems}
+                    status={order.statusHistory[order.statusHistory.length - 1].status}
+                    userSiteId={userSiteId}
+                    fromSiteId={order.fromSite.id}
+                    toSiteId={order.toSite.id}
+                />
             </>
         )
     );

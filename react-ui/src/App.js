@@ -41,8 +41,8 @@ import {JobTitleForm} from "./views/containers/JobTitle/JobTitleForm";
 import {JobTitleDetails} from "./views/containers/JobTitle/JobTitleDetails/index.js";
 import Error from "./views/containers/Auth/Error";
 import {Auth} from "./views/containers/Auth/Auth";
-import {PosMain} from "./views/containers/POS/Main";
-import {PosOrder} from "./views/containers/POS/Order";
+import {PosPurchaseHistory} from "./views/containers/POS/PurchaseHistory";
+import {PosPurchaseOrder} from "./views/containers/POS/PurchaseOrder";
 import {StockLevelForm} from "./views/containers/StockLevels/StockLevelForm";
 import {ViewStockTransfer} from "./views/containers/StockTransfer/ViewStockTransfer";
 import {ManageVendors} from "./views/containers/Vendor/ManageVendors";
@@ -114,9 +114,8 @@ function App() {
               <Route path=":id" element={<ViewStockTransfer subsys="str" />} />
               <Route path="edit/:id" element={<StockTransferForm subsys="str" />} />
             </Route>
-            <Route path="pos/*" element={<PosMain />}>
-              <Route path="order" element={<PosOrder />} />
-            </Route>
+            <Route path="pos/*" element={<PosPurchaseOrder />} />
+            <Route path="orderHistory" element={<PosPurchaseHistory />} />
           </Route>
 
           {/* Admin Subsystem */}

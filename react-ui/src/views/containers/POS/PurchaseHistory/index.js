@@ -5,18 +5,7 @@ import {useSelector, useDispatch} from "react-redux";
 import {EditableCell, SimpleTable} from "../../../components/Tables/SimpleTable";
 import {selectAllOrder} from "../../../../stores/slices/posSlice";
 import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
-import {Header} from "../../../components/Header";
-
-const exitButton = () => {
-  return (
-    <button
-      type="button"
-      class="ml-10 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-700 hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-      <a href="#" />
-      Logout
-    </button>
-  );
-};
+import {HeadingWithTabs, SectionHeading} from "../../../components/HeadingWithTabs";
 
 export const OrderTable = ({data}) => {
   const columns = useMemo(
@@ -41,6 +30,7 @@ export const OrderTable = ({data}) => {
     []
   );
 };
+
 const orderTable = (data) => {
   return (
     <div className="flex flex-col">
@@ -103,11 +93,11 @@ const orderTable = (data) => {
 };
 
 const tabs = [
-  {name: "By Site", href: "sites", current: true},
-  {name: "By Products", href: "products", current: false},
+  {name: "Order", href: "", current: true},
+  {name: "History", href: "orderHistory", current: false},
 ];
 
-export const PosMain = () => {
+export const PosPurchaseHistory = (subsys) => {
   const dispatch = useDispatch();
   const data = useSelector(selectAllOrder);
   const orderStatus = useSelector((state) => state.pos.status);
@@ -119,7 +109,7 @@ export const PosMain = () => {
 
   return (
     <>
-      <Header title="Order Purchase" />
+      <SectionHeading header="Order Purchase" tabs={tabs} />
     </>
   );
 };

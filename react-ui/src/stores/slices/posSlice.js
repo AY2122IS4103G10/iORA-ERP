@@ -7,8 +7,8 @@ const initialState = {
   error: null,
 };
 
-export const fetchSiteOrders = createAsyncThunk("str/pos", async (siteId) => {
-  const response = await posApi.getOrders(`store/customerOrder/${siteId}`);
+export const fetchSiteOrders = createAsyncThunk("store/customerOrder", async (siteId) => {
+  const response = await posApi.getOrders(siteId);
   return response.data;
 });
 

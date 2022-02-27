@@ -37,13 +37,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer createCustomerAccount(Customer customer) throws CustomerException {
-        String password = customer.gethashPass();
         Customer newC = customer;
 
         try {
-            Customer cc = getCustomerByEmail(customer.getEmail());
+            getCustomerByEmail(customer.getEmail());
             throw new CustomerException("Account with " + customer.getEmail() + " has already been created");
-
         } catch (Exception ex) {
             newC.setMembershipTier(findMembershipTierById("BASIC"));
             newC.setAvailStatus(true);
@@ -140,6 +138,20 @@ public class CustomerServiceImpl implements CustomerService {
             return (Customer) q.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new CustomerException("Customer email " + email + " does not exist.");
+        }
+    }
+
+    @Override
+    public Customer getCustomerByPhone(String phone) throws CustomerException {
+        TypedQuery<Customer> q = em.createQuery("SELECT DISTINCT c FROM Customer c WHERE c.contactNumber = :phone", Customer.class);
+        q.setParameter("phone", phone);
+        
+        Customer c = q.getSingleResult();
+
+        if (c == null) {
+            throw new CustomerException("Customer information cannot be retrieved");
+        } else {
+            return c;
         }
     }
 

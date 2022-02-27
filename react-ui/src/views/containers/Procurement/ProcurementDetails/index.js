@@ -307,54 +307,44 @@ export const ProcurementDetails = () => {
       .then(() => {
         alert("Successfully cancelled procurement");
       })
-      .catch((error) => console.error("Failed to cancelled procurement: ", error.message));
+      .catch((error) => console.error("Failed to cancel procurement: ", error.message));
   };
 
   const onVerifyItemsClicked = () => {
-    lineItems.forEach((item) => {
-      const {product, actualQty} = item;
-      procurementApi
-        .generateItems(product.sku, actualQty)
-        .then((response) => {
-          setProductItems(productItems.concat(response.data));
-        })
-        .catch((error) => console.error("Failed to cancelled procurement: ", error.message));
-    });
-    console.log(productItems);
-    // procurementApi
-    //   .fulfillOrder(manufacturing, {
-    //     id: procurementId,
-    //     lineItems: lineItems.map(({ id, product, requestedQty }) => ({
-    //       id,
-    //       product: {
-    //         sku: product.sku,
-    //       },
-    //       requestedQty,
-    //       fulfilledProductItems: productItems,
-    //     })),
-    //   })
-    //   .then((response) => {
-    //     const {
-    //       headquarters,
-    //       manufacturing,
-    //       warehouse,
-    //       fulfilledProductItems,
-    //       statusHistory,
-    //     } = response.data;
-    //     setHeadquarters(headquarters);
-    //     setManufacturing(manufacturing);
-    //     setWarehouse(warehouse);
-    //     setLineItems(
-    //       lineItems.map((item) => ({
-    //         ...item,
-    //         actualQuantity: fulfilledProductItems.length,
-    //       }))
-    //     );
-    //     setStatus(statusHistory[statusHistory.length - 1].status);
-    //   })
-    //   .catch((error) =>
-    //     console.error("Failed to cancelled procurement: ", error.message)
-    //   );
+    procurementApi
+      .fulfillOrder(manufacturing, {
+        id: procurementId,
+        lineItems: lineItems.map(({ id, product, requestedQty, actualQty }) => ({
+          id,
+          product: {
+            sku: product.sku,
+          },
+          requestedQty,
+          actualQty,
+        })),
+      })
+      .then((response) => {
+        const {
+          headquarters,
+          manufacturing,
+          warehouse,
+          fulfilledProductItems,
+          statusHistory,
+        } = response.data;
+        setHeadquarters(headquarters);
+        setManufacturing(manufacturing);
+        setWarehouse(warehouse);
+        setLineItems(
+          lineItems.map((item) => ({
+            ...item,
+            actualQuantity: fulfilledProductItems.length,
+          }))
+        );
+        setStatus(statusHistory[statusHistory.length - 1].status);
+      })
+      .catch((error) =>
+        console.error("Failed to cancelled procurement: ", error.message)
+      );
   };
   const onVerifyReceivedClicked = () => {};
   const openModal = () => setOpenDelete(true);

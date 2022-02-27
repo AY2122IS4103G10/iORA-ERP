@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
@@ -22,14 +21,15 @@ public class StockTransferOrderLI {
     
     @ManyToOne
     private Product product;
-
     private Integer requestedQty;
-    @OneToMany
-    private List<ProductItem> requestedProductItems;
 
-    private Integer actualQty;
+    @OneToMany
+    private List<ProductItem> sentProductItems;
+    private Integer sentQty;
+
     @OneToMany
     private List<ProductItem> actualProductItems;
+    private Integer actualQty;
 
     public Long getId() {
         return this.id;
@@ -55,12 +55,20 @@ public class StockTransferOrderLI {
         this.requestedQty = requestedQty;
     }
 
-    public List<ProductItem> getRequestedProductItems() {
-        return this.requestedProductItems;
+    public List<ProductItem> getSentProductItems() {
+        return this.sentProductItems;
     }
 
-    public void setRequestedProductItems(List<ProductItem> requestedProductItems) {
-        this.requestedProductItems = requestedProductItems;
+    public void setSentProductItems(List<ProductItem> sentProductItems) {
+        this.sentProductItems = sentProductItems;
+    }
+
+    public Integer getSentQty() {
+        return this.sentQty;
+    }
+
+    public void setSentQty(Integer sentQty) {
+        this.sentQty = sentQty;
     }
 
     public Integer getActualQty() {

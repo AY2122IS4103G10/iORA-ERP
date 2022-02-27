@@ -3,14 +3,19 @@ package com.iora.erp.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
+import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerOrderService;
+import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
 
@@ -36,12 +41,35 @@ public class StoreController {
     private StockTransferService stockTransferService;
     @Autowired
     private CustomerOrderService customerOrderService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private CustomerService customerService;
 
     /*
      * ---------------------------------------------------------
      * F.1 Store Inventory Management
      * ---------------------------------------------------------
      */
+
+    @GetMapping(value = "/storeNames", produces = "application/json")
+    public ResponseEntity<Object> getStoreNames() {
+        return ResponseEntity
+                .ok(siteService.searchStores("", "").stream().collect(Collectors.toMap(Site::getId, Site::getName)));
+    }
+
+    @GetMapping(path = "/storeLogin", produces = "application/json")
+    public ResponseEntity<Object> login(@RequestParam Long id, @RequestParam String siteCode) {
+        try {
+            StoreSite s = siteService.storeLogin(id, siteCode);
+            if (s != null) {
+                return ResponseEntity.ok(s);
+            }
+            return ResponseEntity.badRequest().body("No such site");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
     @GetMapping(path = "/viewStock/sites", produces = "application/json")
     public List<Site> viewStockOfSites(@RequestParam List<String> siteTypes, @RequestParam String country,
@@ -194,7 +222,7 @@ public class StoreController {
 
     /*
      * ---------------------------------------------------------
-     * F.3 Store Order Management
+     * F.3 Store Order Management / F.4 Store Order Management
      * ---------------------------------------------------------
      */
 
@@ -210,7 +238,7 @@ public class StoreController {
     }
 
     @GetMapping(path = "/customerOrder/view/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> getCustomerOrder(Long orderId) {
+    public ResponseEntity<Object> getCustomerOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity
                     .ok(customerOrderService.getCustomerOrder(orderId));
@@ -218,5 +246,26 @@ public class StoreController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+    
+    @GetMapping(path = "/productDetails/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> getProductDetails(@PathVariable String rfid) {
+        try {
+            return ResponseEntity
+                    .ok(productService.getProductCartDetails(rfid).toString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
+    @GetMapping(path = "/member/{phone}", produces = "application/json")
+    public ResponseEntity<Object> getCustomerByPhone(@PathVariable String phone) {
+        try {
+            return ResponseEntity
+                    .ok(customerService.getCustomerByPhone(phone));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }

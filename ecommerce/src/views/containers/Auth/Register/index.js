@@ -66,7 +66,7 @@ export const Register = () => {
         )
           .unwrap()
           .then((data) => {
-            localStorage.setItem("user", JSON.stringify(data));
+            localStorage.setItem("user", JSON.stringify(data.id));
             setEmail("");
             setPassword("");
             setConfirmPassword("");

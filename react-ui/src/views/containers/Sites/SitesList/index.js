@@ -13,21 +13,15 @@ import {
   fetchSites,
   selectAllSites,
 } from "../../../../stores/slices/siteSlice";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-export const SitesTable = ({ data }) => {
+export const SitesTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
         Header: "#",
         accessor: "id",
-        Cell: (e) => (
-          <Link
-            to={`/ad/sites/${e.value}`}
-            className="hover:text-gray-700 hover:underline"
-          >
-            {e.value}
-          </Link>
-        ),
       },
       {
         Header: "Code",
@@ -68,18 +62,27 @@ export const SitesTable = ({ data }) => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        <SimpleTable columns={columns} data={data} />
+        <SimpleTable
+          columns={columns}
+          data={data}
+          handleOnClick={handleOnClick}
+        />
       </div>
     </div>
   );
 };
 
 export const SitesList = () => {
+  const { pathname } = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const data = useSelector(selectAllSites);
   const siteStatus = useSelector((state) => state.sites.status);
+
+  const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
+
   useEffect(() => {
     siteStatus === "idle" && dispatch(fetchSites());
   }, [siteStatus, dispatch]);
-  return <SitesTable data={data} />;
+  return <SitesTable data={data} handleOnClick={handleOnClick} />;
 };

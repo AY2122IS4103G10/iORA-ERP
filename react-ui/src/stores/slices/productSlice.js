@@ -6,6 +6,8 @@ const initialState = {
   model: null,
   currProduct: null, //selected product for stock level
   prodStockLevel: null, //view product's stock level
+  prodItem: null, 
+  prodDetails: null, // Selective details for order summary
   status: "idle",
   error: null,
 };
@@ -65,6 +67,22 @@ export const deleteExistingProduct = createAsyncThunk(
   "products/deleteExistingProduct",
   async (existingModelCode) => {
     const response = await api.delete("sam/model", existingModelCode);
+    return response.data;
+  }
+);
+
+export const getProductItem = createAsyncThunk(
+  "products/getProductItem",
+  async (rfid) => {
+    const response = await api.get("sam/productItem", rfid);
+    return response.data;
+  }
+);
+
+export const getProductDetails = createAsyncThunk(
+  "products/getProductDetails",
+  async (rfid) => {
+    const response = await api.get("store/productDetails", rfid);
     return response.data;
   }
 );
@@ -148,6 +166,26 @@ const productSlice = createSlice({
       );
       // state.status = "idle"
     });
+    builder.addCase(getProductItem.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getProductItem.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.prodItem = action.payload;
+    });
+    builder.addCase(getProductItem.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(getProductDetails.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getProductDetails.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.prodDetails = action.payload;
+    });
+    builder.addCase(getProductDetails.rejected, (state, action) => {
+      state.status = "failed";
+    });
   },
 });
 
@@ -164,5 +202,6 @@ export const selectModel = (state) => state.products.model;
 export const selectProductByCode = (state, modelCode) =>
   state.products.products.find((product) => product.modelCode === modelCode);
 
+export const selectProductItem = (state) => state.products.prodItem;
 
-  
+export const selectProductDetails = (state) => state.products.prodDetails;

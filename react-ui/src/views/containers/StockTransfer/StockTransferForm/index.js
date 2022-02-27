@@ -396,7 +396,7 @@ export const StockTransferForm = (subsys) => {
     //get stock level and product information
     const stocklevel = useSelector(selectCurrSiteStock);
     const allModels = useSelector(selectAllProducts);
-    const prodTableData = prepareStockLevel(convertData(stocklevel), allModels);
+    const prodTableData = isObjectEmpty(stocklevel) ? [] : prepareStockLevel(convertData(stocklevel), allModels);
 
     useEffect(() => {
         dispatch(getAllSites());
@@ -459,7 +459,6 @@ export const StockTransferForm = (subsys) => {
 
     const onAddItemsClicked = (e) => {
         e.preventDefault();
-        console.log(selectedRows);
         const selectedRowKeys = Object.keys(selectedRows).map((key) => parseInt(key));
         const lineItems = [];
         selectedRowKeys.map((key) => lineItems.push((prodTableData[key])));
@@ -488,6 +487,8 @@ export const StockTransferForm = (subsys) => {
             fromSite: from,
             toSite: to
         }
+        console.log(stockTransferOrder);
+        console.log(JSON.stringify(stockTransferOrder));
         dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
             .then(() => {

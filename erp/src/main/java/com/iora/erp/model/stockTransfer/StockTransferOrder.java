@@ -36,6 +36,9 @@ public class StockTransferOrder {
     @ManyToOne
     private Site toSite;
 
+    public StockTransferOrder() {
+    }
+
     public Long getId() {
         return this.id;
     }

@@ -56,7 +56,6 @@ const columns = [
   // }
 ]
 
-
 export const MyStoreStock = (subsys) => {
   const id = 3; //get current store/site user is in
   const dispatch = useDispatch();

@@ -73,6 +73,26 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                         </>
                         : ""}
 
+                    {userSiteId === fromSiteId && status === "CONFIRMED" ?
+                        (<button
+                            type="button"
+                            className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                            onClick={handleConfirmOrder}
+                        >
+                            {/* Enter actual qty sent */}
+                            <span>Ready for Delivery</span>
+                        </button>) : ""}
+
+                    {userSiteId === fromSiteId && status === "READYFORDELIVERY" ?
+                        (<button
+                            type="button"
+                            className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                            onClick={handleConfirmOrder}
+                        >
+                            {/* Enter actual qty received */}
+                            <span>Complete Order</span>
+                        </button>) : ""}
+
                 </div>
             </div>
 
@@ -127,7 +147,11 @@ export const LineItems = (lineItems) => {
                 accessor: "requestedQty"
             },
             {
-                Header: "Actual Qty",
+                Header: "Sent Qty",
+                accessor: "sentQty"
+            },
+            {
+                Header: "Received Qty",
                 accessor: "actualQty"
             },
         ]), []);
@@ -211,7 +235,7 @@ export const ViewStockTransfer = (subsys) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
-    const {pathname} = useLocation();
+    const { pathname } = useLocation();
     const userSiteId = useSelector(selectUserSite);
     const userStatus = useSelector((state) => state.user.status);
     const order = useSelector(selectStockTransferOrder);
@@ -230,9 +254,9 @@ export const ViewStockTransfer = (subsys) => {
             userSiteId = 1
         } else if (pathname.includes("wh")) {
             userSiteId = 2
-        } 
+        }
     }
-    
+
 
     const handleConfirmCancel = () => {
         dispatch(cancelStockTransfer({ orderId: id, siteId: userSiteId }))
@@ -313,14 +337,14 @@ export const ViewStockTransfer = (subsys) => {
                     closeModal={closeDeleteModal}
                     onConfirm={handleConfirmCancel}
                 />
-                 <Confirmation
+                <Confirmation
                     title={`Reject Stock Transfer Order #${id}`}
                     body="Are you sure you want to reject stock transfer order? This action cannot be undone."
                     open={openReject}
                     closeModal={closeRejectModal}
                     onConfirm={handleRejectOrder}
                 />
-                
+
             </>
         )
     );

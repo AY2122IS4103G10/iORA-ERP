@@ -217,7 +217,7 @@ const paths = [
   },
   {
     title: "Warehouse",
-    href: "#",
+    href: "/wh",
     icon: TruckIcon,
     iconForeground: "text-teal-700",
     iconBackground: "bg-teal-50",

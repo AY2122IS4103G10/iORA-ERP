@@ -90,6 +90,10 @@ public class ProcurementOrderLI {
         this.fulfilledProductItems = fulfilledProductItems;
     }
 
+    public void addFulfilledProductItems(ProductItem fulfilledProductItem) {
+        this.fulfilledProductItems.add(fulfilledProductItem);
+    }
+
     public int getFulfilledQty() {
         return this.fulfilledProductItems.size();
     }

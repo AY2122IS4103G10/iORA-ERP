@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import {
   CogIcon,
@@ -9,12 +9,16 @@ import {
 } from "@heroicons/react/outline";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import accessRightsMap from "../../../../constants/accessRightsPaths";
+import { api } from "../../../../environments/Api";
+import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
+import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { useNavigate } from "react-router-dom";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export const EnterStoreModal = ({ open, closeModal, siteCode, setSiteCode, handleEnterStore }) => {
+export const EnterStoreModal = ({ open, closeModal, stores, store, setStore, siteCode, setSiteCode, handleEnterStore }) => {
 
   return (
     <SimpleModal open={open} closeModal={closeModal}>
@@ -25,19 +29,25 @@ export const EnterStoreModal = ({ open, closeModal, siteCode, setSiteCode, handl
               as="h3"
               className="text-center text-lg leading-6 font-medium text-gray-900"
             >
-              Enter Store's Site Code
+              Choose Store and Enter Site Code
             </Dialog.Title>
           </div>
+          <div className="pb-3">
+            <SimpleSelectMenu
+              options={stores}
+              selected={store}
+              setSelected={setStore}
+            /></div>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            className="flex-grow shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+            placeholder="Site Code"
+            value={siteCode}
+            onChange={(e) => setSiteCode(e.target.value)}
+          />
         </div>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          className="flex-grow shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-          placeholder="0000000"
-          value={siteCode}
-          onChange={(e) => setSiteCode(e.target.value)}
-        />
         <div className="pt-5">
           <div className="flex justify-end">
             <button
@@ -226,12 +236,27 @@ const paths = [
 ];
 
 export function Home() {
+  const navigate = useNavigate();
   const [openEnterStore, setOpenEnterStore] = useState(false);
   const [siteCode, setSiteCode] = useState("");
+  const [storeNames, setStoreNames] = useState({});
+  const stores = Object.keys(storeNames).map((key) => { return { id: key, name: storeNames[key] } });
+  const [store, setStore] = useState({ id: 0, name: "" });
+
+  useEffect(() => {
+    api.getAll("/store/storeNames").then((response) => {
+      setStoreNames(response.data);
+    })
+  }, [setStoreNames]);
 
   const handleEnterStore = () => {
-    console.log("SiteCode: " + siteCode);
-    //need to api to get site from sitecode + store in localstorage
+    console.log(store);
+    api.getAll(`/store/storeLogin?id=${store.id}&siteCode=${siteCode}`).then((response) => {
+      localStorage.setItem("siteId", response.data.id);
+      navigate("/str");
+    }).catch((err) => {
+      alert(err);
+    })
     closeEnterStoreModal();
   }
 
@@ -252,6 +277,9 @@ export function Home() {
       <EnterStoreModal
         open={openEnterStore}
         closeModal={closeEnterStoreModal}
+        stores={stores}
+        store={stores[0]}
+        setStore={setStore}
         siteCode={siteCode}
         setSiteCode={setSiteCode}
         handleEnterStore={handleEnterStore} />

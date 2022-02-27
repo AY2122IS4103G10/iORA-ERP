@@ -14,6 +14,7 @@ import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.stockTransfer.STOStatus;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
+import com.iora.erp.model.stockTransfer.StockTransferOrderLI;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -213,6 +214,12 @@ public class StockTransferServiceImpl implements StockTransferService {
             } else if (actionBy != stockTransferOrder.getToSite()) {
                 throw new StockTransferException(
                         "Site is not responsible for receiving this order.");
+            }
+
+            // This loop is for simulating that all received qty = shipped qty
+            for (StockTransferOrderLI stoli : stockTransferOrder.getLineItems()) {
+                stoli.setActualProductItems(stoli.getSentProductItems());
+                stoli.setActualQty(stoli.getSentQty());
             }
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.COMPLETED));

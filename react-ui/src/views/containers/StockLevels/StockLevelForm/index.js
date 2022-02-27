@@ -7,7 +7,7 @@ import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 import { XIcon } from '@heroicons/react/outline'
 
 import { selectUserStore } from "../../../../stores/slices/userSlice";
-import { getASiteStock, selectCurrSiteStock } from "../../../../stores/slices/stocklevelSlice";
+import { getASiteStock, selectCurrSiteStock, editStock } from "../../../../stores/slices/stocklevelSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchModel, selectModel } from "../../../../stores/slices/productSlice";
 import { api } from "../../../../environments/Api";
@@ -19,6 +19,7 @@ function classNames(...classes) {
 
 
 export const getProductItem = (data, sku) => {
+  // console.log(data);
   return data.productItems.filter((item) => item.productSKU == sku.trim());
 }
 
@@ -45,49 +46,8 @@ const actions = [
   }
 ]
 
-export const Slideover = ({ open, closeModal }) => {
-  const siteId = useSelector(selectUserStore);
-  const {id} = useParams(); //get sku code
-  const [rfid, setRfid] = useState("");
-  const dispatch = useDispatch();
-  const [selected, setSelected] = useState(actions[0]);
-  const stocklevel = useSelector(selectCurrSiteStock);
-  let productItems = Array.from(stocklevel.productItems);
-
-  useEffect(() => {
-    // dispatch(getASiteStock(siteId));
-  }, [])
-
-
-  const handleEditStock = (e) => {
-    console.log("editing stock");
-    e.preventDefault();
-    const rfidArr = rfid.trim().split(" ");
-    console.log(rfidArr);
-    // add 
-    if (selected.id == 1) {
-      for (var item in rfidArr) {
-        productItems.push({
-          rfid: item,
-          available: true,
-          productSKU: id,
-          stockLevel: stocklevel, 
-        })
-      }
-
-    // remove
-    } else if (selected.id == 2) {
-      for (var item in rfidArr) {
-        productItems.push({
-          rfid: item,
-          available: true,
-          productSKU: id,
-          stockLevel: null, 
-        })
-      }
-    }
-    api.create(`/store/editStock/${siteId}`, productItems);
-  }
+export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, selected, setSelected}) => {
+ 
 
   return (
 
@@ -241,7 +201,7 @@ export const Slideover = ({ open, closeModal }) => {
                       <button
                         type="submit"
                         className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        onClick={() => handleEditStock()}
+                        onClick={(e) => handleEditStock(e)}
                       >
                         Confirm
                       </button>
@@ -260,20 +220,21 @@ export const Slideover = ({ open, closeModal }) => {
 
 export const StockLevelForm = () => {
   const { id } = useParams(); //sku code
-  const siteId = useSelector(selectUserStore); //get current store/site user is in
+  const siteId = 3; //get current store/site user is in
   const dispatch = useDispatch();
+  const status = useSelector((state) => state.stocklevel.status)
   const siteStock = useSelector(selectCurrSiteStock);
-  const [open, setOpen] = useState(true);
-
+  const [open, setOpen] = useState(false);
+  const [rfid, setRfid] = useState("");
+  const [selected, setSelected] = useState(actions[0]);
 
   //get product information
   const modelCode = id.slice(0, -2);
   const model = useSelector(selectModel);
 
 
-  //===UNCOMMENT WHEN STOCK LEVEL IS ADDED=====
   useEffect(() => {
-    // dispatch(getASiteStock(id)); 
+    dispatch(getASiteStock(siteId)); 
     dispatch(fetchModel(modelCode));
   }, [])
 
@@ -281,8 +242,36 @@ export const StockLevelForm = () => {
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
 
+  const handleEditStock = (e) => {
+    e.preventDefault();
+    let toUpdate = {};
+    const rfidArr = rfid.trim().split(" ");
+    console.log(rfidArr);
+    // add 
+    if (selected.id == 1) {
+      Object.entries(rfidArr).forEach(([key, value]) => {
+        toUpdate[value] = siteId;
+      });
+
+    // remove
+    } else if (selected.id == 2) {
+      Object.entries(rfidArr).forEach(([key, value]) => {
+        toUpdate[value] = 0;
+      });
+    }
+    console.log(toUpdate);
+
+    dispatch(editStock({toUpdate: toUpdate, siteId: siteId}))
+      .unwrap()
+      .then((response) => {
+        alert("Successfully edited stock levels");
+        closeModal();
+      })
+      .catch((err) => alert(err.message))
+  }
 
   return (
+    Boolean(model) && (
     <div className="min-h-full">
       <main className="py-10">
         {/* Page header */}
@@ -321,7 +310,7 @@ export const StockLevelForm = () => {
                       <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.price}</dd>
                     </div>
                     {model != null && model.products != null ? (
-                      model.products.filter((prod) => prod.sku == id.trim())[0].productFields.map((field) => {
+                      model?.products?.filter((prod) => prod.sku == id.trim())[0].productFields.map((field) => {
                         return (
                           <div key={field.id} className="sm:col-span-1">
                             <dt className="text-sm font-medium text-gray-500">{field.fieldName}</dt>
@@ -356,7 +345,7 @@ export const StockLevelForm = () => {
                     Product Items
                   </h2>
                 </div>
-                <div className="col-span-1">
+                <div className="col-span-1 flex justify-end">
                   <button
                     type="button"
                     className="inline-flex items-center mr-3 px-3 py-2 border border-transparent text-sm leading-4 
@@ -369,7 +358,7 @@ export const StockLevelForm = () => {
               </div>
 
               <div className="m-1">
-                {siteStock.length == 0 || siteStock == undefined ? <p>loading</p> :
+                {Boolean(siteStock) &&
                   <SimpleTable columns={columns} data={getProductItem(siteStock, id)} />
                 }
               </div>
@@ -378,8 +367,16 @@ export const StockLevelForm = () => {
         </div>
 
         {/* Edit Stock Slideover */}
-        <Slideover open={open} closeModal={closeModal}/>
+        <Slideover 
+        open={open} 
+        closeModal={closeModal} 
+        handleEditStock={handleEditStock}
+        rfid={rfid}
+        setRfid={setRfid}
+        selected={selected}
+        setSelected={setSelected}
+          />
       </main>
-    </div>
+    </div>)
   );
 }

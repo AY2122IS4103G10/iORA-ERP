@@ -99,7 +99,7 @@ function App() {
 
           {/* Store Management Subsystem */}
           <Route path="str" element={<StoreIndex />}>
-            <Route path="stocklevels/*" element={<ViewStoreStock />} />
+            <Route path="stocklevels/*" element={<ViewStoreStock subsys="str"/>} />
             <Route path="stocktransfer" element={<Outlet />}>
               <Route index element={<ManageStockTransfer subsys="str" />} />
               <Route path=":id" element={<ViewStockTransfer subsys="str" />} />

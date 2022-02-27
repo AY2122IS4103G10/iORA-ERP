@@ -79,6 +79,15 @@ export const vendorApi = {
   },
 };
 
+export const stockLevelApi = {
+  editStock(toUpdate, siteId) {
+    return axios.post(
+      `${REST_ENDPOINT}warehouse/editStock/${siteId}`,
+      toUpdate
+    )
+  }
+}
+
 export const stockTransferApi = {
   cancelOrder(orderId, siteId) {
     return axios.delete(

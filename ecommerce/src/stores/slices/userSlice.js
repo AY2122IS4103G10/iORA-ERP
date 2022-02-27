@@ -26,6 +26,14 @@ const initialState = {
   error: "null",
 };
 
+export const fetchUser = createAsyncThunk("user/fetchUser", async ({ id }) => {
+  const response = await api.get("sam/customer/view", id);
+  if (response.data === "") {
+    return Promise.reject(response.error);
+  }
+  return response.data;
+});
+
 export const login = createAsyncThunk(
   "auth/login",
   async ({ email, password }) => {
@@ -45,13 +53,16 @@ export const register = createAsyncThunk("auth/register", async (user) => {
   return response.data;
 });
 
-export const updateAccount = createAsyncThunk("auth/updateAccount", async (user) => {
-  const response = await api.create("/online/profile/edit", user);
-  if (response.data === "") {
-    return Promise.reject(response.error);
+export const updateAccount = createAsyncThunk(
+  "auth/updateAccount",
+  async (user) => {
+    const response = await api.update("/online/profile/edit", user);
+    if (response.data === "") {
+      return Promise.reject(response.error);
+    }
+    return response.data;
   }
-  return response.data;
-});
+);
 
 const userSlice = createSlice({
   name: "user",
@@ -64,6 +75,13 @@ const userSlice = createSlice({
     },
   },
   extraReducers(builder) {
+    builder.addCase(fetchUser.fulfilled, (state, action) => {
+      state.user = action.payload;
+      state.status = "succeeded";
+    });
+    builder.addCase(fetchUser.rejected, (state, action) => {
+      state.error = "Fetch user failed";
+    });
     builder.addCase(login.fulfilled, (state, action) => {
       action.payload.salt !== undefined && delete action.payload.salt;
       action.payload.hashPass !== undefined && delete action.payload.hashPass;
@@ -75,7 +93,6 @@ const userSlice = createSlice({
       state.error = "Login failed";
     });
     builder.addCase(register.fulfilled, (state, action) => {
-      console.log(action.payload)
       action.payload.salt !== undefined && delete action.payload.salt;
       action.payload.hashPass !== undefined && delete action.payload.hashPass;
       state.user = action.payload;
@@ -84,6 +101,16 @@ const userSlice = createSlice({
     });
     builder.addCase(register.rejected, (state, action) => {
       state.error = "Register failed";
+    });
+    builder.addCase(updateAccount.fulfilled, (state, action) => {
+      action.payload.salt !== undefined && delete action.payload.salt;
+      action.payload.hashPass !== undefined && delete action.payload.hashPass;
+      state.user = action.payload;
+      state.status = "succeeded";
+      state.loggedIn = true;
+    });
+    builder.addCase(updateAccount.rejected, (state, action) => {
+      state.error = "Update failed";
     });
   },
 });

@@ -37,7 +37,7 @@ export const ProductsTable = ({ data }) => {
       },
       {
         Header: "Color",
-        width: 208,
+        width: 278,
         accessor: (row) =>
           row.productFields
             .filter((field) => field.fieldName === "COLOUR")
@@ -68,27 +68,27 @@ export const ProductsTable = ({ data }) => {
       {
         Header: "Available",
         accessor: "available",
-        width: 100,
+        width: 110,
         Cell: (e) => (e.value ? "Yes" : "No"),
       },
-      {
-        Header: (
-          <div className="flex items-center">
-            <CogIcon className="h-4 w-4" />
-          </div>
-        ),
-        accessor: "accessor",
-        width: 80,
-        disableSortBy: true,
-        Cell: OptionsCell({
-          options: [
-            {
-              name: "Delete",
-              navigate: "/products",
-            },
-          ],
-        }),
-      },
+      // {
+      //   Header: (
+      //     <div className="flex items-center">
+      //       <CogIcon className="h-4 w-4" />
+      //     </div>
+      //   ),
+      //   accessor: "accessor",
+      //   width: 80,
+      //   disableSortBy: true,
+      //   Cell: OptionsCell({
+      //     options: [
+      //       {
+      //         name: "Delete",
+      //         navigate: "/products",
+      //       },
+      //     ],
+      //   }),
+      // },
     ],
     []
   );

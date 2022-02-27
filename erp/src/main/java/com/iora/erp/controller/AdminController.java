@@ -47,22 +47,21 @@ public class AdminController {
      * ---------------------------------------------------------
      */
 
-
     @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {
+    public JobTitle addJobTitle(@RequestBody JobTitle jt) {
         try {
-            return ResponseEntity.ok(adminService.createJobTitle(jt));
+            return adminService.createJobTitle(jt);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
     @PutMapping(path = "/editJobTitle", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editJobTitle(@RequestBody JobTitle jt) {
+    public JobTitle editJobTitle(@RequestBody JobTitle jt) {
         try {
-            return ResponseEntity.ok(adminService.updateJobTitle(jt));
+            return adminService.updateJobTitle(jt);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
@@ -98,18 +97,18 @@ public class AdminController {
     }
 
     @PostMapping(path = "/addVendor", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addCompany(@RequestBody Vendor v) {
+    public Vendor addVendor(@RequestBody Vendor v) {
         try {
-            return ResponseEntity.ok(adminService.createVendor(v));
+            return adminService.createVendor(v);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
     @GetMapping(path = "/viewVendors", produces = "application/json")
     public List<Vendor> viewVendors(@RequestParam("search") String search) {
         try {
-            if(search == null) {
+            if (search == null) {
                 search = "";
             }
             return adminService.getListofVendor(search);
@@ -128,14 +127,13 @@ public class AdminController {
     }
 
     @PutMapping(path = "/editVendor", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editVendor(@RequestBody Vendor v) {
+    public Vendor editVendor(@RequestBody Vendor v) {
         try {
-            return ResponseEntity.ok(adminService.updateVendor(v));
+            return adminService.updateVendor(v);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
-
 
     @DeleteMapping(path = "/deleteVendor")
     public ResponseEntity<Object> deleteVendor(@RequestParam Long id) {
@@ -146,22 +144,21 @@ public class AdminController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-    
-    
+
     @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addCompany(@RequestBody Company company) {
+    public Company addCompany(@RequestBody Company company) {
         try {
-            return ResponseEntity.ok(adminService.createCompany(company));
+            return adminService.createCompany(company);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
     @GetMapping(path = "/viewCompanies", produces = "application/json")
     public List<Company> viewCompanies(@RequestParam("search") String search) {
         try {
-            if(search == null) {
-                search ="";
+            if (search == null) {
+                search = "";
             }
             return adminService.getCompanysByFields(search);
         } catch (Exception ex) {
@@ -177,17 +174,17 @@ public class AdminController {
             return null;
         }
     }
-    
+
     @PutMapping(path = "/editCompany", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editCompany(@RequestBody Company company) {
+    public Company editCompany(@RequestBody Company company) {
         try {
-            
-            return ResponseEntity.ok(adminService.editCompany(company));
+
+            return adminService.editCompany(company);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
-    
+
     @DeleteMapping(path = "/deleteCompany")
     public ResponseEntity<Object> deleteCompany(@RequestParam Long id) {
         try {
@@ -197,7 +194,6 @@ public class AdminController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-    
 
     @GetMapping(path = "/viewAllAddress", produces = "application/json")
     public List<Address> viewAllAddress() {
@@ -220,14 +216,12 @@ public class AdminController {
         }
     }
 
-
-
     @PostMapping(path = "/addDepartment", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addDepartment(@RequestBody Department d) {
+    public Department addDepartment(@RequestBody Department d) {
         try {
-            return ResponseEntity.ok(adminService.createDepartment(d));
+            return adminService.createDepartment(d);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
@@ -253,11 +247,11 @@ public class AdminController {
     }
 
     @PutMapping(path = "/editDepartment", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editDepartment(@RequestBody Department d) {
+    public Department editDepartment(@RequestBody Department d) {
         try {
-            return ResponseEntity.ok(adminService.editDepartment(d));
+            return adminService.editDepartment(d);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
@@ -272,11 +266,11 @@ public class AdminController {
     }
 
     @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
+    public Employee addEmployee(@RequestBody Employee employee) {
         try {
-            return ResponseEntity.ok(employeeService.createEmployee(employee));
+            return employeeService.createEmployee(employee);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
@@ -332,12 +326,12 @@ public class AdminController {
     }
 
     @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editEmployee(@RequestBody Employee employee) {
+    public Employee editEmployee(@RequestBody Employee employee) {
         try {
-            
-            return ResponseEntity.ok(employeeService.updateEmployeeAccount(employee));
+
+            return employeeService.updateEmployeeAccount(employee);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
@@ -443,15 +437,13 @@ public class AdminController {
     @GetMapping(path = "/countries", produces = "application/json")
     public List<String> getCountries() {
         try {
-            List<String> country = Stream.of(Country.values()).map( 
-                Country::name).collect(Collectors.toList());
+            List<String> country = Stream.of(Country.values()).map(
+                    Country::name).collect(Collectors.toList());
 
             return country;
         } catch (Exception e) {
             return null;
         }
     }
-
-
 
 }

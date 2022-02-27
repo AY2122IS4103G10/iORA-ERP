@@ -29,6 +29,7 @@ import {
   ChevronRightIcon,
   ChevronLeftIcon,
   TrashIcon,
+  CheckIcon,
 } from "@heroicons/react/outline";
 import { DotsHorizontalIcon } from "@heroicons/react/solid";
 
@@ -157,6 +158,18 @@ export const DeleteCell = ({ onClick }) => {
     >
       <span className="sr-only">Delete</span>
       <TrashIcon className="h-5 w-5" aria-hidden="true" />
+    </button>
+  );
+};
+
+export const CheckCell = ({ onClick }) => {
+  return (
+    <button
+      className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+      onClick={onClick}
+    >
+      <span className="sr-only">Delete</span>
+      <CheckIcon className="h-5 w-5" aria-hidden="true" />
     </button>
   );
 };

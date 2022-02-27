@@ -3,12 +3,14 @@ package com.iora.erp.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
+import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.SiteService;
@@ -42,6 +44,25 @@ public class StoreController {
      * F.1 Store Inventory Management
      * ---------------------------------------------------------
      */
+
+    @GetMapping(value = "/storeNames", produces = "application/json")
+    public ResponseEntity<Object> getStoreNames() {
+        return ResponseEntity
+                .ok(siteService.searchStores("", "").stream().collect(Collectors.toMap(Site::getId, Site::getName)));
+    }
+
+    @GetMapping(path = "/storeLogin", produces = "application/json")
+    public ResponseEntity<Object> login(@RequestParam Long id, @RequestParam String siteCode) {
+        try {
+            StoreSite s = siteService.storeLogin(id, siteCode);
+            if (s != null) {
+                return ResponseEntity.ok(s);
+            }
+            return ResponseEntity.badRequest().body("No such site");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
     @GetMapping(path = "/viewStock/sites", produces = "application/json")
     public List<Site> viewStockOfSites(@RequestParam List<String> siteTypes, @RequestParam String country,

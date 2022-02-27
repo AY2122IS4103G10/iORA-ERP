@@ -41,7 +41,10 @@ export const redeemVoucher = createAsyncThunk(
 export const deleteExistingVoucher = createAsyncThunk(
   "vouchers/deleteExistingVoucher",
   async (existingVoucherCode) => {
-    const response = await api.delete("sam/voucher/delete", existingVoucherCode);
+    const response = await api.delete(
+      "sam/voucher/delete",
+      existingVoucherCode
+    );
     return response.data;
   }
 );
@@ -55,7 +58,7 @@ const voucherSlice = createSlice({
     });
     builder.addCase(fetchVouchers.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.vouchers = state.vouchers.concat(action.payload);
+      state.vouchers = action.payload;
     });
     builder.addCase(fetchVouchers.rejected, (state, action) => {
       state.status = "failed";
@@ -64,9 +67,22 @@ const voucherSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(issueVoucher.fulfilled, (state, action) => {
-      state.status = "idle";
+      const { voucherCode, issued } = action.payload;
+      const existingVoucher = state.vouchers.find(
+        (voucher) => voucher.voucherCode === voucherCode
+      );
+      if (existingVoucher) {
+        existingVoucher.issued = issued;
+      }
     });
     builder.addCase(redeemVoucher.fulfilled, (state, action) => {
+      const { voucherCode, redeemed } = action.payload;
+      const existingVoucher = state.vouchers.find(
+        (voucher) => voucher.voucherCode === voucherCode
+      );
+      if (existingVoucher) {
+        existingVoucher.redeemed = redeemed;
+      }
       state.status = "idle";
     });
     builder.addCase(deleteExistingVoucher.fulfilled, (state, action) => {

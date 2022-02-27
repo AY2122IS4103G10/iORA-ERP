@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import moment from "moment";
 import {
   SimpleTable,
   SelectColumnFilter,
@@ -35,6 +35,13 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
       {
         Header: "Warehouse",
         accessor: (row) => row.warehouse,
+      },
+      {
+        Header: "Updated",
+        accessor: (row) =>
+          moment
+            .unix(row.statusHistory[row.statusHistory.length - 1].timeStamp / 1000)
+            .format("DD/MM/YY, h:mm:ss a"),
       },
       // {
       //   Header: CogIcon,
@@ -73,10 +80,11 @@ export const ProcurementList = ({ pathname }) => {
         {Boolean(data.length) ? (
           <ProcurementTable data={data} handleOnClick={handleOnClick} />
         ) : (
-          pathname.includes("sm") &&
-          <Link to="/sm/procurements/create">
-            <DashedBorderES item="procurement order" />
-          </Link>
+          pathname.includes("sm") && (
+            <Link to="/sm/procurements/create">
+              <DashedBorderES item="procurement order" />
+            </Link>
+          )
         )}
       </div>
     </div>

@@ -98,6 +98,15 @@ export const OrderTable = ({data}) => {
     ],
     []
   );*/
+};
+const orderTable = (siteId) => {
+  /*const data = useSelector(fetchSiteOrders);
+  const posStatus = useSelector((state) => state.pos.status);
+  const error = useSelector((state) => state.site.error);
+
+  useEffect(() => {
+    procurementsStatus === "idle" && dispatch(fetchProcurements());
+  }, [procurementsStatus, dispatch]);*/
 
   return (
     <div className="flex flex-col">

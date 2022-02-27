@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -167,6 +168,15 @@ public class ProcurementServiceImpl implements ProcurementService {
         return em.merge(procurementOrder);
     }
 
+    private String generateRFID(String sku) {
+        return "10-0001234-0" + sku.substring(5, 10) + "-0000" +
+                new Random().ints(48, 91)
+                        .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                        .limit(5)
+                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                        .toString();
+    }
+
     @Override
     public ProcurementOrder fulfilProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException,
@@ -183,16 +193,30 @@ public class ProcurementServiceImpl implements ProcurementService {
             throw new SiteConfirmationException("Site is not authorised to fulfil Procurement Order.");
         }
 
-        List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
-                .flatMap(Collection::stream).collect(Collectors.toList());
-        for (int i = 0; i < productItems.size(); i++) {
-            try {
-                productService.createProductItem(productItems.get(i).getRfid(), productItems.get(i).getProductSKU());
-            } catch (ProductItemException e) {
-                System.err.println(e.getMessage());
+        List<ProductItem> allProductItems = new ArrayList<>();
+
+        for (ProcurementOrderLI poli : procurementOrder.getLineItems()) {
+            for (int i = 0; i < poli.getRequestedQty(); i++) {
+                try {
+                    ProductItem pi = productService.createProductItem(generateRFID(poli.getProduct().getsku()), poli.getProduct().getsku());
+                    allProductItems.add(pi);
+                    poli.addFulfilledProductItems(pi);
+                } catch (ProductItemException e) {
+                    System.err.println(e.getMessage());
+                }
             }
         }
-        siteService.addManyToStockLevel(actionBy.getStockLevel(), productItems);
+
+        // List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
+        //         .flatMap(Collection::stream).collect(Collectors.toList());
+        // for (int i = 0; i < productItems.size(); i++) {
+        //     try {
+        //         productService.createProductItem(productItems.get(i).getRfid(), productItems.get(i).getProductSKU());
+        //     } catch (ProductItemException e) {
+        //         System.err.println(e.getMessage());
+        //     }
+        // }
+        siteService.addManyToStockLevel(actionBy.getStockLevel(), allProductItems);
         procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.READY));
 

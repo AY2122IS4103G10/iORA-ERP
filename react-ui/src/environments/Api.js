@@ -131,3 +131,9 @@ export const posApi = {
     return axios.get(`${REST_ENDPOINT}/store/customerOrder/${siteId}`);
   },
 };
+
+export const employeeApi = {
+  getEmployee(employeeId) {
+    return axios.get(`${REST_ENDPOINT}admin/viewEmployee?id=${employeeId}`)
+  }
+}

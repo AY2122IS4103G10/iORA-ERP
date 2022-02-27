@@ -4,32 +4,34 @@ import { useDispatch } from "react-redux";
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 import {
-  ClockIcon,
+  ArchiveIcon,
   CogIcon,
-  CreditCardIcon,
   DocumentReportIcon,
+  DocumentTextIcon,
   HomeIcon,
   QuestionMarkCircleIcon,
   ScaleIcon,
   ShieldCheckIcon,
+  ShoppingBagIcon,
+  TicketIcon,
 } from "@heroicons/react/outline";
 import { updateCurrSite } from "../../../../stores/slices/userSlice";
 
 const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
-  { name: "Products", href: "/sm/products", icon: ClockIcon, current: false },
+  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Products", href: "/sm/products", icon: ShoppingBagIcon, current: false },
   {
     name: "Stock Levels",
     href: "/sm/stocklevels/sites",
     icon: ScaleIcon,
     current: false,
   },
-  { name: "Stock Transfer", href: "/sm/stocktransfer", icon: CreditCardIcon, current: false },
-  { name: "Procurement Orders", href: "/sm/procurements", icon: CreditCardIcon, current: false },
+  { name: "Stock Transfer", href: "/sm/stocktransfer", icon: ArchiveIcon, current: false },
+  { name: "Procurement Orders", href: "/sm/procurements", icon: DocumentTextIcon, current: false },
   {
     name: "Vouchers",
     href: "/sm/vouchers",
-    icon: CreditCardIcon,
+    icon: TicketIcon,
     current: false,
   },
   {
@@ -52,7 +54,7 @@ export const SMIndex = () => {
 
   useEffect(() => {
     dispatch(updateCurrSite(1));
-  },[])
+  },[dispatch])
 
 
   return (

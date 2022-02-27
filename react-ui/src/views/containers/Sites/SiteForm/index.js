@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
@@ -10,6 +10,10 @@ import {
   addNewSite,
   updateExistingSite,
 } from "../../../../stores/slices/siteSlice";
+import {
+  fetchCompanies,
+  selectAllCompanies,
+} from "../../../../stores/slices/companySlice";
 
 const siteTypes = [
   { id: 1, name: "Headquarters" },
@@ -19,7 +23,7 @@ const siteTypes = [
   { id: 5, name: "Warehouse" },
 ];
 
-const companies = [{ id: 1, name: "iORA Fashion Pte. Ltd." }];
+// const companies = [{ id: 1, name: "iORA Fashion Pte. Ltd." }];
 
 export const AddressField = ({
   address1,
@@ -394,16 +398,23 @@ const SiteFormBody = ({
                         billing={billing}
                         onBillingChanged={onBillingChanged}
                       />
+
                       <SimpleInputGroup
                         label="Company"
                         inputField="company"
                         className="relative rounded-md sm:mt-0 sm:col-span-2"
                       >
-                        <SimpleSelectMenu
-                          options={companies}
-                          selected={companySelected}
-                          setSelected={setCompanySelected}
-                        />
+                        {[companies, companySelected, setCompanySelected].every(
+                          Boolean
+                        ) ? (
+                          <SimpleSelectMenu
+                            options={companies}
+                            selected={companySelected}
+                            setSelected={setCompanySelected}
+                          />
+                        ) : (
+                          <div>No companies</div>
+                        )}
                       </SimpleInputGroup>
                     </div>
                   </div>
@@ -437,6 +448,8 @@ const SiteFormBody = ({
 };
 
 export const SiteForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { siteId } = useParams();
   const [name, setName] = useState("");
   const [address1, setAddress1] = useState("");
@@ -448,19 +461,26 @@ export const SiteForm = () => {
   const [postalCode, setPostalCode] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-  const [billing, setBilling] = useState(false)
+  const [billing, setBilling] = useState(false);
   const [siteCode, setSiteCode] = useState("");
   const [phone, setPhone] = useState("");
   const [active, setActive] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [siteTypeSelected, setSiteTypeSelected] = useState(siteTypes[0]);
-  const [companySelected, setCompanySelected] = useState(companies[0]);
+  const [companySelected, setCompanySelected] = useState(null);
   const [stockLevel, setStockLevel] = useState([]);
   const [procurementOrders, setProcurementOrders] = useState([]);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const companies = useSelector(selectAllCompanies);
+  const company = companies[0];
+  const companyStatus = useSelector((state) => state.companies.status);
+  useEffect(() => {
+    companyStatus === "idle" && dispatch(fetchCompanies());
+  }, [companyStatus, dispatch]);
 
+  useEffect(() => {
+    company && setCompanySelected(company);
+  }, [company]);
   const onNameChanged = (e) => setName(e.target.value);
   const onSiteCodeChanged = (e) => setSiteCode(e.target.value);
   const onPhoneChanged = (e) => setPhone(e.target.value);

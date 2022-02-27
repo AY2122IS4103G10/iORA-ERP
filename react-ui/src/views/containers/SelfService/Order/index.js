@@ -35,20 +35,21 @@ const OrderList = ({
                                                     {product.name}
                                                 </a>
                                             </h4>
-                                            {product.discountedPrice === null ?
-                                                <p className="ml-4 text-sm font-medium text-gray-900">${product.price}</p>
-                                                :
+                                            {console.log(product)}
+                                            {'discountedPrice' in product ?
                                                 <div>
                                                     <p className="line-through text-gray-500" >${product.price}</p>
                                                     ${product.discountedPrice}
                                                 </div>
+                                                :
+                                                <p className="ml-4 text-sm font-medium text-gray-900">${product.price}</p>
                                             }
                                         </div>
                                         <p className="mt-1 text-sm text-gray-500">Colour: {product.colour}</p>
                                         <p className="mt-1 text-sm text-gray-500">Size: {product.size}</p>
                                         {product.promotion !== null && <p className="mt-1 text-sm text-gray-500">Promotion: {product.promotion}</p>}
                                     </div>
-                                            <Remove product={product}/>
+                                    <Remove product={product} />
                                 </div>
                             </li>
                         ))}
@@ -78,15 +79,15 @@ const OrderList = ({
                         >
                             Checkout
                         </button>
-                            <button
-                                type="button"
-                                className="w-full mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
-                                onClick={() => {
-                                    window.confirm('Are you sure you want to cancel?') && navigate("/ss")
-                                }}
-                            >
-                                Cancel
-                            </button>
+                        <button
+                            type="button"
+                            className="w-full mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                            onClick={() => {
+                                window.confirm('Are you sure you want to cancel?') && navigate("/ss")
+                            }}
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </section>
             </form>
@@ -149,7 +150,7 @@ export function Order() {
             .then((data) => {
                 products.push(data);
                 setProducts(products);
-                data.discountedPrice !== null ? setAmount(amount + data.discountedPrice) : setAmount(amount + data.price);
+                'discountedPrice' in data ? setAmount(amount + data.discountedPrice) : setAmount(amount + data.price);
             })
             .catch((err) => {
                 console.log(err);
@@ -173,34 +174,34 @@ export function Order() {
 
     function Remove(props) {
         const product = props.product;
-        
+
         const removeProduct = (product) => {
             const index = products.indexOf(product);
             products.splice(index, 1);
             setProducts(products);
-            product.discountedPrice !== null ? setAmount(amount - product.discountedPrice) : setAmount(amount - product.price);
+            'discountedPrice' in product ? setAmount(amount - product.discountedPrice) : setAmount(amount - product.price);
         }
 
         return (
             <div className="">
                 <button type="button"
                     className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-                    onClick = {() => removeProduct(product)}>
+                    onClick={() => removeProduct(product)}>
                     <span>Remove</span>
                 </button>
             </div>
         )
     }
 
-return (
-    <OrderList
-        products={products}
-        amount={amount}
-        rfid={rfid}
-        onRfidChanged={onRfidChanged}
-        addRFIDClicked={addRFIDClicked}
-        Remove = {Remove}
-        navigate = {navigate}
-    />
-)
+    return (
+        <OrderList
+            products={products}
+            amount={amount}
+            rfid={rfid}
+            onRfidChanged={onRfidChanged}
+            addRFIDClicked={addRFIDClicked}
+            Remove={Remove}
+            navigate={navigate}
+        />
+    )
 }

@@ -551,19 +551,24 @@ public class ProductServiceImpl implements ProductService {
         pi.setAvailable(true);
     }
 
-    private String generateRFID() {
-        int leftLimit = 48;
-        int rightLimit = 122;
-        int targetStringLength = 16;
-        Random random = new Random();
+    @Override
+    public List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException {
+        List<ProductItem> piList = new ArrayList<>();
+        for (int i = 0; i < qty; i++) {
+            String rfid = generateRFID(sku);
+            ProductItem pi = createProductItem(rfid, sku);
+            piList.add(pi);
+        }
+        return piList;
+    }
 
-        String generatedString = random.ints(leftLimit, rightLimit + 1)
-                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-
-        return generatedString;
+    private String generateRFID(String sku) {
+        return "10-0001234-0" + sku.substring(5, 10) + "-0000" +
+                new Random().ints(48, 91)
+                        .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                        .limit(5)
+                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                        .toString();
     }
 
     @Override
@@ -679,13 +684,13 @@ public class ProductServiceImpl implements ProductService {
             int stockLevel = r.nextInt(27) + 3;
 
             for (int i = 0; i < stockLevel; i++) {
-                String rfid = generateRFID();
+                String rfid = generateRFID(p.getsku());
                 createProductItem(rfid, p.getsku());
-                // try {
-                //     siteService.addProductItemToSite(r.nextLong(20), rfid);
-                // } catch (NoStockLevelException ex) {
-                //     // do nothing
-                // }
+                try {
+                    siteService.addProductItemToSite(Long.valueOf(r.nextInt(20)) + 1, rfid);
+                } catch (NoStockLevelException ex) {
+                    // do nothing
+                }
             }
         }
     }

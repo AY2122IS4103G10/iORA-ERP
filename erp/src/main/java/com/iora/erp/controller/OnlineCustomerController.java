@@ -36,21 +36,20 @@ public class OnlineCustomerController {
     }
 
     @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addJobTitle(@RequestBody Customer customer) {
+    public Customer registerAccount(@RequestBody Customer customer) {
         try {
-            customerService.createCustomerAccount(customer);
-            return ResponseEntity.ok("Your customer Account has been successfully created");
+            return customerService.createCustomerAccount(customer);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
     @PutMapping(path = "/profile/edit", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editProfile(@RequestBody Customer customer) {
+    public Customer editProfile(@RequestBody Customer customer) {
         try {
-            return ResponseEntity.ok(customerService.updateCustomerAccount(customer));
+            return customerService.updateCustomerAccount(customer);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 

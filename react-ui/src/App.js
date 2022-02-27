@@ -48,13 +48,8 @@ import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTra
 import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
 import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
-import {Auth} from "./views/containers/Auth/Auth";
-import {PosMain} from "./views/containers/POS/Main";
-import {PosOrder} from "./views/containers/POS/Order";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
 import { Order } from "./views/containers/SelfService/Order";
-import {StockLevelForm} from "./views/containers/StockLevels/StockLevelForm";
-import {ViewStockTransfer} from "./views/containers/StockTransfer/ViewStockTransfer";
 
 function App() {
   return (

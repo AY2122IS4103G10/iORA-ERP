@@ -3,6 +3,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { getCustomerByPhone } from "../../../../stores/slices/customerSlice";
+import { XCircleIcon } from '@heroicons/react/solid'
 
 const MemberModal = ({
     cancelButtonRef,
@@ -10,7 +11,9 @@ const MemberModal = ({
     setOpenMemberModal,
     phone,
     onPhoneChanged,
-    memberClicked
+    memberClicked,
+    error,
+    setError
 }) => (
     <Transition.Root show={openMemberModal} as={Fragment}>
         <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={cancelButtonRef} onClose={() => setOpenMemberModal(false)}>
@@ -66,6 +69,21 @@ const MemberModal = ({
                                         </div>
                                     </div>
                                 </div>
+                                {error &&
+                                <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
+                                    <div className="flex">
+                                        <div className="flex-shrink-0">
+                                            <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                                        </div>
+                                        <div className="ml-3">
+                                            <p className="text-sm text-red-800">
+                                                There is no account linked with this phone number.
+                                                Please try again.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                }
                             </div>
                             <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                 <button
@@ -78,7 +96,10 @@ const MemberModal = ({
                                 <button
                                     type="button"
                                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-                                    onClick={() => setOpenMemberModal(false)}
+                                    onClick={() => {
+                                        setOpenMemberModal(false);
+                                        setError(false);
+                                    }}
                                     ref={cancelButtonRef}
                                 >
                                     Cancel
@@ -128,6 +149,7 @@ const Page = ({
 export function FrontPage() {
     const [openMemberModal, setOpenMemberModal] = useState(false);
     const [phone, setPhone] = useState("");
+    const [error, setError] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -143,6 +165,7 @@ export function FrontPage() {
                 window.localStorage.setItem("customer", JSON.stringify(data));
             })
             .then(wait())
+            .catch(error => setError(true))
 
         function wait() {
             if (localStorage.getItem("customer") !== null) {
@@ -164,7 +187,9 @@ export function FrontPage() {
                 setOpenMemberModal={setOpenMemberModal}
                 phone={phone}
                 onPhoneChanged={onPhoneChanged}
-                memberClicked={memberClicked} />
+                memberClicked={memberClicked}
+                error={error} 
+                setError={setError}/>
         </>
     )
 }

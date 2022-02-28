@@ -250,7 +250,6 @@ export function Home() {
   }, [setStoreNames]);
 
   const handleEnterStore = () => {
-    console.log(store);
     api.getAll(`/store/storeLogin?id=${store.id}&siteCode=${siteCode}`).then((response) => {
       localStorage.setItem("siteId", response.data.id);
       navigate("/str");

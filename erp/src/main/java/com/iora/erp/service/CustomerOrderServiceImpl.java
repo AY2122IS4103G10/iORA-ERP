@@ -93,19 +93,21 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public void createCustomerOrder(CustomerOrder customerOrder) {
-        em.persist(customerOrder);
+    public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
         updateMembershipPoints(customerOrder);
+        em.persist(customerOrder);
+        return customerOrder;
     }
 
     @Override
-    public void updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException {
+    public CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException {
         CustomerOrder old = getCustomerOrder(customerOrder.getId());
         old.setDateTime(customerOrder.getDateTime());
         old.setLineItems(customerOrder.getLineItems());
         old.setPayments(customerOrder.getPayments());
         old.setExhcangedLIs(customerOrder.getExhcangedLIs());
         old.setRefundedLIs(customerOrder.getRefundedLIs());
+        return em.merge(old);
     }
 
     @Override
@@ -125,15 +127,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public void createCustomerOrderLI(CustomerOrderLI customerOrderLI) {
+    public CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI) {
         em.persist(customerOrderLI);
-
+        return customerOrderLI;
     }
 
     @Override
-    public void updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException {
+    public CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException {
         CustomerOrderLI old = getCustomerOrderLI(customerOrderLI.getId());
         old.setProductItems(customerOrderLI.getProductItems());
+        return em.merge(old);
     }
 
     @Override
@@ -154,17 +157,18 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public void createPayment(Payment payment) {
+    public Payment createPayment(Payment payment) {
         em.persist(payment);
-
+        return payment;
     }
 
     @Override
-    public void updatePayment(Payment payment) throws CustomerOrderException {
+    public Payment updatePayment(Payment payment) throws CustomerOrderException {
         Payment old = getPayment(payment.getId());
         old.setAmount(payment.getAmount());
         old.setCcTransactionId(payment.getCcTransactionId());
         old.setDateTime(payment.getDateTime());
+        return em.merge(old);
     }
 
     @Override
@@ -185,16 +189,17 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public void createExchangeLI(ExchangeLI exchangeLI) {
+    public ExchangeLI createExchangeLI(ExchangeLI exchangeLI) {
         em.persist(exchangeLI);
-
+        return exchangeLI;
     }
 
     @Override
-    public void updateExchangeLI(ExchangeLI exchangeLI) throws CustomerOrderException {
+    public ExchangeLI updateExchangeLI(ExchangeLI exchangeLI) throws CustomerOrderException {
         ExchangeLI old = getExchangeLI(exchangeLI.getId());
         old.setNewItem(exchangeLI.getNewItem());
         old.setOldItem(exchangeLI.getOldItem());
+        return em.merge(old);
     }
 
     @Override
@@ -215,15 +220,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public void createRefundLI(RefundLI refundLI) {
+    public RefundLI createRefundLI(RefundLI refundLI) {
         em.persist(refundLI);
-
+        return refundLI;
     }
 
     @Override
-    public void updateRefundLI(RefundLI refundLI) throws CustomerOrderException {
+    public RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException {
         RefundLI old = getRefundLI(refundLI.getId());
         old.setRefundedItem(refundLI.getRefundedItem());
+        return em.merge(old);
     }
 
     // Helper methods

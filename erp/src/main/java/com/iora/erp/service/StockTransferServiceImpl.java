@@ -83,8 +83,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             }
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDING));
             stockTransferOrder.setStatusHistory(statusHistory);
-            em.merge(stockTransferOrder);
-            return stockTransferOrder;
+            return em.merge(stockTransferOrder);
         }
     }
 
@@ -106,8 +105,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             }
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
             stOrder.setStatusHistory(statusHistory);
-            em.merge(stOrder);
-            return stOrder;
+            return em.merge(stOrder);
         }
     }
 
@@ -127,8 +125,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
             stOrder.setStatusHistory(statusHistory);
-            em.merge(stOrder);
-            return stOrder;
+            return em.merge(stOrder);
         }
     }
 
@@ -148,8 +145,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CONFIRMED));
             stOrder.setStatusHistory(statusHistory);
-            em.merge(stOrder);
-            return stOrder;
+            return em.merge(stOrder);
         }
     }
 
@@ -171,8 +167,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.READY));
             stockTransferOrder.setStatusHistory(statusHistory);
-            em.merge(stockTransferOrder);
-            return stockTransferOrder;
+            return em.merge(stockTransferOrder);
         }
     }
 
@@ -194,8 +189,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.DELIVERING));
             stockTransferOrder.setStatusHistory(statusHistory);
-            em.merge(stockTransferOrder);
-            return stockTransferOrder;
+            return em.merge(stockTransferOrder);
         }
     }
 
@@ -224,8 +218,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.COMPLETED));
             stockTransferOrder.setStatusHistory(statusHistory);
-            em.merge(stockTransferOrder);
-            return stockTransferOrder;
+            return em.merge(stockTransferOrder);
         }
     }
 }

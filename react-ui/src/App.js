@@ -14,7 +14,7 @@ import {HomeIndex} from "./views/containers/Index/HomeIndex";
 import {ManageVouchers} from "./views/containers/Vouchers/ManageVouchers";
 import {VoucherForm} from "./views/containers/Vouchers/VoucherForm";
 import {VoucherDetails} from "./views/containers/Vouchers/VoucherDetails/index.js";
-import {StoreIndex} from "./views/containers/Index/Store";
+import {StoreIndex} from "./views/containers/Index/StrIndex";
 import {SMRoute} from "./routes/SMRoute";
 import {ManagePromotions} from "./views/containers/Promotions/ManagePromotions";
 import {ADRoute} from "./routes/ADRoute";

@@ -3,6 +3,7 @@ import {useState, useEffect, useMemo} from "react";
 import {useSelector, useDispatch} from "react-redux";
 import {EditableCell, SimpleTable} from "../../../components/Tables/SimpleTable";
 import {selectAllOrder} from "../../../../stores/slices/posSlice";
+import {selectUserSite} from "../../../../stores/slices/userSlice";
 import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
 import {SectionHeading} from "../../../components/HeadingWithTabs";
 
@@ -29,11 +30,11 @@ export const PosPurchaseHistory = (subsys) => {
   const dispatch = useDispatch();
   const data = useSelector(selectAllOrder);
   const orderStatus = useSelector((state) => state.pos.status);
-  const siteId = useState(1);
+  const siteId = useSelector(selectUserSite);
 
   useEffect(() => {
     orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
-  }, [orderStatus]);
+  }, [orderStatus, siteId]);
 
   return (
     <>

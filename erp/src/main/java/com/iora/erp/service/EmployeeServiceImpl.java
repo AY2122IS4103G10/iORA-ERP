@@ -84,7 +84,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                         old.setUsername(employee.getUsername());
                         old.setEmail(employee.getEmail());
-                        old.setPassword(generateProtectedPassword(salt, employee.getPassword()));
+
+                        if (employee.getPassword() != null && employee.getPassword() != "") {
+                            old.setPassword(generateProtectedPassword(salt, employee.getPassword()));
+                        }
                         old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
                         old.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
                         old.setName(employee.getName());
@@ -206,7 +209,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return getEmployeeByUsername(username).getJobTitle().getResponsibility();
     }
 
-    
     @Override
     public Boolean usernameAvailability(String username) {
         Query q = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
@@ -214,7 +216,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee e = (Employee) q.getSingleResult();
             return false;
-            
+
         } catch (NoResultException | NonUniqueResultException ex) {
             return true;
         }
@@ -227,17 +229,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee e = (Employee) q.getSingleResult();
             return false;
-            
+
         } catch (NoResultException | NonUniqueResultException ex) {
             return true;
         }
     }
-    
+
     @Override
     public Employee loginAuthentication(String username, String password) throws EmployeeException {
         try {
             Employee c = getEmployeeByUsername(username);
-            
+
             if (c.authentication(generateProtectedPassword(c.getSalt(), password))) {
                 return c;
             } else {
@@ -246,24 +248,24 @@ public class EmployeeServiceImpl implements EmployeeService {
         } catch (Exception ex) {
             throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
         }
-        
+
     }
-    
+
     private String generateProtectedPassword(String salt, String password) {
         String generatedPassword;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.reset();
             md.update((salt + password).getBytes("utf8"));
-            
+
             generatedPassword = String.format("%0129x", new BigInteger(1, md.digest()));
             return generatedPassword;
-            
+
         } catch (Exception ex) {
             return null;
         }
     }
-    
+
     private byte[] saltGeneration() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];

@@ -131,7 +131,7 @@ export const PromotionsTable = ({
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
+        Header: "#",
         accessor: "id",
       },
       {

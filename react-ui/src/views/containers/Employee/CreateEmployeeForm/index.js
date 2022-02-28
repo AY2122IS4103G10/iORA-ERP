@@ -122,10 +122,10 @@ const EmployeeFormBody = ({
                             name="password"
                             id="password"
                             autoComplete="password"
-                            placeholder="Leave blank if unchanged."
+                            placeholder={isEditing && "Leave blank if unchanged."}
                             value={password}
                             onChange={onPasswordChanged}
-                            required
+                            required={!isEditing ? true : false}
                           />
                         </SimpleInputGroup>
                         <SimpleInputGroup
@@ -162,6 +162,7 @@ const EmployeeFormBody = ({
                             autoComplete="salary"
                             className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                             placeholder="0.00"
+                            min="0"
                             value={salary}
                             onChange={onSalaryChanged}
                             required

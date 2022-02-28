@@ -63,10 +63,17 @@ const OrderList = ({products, amount, rfid, onRfidChanged, addRFIDClicked, Remov
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                     <div>
                       <div className="flex justify-between">
-                        <h4 className="text-lg">
+                        <h4 className="text-lg w-9/12">
                           <a className="font-medium text-gray-700 hover:text-gray-800">
                             {product.name}
                           </a>
+                          <p className="mt-1 flex text-sm text-gray-500">
+                            {product.colour}
+                            {"   -- "}
+                            {product.size !== null ? product.size : null}
+                            {"   -- "}
+                            {product.promotion !== null ? product.promotion : null}
+                          </p>
                         </h4>
                         {"discountedPrice" in product ? (
                           <div>
@@ -76,14 +83,9 @@ const OrderList = ({products, amount, rfid, onRfidChanged, addRFIDClicked, Remov
                         ) : (
                           <p className="ml-4 text-sm font-medium text-gray-900">${product.price}</p>
                         )}
+                        <Remove product={product} />
                       </div>
-                      <p className="mt-1 text-sm text-gray-500">Colour: {product.colour}</p>
-                      <p className="mt-1 text-sm text-gray-500">Size: {product.size}</p>
-                      {product.promotion !== null && (
-                        <p className="mt-1 text-sm text-gray-500">Promotion: {product.promotion}</p>
-                      )}
                     </div>
-                    <Remove product={product} />
                   </div>
                 </li>
               ))}
@@ -97,9 +99,9 @@ const OrderList = ({products, amount, rfid, onRfidChanged, addRFIDClicked, Remov
             </h2>
 
             <div>
-              <dl className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <dd className="ml-4 text-2xl font-bold font-medium text-red-800">
+              <dl className="space-y-8 flex flex-row-reverse">
+                <div className="flex items-right justify-between">
+                  <dd className="ml-4 text-xl font-bold font-medium text-red-800">
                     Total Amount: ${amount}
                   </dd>
                 </div>

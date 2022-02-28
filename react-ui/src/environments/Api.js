@@ -2,7 +2,7 @@
  * REST API connections
  */
 import axios from "axios";
-import {REST_ENDPOINT} from "../constants/restEndpoint";
+import { REST_ENDPOINT } from "../constants/restEndpoint";
 
 export const api = {
   getAll(path) {
@@ -70,7 +70,10 @@ export const procurementApi = {
     );
   },
   fulfillOrder(siteId, order) {
-    return axios.put(`${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`, order);
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`,
+      order
+    );
   },
   shipOrder(siteId, order) {
     return axios.put(
@@ -85,7 +88,12 @@ export const vendorApi = {
     return axios.get(`${REST_ENDPOINT}admin/viewVendors?search=${keyword}`);
   },
   generateItems(sku, quantity) {
-    return axios.post(`${REST_ENDPOINT}sam/productItem/generate/${sku}/${quantity}`);
+    return axios.post(
+      `${REST_ENDPOINT}sam/productItem/generate/${sku}/${quantity}`
+    );
+  },
+  delete(id) {
+    return axios.delete(`${REST_ENDPOINT}admin/deleteVendor?id=${id}`);
   },
 };
 
@@ -94,34 +102,49 @@ export const stockLevelApi = {
     return axios.post(
       `${REST_ENDPOINT}warehouse/editStock/${siteId}`,
       toUpdate
-    )
-  }
-}
+    );
+  },
+};
 
 export const stockTransferApi = {
   cancelOrder(orderId, siteId) {
-    return axios.delete(`${REST_ENDPOINT}store/stockTransfer/cancel/${orderId}/${siteId}`);
+    return axios.delete(
+      `${REST_ENDPOINT}store/stockTransfer/cancel/${orderId}/${siteId}`
+    );
   },
   editOrder(order, siteId) {
-    return axios.put(`${REST_ENDPOINT}store/stockTransfer/update/${siteId}`, order);
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/update/${siteId}`,
+      order
+    );
   },
   confirmOrder(orderId, siteId) {
-    return axios.put(`${REST_ENDPOINT}store/stockTransfer/confirm/${orderId}/${siteId}`);
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/confirm/${orderId}/${siteId}`
+    );
   },
   rejectOrder(orderId, siteId) {
-    return axios.put(`${REST_ENDPOINT}store/stockTransfer/reject/${orderId}/${siteId}`);
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/reject/${orderId}/${siteId}`
+    );
   },
   readyOrder(order, siteId) {
-    return axios.put(`${REST_ENDPOINT}store/stockTransfer/ready/${siteId}`, order);
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/ready/${siteId}`,
+      order
+    );
   },
   deliverOrder(order, siteId) {
-    return axios.put(`${REST_ENDPOINT}store/stockTransfer/deliver/${siteId}`, order);
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/deliver/${siteId}`,
+      order
+    );
   },
   completeOrder(order, siteId) {
     return axios.put(
-      `${REST_ENDPOINT}store/stockTransfer/complete/${siteId}`, 
+      `${REST_ENDPOINT}store/stockTransfer/complete/${siteId}`,
       order
-    )
+    );
   },
 };
 

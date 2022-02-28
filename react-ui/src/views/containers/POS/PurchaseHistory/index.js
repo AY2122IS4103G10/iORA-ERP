@@ -1,10 +1,11 @@
 import {Link} from "react-router-dom";
 import {useState, useEffect, useMemo} from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {EditableCell, SimpleTable} from "../../../components/Tables/SimpleTable";
+import {SimpleTable} from "../../../components/Tables/SimpleTable";
 import {selectAllOrder} from "../../../../stores/slices/posSlice";
+import {selectUserSite} from "../../../../stores/slices/userSlice";
 import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
-import {SectionHeading} from "../../../components/HeadingWithTabs";
+import {getASite, selectSite, selectSiteById} from "../../../../stores/slices/siteSlice";
 
 const columns = [
   {
@@ -29,21 +30,27 @@ export const PosPurchaseHistory = (subsys) => {
   const dispatch = useDispatch();
   const data = useSelector(selectAllOrder);
   const orderStatus = useSelector((state) => state.pos.status);
-  const siteId = useState(1);
+  const siteStatus = useSelector((state) => state.sites.status);
+  const siteId = useSelector(selectUserSite);
+  const site = useSelector(selectSite);
 
   useEffect(() => {
     orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
-  }, [orderStatus]);
+  }, [orderStatus, siteId]);
+
+  useEffect(() => {
+    siteStatus === "idle" && dispatch(getASite(siteId));
+  }, [siteStatus, site]);
 
   return (
     <>
       <div className="min-h-full">
         <main className="py-10">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
             <div className="flex items-center space-x-3">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {siteId != null ? siteId : "No Reocrds"}
+                  {siteId != null ? site.name : "No Reocrds"}
                 </h1>
               </div>
             </div>

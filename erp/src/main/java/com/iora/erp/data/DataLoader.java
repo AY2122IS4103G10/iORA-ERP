@@ -153,7 +153,7 @@ public class DataLoader implements CommandLineRunner {
 
                 List<Address> listAdd = new ArrayList<>();
                 listAdd.add(a2);
-                Vendor v1 = new Vendor("Ninja Van", "+65 66028271", "Singapore domestic delivery", "");
+                Vendor v1 = new Vendor("Ninja Van", "+65 66028271", "Singapore domestic delivery", "admin@ninjavan.com");
                 em.persist(v1);
                 v1.setAddress(listAdd);
 

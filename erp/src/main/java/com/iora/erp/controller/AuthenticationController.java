@@ -1,8 +1,6 @@
 package com.iora.erp.controller;
 
 import com.iora.erp.model.company.Employee;
-import com.iora.erp.model.customer.Customer;
-import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.EmployeeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +15,6 @@ public class AuthenticationController {
 
     @Autowired
     private EmployeeService employeeService;
-    @Autowired
-    private CustomerService customerService;
     
     /*
      * ---------------------------------------------------------

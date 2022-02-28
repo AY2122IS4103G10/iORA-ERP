@@ -328,7 +328,6 @@ public class AdminController {
     @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
     public Employee editEmployee(@RequestBody Employee employee) {
         try {
-
             return employeeService.updateEmployeeAccount(employee);
         } catch (Exception ex) {
             return null;
@@ -346,22 +345,20 @@ public class AdminController {
     }
 
     @PutMapping(path = "/enableEmployee", produces = "application/json")
-    public ResponseEntity<Object> enableEmployee(@RequestParam Long id) {
+    public Employee enableEmployee(@RequestParam Long id) {
         try {
-            employeeService.unblockEmployee(id);
-            return ResponseEntity.ok("Employee with employee ID " + id + " has been activated.");
+            return employeeService.unblockEmployee(id);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 
     @PutMapping(path = "/disableEmployee", produces = "application/json")
-    public ResponseEntity<Object> disableEmployee(@RequestParam Long id) {
+    public Employee disableEmployee(@RequestParam Long id) {
         try {
-            employeeService.blockEmployee(id);
-            return ResponseEntity.ok("Employee with employee ID " + id + " has been blocked.");
+            return employeeService.blockEmployee(id);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return null;
         }
     }
 

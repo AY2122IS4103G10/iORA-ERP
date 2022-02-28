@@ -93,15 +93,14 @@ public class StoreController {
     }
 
     @PostMapping(path = "/editStock/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> editStock(@RequestBody List<ProductItem> toUpdate, @PathVariable Long siteId) {
+    public ResponseEntity<Object> editStock(@RequestBody Map<String,Long> toUpdate, @PathVariable Long siteId) {
         List<String> errors = new ArrayList<>();
-        for (ProductItem item : toUpdate) {
+        for (Map.Entry<String,Long> entry : toUpdate.entrySet()) {
             try {
-                if (item.getStockLevel() == null) {
-                    siteService.removeProductItemFromSite(item.getRfid());
+                if (entry.getValue().equals(0L)) {
+                    siteService.removeProductItemFromSite(entry.getKey());;
                 } else {
-                    siteService.addToStockLevel(item.getStockLevel(), item);
-                    ;
+                    siteService.addProductItemToSite(entry.getValue(), entry.getKey());
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());
@@ -109,7 +108,30 @@ public class StoreController {
         }
 
         if (errors.isEmpty()) {
-            return ResponseEntity.ok("Transaction successful");
+            return ResponseEntity.ok(viewStock(siteId));
+        } else {
+            System.err.println(errors);
+            return ResponseEntity.badRequest().body(String.join("\n", errors));
+        }
+    }
+
+    @PostMapping(path = "/editStockList/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> editStockList(@RequestBody List<ProductItem> toUpdate, @PathVariable Long siteId) {
+        List<String> errors = new ArrayList<>();
+        for (ProductItem item : toUpdate) {
+            try {
+                if (item.getStockLevel() == null) {
+                    siteService.removeProductItemFromSite(item.getRfid());
+                } else {
+                    siteService.addToStockLevel(item.getStockLevel(), item);
+                }
+            } catch (Exception ex) {
+                errors.add(ex.getMessage());
+            }
+        }
+
+        if (errors.isEmpty()) {
+            return ResponseEntity.ok(viewStock(siteId));
         } else {
             System.out.println("Error" + String.join("\n", errors));
             return ResponseEntity.badRequest().body(String.join("\n", errors));

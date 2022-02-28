@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getProductItem, getProductDetails } from "../../../../stores/slices/productSlice";
+import { XCircleIcon } from '@heroicons/react/solid'
 
 const OrderList = ({
     products,
@@ -10,7 +11,8 @@ const OrderList = ({
     onRfidChanged,
     addRFIDClicked,
     Remove,
-    navigate
+    navigate,
+    error
 }) => (
     <main>
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-0">
@@ -77,15 +79,18 @@ const OrderList = ({
                             type="button"
                             className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                         >
-                            {localStorage.getItem("customer") === null ? <>Checkout as Guest</> : <>Checkout as {JSON.parse(localStorage.customer).firstName}</>}
+                            {localStorage.getItem("customer") === null ?
+                                <>Checkout as Guest</> :
+                                <>Checkout as {JSON.parse(localStorage.customer).firstName} {JSON.parse(localStorage.customer).lastName}</>}
                         </button>
                         <button
                             type="button"
                             className="w-full mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                             onClick={() => {
-                                window.confirm('Are you sure you want to cancel?') && 
-                                localStorage.clear()
-                                navigate("/ss")
+                                if (window.confirm('Are you sure you want to cancel?')) {
+                                    localStorage.clear()
+                                    navigate("/ss")
+                                }
                             }}
                         >
                             Cancel
@@ -121,6 +126,20 @@ const OrderList = ({
                             required
                             aria-describedby="rfid"
                         />
+                        {error &&
+                            <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm text-red-800">
+                                            Product not found.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                         <button
                             type="submit"
                             className="inline-flex justify-end mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -140,6 +159,7 @@ export function Order() {
     const [products, setProducts] = useState([]);
     const [amount, setAmount] = useState(0);
     const [rfid, setRfid] = useState("");
+    const [error, setError] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -153,9 +173,7 @@ export function Order() {
                 products.push(data);
                 setProducts(products);
                 'discountedPrice' in data ? setAmount(amount + data.discountedPrice) : setAmount(amount + data.price);
-            })
-            .catch((err) => {
-                console.log(err);
+                setError(false)
             });
     }
 
@@ -168,9 +186,7 @@ export function Order() {
                 setProductItems(productItems);
                 addProduct(rfid);
             })
-            .catch((err) => {
-                console.log(err);
-            });
+            .catch((err) => setError(true));
         setRfid("");
     }
 
@@ -204,6 +220,7 @@ export function Order() {
             addRFIDClicked={addRFIDClicked}
             Remove={Remove}
             navigate={navigate}
+            error={error}
         />
     )
 }

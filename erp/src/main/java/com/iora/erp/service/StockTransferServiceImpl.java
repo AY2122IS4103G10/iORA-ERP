@@ -14,6 +14,7 @@ import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.stockTransfer.STOStatus;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
+import com.iora.erp.model.stockTransfer.StockTransferOrderLI;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,8 +83,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             }
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDING));
             stockTransferOrder.setStatusHistory(statusHistory);
-            em.merge(stockTransferOrder);
-            return stockTransferOrder;
+            return em.merge(stockTransferOrder);
         }
     }
 
@@ -105,8 +105,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             }
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
             stOrder.setStatusHistory(statusHistory);
-            em.merge(stOrder);
-            return stOrder;
+            return em.merge(stOrder);
         }
     }
 
@@ -126,8 +125,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
             stOrder.setStatusHistory(statusHistory);
-            em.merge(stOrder);
-            return stOrder;
+            return em.merge(stOrder);
         }
     }
 
@@ -147,8 +145,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CONFIRMED));
             stOrder.setStatusHistory(statusHistory);
-            em.merge(stOrder);
-            return stOrder;
+            return em.merge(stOrder);
         }
     }
 
@@ -170,8 +167,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.READY));
             stockTransferOrder.setStatusHistory(statusHistory);
-            em.merge(stockTransferOrder);
-            return stockTransferOrder;
+            return em.merge(stockTransferOrder);
         }
     }
 
@@ -193,8 +189,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.DELIVERING));
             stockTransferOrder.setStatusHistory(statusHistory);
-            em.merge(stockTransferOrder);
-            return stockTransferOrder;
+            return em.merge(stockTransferOrder);
         }
     }
 
@@ -215,10 +210,15 @@ public class StockTransferServiceImpl implements StockTransferService {
                         "Site is not responsible for receiving this order.");
             }
 
+            // This loop is for simulating that all received qty = shipped qty
+            for (StockTransferOrderLI stoli : stockTransferOrder.getLineItems()) {
+                stoli.setActualProductItems(stoli.getSentProductItems());
+                stoli.setActualQty(stoli.getSentQty());
+            }
+
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.COMPLETED));
             stockTransferOrder.setStatusHistory(statusHistory);
-            em.merge(stockTransferOrder);
-            return stockTransferOrder;
+            return em.merge(stockTransferOrder);
         }
     }
 }

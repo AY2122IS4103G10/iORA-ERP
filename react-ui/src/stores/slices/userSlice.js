@@ -22,11 +22,12 @@ const guest = {
 };
 
 const initialUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : guest;
+const initialStore = localStorage.getItem("siteId") ? JSON.parse(localStorage.getItem("siteId")) : 0;
 
 const initialState = {
   user: { ...initialUser },
   loggedIn: localStorage.getItem("user") ? true : false,
-  currSite: 0, //to be updated when login is finalised
+  currSite: initialStore,
   status: "idle",
   error: "null",
 };
@@ -89,7 +90,7 @@ export const selectUser = (state) => { return { ...state.user.user } };
 
 export const selectUserId = (state) => state.user.user.id;
 
-export const selectUserStore = (state) => state.user.currStore;
+export const selectUserStore = (state) => state.user.currSite;
 
 export const selectUserSite = (state) => state.user.currSite;
 

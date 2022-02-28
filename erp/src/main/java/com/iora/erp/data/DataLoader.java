@@ -148,9 +148,9 @@ public class DataLoader implements CommandLineRunner {
 
                 // Vendors
                 Address a2 = new Address(Country.Singapore, "Singapore", "Kewalram House", "Singapore", "02-01",
-                "8 Jln Kilang Timor", "Singapore 159305", false, 1.334251, 103.704246);
+                                "8 Jln Kilang Timor", "Singapore 159305", false, 1.334251, 103.704246);
                 em.persist(a2);
-                
+
                 List<Address> listAdd = new ArrayList<>();
                 listAdd.add(a2);
                 Vendor v1 = new Vendor("Ninja Van", "+65 66028271", "Singapore domestic delivery", "");
@@ -167,7 +167,6 @@ public class DataLoader implements CommandLineRunner {
                 iora.setAddress(a1);
                 adminService.createCompany(iora);
 
-
                 Company lalu = new Company("LALU Fashion Pte. Ltd.", "201226449M", "+65-63610056");
                 lalu.setDepartments(departments);
                 lalu.setAddress(a1);
@@ -178,12 +177,12 @@ public class DataLoader implements CommandLineRunner {
                 sora.setAddress(a1);
                 em.persist(sora);
 
-                // Employee 
+                // Employee
                 Employee e = new Employee("Sharon KS", "sharonE", "password");
                 e.setEmail("sharonMS.12@gmail.com");
                 e.setSalary(4100.0);
                 e.setPayType(PayType.MONTHLY);
-                e.setJobTitle(adminService.getJobTitleById(Long.valueOf(1))); 
+                e.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
                 e.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
                 e.setCompany(adminService.getCompanyById(Long.valueOf(1)));
                 employeeService.createEmployee(e);
@@ -192,7 +191,7 @@ public class DataLoader implements CommandLineRunner {
                 e2.setEmail("darth.vader@gmail.com");
                 e2.setSalary(5678.90);
                 e2.setPayType(PayType.MONTHLY);
-                e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(4))); 
+                e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(4)));
                 e2.setDepartment(adminService.getDepartmentById(Long.valueOf(6)));
                 e2.setCompany(adminService.getCompanyById(Long.valueOf(1)));
                 employeeService.createEmployee(e2);
@@ -325,7 +324,6 @@ public class DataLoader implements CommandLineRunner {
                 customer.setMembershipPoints(0);
                 customer.setStoreCredit(0.0);
                 customerService.createCustomerAccount(customer);
-
 
                 // Generate 10 $10 vouchers
                 customerService.generateVouchers(10, 10, "2022-02-16");

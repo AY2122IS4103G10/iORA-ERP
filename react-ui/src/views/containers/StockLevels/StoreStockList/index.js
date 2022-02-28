@@ -58,7 +58,7 @@ export const MyStoreStock = (subsys) => {
 
     //===UNCOMMENT WHEN STOCK LEVEL IS ADDED=====
     useEffect(() => {
-      // dispatch(getASiteStock(id)); 
+      dispatch(getASiteStock(id)); 
     }, [])
     
     const path = `/${subsys.subsys.subsys}/stocklevels/my`;

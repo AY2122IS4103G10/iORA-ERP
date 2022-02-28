@@ -18,26 +18,26 @@ public interface CustomerOrderService {
     public abstract List<CustomerOrder> getAllInStoreOrders();
     public abstract List<CustomerOrder> getInStoreOrdersBySite(Long siteId);
     public abstract List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date);
-    public abstract void createCustomerOrder(CustomerOrder customerOrder);
-    public abstract void updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
+    public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder);
+    public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
     
     public abstract CustomerOrderLI getCustomerOrderLI(Long id) throws CustomerOrderException;
     public abstract List<CustomerOrderLI> getCustomerOrderLIs(CustomerOrder customerOrder);
-    public abstract void createCustomerOrderLI(CustomerOrderLI customerOrderLI);
-    public abstract void updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException;
+    public abstract CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI);
+    public abstract CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException;
 
     public abstract Payment getPayment(Long id) throws CustomerOrderException;
     public abstract List<Payment> getAllPayments();
-    public abstract void createPayment(Payment payment);
-    public abstract void updatePayment(Payment payment) throws CustomerOrderException;
+    public abstract Payment createPayment(Payment payment);
+    public abstract Payment updatePayment(Payment payment) throws CustomerOrderException;
 
     public abstract ExchangeLI getExchangeLI(Long id) throws CustomerOrderException;
     public abstract List<ExchangeLI> getAllExchangeLIs();
-    public abstract void createExchangeLI(ExchangeLI exchangeLI);
-    public abstract void updateExchangeLI(ExchangeLI exchangeLI) throws CustomerOrderException;
+    public abstract ExchangeLI createExchangeLI(ExchangeLI exchangeLI);
+    public abstract ExchangeLI updateExchangeLI(ExchangeLI exchangeLI) throws CustomerOrderException;
 
     public abstract RefundLI getRefundLI(Long id) throws CustomerOrderException;
     public abstract List<RefundLI> getAllRefundLIs();
-    public abstract void createRefundLI(RefundLI refundLI);
-    public abstract void updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
+    public abstract RefundLI createRefundLI(RefundLI refundLI);
+    public abstract RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
 }

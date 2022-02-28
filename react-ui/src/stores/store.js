@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import {configureStore} from "@reduxjs/toolkit";
 import userReducer from "./slices/userSlice";
 import productReducer from "./slices/productSlice";
 import prodFieldReducer from "./slices/prodFieldSlice";
@@ -13,6 +13,7 @@ import employeeReducer from "./slices/employeeSlice";
 import jobTitleReducer from "./slices/jobTitleSlice";
 import departmentReducer from "./slices/departmentSlice";
 import vendorReducer from "./slices/vendorSlice";
+import posReducer from "./slices/posSlice";
 
 export default configureStore({
   reducer: {
@@ -30,5 +31,6 @@ export default configureStore({
     stocktransfer: stocktransferReducer,
     vendors: vendorReducer,
     vouchers: voucherReducer,
+    pos: posReducer,
   },
 });

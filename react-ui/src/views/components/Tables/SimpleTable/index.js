@@ -197,6 +197,7 @@ export const EditableCell = ({
     <input
       type="number"
       className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+      min="0"
       value={value}
       onChange={onChange}
       onBlur={onBlur}

@@ -81,11 +81,6 @@ const ModalAddItem = ({open, close}) => {
   );
 };
 
-const tabs = [
-  {name: "Order", href: "", current: true},
-  {name: "History", href: "orderHistory", current: false},
-];
-
 export const PosPurchaseOrder = () => {
   const [modalState, setModalState] = useState(false);
   const openModal = () => setModalState(true);

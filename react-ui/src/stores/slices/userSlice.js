@@ -90,8 +90,6 @@ export const selectUser = (state) => { return { ...state.user.user } };
 
 export const selectUserId = (state) => state.user.user.id;
 
-export const selectUserStore = (state) => state.user.currSite;
-
 export const selectUserSite = (state) => state.user.currSite;
 
 export const selectUserAccess = (state) =>

@@ -4,38 +4,38 @@ import { api, stockLevelApi } from "../../environments/Api";
 
 const initialState = {
   currSiteStock: {
-    id: 4,
-    productItems: [
-      {
-        "rfid": "T1ZZ3OA60NOBK18H",
-        "available": true,
-        "productSKU": "AKV0010057J-1",
-        "stockLevel": null
-      },
-      {
-        "rfid": "NJCTRE9HI281F8B7",
-        "available": true,
-        "productSKU": "AKV0010057J-2",
-        "stockLevel": null
-      },
-      {
-        "rfid": "1HAC5IJD2Y8R2X4G",
-        "available": true,
-        "productSKU": "AKV0010057J-3",
-        "stockLevel": null
-      },
-    ],
-    products: {
-      "AKV0010057J-1": 1,
-      "AKV0010057J-2": 2,
-      "AKV0010057J-3": 3,
-    },
-    models: {
-      "AKV0010057J": 6,
-    },
-    reserveProducts: {
-      "AKV0010057J-2": 1
-    }
+    // id: 4,
+    // productItems: [
+    //   {
+    //     "rfid": "T1ZZ3OA60NOBK18H",
+    //     "available": true,
+    //     "productSKU": "AKV0010057J-1",
+    //     "stockLevel": null
+    //   },
+    //   {
+    //     "rfid": "NJCTRE9HI281F8B7",
+    //     "available": true,
+    //     "productSKU": "AKV0010057J-2",
+    //     "stockLevel": null
+    //   },
+    //   {
+    //     "rfid": "1HAC5IJD2Y8R2X4G",
+    //     "available": true,
+    //     "productSKU": "AKV0010057J-3",
+    //     "stockLevel": null
+    //   },
+    // ],
+    // products: {
+    //   "AKV0010057J-1": 1,
+    //   "AKV0010057J-2": 2,
+    //   "AKV0010057J-3": 3,
+    // },
+    // models: {
+    //   "AKV0010057J": 6,
+    // },
+    // reserveProducts: {
+    //   "AKV0010057J-2": 1
+    // }
   },
   status: "idle",
   error: null

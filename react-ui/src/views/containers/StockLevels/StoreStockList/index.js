@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CogIcon } from "@heroicons/react/outline";
 
 import { getASite, selectSite } from '../../../../stores/slices/siteSlice';
-import { selectUserSite, selectUserStore } from '../../../../stores/slices/userSlice';
+import { selectUserSite } from '../../../../stores/slices/userSlice';
 import { SelectableTable } from '../../../components/Tables/SelectableTable';
 import { selectCurrSiteStock, getASiteStock } from '../../../../stores/slices/stocklevelSlice';
 
@@ -60,10 +60,13 @@ export const MyStoreStock = (subsys) => {
   const id = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
   const siteStock = useSelector(selectCurrSiteStock);
+  const status = useSelector((state) => state.stocklevel.status )
 
-  //===UNCOMMENT WHEN STOCK LEVEL IS ADDED=====
+
   useEffect(() => {
-    dispatch(getASiteStock(id));
+    if (id !== 0) {
+      dispatch(getASiteStock(id));
+    }
   }, [])
 
   const path = `/${subsys.subsys.subsys}/stocklevels/my`;

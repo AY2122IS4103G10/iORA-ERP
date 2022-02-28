@@ -306,8 +306,14 @@ function prepareStockLevel(stocklevel, allModels) {
     stocklevel.map((stock) => {
         let model = allModels?.find((model) => model.modelCode === stock.sku.slice(0, -2));
         stock.name = model?.name;
-        stock.product = model?.products.find((prod) => prod.sku === stock.sku);
+        var prod = model?.products.find((prod) => prod.sku === stock.sku);
+        console.log(prod);
+        if (prod !== undefined) {
+            prod.productItems = null;
+            stock.product = prod;
+        }
     })
+    console.log(stocklevel);
     return stocklevel;
 }
 
@@ -400,7 +406,7 @@ export const StockTransferForm = (subsys) => {
 
     useEffect(() => {
         dispatch(getAllSites());
-        //dispatch(getASiteStock(from?.id));
+        dispatch(getASiteStock(from?.id));
         dispatch(fetchProducts());
     }, [])
 

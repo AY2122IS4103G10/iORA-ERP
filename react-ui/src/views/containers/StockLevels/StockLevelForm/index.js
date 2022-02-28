@@ -239,11 +239,15 @@ export const StockLevelForm = () => {
   const modelCode = id.substring(0, id.indexOf('-'));
   const model = useSelector(selectModel);
 
+  console.log(siteId); 
+  console.log(siteStock);
 
   useEffect(() => {
-    dispatch(getASiteStock(siteId)); 
-    dispatch(fetchModel(modelCode));
-  }, [])
+    if (status === "idle" ) {
+      dispatch(getASiteStock(siteId)); 
+      dispatch(fetchModel(modelCode));
+    }
+  }, [status])
 
 
   const openModal = () => setOpen(true);

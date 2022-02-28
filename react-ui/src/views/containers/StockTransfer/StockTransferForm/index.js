@@ -15,7 +15,7 @@ import { fetchProducts, selectAllProducts, selectProductByCode, selectProductByS
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { api } from "../../../../environments/Api";
 import { selectUserStore } from "../../../../stores/slices/userSlice";
-import { createStockTransfer, editStockTransfer } from "../../../../stores/slices/stocktransferSlice";
+import { createStockTransfer, editStockTransfer, getStockTransfer, selectStockTransferOrder } from "../../../../stores/slices/stocktransferSlice";
 import { useNavigate, useParams } from "react-router-dom";
 
 
@@ -199,8 +199,6 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                             </div>
                         </div>
                     </div>
-
-
                     <ClickableRowTable columns={columns} data={data} onRowClick={onRowClick} />
                 </div>
             </div>
@@ -308,7 +306,7 @@ function prepareStockLevel(stocklevel, allModels) {
         stock.name = model?.name;
         stock.product = model?.products.find((prod) => prod.sku === stock.sku);
     })
-    console.log(stocklevel);
+    // console.log(stocklevel);
     return stocklevel;
 }
 
@@ -400,13 +398,26 @@ export const StockTransferForm = (subsys) => {
     const allModels = useSelector(selectAllProducts);
     const prodTableData = isObjectEmpty(stocklevel) ? [] : prepareStockLevel(convertData(stocklevel), allModels);
 
+ 
+
     useEffect(() => {
+        if (!isObjectEmpty(id) || id === undefined || id === null) {
+            setIsEditing(true);
+        }
+
         dispatch(getAllSites());
-        if (from !== undefined) {
-            dispatch(getASiteStock(from?.id));
+        if (!isObjectEmpty(from)) {
+            dispatch(getASiteStock(from.id));
         }
         dispatch(fetchProducts());
-    }, [from])
+        // if (!isObjectEmpty(originalOrder)) {
+        //     console.log(originalOrder)
+        //     setIsEditing(true);
+        //     setLineItems(mapLineItemsToSelectedRows(originalOrder.lineItems));
+        //     setFrom(originalOrder.fromSite);
+        //     setTo(originalOrder.toSite);
+        // }
+    }, [dispatch, from])
 
     //editing 
     function mapLineItemsToSelectedRows(data) {
@@ -490,7 +501,6 @@ export const StockTransferForm = (subsys) => {
             fromSite: from,
             toSite: to
         }
-        console.log(JSON.stringify(stockTransferOrder));
         dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
             .then(() => {
@@ -533,7 +543,7 @@ export const StockTransferForm = (subsys) => {
     }
 
     return (
-        <>
+        Boolean(originalOrder) && (<>
             <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                 <div className="mt-4 grid grid-cols-1 gap-4 items-start lg:gap-8">
                     <section aria-labelledby="stocktransfer-form">
@@ -596,6 +606,7 @@ export const StockTransferForm = (subsys) => {
                                                             value={isObjectEmpty(to) ? "" : to.name}
                                                             className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
                                                             placeholder="Search Site"
+                                                            readOnly
                                                         >
                                                         </input>
                                                         <button
@@ -685,5 +696,5 @@ export const StockTransferForm = (subsys) => {
                 message="Please choose a from site before adding items." />
 
         </>
-    );
+    ))
 }

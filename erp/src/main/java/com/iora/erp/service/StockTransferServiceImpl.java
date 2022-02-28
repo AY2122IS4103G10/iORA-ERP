@@ -205,7 +205,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.DELIVERING) {
                 throw new StockTransferException(
                         "Stock Transfer Order is not confirmed.");
-            } else if (actionBy != stockTransferOrder.getToSite()) {
+            } else if (siteId != stockTransferOrder.getToSite().getId()) {
                 throw new StockTransferException(
                         "Site is not responsible for receiving this order.");
             }

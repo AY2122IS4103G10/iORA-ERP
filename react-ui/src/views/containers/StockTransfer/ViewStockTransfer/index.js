@@ -11,7 +11,8 @@ import {
     rejectStockTransfer, 
     confirmStockTransfer, 
     readyStockTransfer, 
-    completeStockTransfer } from "../../../../stores/slices/stocktransferSlice";
+    completeStockTransfer, 
+    deliverStockTransfer} from "../../../../stores/slices/stocktransferSlice";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import Confirmation from "../../../components/Modals/Confirmation";
 import { EditableCell } from "../../../components/Tables/SimpleTable";
@@ -22,8 +23,6 @@ import { SimpleTable } from "../../../components/Tables/SimpleTable";
 export const VerifyItemsModal = ({ open, closeModal, lineItems, status, userSiteId, 
     fromSiteId, toSiteId, setLineItems,handleReadyOrder, handleCompleteOrder }) => {
 
-        console.log("Verify");
-        console.log(lineItems);
     return (
         <SimpleModal open={open} closeModal={closeModal}>
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-max">
@@ -65,7 +64,7 @@ export const VerifyItemsModal = ({ open, closeModal, lineItems, status, userSite
 
 
 export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, toSiteId, orderMadeBy,
-    openDeleteModal, openRejectModal, handleConfirmOrder, openVerifyItemsModal }) => {
+    openDeleteModal, openRejectModal, handleConfirmOrder, openVerifyItemsModal, handleDeliveringOrder }) => {
 
 
     return (
@@ -135,8 +134,18 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
                             {/* Enter qty sent */}                                                                                                                                                                                                                                                                                                                                                                                 
                             <span>Ready for Delivery</span>
                         </button>) : ""}
+                    
+                        {userSiteId === fromSiteId && status === "READY" ?
+                        (<button
+                            type="button"
+                            className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                            onClick={handleDeliveringOrder}
+                        >
+                            {/* Enter qty sent */}                                                                                                                                                                                                                                                                                                                                                                                 
+                            <span>Delivering</span>
+                        </button>) : ""}
 
-                    {userSiteId === fromSiteId && (status === "READY" || status === "DELIVERING") ?
+                    {userSiteId === toSiteId && (status === "DELIVERING") ?
                         (<button
                             type="button"
                             className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
@@ -155,6 +164,9 @@ export const StockTransferHeader = ({ orderId, status, userSiteId, fromSiteId, t
 
 export const LineItems = (lineItems, status, userSiteId, fromSiteId, toSiteId, setLineItems) => {
     const [skipPageReset, setSkipPageReset] = useState(false);
+
+    console.log("TABLE: ");
+    console.log(status);
 
     const columns = useMemo(() => {
         const updateMyData = (rowIndex, columnId, value) => {
@@ -198,11 +210,13 @@ export const LineItems = (lineItems, status, userSiteId, fromSiteId, toSiteId, s
                 accessor: "sentQty",
                 disableSortBy: true,
                 Cell: (row) => {
-                    return status === "CONFIRMED" && userSiteId === fromSiteId ? (
+                    console.log("TABLE==")
+                    console.log(row);
+                    console.log(status);
+                    console.log(status === "CONFIRMED" && userSiteId === fromSiteId)
+                    return (status === "CONFIRMED" && userSiteId === fromSiteId) ? (
                         <EditableCell value={0} row={row.row} column={row.column} updateMyData={updateMyData} />
-                    ) : (
-                        <span>{row.row.sentQty}</span>
-                        );
+                    ) : (`${row.sentQty === undefined ? "-" : row.sentQty }`);
                 }
             },
             {
@@ -238,7 +252,7 @@ export const LineItems = (lineItems, status, userSiteId, fromSiteId, toSiteId, s
 }
 
 
-export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, fromSitePhone, toSite, toSiteCode, toSitePhone, orderMadeBy }) => {
+export const StockTransferBody = ({ lineItems, status, fromSite, fromSitePhone, toSite, toSitePhone, orderMadeBy }) => {
 
     return (
         <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
@@ -271,15 +285,13 @@ export const StockTransferBody = ({ lineItems, status, fromSite, fromSiteCode, f
 
                                 <div className="sm:col-span-1">
                                     <dt className="text-sm font-medium text-gray-500">From</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">Site Code: {fromSiteCode}</dd>
-                                    <dd className="mt-1 text-sm text-gray-900">Name: {fromSite}</dd>
-                                    <dd className="mt-1 text-sm text-gray-900">Phone: {fromSitePhone} </dd>
+                                    <dd className="mt-1 text-sm text-gray-900">{fromSite}</dd>
+                                    <dd className="mt-1 text-sm text-gray-900">{fromSitePhone} </dd>
                                 </div>
                                 <div className="sm:col-span-1">
                                     <dt className="text-sm font-medium text-gray-500">To</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">Site Code: {toSiteCode}</dd>
-                                    <dd className="mt-1 text-sm text-gray-900">Name: {toSite}</dd>
-                                    <dd className="mt-1 text-sm text-gray-900">Phone: {toSitePhone}</dd>
+                                    <dd className="mt-1 text-sm text-gray-900">{toSite}</dd>
+                                    <dd className="mt-1 text-sm text-gray-900">{toSitePhone}</dd>
                                 </div>
                             </dl>
                         </div>
@@ -299,15 +311,14 @@ export const ViewStockTransfer = (subsys) => {
     const { id } = useParams();
     const { pathname } = useLocation();
     let userSiteId = useSelector(selectUserSite);
-     //get user site id
-     if (userSiteId === 0) {
-        if (pathname.includes("sm")) {
-            userSiteId = 1
-        } else if (pathname.includes("wh")) {
-            userSiteId = 2
-        }
-    }
-    console.log(userSiteId);
+    //  //get user site id
+    //  if (userSiteId === 0) {
+    //     if (pathname.includes("sm")) {
+    //         userSiteId = 1
+    //     } else if (pathname.includes("wh")) {
+    //         userSiteId = 2
+    //     }
+    // }
 
     const userStatus = useSelector((state) => state.user.status);
     var order = useSelector(selectStockTransferOrder);
@@ -315,20 +326,29 @@ export const ViewStockTransfer = (subsys) => {
     const [openDelete, setOpenDelete] = useState(false);
     const [openReject, setOpenReject] = useState(false);
     const [openVerifyItems, setOpenVerifyItems] = useState(false);
+    const [reload, setReload] = useState(0);
+    const stoStatus = useSelector((state) => state.stocktransfer.status)
 
-
-    useEffect(() => {
+    useEffect(() => { 
         dispatch(getStockTransfer(id))
-            .unwrap()
-            .then((response) => {
-                order = response.data;
-                if (order !== undefined && order !== null) {
-                    setLineItems(order.lineItems);
-                }
-            })
-            .catch((err) => alert(err.message))
-    }, [userStatus, userSiteId, openVerifyItems, openDelete])
+        setLineItems(order?.lineItems)
+            // .unwrap()
+            // .then((response) => {
+            //     console.log("RESPONSE:", response.data);
+            //     order = response.data;
+            //     if (order !== undefined && order !== null) {
+            //         setLineItems(order.lineItems);
+            //     }
+            // })
+            // .catch((err) => alert(err.message))
+    }, [dispatch, reload])
 
+    if (Object.keys(order) != 0) {
+        console.log("Status", order);
+        console.log(order.statusHistory)
+        // let index = order.statusHistory.length
+        console.log(order.statusHistory)
+    }
 
    
     const openDeleteModal = () => setOpenDelete(true);
@@ -346,8 +366,6 @@ export const ViewStockTransfer = (subsys) => {
                 ...item, 
                 sentQty: item.requestedQty
             }))
-            console.log(orderStatus === "CONFIRMED" && userSiteId === order.fromSite.id);
-            
         }
         if (orderStatus === "DELIVERING" || orderStatus ==="READY") {
             temp = order.lineItems.map((item) => ({
@@ -355,7 +373,7 @@ export const ViewStockTransfer = (subsys) => {
                 actualQty: item.sentQty
             }))
         }
-
+        console.log(orderStatus === "CONFIRMED" && userSiteId === order.fromSite.id);
         setLineItems(temp)
         setOpenVerifyItems(true);
     }
@@ -375,6 +393,17 @@ export const ViewStockTransfer = (subsys) => {
         closeVerifyItemsModal();
     }
 
+    const handleDeliveringOrder = (e) => {
+        e.preventDefault();
+        dispatch(deliverStockTransfer({order: order, siteId: userSiteId}))
+            .unwrap()
+            .then(() => alert("Order is Delivering"))
+            .catch((err) => alert(err.message));
+        
+        setReload(reload+1);
+        
+    }
+
     const handleCompleteOrder = (e) => {
         e.preventDefault();
         let temp = {...order}
@@ -389,8 +418,6 @@ export const ViewStockTransfer = (subsys) => {
         navigate(pathname);
     }
 
-
-  
     const handleConfirmCancel = (e) => {
         e.preventDefault();
         dispatch(cancelStockTransfer({ orderId: id, siteId: userSiteId }))
@@ -426,14 +453,14 @@ export const ViewStockTransfer = (subsys) => {
             .then(() => {
                 alert("Successfully confirmed stock transfer order");
                 closeDeleteModal();
-                navigate(pathname);
+                setReload(reload+1);
             })
             .catch((error) => {
                 alert(error.message);
             })
     }
-
-
+       
+        
     return (
         Boolean(Object.keys(order) != 0) && (
             <>
@@ -448,12 +475,11 @@ export const ViewStockTransfer = (subsys) => {
                     openRejectModal={openRejectModal}
                     handleConfirmOrder={handleConfirmOrder}
                     openVerifyItemsModal={openVerifyItemsModal}
+                    handleDeliveringOrder={handleDeliveringOrder}
                 />
                 <StockTransferBody
-                    lineItems={order.lineItems}
-                    status={
-                        order.statusHistory[order.statusHistory.length - 1].status
-                    }
+                    lineItems={lineItems}
+                    status={order.statusHistory[order.statusHistory?.length - 1].status}
                     fromSite={order.fromSite?.name}
                     fromSiteCode={order.fromSite.siteCode}
                     fromSitePhone={order.fromSite.phoneNumber}

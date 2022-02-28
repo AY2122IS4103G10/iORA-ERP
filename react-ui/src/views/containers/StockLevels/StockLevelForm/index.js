@@ -6,7 +6,7 @@ import { Dialog, Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 import { XIcon } from '@heroicons/react/outline'
 
-import { selectUserStore } from "../../../../stores/slices/userSlice";
+import { selectUserSite, selectUserStore } from "../../../../stores/slices/userSlice";
 import { getASiteStock, selectCurrSiteStock, editStock } from "../../../../stores/slices/stocklevelSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchModel, selectModel } from "../../../../stores/slices/productSlice";
@@ -19,8 +19,15 @@ function classNames(...classes) {
 
 
 export const getProductItem = (data, sku) => {
-  // console.log(data);
-  return data.productItems.filter((item) => item.productSKU == sku.trim());
+  console.log(data); 
+  console.log(sku);
+  console.log(data.productItems[2]);
+  console.log(data.productItems.filter((item) => {
+    // console.log(item);
+    return item.productSKU === sku.trim();
+    
+  }));
+  return data.productItems.filter((item) => item.productSKU?.trim() === sku.trim());
 }
 
 const columns = [
@@ -220,7 +227,7 @@ export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, se
 
 export const StockLevelForm = () => {
   const { id } = useParams(); //sku code
-  const siteId = 3; //get current store/site user is in
+  const siteId = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
   const status = useSelector((state) => state.stocklevel.status)
   const siteStock = useSelector(selectCurrSiteStock);
@@ -229,7 +236,7 @@ export const StockLevelForm = () => {
   const [selected, setSelected] = useState(actions[0]);
 
   //get product information
-  const modelCode = id.slice(0, -2);
+  const modelCode = id.substring(0, id.indexOf('-'));
   const model = useSelector(selectModel);
 
 
@@ -246,7 +253,7 @@ export const StockLevelForm = () => {
     e.preventDefault();
     let toUpdate = {};
     const rfidArr = rfid.trim().split(" ");
-    console.log(rfidArr);
+    // console.log(rfidArr);
     // add 
     if (selected.id == 1) {
       Object.entries(rfidArr).forEach(([key, value]) => {
@@ -259,7 +266,7 @@ export const StockLevelForm = () => {
         toUpdate[value] = 0;
       });
     }
-    console.log(toUpdate);
+    // console.log(toUpdate);
 
     dispatch(editStock({toUpdate: toUpdate, siteId: siteId}))
       .unwrap()
@@ -310,7 +317,7 @@ export const StockLevelForm = () => {
                       <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.price}</dd>
                     </div>
                     {model != null && model.products != null ? (
-                      model?.products?.filter((prod) => prod.sku == id.trim())[0].productFields.map((field) => {
+                      model?.products?.filter((prod) => prod.sku == id.trim())[0]?.productFields.map((field) => {
                         return (
                           <div key={field.id} className="sm:col-span-1">
                             <dt className="text-sm font-medium text-gray-500">{field.fieldName}</dt>

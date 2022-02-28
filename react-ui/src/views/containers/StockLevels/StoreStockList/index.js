@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CogIcon } from "@heroicons/react/outline";
 
 import { getASite, selectSite } from '../../../../stores/slices/siteSlice';
-import { selectUserStore } from '../../../../stores/slices/userSlice';
+import { selectUserSite, selectUserStore } from '../../../../stores/slices/userSlice';
 import { SelectableTable } from '../../../components/Tables/SelectableTable';
 import { selectCurrSiteStock, getASiteStock } from '../../../../stores/slices/stocklevelSlice';
 
@@ -57,7 +57,7 @@ const columns = [
 ]
 
 export const MyStoreStock = (subsys) => {
-  const id = 3; //get current store/site user is in
+  const id = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
   const siteStock = useSelector(selectCurrSiteStock);
 

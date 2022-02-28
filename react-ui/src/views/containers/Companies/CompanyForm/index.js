@@ -3,24 +3,45 @@ import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
-
-import { companyApi } from "../../../../environments/Api";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { api, companyApi } from "../../../../environments/Api";
 import { AddressField } from "../../Sites/SiteForm";
 import {
   addNewCompany,
   updateExistingCompany,
 } from "../../../../stores/slices/companySlice";
+import { FormCheckboxes } from "../../Products/ProductForm";
 
-const siteTypes = [
-  { id: 1, name: "Headquarters" },
-  { id: 2, name: "Manufacturing" },
-  { id: 3, name: "Online Store" },
-  { id: 4, name: "Store" },
-  { id: 5, name: "Warehouse" },
-];
-
-const companies = [{ id: 1, name: "iORA Fashion Pte. Ltd." }];
+const RightColSection = ({
+  fieldName,
+  children,
+  path = "/",
+  disableButton = false,
+}) => {
+  return (
+    <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
+      <div className="rounded-lg bg-white  shadow">
+        <div className="p-6">
+          <h2
+            className="text-base font-medium text-gray-900"
+            id="announcements-title"
+          >
+            {fieldName}
+          </h2>
+          <div className="flow-root max-h-60 overflow-y-auto mt-6">
+            {children}
+          </div>
+          {!disableButton && (
+            <div className="mt-6">
+              <button className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                Add {fieldName.toLowerCase()}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const CompanyFormBody = ({
   isEditing,
@@ -50,123 +71,167 @@ const CompanyFormBody = ({
   onLongitudeChanged,
   billing,
   onBillingChanged,
+  departments,
+  onDepartmentsChanged,
+  deptCheckedState,
+  vendors,
+  onVendorsChanged,
+  vendorCheckedState,
+  setFieldNameSelected,
+  openModal,
   onAddCompanyClicked,
   onCancelClicked,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-    <h1 className="sr-only">{!isEditing ? "Add" : "Edit"} New Company</h1>
-    <div className="grid grid-cols-1 gap-4 lg:col-span-2">
+    <h1 className="sr-only">{!isEditing ? "Add New" : "Edit"} Company</h1>
+    <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
       {/* Form */}
-      <section aria-labelledby="profile-overview-title">
-        <div className="rounded-lg bg-white overflow-hidden shadow">
-          <form>
-            <div className="p-8 space-y-8 divide-y divide-gray-200">
-              <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-                <div>
+      <div className="grid grid-cols-1 gap-4 lg:col-span-2">
+        <section aria-labelledby="profile-overview-title">
+          <div className="rounded-lg bg-white overflow-hidden shadow">
+            <form>
+              <div className="p-8 space-y-8 divide-y divide-gray-200">
+                <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                      {!isEditing ? "Add New" : "Edit"} Company
-                    </h3>
-                  </div>
-                  <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                    <SimpleInputGroup
-                      label="Name"
-                      inputField="name"
-                      className="relative rounded-md sm:mt-0 sm:col-span-2"
-                    >
-                      <SimpleInputBox
-                        type="text"
-                        name="name"
-                        id="name"
-                        autoComplete="name"
-                        value={name}
-                        onChange={onNameChanged}
-                        required
+                    <div>
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">
+                        {!isEditing ? "Add New" : "Edit"} Company
+                      </h3>
+                    </div>
+                    <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                      <SimpleInputGroup
+                        label="Name"
+                        inputField="name"
+                        className="relative rounded-md sm:mt-0 sm:col-span-2"
+                      >
+                        <SimpleInputBox
+                          type="text"
+                          name="name"
+                          id="name"
+                          autoComplete="name"
+                          value={name}
+                          onChange={onNameChanged}
+                          required
+                        />
+                      </SimpleInputGroup>
+                      <SimpleInputGroup
+                        label="Register No."
+                        inputField="registerNo"
+                        className="relative rounded-md sm:mt-0 sm:col-span-2"
+                      >
+                        <SimpleInputBox
+                          type="text"
+                          name="registerNo"
+                          id="registerNo"
+                          value={registerNo}
+                          onChange={onRegisterNoChanged}
+                          required
+                        />
+                      </SimpleInputGroup>
+                      <SimpleInputGroup
+                        label="Phone"
+                        inputField="phone"
+                        className="relative rounded-md sm:mt-0 sm:col-span-2"
+                      >
+                        <SimpleInputBox
+                          type="text"
+                          name="phone"
+                          id="phone"
+                          placeholder="+65-"
+                          value={phone}
+                          onChange={onPhoneChanged}
+                          required
+                        />
+                      </SimpleInputGroup>
+                      <AddressField
+                        address1={address1}
+                        onAddress1Changed={onAddress1Changed}
+                        building={building}
+                        onBuildingChanged={onBuildingChanged}
+                        unit={unit}
+                        onUnitChanged={onUnitChanged}
+                        country={country}
+                        onCountryChanged={onCountryChanged}
+                        city={city}
+                        onCityChanged={onCityChanged}
+                        state={state}
+                        onStateChanged={onStateChanged}
+                        postalCode={postalCode}
+                        onPostalCodeChanged={onPostalCodeChanged}
+                        latitude={latitude}
+                        onLatitudeChanged={onLatitudeChanged}
+                        longitude={longitude}
+                        onLongitudeChanged={onLongitudeChanged}
+                        billing={billing}
+                        onBillingChanged={onBillingChanged}
                       />
-                    </SimpleInputGroup>
-                    <SimpleInputGroup
-                      label="Register No."
-                      inputField="registerNo"
-                      className="relative rounded-md sm:mt-0 sm:col-span-2"
-                    >
-                      <SimpleInputBox
-                        type="text"
-                        name="registerNo"
-                        id="registerNo"
-                        value={registerNo}
-                        onChange={onRegisterNoChanged}
-                        required
-                      />
-                    </SimpleInputGroup>
-                    <SimpleInputGroup
-                      label="Phone"
-                      inputField="phone"
-                      className="relative rounded-md sm:mt-0 sm:col-span-2"
-                    >
-                      <SimpleInputBox
-                        type="text"
-                        name="phone"
-                        id="phone"
-                        placeholder="+65-"
-                        value={phone}
-                        onChange={onPhoneChanged}
-                        required
-                      />
-                    </SimpleInputGroup>
-                    <AddressField
-                      address1={address1}
-                      onAddress1Changed={onAddress1Changed}
-                      building={building}
-                      onBuildingChanged={onBuildingChanged}
-                      unit={unit}
-                      onUnitChanged={onUnitChanged}
-                      country={country}
-                      onCountryChanged={onCountryChanged}
-                      city={city}
-                      onCityChanged={onCityChanged}
-                      state={state}
-                      onStateChanged={onStateChanged}
-                      postalCode={postalCode}
-                      onPostalCodeChanged={onPostalCodeChanged}
-                      latitude={latitude}
-                      onLatitudeChanged={onLatitudeChanged}
-                      longitude={longitude}
-                      onLongitudeChanged={onLongitudeChanged}
-                      billing={billing}
-                      onBillingChanged={onBillingChanged}
-                    />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="pt-5">
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                    onClick={onCancelClicked}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                    onClick={onAddCompanyClicked}
-                  >
-                    {!isEditing ? "Add" : "Save"} company
-                  </button>
+                <div className="pt-5">
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                      onClick={onCancelClicked}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                      onClick={onAddCompanyClicked}
+                    >
+                      {!isEditing ? "Add" : "Save"} company
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </form>
-        </div>
-      </section>
+            </form>
+          </div>
+        </section>
+      </div>
+      {/* Right column */}
+      <div className="grid grid-cols-1 gap-4">
+        {/* Departments */}
+        <RightColSection fieldName="Department" path="/ad/departments/create">
+          {departments.length ? (
+            <FormCheckboxes
+              legend="Department"
+              options={departments}
+              inputField="Department"
+              onFieldsChanged={onDepartmentsChanged}
+              fieldValues={deptCheckedState}
+            />
+          ) : (
+            "No departments found"
+          )}
+        </RightColSection>
+        {/* Vendors */}
+        <RightColSection fieldName="Vendor" path="/ad/vendors/create">
+          {vendors.length ? (
+            <FormCheckboxes
+              legend="Vendor"
+              options={vendors}
+              inputField="Vendor"
+              onFieldsChanged={onVendorsChanged}
+              fieldValues={vendorCheckedState}
+            />
+          ) : (
+            "No vendors found"
+          )}
+        </RightColSection>
+      </div>
     </div>
   </div>
 );
 
 export const CompanyForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { companyId } = useParams();
+  const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
   const [address1, setAddress1] = useState("");
   const [building, setBuilding] = useState("");
@@ -180,11 +245,31 @@ export const CompanyForm = () => {
   const [billing, setBilling] = useState(false);
   const [registerNo, setRegisterNo] = useState("");
   const [phone, setPhone] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const [addressId, setAddressId] = useState(null)
+  const [departments, setDepartments] = useState([]);
+  const [deptCheckedState, setDeptCheckedState] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [vendorCheckedState, setVendorCheckedState] = useState([]);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  useEffect(() => {
+    api.getAll("admin/viewDepartments?search=").then((response) => {
+      setDepartments(
+        response.data.map((dept) => ({ ...dept, fieldValue: dept.deptName }))
+      );
+      setDeptCheckedState(new Array(response.data.length).fill(false));
+    });
+  }, []);
+
+  useEffect(() => {
+    api.getAll("admin/viewVendors?search=").then((response) => {
+      setVendors(
+        response.data.map((vendor) => ({
+          ...vendor,
+          fieldValue: vendor.companyName,
+        }))
+      );
+      setVendorCheckedState(new Array(response.data.length).fill(false));
+    });
+  }, []);
 
   const onNameChanged = (e) => setName(e.target.value);
   const onRegisterNoChanged = (e) => setRegisterNo(e.target.value);
@@ -200,93 +285,126 @@ export const CompanyForm = () => {
   const onLongitudeChanged = (e) => setLongitude(e.target.value);
   const onBillingChanged = () => setBilling(!billing);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-  const canAdd =
-    [
-      name,
-      country,
-      city,
-      building,
-      state,
-      unit,
-      address1,
-      postalCode,
-      latitude,
-      longitude,
-      registerNo,
-      phone,
-    ].every(Boolean) && requestStatus === "idle";
+  const onDepartmentsChanged = (pos) => {
+    const updateCheckedState = deptCheckedState.map((item, index) =>
+      index === pos ? !item : item
+    );
+    setDeptCheckedState(updateCheckedState);
+  };
+  const onVendorsChanged = (pos) => {
+    const updateCheckedState = vendorCheckedState.map((item, index) =>
+      index === pos ? !item : item
+    );
+    setVendorCheckedState(updateCheckedState);
+  };
+  const canAdd = [
+    name,
+    country,
+    city,
+    building,
+    state,
+    unit,
+    address1,
+    postalCode,
+    latitude,
+    longitude,
+    registerNo,
+    phone,
+  ].every(Boolean);
+
   const onAddCompanyClicked = (evt) => {
     evt.preventDefault();
+    const depts = [],
+      vends = [];
+    departments.forEach(
+      (dept, index) => deptCheckedState[index] && depts.push(dept)
+    );
+    vendors.forEach(
+      (vendor, index) => vendorCheckedState[index] && vends.push(vendor)
+    );
+    console.log({
+      name,
+      address: {
+        country:
+          country.charAt(0).toUpperCase() + country.slice(1).toLowerCase(),
+        city,
+        building,
+        state,
+        unit,
+        road: address1,
+        postalCode,
+        billing: false,
+        latitude,
+        longitude,
+      },
+      registerNumber: registerNo,
+      telephone: phone,
+      active: true,
+      departments: depts,
+      vendors: vends,
+    });
     if (canAdd)
-      try {
-        setRequestStatus("pending");
-        if (!isEditing)
-          dispatch(
-            addNewCompany({
-              name,
-              address: {
-                country:
-                  country.charAt(0).toUpperCase() +
-                  country.slice(1).toLowerCase(),
-                city,
-                building,
-                state,
-                unit,
-                road: address1,
-                postalCode,
-                billing: false,
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
-              },
-              registerNumber: registerNo,
-              telephone: phone,
-              active: true,
-              departments: [],
-              vendors: [],
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully added company");
-              navigate("/ad/companies");
-            })
-            .catch((err) => console.error(err));
-        else
-          dispatch(
-            updateExistingCompany({
-              id: companyId,
-              name,
-              address: {
-                country,
-                city,
-                building,
-                state,
-                unit,
-                road: address1,
-                postalCode,
-                billing: false,
-                latitude,
-                longitude,
-              },
-              registerNumber: registerNo,
-              telephone: phone,
-              active: true,
-              departments: [],
-              vendors: [],
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully updated company");
-              navigate(`/ad/companies/${companyId}`);
-            })
-            .catch((err) => console.error(err));
-      } catch (err) {
-        console.error("Failed to add company: ", err);
-      } finally {
-        setRequestStatus("idle");
-      }
+      if (!isEditing)
+        dispatch(
+          addNewCompany({
+            name,
+            address: {
+              country:
+                country.charAt(0).toUpperCase() +
+                country.slice(1).toLowerCase(),
+              city,
+              building,
+              state,
+              unit,
+              road: address1,
+              postalCode,
+              billing: false,
+              latitude,
+              longitude,
+            },
+            registerNumber: registerNo,
+            telephone: phone,
+            active: true,
+            departments: depts,
+            vendors: vends,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            alert("Successfully added company");
+            navigate("/ad/companies");
+          })
+          .catch((err) => console.error(err));
+      else
+        dispatch(
+          updateExistingCompany({
+            id: companyId,
+            name,
+            address: {
+              country,
+              city,
+              building,
+              state,
+              unit,
+              road: address1,
+              postalCode,
+              billing: false,
+              latitude,
+              longitude,
+            },
+            registerNumber: registerNo,
+            telephone: phone,
+            active: true,
+            departments: [],
+            vendors: [],
+          })
+        )
+          .unwrap()
+          .then(() => {
+            alert("Successfully updated company");
+            navigate(`/ad/companies/${companyId}`);
+          })
+          .catch((err) => console.error(err));
   };
 
   const onCancelClicked = () =>
@@ -295,7 +413,7 @@ export const CompanyForm = () => {
   useEffect(() => {
     Boolean(companyId) &&
       companyApi.getCompany(companyId).then((response) => {
-        const { name, address, registerNumber, telephone } =
+        const { name, address, registerNumber, telephone, depts, vends } =
           response.data;
         setIsEditing(true);
         setName(name);
@@ -310,7 +428,16 @@ export const CompanyForm = () => {
         setLatitude(address.latitude);
         setLongitude(address.longitude);
         setPhone(telephone);
-        setAddressId(address.id)
+        // setDepartments(
+        //   departments.map((dept) =>
+        //     depts.map((d) => d.deptName).includes(dept.deptName)
+        //   )
+        // );
+        // setVendors(
+        //   vendors.map((vend) =>
+        //     vends.map((v) => v.companyName).includes(vend.companyName)
+        //   )
+        // );
       });
   }, [companyId]);
 
@@ -343,10 +470,14 @@ export const CompanyForm = () => {
       onLongitudeChanged={onLongitudeChanged}
       billing={billing}
       onBillingChanged={onBillingChanged}
+      departments={departments}
+      onDepartmentsChanged={onDepartmentsChanged}
+      deptCheckedState={deptCheckedState}
+      vendors={vendors}
+      onVendorsChanged={onVendorsChanged}
+      vendorCheckedState={vendorCheckedState}
       onAddCompanyClicked={onAddCompanyClicked}
       onCancelClicked={onCancelClicked}
-      siteTypes={siteTypes}
-      companies={companies}
     />
   );
 };

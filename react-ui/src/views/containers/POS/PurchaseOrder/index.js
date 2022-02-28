@@ -15,7 +15,7 @@ const OrderList = ({
   clear,
 }) => (
   <main>
-    <div className="max-w-4xl mx-auto py-2 px-4 sm:py-2 sm:px-4 lg:px-0">
+    <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4 lg:px-0">
       <form>
         <div>
           <label htmlFor="rfid" className="block mt-8 text-base font-medium text-gray-700">

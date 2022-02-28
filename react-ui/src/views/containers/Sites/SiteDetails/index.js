@@ -109,7 +109,7 @@ export const SiteDetails = () => {
       closeModal();
       navigate("/ad/sites");
     } catch (err) {
-      console.error("Failed to add promo: ", err);
+      console.error("Failed to add site: ", err);
     }
   };
 

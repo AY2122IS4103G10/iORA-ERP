@@ -217,6 +217,9 @@ public class ProcurementServiceImpl implements ProcurementService {
         //     }
         // }
         siteService.addManyToStockLevel(actionBy.getStockLevel(), allProductItems);
+        procurementOrder.setHeadquarters(oldOrder.getHeadquarters());
+        procurementOrder.setManufacturing(oldOrder.getManufacturing());
+        procurementOrder.setWarehouse(oldOrder.getWarehouse());
         procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.READY));
 
@@ -242,6 +245,9 @@ public class ProcurementServiceImpl implements ProcurementService {
         List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
                 .flatMap(Collection::stream).collect(Collectors.toList());
         siteService.removeManyFromStockLevel(productItems);
+        procurementOrder.setHeadquarters(oldOrder.getHeadquarters());
+        procurementOrder.setManufacturing(oldOrder.getManufacturing());
+        procurementOrder.setWarehouse(oldOrder.getWarehouse());
         procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.SHIPPED));
 

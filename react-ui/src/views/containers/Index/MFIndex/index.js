@@ -12,7 +12,7 @@ import {
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
-  { name: "Procurement Orders", href: "/mf/procurements", icon: CreditCardIcon, current: false },
+  { name: "Procurement", href: "/mf/procurements", icon: CreditCardIcon, current: false },
 ];
 
 const secondaryNavigation = [
@@ -24,7 +24,7 @@ const secondaryNavigation = [
 export const MFIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
-    <div className="min-h-full">
+    <div className="min-h-screen bg-gray-100">
       <SideBar
         navigation={navigation}
         secondaryNavigation={secondaryNavigation}
@@ -42,7 +42,7 @@ export const MFIndex = () => {
             </div>
           }
         />
-        <main className="flex-1 pb-8 bg-gray-100">
+        <main className="flex-1 pb-8">
           <Outlet />
         </main>
       </div>

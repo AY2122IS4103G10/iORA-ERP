@@ -14,6 +14,7 @@ import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
 import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
 
@@ -222,17 +223,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee loginAuthentication(String username, String password) throws EmployeeException {
+    public Employee loginAuthentication(String username, String password) throws AuthenticationException {
         try {
             Employee c = getEmployeeByUsername(username);
 
             if (c.authentication(generateProtectedPassword(c.getSalt(), password))) {
-                return c;
+                if (c.getAvailStatus() == true) {
+                    return c;
+                } else {
+                    throw new AuthenticationException("Your account has been terminated.");
+                }
+
             } else {
-                throw new EmployeeException();
+                throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
             }
-        } catch (Exception ex) {
-            throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
+
+        } catch (EmployeeException ex) {
+            throw new AuthenticationException("Authentication Fail. Invalid Username or Password.");
         }
 
     }

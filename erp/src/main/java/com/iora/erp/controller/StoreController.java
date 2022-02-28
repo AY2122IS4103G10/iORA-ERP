@@ -232,7 +232,7 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransfer/complete/{siteId}", produces = "application/json")
+    @PutMapping(path = "/stockTransfer/complete/{siteId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> completeStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder, @PathVariable Long siteId) {
         try {
             return ResponseEntity

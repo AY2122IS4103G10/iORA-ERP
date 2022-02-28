@@ -86,6 +86,15 @@ export const vendorApi = {
   },
 };
 
+export const stockLevelApi = {
+  editStock(toUpdate, siteId) {
+    return axios.post(
+      `${REST_ENDPOINT}warehouse/editStock/${siteId}`,
+      toUpdate
+    )
+  }
+}
+
 export const stockTransferApi = {
   cancelOrder(orderId, siteId) {
     return axios.delete(`${REST_ENDPOINT}store/stockTransfer/cancel/${orderId}/${siteId}`);
@@ -105,8 +114,11 @@ export const stockTransferApi = {
   deliverOrder(order, siteId) {
     return axios.put(`${REST_ENDPOINT}store/stockTransfer/deliver/${siteId}`, order);
   },
-  completeOrder(orderId, siteId) {
-    return axios.put(`${REST_ENDPOINT}store/stockTransfer/complete/${orderId}/${siteId}`);
+  completeOrder(order, siteId) {
+    return axios.put(
+      `${REST_ENDPOINT}store/stockTransfer/complete/${siteId}`, 
+      order
+    )
   },
 };
 

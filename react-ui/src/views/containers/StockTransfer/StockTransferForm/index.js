@@ -308,6 +308,7 @@ function prepareStockLevel(stocklevel, allModels) {
         stock.name = model?.name;
         stock.product = model?.products.find((prod) => prod.sku === stock.sku);
     })
+    console.log(stocklevel);
     return stocklevel;
 }
 
@@ -392,17 +393,20 @@ export const StockTransferForm = (subsys) => {
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [originalOrder, setOriginalOrder] = useState({});
+    const currSite = useSelector(selectUserSite);
 
     //get stock level and product information
     const stocklevel = useSelector(selectCurrSiteStock);
     const allModels = useSelector(selectAllProducts);
-    const prodTableData = prepareStockLevel(convertData(stocklevel), allModels);
+    const prodTableData = isObjectEmpty(stocklevel) ? [] : prepareStockLevel(convertData(stocklevel), allModels);
 
     useEffect(() => {
         dispatch(getAllSites());
-        //dispatch(getASiteStock(from?.id));
+        if (from !== undefined) {
+            dispatch(getASiteStock(from?.id));
+        }
         dispatch(fetchProducts());
-    }, [])
+    }, [from])
 
     //editing 
     function mapLineItemsToSelectedRows(data) {
@@ -459,7 +463,6 @@ export const StockTransferForm = (subsys) => {
 
     const onAddItemsClicked = (e) => {
         e.preventDefault();
-        console.log(selectedRows);
         const selectedRowKeys = Object.keys(selectedRows).map((key) => parseInt(key));
         const lineItems = [];
         selectedRowKeys.map((key) => lineItems.push((prodTableData[key])));
@@ -472,7 +475,6 @@ export const StockTransferForm = (subsys) => {
         closeItemsModal();
     }
 
-    const currSite = useSelector(selectUserSite);
 
     //Handle Create Order product
     const handleSubmit = (e) => {
@@ -488,6 +490,7 @@ export const StockTransferForm = (subsys) => {
             fromSite: from,
             toSite: to
         }
+        console.log(JSON.stringify(stockTransferOrder));
         dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
             .then(() => {

@@ -57,7 +57,7 @@ export const AProductStock = (subsys) => {
       dispatch(getAllSites());
   }, []);
 
-  const path = "/" + subsys.subsys + "/stocklevels";
+  const path = "/" + subsys.subsys.subsys + "/stocklevels";
   
   return(
       <div className="min-h-full">

@@ -73,7 +73,6 @@ export const CompanyDetails = () => {
         console.error("Failed to add company: ", err);
       });
   };
-  console.log(company)
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 

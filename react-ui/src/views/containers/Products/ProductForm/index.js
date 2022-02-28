@@ -116,7 +116,7 @@ export const FormCheckboxes = ({
   );
 };
 
-const RadioGroup = ({ options, defaultChecked }) => {
+const RadioGroup = ({ options, selected, onSelectedChanged }) => {
   return (
     <fieldset className="mt-4">
       <legend className="sr-only">Option</legend>
@@ -127,8 +127,11 @@ const RadioGroup = ({ options, defaultChecked }) => {
               id={option.id}
               name="option"
               type="radio"
-              defaultChecked={defaultChecked(option)}
+              // defaultChecked={defaultChecked(option)}
+              checked={option.fieldValue === selected.fieldValue}
               className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300"
+              value={selected}
+              onChange={onSelectedChanged}
             />
             <label
               htmlFor={option.id}
@@ -212,6 +215,7 @@ const AddProductFormBody = ({
   onPromosChanged,
   promoCheckedState,
   companies,
+  companySelected,
   onCompanyChanged,
   onSaveClicked,
   onCancelClicked,
@@ -220,7 +224,7 @@ const AddProductFormBody = ({
 }) => {
   return (
     <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-      <h1 className="sr-only">Add Product</h1>
+      <h1 className="sr-only">{!isEditing ? "Add New" : "Edit"} Product</h1>
       {/* Main 3 column grid */}
       <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
         {/* Left column */}
@@ -471,7 +475,7 @@ const AddProductFormBody = ({
             )}
           </RightColSection>
           {/* Companies */}
-          <RightColSection
+          {/* <RightColSection
             fieldName="Company"
             openModal={openModal}
             setFieldNameSelected={setFieldNameSelected}
@@ -479,12 +483,14 @@ const AddProductFormBody = ({
             {companies.length ? (
               <RadioGroup
                 options={companies}
-                defaultChecked={(option) => option.fieldValue === "IORA"}
+                // defaultChecked={(option) => option.fieldValue === "IORA"}
+                selected={companySelected}
+                onSelectedChanged={onCompanyChanged}
               />
             ) : (
               `No company found.`
             )}
-          </RightColSection>
+          </RightColSection> */}
         </div>
       </div>
     </div>
@@ -553,6 +559,7 @@ export const ProductForm = () => {
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
   const onListPriceChanged = (e) => setPrice(e.target.value);
+  const onCompanyChanged = (e) => setCompanySelected(e.currentTarget.value);
   const onOnlineOnlyChanged = () => {
     setOnlineOnly(!onlineOnly);
   };
@@ -708,22 +715,33 @@ export const ProductForm = () => {
             .map((field) => field.fieldValue)
             .map((category) =>
               productFields
-                .filter((field) => field.fieldName === "CATEGORY" && !Boolean(field.discountedPrice))
+                .filter(
+                  (field) =>
+                    field.fieldName === "CATEGORY" &&
+                    !Boolean(field.discountedPrice)
+                )
                 .map((field) => field.fieldValue)
                 .includes(category)
             )
         );
-        setPromoCheckedState(promotions
-          .map((field) => field.fieldValue)
-          .map((promo) =>
-            productFields
-              .filter((field) => field.fieldName === "CATEGORY" && Boolean(field.discountedPrice))
-              .map((field) => field.fieldValue)
-              .includes(promo)
-          ))
+        setPromoCheckedState(
+          promotions
+            .map((field) => field.fieldValue)
+            .map((promo) =>
+              productFields
+                .filter(
+                  (field) =>
+                    field.fieldName === "CATEGORY" &&
+                    Boolean(field.discountedPrice)
+                )
+                .map((field) => field.fieldValue)
+                .includes(promo)
+            )
+        );
         setProducts(products);
+        setCompanySelected(companies[0])
       });
-  }, [prodId, colors, sizes, tags, categories, promotions]);
+  }, [prodId, colors, sizes, tags, categories, promotions, companies]);
   const [fieldNameSelected, setFieldNameSelected] = useState("");
   const [fieldValue, setFieldValue] = useState("");
   const [openAddField, setOpenAddField] = useState(false);
@@ -751,7 +769,7 @@ export const ProductForm = () => {
         setFieldRequestStatus("idle");
       }
   };
-
+  // console.log(companySelected)
   const openModal = () => setOpenAddField(true);
   const closeModal = () => setOpenAddField(false);
   return (
@@ -786,6 +804,8 @@ export const ProductForm = () => {
         onPromosChanged={onPromosChanged}
         promoCheckedState={promoCheckedState}
         companies={companies}
+        companySelected={companySelected}
+        onCompanyChanged={onCompanyChanged}
         onSaveClicked={onSaveClicked}
         onCancelClicked={onCancelClicked}
         openModal={openModal}

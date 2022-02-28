@@ -108,6 +108,7 @@ const EmployeeFormBody = ({
                             name="username"
                             id="username"
                             autoComplete="username"
+                            placeholder="Leave blank if using email as username."
                             value={username}
                             onChange={onUsernameChanged}
                           />
@@ -122,7 +123,9 @@ const EmployeeFormBody = ({
                             name="password"
                             id="password"
                             autoComplete="password"
-                            placeholder={isEditing && "Leave blank if unchanged."}
+                            placeholder={
+                              isEditing ? "Leave blank if unchanged." : ""
+                            }
                             value={password}
                             onChange={onPasswordChanged}
                             required={!isEditing ? true : false}
@@ -166,7 +169,7 @@ const EmployeeFormBody = ({
                             value={salary}
                             onChange={onSalaryChanged}
                             required
-                            step="100"
+                            step="0.01"
                             aria-describedby="salary-currency"
                           />
                           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -329,11 +332,14 @@ export const EmployeeForm = () => {
     company && setCompanySelected(company);
   }, [company]);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-  const canAdd =
-    [name, departmentSelected, email, payTypeSelected, salary, jobTitles].every(
-      Boolean
-    ) && requestStatus === "idle";
+  const canAdd = [
+    name,
+    departmentSelected,
+    email,
+    payTypeSelected,
+    salary,
+    jobTitles,
+  ].every(Boolean);
 
   const onAddEmployeeClicked = (evt) => {
     evt.preventDefault();
@@ -353,62 +359,57 @@ export const EmployeeForm = () => {
       },
     });
     if (canAdd)
-      try {
-        setRequestStatus("pending");
-        if (!isEditing) {
-          dispatch(
-            addNewEmployee({
-              name,
-              availStatus: true,
-              email,
-              username: Boolean(username.length) ? username : email,
-              password,
-              payType: payTypeSelected.value,
-              salary,
-              department: {
-                id: departmentSelected.id,
-              },
-              jobTitle: {
-                id: jobTitleSelected.id,
-              },
-              company: { id: companySelected.id },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully added employee");
-              navigate("/ad/employees");
-            });
-        } else {
-          dispatch(
-            updateExistingEmployee({
-              id: employeeId,
-              name,
-              availStatus: true,
-              email,
-              username: Boolean(username.length) ? username : email,
-              password,
-              payType: payTypeSelected.value,
-              salary,
-              department: {
-                id: departmentSelected.id,
-              },
-              jobTitle: {
-                id: jobTitleSelected.id,
-              },
-              company: { id: companySelected.id },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully updated employee");
-              navigate(`/ad/employees/${employeeId}`);
-            });
-        }
-      } catch (err) {
-        console.error("Failed to add employee: ", err);
-      } finally {
-        setRequestStatus("idle");
+      if (!isEditing) {
+        dispatch(
+          addNewEmployee({
+            name,
+            availStatus: true,
+            email,
+            username: Boolean(username.length) ? username : email,
+            password,
+            payType: payTypeSelected.value,
+            salary,
+            department: {
+              id: departmentSelected.id,
+            },
+            jobTitle: {
+              id: jobTitleSelected.id,
+            },
+            company: { id: companySelected.id },
+          })
+        )
+          .unwrap()
+          .then(() => {
+            alert("Successfully added employee");
+            navigate("/ad/employees");
+          })
+          .catch((err) => console.error("Failed to add employee: ", err));
+      } else {
+        dispatch(
+          updateExistingEmployee({
+            id: employeeId,
+            name,
+            availStatus: true,
+            email,
+            username: Boolean(username.length) ? username : email,
+            password,
+            payType: payTypeSelected.value,
+            salary,
+            department: {
+              id: departmentSelected.id,
+            },
+            jobTitle: {
+              id: jobTitleSelected.id,
+            },
+            company: { id: companySelected.id },
+          })
+        )
+          .unwrap()
+          .then(() => {
+            alert("Successfully updated employee");
+            navigate(`/ad/employees/${employeeId}`);
+          })
+          .catch((err) => console.error("Failed to update employee: ", err));
       }
   };
 

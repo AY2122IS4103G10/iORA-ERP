@@ -73,6 +73,7 @@ const employeeSlice = createSlice({
       state.employee.push(action.payload);
     });
     builder.addCase(updateExistingEmployee.fulfilled, (state, action) => {
+      console.log(action.payload)
       const {
         employeeId,
         name,

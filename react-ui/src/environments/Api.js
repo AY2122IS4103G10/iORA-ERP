@@ -122,9 +122,10 @@ export const stockTransferApi = {
       order
     )
   },
-  completeOrder(orderId, siteId) {
+  completeOrder(order, siteId) {
     return axios.put(
-      `${REST_ENDPOINT}store/stockTransfer/complete/${orderId}/${siteId}`
+      `${REST_ENDPOINT}store/stockTransfer/complete/${siteId}`, 
+      order
     )
   },
 }

@@ -21,6 +21,9 @@ import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 export const VerifyItemsModal = ({ open, closeModal, lineItems, status, userSiteId, 
     fromSiteId, toSiteId, setLineItems,handleReadyOrder, handleCompleteOrder }) => {
+
+        console.log("Verify");
+        console.log(lineItems);
     return (
         <SimpleModal open={open} closeModal={closeModal}>
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-max">
@@ -30,7 +33,7 @@ export const VerifyItemsModal = ({ open, closeModal, lineItems, status, userSite
                             as="h3"
                             className="text-center text-lg leading-6 font-medium text-gray-900"
                         >
-                            Add Items
+                            Verify Quantity
                         </Dialog.Title>
                         <LineItems lineItems={lineItems} status={status} userSiteId={userSiteId} fromSiteId={fromSiteId} toSiteId={toSiteId} setLineItems={setLineItems} />
                     </div>
@@ -197,7 +200,9 @@ export const LineItems = (lineItems, status, userSiteId, fromSiteId, toSiteId, s
                 Cell: (row) => {
                     return status === "CONFIRMED" && userSiteId === fromSiteId ? (
                         <EditableCell value={0} row={row.row} column={row.column} updateMyData={updateMyData} />
-                    ) : ("-");
+                    ) : (
+                        <span>{row.row.sentQty}</span>
+                        );
                 }
             },
             {
@@ -302,55 +307,92 @@ export const ViewStockTransfer = (subsys) => {
             userSiteId = 2
         }
     }
+    console.log(userSiteId);
 
     const userStatus = useSelector((state) => state.user.status);
-    const order = useSelector(selectStockTransferOrder);
+    var order = useSelector(selectStockTransferOrder);
     const [lineItems, setLineItems] = useState([]);
-
     const [openDelete, setOpenDelete] = useState(false);
+    const [openReject, setOpenReject] = useState(false);
+    const [openVerifyItems, setOpenVerifyItems] = useState(false);
+
+
+    useEffect(() => {
+        dispatch(getStockTransfer(id))
+            .unwrap()
+            .then((response) => {
+                order = response.data;
+                if (order !== undefined && order !== null) {
+                    setLineItems(order.lineItems);
+                }
+            })
+            .catch((err) => alert(err.message))
+    }, [userStatus, userSiteId, openVerifyItems, openDelete])
+
+
+   
     const openDeleteModal = () => setOpenDelete(true);
     const closeDeleteModal = () => setOpenDelete(false);
 
-    const [openReject, setOpenReject] = useState(false);
     const openRejectModal = () => setOpenReject(true);
     const closeRejectModal = () => setOpenReject(false);
 
-    const [openVerifyItems, setOpenVerifyItems] = useState(true);
+    
     const openVerifyItemsModal = () => {
-        order.lineItems.map((item) => {
-            item.sentQty = item.requestedQty;
-        })
-        if (order.status === "DELIVERING" || order.status==="READY") {
-            order.lineItems.map((item) => {
-                item.actualQty = item.sentQty;
-            })
+        const orderStatus = order.statusHistory[order.statusHistory.length - 1].status
+        let temp = order.lineItems;
+        if (orderStatus === "CONFIRMED") {
+            temp = order.lineItems.map((item) => ({
+                ...item, 
+                sentQty: item.requestedQty
+            }))
+            console.log(orderStatus === "CONFIRMED" && userSiteId === order.fromSite.id);
+            
         }
+        if (orderStatus === "DELIVERING" || orderStatus ==="READY") {
+            temp = order.lineItems.map((item) => ({
+                ...item, 
+                actualQty: item.sentQty
+            }))
+        }
+
+        setLineItems(temp)
         setOpenVerifyItems(true);
     }
     const closeVerifyItemsModal = () => setOpenVerifyItems(false);
-    const handleReadyOrder = () => {
-        order.lineItems = lineItems;
+    
+    const handleReadyOrder = (e) => {
+        e.preventDefault();
+        let temp = {...order}
+        temp.lineItems = lineItems;
+        order = temp;
         dispatch(readyStockTransfer({order: order, siteId: userSiteId}))
             .unwrap()
             .then(() => alert("Order is ready for delivery"))
             .catch((err) => alert(err.message));
 
         navigate(pathname);
+        closeVerifyItemsModal();
     }
 
-    const handleCompleteOrder = () => {
-        order.lineItems = lineItems;
+    const handleCompleteOrder = (e) => {
+        e.preventDefault();
+        let temp = {...order}
+        temp.lineItems = lineItems;
+        order = temp;
         dispatch(completeStockTransfer({order: order, siteId: userSiteId}))
             .unwrap()
-            .then(() => alert("Order is ready for delivery"))
+            .then(() => alert("Order is completed"))
             .catch((err) => alert(err.message));
 
+        setOpenVerifyItems(false);
         navigate(pathname);
     }
 
 
   
-    const handleConfirmCancel = () => {
+    const handleConfirmCancel = (e) => {
+        e.preventDefault();
         dispatch(cancelStockTransfer({ orderId: id, siteId: userSiteId }))
             .unwrap()
             .then(() => {
@@ -363,7 +405,8 @@ export const ViewStockTransfer = (subsys) => {
             })
     }
 
-    const handleRejectOrder = () => {
+    const handleRejectOrder = (e) => {
+        e.preventDefault();
         dispatch(rejectStockTransfer({ orderId: id, siteId: userSiteId }))
             .unwrap()
             .then(() => {
@@ -376,29 +419,19 @@ export const ViewStockTransfer = (subsys) => {
             })
     }
 
-    const handleConfirmOrder = () => {
+    const handleConfirmOrder = (e) => {
+        e.preventDefault();
         dispatch(confirmStockTransfer({ orderId: id, siteId: userSiteId }))
             .unwrap()
             .then(() => {
                 alert("Successfully confirmed stock transfer order");
                 closeDeleteModal();
-                navigate(`/${subsys.subsys}/stocktransfer`);
+                navigate(pathname);
             })
             .catch((error) => {
                 alert(error.message);
             })
     }
-
-    
-    useEffect(() => {
-        dispatch(getStockTransfer(id))
-            .unwrap()
-            .then((response) => {
-                order = response.data;
-                setLineItems(order.lineItems);
-            })
-            .catch((err) => alert(err.message))
-    }, [userStatus])
 
 
     return (
@@ -421,7 +454,7 @@ export const ViewStockTransfer = (subsys) => {
                     status={
                         order.statusHistory[order.statusHistory.length - 1].status
                     }
-                    fromSite={order.fromSite.name}
+                    fromSite={order.fromSite?.name}
                     fromSiteCode={order.fromSite.siteCode}
                     fromSitePhone={order.fromSite.phoneNumber}
                     toSite={order.toSite.name}
@@ -448,7 +481,7 @@ export const ViewStockTransfer = (subsys) => {
                     closeModal={closeVerifyItemsModal}
                     handleReadyOrder={handleReadyOrder}
                     handleCompleteOrder={handleCompleteOrder}
-                    lineItems={order.lineItems}
+                    lineItems={lineItems}
                     setLineItems={setLineItems}
                     status={order.statusHistory[order.statusHistory.length - 1].status}
                     userSiteId={userSiteId}

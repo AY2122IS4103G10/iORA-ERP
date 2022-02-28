@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom";
 import {useState, useEffect} from "react";
 import {useDispatch} from "react-redux";
+import {Dialog, Listbox, Transition} from "@headlessui/react";
 import {getProductItem, getProductDetails} from "../../../../stores/slices/productSlice";
 import {XCircleIcon} from "@heroicons/react/solid";
 
@@ -157,6 +158,7 @@ export const PosPurchaseOrder = () => {
   const [modalState, setModalState] = useState(false);
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
+  const [paymentType, setPaymentType] = useState("");
   const [productItems, setProductItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [productQty, setProductQty] = useState([]);

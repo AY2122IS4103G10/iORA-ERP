@@ -14,6 +14,7 @@ import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
 import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
 
@@ -64,11 +65,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee updateEmployeeAccount(Employee employee) throws EmployeeException {
         Employee old = em.find(Employee.class, employee.getId());
-        String salt = old.getSalt();
-
         if (old == null) {
             throw new EmployeeException("Employee not found");
         }
+        String salt = old.getSalt();
 
         try {
             if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
@@ -117,23 +117,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void blockEmployee(Long id) throws EmployeeException {
+    public Employee blockEmployee(Long id) throws EmployeeException {
         Employee e = em.find(Employee.class, id);
 
         if (e == null) {
             throw new EmployeeException("Employee not found");
         }
         e.setAvailStatus(false);
+        return e;
     }
 
     @Override
-    public void unblockEmployee(Long id) throws EmployeeException {
+    public Employee unblockEmployee(Long id) throws EmployeeException {
         Employee e = em.find(Employee.class, id);
 
         if (e == null) {
             throw new EmployeeException("Employee not found");
         }
         e.setAvailStatus(true);
+        return e;
     }
 
     @Override
@@ -154,8 +156,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> listOfEmployee() throws EmployeeException {
         try {
-            Query q = em.createQuery("SELECT e FROM Employee e");
-            return q.getResultList();
+            return em.createQuery("SELECT e FROM Employee e", Employee.class).getResultList();
 
         } catch (Exception ex) {
             throw new EmployeeException();
@@ -167,13 +168,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (search == "") {
             return listOfEmployee();
         }
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.email) LIKE :email OR " +
-                "LOWER(e.name) LIKE :name OR LOWER(e.username) LIKE :username OR e.salary LIKE :salary");
-        q.setParameter("email", "%" + search.toLowerCase() + "%");
-        q.setParameter("username", "%" + search.toLowerCase() + "%");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        q.setParameter("salary", "%" + search + "%");
-        return q.getResultList();
+        return em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.email) LIKE :email OR " +
+                "LOWER(e.name) LIKE :name OR LOWER(e.username) LIKE :username OR e.salary LIKE :salary", Employee.class)
+                .setParameter("email", "%" + search.toLowerCase() + "%")
+                .setParameter("username", "%" + search.toLowerCase() + "%")
+                .setParameter("name", "%" + search.toLowerCase() + "%")
+                .setParameter("salary", "%" + search + "%")
+                .getResultList();
     }
 
     @Override
@@ -211,42 +212,34 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Boolean usernameAvailability(String username) {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
-        q.setParameter("username", username);
-        try {
-            Employee e = (Employee) q.getSingleResult();
-            return false;
-
-        } catch (NoResultException | NonUniqueResultException ex) {
-            return true;
-        }
+        return em.createQuery("SELECT e FROM Employee e WHERE e.username = :username")
+                .setParameter("username", username).getResultList().size() == 0;
     }
 
     @Override
     public Boolean emailAvailability(String email) {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.email = :email");
-        q.setParameter("email", email);
-        try {
-            Employee e = (Employee) q.getSingleResult();
-            return false;
-
-        } catch (NoResultException | NonUniqueResultException ex) {
-            return true;
-        }
+        return em.createQuery("SELECT e FROM Employee e WHERE e.email = :email")
+                .setParameter("email", email).getResultList().size() == 0;
     }
 
     @Override
-    public Employee loginAuthentication(String username, String password) throws EmployeeException {
+    public Employee loginAuthentication(String username, String password) throws AuthenticationException {
         try {
             Employee c = getEmployeeByUsername(username);
 
             if (c.authentication(generateProtectedPassword(c.getSalt(), password))) {
-                return c;
+                if (c.getAvailStatus() == true) {
+                    return c;
+                } else {
+                    throw new AuthenticationException("Your account has been terminated.");
+                }
+
             } else {
-                throw new EmployeeException();
+                throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
             }
-        } catch (Exception ex) {
-            throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
+
+        } catch (EmployeeException ex) {
+            throw new AuthenticationException("Authentication Fail. Invalid Username or Password.");
         }
 
     }

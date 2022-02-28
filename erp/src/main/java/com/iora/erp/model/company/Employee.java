@@ -1,8 +1,6 @@
 package com.iora.erp.model.company;
 
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

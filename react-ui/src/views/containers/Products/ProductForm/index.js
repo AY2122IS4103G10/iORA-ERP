@@ -325,7 +325,6 @@ const AddProductFormBody = ({
                             className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
                             value={available}
                             onChange={onAvailableChanged}
-                            required
                             defaultChecked
                             aria-describedby="available"
                           />
@@ -344,7 +343,6 @@ const AddProductFormBody = ({
                             className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
                             value={onlineOnly}
                             onChange={onOnlineOnlyChanged}
-                            required
                             aria-describedby="onlineOnly"
                           />
                         </div>

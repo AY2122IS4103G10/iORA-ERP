@@ -27,7 +27,7 @@ const navigation = [
     current: false,
   },
   { name: "Stock Transfer", href: "/sm/stocktransfer", icon: ArchiveIcon, current: false },
-  { name: "Procurement Orders", href: "/sm/procurements", icon: DocumentTextIcon, current: false },
+  { name: "Procurement", href: "/sm/procurements", icon: DocumentTextIcon, current: false },
   {
     name: "Vouchers",
     href: "/sm/vouchers",

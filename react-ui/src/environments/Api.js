@@ -33,7 +33,9 @@ export const voucherApi = {
 
 export const sitesApi = {
   searchByType(siteType) {
-    return axios.get(`${REST_ENDPOINT}sam/viewSites/${siteType}?country=&company=`);
+    return axios.get(
+      `${REST_ENDPOINT}sam/viewSites/${siteType}?country=&company=`
+    );
   },
   getAll() {
     return axios.get(`${REST_ENDPOINT}sam/viewSites/all`);
@@ -55,19 +57,29 @@ export const companyApi = {
 
 export const procurementApi = {
   acceptOrder(orderId, siteId) {
-    return axios.put(`${REST_ENDPOINT}manufacturing/procurementOrder/accept/${orderId}/${siteId}`);
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/accept/${orderId}/${siteId}`
+    );
   },
   cancelOrder(orderId, siteId) {
-    return axios.put(`${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`);
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`
+    );
+  },
+  fulfillOrder(siteId, order) {
+    return axios.put(`${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`, order);
+  },
+  shipOrder(siteId, order) {
+    return axios.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/ship/${siteId}`,
+      order
+    );
   },
 };
 
 export const vendorApi = {
   search(keyword) {
     return axios.get(`${REST_ENDPOINT}admin/viewVendors?search=${keyword}`);
-  },
-  fulfillOrder(siteId, order) {
-    return axios.put(`${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`, order);
   },
   generateItems(sku, quantity) {
     return axios.post(`${REST_ENDPOINT}sam/productItem/generate/${sku}/${quantity}`);
@@ -100,7 +112,9 @@ export const stockTransferApi = {
 
 export const authApi = {
   login(username, password) {
-    return axios.get(`${REST_ENDPOINT}auth/empLogin?username=${username}&password=${password}`);
+    return axios.get(
+      `${REST_ENDPOINT}auth/empLogin?username=${username}&password=${password}`
+    );
   },
 };
 
@@ -114,4 +128,7 @@ export const employeeApi = {
   getEmployee(employeeId) {
     return axios.get(`${REST_ENDPOINT}admin/viewEmployee?id=${employeeId}`);
   },
+  deleteEmployee(employeeId) {
+    return axios.delete(`${REST_ENDPOINT}admin/deleteEmployee?id=${employeeId}`)
+  }
 };

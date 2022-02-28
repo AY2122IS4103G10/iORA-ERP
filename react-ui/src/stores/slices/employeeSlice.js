@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { api, employeeApi } from "../../environments/Api";
 
 const initialState = {
   employee: [],
@@ -34,7 +34,23 @@ export const updateExistingEmployee = createAsyncThunk(
 export const deleteExistingEmployee = createAsyncThunk(
   "employee/deleteExistingEmployee",
   async (existingEmployeeId) => {
-    const response = await api.delete("admin/deleteEmployee", existingEmployeeId);
+    const response = await employeeApi.deleteEmployee(existingEmployeeId);
+    return response.data;
+  }
+);
+
+export const enableEmployee = createAsyncThunk(
+  "employee/deleteExistingEmployee",
+  async (existingEmployeeId) => {
+    const response = await employeeApi.deleteEmployee(existingEmployeeId);
+    return response.data;
+  }
+);
+
+export const disableEmployee = createAsyncThunk(
+  "employee/deleteExistingEmployee",
+  async (existingEmployeeId) => {
+    const response = await employeeApi.deleteEmployee(existingEmployeeId);
     return response.data;
   }
 );
@@ -67,10 +83,12 @@ const employeeSlice = createSlice({
         availStatus,
         payType,
         jobTitle,
-        department
+        department,
       } = action.payload;
       console.log(action.payload);
-      const existingEmployee = state.employee.find((emp) => emp.employeeId === employeeId);
+      const existingEmployee = state.employee.find(
+        (emp) => emp.employeeId === employeeId
+      );
       if (existingEmployee) {
         existingEmployee.name = name;
         existingEmployee.email = email;
@@ -82,13 +100,12 @@ const employeeSlice = createSlice({
         existingEmployee.jobTitle = jobTitle;
         existingEmployee.department = department;
       }
-      // state.status = "idle";
     });
     builder.addCase(deleteExistingEmployee.fulfilled, (state, action) => {
-      state.employee = state.employee.filter(
-        ({ employeeId }) => employeeId !== action.payload.employeeId
-      );
-      // state.status = "idle"
+      // state.employee = state.employee.filter(
+      //   ({ employeeId }) => employeeId !== action.payload.id
+      // );
+      state.employee.status = "idle"
     });
   },
 });
@@ -98,4 +115,4 @@ export default employeeSlice.reducer;
 export const selectAllEmployee = (state) => state.employee.employee;
 
 export const selectEmployeeById = (state, employeeId) =>
-  state.employee.employee.find((employee) => employee.employeeId === employeeId);
+  state.employee.employee.find((employee) => employee.id === employeeId);

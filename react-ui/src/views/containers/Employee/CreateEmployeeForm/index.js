@@ -110,7 +110,6 @@ const EmployeeFormBody = ({
                             autoComplete="username"
                             value={username}
                             onChange={onUsernameChanged}
-                            required
                           />
                         </SimpleInputGroup>
                         <SimpleInputGroup
@@ -123,6 +122,7 @@ const EmployeeFormBody = ({
                             name="password"
                             id="password"
                             autoComplete="password"
+                            placeholder="Leave blank if unchanged."
                             value={password}
                             onChange={onPasswordChanged}
                             required
@@ -400,7 +400,7 @@ export const EmployeeForm = () => {
           )
             .unwrap()
             .then(() => {
-              alert("Successfully added employee");
+              alert("Successfully updated employee");
               navigate(`/ad/employees/${employeeId}`);
             });
         }

@@ -89,7 +89,15 @@ const EmployeeDetailsBody = ({
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Status</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {!availStatus && "Not "}Available
+                  {availStatus ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      Disabled
+                    </span>
+                  )}
                 </dd>
               </div>
               <div className="sm:col-span-1">
@@ -98,7 +106,9 @@ const EmployeeDetailsBody = ({
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Salary</dt>
-                <dd className="mt-1 text-sm text-gray-900">${salary.toFixed(2)}</dd>
+                <dd className="mt-1 text-sm text-gray-900">
+                  ${salary.toFixed(2)}
+                </dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
@@ -135,8 +145,8 @@ export const EmployeeDetails = () => {
   }, [empStatus, dispatch]);
 
   const onToggleEnableClicked = () => {
-    
-  }
+    dispatch()
+  };
 
   const onDeleteEmployeeClicked = () => {
     dispatch(deleteExistingEmployee(employeeId))

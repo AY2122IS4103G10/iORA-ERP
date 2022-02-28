@@ -160,7 +160,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.CONFIRMED) {
                 throw new StockTransferException(
                         "Stock Transfer Order is not confirmed.");
-            } else if (actionBy != stockTransferOrder.getFromSite()) {
+            } else if (siteId != stockTransferOrder.getFromSite().getId()) {
                 throw new StockTransferException(
                         "Site is not responsible for fulfilling this order.");
             }
@@ -182,7 +182,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.READY) {
                 throw new StockTransferException(
                         "Stock Transfer Order is not confirmed.");
-            } else if (actionBy != stockTransferOrder.getFromSite()) {
+            } else if (siteId != stockTransferOrder.getFromSite().getId()) {
                 throw new StockTransferException(
                         "Site is not responsible for delivering this order.");
             }
@@ -194,8 +194,8 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public StockTransferOrder completeStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException {
-        StockTransferOrder stockTransferOrder = getStockTransferOrder(id);
+    public StockTransferOrder completeStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws StockTransferException, SiteConfirmationException {
+        // StockTransferOrder stockTransferOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null) {

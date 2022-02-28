@@ -31,7 +31,8 @@ export const SiteTables = (subsys) => {
     useEffect(() => {
         siteStatus === "idle" && dispatch(getAllSites());
     }, [siteStatus])
-    const path = "/" + subsys.subsys.subsys + "/stocklevels";
+    // console.log(subsys);
+    const path = "/" + subsys.subsys.subsys.subsys + "/stocklevels";
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="mt-4">

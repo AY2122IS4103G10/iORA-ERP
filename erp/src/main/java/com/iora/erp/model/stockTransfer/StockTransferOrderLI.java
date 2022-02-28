@@ -31,6 +31,9 @@ public class StockTransferOrderLI {
     private List<ProductItem> actualProductItems;
     private Integer actualQty;
 
+    public StockTransferOrderLI() {
+    }
+
     public Long getId() {
         return this.id;
     }

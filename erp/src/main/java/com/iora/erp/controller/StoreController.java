@@ -232,11 +232,11 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransfer/complete/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> completeStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+    @PutMapping(path = "/stockTransfer/complete/{siteId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> completeStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder, @PathVariable Long siteId) {
         try {
             return ResponseEntity
-                    .ok(stockTransferService.completeStockTransferOrder(orderId, siteId));
+                    .ok(stockTransferService.completeStockTransferOrder(stockTransferOrder, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

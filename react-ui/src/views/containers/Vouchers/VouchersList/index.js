@@ -50,7 +50,7 @@ export const VouchersTable = () => {
       {
         Header: "Expiry Date",
         accessor: "expiry",
-        Cell: (e) => moment(e.value).format("DD/MM/YY"),
+        Cell: (e) => moment(e.value).subtract(1, 'months').format("DD/MM/YY"),
       },
       {
         Header: "Issued",

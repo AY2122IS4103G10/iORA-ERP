@@ -92,7 +92,7 @@ export const deliverStockTransfer = createAsyncThunk(
 export const completeStockTransfer = createAsyncThunk(
     "stocktransfer/complete",
     async (data) => {
-        const response = await stockTransferApi.completeOrder(data.orderId, data.siteId);
+        const response = await stockTransferApi.completeOrder(data.order, data.siteId);
         return response.data;
     }
 )

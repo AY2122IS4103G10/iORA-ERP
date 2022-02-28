@@ -44,9 +44,10 @@ const cols = [
 
 export const StockTransferList = ({subsys}) => {
     const dispatch = useDispatch();
-    let currSiteId = useSelector(selectUserSite);
+    const status = useSelector((state) => state.stocklevel.status)
     const sto = useSelector(selectAllOrders);
     const {pathname} = useLocation();
+    let currSiteId = useSelector(selectUserSite);
 
     if (currSiteId === 0) {
         if (pathname.includes("sm")) {
@@ -59,8 +60,8 @@ export const StockTransferList = ({subsys}) => {
     const columns = useMemo(() => cols, [cols] )
     const path = `/${subsys.subsys}/stocktransfer`;
     useEffect(() => {
-        dispatch(getAllStockTransfer(currSiteId));
-    }, [])
+            dispatch(getAllStockTransfer(currSiteId));
+    }, [status])
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
             <div className="mt-4">

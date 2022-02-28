@@ -27,10 +27,10 @@ export const ProductTable = (subsys) => {
       })));
 
     useEffect(() => {
-        prodStatus === "idle" && dispatch(fetchProducts());
-      }, [prodStatus]);
+        dispatch(fetchProducts());
+      }, []);
 
-    const path = "/" + subsys.subsys.subsys + "/stocklevels/products";
+    const path = "/" + subsys.subsys.subsys.subsys + "/stocklevels/products";
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="mt-4">

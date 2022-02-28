@@ -117,8 +117,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductField> getAllProductFields() {
-        TypedQuery<ProductField> q = em.createQuery("SELECT pf FROM ProductField pf", ProductField.class);
-        return q.getResultList();
+        TypedQuery<ProductField> q1 = em.createQuery("SELECT pf FROM ProductField pf", ProductField.class);
+        List<ProductField> productFields = q1.getResultList();
+        productFields.removeAll(getPromotionFields());
+        return productFields;
     }
 
     @Override

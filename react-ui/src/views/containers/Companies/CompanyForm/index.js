@@ -181,6 +181,7 @@ export const CompanyForm = () => {
   const [registerNo, setRegisterNo] = useState("");
   const [phone, setPhone] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [addressId, setAddressId] = useState(null)
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -217,28 +218,6 @@ export const CompanyForm = () => {
     ].every(Boolean) && requestStatus === "idle";
   const onAddCompanyClicked = (evt) => {
     evt.preventDefault();
-    console.log({
-      name,
-      address: {
-        country:
-          country.charAt(0).toUpperCase() +
-          country.slice(1).toLowerCase(),
-        city,
-        building,
-        state,
-        unit,
-        road: address1,
-        postalCode,
-        billing: false,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-      },
-      registerNumber: registerNo,
-      telephone: phone,
-      active: true,
-      departments: [],
-      vendors: [],
-    });
     if (canAdd)
       try {
         setRequestStatus("pending");
@@ -276,6 +255,7 @@ export const CompanyForm = () => {
         else
           dispatch(
             updateExistingCompany({
+              id: companyId,
               name,
               address: {
                 country,
@@ -315,7 +295,7 @@ export const CompanyForm = () => {
   useEffect(() => {
     Boolean(companyId) &&
       companyApi.getCompany(companyId).then((response) => {
-        const { name, address, registerNumber, active, telephone } =
+        const { name, address, registerNumber, telephone } =
           response.data;
         setIsEditing(true);
         setName(name);
@@ -330,6 +310,7 @@ export const CompanyForm = () => {
         setLatitude(address.latitude);
         setLongitude(address.longitude);
         setPhone(telephone);
+        setAddressId(address.id)
       });
   }, [companyId]);
 

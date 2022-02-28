@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { api, companyApi } from "../../environments/Api";
 
 const initialState = {
   companies: [],
@@ -34,10 +34,7 @@ export const updateExistingCompany = createAsyncThunk(
 export const deleteExistingCompany = createAsyncThunk(
   "companies/deleteExistingCompany",
   async (existingCompanyId) => {
-    const response = await api.delete(
-      "admin/deleteCompany?id=",
-      existingCompanyId
-    );
+    const response = await companyApi.deleteCompany(existingCompanyId);
     return response.data;
   }
 );
@@ -63,32 +60,32 @@ const companySlice = createSlice({
       const {
         companyId,
         name,
-        description,
-        price,
-        onlineOnly,
-        available,
-        companies,
-        productFields,
+        address,
+        registerNumber,
+        telephone,
+        active,
+        departments,
+        vendors,
       } = action.payload;
       const existingProd = state.companies.find(
         (prod) => prod.companyId === companyId
       );
       if (existingProd) {
         existingProd.name = name;
-        existingProd.description = description;
-        existingProd.price = price;
-        existingProd.onlineOnly = onlineOnly;
-        existingProd.available = available;
-        existingProd.companies = companies;
-        existingProd.productFields = productFields;
+        existingProd.address = address;
+        existingProd.registerNumber = registerNumber;
+        existingProd.telephone = telephone;
+        existingProd.active = active;
+        existingProd.departments = departments;
+        existingProd.vendors = vendors;
       }
       // state.status = "idle";
     });
     builder.addCase(deleteExistingCompany.fulfilled, (state, action) => {
-      state.companies = state.companies.filter(
-        ({ companyId }) => companyId !== action.payload.companyId
-      );
-      // state.status = "idle"
+      // state.companies = state.companies.filter(
+      //   ({ companyId }) => companyId !== action.payload.companyId
+      // );
+      state.status = "idle"
     });
   },
 });

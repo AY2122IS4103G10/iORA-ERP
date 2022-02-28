@@ -53,6 +53,9 @@ export const companyApi = {
   getCompany(id) {
     return axios.get(`${REST_ENDPOINT}admin/viewCompany?id=${id}`);
   },
+  deleteCompany(id) {
+    return axios.delete(`${REST_ENDPOINT}admin/deleteCompany?id=${id}`);
+  }
 };
 
 export const procurementApi = {
@@ -164,8 +167,12 @@ export const employeeApi = {
     return axios.get(`${REST_ENDPOINT}admin/viewEmployee?id=${employeeId}`);
   },
   deleteEmployee(employeeId) {
-    return axios.delete(
-      `${REST_ENDPOINT}admin/deleteEmployee?id=${employeeId}`
-    );
+    return axios.delete(`${REST_ENDPOINT}admin/deleteEmployee?id=${employeeId}`)
+  },
+  enableEmployee(employeeId) {
+    return axios.put(`${REST_ENDPOINT}admin/enableEmployee?id=${employeeId}`);
+  },
+  disableEmployee(employeeId) {
+    return axios.put(`${REST_ENDPOINT}admin/disableEmployee?id=${employeeId}`);
   },
 };

@@ -35,7 +35,7 @@ const fieldSection = ({ fieldName, fields }) => {
       </ul>
     </div>
   ) : (
-    <div>No ${fieldName}</div>
+    <div>No {fieldName}</div>
   );
 };
 const ProductDetailsBody = ({
@@ -47,6 +47,7 @@ const ProductDetailsBody = ({
   sizes,
   tags,
   categories,
+  available,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
@@ -57,6 +58,7 @@ const ProductDetailsBody = ({
             <div className="md:flex md:items-center md:justify-between md:space-x-4 xl:border-b xl:pb-6">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
+
                 <p className="mt-2 text-sm text-gray-500">{prodCode}</p>
               </div>
               <div className="mt-4 flex space-x-3 md:mt-0">
@@ -77,6 +79,15 @@ const ProductDetailsBody = ({
             <aside className="mt-8 xl:hidden">
               <h2 className="sr-only">Details</h2>
               <div className="space-y-5">
+                {available ? (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Available
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    Unavailable
+                  </span>
+                )}
                 <div className="flex items-center space-x-2">
                   <CurrencyDollarIcon
                     className="h-5 w-5 text-gray-400"
@@ -86,17 +97,6 @@ const ProductDetailsBody = ({
                     {`List Price: $${price}`}
                   </span>
                 </div>
-                {/* {Boolean(category) && (
-                  <div className="flex items-center space-x-2">
-                    <CurrencyDollarIconSolid
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                    <span className="text-gray-900 text-sm font-medium">
-                      {`Discount Price: $${category.discountedPrice}`}
-                    </span>
-                  </div>
-                )} */}
               </div>
               <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
                 {fieldSection({
@@ -125,6 +125,15 @@ const ProductDetailsBody = ({
         <aside className="hidden xl:block xl:pl-8">
           <h2 className="sr-only">Details</h2>
           <div className="space-y-5">
+            {available ? (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Available
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                Unavailable
+              </span>
+            )}
             <div className="flex items-center space-x-2">
               <CurrencyDollarIcon
                 className="h-5 w-5 text-gray-400"
@@ -132,15 +141,6 @@ const ProductDetailsBody = ({
               />
               <span className="text-gray-900 text-sm font-medium">
                 {`List Price: $${price}`}
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CurrencyDollarIconSolid
-                className="h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              <span className="text-gray-900 text-sm font-medium">
-                {`Discount Price: $${price}`}
               </span>
             </div>
           </div>
@@ -174,7 +174,7 @@ export const ProductDetails = () => {
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
-  console.log(product);
+
   return (
     Boolean(product) && (
       <>
@@ -195,6 +195,7 @@ export const ProductDetails = () => {
           categories={product.productFields.filter(
             (field) => field.fieldName === "CATEGORY"
           )}
+          available={product.available}
         />
       </>
     )

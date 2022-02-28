@@ -148,6 +148,7 @@ const RightColSection = ({
   children,
   openModal,
   setFieldNameSelected,
+  disableButton = false,
 }) => {
   return (
     <section aria-labelledby={`${fieldName.toLowerCase()}-title`}>
@@ -162,17 +163,19 @@ const RightColSection = ({
           <div className="flow-root max-h-60 overflow-y-auto mt-6">
             {children}
           </div>
-          <div className="mt-6">
-            <button
-              className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              onClick={() => {
-                setFieldNameSelected(fieldName);
-                openModal();
-              }}
-            >
-              Add {fieldName.toLowerCase()}
-            </button>
-          </div>
+          {!disableButton && (
+            <div className="mt-6">
+              <button
+                className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                onClick={() => {
+                  setFieldNameSelected(fieldName);
+                  openModal();
+                }}
+              >
+                Add {fieldName.toLowerCase()}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -205,6 +208,9 @@ const AddProductFormBody = ({
   categories,
   onCatsChanged,
   catCheckedState,
+  promotions,
+  onPromosChanged,
+  promoCheckedState,
   companies,
   onCompanyChanged,
   onSaveClicked,
@@ -391,6 +397,7 @@ const AddProductFormBody = ({
               "No colours found"
             )}
           </RightColSection>
+          {/* Sizes */}
           <RightColSection
             fieldName="Size"
             openModal={openModal}
@@ -408,6 +415,26 @@ const AddProductFormBody = ({
               "No sizes found"
             )}
           </RightColSection>
+          {/* Promotions */}
+          <RightColSection
+            fieldName="Promotion"
+            openModal={openModal}
+            setFieldNameSelected={setFieldNameSelected}
+            disableButton={true}
+          >
+            {promotions.length ? (
+              <FormCheckboxes
+                legend="Promotion"
+                options={promotions}
+                inputField="Promotion"
+                onFieldsChanged={onPromosChanged}
+                fieldValues={promoCheckedState}
+              />
+            ) : (
+              "No promotions found"
+            )}
+          </RightColSection>
+          {/* Categories */}
           <RightColSection
             fieldName="Category"
             openModal={openModal}
@@ -425,6 +452,7 @@ const AddProductFormBody = ({
               "No categories found"
             )}
           </RightColSection>
+          {/* Tags */}
           <RightColSection
             fieldName="Tag"
             openModal={openModal}
@@ -442,6 +470,7 @@ const AddProductFormBody = ({
               "No tag found."
             )}
           </RightColSection>
+          {/* Companies */}
           <RightColSection
             fieldName="Company"
             openModal={openModal}
@@ -478,6 +507,7 @@ export const ProductForm = () => {
   const [sizes, setSizes] = useState([]);
   const [tags, setTags] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const [companies, setCompanies] = useState([]);
 
   useEffect(() => {
@@ -504,11 +534,20 @@ export const ProductForm = () => {
       setCompanySelected(companies[0]);
     });
   }, []);
+
+  useEffect(() => {
+    api.getAll("sam/promotionFields").then((response) => {
+      setPromotions(response.data);
+      setPromoCheckedState(new Array(response.data.length).fill(false));
+    });
+  }, []);
+
   const [colorCheckedState, setColorCheckedState] = useState([]);
   const [sizeCheckedState, setSizeCheckedState] = useState([]);
   const [tagCheckedState, setTagCheckedState] = useState([]);
   const [catCheckedState, setCatCheckedState] = useState([]);
   const [companySelected, setCompanySelected] = useState([]);
+  const [promoCheckedState, setPromoCheckedState] = useState([]);
 
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
@@ -543,11 +582,14 @@ export const ProductForm = () => {
     setCatCheckedState(updateCheckedState);
   };
 
-  const [requestStatus, setRequestStatus] = useState("idle");
+  const onPromosChanged = (pos) => {
+    const updateCheckedState = promoCheckedState.map((item, index) =>
+      index === pos ? !item : item
+    );
+    setPromoCheckedState(updateCheckedState);
+  };
 
-  const canAdd =
-    [prodCode, name, description, price].every(Boolean) &&
-    requestStatus === "idle";
+  const canAdd = [prodCode, name, description, price].every(Boolean);
 
   const onSaveClicked = (evt) => {
     evt.preventDefault();
@@ -562,45 +604,48 @@ export const ProductForm = () => {
     categories.forEach(
       (cat, index) => catCheckedState[index] && fields.push(cat)
     );
+    promotions.forEach(
+      (promo, index) => promoCheckedState[index] && fields.push(promo)
+    );
     if (canAdd) {
-      try {
-        setRequestStatus("pending");
-        if (!isEditing) {
-          dispatch(
-            addNewProduct({
-              modelCode: prodCode,
-              name,
-              description,
-              price,
-              onlineOnly,
-              available,
-              products: [],
-              productFields: fields,
-            })
-          ).unwrap();
-        } else {
-          dispatch(
-            updateExistingProduct({
-              modelCode: prodCode,
-              name,
-              description,
-              price,
-              onlineOnly,
-              available,
-              products,
-              productFields: fields,
-            })
-          ).unwrap();
-        }
-        alert(`Successfully ${!isEditing ? "added" : "updated"} product`);
-        navigate(!isEditing ? "/sm/products" : `/sm/products/${prodCode}`);
-      } catch (err) {
-        console.error(
-          `Failed to ${!isEditing ? "add" : "update"} product: `,
-          err
-        );
-      } finally {
-        setRequestStatus("idle");
+      if (!isEditing) {
+        dispatch(
+          addNewProduct({
+            modelCode: prodCode,
+            name,
+            description,
+            price,
+            onlineOnly,
+            available,
+            products: [],
+            productFields: fields,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            alert("Successfully added product");
+            navigate("/sm/products");
+          })
+          .catch((err) => console.error("Failed to add product: ", err));
+      } else {
+        dispatch(
+          updateExistingProduct({
+            modelCode: prodCode,
+            name,
+            description,
+            price,
+            onlineOnly,
+            available,
+            products,
+            productFields: fields,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            alert(`Successfully updated product`);
+            navigate(`/sm/products/${prodCode}`);
+          })
+          .catch((err) => console.error(`Failed to update product: `, err));
       }
     }
   };
@@ -663,14 +708,22 @@ export const ProductForm = () => {
             .map((field) => field.fieldValue)
             .map((category) =>
               productFields
-                .filter((field) => field.fieldName === "CATEGORY")
+                .filter((field) => field.fieldName === "CATEGORY" && !Boolean(field.discountedPrice))
                 .map((field) => field.fieldValue)
                 .includes(category)
             )
         );
+        setPromoCheckedState(promotions
+          .map((field) => field.fieldValue)
+          .map((promo) =>
+            productFields
+              .filter((field) => field.fieldName === "CATEGORY" && Boolean(field.discountedPrice))
+              .map((field) => field.fieldValue)
+              .includes(promo)
+          ))
         setProducts(products);
       });
-  }, [prodId, colors, sizes, tags, categories]);
+  }, [prodId, colors, sizes, tags, categories, promotions]);
   const [fieldNameSelected, setFieldNameSelected] = useState("");
   const [fieldValue, setFieldValue] = useState("");
   const [openAddField, setOpenAddField] = useState(false);
@@ -729,6 +782,9 @@ export const ProductForm = () => {
         categories={categories}
         onCatsChanged={onCatsChanged}
         catCheckedState={catCheckedState}
+        promotions={promotions}
+        onPromosChanged={onPromosChanged}
+        promoCheckedState={promoCheckedState}
         companies={companies}
         onSaveClicked={onSaveClicked}
         onCancelClicked={onCancelClicked}

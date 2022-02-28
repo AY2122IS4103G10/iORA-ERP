@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { api, vendorApi } from "../../environments/Api";
 const initialState = {
     vendors: [],
     status: "idle",
@@ -29,10 +29,7 @@ export const updateExistingVendor = createAsyncThunk(
 export const deleteExistingVendor = createAsyncThunk(
     "vendors/deleteExistingVendor",
     async (existingVendorId) => {
-        const response = await api.delete(
-            "admin/deleteVendor?id=",
-            existingVendorId
-        );
+        const response = await vendorApi.delete(existingVendorId);
         return response.data;
     }
 );

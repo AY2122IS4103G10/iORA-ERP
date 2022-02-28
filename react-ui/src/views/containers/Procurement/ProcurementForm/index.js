@@ -74,7 +74,7 @@ export const ItemsList = ({
   );
 };
 
-const ProcurementItemsList = ({ data, setData }) => {
+const ProcurementItemsList = ({ data, setData, isEditing }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
 
   const columns = useMemo(() => {
@@ -117,7 +117,7 @@ const ProcurementItemsList = ({ data, setData }) => {
         Cell: (row) => {
           return (
             <EditableCell
-              value={1}
+              value={isEditing ? row.row.original.requestedQty : 1}
               row={row.row}
               column={row.column}
               updateMyData={updateMyData}
@@ -126,7 +126,7 @@ const ProcurementItemsList = ({ data, setData }) => {
         },
       },
     ];
-  }, [setData]);
+  }, [setData, isEditing]);
 
   return (
     <div className="mt-4">
@@ -204,7 +204,7 @@ const ProcurementFormBody = ({
   items,
   setItems,
   openProducts,
-  onAddOrderClicked,
+  onSaveOrderClicked,
   onCancelClicked,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -213,7 +213,10 @@ const ProcurementFormBody = ({
         <h1 className="sr-only">
           {!isEditing ? "New" : "Edit"} Procurement Order
         </h1>
-        <form className="p-8 space-y-8 divide-y divide-gray-200" onSubmit={onAddOrderClicked}>
+        <form
+          className="p-8 space-y-8 divide-y divide-gray-200"
+          onSubmit={onSaveOrderClicked}
+        >
           <div className="space-y-8 divide-y divide-gray-200">
             <div>
               <div>
@@ -283,7 +286,11 @@ const ProcurementFormBody = ({
                 </div>
               </div>
               {Boolean(items.length) && (
-                <ProcurementItemsList data={items} setData={setItems} />
+                <ProcurementItemsList
+                  data={items}
+                  setData={setItems}
+                  isEditing={isEditing}
+                />
               )}
             </div>
 
@@ -353,10 +360,9 @@ export const ProcurementForm = () => {
   const headquarters = useSelector(selectAllHeadquarters);
   const hq = headquarters[0];
   const hqStatus = useSelector((state) => state.sites.hqStatus);
-  
+
   useEffect(() => {
-    hqStatus === "idle" &&
-      dispatch(fetchHeadquarters())
+    hqStatus === "idle" && dispatch(fetchHeadquarters());
   }, [hqStatus, dispatch]);
 
   useEffect(() => {
@@ -367,8 +373,7 @@ export const ProcurementForm = () => {
   const factory = factories[0];
   const factoryStatus = useSelector((state) => state.sites.manStatus);
   useEffect(() => {
-    factoryStatus === "idle" &&
-      dispatch(fetchManufacturing())
+    factoryStatus === "idle" && dispatch(fetchManufacturing());
   }, [factoryStatus, dispatch]);
 
   useEffect(() => {
@@ -379,8 +384,7 @@ export const ProcurementForm = () => {
   const warehouse = warehouses[0];
   const warehouseStatus = useSelector((state) => state.sites.warStatus);
   useEffect(() => {
-    warehouseStatus === "idle" &&
-      dispatch(fetchWarehouse())
+    warehouseStatus === "idle" && dispatch(fetchWarehouse());
   }, [warehouseStatus, dispatch]);
 
   useEffect(() => {
@@ -411,7 +415,7 @@ export const ProcurementForm = () => {
     Boolean
   );
 
-  const onAddOrderClicked = (evt) => {
+  const onSaveOrderClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
       if (!isEditing)
@@ -438,10 +442,14 @@ export const ProcurementForm = () => {
       else
         api
           .update(`sam/procurementOrder/update/${hqSelected.id}`, {
+            id: orderId,
             lineItems: lineItems.map(({ product, requestedQty }) => ({
               product,
               requestedQty,
             })),
+            headquarters: { id: hqSelected.id },
+            manufacturing: { id: manufacturingSelected.id },
+            warehouse: { id: warehouseSelected.id },
           })
           .then(() => {
             alert("Successfully updated procurement order");
@@ -476,9 +484,12 @@ export const ProcurementForm = () => {
           .then(
             (response) => response.data && setWarehouseSelected(response.data)
           );
+        let selectedRows = {};
+        lineItems.forEach((item, index) => (selectedRows[index] = true));
+        setSelectedRows(selectedRows);
       });
   }, [orderId]);
-
+  
   return (
     <>
       <ProcurementFormBody
@@ -495,7 +506,7 @@ export const ProcurementForm = () => {
         items={lineItems}
         setItems={setLineItems}
         openProducts={openModal}
-        onAddOrderClicked={onAddOrderClicked}
+        onSaveOrderClicked={onSaveOrderClicked}
         onCancelClicked={onCancelClicked}
       />
       <AddProductItemModal

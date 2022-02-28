@@ -1,13 +1,7 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Locale.IsoCountryCode;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -84,8 +78,7 @@ public class AdminServiceImpl implements AdminService {
             throw new JobTitleException("Failure: Department is currently being used.");
         } else {
             try {
-                Query p = em.createQuery("SELECT e FROM Department e");
-                List<Department> dd = p.getResultList();
+                List<Department> dd = em.createQuery("SELECT e FROM Department e", Department.class).getResultList();
 
                 for (Department d : dd) {
                     Department dept = getDepartmentById(d.getId());
@@ -208,9 +201,7 @@ public class AdminServiceImpl implements AdminService {
             if (checkDepartment == true) {
                 throw new DepartmentException("Failure: Department is currently being used.");
             } else {
-                Query p = em.createQuery("SELECT c FROM Company c");
-
-                List<Company> listC = p.getResultList();
+                List<Company> listC = em.createQuery("SELECT c FROM Company c", Company.class).getResultList();
                 System.out.println(listC);
                 if (listC.size() > 0) {
                     for (Company c : listC) {
@@ -232,8 +223,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<Department> listOfDepartments() throws DepartmentException {
         try {
-            Query q = em.createQuery("SELECT e FROM Department e");
-            return q.getResultList();
+            return em.createQuery("SELECT e FROM Department e", Department.class).getResultList();
 
         } catch (Exception ex) {
             throw new DepartmentException("Department cannot be retrieved");
@@ -246,9 +236,9 @@ public class AdminServiceImpl implements AdminService {
             return listOfDepartments();
         }
 
-        Query q = em.createQuery("SELECT e FROM Department e WHERE LOWER(e.deptName) LIKE :name");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        return q.getResultList();
+        return em.createQuery("SELECT e FROM Department e WHERE LOWER(e.deptName) LIKE :name", Department.class)
+                .setParameter("name", "%" + search.toLowerCase() + "%")
+                .getResultList();
     }
 
     @Override
@@ -343,16 +333,16 @@ public class AdminServiceImpl implements AdminService {
         if (search == "") {
             return getListAddress();
         }
-        Query q = em.createQuery(
+        return em.createQuery(
                 "SELECT a FROM Address a WHERE LOWER(a.building) LIKE :building OR lOWER(a.postalCode) LIKE :postal OR"
-                        +
-                        " LOWER(a.unit) LIKE :unit OR LOWER(a.road) LIKE :road OR LOWER(a.city) LIKE :city");
-        q.setParameter("building", "%" + search + "%");
-        q.setParameter("postal", "%" + search + "%");
-        q.setParameter("unit", "%" + search + "%");
-        q.setParameter("road", "%" + search + "%");
-        q.setParameter("city", "%" + search + "%");
-        return q.getResultList();
+                        + " LOWER(a.unit) LIKE :unit OR LOWER(a.road) LIKE :road OR LOWER(a.city) LIKE :city",
+                Address.class)
+                .setParameter("building", "%" + search + "%")
+                .setParameter("postal", "%" + search + "%")
+                .setParameter("unit", "%" + search + "%")
+                .setParameter("road", "%" + search + "%")
+                .setParameter("city", "%" + search + "%")
+                .getResultList();
     }
 
     @Override
@@ -551,13 +541,12 @@ public class AdminServiceImpl implements AdminService {
         }
 
         try {
-            Query q = em.createQuery("SELECT c FROM Company c WHERE LOWER(c.name) LIKE :name OR " +
-                    "LOWER(c.registerNumber) LIKE :regsNum OR c.telephone LIKE :telephone");
-            q.setParameter("name", "%" + search.toLowerCase() + "%");
-            q.setParameter("regsNum", "%" + search.toLowerCase() + "%");
-            q.setParameter("telephone", "%" + search + "%");
-
-            return q.getResultList();
+            return em.createQuery("SELECT c FROM Company c WHERE LOWER(c.name) LIKE :name OR " +
+                    "LOWER(c.registerNumber) LIKE :regsNum OR c.telephone LIKE :telephone", Company.class)
+                    .setParameter("name", "%" + search.toLowerCase() + "%")
+                    .setParameter("regsNum", "%" + search.toLowerCase() + "%")
+                    .setParameter("telephone", "%" + search + "%")
+                    .getResultList();
 
         } catch (Exception ex) {
             throw new CompanyException("Unable to retrieve list from search");
@@ -680,25 +669,18 @@ public class AdminServiceImpl implements AdminService {
     public void deleteVendor(Long id) throws VendorException {
         Vendor v = getVendorById(id);
 
-        Query q = em.createQuery("SELECT e FROM Company e");
-        List<Company> cc = q.getResultList();
-
-        try {
-            for (Company c : cc) {
-                Company comp = getCompanyById(c.getId());
-                comp.getVendors().remove(v);
-            }
-        } catch (Exception ex) {
-            throw new VendorException(ex.toString());
+        List<Company> cc = em.createQuery("SELECT e FROM Company e", Company.class).getResultList();
+        for (int i = 0; i < cc.size(); i++) {
+            cc.get(i).getVendors().remove(v);
         }
+
         em.remove(v);
     }
 
     @Override
     public List<Vendor> listofVendor() throws VendorException {
         try {
-            Query q = em.createQuery("SELECT e FROM Vendor e");
-            return q.getResultList();
+            return em.createQuery("SELECT e FROM Vendor e", Vendor.class).getResultList();
 
         } catch (Exception ex) {
             throw new VendorException("Fail to retrieve vendors");
@@ -712,12 +694,13 @@ public class AdminServiceImpl implements AdminService {
         }
 
         try {
-            Query q = em.createQuery(
-                    "SELECT e FROM Vendor e WHERE LOWER(e.companyName) LIKE :name OR LOWER(e.email) LIKE :email OR LOWER(e.telephone) LIKE :telephone");
-            q.setParameter("name", "%" + search + "%");
-            q.setParameter("email", "%" + search + "%");
-            q.setParameter("telephone", "%" + search + "%");
-            return q.getResultList();
+            return em.createQuery(
+                    "SELECT e FROM Vendor e WHERE LOWER(e.companyName) LIKE :name OR LOWER(e.email) LIKE :email OR LOWER(e.telephone) LIKE :telephone",
+                    Vendor.class)
+                    .setParameter("name", "%" + search + "%")
+                    .setParameter("email", "%" + search + "%")
+                    .setParameter("telephone", "%" + search + "%")
+                    .getResultList();
 
         } catch (Exception ex) {
             throw new VendorException("Fail to retrieve vendors");

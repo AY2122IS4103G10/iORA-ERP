@@ -461,11 +461,11 @@ export const VendorForm = () => {
             postalCode,
             latitude,
             longitude,
-            billing,
             description,
             telephone,
         ].every(Boolean) && requestStatus === "idle";
     const onAddVendorClicked = (evt) => {
+        console.log(canAdd);
         evt.preventDefault();
         if (canAdd)
             try {

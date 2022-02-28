@@ -1,6 +1,7 @@
 package com.iora.erp.data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.customer.BirthdayPoints;
+import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
@@ -67,12 +69,13 @@ public class DataLoader implements CommandLineRunner {
         private void loadData() throws Exception {
                 // Insert Data-Init here
 
+                // Singapore
                 Address a1 = new Address(Country.Singapore, "Singapore", "Enterprise 10", "Singapore", "NIL",
                                 "10P Enterprise Road", "Singapore 629840", false, 1.334251, 103.704246);
 
                 em.persist(a1);
 
-                //JobTitle
+                // JobTitles
                 Set<AccessRights> s = new HashSet<>();
                 s.add(AccessRights.MARKETING_BASIC);
 
@@ -108,7 +111,7 @@ public class DataLoader implements CommandLineRunner {
                 JobTitle jobTitle4 = new JobTitle("IT Admin", "Managing all IT", ar4);
                 em.persist(jobTitle4);
 
-                //Department
+                // Departments
                 Department sam = new Department("Sales and Marketing");
                 List<JobTitle> jt = new ArrayList<>();
                 jt.add(jobTitle1);
@@ -143,7 +146,7 @@ public class DataLoader implements CommandLineRunner {
                 adm.setJobTitles(jt5);
                 adminService.createDepartment(adm);
 
-                //Vendor
+                // Vendors
                 Address a2 = new Address(Country.Singapore, "Singapore", "Kewalram House", "Singapore", "02-01",
                 "8 Jln Kilang Timor", "Singapore 159305", false, 1.334251, 103.704246);
                 em.persist(a2);
@@ -154,7 +157,7 @@ public class DataLoader implements CommandLineRunner {
                 em.persist(v1);
                 v1.setAddress(listAdd);
 
-                //Company
+                // Companies
                 List<Department> departments = new ArrayList<>();
                 departments.add(adminService.getDepartmentById(Long.valueOf(1)));
                 departments.add(adminService.getDepartmentById(Long.valueOf(2)));
@@ -175,7 +178,7 @@ public class DataLoader implements CommandLineRunner {
                 sora.setAddress(a1);
                 em.persist(sora);
 
-                //Employee 
+                // Employee 
                 Employee e = new Employee("Sharon KS", "sharonE", "password");
                 e.setEmail("sharonMS.12@gmail.com");
                 e.setSalary(4100.0);
@@ -312,6 +315,17 @@ public class DataLoader implements CommandLineRunner {
                 em.persist(silver);
                 em.persist(gold);
                 em.persist(diamond);
+
+                // Customer
+                Customer customer = new Customer("Steven", "Lim");
+                customer.setContactNumber("91234567");
+                customer.setDob(new Date(655530832000L));
+                customer.setEmail("stevenlim@gmail.com");
+                customer.sethashPass("password");
+                customer.setMembershipPoints(0);
+                customer.setStoreCredit(0.0);
+                customerService.createCustomerAccount(customer);
+
 
                 // Generate 10 $10 vouchers
                 customerService.generateVouchers(10, 10, "2022-02-16");

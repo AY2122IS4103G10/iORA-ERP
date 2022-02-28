@@ -47,6 +47,8 @@ import {ViewStockTransfer} from "./views/containers/StockTransfer/ViewStockTrans
 import {ManageVendors} from "./views/containers/Vendor/ManageVendors";
 import {VendorDetails} from "./views/containers/Vendor/VendorDetails";
 import {VendorForm} from "./views/containers/Vendor/VendorForm";
+import {FrontPage} from "./views/containers/SelfService/FrontPage";
+import {Order} from "./views/containers/SelfService/Order";
 
 function App() {
   return (
@@ -203,6 +205,12 @@ function App() {
               <Route path="edit/:id" element={<StockTransferForm subsys="wh" />} />
             </Route>
           </Route>
+        </Route>
+
+        {/* Self Service Kiosk*/}
+        <Route path="ss" element={<Outlet />}>
+          <Route index element={<FrontPage />} />
+          <Route path="order" element={<Order />} />
         </Route>
 
         <Route path="*" element={<Error />} />

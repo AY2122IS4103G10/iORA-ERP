@@ -7,12 +7,15 @@ import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerOrderService;
+import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
 
@@ -38,6 +41,10 @@ public class StoreController {
     private StockTransferService stockTransferService;
     @Autowired
     private CustomerOrderService customerOrderService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private CustomerService customerService;
 
     /*
      * ---------------------------------------------------------
@@ -86,15 +93,14 @@ public class StoreController {
     }
 
     @PostMapping(path = "/editStock/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> editStock(@RequestBody List<ProductItem> toUpdate, @PathVariable Long siteId) {
+    public ResponseEntity<Object> editStock(@RequestBody Map<String,Long> toUpdate, @PathVariable Long siteId) {
         List<String> errors = new ArrayList<>();
-        for (ProductItem item : toUpdate) {
+        for (Map.Entry<String,Long> entry : toUpdate.entrySet()) {
             try {
-                if (item.getStockLevel() == null) {
-                    siteService.removeProductItemFromSite(item.getRfid());
+                if (entry.getValue().equals(0L)) {
+                    siteService.removeProductItemFromSite(entry.getKey());;
                 } else {
-                    siteService.addToStockLevel(item.getStockLevel(), item);
-                    ;
+                    siteService.addProductItemToSite(entry.getValue(), entry.getKey());
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());
@@ -102,7 +108,30 @@ public class StoreController {
         }
 
         if (errors.isEmpty()) {
-            return ResponseEntity.ok("Transaction successful");
+            return ResponseEntity.ok(viewStock(siteId));
+        } else {
+            System.err.println(errors);
+            return ResponseEntity.badRequest().body(String.join("\n", errors));
+        }
+    }
+
+    @PostMapping(path = "/editStockList/{siteId}", consumes = "application/json")
+    public ResponseEntity<Object> editStockList(@RequestBody List<ProductItem> toUpdate, @PathVariable Long siteId) {
+        List<String> errors = new ArrayList<>();
+        for (ProductItem item : toUpdate) {
+            try {
+                if (item.getStockLevel() == null) {
+                    siteService.removeProductItemFromSite(item.getRfid());
+                } else {
+                    siteService.addToStockLevel(item.getStockLevel(), item);
+                }
+            } catch (Exception ex) {
+                errors.add(ex.getMessage());
+            }
+        }
+
+        if (errors.isEmpty()) {
+            return ResponseEntity.ok(viewStock(siteId));
         } else {
             System.out.println("Error" + String.join("\n", errors));
             return ResponseEntity.badRequest().body(String.join("\n", errors));
@@ -215,7 +244,7 @@ public class StoreController {
 
     /*
      * ---------------------------------------------------------
-     * F.3 Store Order Management
+     * F.3 Store Order Management / F.4 Store Order Management
      * ---------------------------------------------------------
      */
 
@@ -231,7 +260,7 @@ public class StoreController {
     }
 
     @GetMapping(path = "/customerOrder/view/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> getCustomerOrder(Long orderId) {
+    public ResponseEntity<Object> getCustomerOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity
                     .ok(customerOrderService.getCustomerOrder(orderId));
@@ -239,5 +268,26 @@ public class StoreController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+    
+    @GetMapping(path = "/productDetails/{rfid}", produces = "application/json")
+    public ResponseEntity<Object> getProductDetails(@PathVariable String rfid) {
+        try {
+            return ResponseEntity
+                    .ok(productService.getProductCartDetails(rfid).toString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
+    @GetMapping(path = "/member/{phone}", produces = "application/json")
+    public ResponseEntity<Object> getCustomerByPhone(@PathVariable String phone) {
+        try {
+            return ResponseEntity
+                    .ok(customerService.getCustomerByPhone(phone));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }

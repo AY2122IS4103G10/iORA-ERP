@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
 
@@ -30,7 +31,7 @@ public interface EmployeeService {
 
     public abstract Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException;
 
-    public abstract Employee loginAuthentication(String username, String password) throws EmployeeException;
+    public abstract Employee loginAuthentication(String username, String password) throws AuthenticationException;
 
     public abstract Boolean usernameAvailability(String username);
 

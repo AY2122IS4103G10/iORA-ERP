@@ -219,6 +219,7 @@ export const PosPurchaseOrder = () => {
 
   const clear = () => {
     setProducts([]);
+    setProductItems([]);
     setAmount(0);
   };
 

@@ -184,7 +184,7 @@ public class AdminServiceImpl implements AdminService {
         } catch (Exception ex) {
             throw new DepartmentException(ex.getMessage());
         }
-        
+
         return old;
     }
 
@@ -419,10 +419,10 @@ public class AdminServiceImpl implements AdminService {
                         company.getVendors().add(v);
                     }
                 }
-            } 
+            }
 
             return company;
-            
+
         } catch (Exception ex) {
             throw new CompanyException("Company has already been created");
         }
@@ -476,25 +476,7 @@ public class AdminServiceImpl implements AdminService {
                 old.setRegisterNumber(company.getRegisterNumber());
                 old.setTelephone(company.getTelephone());
                 old.setActive(company.getActive());
-
-                if (company.getAddress().getId().equals(old.getAddress().getId())) {
-
-                    updateAddress(company.getAddress());
-                    company.setAddress(getAddressById(company.getAddress().getId()));
-
-                } else {
-                    Address oldAdd = old.getAddress();
-                    Address newAdd = company.getAddress();
-                    em.persist(newAdd);
-                    company.setAddress(newAdd);
-
-                    Query q = em.createQuery("SELECT c FROM Company c WHERE c.address.id =: id").setMaxResults(1);
-                    q.setParameter("id", oldAdd.getId());
-
-                    if (q.getResultList().size() == 0) {
-                        em.remove(getAddressById(oldAdd.getId()));
-                    }
-                }
+                old.setAddress(company.getAddress());
 
                 List<Department> dep = company.getDepartments();
                 List<Vendor> ven = company.getVendors();

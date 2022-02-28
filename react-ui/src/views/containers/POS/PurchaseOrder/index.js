@@ -13,6 +13,8 @@ const OrderList = ({
   Remove,
   error,
   clear,
+  openModal,
+  closeModal,
 }) => (
   <main>
     <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4 lg:px-0">
@@ -84,11 +86,15 @@ const OrderList = ({
                         </h4>
                         {"discountedPrice" in product ? (
                           <div>
-                            <p className="line-through text-gray-500">${product.price}</p>$
-                            {product.discountedPrice}
+                            <p className="line-through text-gray-500">
+                              ${Number.parseFloat(product.price).toFixed(2)}
+                            </p>
+                            ${Number.parseFloat(product.discountedPrice).toFixed(2)}
                           </div>
                         ) : (
-                          <p className="ml-4 text-sm font-medium text-gray-900">${product.price}</p>
+                          <p className="ml-4 text-sm font-medium text-gray-900">
+                            ${Number.parseFloat(product.price).toFixed(2)}
+                          </p>
                         )}
                         <Remove product={product} />
                       </div>
@@ -110,7 +116,7 @@ const OrderList = ({
                 <div className="flex items-right justify-between">
                   <dd className="ml-4 text-xl font-bold font-medium text-red-800">
                     Total Amount: &emsp;$
-                    {amount.toLocaleString(undefined, {maximumFractionDigits: 2})}
+                    {Number.parseFloat(amount).toFixed(2)}
                   </dd>
                 </div>
               </dl>
@@ -124,15 +130,9 @@ const OrderList = ({
         <div className="mt-10 flex flex-row-reverse space-x-4 space-x-reverse">
           <button
             type="button"
+            onClick={openModal}
             className="w-2/12 mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500">
-            {localStorage.getItem("customer") === null ? (
-              <>Payment</>
-            ) : (
-              <>
-                Checkout as {JSON.parse(localStorage.customer).firstName}{" "}
-                {JSON.parse(localStorage.customer).lastName}
-              </>
-            )}
+            Payment
           </button>
           <button
             type="button"
@@ -224,15 +224,19 @@ export const PosPurchaseOrder = () => {
   };
 
   return (
-    <OrderList
-      products={products}
-      amount={amount}
-      rfid={rfid}
-      onRfidChanged={onRfidChanged}
-      addRFIDClicked={addRFIDClicked}
-      Remove={Remove}
-      error={error}
-      clear={clear}
-    />
+    <div>
+      <OrderList
+        products={products}
+        amount={amount}
+        rfid={rfid}
+        onRfidChanged={onRfidChanged}
+        addRFIDClicked={addRFIDClicked}
+        Remove={Remove}
+        error={error}
+        clear={clear}
+        openModal={openModal}
+        closeModal={closeModal}
+      />
+    </div>
   );
 };

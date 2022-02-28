@@ -115,7 +115,7 @@ export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, se
                             {({ open }) => (
                               <>
                                 <div className="mt-1 relative">
-                                  <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                  <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm">
                                     <span className="block truncate">{selected.name}</span>
                                     <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                                       <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -135,7 +135,7 @@ export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, se
                                           key={action.id}
                                           className={({ active }) =>
                                             classNames(
-                                              active ? 'text-white bg-indigo-600' : 'text-gray-900',
+                                              active ? 'text-white bg-cyan-600' : 'text-gray-900',
                                               'cursor-default select-none relative py-2 pl-8 pr-4'
                                             )
                                           }
@@ -150,7 +150,7 @@ export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, se
                                               {selected ? (
                                                 <span
                                                   className={classNames(
-                                                    active ? 'text-white' : 'text-indigo-600',
+                                                    active ? 'text-white' : 'text-cyan-600',
                                                     'absolute inset-y-0 left-0 flex items-center pl-1.5'
                                                   )}
                                                 >
@@ -185,7 +185,7 @@ export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, se
                             id="rfid"
                             name="rfid"
                             rows={5}
-                            className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
                             value={rfid}
                             onChange={(e) => setRfid(e.target.value)}
                             placeholder="Scan or Enter RFID tags with a space in between"
@@ -200,14 +200,14 @@ export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, se
                     <div className="flex justify-end space-x-3">
                       <button
                         type="button"
-                        className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
                         onClick={closeModal}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
                         onClick={(e) => handleEditStock(e)}
                       >
                         Confirm
@@ -230,6 +230,7 @@ export const StockLevelForm = () => {
   const siteId = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
   const status = useSelector((state) => state.stocklevel.status)
+  const prodStatus = useSelector((state) => state.products.status)
   const siteStock = useSelector(selectCurrSiteStock);
   const [open, setOpen] = useState(false);
   const [rfid, setRfid] = useState("");
@@ -243,11 +244,11 @@ export const StockLevelForm = () => {
   console.log(siteStock);
 
   useEffect(() => {
-    if (status === "idle" ) {
+    // if (status === "idle") {
       dispatch(getASiteStock(siteId)); 
       dispatch(fetchModel(modelCode));
-    }
-  }, [status])
+    // }
+  }, [siteId])
 
 
   const openModal = () => setOpen(true);

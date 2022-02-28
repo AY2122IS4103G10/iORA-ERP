@@ -64,10 +64,8 @@ export const MyStoreStock = (subsys) => {
 
 
   useEffect(() => {
-    if (id !== 0) {
       dispatch(getASiteStock(id));
-    }
-  }, [])
+  }, [id])
 
   const path = `/${subsys.subsys.subsys}/stocklevels/my`;
 

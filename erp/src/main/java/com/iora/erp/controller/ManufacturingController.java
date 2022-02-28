@@ -66,7 +66,8 @@ public class ManufacturingController {
     }
 
     @PutMapping(path = "/procurementOrder/fulfil/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> fulfilProcurementOrder(@RequestBody ProcurementOrder order, @PathVariable Long siteId) {
+    public ResponseEntity<Object> fulfilProcurementOrder(@RequestBody ProcurementOrder order,
+            @PathVariable Long siteId) {
         try {
             return ResponseEntity.ok(procurementService.fulfilProcurementOrder(order, siteId));
         } catch (Exception ex) {

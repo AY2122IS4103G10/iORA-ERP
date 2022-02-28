@@ -1,103 +1,47 @@
 import {Link} from "react-router-dom";
 import {useState, useEffect, useMemo} from "react";
-import {posApi} from "../../../../environments/Api";
 import {useSelector, useDispatch} from "react-redux";
 import {EditableCell, SimpleTable} from "../../../components/Tables/SimpleTable";
 import {selectAllOrder} from "../../../../stores/slices/posSlice";
 import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
-import {HeadingWithTabs, SectionHeading} from "../../../components/HeadingWithTabs";
+import {SectionHeading} from "../../../components/HeadingWithTabs";
 
-export const OrderTable = ({data}) => {
-  const columns = useMemo(
-    () => [
-      {
-        Header: "OrderId",
-        accessor: "id",
-      },
-      {
-        Header: "DateTime",
-        accessor: "dateTime",
-      },
-      {
-        Header: "Amount",
-        accessor: (row) => row.payments.name.amount,
-      },
-      {
-        Header: "Customer Number",
-        accessor: (row) => row.customer.id,
-      },
-    ],
-    []
-  );
-};
+const columns = [
+  {
+    Header: "OrderId",
+    accessor: "id",
+  },
+  {
+    Header: "DateTime",
+    accessor: "dateTime",
+  },
+  {
+    Header: "Amount",
+    accessor: (row) => row.payments.amount,
+  },
+  {
+    Header: "Customer Number",
+    accessor: (row) => row.customer.id,
+  },
+];
 
-const orderTable = (data) => {
+export const OrderTable = (data) => {
   return (
-    <div className="flex flex-col">
-      <div className="-my-2 overflow-x-auto sm:-mx-4 lg:-mx-6">
-        <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    OrderId
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    DateTime
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total Amount
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer Number
-                  </th>
-                  <th scope="col" className="relative px-6 py-3">
-                    <span className="sr-only"></span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    Jane Cooper
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Regional Paradigm Technician
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    jane.cooper@example.com
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Admin</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                      View
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <section aria-labelledby="stocks-level">
+      <h2 className="ml-2 mb-4 text-lg leading-6 font-bold text-gray-900">Orders</h2>
+      <div className="ml-2 mr-2">
+        {data == undefined ? <p>loading</p> : <SimpleTable columns={columns} data={data} />}
       </div>
-    </div>
+    </section>
   );
 };
 
 const tabs = [
-  {name: "Order", href: "", current: true},
-  {name: "History", href: "orderHistory", current: false},
+  {name: "Order", href: "", current: false},
+  {name: "History", href: "orderHistory", current: true},
 ];
 
-export const PosPurchaseHistory = (subsys) => {
+export const PosPurchaseHistory = () => {
   const dispatch = useDispatch();
   const data = useSelector(selectAllOrder);
   const orderStatus = useSelector((state) => state.pos.status);
@@ -109,7 +53,16 @@ export const PosPurchaseHistory = (subsys) => {
 
   return (
     <>
-      <SectionHeading header="Order Purchase" tabs={tabs} />
+      <div className="min-h-full">
+        <main className="py-10">
+          <section aria-labelledby="stocks-level">
+            <h2 className="ml-2 mb-4 text-lg leading-6 font-bold text-gray-900">Orders</h2>
+            <div className="ml-2 mr-2">
+              {data == undefined ? <p>loading</p> : <SimpleTable columns={columns} data={data} />}
+            </div>
+          </section>
+        </main>
+      </div>
     </>
   );
 };

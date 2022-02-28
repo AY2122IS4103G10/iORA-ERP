@@ -91,9 +91,5 @@ export const PosPurchaseOrder = () => {
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
 
-  return (
-    <>
-      <SectionHeading header="Order History" tabs={tabs} />
-    </>
-  );
+  return <></>;
 };

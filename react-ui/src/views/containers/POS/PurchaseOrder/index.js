@@ -4,7 +4,16 @@ import {useDispatch} from "react-redux";
 import {getProductItem, getProductDetails} from "../../../../stores/slices/productSlice";
 import {XCircleIcon} from "@heroicons/react/solid";
 
-const OrderList = ({products, amount, rfid, onRfidChanged, addRFIDClicked, Remove, error}) => (
+const OrderList = ({
+  products,
+  amount,
+  rfid,
+  onRfidChanged,
+  addRFIDClicked,
+  Remove,
+  error,
+  clear,
+}) => (
   <main>
     <div className="max-w-4xl mx-auto py-2 px-4 sm:py-2 sm:px-4 lg:px-0">
       <form>
@@ -68,10 +77,8 @@ const OrderList = ({products, amount, rfid, onRfidChanged, addRFIDClicked, Remov
                             {product.name}
                           </a>
                           <p className="mt-1 flex text-sm text-gray-500">
-                            {product.colour}
-                            {"   -- "}
-                            {product.size !== null ? product.size : null}
-                            {"   -- "}
+                            {product.colour}&nbsp; -- &nbsp;
+                            {product.size !== null ? product.size : null} &nbsp; -- &nbsp;
                             {product.promotion !== null ? product.promotion : null}
                           </p>
                         </h4>
@@ -102,7 +109,8 @@ const OrderList = ({products, amount, rfid, onRfidChanged, addRFIDClicked, Remov
               <dl className="space-y-8 flex flex-row-reverse">
                 <div className="flex items-right justify-between">
                   <dd className="ml-4 text-xl font-bold font-medium text-red-800">
-                    Total Amount: ${amount}
+                    Total Amount: &emsp;$
+                    {amount.toLocaleString(undefined, {maximumFractionDigits: 2})}
                   </dd>
                 </div>
               </dl>
@@ -132,6 +140,9 @@ const OrderList = ({products, amount, rfid, onRfidChanged, addRFIDClicked, Remov
             onClick={() => {
               if (window.confirm("Are you sure to clear ALL items?")) {
                 localStorage.clear();
+                {
+                  clear();
+                }
               }
             }}>
             Clear All Items
@@ -148,6 +159,7 @@ export const PosPurchaseOrder = () => {
   const closeModal = () => setModalState(false);
   const [productItems, setProductItems] = useState([]);
   const [products, setProducts] = useState([]);
+  const [productQty, setProductQty] = useState([]);
   const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
   const [error, setError] = useState(false);
@@ -197,13 +209,19 @@ export const PosPurchaseOrder = () => {
       <div className="">
         <button
           type="button"
-          className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+          className="text-sm font-medium text-indigo-600 hover:text-red-500"
           onClick={() => removeProduct(product)}>
           <span>Remove</span>
         </button>
       </div>
     );
   }
+
+  const clear = () => {
+    setProducts([]);
+    setAmount(0);
+  };
+
   return (
     <OrderList
       products={products}
@@ -213,6 +231,7 @@ export const PosPurchaseOrder = () => {
       addRFIDClicked={addRFIDClicked}
       Remove={Remove}
       error={error}
+      clear={clear}
     />
   );
 };

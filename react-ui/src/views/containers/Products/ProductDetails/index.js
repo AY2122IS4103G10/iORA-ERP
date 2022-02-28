@@ -1,21 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   CurrencyDollarIcon as CurrencyDollarIconSolid,
   PencilIcon,
 } from "@heroicons/react/solid";
-import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
+import { CurrencyDollarIcon } from "@heroicons/react/outline";
 import {
-  deleteExistingProduct,
   fetchProducts,
   selectProductByCode,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useEffect, useState } from "react";
-import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
+import { useEffect } from "react";
 
 const fieldSection = ({ fieldName, fields }) => {
-  return (
+  return Boolean(fields.length) ? (
     <div>
       <h2 className="text-sm font-medium text-gray-500">{fieldName}</h2>
       <ul className="mt-2 leading-8">
@@ -36,6 +34,8 @@ const fieldSection = ({ fieldName, fields }) => {
         ))}
       </ul>
     </div>
+  ) : (
+    <div>No ${fieldName}</div>
   );
 };
 const ProductDetailsBody = ({
@@ -46,7 +46,7 @@ const ProductDetailsBody = ({
   colors,
   sizes,
   tags,
-  category,
+  categories,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
@@ -86,7 +86,7 @@ const ProductDetailsBody = ({
                     {`List Price: $${price}`}
                   </span>
                 </div>
-                {Boolean(category) && (
+                {/* {Boolean(category) && (
                   <div className="flex items-center space-x-2">
                     <CurrencyDollarIconSolid
                       className="h-5 w-5 text-gray-400"
@@ -96,7 +96,7 @@ const ProductDetailsBody = ({
                       {`Discount Price: $${category.discountedPrice}`}
                     </span>
                   </div>
-                )}
+                )} */}
               </div>
               <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
                 {fieldSection({
@@ -107,30 +107,7 @@ const ProductDetailsBody = ({
                   fieldName: "Sizes",
                   fields: sizes,
                 })}
-                <div>
-                  <h2 className="text-sm font-medium text-gray-500">
-                    Category
-                  </h2>
-                  <div className="mt-2 leading-8">
-                    <div className="inline">
-                      {Boolean(category) ? (
-                        <div className="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5">
-                          <div className="absolute flex-shrink-0 flex items-center justify-center">
-                            <span
-                              className="h-1.5 w-1.5 rounded-full bg-red-500"
-                              aria-hidden="true"
-                            />
-                          </div>
-                          <div className="ml-3.5 text-sm font-medium text-gray-900">
-                            {category.fieldValue}
-                          </div>
-                        </div>
-                      ) : (
-                        <p>No category</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                {fieldSection({ fieldName: "Categories", fields: categories })}
                 {fieldSection({
                   fieldName: "Tags",
                   fields: tags,
@@ -176,28 +153,7 @@ const ProductDetailsBody = ({
               fieldName: "Sizes",
               fields: sizes,
             })}
-            <div>
-              <h2 className="text-sm font-medium text-gray-500">Category</h2>
-              <div className="mt-2 leading-8">
-                <div className="inline">
-                  {Boolean(category) ? (
-                    <div className="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5">
-                      <div className="absolute flex-shrink-0 flex items-center justify-center">
-                        <span
-                          className="h-1.5 w-1.5 rounded-full bg-red-500"
-                          aria-hidden="true"
-                        />
-                      </div>
-                      <div className="ml-3.5 text-sm font-medium text-gray-900">
-                        {category.fieldValue}
-                      </div>
-                    </div>
-                  ) : (
-                    <p>No category</p>
-                  )}
-                </div>
-              </div>
-            </div>
+            {fieldSection({ fieldName: "Categories", fields: categories })}
             {fieldSection({
               fieldName: "Tags",
               fields: tags,
@@ -213,13 +169,12 @@ export const ProductDetails = () => {
   const { prodCode } = useParams();
   const product = useSelector((state) => selectProductByCode(state, prodCode));
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const prodStatus = useSelector((state) => state.products.status);
 
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
-
+  console.log(product);
   return (
     Boolean(product) && (
       <>
@@ -237,8 +192,8 @@ export const ProductDetails = () => {
           tags={product.productFields.filter(
             (field) => field.fieldName === "TAG"
           )}
-          category={product.productFields.find(
-            (field) => field.fieldName === "category"
+          categories={product.productFields.filter(
+            (field) => field.fieldName === "CATEGORY"
           )}
         />
       </>

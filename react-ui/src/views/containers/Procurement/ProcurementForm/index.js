@@ -287,7 +287,7 @@ const ProcurementFormBody = ({
               )}
             </div>
 
-            <div className="pt-8">
+            {/* <div className="pt-8">
               <div className="md:flex md:items-center md:justify-between">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
                   Stores
@@ -301,7 +301,7 @@ const ProcurementFormBody = ({
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="pt-5">

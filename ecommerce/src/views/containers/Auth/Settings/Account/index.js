@@ -42,7 +42,7 @@ export const Account = () => {
           updateAccount({
             ...user,
             email,
-            hashPass: password,
+            // hashPass: password,
           })
         )
           .then(() => {
@@ -122,7 +122,7 @@ export const Account = () => {
                     </div>
                   </div>
 
-                  <div className="relative col-span-4 sm:col-span-2">
+                  {/* <div className="relative col-span-4 sm:col-span-2">
                     <label
                       htmlFor="password"
                       className="block text-sm font-medium text-gray-700"
@@ -196,7 +196,7 @@ export const Account = () => {
                         </p>
                       </>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">

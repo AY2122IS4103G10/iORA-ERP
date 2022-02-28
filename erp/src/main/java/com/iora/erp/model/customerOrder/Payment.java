@@ -8,6 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+//no status?
+//payement
+
 @Entity
 public class Payment {
     @Id

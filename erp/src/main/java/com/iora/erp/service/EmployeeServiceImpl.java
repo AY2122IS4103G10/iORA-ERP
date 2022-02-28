@@ -117,23 +117,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void blockEmployee(Long id) throws EmployeeException {
+    public Employee blockEmployee(Long id) throws EmployeeException {
         Employee e = em.find(Employee.class, id);
 
         if (e == null) {
             throw new EmployeeException("Employee not found");
         }
         e.setAvailStatus(false);
+        return e;
     }
 
     @Override
-    public void unblockEmployee(Long id) throws EmployeeException {
+    public Employee unblockEmployee(Long id) throws EmployeeException {
         Employee e = em.find(Employee.class, id);
 
         if (e == null) {
             throw new EmployeeException("Employee not found");
         }
         e.setAvailStatus(true);
+        return e;
     }
 
     @Override

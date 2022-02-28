@@ -101,7 +101,6 @@ public class StoreController {
                     siteService.removeProductItemFromSite(item.getRfid());
                 } else {
                     siteService.addToStockLevel(item.getStockLevel(), item);
-                    ;
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());

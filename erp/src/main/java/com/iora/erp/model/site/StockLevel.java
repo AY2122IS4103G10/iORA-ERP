@@ -12,8 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iora.erp.model.product.ProductItem;
 
 @Entity
@@ -23,7 +22,7 @@ public class StockLevel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "rfid")
+    @JsonManagedReference
     @OneToMany(mappedBy = "stockLevel")
     private List<ProductItem> productItems;
 

@@ -4,8 +4,8 @@ import { CustomerList } from "../CustomerList";
 import { classNames } from "../../../../utilities/Util";
 
 const tabs = [
-  { name: "All Customer", href: "/crm/customer", current: true },
-  { name: "All Customer", href: "/crm/customer", current: true },
+  { name: "View Customers", href: "/sam/customers", current: true },
+  { name: "Support Center", href: "/sam/customers/support", current: true },
 ];
 
 const Header = () => {
@@ -33,7 +33,7 @@ const Header = () => {
             </div>
           </div>
           <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-            <Link to="/crm/customer/create">
+            <Link to="/sm/customers/create">
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"

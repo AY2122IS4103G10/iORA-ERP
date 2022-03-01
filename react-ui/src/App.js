@@ -49,6 +49,9 @@ import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
 import { Order } from "./views/containers/SelfService/Order";
+import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
+import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
+import { CustomerForm } from "./views/containers/Customer/CustomerForm";
 
 function App() {
   return (
@@ -102,6 +105,12 @@ function App() {
               <Route path=":procurementId" element={<ProcurementDetails />} />
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
+            </Route>
+            <Route path="customers" element={<Outlet />}>
+              <Route index element={<ManageCustomer />} />
+              <Route path=":customerId" element={<CustomerDetails />} />
+              <Route path="create" element={<CustomerForm />} />
+              <Route path="edit/:customerId" element={<CustomerForm />} />
             </Route>
             <Route path="vouchers" element={<Outlet />}>
               <Route index element={<ManageVouchers />} />

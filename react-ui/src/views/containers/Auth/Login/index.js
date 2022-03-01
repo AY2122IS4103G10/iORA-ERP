@@ -31,8 +31,10 @@ export function Login() {
         id !== -1 && navigate("/home");
       })
       .catch((err) => {
-        console.log(err);
-        addToast(`Error`, { appearance: "error", autoDismiss: true });
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
       });
   };
 

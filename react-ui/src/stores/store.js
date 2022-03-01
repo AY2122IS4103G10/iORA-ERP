@@ -9,6 +9,7 @@ import stocklevelReducer from "./slices/stocklevelSlice";
 import stocktransferReducer from "./slices/stocktransferSlice";
 import voucherReducer from "./slices/voucherSlice";
 import companyReducer from "./slices/companySlice";
+import customerReducer from "./slices/customerSlice";
 import employeeReducer from "./slices/employeeSlice";
 import jobTitleReducer from "./slices/jobTitleSlice";
 import departmentReducer from "./slices/departmentSlice";
@@ -18,6 +19,7 @@ import posReducer from "./slices/posSlice";
 export default configureStore({
   reducer: {
     companies: companyReducer,
+    customers: customerReducer,
     employee: employeeReducer,
     jobTitle: jobTitleReducer,
     department: departmentReducer,

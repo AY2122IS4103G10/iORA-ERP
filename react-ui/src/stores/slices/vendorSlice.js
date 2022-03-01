@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api, vendorApi } from "../../environments/Api";
+
 const initialState = {
     vendors: [],
     status: "idle",

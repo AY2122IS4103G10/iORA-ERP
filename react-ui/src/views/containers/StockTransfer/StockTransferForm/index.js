@@ -23,10 +23,6 @@ import { useNavigate, useParams } from "react-router-dom";
 const cols =
     [
         {
-            Header: "Site Code",
-            accessor: "siteCode"
-        },
-        {
             Header: "Name",
             accessor: "name"
         },
@@ -136,7 +132,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                                             ref={fromRef}
                                             type="text"
                                             value={isObjectEmpty(from) ? "" : from.name}
-                                            className="block w-full h-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                                            className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
                                             placeholder="Select From Site"
                                             readOnly
                                             autoFocus
@@ -157,7 +153,6 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                                     <div className="flex mt-2">
                                         <span className="mr-1 ml-1 text-sm text-red-600" id="same-site-error">
                                             From and To Site cannot be the same.
-
                                         </span>
                                         <ExclamationCircleIcon className="h-5 w-5 text-red-500" aria-hidden="true" />
                                     </div> : ""}
@@ -182,7 +177,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                                             ref={toRef}
                                             type="text"
                                             value={isObjectEmpty(to) ? "" : to.name}
-                                            className="block w-full h-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                                            className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
                                             placeholder="Select To Site"
                                             readOnly
                                         >
@@ -198,8 +193,11 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                                 </div>
                             </div>
                         </div>
+
                     </div>
-                    <ClickableRowTable columns={columns} data={data} onRowClick={onRowClick} />
+                    <div className="m-5">
+                        <ClickableRowTable columns={columns} data={data} onRowClick={onRowClick} />
+                    </div>
                 </div>
             </div>
         </SimpleModal>
@@ -261,13 +259,22 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
         <SimpleModal open={open} closeModal={closeModal}>
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-max">
                 <div>
-                    <div className="mt-3 sm:mt-5">
-                        <Dialog.Title
-                            as="h3"
-                            className="text-center text-lg leading-6 font-medium text-gray-900"
-                        >
-                            Add Items
-                        </Dialog.Title>
+                        <div className="flex justify-between border-b border-gray-200">
+                            <Dialog.Title
+                                as="h3"
+                                className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
+                            >
+                                Select Items
+                            </Dialog.Title>
+                            <button
+                                type="button"
+                                className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
+                                onClick={closeModal}
+                            >
+                                <XIcon className="h-5 w-5" />
+                            </button>
+                        </div>
+                    <div className="border-b border-gray-200 m-5">
                         <ItemsList
                             cols={itemCols}
                             data={data}
@@ -277,7 +284,7 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
                         />
                     </div>
                 </div>
-                <div className="pt-5">
+                <div>
                     <div className="flex justify-end">
                         <button
                             type="button"
@@ -381,7 +388,7 @@ export const StockTransferForm = (subsys) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
-    let isEditing = false;
+    const [isEditing, setIsEditing] = useState(false)
     const [from, setFrom] = useState({});
     const [to, setTo] = useState({});
     const [openSites, setOpenSites] = useState(false);
@@ -399,9 +406,6 @@ export const StockTransferForm = (subsys) => {
 
 
     useEffect(() => {
-        if (id === undefined || id === null) {
-            isEditing = true;
-        }
         dispatch(getAllSites());
         if (!isObjectEmpty(from)) {
             dispatch(getASiteStock(from.id));
@@ -426,7 +430,8 @@ export const StockTransferForm = (subsys) => {
     }
 
     useEffect(() => {
-        Boolean(id) &&
+        if (id !== undefined) {
+            setIsEditing(true);
             api.get("store/stockTransfer", id)
                 .then((response) => {
                     const { lineItems, fromSite, toSite } = response.data;
@@ -439,6 +444,7 @@ export const StockTransferForm = (subsys) => {
                 .catch((error) => {
                     alert(error.message);
                 })
+        }
     }, [])
 
 
@@ -453,7 +459,6 @@ export const StockTransferForm = (subsys) => {
             setErrorModal(true);
         } else {
             setOpenItems(true);
-            // dispatch(getASiteStock(from.id));
         }
     }
     const closeItemsModal = () => setOpenItems(false);
@@ -686,5 +691,5 @@ export const StockTransferForm = (subsys) => {
                 message="Please choose a from site before adding items." />
 
         </>
-    ))
+        ))
 }

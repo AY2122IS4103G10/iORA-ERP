@@ -334,7 +334,7 @@ export const ViewStockTransfer = (subsys) => {
 
     useEffect(() => {
         dispatch(getStockTransfer(id))
-    }, [dispatch, ])
+    }, [dispatch])
 
     useEffect(() => {
         setLineItems(order.lineItems)
@@ -365,6 +365,7 @@ export const ViewStockTransfer = (subsys) => {
         }
         setLineItems(temp)
         setOpenVerifyItems(true);
+        dispatch(getStockTransfer(id))
     }
 
     const closeVerifyItemsModal = () => setOpenVerifyItems(false);
@@ -380,6 +381,7 @@ export const ViewStockTransfer = (subsys) => {
             .catch((err) => alert(err.message));
 
         closeVerifyItemsModal();
+        dispatch(getStockTransfer(id))
     }
 
     const handleDeliveringOrder = (e) => {
@@ -388,8 +390,7 @@ export const ViewStockTransfer = (subsys) => {
             .unwrap()
             .then(() => alert("Order is Delivering"))
             .catch((err) => alert(err.message));
-
-
+        dispatch(getStockTransfer(id))
     }
 
     const handleCompleteOrder = (e) => {
@@ -404,6 +405,7 @@ export const ViewStockTransfer = (subsys) => {
 
         setOpenVerifyItems(false);
         navigate(pathname);
+        dispatch(getStockTransfer(id))
     }
 
     const handleConfirmCancel = (e) => {
@@ -418,6 +420,7 @@ export const ViewStockTransfer = (subsys) => {
             .catch((error) => {
                 alert(error.message);
             })
+        dispatch(getStockTransfer(id))
     }
 
     const handleRejectOrder = (e) => {

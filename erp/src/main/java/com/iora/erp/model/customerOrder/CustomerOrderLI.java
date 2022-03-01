@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import com.iora.erp.model.product.ProductItem;
 
@@ -18,7 +19,7 @@ public class CustomerOrderLI {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Transient
     private int qty;
 
     @OneToMany
@@ -39,7 +40,7 @@ public class CustomerOrderLI {
     }
 
     public int getQty() {
-        return this.qty;
+        return this.productItems.size();
     }
 
     public List<ProductItem> getProductItems() {

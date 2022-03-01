@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
+import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.model.Currency;
 import com.iora.erp.model.customer.Customer;
@@ -22,12 +23,15 @@ import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.RefundLI;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("customerOrderServiceImpl")
 @Transactional
 public class CustomerOrderServiceImpl implements CustomerOrderService {
+    @Autowired
+    CustomerService customerService;
     @PersistenceContext
     private EntityManager em;
 
@@ -94,7 +98,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
-        updateMembershipPoints(customerOrder);
+        //updateMembershipPoints(customerOrder);
         em.persist(customerOrder);
         return customerOrder;
     }
@@ -234,9 +238,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     // Helper methods
 
-    // TODO: update after currency amount added to payments
-    public void updateMembershipPoints(CustomerOrder order) {
-        Customer customer = order.getCustomer();
+    // TODO: fix this method, and update after currency amount added to payments
+    public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
+        Customer customer =  customerService.getCustomerById(order.getCustomerId());
 
         Currency currency = em.find(Currency.class, "SGD");
         Double spending = em

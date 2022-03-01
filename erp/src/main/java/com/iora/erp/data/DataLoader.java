@@ -1,5 +1,7 @@
 package com.iora.erp.data;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -25,6 +27,7 @@ import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
@@ -33,8 +36,10 @@ import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
+import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.EmployeeService;
+import com.iora.erp.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -51,6 +56,10 @@ public class DataLoader implements CommandLineRunner {
 	private AdminService adminService;
 	@Autowired
 	private EmployeeService employeeService;
+	@Autowired
+	private ProductService productService;
+	@Autowired
+	private CustomerOrderService customerOrderService;
 	@PersistenceContext
 	private EntityManager em;
 
@@ -360,25 +369,27 @@ public class DataLoader implements CommandLineRunner {
 		customerService.generateVouchers(5, 10, "2022-02-16");
 
 		// Customer Order
-		Product pdt = new Product("Test01 Product");
-		em.persist(pdt);
+		
+		
+		// Customer Order
+		// Product pdt = new Product("Test01 Product");
+		// em.persist(pdt);
 
-		ProductItem pi = new ProductItem("10-1003939-1-30-test");
-		pi.setProductSKU("Test01 Product");
-		em.persist(pi);
+		// ProductItem pi = new ProductItem("10-1003939-1-30-test");
+		// pi.setProductSKU("Test01 Product");
+		// em.persist(pi);
 
-		pdt.getProductItems().add(pi);
+		// pdt.getProductItems().add(pi);
 
-		CustomerOrderLI co = new CustomerOrderLI();
-		em.persist(co);
-		co.addProductItem(pi);
-
-		/*
-		 * CustomerOrder coo = new CustomerOrder();
-		 * coo.setStoreSiteId(Long.valueOf(1));
-		 * em.persist(coo);
-		 * coo.getLineItems().add(co);
-		 */
+		// CustomerOrderLI co = new CustomerOrderLI();
+		// em.persist(co);
+		// co.addProductItem(pi);
+		
+		// CustomerOrder coo = new CustomerOrder();
+		// coo.setStoreSiteId(Long.valueOf(1));
+		// em.persist(coo);
+		// coo.getLineItems().add(co);
+		 
 
 	}
 

@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { PencilIcon } from "@heroicons/react/solid";
 import { TrashIcon } from "@heroicons/react/outline";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
@@ -78,7 +79,7 @@ const Header = ({
             </button>
           </div>
         )
-      ) : status === "ACCEPTED" ? (
+      ) : status === "ACCEPTED" && pathname.includes("mf") ? (
         <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
           <button
             type="button"
@@ -89,13 +90,13 @@ const Header = ({
             <span>Fulfill order</span>
           </button>
         </div>
-      ) : status === "READY" ? (
+      ) : status === "READY" && pathname.includes("mf") ? (
         <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
           <button
             type="button"
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
             onClick={onShippedClicked}
-            disabled={status !== "READY"}
+            disabled
           >
             <span>Ship order</span>
           </button>
@@ -112,7 +113,6 @@ const ItemsSummary = ({
   status,
   setData,
   pathname,
-  onFulfillClicked,
   onVerifyReceivedClicked,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
@@ -289,6 +289,7 @@ const ProcurementDetailsBody = ({
 );
 
 export const ProcurementDetails = () => {
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -333,11 +334,19 @@ export const ProcurementDetails = () => {
     )
       .unwrap()
       .then(() => {
-        alert("Successfully deleted procurement");
+        addToast("Successfully deleted procurement order", {
+          appearance: "success",
+          autoDismiss: true,
+        });
         closeModal();
         navigate("/sm/procurements");
       })
-      .catch((err) => console.error("Failed to add procurement: ", err));
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
   };
 
   const onAcceptClicked = () => {
@@ -348,10 +357,16 @@ export const ProcurementDetails = () => {
         setStatus(statusHistory[statusHistory.length - 1].status);
       })
       .then(() => {
-        alert("Successfully accepted procurement");
+        addToast("Successfully accepted procurement order", {
+          appearance: "success",
+          autoDismiss: true,
+        });
       })
-      .catch((error) =>
-        console.error("Failed to accept procurement: ", error.message)
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
       );
   };
 
@@ -363,10 +378,16 @@ export const ProcurementDetails = () => {
         setStatus(statusHistory[statusHistory.length - 1].status);
       })
       .then(() => {
-        alert("Successfully cancelled procurement");
+        addToast("Successfully cancelled procurement order", {
+          appearance: "success",
+          autoDismiss: true,
+        });
       })
-      .catch((error) =>
-        console.error("Failed to cancel procurement: ", error.message)
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
       );
   };
 
@@ -382,9 +403,17 @@ export const ProcurementDetails = () => {
         setLineItems(lineItems);
         setStatus(statusHistory[statusHistory.length - 1].status);
       })
-      .then(() => alert("Successfully verified items."))
-      .catch((error) =>
-        console.error("Failed to fulfill procurement: ", error.message)
+      .then(() =>
+        addToast("Successfully fulfilled procurement order", {
+          appearance: "success",
+          autoDismiss: true,
+        })
+      )
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
       );
   };
 

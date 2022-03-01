@@ -181,7 +181,7 @@ export const CustomerDetails = () => {
     Boolean(customer) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="Customers" path={-1} />
+          <NavigatePrev page="Customers" path="/sm/customers" />
           <Header
             customerId={customer.id}
             firstName={customer.firstName}

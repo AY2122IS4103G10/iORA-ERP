@@ -23,6 +23,10 @@ import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.product.Product;
+import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
@@ -322,6 +326,27 @@ public class DataLoader implements CommandLineRunner {
 
 		// Generate 10 $5 vouchers
 		customerService.generateVouchers(5, 10, "2022-02-16");
+
+		// Customer Order
+		Product pdt = new Product("Test01 Product");
+		em.persist(pdt);
+
+		ProductItem pi = new ProductItem("10-1003939-1-30-test");
+		pi.setProductSKU("Test01 Product");
+		em.persist(pi);
+
+		pdt.getProductItems().add(pi);
+
+		CustomerOrderLI co = new CustomerOrderLI();
+		em.persist(co);
+		co.addProductItem(pi);
+
+		/*
+		 * CustomerOrder coo = new CustomerOrder();
+		 * coo.setStoreSiteId(Long.valueOf(1));
+		 * em.persist(coo);
+		 * coo.getLineItems().add(co);
+		 */
 
 	}
 

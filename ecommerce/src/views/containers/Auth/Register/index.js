@@ -3,7 +3,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
-import { ExclamationCircleIcon, XCircleIcon } from "@heroicons/react/solid";
+import { ExclamationCircleIcon } from "@heroicons/react/solid";
 import DatePicker from "react-datepicker";
 import { useToasts } from "react-toast-notifications";
 import { classNames } from "../../../../utilities/Util";

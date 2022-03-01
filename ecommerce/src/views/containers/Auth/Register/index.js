@@ -20,7 +20,6 @@ export const Register = () => {
   const [contactNo, setContactNo] = useState("");
   const [dob, setDob] = useState("");
   const [error, setError] = useState(null);
-  const [submitError, setSubmitError] = useState(null);
   const { addToast } = useToasts();
 
   const onEmailChanged = (e) => setEmail(e.target.value);
@@ -116,28 +115,6 @@ export const Register = () => {
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {/* {submitError && (
-            <div className="py-4">
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <XCircleIcon
-                      className="h-5 w-5 text-red-400"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      There were errors when attempting to create your account.
-                    </h3>
-                    <div className="mt-2 text-sm text-red-700">
-                      {submitError.message}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )} */}
           <form className="space-y-6" onSubmit={onSaveClicked}>
             <div className="space-y-8 divide-y divide-gray-200">
               <div>
@@ -339,6 +316,14 @@ export const Register = () => {
             </div>
           </form>
         </div>
+        <div className="mt-6 text-center">
+            <Link
+              to="/"
+              className="text-base font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              <span aria-hidden="true"> &larr;</span> Back to store
+            </Link>
+          </div>
       </div>
     </div>
   );

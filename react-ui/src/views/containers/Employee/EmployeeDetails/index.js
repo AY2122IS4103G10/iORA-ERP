@@ -1,17 +1,20 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { PencilIcon } from "@heroicons/react/solid";
 import { TrashIcon } from "@heroicons/react/outline";
 import {
   fetchEmployees,
   deleteExistingEmployee,
   selectEmployeeById,
+  enableEmployee,
+  disableEmployee,
 } from "../../../../stores/slices/employeeSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 
-const Header = ({ employeeId, name, openModal, availStatus }) => {
+const Header = ({ employeeId, name, openModal, availStatus, onToggleEnableClicked }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <div className="flex items-center space-x-3">
@@ -23,8 +26,9 @@ const Header = ({ employeeId, name, openModal, availStatus }) => {
         <button
           type="button"
           className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+          onClick={onToggleEnableClicked}
         >
-          <span>{availStatus ? "Enable" : "Disable"}</span>
+          <span>{!availStatus ? "Enable" : "Disable"}</span>
         </button>
         <Link to={`/ad/employees/edit/${employeeId}`}>
           <button
@@ -60,6 +64,7 @@ const EmployeeDetailsBody = ({
   username,
   availStatus,
   payType,
+  company,
   jobTitle,
   department,
 }) => (
@@ -111,6 +116,10 @@ const EmployeeDetailsBody = ({
                 </dd>
               </div>
               <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">Company</dt>
+                <dd className="mt-1 text-sm text-gray-900">{company.name}</dd>
+              </div>
+              <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
                   Department
                 </dt>
@@ -139,13 +148,27 @@ export const EmployeeDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const empStatus = useSelector((state) => state.employee.status);
+  const { addToast } = useToasts();
 
   useEffect(() => {
     empStatus === "idle" && dispatch(fetchEmployees());
   }, [empStatus, dispatch]);
 
   const onToggleEnableClicked = () => {
-    dispatch()
+    if (employee.availStatus)
+      dispatch(disableEmployee(employeeId)).unwrap().then(() =>
+        addToast("Successfully disabled employee", {
+          appearance: "success",
+          autoDismiss: true,
+        })
+      );
+    else
+      dispatch(enableEmployee(employeeId)).unwrap().then(() =>
+        addToast("Successfully enabled employee", {
+          appearance: "success",
+          autoDismiss: true,
+        })
+      );
   };
 
   const onDeleteEmployeeClicked = () => {
@@ -174,6 +197,7 @@ export const EmployeeDetails = () => {
             name={employee.name}
             openModal={openModal}
             availStatus={employee.availStatus}
+            onToggleEnableClicked={onToggleEnableClicked}
           />
           <EmployeeDetailsBody
             email={employee.email}
@@ -181,6 +205,7 @@ export const EmployeeDetails = () => {
             username={employee.username}
             availStatus={employee.availStatus}
             payType={employee.payType}
+            company={employee.company}
             jobTitle={employee.jobTitle}
             department={employee.department}
           />

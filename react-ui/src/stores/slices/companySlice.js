@@ -19,6 +19,7 @@ export const addNewCompany = createAsyncThunk(
   "companies/addNewCompany",
   async (initialCompany) => {
     const response = await api.create("admin/addCompany", initialCompany);
+    if (response.data === "") return Promise.reject(response.error);
     return response.data;
   }
 );
@@ -85,7 +86,7 @@ const companySlice = createSlice({
       // state.companies = state.companies.filter(
       //   ({ companyId }) => companyId !== action.payload.companyId
       // );
-      state.status = "idle"
+      state.status = "idle";
     });
   },
 });

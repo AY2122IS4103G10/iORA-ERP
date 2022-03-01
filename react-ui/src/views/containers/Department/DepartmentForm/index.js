@@ -120,8 +120,7 @@ export const DepartmentForm = () => {
       }
   };
 
-  const onCancelClicked = () =>
-    navigate(!isEditing ? "/ad/departments" : `/ad/departments/${departmentId}`);
+  const onCancelClicked = () => navigate(-1);
 
   useEffect(() => {
     Boolean(departmentId) &&

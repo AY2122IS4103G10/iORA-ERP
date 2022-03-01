@@ -1,5 +1,5 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/outline";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
@@ -9,6 +9,10 @@ import {
 } from "../../../../stores/slices/companySlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
+import {
+  SelectColumnFilter,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 
 const Header = ({ company, openModal }) => {
   return (
@@ -42,6 +46,89 @@ const Header = ({ company, openModal }) => {
           />
           <span>Delete</span>
         </button>
+      </div>
+    </div>
+  );
+};
+
+const DepartmentTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Id",
+        accessor: "id",
+      },
+      {
+        Header: "Name",
+        accessor: "deptName",
+      },
+      {
+        Header: "Job Titles",
+        accessor: (row) => row.jobTitles.map((title) => title.title).join(", "),
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Departments
+        </h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
+const VendorTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "#",
+        accessor: "id",
+        Cell: (e) => (
+          <Link
+            to={`/ad/vendors/${e.value}`}
+            className="hover:text-gray-700 hover:underline"
+          >
+            {e.value}
+          </Link>
+        ),
+      },
+      {
+        Header: "Company Name",
+        accessor: "companyName",
+      },
+      {
+        Header: "Email",
+        accessor: "email",
+      },
+      {
+        Header: "Telephone",
+        accessor: "telephone",
+      },
+      {
+        Header: "Country",
+        accessor: (row) => row.address[0].country,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">Vendors</h3>
+      </div>
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
       </div>
     </div>
   );
@@ -128,6 +215,16 @@ export const CompanyDetails = () => {
                   </div>
                 </div>
               </section>
+              {Boolean(company.departments.length) && (
+                <section aria-labelledby="departments">
+                  <DepartmentTable data={company.departments} />
+                </section>
+              )}
+              {Boolean(company.vendors.length) && (
+                <section aria-labelledby="departments">
+                  <VendorTable data={company.vendors} />
+                </section>
+              )}
             </div>
           </div>
         </div>

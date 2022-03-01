@@ -8,12 +8,12 @@ import {
   SelectColumnFilter,
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
-import { 
+import {
   fetchJobTitles,
-  selectAllJobTitle, 
+  selectAllJobTitle,
 } from "../../../../stores/slices/jobTitleSlice";
 
-export const JobTitleTable = () => {
+export const JobTitleTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
@@ -31,7 +31,6 @@ export const JobTitleTable = () => {
       {
         Header: "Job Title",
         accessor: "title",
-        
       },
       {
         Header: "Description",
@@ -40,7 +39,7 @@ export const JobTitleTable = () => {
       },
       {
         Header: "Responsibility",
-        accessor: (row) => row.Responsibility.responsibility,
+        accessor: (row) => row.responsibility.responsibility,
         Filter: SelectColumnFilter,
         filter: "includes",
         //Cell: (e) => moment(e.value).format("lll"),
@@ -81,7 +80,7 @@ export const JobTitleList = () => {
   useEffect(() => {
     jobTitleStatus === "idle" && dispatch(fetchJobTitles());
   }, [jobTitleStatus, dispatch]);
-  
+
   const handleOnClick = (row) => navigate(`/ad/jobTitle/${row.original.id}`);
 
   return <JobTitleTable data={data} handleOnClick={handleOnClick} />;

@@ -20,6 +20,7 @@ const Header = ({
   onAcceptClicked,
   onCancelOrderClicked,
   onShippedClicked,
+  onFulfillClicked,
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
@@ -82,8 +83,8 @@ const Header = ({
           <button
             type="button"
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-            onClick={onShippedClicked}
-            disabled={status !== "READY"}
+            onClick={onFulfillClicked}
+            disabled={status !== "ACCEPTED"}
           >
             <span>Fulfill order</span>
           </button>
@@ -111,7 +112,7 @@ const ItemsSummary = ({
   status,
   setData,
   pathname,
-  onVerifyItemsClicked,
+  onFulfillClicked,
   onVerifyReceivedClicked,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
@@ -156,26 +157,20 @@ const ItemsSummary = ({
         Header: "Fulfilled",
         accessor: "fulfilledQty",
         disableSortBy: true,
-        Cell: (row) => {
-          return status === "ACCEPTED" && pathname.includes("mf") ? (
-            <EditableCell
-              value={0}
-              row={row.row}
-              column={row.column}
-              updateMyData={updateMyData}
-            />
-          ) : status === "PENDING" || "CANCELLED" ? (
-            "-"
-          ) : (
-            row.row.original.fulfilledProductItems.length
-          );
-        },
+        Cell: (row) =>
+          status === "PENDING" ||
+          status === "CANCELLED" ||
+          status === "ACCEPTED"
+            ? "-"
+            : row.row.original.fulfilledProductItems.length,
       },
       {
         Header: "Shipped",
         accessor: "",
         Cell: (row) => {
-          return status === ("SHIPPED" || "VERIFIED" || "COMPLETED")
+          return status === "SHIPPED" ||
+            status === "VERIFIED" ||
+            status === "COMPLETED"
             ? row.row.original.fulfilledProductItems.length
             : "-";
         },
@@ -222,7 +217,6 @@ const ItemsSummary = ({
             columns={columns}
             data={data}
             skipPageReset={skipPageReset}
-            // hiddenColumns={["actualQty"]}
           />
         </div>
       )}
@@ -238,7 +232,7 @@ const ProcurementDetailsBody = ({
   warehouse,
   setLineItems,
   pathname,
-  onVerifyItemsClicked,
+  onFulfillClicked,
   onVerifyReceivedClicked,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
@@ -286,7 +280,7 @@ const ProcurementDetailsBody = ({
           status={status}
           setData={setLineItems}
           pathname={pathname}
-          onVerifyItemsClicked={onVerifyItemsClicked}
+          onFulfillClicked={onFulfillClicked}
           onVerifyReceivedClicked={onVerifyReceivedClicked}
         />
       </section>
@@ -345,7 +339,6 @@ export const ProcurementDetails = () => {
       })
       .catch((err) => console.error("Failed to add procurement: ", err));
   };
-  // console.log(lineItems);
 
   const onAcceptClicked = () => {
     procurementApi
@@ -377,16 +370,11 @@ export const ProcurementDetails = () => {
       );
   };
 
-  const onVerifyItemsClicked = () => {
+  const onFulfillClicked = () => {
     procurementApi
       .fulfillOrder(manufacturing, {
         id: procurementId,
-        lineItems: lineItems.map(({ product, ...item }) => ({
-          ...item,
-          product: {
-            sku: product.sku,
-          },
-        })),
+        lineItems,
       })
       .then((response) => {
         const { lineItems, statusHistory } = response.data;
@@ -452,6 +440,7 @@ export const ProcurementDetails = () => {
             onAcceptClicked={onAcceptClicked}
             onCancelOrderClicked={onCancelOrderClicked}
             onShippedClicked={onShippedClicked}
+            onFulfillClicked={onFulfillClicked}
           />
           <ProcurementDetailsBody
             procurementId={procurementId}
@@ -462,7 +451,7 @@ export const ProcurementDetails = () => {
             lineItems={lineItems}
             setLineItems={setLineItems}
             pathname={pathname}
-            onVerifyItemsClicked={onVerifyItemsClicked}
+            onFulfillClicked={onFulfillClicked}
             onVerifyReceivedClicked={onVerifyReceivedClicked}
           />
         </div>

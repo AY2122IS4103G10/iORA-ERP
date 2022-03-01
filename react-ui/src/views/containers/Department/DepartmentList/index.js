@@ -12,7 +12,7 @@ const DepartmentTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
+        Header: "#",
         accessor: "id",
       },
       {

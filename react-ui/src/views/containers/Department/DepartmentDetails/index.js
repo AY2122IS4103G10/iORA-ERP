@@ -7,8 +7,10 @@ import {
   deleteExistingDepartment,
   selectDepartmentById,
 } from "../../../../stores/slices/departmentSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const Header = ({ departmentId, name, openModal }) => {
   return (
@@ -19,7 +21,7 @@ const Header = ({ departmentId, name, openModal }) => {
         </div>
       </div>
       <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-        <Link to={`/sm/procurements/edit/${departmentId}`}>
+        <Link to={`/ad/departments/edit/${departmentId}`}>
           <button
             type="button"
             className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
@@ -47,13 +49,11 @@ const Header = ({ departmentId, name, openModal }) => {
   );
 };
 
-const DepartmentDetailsBody = ({
-  name,
-}) => (
+const DepartmentDetailsBody = ({ name, jobTitles }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
       {/* Departments Information*/}
-      <section aria-labelledby="order-information-title">
+      {/* <section aria-labelledby="order-information-title">
         <div className="bg-white shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:px-6">
             <h2
@@ -72,14 +72,55 @@ const DepartmentDetailsBody = ({
             </dl>
           </div>
         </div>
-      </section>
+      </section> */}
+      {Boolean(jobTitles.length) && (
+        <section aria-labelledby="vendors">
+          <JobTitleTable data={jobTitles} />
+        </section>
+      )}
     </div>
   </div>
 );
 
+const JobTitleTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "#",
+        accessor: "id",
+      },
+      {
+        Header: "Title",
+        accessor: "title",
+      },
+      {
+        Header: "Description",
+        accessor: "description",
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Job Titles
+        </h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
 export const DepartmentDetails = () => {
-  const { name } = useParams();
-  const department = useSelector((state) => selectDepartmentById(state, name));
+  const { departmentId } = useParams();
+  const department = useSelector((state) =>
+    selectDepartmentById(state, parseInt(departmentId))
+  );
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -90,9 +131,10 @@ export const DepartmentDetails = () => {
   }, [depStatus, dispatch]);
 
   const onDeleteDepartmentClicked = () => {
-    dispatch(deleteExistingDepartment(department.name));
-    closeModal();
-    navigate("/ad/Department");
+    dispatch(deleteExistingDepartment(departmentId)).then(() => {
+      closeModal();
+      navigate("/ad/departments");
+    });
   };
 
   const openModal = () => setOpenDelete(true);
@@ -102,12 +144,13 @@ export const DepartmentDetails = () => {
     Boolean(department) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="Departments" path={-1} />
+          <NavigatePrev page="Departments" path="/ad/departments" />
           <Header
             departmentId={department.id}
-            name={department.name}
+            name={department.deptName}
             openModal={openModal}
           />
+          <DepartmentDetailsBody jobTitles={department.jobTitles} />
         </div>
         <ConfirmDelete
           item={department.name}

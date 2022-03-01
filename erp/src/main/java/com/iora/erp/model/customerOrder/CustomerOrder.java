@@ -38,8 +38,8 @@ public class CustomerOrder {
     @OneToMany
     private List<ExchangeLI> exhcangedLIs;
 
-    @ManyToOne
-    private Customer customer;
+    @Column
+    private Long customerId;
 
     public CustomerOrder() {
         dateTime = LocalDateTime.now();
@@ -113,12 +113,12 @@ public class CustomerOrder {
         this.exhcangedLIs.add(exchangedLI);
     }
 
-    public Customer getCustomer() {
-        return this.customer;
+    public Long getCustomerId() {
+        return this.customerId;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
     public Long getStoreSiteId() {

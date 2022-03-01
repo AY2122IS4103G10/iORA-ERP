@@ -221,7 +221,7 @@ export const CompanyDetails = () => {
                 </section>
               )}
               {Boolean(company.vendors.length) && (
-                <section aria-labelledby="departments">
+                <section aria-labelledby="vendors">
                   <VendorTable data={company.vendors} />
                 </section>
               )}

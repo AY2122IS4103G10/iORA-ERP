@@ -7,7 +7,8 @@ import { TrashIcon } from "@heroicons/react/outline";
 import {
   fetchJobTitles,
   deleteExistingJobTitle,
-  selectJobTitlesById,
+
+  selectJobTitleById,
 } from "../../../../stores/slices/jobTitleSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useState } from "react";
@@ -50,7 +51,7 @@ const Header = ({ jobTitlesId, name, openModal }) => {
   );
 };
 
-const JobTitlesDetailsBody = ({
+const JobTitleDetailsBody = ({
   title,
   description,
   responsibility,

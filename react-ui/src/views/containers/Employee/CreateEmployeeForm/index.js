@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
-import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-
-import { api, employeeApi } from "../../../../environments/Api";
+import { employeeApi } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import {
   addNewEmployee,
@@ -270,6 +268,8 @@ const EmployeeFormBody = ({
 };
 
 export const EmployeeForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { employeeId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
@@ -283,9 +283,7 @@ export const EmployeeForm = () => {
   const [departments, setDepartments] = useState([]);
   const [departmentSelected, setDepartmentSelected] = useState(null);
   const [companySelected, setCompanySelected] = useState(null);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const { addToast } = useToasts();
 
   const onNameChanged = (e) => setName(e.target.value);
   const onEmailChanged = (e) => setEmail(e.target.value);
@@ -380,10 +378,18 @@ export const EmployeeForm = () => {
         )
           .unwrap()
           .then(() => {
-            alert("Successfully added employee");
+            addToast("Successfully added employee", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate("/ad/employees");
           })
-          .catch((err) => console.error("Failed to add employee: ", err));
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
       } else {
         const employee = {
           id: employeeId,
@@ -405,10 +411,18 @@ export const EmployeeForm = () => {
         dispatch(updateExistingEmployee(employee))
           .unwrap()
           .then(() => {
-            alert("Successfully updated employee");
+            addToast("Successfully update employee", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate(`/ad/employees/${employeeId}`);
           })
-          .catch((err) => console.error("Failed to update employee: ", err));
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
       }
   };
 

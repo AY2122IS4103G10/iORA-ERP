@@ -16,6 +16,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
+import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
@@ -35,13 +36,14 @@ public class CustomerServiceImpl implements CustomerService {
     private EntityManager em;
 
     @Override
-    public Customer createCustomerAccount(Customer customer) throws CustomerException {
+    public Customer createCustomerAccount(Customer customer) throws RegistrationException {
         Customer newC = customer;
 
         try {
             getCustomerByEmail(customer.getEmail());
-            throw new CustomerException("Account with " + customer.getEmail() + " has already been created");
-        } catch (Exception ex) {
+            throw new RegistrationException("Account with " + customer.getEmail() + " has already been created");
+
+        } catch (CustomerException ex) {
             newC.setMembershipTier(findMembershipTierById("BASIC"));
             newC.setAvailStatus(true);
             byte[] salt = saltGeneration();

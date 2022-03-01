@@ -21,23 +21,18 @@ export function Login() {
         localStorage.setItem("user", JSON.stringify(data));
         setUsername("");
         setPassword("");
-        addToast("Login Successfully", { appearance: "success", autoDismiss: true });
+        addToast("Login Successfully", {
+          appearance: "success",
+          autoDismiss: true,
+        });
         return data.id;
       })
       .then((id) => {
         id !== -1 && navigate("/home");
       })
       .catch((err) => {
-        switch (err.message) {
-          case "Rejected":
-            addToast(`Error: Invalid credentials`, { appearance: "error", autoDismiss: true });
-            break;
-          case "Blocked":
-            addToast(`Error: User blocked`, { appearance: "error", autoDismiss: true });
-            break;
-          default:
-            addToast(`Error`, { appearance: "error", autoDismiss: true });
-        }
+        console.log(err);
+        addToast(`Error`, { appearance: "error", autoDismiss: true });
       });
   };
 

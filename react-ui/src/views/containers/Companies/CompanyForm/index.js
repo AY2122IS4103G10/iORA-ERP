@@ -250,6 +250,7 @@ export const CompanyForm = () => {
   const [deptCheckedState, setDeptCheckedState] = useState([]);
   const [vends, setVendors] = useState([]);
   const [vendorCheckedState, setVendorCheckedState] = useState([]);
+  const [addressId, setAddressId] = useState(null)
   const { addToast } = useToasts();
 
   useEffect(() => {
@@ -301,15 +302,15 @@ export const CompanyForm = () => {
   };
   const canAdd = [
     name,
-    country,
-    city,
-    building,
-    state,
-    unit,
-    address1,
-    postalCode,
-    latitude,
-    longitude,
+    // country,
+    // city,
+    // building,
+    // state,
+    // unit,
+    // address1,
+    // postalCode,
+    // latitude,
+    // longitude,
     registerNo,
     phone,
   ].every(Boolean);
@@ -322,11 +323,10 @@ export const CompanyForm = () => {
       (vendor, index) => vendorCheckedState[index] && v.push(vendor)
     );
     console.log({
+      id: companyId,
       name,
       address: {
-        country:
-          country.charAt(0).toUpperCase() +
-          country.slice(1).toLowerCase(),
+        country,
         city,
         building,
         state,
@@ -342,7 +342,7 @@ export const CompanyForm = () => {
       active: true,
       departments: d.map((dept) => ({ id: dept.id })),
       vendors: v.map((vendor) => ({ id: vendor.id })),
-    });
+    })
     if (canAdd)
       if (!isEditing)
         dispatch(
@@ -389,6 +389,7 @@ export const CompanyForm = () => {
             id: companyId,
             name,
             address: {
+              id: addressId,
               country,
               city,
               building,
@@ -409,10 +410,18 @@ export const CompanyForm = () => {
         )
           .unwrap()
           .then(() => {
-            alert("Successfully updated company");
+            addToast("Successfully updated company", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate(`/ad/companies/${companyId}`);
           })
-          .catch((err) => console.error(err));
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
   };
 
   const onCancelClicked = () =>
@@ -432,6 +441,7 @@ export const CompanyForm = () => {
         setIsEditing(true);
         setName(name);
         setRegisterNo(registerNumber);
+        setAddressId(address.id)
         setAddress1(address.road);
         setBuilding(address.building);
         setUnit(address.unit);

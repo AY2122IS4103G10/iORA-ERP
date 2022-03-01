@@ -14,7 +14,13 @@ import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 
-const Header = ({ employeeId, name, openModal, availStatus, onToggleEnableClicked }) => {
+const Header = ({
+  employeeId,
+  name,
+  openModal,
+  availStatus,
+  onToggleEnableClicked,
+}) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <div className="flex items-center space-x-3">
@@ -156,28 +162,41 @@ export const EmployeeDetails = () => {
 
   const onToggleEnableClicked = () => {
     if (employee.availStatus)
-      dispatch(disableEmployee(employeeId)).unwrap().then(() =>
-        addToast("Successfully disabled employee", {
-          appearance: "success",
-          autoDismiss: true,
-        })
-      );
+      dispatch(disableEmployee(employeeId))
+        .unwrap()
+        .then(() =>
+          addToast("Successfully disabled employee", {
+            appearance: "success",
+            autoDismiss: true,
+          })
+        );
     else
-      dispatch(enableEmployee(employeeId)).unwrap().then(() =>
-        addToast("Successfully enabled employee", {
-          appearance: "success",
-          autoDismiss: true,
-        })
-      );
+      dispatch(enableEmployee(employeeId))
+        .unwrap()
+        .then(() =>
+          addToast("Successfully enabled employee", {
+            appearance: "success",
+            autoDismiss: true,
+          })
+        );
   };
 
   const onDeleteEmployeeClicked = () => {
     dispatch(deleteExistingEmployee(employeeId))
       .then(() => {
         closeModal();
+        addToast("Successfully deleted employee", {
+          appearance: "success",
+          autoDismiss: true,
+        });
         navigate("/ad/employees");
       })
-      .catch((err) => console.error(err.message));
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
   };
 
   const openModal = () => setOpenDelete(true);

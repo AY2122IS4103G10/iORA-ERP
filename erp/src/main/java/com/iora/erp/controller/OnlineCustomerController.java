@@ -48,12 +48,12 @@ public class OnlineCustomerController {
     }
 
     @PutMapping(path = "/profile/edit", consumes = "application/json", produces = "application/json")
-    public Customer editProfile(@RequestBody Customer customer) {
+    public ResponseEntity<Object> editProfile(@RequestBody Customer customer) {
         try {
-            return customerService.updateCustomerAccount(customer);
+            return ResponseEntity.ok(customerService.updateCustomerAccount(customer));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
-
 }

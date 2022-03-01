@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { login } from "../../../../stores/slices/userSlice";
 
 export const Login = () => {
@@ -9,6 +10,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { addToast } = useToasts();
 
   const handleLogin = (evt) => {
     evt.preventDefault();
@@ -19,11 +21,19 @@ export const Login = () => {
           localStorage.setItem("user", JSON.stringify(data.id));
           setEmail("");
           setPassword("");
-          navigate("/");
+          addToast("Login Successfully", {
+            appearance: "success",
+            autoDismiss: true,
+          });
+          return data.id;
         }
       })
+      .then((id) => id !== -1 && navigate("/"))
       .catch((err) => {
-        console.error(err);
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
       });
   };
 

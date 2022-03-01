@@ -40,17 +40,17 @@ export const deleteExistingEmployee = createAsyncThunk(
 );
 
 export const enableEmployee = createAsyncThunk(
-  "employee/deleteExistingEmployee",
+  "employee/enableEmployee",
   async (existingEmployeeId) => {
-    const response = await employeeApi.deleteEmployee(existingEmployeeId);
+    const response = await employeeApi.enableEmployee(existingEmployeeId);
     return response.data;
   }
 );
 
 export const disableEmployee = createAsyncThunk(
-  "employee/deleteExistingEmployee",
+  "employee/disableEmployee",
   async (existingEmployeeId) => {
-    const response = await employeeApi.deleteEmployee(existingEmployeeId);
+    const response = await employeeApi.disableEmployee(existingEmployeeId);
     return response.data;
   }
 );
@@ -73,40 +73,50 @@ const employeeSlice = createSlice({
       state.employee.push(action.payload);
     });
     builder.addCase(updateExistingEmployee.fulfilled, (state, action) => {
-      console.log(action.payload)
       const {
-        employeeId,
+        id,
         name,
         email,
         salary,
         username,
         password,
-        availStatus,
         payType,
         jobTitle,
         department,
+        company,
       } = action.payload;
-      console.log(action.payload);
-      const existingEmployee = state.employee.find(
-        (emp) => emp.employeeId === employeeId
-      );
+      const existingEmployee = state.employee.find((emp) => emp.id === id);
       if (existingEmployee) {
         existingEmployee.name = name;
         existingEmployee.email = email;
         existingEmployee.salary = salary;
         existingEmployee.username = username;
         existingEmployee.password = password;
-        existingEmployee.availStatus = availStatus;
         existingEmployee.payType = payType;
         existingEmployee.jobTitle = jobTitle;
         existingEmployee.department = department;
+        existingEmployee.company = company;
       }
     });
     builder.addCase(deleteExistingEmployee.fulfilled, (state, action) => {
       // state.employee = state.employee.filter(
       //   ({ employeeId }) => employeeId !== action.payload.id
       // );
-      state.employee.status = "idle"
+      state.employee.status = "idle";
+    });
+    builder.addCase(enableEmployee.fulfilled, (state, action) => {
+      const { id, availStatus } = action.payload;
+      const existingEmployee = state.employee.find((emp) => emp.id === id);
+      if (existingEmployee) {
+        existingEmployee.availStatus = availStatus;
+      }
+    });
+    builder.addCase(disableEmployee.fulfilled, (state, action) => {
+      const { id, availStatus } = action.payload;
+      const existingEmployee = state.employee.find((emp) => emp.id === id);
+      if (existingEmployee) {
+        existingEmployee.availStatus = availStatus;
+      }
     });
   },
 });

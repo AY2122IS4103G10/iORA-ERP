@@ -8,7 +8,7 @@ import {
   selectAllDepartment,
 } from "../../../../stores/slices/departmentSlice";
 
-export const DepartmentTable = ({ data, handleOnClick }) => {
+const DepartmentTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
@@ -23,18 +23,6 @@ export const DepartmentTable = ({ data, handleOnClick }) => {
         Header: "Job Titles",
         accessor: (row) => row.jobTitles.map((title) => title.title).join(", "),
       },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/department",
-      //       },
-      //     ],
-      //   }),
-      // },
     ],
     []
   );

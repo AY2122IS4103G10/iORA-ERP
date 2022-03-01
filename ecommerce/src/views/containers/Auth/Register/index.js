@@ -1,15 +1,17 @@
+import { useDispatch } from "react-redux";
+import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { ExclamationCircleIcon, XCircleIcon } from "@heroicons/react/solid";
-import { useDispatch } from "react-redux";
 import DatePicker from "react-datepicker";
+import { useToasts } from "react-toast-notifications";
 import { classNames } from "../../../../utilities/Util";
-import "react-datepicker/dist/react-datepicker.css";
 import { register } from "../../../../stores/slices/userSlice";
 
 export const Register = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,7 +21,7 @@ export const Register = () => {
   const [dob, setDob] = useState("");
   const [error, setError] = useState(null);
   const [submitError, setSubmitError] = useState(null);
-  const navigate = useNavigate();
+  const { addToast } = useToasts();
 
   const onEmailChanged = (e) => setEmail(e.target.value);
   const onPasswordChanged = (e) => setPassword(e.target.value);
@@ -74,19 +76,26 @@ export const Register = () => {
             setLastName("");
             setContactNo("");
             setDob("");
-            alert("Successfully created account.");
-            data.id !== -1 && navigate("/");
+            addToast("Welcome to iORA!", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            return data.id;
           })
-          .then(() => navigate("/"))
+          .then((id) => id !== -1 && navigate("/"))
           .catch((error) => {
-            if (!error.response)
-              setSubmitError(new Error("Failed to connect to server"));
-            if (error.response.status === 404)
-              setSubmitError(new Error("Account already exists"));
-            else
-              setSubmitError(
-                new Error("Something went wrong. Please try again later.")
-              );
+            // if (!error.response)
+            //   setSubmitError(new Error("Failed to connect to server"));
+            // if (error.response.status === 404)
+            //   setSubmitError(new Error("Account already exists"));
+            // else
+            //   setSubmitError(
+            //     new Error("Something went wrong. Please try again later.")
+            //   );
+            addToast(`Error: ${error.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
           });
     }
   };
@@ -115,7 +124,7 @@ export const Register = () => {
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {submitError && (
+          {/* {submitError && (
             <div className="py-4">
               <div className="rounded-md bg-red-50 p-4">
                 <div className="flex">
@@ -136,7 +145,7 @@ export const Register = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
           <form className="space-y-6" onSubmit={onSaveClicked}>
             <div className="space-y-8 divide-y divide-gray-200">
               <div>

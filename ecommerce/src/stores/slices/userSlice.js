@@ -37,20 +37,22 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async ({ id }) => {
 export const login = createAsyncThunk(
   "auth/login",
   async ({ email, password }) => {
-    const response = await authApi.login(email, password);
-    if (response.data === "") {
-      return Promise.reject(response.error);
+    try {
+      const response = await authApi.login(email, password);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
     }
-    return response.data;
   }
 );
 
 export const register = createAsyncThunk("auth/register", async (user) => {
-  const response = await authApi.register(user);
-  if (response.data === "") {
-    return Promise.reject(response.error);
+  try {
+    const response = await authApi.register(user);
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error.response.data);
   }
-  return response.data;
 });
 
 export const updateAccount = createAsyncThunk(
@@ -90,7 +92,7 @@ const userSlice = createSlice({
       state.loggedIn = true;
     });
     builder.addCase(login.rejected, (state, action) => {
-      state.error = "Login failed";
+      state.error = action.error;
     });
     builder.addCase(register.fulfilled, (state, action) => {
       action.payload.salt !== undefined && delete action.payload.salt;

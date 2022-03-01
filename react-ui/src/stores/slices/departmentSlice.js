@@ -60,19 +60,9 @@ const departmentSlice = createSlice({
       state.department.push(action.payload);
     });
     builder.addCase(updateExistingDepartment.fulfilled, (state, action) => {
-      const { id, deptName, jobTitles } = action.payload;
-      const existingDepartment = state.department.find(
-        (department) => department.id === id
-      );
-      if (existingDepartment) {
-        existingDepartment.deptName = deptName;
-        existingDepartment.jobTitles = jobTitles;
-      }
+      state.status = "idle";
     });
     builder.addCase(deleteExistingDepartment.fulfilled, (state, action) => {
-      // state.department = state.department.filter(
-      //   ({ departmentId }) => departmentId !== action.payload.departmenteId
-      // );
       state.status = "idle";
     });
   },

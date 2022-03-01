@@ -23,8 +23,6 @@ const siteTypes = [
   { id: 5, name: "Warehouse" },
 ];
 
-// const companies = [{ id: 1, name: "iORA Fashion Pte. Ltd." }];
-
 export const AddressField = ({
   address1,
   onAddress1Changed,
@@ -67,7 +65,7 @@ export const AddressField = ({
             id="address"
             className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
             autoComplete="address"
-            value={address1}
+            value={address1.toUpperCase()}
             onChange={onAddress1Changed}
             required
           />
@@ -150,7 +148,7 @@ export const AddressField = ({
               id="city"
               className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
               autoComplete="city"
-              value={city}
+              value={city.toUpperCase()}
               onChange={onCityChanged}
               required
             />
@@ -170,7 +168,7 @@ export const AddressField = ({
               id="state"
               className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
               autoComplete="state"
-              value={state}
+              value={state.toUpperCase()}
               onChange={onStateChanged}
               required
             />

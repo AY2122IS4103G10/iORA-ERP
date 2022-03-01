@@ -84,14 +84,6 @@ export const Register = () => {
           })
           .then((id) => id !== -1 && navigate("/"))
           .catch((error) => {
-            // if (!error.response)
-            //   setSubmitError(new Error("Failed to connect to server"));
-            // if (error.response.status === 404)
-            //   setSubmitError(new Error("Account already exists"));
-            // else
-            //   setSubmitError(
-            //     new Error("Something went wrong. Please try again later.")
-            //   );
             addToast(`Error: ${error.message}`, {
               appearance: "error",
               autoDismiss: true,

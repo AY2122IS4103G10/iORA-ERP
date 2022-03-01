@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Error() {
     return (
       <>
@@ -27,9 +29,9 @@ export default function Error() {
                 <h1 className="mt-2 text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">Page not found.</h1>
                 <p className="mt-2 text-base text-gray-500">Sorry, we couldn’t find the page you’re looking for.</p>
                 <div className="mt-6">
-                  <a href="/home" className="text-base font-medium text-indigo-600 hover:text-indigo-500">
+                  <Link to="/home" className="text-base font-medium text-indigo-600 hover:text-indigo-500">
                     Go back home<span aria-hidden="true"> &rarr;</span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

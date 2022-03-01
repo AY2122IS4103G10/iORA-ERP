@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { PlusIcon } from "@heroicons/react/outline";
+import { useToasts } from "react-toast-notifications";
+// import { PlusIcon } from "@heroicons/react/outline";
 import {
   SimpleTable,
   DeleteCell,
@@ -11,112 +12,112 @@ import {
   selectAllPromotions,
   updateExistingPromotion,
 } from "../../../../stores/slices/promotionsSlice";
-import {
-  fetchProducts,
-  selectAllProducts,
-} from "../../../../stores/slices/productSlice";
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import { Dialog } from "@headlessui/react";
-import { Link } from "react-router-dom";
+// import {
+//   fetchProducts,
+//   selectAllProducts,
+// } from "../../../../stores/slices/productSlice";
+// import { SimpleModal } from "../../../components/Modals/SimpleModal";
+// import { Dialog } from "@headlessui/react";
+// import { Link } from "react-router-dom";
 
-const ProductsModal = ({
-  open,
-  closeModal,
-  data,
-  onAddItemsClicked,
-  selectedRows,
-  setRowSelect,
-}) => {
-  const columns = useMemo(
-    () => [
-      {
-        Header: "Product Code",
-        accessor: "modelCode",
-        Cell: (e) => (
-          <Link
-            to={`/sm/products/${e.value}`}
-            className="hover:text-gray-700 hover:underline"
-          >
-            {e.value}
-          </Link>
-        ),
-      },
-      {
-        Header: "Name",
-        accessor: "name",
-      },
-      {
-        Header: "Color",
-        accessor: (row) =>
-          row.productFields
-            .filter((field) => field.fieldName === "COLOUR")
-            .map((field) => field.fieldValue)
-            .join(", "),
-      },
-      {
-        Header: "Size",
-        accessor: (row) =>
-          row.productFields
-            .filter((field) => field.fieldName === "SIZE")
-            .map((field) => field.fieldValue)
-            .join(", "),
-      },
-      {
-        Header: "List Price",
-        accessor: "price",
-        Cell: (e) => `$${e.value}`,
-      },
-      {
-        Header: "Available",
-        accessor: "available",
-        Cell: (e) => (e.value ? "Yes" : "No"),
-      },
-    ],
+// const ProductsModal = ({
+//   open,
+//   closeModal,
+//   data,
+//   onAddItemsClicked,
+//   selectedRows,
+//   setRowSelect,
+// }) => {
+//   const columns = useMemo(
+//     () => [
+//       {
+//         Header: "Product Code",
+//         accessor: "modelCode",
+//         Cell: (e) => (
+//           <Link
+//             to={`/sm/products/${e.value}`}
+//             className="hover:text-gray-700 hover:underline"
+//           >
+//             {e.value}
+//           </Link>
+//         ),
+//       },
+//       {
+//         Header: "Name",
+//         accessor: "name",
+//       },
+//       {
+//         Header: "Color",
+//         accessor: (row) =>
+//           row.productFields
+//             .filter((field) => field.fieldName === "COLOUR")
+//             .map((field) => field.fieldValue)
+//             .join(", "),
+//       },
+//       {
+//         Header: "Size",
+//         accessor: (row) =>
+//           row.productFields
+//             .filter((field) => field.fieldName === "SIZE")
+//             .map((field) => field.fieldValue)
+//             .join(", "),
+//       },
+//       {
+//         Header: "List Price",
+//         accessor: "price",
+//         Cell: (e) => `$${e.value}`,
+//       },
+//       {
+//         Header: "Available",
+//         accessor: "available",
+//         Cell: (e) => (e.value ? "Yes" : "No"),
+//       },
+//     ],
 
-    []
-  );
-  return (
-    <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
-        <div>
-          <div className="mt-3 sm:mt-5">
-            <Dialog.Title
-              as="h3"
-              className="text-center text-lg leading-6 font-medium text-gray-900"
-            >
-              Add Items
-            </Dialog.Title>
-            <SimpleTable
-              columns={columns}
-              data={data}
-              rowSelect={true}
-              selectedRows={selectedRows}
-              setSelectedRows={setRowSelect}
-            />
-          </div>
-        </div>
-        <div className="pt-5">
-          <div className="flex justify-end">
-            <button
-              type="button"
-              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={closeModal}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={onAddItemsClicked}
-            >
-              {!Boolean(data.length) ? "Add" : "Save"} items
-            </button>
-          </div>
-        </div>
-      </div>
-    </SimpleModal>
-  );
-};
+//     []
+//   );
+//   return (
+//     <SimpleModal open={open} closeModal={closeModal}>
+//       <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+//         <div>
+//           <div className="mt-3 sm:mt-5">
+//             <Dialog.Title
+//               as="h3"
+//               className="text-center text-lg leading-6 font-medium text-gray-900"
+//             >
+//               Add Items
+//             </Dialog.Title>
+//             <SimpleTable
+//               columns={columns}
+//               data={data}
+//               rowSelect={true}
+//               selectedRows={selectedRows}
+//               setSelectedRows={setRowSelect}
+//             />
+//           </div>
+//         </div>
+//         <div className="pt-5">
+//           <div className="flex justify-end">
+//             <button
+//               type="button"
+//               className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+//               onClick={closeModal}
+//             >
+//               Cancel
+//             </button>
+//             <button
+//               type="submit"
+//               className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+//               onClick={onAddItemsClicked}
+//             >
+//               {!Boolean(data.length) ? "Add" : "Save"} items
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </SimpleModal>
+//   );
+// };
 
 export const PromotionsTable = ({
   data,
@@ -126,7 +127,7 @@ export const PromotionsTable = ({
   setPromoId,
   setModalState,
   onDeletePromoClicked,
-  openProductsModal,
+  // openProductsModal,
 }) => {
   const columns = useMemo(
     () => [
@@ -180,13 +181,6 @@ export const PromotionsTable = ({
         Cell: (e) => {
           return (
             <div className="flex">
-              <button
-                className="mr-6 bg-white rounded-full items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-                onClick={openProductsModal}
-              >
-                <span className="sr-only">Delete</span>
-                <PlusIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
               {e.row.original.available ? (
                 <DeleteCell
                   onClick={() => onDeletePromoClicked(e.row.original)}
@@ -208,7 +202,6 @@ export const PromotionsTable = ({
       setModalState,
       setPromoId,
       onDeletePromoClicked,
-      openProductsModal,
     ]
   );
   return (
@@ -228,31 +221,32 @@ export const PromotionsList = ({
   setPromoId,
   setModalState,
 }) => {
-  const [openProdModal, setOpenProdModal] = useState(false);
+  const { addToast } = useToasts();
   const data = useSelector(selectAllPromotions);
   const promoStatus = useSelector((state) => state.promotions.status);
   useEffect(() => {
     promoStatus === "idle" && dispatch(fetchPromotions());
   }, [promoStatus, dispatch]);
 
-  const products = useSelector(selectAllProducts);
-  const productStatus = useSelector((state) => state.products.status);
-  useEffect(() => {
-    productStatus === "idle" && dispatch(fetchProducts());
-  }, [productStatus, dispatch]);
+  // const [openProdModal, setOpenProdModal] = useState(false);
+  // const products = useSelector(selectAllProducts);
+  // const productStatus = useSelector((state) => state.products.status);
+  // useEffect(() => {
+  //   productStatus === "idle" && dispatch(fetchProducts());
+  // }, [productStatus, dispatch]);
 
-  const [itemsToAdd, setItemsToAdd] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const onAddItemsClicked = (evt) => {
-    evt.preventDefault();
-    const selectedRowKeys = Object.keys(selectedRows).map((key) =>
-      parseInt(key)
-    );
-    const lineItems = [];
-    selectedRowKeys.map((key) => lineItems.push(products[key]));
-    setItemsToAdd(lineItems);
-    closeProductsModal();
-  };
+  // const [itemsToAdd, setItemsToAdd] = useState([]);
+  // const [selectedRows, setSelectedRows] = useState([]);
+  // const onAddItemsClicked = (evt) => {
+  //   evt.preventDefault();
+  //   const selectedRowKeys = Object.keys(selectedRows).map((key) =>
+  //     parseInt(key)
+  //   );
+  //   const lineItems = [];
+  //   selectedRowKeys.map((key) => lineItems.push(products[key]));
+  //   setItemsToAdd(lineItems);
+  //   closeProductsModal();
+  // };
 
   const onDeletePromoClicked = ({
     id,
@@ -272,12 +266,24 @@ export const PromotionsList = ({
     )
       .unwrap()
       .then(() => {
-        alert(`Successfully ${available ? "disabled" : "enabled"} promotion`);
-      });
+        addToast(
+          `Successfully ${available ? "disabled" : "enabled"} promotion`,
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
+        );
+      })
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
   };
 
-  const openProductsModal = () => setOpenProdModal(true);
-  const closeProductsModal = () => setOpenProdModal(false);
+  // const openProductsModal = () => setOpenProdModal(true);
+  // const closeProductsModal = () => setOpenProdModal(false);
 
   return (
     <>
@@ -289,9 +295,9 @@ export const PromotionsList = ({
         setPromoId={setPromoId}
         setModalState={setModalState}
         onDeletePromoClicked={onDeletePromoClicked}
-        openProductsModal={openProductsModal}
+        // openProductsModal={openProductsModal}
       />
-      {Boolean(products.length) && (
+      {/* {Boolean(products.length) && (
         <ProductsModal
           open={openProdModal}
           closeModal={closeProductsModal}
@@ -300,7 +306,7 @@ export const PromotionsList = ({
           selectedRows={selectedRows}
           setRowSelect={setSelectedRows}
         />
-      )}
+      )} */}
     </>
   );
 };

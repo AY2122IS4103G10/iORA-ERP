@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { api, employeeApi } from "../../environments/Api";
 
 const initialState = {
   employee: [],
@@ -34,7 +34,23 @@ export const updateExistingEmployee = createAsyncThunk(
 export const deleteExistingEmployee = createAsyncThunk(
   "employee/deleteExistingEmployee",
   async (existingEmployeeId) => {
-    const response = await api.delete("admin/deleteEmployee", existingEmployeeId);
+    const response = await employeeApi.deleteEmployee(existingEmployeeId);
+    return response.data;
+  }
+);
+
+export const enableEmployee = createAsyncThunk(
+  "employee/enableEmployee",
+  async (existingEmployeeId) => {
+    const response = await employeeApi.enableEmployee(existingEmployeeId);
+    return response.data;
+  }
+);
+
+export const disableEmployee = createAsyncThunk(
+  "employee/disableEmployee",
+  async (existingEmployeeId) => {
+    const response = await employeeApi.disableEmployee(existingEmployeeId);
     return response.data;
   }
 );
@@ -58,37 +74,49 @@ const employeeSlice = createSlice({
     });
     builder.addCase(updateExistingEmployee.fulfilled, (state, action) => {
       const {
-        employeeId,
+        id,
         name,
         email,
         salary,
         username,
         password,
-        availStatus,
         payType,
         jobTitle,
-        department
+        department,
+        company,
       } = action.payload;
-      console.log(action.payload);
-      const existingEmployee = state.employee.find((emp) => emp.employeeId === employeeId);
+      const existingEmployee = state.employee.find((emp) => emp.id === id);
       if (existingEmployee) {
         existingEmployee.name = name;
         existingEmployee.email = email;
         existingEmployee.salary = salary;
         existingEmployee.username = username;
         existingEmployee.password = password;
-        existingEmployee.availStatus = availStatus;
         existingEmployee.payType = payType;
         existingEmployee.jobTitle = jobTitle;
         existingEmployee.department = department;
+        existingEmployee.company = company;
       }
-      // state.status = "idle";
     });
     builder.addCase(deleteExistingEmployee.fulfilled, (state, action) => {
-      state.employee = state.employee.filter(
-        ({ employeeId }) => employeeId !== action.payload.employeeId
-      );
-      // state.status = "idle"
+      // state.employee = state.employee.filter(
+      //   ({ employeeId }) => employeeId !== action.payload.id
+      // );
+      state.employee.status = "idle";
+    });
+    builder.addCase(enableEmployee.fulfilled, (state, action) => {
+      const { id, availStatus } = action.payload;
+      const existingEmployee = state.employee.find((emp) => emp.id === id);
+      if (existingEmployee) {
+        existingEmployee.availStatus = availStatus;
+      }
+    });
+    builder.addCase(disableEmployee.fulfilled, (state, action) => {
+      const { id, availStatus } = action.payload;
+      const existingEmployee = state.employee.find((emp) => emp.id === id);
+      if (existingEmployee) {
+        existingEmployee.availStatus = availStatus;
+      }
     });
   },
 });
@@ -98,4 +126,4 @@ export default employeeSlice.reducer;
 export const selectAllEmployee = (state) => state.employee.employee;
 
 export const selectEmployeeById = (state, employeeId) =>
-  state.employee.employee.find((employee) => employee.employeeId === employeeId);
+  state.employee.employee.find((employee) => employee.id === employeeId);

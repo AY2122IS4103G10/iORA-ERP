@@ -1,66 +1,56 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { CogIcon } from "@heroicons/react/outline";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
-  SimpleTable,
-} from "../../../components/Tables/SimpleTable";
-import { 
   fetchDepartments,
-  selectAllDepartment, 
+  selectAllDepartment,
 } from "../../../../stores/slices/departmentSlice";
 
-export const DepartmentTable = () => {
+const DepartmentTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
         Header: "Id",
         accessor: "id",
-        // Cell: (e) => (
-        //   <Link
-        //     to={`/admin/employee/${e.value}`}
-        //     className="hover:text-gray-700 hover:underline"
-        //   >
-        //     {e.value}
-        //   </Link>
-        // ),name, department, companyCode, status, email
       },
       {
-        Header: "Department Name",
-        accessor: "name",
-        
+        Header: "Name",
+        accessor: "deptName",
       },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/department",
-      //       },
-      //     ],
-      //   }),
-      // },
+      {
+        Header: "Job Titles",
+        accessor: (row) => row.jobTitles.map((title) => title.title).join(", "),
+      },
     ],
     []
   );
-  const dispatch = useDispatch();
-  const data = useSelector(selectAllDepartment);
-  const departmentStatus = useSelector((state) => state.department.status);
-  useEffect(() => {
-    departmentStatus === "idle" && dispatch(fetchDepartments());
-  }, [departmentStatus, dispatch]);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        <SimpleTable columns={columns} data={data} />
+        <SimpleTable
+          columns={columns}
+          data={data}
+          handleOnClick={handleOnClick}
+        />
       </div>
     </div>
   );
 };
 
 export const DepartmentList = () => {
-  return <DepartmentTable />;
+  const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const data = useSelector(selectAllDepartment);
+  const departmentStatus = useSelector((state) => state.department.status);
+
+  const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
+
+  useEffect(() => {
+    departmentStatus === "idle" && dispatch(fetchDepartments());
+  }, [departmentStatus, dispatch]);
+  return <DepartmentTable data={data} handleOnClick={handleOnClick} />;
 };

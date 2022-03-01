@@ -4,6 +4,7 @@ import com.iora.erp.model.customer.Customer;
 import com.iora.erp.service.CustomerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,20 +28,22 @@ public class OnlineCustomerController {
      */
 
     @GetMapping(path = "/login", produces = "application/json")
-    public Customer customerLogin(@RequestParam String email, @RequestParam String password) {
+    public ResponseEntity<Object> customerLogin(@RequestParam String email, @RequestParam String password) {
         try {
-            return customerService.loginAuthentication(email, password);
-        } catch (Exception e) {
-            return null;
+            return ResponseEntity.ok(customerService.loginAuthentication(email, password));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
     @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
-    public Customer registerAccount(@RequestBody Customer customer) {
+    public ResponseEntity<Object> registerAccount(@RequestBody Customer customer) {
         try {
-            return customerService.createCustomerAccount(customer);
+            return ResponseEntity.ok(customerService.createCustomerAccount(customer));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 

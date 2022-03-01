@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
-import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
@@ -232,7 +231,7 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransfer/complete/{siteId}", produces = "application/json")
+    @PutMapping(path = "/stockTransfer/complete/{siteId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> completeStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder, @PathVariable Long siteId) {
         try {
             return ResponseEntity

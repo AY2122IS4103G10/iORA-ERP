@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.iora.erp.exception.CustomerException;
-import com.iora.erp.exception.StockTransferException;
+// import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
@@ -16,12 +16,12 @@ import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
-import com.iora.erp.model.stockTransfer.StockTransferOrder;
+// import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
-import com.iora.erp.service.StockTransferService;
+// import com.iora.erp.service.StockTransferService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,8 +47,8 @@ public class SAMController {
     private SiteService siteService;
     @Autowired
     private ProcurementService procurementService;
-    @Autowired
-    private StockTransferService stockTransferService;
+    // @Autowired
+    // private StockTransferService stockTransferService;
 
     /*
      * ---------------------------------------------------------

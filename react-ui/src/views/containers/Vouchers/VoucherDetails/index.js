@@ -188,7 +188,7 @@ export const VoucherDetails = () => {
           onRedeemClicked={onRedeemClicked}
         />
         <ConfirmDelete
-          item={`${voucher.amount} voucher?`}
+          item={`$${voucher.amount} voucher?`}
           open={openDelete}
           closeModal={closeModal}
           onConfirm={onDeleteVoucherClicked}

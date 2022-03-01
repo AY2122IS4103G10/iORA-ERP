@@ -10,7 +10,6 @@ import {
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import accessRightsMap from "../../../../constants/accessRightsPaths";
 import { api } from "../../../../environments/Api";
-import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { useNavigate } from "react-router-dom";
 
@@ -240,7 +239,7 @@ export function Home() {
   const [openEnterStore, setOpenEnterStore] = useState(false);
   const [siteCode, setSiteCode] = useState("");
   const [storeNames, setStoreNames] = useState({});
-  const stores = Object.keys(storeNames).map((key) => { return { id: key, name: storeNames[key] } });
+  const stores = [{ id : 0, name : "Choose one" }, ...Object.keys(storeNames).map((key) => { return { id: key, name: storeNames[key] } })];
   const [store, setStore] = useState({ id: 0, name: "" });
 
   useEffect(() => {

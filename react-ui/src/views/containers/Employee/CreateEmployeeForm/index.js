@@ -69,113 +69,23 @@ const EmployeeFormBody = ({
                       </div>
                       <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
                         <SimpleInputGroup
-                          label="Employee Name"
-                          inputField="name"
-                          className="sm:mt-0 sm:col-span-2"
-                        >
-                          <SimpleInputBox
-                            type="text"
-                            name="name"
-                            id="name"
-                            autoComplete="name"
-                            value={name}
-                            onChange={onNameChanged}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Email"
-                          inputField="email"
-                          className="sm:mt-0 sm:col-span-2"
-                        >
-                          <SimpleInputBox
-                            type="email"
-                            name="email"
-                            id="email"
-                            autoComplete="email"
-                            value={email}
-                            onChange={onEmailChanged}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Username"
-                          inputField="username"
-                          className="sm:mt-0 sm:col-span-2"
-                        >
-                          <SimpleInputBox
-                            type="text"
-                            name="username"
-                            id="username"
-                            autoComplete="username"
-                            value={username}
-                            onChange={onUsernameChanged}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Password"
-                          inputField="password"
-                          className="sm:mt-0 sm:col-span-2"
-                        >
-                          <SimpleInputBox
-                            type="password"
-                            name="password"
-                            id="password"
-                            autoComplete="password"
-                            value={password}
-                            onChange={onPasswordChanged}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Pay Type"
-                          inputField="payType"
-                          className="sm:mt-0 sm:col-span-2"
-                        >
-                          {[
-                            payTypes.length,
-                            payTypeSelected,
-                            setPayTypeSelected,
-                          ].every(Boolean) ? (
-                            <SimpleSelectMenu
-                              options={payTypes}
-                              selected={payTypeSelected}
-                              setSelected={setPayTypeSelected}
-                            />
-                          ) : (
-                            <div>No pay types</div>
-                          )}
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Salary"
-                          inputField="salary"
+                          label="Company"
+                          inputField="company"
                           className="relative rounded-md sm:mt-0 sm:col-span-2"
                         >
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span className="text-gray-500 sm:text-sm">$</span>
-                          </div>
-                          <input
-                            type="number"
-                            name="salary"
-                            id="salary"
-                            autoComplete="salary"
-                            className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                            placeholder="0.00"
-                            value={salary}
-                            onChange={onSalaryChanged}
-                            required
-                            step="100"
-                            aria-describedby="salary-currency"
-                          />
-                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <span
-                              className="text-gray-500 sm:text-sm"
-                              id="salary-currency"
-                            >
-                              SGD
-                            </span>
-                          </div>
+                          {[
+                            companies,
+                            companySelected,
+                            setCompanySelected,
+                          ].every(Boolean) ? (
+                            <SimpleSelectMenu
+                              options={companies}
+                              selected={companySelected}
+                              setSelected={setCompanySelected}
+                            />
+                          ) : (
+                            <div>No companies</div>
+                          )}
                         </SimpleInputGroup>
                         <SimpleInputGroup
                           label="Department"
@@ -216,23 +126,117 @@ const EmployeeFormBody = ({
                           )}
                         </SimpleInputGroup>
                         <SimpleInputGroup
-                          label="Company"
-                          inputField="company"
-                          className="relative rounded-md sm:mt-0 sm:col-span-2"
+                          label="Employee Name"
+                          inputField="name"
+                          className="sm:mt-0 sm:col-span-2"
+                        >
+                          <SimpleInputBox
+                            type="text"
+                            name="name"
+                            id="name"
+                            autoComplete="name"
+                            value={name}
+                            onChange={onNameChanged}
+                            required
+                          />
+                        </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Email"
+                          inputField="email"
+                          className="sm:mt-0 sm:col-span-2"
+                        >
+                          <SimpleInputBox
+                            type="email"
+                            name="email"
+                            id="email"
+                            autoComplete="email"
+                            value={email}
+                            onChange={onEmailChanged}
+                            required
+                          />
+                        </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Username"
+                          inputField="username"
+                          className="sm:mt-0 sm:col-span-2"
+                        >
+                          <SimpleInputBox
+                            type="text"
+                            name="username"
+                            id="username"
+                            autoComplete="username"
+                            placeholder="Leave blank if using email as username."
+                            value={username}
+                            onChange={onUsernameChanged}
+                          />
+                        </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Password"
+                          inputField="password"
+                          className="sm:mt-0 sm:col-span-2"
+                        >
+                          <SimpleInputBox
+                            type="password"
+                            name="password"
+                            id="password"
+                            autoComplete="password"
+                            placeholder={
+                              isEditing ? "Leave blank if unchanged." : ""
+                            }
+                            value={password}
+                            onChange={onPasswordChanged}
+                            required={!isEditing ? true : false}
+                          />
+                        </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Pay Type"
+                          inputField="payType"
+                          className="sm:mt-0 sm:col-span-2"
                         >
                           {[
-                            companies,
-                            companySelected,
-                            setCompanySelected,
+                            payTypes.length,
+                            payTypeSelected,
+                            setPayTypeSelected,
                           ].every(Boolean) ? (
                             <SimpleSelectMenu
-                              options={companies}
-                              selected={companySelected}
-                              setSelected={setCompanySelected}
+                              options={payTypes}
+                              selected={payTypeSelected}
+                              setSelected={setPayTypeSelected}
                             />
                           ) : (
-                            <div>No companies</div>
+                            <div>No pay types</div>
                           )}
+                        </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Salary"
+                          inputField="salary"
+                          className="relative rounded-md sm:mt-0 sm:col-span-2"
+                        >
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span className="text-gray-500 sm:text-sm">$</span>
+                          </div>
+                          <input
+                            type="number"
+                            name="salary"
+                            id="salary"
+                            autoComplete="salary"
+                            className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                            placeholder="0.00"
+                            min="0"
+                            value={salary}
+                            onChange={onSalaryChanged}
+                            required
+                            step="0.01"
+                            aria-describedby="salary-currency"
+                          />
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span
+                              className="text-gray-500 sm:text-sm"
+                              id="salary-currency"
+                            >
+                              SGD
+                            </span>
+                          </div>
                         </SimpleInputGroup>
                       </div>
                     </div>
@@ -288,6 +292,22 @@ export const EmployeeForm = () => {
   const onUsernameChanged = (e) => setUsername(e.target.value);
   const onPasswordChanged = (e) => setPassword(e.target.value);
   const onSalaryChanged = (e) => setSalary(e.target.value);
+  const onCompanyChanged = (company) => {
+    setCompanySelected(company);
+    const departments = company.departments.map((dept) => ({
+      id: dept.id,
+      name: dept.deptName,
+      jobTitles: dept.jobTitles,
+    }));
+    setDepartments(departments);
+    setDepartmentSelected(departments[0]);
+    const jobTitles = departments[0].jobTitles.map((jobTitle) => ({
+      id: jobTitle.id,
+      name: jobTitle.title,
+    }));
+    setJobTitles(jobTitles);
+    setJobTitleSelected(jobTitles[0]);
+  };
   const onDeptChanged = (e) => {
     setDepartmentSelected(e);
     const jobTitles = e.jobTitles.map((jobTitle) => ({
@@ -299,9 +319,17 @@ export const EmployeeForm = () => {
   };
   const onJobTitleChanged = (e) => setJobTitleSelected(e);
 
+  const companies = useSelector(selectAllCompanies);
+  const company = companies[0];
+  const companyStatus = useSelector((state) => state.companies.status);
   useEffect(() => {
-    api.getAll("admin/viewDepartments?search=").then((response) => {
-      const departments = response.data.map((dept) => ({
+    companyStatus === "idle" && dispatch(fetchCompanies());
+  }, [companyStatus, dispatch]);
+
+  useEffect(() => {
+    if (company) {
+      setCompanySelected(company);
+      const departments = company.departments.map((dept) => ({
         id: dept.id,
         name: dept.deptName,
         jobTitles: dept.jobTitles,
@@ -314,100 +342,73 @@ export const EmployeeForm = () => {
       }));
       setJobTitles(jobTitles);
       setJobTitleSelected(jobTitles[0]);
-    });
-  }, []);
-
-  const companies = useSelector(selectAllCompanies);
-  const company = companies[0];
-  const companyStatus = useSelector((state) => state.companies.status);
-  useEffect(() => {
-    companyStatus === "idle" && dispatch(fetchCompanies());
-  }, [companyStatus, dispatch]);
-
-  useEffect(() => {
-    company && setCompanySelected(company);
+    }
   }, [company]);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-  const canAdd =
-    [name, departmentSelected, email, payTypeSelected, salary, jobTitles].every(
-      Boolean
-    ) && requestStatus === "idle";
+  const canAdd = [
+    name,
+    companySelected,
+    jobTitleSelected,
+    departmentSelected,
+    email,
+    payTypeSelected,
+    salary,
+    jobTitles,
+  ].every(Boolean);
 
   const onAddEmployeeClicked = (evt) => {
     evt.preventDefault();
-    console.log({
-      name,
-      availStatus: true,
-      email,
-      username: Boolean(username.length) ? username : email,
-      password,
-      payType: payTypeSelected.value,
-      salary,
-      department: {
-        id: departmentSelected.id,
-      },
-      jobTitle: {
-        id: jobTitleSelected.id,
-      },
-    });
     if (canAdd)
-      try {
-        setRequestStatus("pending");
-        if (!isEditing) {
-          dispatch(
-            addNewEmployee({
-              name,
-              availStatus: true,
-              email,
-              username: Boolean(username.length) ? username : email,
-              password,
-              payType: payTypeSelected.value,
-              salary,
-              department: {
-                id: departmentSelected.id,
-              },
-              jobTitle: {
-                id: jobTitleSelected.id,
-              },
-              company: { id: companySelected.id },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully added employee");
-              navigate("/ad/employees");
-            });
-        } else {
-          dispatch(
-            updateExistingEmployee({
-              id: employeeId,
-              name,
-              availStatus: true,
-              email,
-              username: Boolean(username.length) ? username : email,
-              password,
-              payType: payTypeSelected.value,
-              salary,
-              department: {
-                id: departmentSelected.id,
-              },
-              jobTitle: {
-                id: jobTitleSelected.id,
-              },
-              company: { id: companySelected.id },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully added employee");
-              navigate(`/ad/employees/${employeeId}`);
-            });
-        }
-      } catch (err) {
-        console.error("Failed to add employee: ", err);
-      } finally {
-        setRequestStatus("idle");
+      if (!isEditing) {
+        dispatch(
+          addNewEmployee({
+            name,
+            availStatus: true,
+            email,
+            username: Boolean(username.length) ? username : email,
+            password,
+            payType: payTypeSelected.value,
+            salary,
+            department: {
+              id: departmentSelected.id,
+            },
+            jobTitle: {
+              id: jobTitleSelected.id,
+            },
+            company: { id: companySelected.id },
+          })
+        )
+          .unwrap()
+          .then(() => {
+            alert("Successfully added employee");
+            navigate("/ad/employees");
+          })
+          .catch((err) => console.error("Failed to add employee: ", err));
+      } else {
+        const employee = {
+          id: employeeId,
+          name,
+          availStatus: true,
+          email,
+          username: Boolean(username.length) ? username : email,
+          payType: payTypeSelected.value,
+          salary,
+          department: {
+            id: departmentSelected.id,
+          },
+          jobTitle: {
+            id: jobTitleSelected.id,
+          },
+          company: { id: companySelected.id },
+        };
+        if (Boolean(password.length)) employee[password] = password;
+        dispatch(updateExistingEmployee(employee))
+          .unwrap()
+          .then(() => {
+            alert("Successfully updated employee");
+            navigate(`/ad/employees/${employeeId}`);
+          })
+          .catch((err) => console.error("Failed to update employee: ", err));
       }
   };
 
@@ -464,7 +465,7 @@ export const EmployeeForm = () => {
       jobTitles={jobTitles}
       companies={companies}
       companySelected={companySelected}
-      setCompanySelected={setCompanySelected}
+      setCompanySelected={onCompanyChanged}
       email={email}
       onEmailChanged={onEmailChanged}
       username={username}

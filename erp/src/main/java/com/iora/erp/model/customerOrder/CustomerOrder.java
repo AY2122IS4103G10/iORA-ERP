@@ -120,4 +120,12 @@ public class CustomerOrder {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
+    public Long getStoreSiteId() {
+        return storeSiteId;
+    }
+
+    public void setStoreSiteId(Long storeSiteId) {
+        this.storeSiteId = storeSiteId;
+    }
 }

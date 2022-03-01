@@ -16,7 +16,7 @@ const initialState = {
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const response = await api.getAll(`sam/model?modelCode=`);
+    const response = await api.getAll("sam/model?modelCode=");
     return response.data;
   }
 );
@@ -146,7 +146,6 @@ const productSlice = createSlice({
         products,
         productFields,
       } = action.payload;
-      console.log(action.payload);
       const existingProd = state.products.find(
         (prod) => prod.modelCode === modelCode
       );

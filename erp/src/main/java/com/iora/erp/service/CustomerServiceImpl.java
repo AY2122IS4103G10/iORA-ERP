@@ -1,6 +1,5 @@
 package com.iora.erp.service;
 
-import java.lang.reflect.Member;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -17,6 +16,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
+import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
@@ -36,13 +36,14 @@ public class CustomerServiceImpl implements CustomerService {
     private EntityManager em;
 
     @Override
-    public Customer createCustomerAccount(Customer customer) throws CustomerException {
+    public Customer createCustomerAccount(Customer customer) throws RegistrationException {
         Customer newC = customer;
 
         try {
             getCustomerByEmail(customer.getEmail());
-            throw new CustomerException("Account with " + customer.getEmail() + " has already been created");
-        } catch (Exception ex) {
+            throw new RegistrationException("Account with " + customer.getEmail() + " has already been created");
+
+        } catch (CustomerException ex) {
             newC.setMembershipTier(findMembershipTierById("BASIC"));
             newC.setAvailStatus(true);
             byte[] salt = saltGeneration();
@@ -112,13 +113,14 @@ public class CustomerServiceImpl implements CustomerService {
          * "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact"
          * , Customer.class);
          */
-        Query q = em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.email) LIKE :email OR " +
-                "LOWER(c.LastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact");
-        q.setParameter("email", "%" + search.toLowerCase() + "%");
-        q.setParameter("last", "%" + search.toLowerCase() + "%");
-        q.setParameter("first", "%" + search.toLowerCase() + "%");
-        q.setParameter("contact", "%" + search + "%");
-        return q.getResultList();
+        return em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.email) LIKE :email OR " +
+                "LOWER(c.LastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact",
+                Customer.class)
+                .setParameter("email", "%" + search.toLowerCase() + "%")
+                .setParameter("last", "%" + search.toLowerCase() + "%")
+                .setParameter("first", "%" + search.toLowerCase() + "%")
+                .setParameter("contact", "%" + search + "%")
+                .getResultList();
     }
 
     @Override
@@ -143,9 +145,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer getCustomerByPhone(String phone) throws CustomerException {
-        TypedQuery<Customer> q = em.createQuery("SELECT DISTINCT c FROM Customer c WHERE c.contactNumber = :phone", Customer.class);
+        TypedQuery<Customer> q = em.createQuery("SELECT DISTINCT c FROM Customer c WHERE c.contactNumber = :phone",
+                Customer.class);
         q.setParameter("phone", phone);
-        
+
         Customer c = q.getSingleResult();
 
         if (c == null) {

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   login,
@@ -10,9 +10,10 @@ export function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user"));
+  const userState = useSelector(state => state.user.status)
 
   useEffect(() => {
-    if (user && user.username !== "" && user.password !== "") {
+    if (user && user.username !== "" && user.password !== "" && userState === "idle") {
       dispatch(login({ username: user.username, password: user.password }))
         .unwrap()
         .then((data) => {
@@ -26,7 +27,7 @@ export function Auth() {
     } else {
       location.pathname !== "/" && navigate("/");
     }
-  }, [location]);
+  }, [location, dispatch, navigate, user, userState]);
 
   return <Outlet />;
 }

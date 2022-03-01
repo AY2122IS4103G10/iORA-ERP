@@ -88,32 +88,31 @@ export const DepartmentForm = () => {
   const onNameChanged = (e) => setName(e.target.value);
 
   const [requestStatus, setRequestStatus] = useState("idle");
-  const canAdd =
-    [
-      name,
-    ].every(Boolean) && requestStatus === "idle";
+  const canAdd = [name].every(Boolean) && requestStatus === "idle";
 
-    const onAddDepartmentClicked = (evt) => {
-        evt.preventDefault();
-        if (canAdd)
-            try {
-                setRequestStatus("pending");
-                if (!isEditing) {
-                    dispatch(
-                      addNewDepartment({
-                        name,
-                      })
-                    ).unwrap();
-                  } else {
-                    dispatch(
-                      updateExistingDepartment({
-                        name,
-                      })
-                    ).unwrap();
-                  }
+  const onAddDepartmentClicked = (evt) => {
+    evt.preventDefault();
+    if (canAdd)
+      try {
+        setRequestStatus("pending");
+        if (!isEditing) {
+          dispatch(
+            addNewDepartment({
+              deptName: name,
+            })
+          ).unwrap();
+        } else {
+          dispatch(
+            updateExistingDepartment({
+              deptName: name,
+            })
+          ).unwrap();
+        }
         alert("Successfully added department");
         setName("");
-        navigate(!isEditing ? "/ad/department" : `/ad/department/${departmentId}`);
+        navigate(
+          !isEditing ? "/ad/department" : `/ad/department/${departmentId}`
+        );
       } catch (err) {
         console.error("Failed to add department: ", err);
       } finally {
@@ -121,14 +120,12 @@ export const DepartmentForm = () => {
       }
   };
 
-  const onCancelClicked = () =>
-    navigate(!isEditing ? "/ad/department" : `/ad/department/${departmentId}`);
+  const onCancelClicked = () => navigate(!isEditing ? "/ad/department" : `/ad/department/${departmentId}`);
 
   useEffect(() => {
     Boolean(departmentId) &&
       api.get("admin/viewDepartment", departmentId).then((response) => {
-        const { name } =
-          response.data;
+        const { name } = response.data;
         setIsEditing(true);
         setName(name);
       });

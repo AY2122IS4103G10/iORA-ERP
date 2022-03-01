@@ -12,7 +12,7 @@ import {
 } from "../../../../stores/slices/companySlice";
 import { FormCheckboxes } from "../../Products/ProductForm";
 
-const RightColSection = ({
+export const RightColSection = ({
   fieldName,
   children,
   path = "/",
@@ -196,7 +196,7 @@ const CompanyFormBody = ({
       {/* Right column */}
       <div className="grid grid-cols-1 gap-4">
         {/* Departments */}
-        <RightColSection fieldName="Department" path="/ad/depts/create">
+        <RightColSection fieldName="Department" path="/ad/departments/create">
           {depts.length ? (
             <FormCheckboxes
               legend="Department"
@@ -210,7 +210,7 @@ const CompanyFormBody = ({
           )}
         </RightColSection>
         {/* Vendors */}
-        <RightColSection fieldName="Vendor" path="/ad/vends/create">
+        <RightColSection fieldName="Vendor" path="/ad/vendors/create">
           {vends.length ? (
             <FormCheckboxes
               legend="Vendor"
@@ -322,27 +322,6 @@ export const CompanyForm = () => {
     vends.forEach(
       (vendor, index) => vendorCheckedState[index] && v.push(vendor)
     );
-    console.log({
-      id: companyId,
-      name,
-      address: {
-        country,
-        city,
-        building,
-        state,
-        unit,
-        road: address1,
-        postalCode,
-        billing: false,
-        latitude,
-        longitude,
-      },
-      registerNumber: registerNo,
-      telephone: phone,
-      active: true,
-      departments: d.map((dept) => ({ id: dept.id })),
-      vendors: v.map((vendor) => ({ id: vendor.id })),
-    })
     if (canAdd)
       if (!isEditing)
         dispatch(

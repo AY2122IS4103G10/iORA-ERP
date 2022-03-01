@@ -6,7 +6,10 @@ import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
 import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
-import { addNewJobTitle, updateExistingJobTitle } from "../../../../stores/slices/jobTitleSlice";
+import {
+  addNewJobTitle,
+  updateExistingJobTitle,
+} from "../../../../stores/slices/jobTitleSlice";
 
 const JobTitleFormBody = ({
   isEditing,
@@ -124,34 +127,31 @@ export const JobTitleForm = () => {
 
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
-    [
-      title,
-      description,
-      responsibility,
-    ].every(Boolean) && requestStatus === "idle";
+    [title, description, responsibility].every(Boolean) &&
+    requestStatus === "idle";
 
-    const onAddJobTitleClicked = (evt) => {
-        evt.preventDefault();
-        if (canAdd)
-            try {
-                setRequestStatus("pending");
-                if (!isEditing) {
-                    dispatch(
-                      addNewJobTitle({
-                        title,
-                        description,
-                        responsibility,
-                      })
-                    ).unwrap();
-                  } else {
-                    dispatch(
-                      updateExistingJobTitle({
-                        title,
-                        description,
-                        responsibility,
-                      })
-                    ).unwrap();
-                  }
+  const onAddJobTitleClicked = (evt) => {
+    evt.preventDefault();
+    if (canAdd)
+      try {
+        setRequestStatus("pending");
+        if (!isEditing) {
+          dispatch(
+            addNewJobTitle({
+              title,
+              description,
+              responsibility,
+            })
+          ).unwrap();
+        } else {
+          dispatch(
+            updateExistingJobTitle({
+              title,
+              description,
+              responsibility,
+            })
+          ).unwrap();
+        }
         alert("Successfully added job title");
         setTitle("");
         navigate(!isEditing ? "/ad/jobTitle" : `/ad/jobTitle/${jobTitleId}`);
@@ -162,14 +162,12 @@ export const JobTitleForm = () => {
       }
   };
 
-  const onCancelClicked = () =>
-    navigate(!isEditing ? "/ad/jobTitle" : `/ad/jobTitle/${jobTitleId}`);
+  const onCancelClicked = () => navigate(-1);
 
   useEffect(() => {
     Boolean(jobTitleId) &&
       api.get("admin/viewJobTitle", jobTitleId).then((response) => {
-        const { title, description, responsibility } =
-          response.data;
+        const { title, description, responsibility } = response.data;
         setIsEditing(true);
         setTitle(title);
         setDescription(description);

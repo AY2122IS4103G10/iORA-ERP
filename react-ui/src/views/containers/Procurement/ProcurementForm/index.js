@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { Dialog } from "@headlessui/react";
 import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
@@ -335,6 +336,7 @@ const ProcurementFormBody = ({
 );
 
 export const ProcurementForm = () => {
+  const { addToast } = useToasts();
   const { orderId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -433,11 +435,17 @@ export const ProcurementForm = () => {
             warehouse: { id: warehouseSelected.id },
           })
           .then(() => {
-            alert("Successfully created procurement order");
+            addToast("Successfully created procurement order", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate("/sm/procurements");
           })
-          .catch((error) =>
-            console.error("Failed to create procurement: ", error.message)
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
           );
       else
         api
@@ -452,11 +460,17 @@ export const ProcurementForm = () => {
             warehouse: { id: warehouseSelected.id },
           })
           .then(() => {
-            alert("Successfully updated procurement order");
+            addToast("Successfully updated procurement order", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate(`/sm/procurements/${orderId}`);
           })
-          .catch((error) =>
-            console.error("Failed to update procurement: ", error.message)
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
           );
   };
 
@@ -489,7 +503,7 @@ export const ProcurementForm = () => {
         setSelectedRows(selectedRows);
       });
   }, [orderId]);
-  
+
   return (
     <>
       <ProcurementFormBody

@@ -12,12 +12,16 @@ import com.iora.erp.model.customerOrder.RefundLI;
 
 public interface CustomerOrderService {
     public abstract CustomerOrder getCustomerOrder(Long id) throws CustomerOrderException;
+    public abstract List<CustomerOrder> searchCustomerOrders(String id);
+
     public abstract List<OnlineOrder> getAllOnlineOrders();
     public abstract List<OnlineOrder> getOnlineOrdersBySite(Long siteId);
     public abstract List<OnlineOrder> getOnlineOrdersBySiteDate(Long siteId, String date);
+
     public abstract List<CustomerOrder> getAllInStoreOrders();
     public abstract List<CustomerOrder> getInStoreOrdersBySite(Long siteId);
     public abstract List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date);
+
     public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder);
     public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
     

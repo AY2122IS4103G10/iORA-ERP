@@ -43,6 +43,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    public List<CustomerOrder> searchCustomerOrders(String id) {
+        TypedQuery<CustomerOrder> q;
+        if (id != null) {
+            q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.id LIKE :id", CustomerOrder.class);
+            q.setParameter("id", "%" + Long.parseLong(id) + "%");
+        } else {
+            q = em.createQuery("SELECT co FROM CustomerOrder co", CustomerOrder.class);
+        }
+
+        return q.getResultList();
+    }
+
+    @Override
     public List<OnlineOrder> getAllOnlineOrders() {
         TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo", OnlineOrder.class);
         return q.getResultList();
@@ -56,6 +69,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         return q.getResultList();
     }
 
+    // Not working yet
     @Override
     public List<OnlineOrder> getOnlineOrdersBySiteDate(Long siteId, String date) {
         TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.storeSiteId = :siteId AND SUBSTRING(oo.dateTime, 0, 10) = :date",
@@ -83,6 +97,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         return q.getResultList();
     }
 
+    // Not working yet
     @Override
     public List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date) {
         TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId AND SUBSTRING(co.dateTime, 0, 10) = :date",

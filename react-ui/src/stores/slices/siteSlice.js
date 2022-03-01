@@ -63,11 +63,15 @@ export const fetchWarehouse = createAsyncThunk(
 export const addNewSite = createAsyncThunk(
   "sites/addNewSite",
   async (initialSite) => {
-    const response = await api.create(
-      `admin/addSite/${initialSite.storeType}`,
-      initialSite.initialSite
-    );
-    return response.data;
+    try {
+      const response = await api.create(
+        `admin/addSite/${initialSite.storeType}`,
+        initialSite.initialSite
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
@@ -82,8 +86,12 @@ export const updateExistingSite = createAsyncThunk(
 export const deleteExistingSite = createAsyncThunk(
   "sites/deleteExistingSite",
   async (existingSiteId) => {
-    const response = await sitesApi.deleteSite(existingSiteId);
-    return response.data;
+    try {
+      const response = await sitesApi.deleteSite(existingSiteId);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 

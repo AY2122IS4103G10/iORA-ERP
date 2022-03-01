@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useToasts } from "react-toast-notifications";
 import { useNavigate, useParams } from "react-router-dom";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
@@ -22,8 +23,6 @@ const siteTypes = [
   { id: 4, name: "Store" },
   { id: 5, name: "Warehouse" },
 ];
-
-// const companies = [{ id: 1, name: "iORA Fashion Pte. Ltd." }];
 
 export const AddressField = ({
   address1,
@@ -319,18 +318,20 @@ const SiteFormBody = ({
                       </h3>
                     </div>
                     <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                      <SimpleInputGroup
-                        label="Site Type"
-                        inputField="siteCode"
-                        className="relative rounded-md sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleSelectMenu
-                          options={siteTypes}
-                          selected={siteTypeSelected}
-                          setSelected={setSiteTypeSelected}
-                          disabled={isEditing}
-                        />
-                      </SimpleInputGroup>
+                      {!isEditing && (
+                        <SimpleInputGroup
+                          label="Site Type"
+                          inputField="siteCode"
+                          className="relative rounded-md sm:mt-0 sm:col-span-2"
+                        >
+                          <SimpleSelectMenu
+                            options={siteTypes}
+                            selected={siteTypeSelected}
+                            setSelected={setSiteTypeSelected}
+                            disabled={isEditing}
+                          />
+                        </SimpleInputGroup>
+                      )}
 
                       <SimpleInputGroup
                         label="Name"
@@ -450,6 +451,7 @@ const SiteFormBody = ({
 export const SiteForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useToasts();
   const { siteId } = useParams();
   const [name, setName] = useState("");
   const [address1, setAddress1] = useState("");
@@ -495,69 +497,30 @@ export const SiteForm = () => {
   const onLongitudeChanged = (e) => setLongitude(e.target.value);
   const onBillingChanged = () => setBilling(!billing);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-  const canAdd =
-    [
-      name,
-      country,
-      city,
-      building,
-      state,
-      unit,
-      address1,
-      postalCode,
-      latitude,
-      longitude,
-      siteCode,
-      phone,
-    ].every(Boolean) && requestStatus === "idle";
+  const canAdd = [
+    name,
+    // country,
+    // city,
+    // address1,
+    // postalCode,
+    // latitude,
+    // longitude,
+    siteCode,
+    phone,
+  ].every(Boolean);
   const onAddSiteClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
-      try {
-        setRequestStatus("pending");
-        if (!isEditing)
-          dispatch(
-            addNewSite({
-              storeType: siteTypeSelected.name,
-              initialSite: {
-                name,
-                address: {
-                  country:
-                    country.charAt(0).toUpperCase() +
-                    country.slice(1).toLowerCase(),
-                  city,
-                  building,
-                  state,
-                  unit,
-                  road: address1,
-                  postalCode: `Singapore ${postalCode}`,
-                  billing,
-                  latitude,
-                  longitude,
-                },
-                siteCode,
-                phoneNumber: phone,
-                active: true,
-                company: {
-                  id: companySelected.id,
-                  name: companySelected.name,
-                },
-              },
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully added site");
-              navigate("/ad/sites");
-            });
-        else
-          dispatch(
-            updateExistingSite({
-              id: siteId,
+      if (!isEditing)
+        dispatch(
+          addNewSite({
+            storeType: siteTypeSelected.name,
+            initialSite: {
               name,
               address: {
-                country,
+                country:
+                  country.charAt(0).toUpperCase() +
+                  country.slice(1).toLowerCase(),
                 city,
                 building,
                 state,
@@ -570,22 +533,67 @@ export const SiteForm = () => {
               },
               siteCode,
               phoneNumber: phone,
-              active,
-              stockLevel,
-              company: companySelected,
-              procurementOrders,
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully updated site");
-              navigate(`/ad/sites/${siteId}`);
+              active: true,
+              company: {
+                id: companySelected.id,
+                name: companySelected.name,
+              },
+            },
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully added site", {
+              appearance: "success",
+              autoDismiss: true,
             });
-      } catch (err) {
-        console.error("Failed to add/edit site: ", err);
-      } finally {
-        setRequestStatus("idle");
-      }
+            navigate("/ad/sites");
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+          });
+      else
+        dispatch(
+          updateExistingSite({
+            id: siteId,
+            name,
+            address: {
+              country,
+              city,
+              building,
+              state,
+              unit,
+              road: address1,
+              postalCode,
+              billing,
+              latitude,
+              longitude,
+            },
+            siteCode,
+            phoneNumber: phone,
+            active,
+            stockLevel,
+            company: companySelected,
+            procurementOrders,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully updated site", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            navigate(`/ad/sites/${siteId}`);
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+          });
   };
 
   const onCancelClicked = () =>
@@ -622,6 +630,7 @@ export const SiteForm = () => {
         setStockLevel(stockLevel);
         setProcurementOrders(procurementOrders);
         setActive(active);
+        // setSiteTypeSelected()
       });
   }, [siteId]);
   return (

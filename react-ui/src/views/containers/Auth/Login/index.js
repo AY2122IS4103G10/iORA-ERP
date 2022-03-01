@@ -21,7 +21,7 @@ export function Login() {
         localStorage.setItem("user", JSON.stringify(data));
         setUsername("");
         setPassword("");
-        addToast("Login Successfully", {
+        addToast("Login Successful", {
           appearance: "success",
           autoDismiss: true,
         });

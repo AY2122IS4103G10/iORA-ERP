@@ -116,35 +116,35 @@ export const FormCheckboxes = ({
   );
 };
 
-const RadioGroup = ({ options, selected, onSelectedChanged }) => {
-  return (
-    <fieldset className="mt-4">
-      <legend className="sr-only">Option</legend>
-      <div className="space-y-4">
-        {options.map((option) => (
-          <div key={option.id} className="flex items-center">
-            <input
-              id={option.id}
-              name="option"
-              type="radio"
-              // defaultChecked={defaultChecked(option)}
-              checked={option.fieldValue === selected.fieldValue}
-              className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300"
-              value={selected}
-              onChange={onSelectedChanged}
-            />
-            <label
-              htmlFor={option.id}
-              className="ml-3 block text-sm font-medium text-gray-700"
-            >
-              {option.fieldValue}
-            </label>
-          </div>
-        ))}
-      </div>
-    </fieldset>
-  );
-};
+// const RadioGroup = ({ options, selected, onSelectedChanged }) => {
+//   return (
+//     <fieldset className="mt-4">
+//       <legend className="sr-only">Option</legend>
+//       <div className="space-y-4">
+//         {options.map((option) => (
+//           <div key={option.id} className="flex items-center">
+//             <input
+//               id={option.id}
+//               name="option"
+//               type="radio"
+//               // defaultChecked={defaultChecked(option)}
+//               checked={option.fieldValue === selected.fieldValue}
+//               className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300"
+//               value={selected}
+//               onChange={onSelectedChanged}
+//             />
+//             <label
+//               htmlFor={option.id}
+//               className="ml-3 block text-sm font-medium text-gray-700"
+//             >
+//               {option.fieldValue}
+//             </label>
+//           </div>
+//         ))}
+//       </div>
+//     </fieldset>
+//   );
+// };
 
 const RightColSection = ({
   fieldName,
@@ -742,6 +742,7 @@ export const ProductForm = () => {
         setCompanySelected(companies[0])
       });
   }, [prodId, colors, sizes, tags, categories, promotions, companies]);
+
   const [fieldNameSelected, setFieldNameSelected] = useState("");
   const [fieldValue, setFieldValue] = useState("");
   const [openAddField, setOpenAddField] = useState(false);

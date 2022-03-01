@@ -176,3 +176,11 @@ export const employeeApi = {
     return axios.put(`${REST_ENDPOINT}admin/disableEmployee?id=${employeeId}`);
   },
 };
+export const departmentApi = {
+  getDepartment(id) {
+    return axios.get(`${REST_ENDPOINT}admin/viewDepartment?id=${id}`);
+  },
+  deleteDepartment(id) {
+    return axios.delete(`${REST_ENDPOINT}admin/deleteDepartment?id=${id}`)
+  },
+}

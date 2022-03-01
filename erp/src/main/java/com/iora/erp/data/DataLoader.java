@@ -57,9 +57,8 @@ public class DataLoader implements CommandLineRunner {
                 }
         }
 
+        // Insert Data-Init here
         private void loadData() throws Exception {
-                // Insert Data-Init here
-
                 // Singapore
                 Address a1 = new Address(Country.Singapore, "Singapore", "Enterprise 10", "Singapore", "NIL",
                                 "10P Enterprise Road", "Singapore 629840", false, 1.334251, 103.704246);
@@ -67,45 +66,57 @@ public class DataLoader implements CommandLineRunner {
                 em.persist(a1);
 
                 // JobTitles
-                Set<AccessRights> s = new HashSet<>();
-                s.add(AccessRights.MARKETING_BASIC);
-
-                Set<AccessRights> ar = new HashSet<>();
-                ar.add(AccessRights.MARKETING_BASIC);
-                ar.add(AccessRights.MARKETING_CRM);
-                JobTitle jobTitle1 = new JobTitle("Sales", "Sales and Marketing Product", ar);
+                Set<AccessRights> ar1 = new HashSet<>();
+                ar1.add(AccessRights.SYSADMIN_BASIC);
+                ar1.add(AccessRights.SYSADMIN_COMPANY);
+                ar1.add(AccessRights.SYSADMIN_EMPLOYEE);
+                ar1.add(AccessRights.MARKETING_BASIC);
+                ar1.add(AccessRights.MARKETING_MERCHANDISE);
+                ar1.add(AccessRights.MARKETING_PROCUREMENT);
+                ar1.add(AccessRights.MARKETING_CRM);
+                ar1.add(AccessRights.MANUFACTURING_BASIC);
+                ar1.add(AccessRights.WAREHOUSE_BASIC);
+                ar1.add(AccessRights.WAREHOUSE_ORDER);
+                ar1.add(AccessRights.STORE_BASIC);
+                ar1.add(AccessRights.STORE_INVENTORY);
+                JobTitle jobTitle1 = new JobTitle("IT Admin", "Managing all IT", ar1);
                 em.persist(jobTitle1);
 
                 Set<AccessRights> ar2 = new HashSet<>();
-                ar2.add(AccessRights.STORE_BASIC);
-                ar2.add(AccessRights.STORE_INVENTORY);
-                JobTitle jobTitle2 = new JobTitle("Store Manager", "Managing the physical store", ar2);
+                ar2.add(AccessRights.MARKETING_BASIC);
+                ar2.add(AccessRights.MARKETING_MERCHANDISE);
+                ar2.add(AccessRights.MARKETING_PROCUREMENT);
+                ar2.add(AccessRights.MARKETING_CRM);
+                JobTitle jobTitle2 = new JobTitle("Sales", "Sales and Marketing Product", ar2);
                 em.persist(jobTitle2);
 
                 Set<AccessRights> ar3 = new HashSet<>();
-                ar2.add(AccessRights.WAREHOUSE_BASIC);
-                ar2.add(AccessRights.WAREHOUSE_ORDER);
+                ar3.add(AccessRights.MANUFACTURING_BASIC);
                 JobTitle jobTitle3 = new JobTitle("Manufacturing Manager", "Managing the products production", ar3);
                 em.persist(jobTitle3);
 
                 Set<AccessRights> ar4 = new HashSet<>();
-                ar4.add(AccessRights.MARKETING_BASIC);
-                ar4.add(AccessRights.MARKETING_CRM);
-                ar4.add(AccessRights.STORE_BASIC);
-                ar4.add(AccessRights.STORE_INVENTORY);
                 ar4.add(AccessRights.WAREHOUSE_BASIC);
                 ar4.add(AccessRights.WAREHOUSE_ORDER);
-                ar4.add(AccessRights.MANUFACTURING_BASIC);
-                ar4.add(AccessRights.SYSADMIN_BASIC);
-                ar4.add(AccessRights.SYSADMIN_COMPANY);
-                ar4.add(AccessRights.SYSADMIN_EMPLOYEE);
-                JobTitle jobTitle4 = new JobTitle("IT Admin", "Managing all IT", ar4);
+                JobTitle jobTitle4 = new JobTitle("Warehouse Manager", "Managing inventory in warehouse", ar4);
                 em.persist(jobTitle4);
 
+                Set<AccessRights> ar5 = new HashSet<>();
+                ar5.add(AccessRights.STORE_BASIC);
+                ar5.add(AccessRights.STORE_INVENTORY);
+                JobTitle jobTitle5 = new JobTitle("Store Manager", "Managing the physical store", ar5);
+                em.persist(jobTitle5);
+
                 // Departments
+                Department adm = new Department("IT");
+                List<JobTitle> jt5 = new ArrayList<>();
+                jt5.add(jobTitle1);
+                adm.setJobTitles(jt5);
+                adminService.createDepartment(adm);
+
                 Department sam = new Department("Sales and Marketing");
                 List<JobTitle> jt = new ArrayList<>();
-                jt.add(jobTitle1);
+                jt.add(jobTitle2);
                 sam.setJobTitles(jt);
                 adminService.createDepartment(sam);
 
@@ -113,30 +124,24 @@ public class DataLoader implements CommandLineRunner {
                 sam2.setJobTitles(jt);
                 adminService.createDepartment(sam2);
 
-                Department store1 = new Department("Storefront");
-                List<JobTitle> jt2 = new ArrayList<>();
-                jt2.add(jobTitle2);
-                store1.setJobTitles(jt2);
-                adminService.createDepartment(store1);
-
                 Department mf1 = new Department("Manufacturing");
                 List<JobTitle> jt3 = new ArrayList<>();
                 jt3.add(jobTitle3);
                 mf1.setJobTitles(jt3);
                 adminService.createDepartment(mf1);
-
+                
                 Department wh1 = new Department("Warehouse");
                 List<JobTitle> jt4 = new ArrayList<>();
-                jt4.add(jobTitle3);
+                jt4.add(jobTitle4);
                 wh1.setJobTitles(jt4);
                 adminService.createDepartment(wh1);
 
-                Department adm = new Department("IT");
-                List<JobTitle> jt5 = new ArrayList<>();
-                jt5.add(jobTitle4);
-                adm.setJobTitles(jt5);
-                adminService.createDepartment(adm);
-
+                Department store1 = new Department("Storefront");
+                List<JobTitle> jt2 = new ArrayList<>();
+                jt2.add(jobTitle5);
+                store1.setJobTitles(jt2);
+                adminService.createDepartment(store1);
+                
                 // Vendors
                 Address a2 = new Address(Country.Singapore, "Singapore", "Kewalram House", "Singapore", "02-01",
                                 "8 Jln Kilang Timor", "Singapore 159305", false, 1.334251, 103.704246);
@@ -144,7 +149,8 @@ public class DataLoader implements CommandLineRunner {
 
                 List<Address> listAdd = new ArrayList<>();
                 listAdd.add(a2);
-                Vendor v1 = new Vendor("Ninja Van", "+65 66028271", "Singapore domestic delivery", "admin@ninjavan.com");
+                Vendor v1 = new Vendor("Ninja Van", "+65 66028271", "Singapore domestic delivery",
+                                "admin@ninjavan.com");
                 em.persist(v1);
                 v1.setAddress(listAdd);
 
@@ -169,23 +175,50 @@ public class DataLoader implements CommandLineRunner {
                 em.persist(sora);
 
                 // Employee
-                Employee e = new Employee("Sharon KS", "sharonE", "password");
-                e.setEmail("sharonMS.12@gmail.com");
-                e.setSalary(4100.0);
-                e.setPayType(PayType.MONTHLY);
-                e.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
-                e.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
-                e.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-                employeeService.createEmployee(e);
-
-                Employee e2 = new Employee("Darth Vader", "darthV", "password");
-                e2.setEmail("darth.vader@gmail.com");
-                e2.setSalary(5678.90);
+                Employee e1 = new Employee("Darth Vader", "darthV", "password");
+                e1.setEmail("darth.vader@gmail.com");
+                e1.setSalary(5678.90);
+                e1.setPayType(PayType.MONTHLY);
+                e1.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
+                e1.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
+                e1.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+                employeeService.createEmployee(e1);
+                
+                Employee e2 = new Employee("Sharon KS", "sharonE", "password");
+                e2.setEmail("sharonMS.12@gmail.com");
+                e2.setSalary(4100.0);
                 e2.setPayType(PayType.MONTHLY);
-                e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(4)));
-                e2.setDepartment(adminService.getDepartmentById(Long.valueOf(6)));
+                e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(2)));
+                e2.setDepartment(adminService.getDepartmentById(Long.valueOf(2)));
                 e2.setCompany(adminService.getCompanyById(Long.valueOf(1)));
                 employeeService.createEmployee(e2);
+
+                Employee e3 = new Employee("Manuel Manny", "manu", "password");
+                e3.setEmail("MannyManuel@gmail.com");
+                e3.setSalary(4300.0);
+                e3.setPayType(PayType.MONTHLY);
+                e3.setJobTitle(adminService.getJobTitleById(Long.valueOf(3)));
+                e3.setDepartment(adminService.getDepartmentById(Long.valueOf(4)));
+                e3.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+                employeeService.createEmployee(e3);
+
+                Employee e4 = new Employee("Warren Ho", "warren", "password");
+                e4.setEmail("WarrenHoHoHo@gmail.com");
+                e4.setSalary(4288.0);
+                e4.setPayType(PayType.MONTHLY);
+                e4.setJobTitle(adminService.getJobTitleById(Long.valueOf(4)));
+                e4.setDepartment(adminService.getDepartmentById(Long.valueOf(5)));
+                e4.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+                employeeService.createEmployee(e4);
+
+                Employee e5 = new Employee("Storm", "storm", "password");
+                e5.setEmail("storm@gmail.com");
+                e5.setSalary(4444.44);
+                e5.setPayType(PayType.MONTHLY);
+                e5.setJobTitle(adminService.getJobTitleById(Long.valueOf(5)));
+                e5.setDepartment(adminService.getDepartmentById(Long.valueOf(6)));
+                e5.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+                employeeService.createEmployee(e5);
 
                 // Adding Sites
                 HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", "+65-63610056", iora);

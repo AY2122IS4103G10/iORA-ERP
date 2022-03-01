@@ -19,14 +19,14 @@ function classNames(...classes) {
 
 
 export const getProductItem = (data, sku) => {
-  console.log(data); 
-  console.log(sku);
-  console.log(data.productItems[2]);
-  console.log(data.productItems.filter((item) => {
-    // console.log(item);
-    return item.productSKU === sku.trim();
+  // console.log(data); 
+  // console.log(sku);
+  // console.log(data.productItems[2]);
+  // console.log(data.productItems.filter((item) => {
+  //   // console.log(item);
+  //   return item.productSKU === sku.trim();
     
-  }));
+  // }));
   return data.productItems.filter((item) => item.productSKU?.trim() === sku.trim());
 }
 
@@ -240,8 +240,6 @@ export const StockLevelForm = () => {
   const modelCode = id.substring(0, id.indexOf('-'));
   const model = useSelector(selectModel);
 
-  console.log(siteId); 
-  console.log(siteStock);
 
   useEffect(() => {
     // if (status === "idle") {

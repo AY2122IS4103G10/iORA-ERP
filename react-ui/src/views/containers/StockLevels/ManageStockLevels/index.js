@@ -19,8 +19,7 @@ export const ViewStockLevels = (subsys) => {
       <Routes>
         <Route path="sites" element={<SiteStocks subsys={subsys} />} />
         <Route path="products" element={<ProductStocks subsys={subsys} />} />
-        <Route path=":id" element={<AsiteStock />} />
-        <Route path="products/:id" element={<AProductStock subsys={subsys} />} />
+
       </Routes>
     </>
   );

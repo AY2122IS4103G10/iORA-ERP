@@ -34,7 +34,7 @@ export const updateExistingJobTitle = createAsyncThunk(
 export const deleteExistingJobTitle = createAsyncThunk(
   "jobTitle/deleteExistingJobTitle",
   async (existingJobTitleId) => {
-    const response = await api.delete(
+    const response = await api.deleteJobTitle(
       "admin/deleteEmployee",
       existingJobTitleId
     );
@@ -60,17 +60,19 @@ const jobTitleSlice = createSlice({
       state.jobTitle.push(action.payload);
     });
     builder.addCase(updateExistingJobTitle.fulfilled, (state, action) => {
-      const { jobTitleId, title, description, responsibility } = action.payload;
+      const {
+        jobTitleId,
+        title,
+        description,
+        responsibility,
+      } = action.payload;
       console.log(action.payload);
-      const existingJobTitle = state.jobTitle.find(
-        (jobTitle) => jobTitle.jobTitleId === jobTitleId
-      );
+      const existingJobTitle = state.jobTitle.find((job) => job.jobTitleId === jobTitleId);
       if (existingJobTitle) {
         existingJobTitle.title = title;
         existingJobTitle.description = description;
         existingJobTitle.responsibility = responsibility;
       }
-      // state.status = "idle";
     });
     builder.addCase(deleteExistingJobTitle.fulfilled, (state, action) => {
       state.jobTitle = state.jobTitle.filter(

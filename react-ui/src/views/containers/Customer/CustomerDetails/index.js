@@ -1,10 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
-  CurrencyDollarIcon as CurrencyDollarIconSolid,
   PencilIcon,
 } from "@heroicons/react/solid";
-import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
+import { TrashIcon } from "@heroicons/react/outline";
 import {
   fetchCustomers,
   deleteExistingCustomer,
@@ -118,8 +117,8 @@ const CustomerDetailsBody = ({
 );
 
 export const CustomerDetails = () => {
-  const { firstName } = useParams();
-  const customer = useSelector((state) => selectCustomerById(state, firstName));
+  const { customerId } = useParams();
+  const customer = useSelector((state) => selectCustomerById(state, customerId));
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -130,9 +129,12 @@ export const CustomerDetails = () => {
   }, [cusStatus, dispatch]);
 
   const onDeleteCustomerClicked = () => {
-    dispatch(deleteExistingCustomer(customer.name));
-    closeModal();
-    navigate("/crm/customer");
+    dispatch(deleteExistingCustomer(customerId))
+      .then(() => {
+        closeModal();
+        navigate("/crm/customers");
+      })
+      .catch((err) => console.error(err.message));
   };
 
   const openModal = () => setOpenDelete(true);
@@ -146,6 +148,7 @@ export const CustomerDetails = () => {
           <Header
             customerId={customer.id}
             firstName={customer.firstName}
+            availStatus={customer.availStatus}
             openModal={openModal}
           />
           <CustomerDetailsBody

@@ -1,9 +1,11 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { CogIcon } from "@heroicons/react/outline";
 
 import {
+  SelectColumnFilter,
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 import { 
@@ -15,7 +17,7 @@ export const JobTitleTable = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
+        Header: "#",
         accessor: "id",
         // Cell: (e) => (
         //   <Link
@@ -38,7 +40,9 @@ export const JobTitleTable = () => {
       },
       {
         Header: "Responsibility",
-        accessor: "responsibility",
+        accessor: (row) => row.Responsibility.responsibility,
+        Filter: SelectColumnFilter,
+        filter: "includes",
         //Cell: (e) => moment(e.value).format("lll"),
       },
       // {
@@ -56,21 +60,29 @@ export const JobTitleTable = () => {
     ],
     []
   );
-  const dispatch = useDispatch();
-  const data = useSelector(selectAllJobTitle);
-  const jobTitleStatus = useSelector((state) => state.jobTitle.status);
-  useEffect(() => {
-    jobTitleStatus === "idle" && dispatch(fetchJobTitles());
-  }, [jobTitleStatus, dispatch]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        <SimpleTable columns={columns} data={data} />
+        <SimpleTable
+          columns={columns}
+          data={data}
+          handleOnClick={handleOnClick}
+        />
       </div>
     </div>
   );
 };
 
 export const JobTitleList = () => {
-  return <JobTitleTable />;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const data = useSelector(selectAllJobTitle);
+  const jobTitleStatus = useSelector((state) => state.jobTitle.status);
+  useEffect(() => {
+    jobTitleStatus === "idle" && dispatch(fetchJobTitles());
+  }, [jobTitleStatus, dispatch]);
+  
+  const handleOnClick = (row) => navigate(`/ad/jobTitle/${row.original.id}`);
+
+  return <JobTitleTable data={data} handleOnClick={handleOnClick} />;
 };

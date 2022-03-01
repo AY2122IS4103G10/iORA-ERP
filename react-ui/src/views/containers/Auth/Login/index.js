@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 
 import { login } from "../../../../stores/slices/userSlice";
 
@@ -9,6 +10,7 @@ export function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { addToast } = useToasts();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -19,13 +21,23 @@ export function Login() {
         localStorage.setItem("user", JSON.stringify(data));
         setUsername("");
         setPassword("");
-        return data.id
+        addToast("Login Successfully", { appearance: "success", autoDismiss: true });
+        return data.id;
       })
       .then((id) => {
         id !== -1 && navigate("/home");
       })
       .catch((err) => {
-        console.error(err);
+        switch (err.message) {
+          case "Rejected":
+            addToast(`Error: Invalid credentials`, { appearance: "error", autoDismiss: true });
+            break;
+          case "Blocked":
+            addToast(`Error: User blocked`, { appearance: "error", autoDismiss: true });
+            break;
+          default:
+            addToast(`Error`, { appearance: "error", autoDismiss: true });
+        }
       });
   };
 

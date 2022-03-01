@@ -306,7 +306,6 @@ function prepareStockLevel(stocklevel, allModels) {
         stock.name = model?.name;
         stock.product = model?.products.find((prod) => prod.sku === stock.sku);
     })
-    // console.log(stocklevel);
     return stocklevel;
 }
 
@@ -382,13 +381,13 @@ export const StockTransferForm = (subsys) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
+    let isEditing = false;
     const [from, setFrom] = useState({});
     const [to, setTo] = useState({});
     const [openSites, setOpenSites] = useState(false);
     const [openItems, setOpenItems] = useState(false);
     const [openErrorModal, setErrorModal] = useState(false);
     const [lineItems, setLineItems] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [originalOrder, setOriginalOrder] = useState({});
     const currSite = useSelector(selectUserSite);
@@ -398,26 +397,17 @@ export const StockTransferForm = (subsys) => {
     const allModels = useSelector(selectAllProducts);
     const prodTableData = isObjectEmpty(stocklevel) ? [] : prepareStockLevel(convertData(stocklevel), allModels);
 
- 
 
     useEffect(() => {
-        if (!isObjectEmpty(id) || id === undefined || id === null) {
-            setIsEditing(true);
+        if (id === undefined || id === null) {
+            isEditing = true;
         }
-
         dispatch(getAllSites());
         if (!isObjectEmpty(from)) {
             dispatch(getASiteStock(from.id));
         }
         dispatch(fetchProducts());
-        // if (!isObjectEmpty(originalOrder)) {
-        //     console.log(originalOrder)
-        //     setIsEditing(true);
-        //     setLineItems(mapLineItemsToSelectedRows(originalOrder.lineItems));
-        //     setFrom(originalOrder.fromSite);
-        //     setTo(originalOrder.toSite);
-        // }
-    }, [dispatch, from])
+    }, [from])
 
     //editing 
     function mapLineItemsToSelectedRows(data) {
@@ -440,8 +430,8 @@ export const StockTransferForm = (subsys) => {
             api.get("store/stockTransfer", id)
                 .then((response) => {
                     const { lineItems, fromSite, toSite } = response.data;
+                    console.log(lineItems);
                     setOriginalOrder(response.data)
-                    setIsEditing(true);
                     setLineItems(mapLineItemsToSelectedRows(lineItems));
                     setFrom(fromSite);
                     setTo(toSite);
@@ -456,7 +446,6 @@ export const StockTransferForm = (subsys) => {
     const sites = useSelector(selectAllSites);
     const openSitesModal = () => setOpenSites(true);
     const closeSitesModal = () => setOpenSites(false);
-
 
     //open items modal
     const openItemsModal = () => {
@@ -501,6 +490,7 @@ export const StockTransferForm = (subsys) => {
             fromSite: from,
             toSite: to
         }
+        console.log("Order created: ", stockTransferOrder)
         dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
             .then(() => {

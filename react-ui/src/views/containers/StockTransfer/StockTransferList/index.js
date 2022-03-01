@@ -49,16 +49,9 @@ export const StockTransferList = ({subsys}) => {
     const {pathname} = useLocation();
     let currSiteId = useSelector(selectUserSite);
 
-    // if (currSiteId === 0) {
-    //     if (pathname.includes("sm")) {
-    //         currSiteId = 1;
-    //     } else if (pathname.includes("wh")) {
-    //         currSiteId = 2;
-    //     } 
-    // }
-
     const columns = useMemo(() => cols, [cols] )
     const path = `/${subsys.subsys}/stocktransfer`;
+
     useEffect(() => {
             dispatch(getAllStockTransfer(currSiteId));
     }, [dispatch, currSiteId])

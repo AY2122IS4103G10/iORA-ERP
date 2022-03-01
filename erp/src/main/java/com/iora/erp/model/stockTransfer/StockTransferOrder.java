@@ -28,11 +28,9 @@ public class StockTransferOrder {
     @OneToMany(cascade = CascadeType.ALL)
     private List<StockTransferOrderLI> lineItems;
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ManyToOne
     private Site fromSite;
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ManyToOne
     private Site toSite;
 

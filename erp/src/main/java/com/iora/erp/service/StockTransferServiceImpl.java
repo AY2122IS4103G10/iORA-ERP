@@ -57,6 +57,8 @@ public class StockTransferServiceImpl implements StockTransferService {
     public StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
             throws SiteConfirmationException {
         Site actionBy = em.find(Site.class, siteId);
+        System.out.println(stockTransferOrder.getFromSite());
+        
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else {

@@ -57,6 +57,8 @@ public class StockTransferServiceImpl implements StockTransferService {
     public StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
             throws SiteConfirmationException {
         Site actionBy = em.find(Site.class, siteId);
+        System.out.println(stockTransferOrder.getFromSite());
+        
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else {
@@ -205,7 +207,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.DELIVERING) {
                 throw new StockTransferException(
                         "Stock Transfer Order is not confirmed.");
-            } else if (actionBy != stockTransferOrder.getToSite()) {
+            } else if (siteId != stockTransferOrder.getToSite().getId()) {
                 throw new StockTransferException(
                         "Site is not responsible for receiving this order.");
             }

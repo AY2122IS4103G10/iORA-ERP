@@ -153,6 +153,7 @@ export const JobTitleForm = () => {
                     ).unwrap();
                   }
         alert("Successfully added job title");
+        setTitle("");
         navigate(!isEditing ? "/ad/jobTitle" : `/ad/jobTitle/${jobTitleId}`);
       } catch (err) {
         console.error("Failed to add job title: ", err);

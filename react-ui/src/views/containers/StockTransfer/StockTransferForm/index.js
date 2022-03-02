@@ -1,24 +1,18 @@
-import { useState, useEffect, useMemo, useRef } from "react";
 import { Dialog } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
-import { ExclamationCircleIcon } from "@heroicons/react/outline";
-
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import { ClickableRowTable, SelectColumnFilter, EditableCell } from "../../../components/Tables/ClickableRowTable";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { ExclamationCircleIcon, XIcon } from "@heroicons/react/outline";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { api } from "../../../../environments/Api";
+import { fetchProducts, selectAllProducts } from "../../../../stores/slices/productSlice";
 import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 import { getASiteStock, selectCurrSiteStock } from "../../../../stores/slices/stocklevelSlice";
-import ErrorModal from "../../../components/Modals/ErrorModal";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
-import { fetchProducts, selectAllProducts, selectProductByCode, selectProductBySkuList } from "../../../../stores/slices/productSlice";
+import { createStockTransfer, editStockTransfer } from "../../../../stores/slices/stocktransferSlice";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
-import { api } from "../../../../environments/Api";
-import { selectUserStore } from "../../../../stores/slices/userSlice";
-import { createStockTransfer, editStockTransfer, getStockTransfer, selectStockTransferOrder } from "../../../../stores/slices/stocktransferSlice";
-import { useNavigate, useParams } from "react-router-dom";
-
-
+import ErrorModal from "../../../components/Modals/ErrorModal";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { ClickableRowTable, EditableCell, SelectColumnFilter } from "../../../components/Tables/ClickableRowTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const cols =
     [
@@ -59,12 +53,6 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
         ref.current.focus();
     }
 
-    let disableTo = true;
-    if (!isObjectEmpty(from)) {
-        disableTo = false;
-    } else {
-        disableTo = true;
-    }
     const onRowClick = (row) => {
         if (!isObjectEmpty(to) && to.id === from.id) {
             setError(true);
@@ -74,7 +62,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
 
         if (isObjectEmpty(from)) {
             //check if from and to sites are the same
-            if (row.id == to.id) {
+            if (row.id === to.id) {
                 setError(true);
             } else {
                 setFrom(row);
@@ -86,7 +74,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
 
         } else if (isObjectEmpty(to)) {
             //check if from and to sites are the same
-            if (row.id == from.id) {
+            if (row.id === from.id) {
                 setError(true);
             } else {
                 setTo(row);

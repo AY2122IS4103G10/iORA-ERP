@@ -1,13 +1,12 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { CogIcon } from "@heroicons/react/outline";
-
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { useNavigate } from "react-router-dom";
 import {
   fetchMembershipTiers,
-  selectAllMembershipTiers,
+  selectAllMembershipTiers
 } from "../../../../stores/slices/membershipTierSlice";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
+
 
 export const MembershipTierTable = ({ data, handleOnClick }) => {
   const columns = useMemo(

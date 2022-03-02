@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
-import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
-import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-
+import { useToasts } from "react-toast-notifications";
 import { api } from "../../../../environments/Api";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import {
   addNewMembershipTier,
-  updateExistingMembershipTier,
+  updateExistingMembershipTier
 } from "../../../../stores/slices/membershipTierSlice";
-import { useToasts } from "react-toast-notifications";
+import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
+import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
+
 
 const MembershipTierFormBody = ({
   isEditing,

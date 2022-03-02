@@ -28,7 +28,7 @@ const convertData = (data) =>
   Object.entries(data.products).map((key) => ({
     sku: key[0],
     qty: key[1],
-    reserve: data.reserveProducts[key[0]] == null ? 0 : stocklevel.reserveProducts[key[0]],
+    reserve: data.reserveProducts[key[0]] === null ? 0 : stocklevel.reserveProducts[key[0]],
   }))
 
 const columns = [
@@ -59,7 +59,7 @@ export const AsiteStock = () => {
 
     useEffect(() => {
       dispatch(getASite(id));
-    }, [])
+    }, [dispatch, id])
 
     return(
       <>
@@ -117,7 +117,7 @@ export const AsiteStock = () => {
                         Stock Levels
                   </h2>
                   <div className="ml-2 mr-2">
-                    {stocklevel == undefined ? <p>loading</p> : 
+                    {stocklevel === undefined ? <p>loading</p> : 
                       <SimpleTable columns={columns} data={convertData(stocklevel)}/>
                     }
                   </div>

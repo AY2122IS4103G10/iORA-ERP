@@ -1,20 +1,15 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { CogIcon } from "@heroicons/react/outline";
-
-import {
-  SimpleTable,
-  SelectColumnFilter,
-  OptionsCell,
-} from "../../../components/Tables/SimpleTable";
-
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   fetchSites,
-  selectAllSites,
+  selectAllSites
 } from "../../../../stores/slices/siteSlice";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import {
+  SelectColumnFilter, SimpleTable
+} from "../../../components/Tables/SimpleTable";
+
+
 
 export const SitesTable = ({ data, handleOnClick }) => {
   const columns = useMemo(

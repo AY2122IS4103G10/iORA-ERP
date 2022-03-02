@@ -1,19 +1,15 @@
+import moment from "moment";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import moment from "moment";
-import { CogIcon } from "@heroicons/react/outline";
-
-import {
-  SimpleTable,
-  SelectColumnFilter,
-  OptionsCell,
-} from "../../../components/Tables/SimpleTable";
-import { SelectableTable } from "../../../components/Tables/SelectableTable";
 import {
   fetchVouchers,
-  selectAllVouchers,
+  selectAllVouchers
 } from "../../../../stores/slices/voucherSlice";
+import {
+  SelectColumnFilter, SimpleTable
+} from "../../../components/Tables/SimpleTable";
+
 
 export const VouchersTable = () => {
   const columns = useMemo(

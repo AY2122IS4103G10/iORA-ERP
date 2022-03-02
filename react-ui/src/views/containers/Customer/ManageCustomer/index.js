@@ -32,7 +32,7 @@ export const Header = ({type, path}) => {
                     alt=""
                   />
                   <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                    {type}
+                    {type}s
                   </h1>
                 </div>
               </div>
@@ -42,7 +42,7 @@ export const Header = ({type, path}) => {
             <Link to={`${path}`}>
               <button
                 type="button"
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Create New {type}
               </button>
@@ -58,7 +58,7 @@ export const Header = ({type, path}) => {
                   to={tab.href}
                   className={classNames(
                     tab.index === currTab
-                      ? "border-cyan-500 text-cyan-600"
+                      ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
                     "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
                   )}

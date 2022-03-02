@@ -81,7 +81,7 @@ const JobTitleDetailsBody = ({
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Responsibilities</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  <ul role="list" className="divide-y divide-gray-200">
+                  <ul className="divide-y divide-gray-200">
                     {responsibility.map((value) =>
                       <li key={value} className="py-4">
                         {value}

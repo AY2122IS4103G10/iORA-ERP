@@ -1,13 +1,11 @@
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { PencilIcon } from "@heroicons/react/solid";
-import { TrashIcon } from "@heroicons/react/outline";
+import { useParams } from "react-router-dom";
 import {
   fetchMembershipTiers,
-  selectMembershipTierByName,
+  selectMembershipTierByName
 } from "../../../../stores/slices/membershipTierSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useEffect, useState } from "react";
 
 const Header = ({ name, openModal }) => {
   return (
@@ -81,7 +79,7 @@ export const MembershipTierDetails = () => {
     selectMembershipTierByName(state, name)
   );
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const memStatus = useSelector((state) => state.membershipTiers.status);
 
   useEffect(() => {

@@ -154,7 +154,7 @@ export const JobTitleForm = () => {
   useEffect(() => {
     api.getAll("admin/accessRights").then((response) => {
       setAccessRights(response.data);
-      setRightsCheckedState(new Array(accessRights.length).fill(false));
+      setRightsCheckedState(new Array(response.data.length).fill(false));
     });
   }, []);
 

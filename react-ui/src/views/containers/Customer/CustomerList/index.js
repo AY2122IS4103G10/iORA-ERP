@@ -31,7 +31,6 @@ export const CustomerTable = ({ data, handleOnClick }) => {
       {
         Header: "Contact Number",
         accessor: "contactNumber",
-        //Cell: (e) => moment(e.value).format("lll"),
       },
       {
         Header: "Membership Points",

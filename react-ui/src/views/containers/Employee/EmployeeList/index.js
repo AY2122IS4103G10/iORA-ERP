@@ -1,16 +1,15 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { CogIcon } from "@heroicons/react/outline";
-
-import {
-  SelectColumnFilter,
-  SimpleTable,
-} from "../../../components/Tables/SimpleTable";
 import {
   fetchEmployees,
-  selectAllEmployee,
+  selectAllEmployee
 } from "../../../../stores/slices/employeeSlice";
+import {
+  SelectColumnFilter,
+  SimpleTable
+} from "../../../components/Tables/SimpleTable";
+
 
 export const EmployeeTable = ({ data, handleOnClick }) => {
   const columns = useMemo(

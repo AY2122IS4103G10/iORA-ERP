@@ -1,13 +1,11 @@
+import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import moment from "moment";
-import {
-  SimpleTable,
-  SelectColumnFilter,
-  OptionsCell,
-} from "../../../components/Tables/SimpleTable";
-import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import { api } from "../../../../environments/Api";
+import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
+import {
+  SelectColumnFilter, SimpleTable
+} from "../../../components/Tables/SimpleTable";
 
 export const ProcurementTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
@@ -43,18 +41,6 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
             .unix(row.statusHistory[row.statusHistory.length - 1].timeStamp / 1000)
             .format("DD/MM/YY, h:mm:ss a"),
       },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/procurements",
-      //       },
-      //     ],
-      //   }),
-      // },
     ],
     []
   );

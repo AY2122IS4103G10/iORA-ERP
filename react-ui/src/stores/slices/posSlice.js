@@ -1,5 +1,5 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {api, posApi} from "../../environments/Api";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { posApi } from "../../environments/Api";
 
 const initialState = {
   pos: [],

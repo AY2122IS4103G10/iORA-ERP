@@ -46,6 +46,7 @@ export const EnterStoreModal = ({ open, closeModal, stores, store, setStore, sit
             placeholder="Site Code"
             value={siteCode}
             onChange={setSiteCode}
+            onKeyPress={(e) => e.key === 'Enter' && handleEnterStore()}
           />
         </div>
         <div className="pt-5">

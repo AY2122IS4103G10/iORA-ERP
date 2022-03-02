@@ -17,7 +17,7 @@ import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index
 import { StoreIndex } from "./views/containers/Index/StrIndex";
 import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
-import { ADRoute } from "./routes/ADRoute";
+// import { ADRoute } from "./routes/ADRoute";
 import { ManageSites } from "./views/containers/Sites/ManageSites";
 import { SiteForm } from "./views/containers/Sites/SiteForm";
 import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";

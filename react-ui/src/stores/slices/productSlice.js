@@ -4,7 +4,7 @@ import { api } from "../../environments/Api";
 const initialState = {
   products: [], //models
   model: null,
-  currProduct: null, //selected product for stock level
+  currProduct: null, 
   prodItem: null, 
   prodDetails: null, // Selective details for order summary
   status: "idle",
@@ -173,8 +173,6 @@ export default productSlice.reducer;
 export const selectAllProducts = (state) => state.products.products;
 
 export const selectAProduct = (state) => state.products.currProduct;
-
-export const selectProductSL = (state) => state.products.prodStockLevel;
 
 export const selectModel = (state) => state.products.model;
 

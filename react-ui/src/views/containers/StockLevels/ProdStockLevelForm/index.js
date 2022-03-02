@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Fragment, useState } from 'react'
 import { Dialog, Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
@@ -225,7 +225,7 @@ export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, se
 }
 
 
-export const StockLevelForm = () => {
+export const StockLevelForm = (subsys) => {
   const { id } = useParams(); //sku code
   const siteId = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
@@ -233,19 +233,22 @@ export const StockLevelForm = () => {
   const [open, setOpen] = useState(false);
   const [rfid, setRfid] = useState("");
   const [selected, setSelected] = useState(actions[0]);
+  const [reload, setReload] = useState(0);
   const {addToast} = useToasts();
 
   //get product information
   const modelCode = id.substring(0, id.indexOf('-'));
   const model = useSelector(selectModel);
 
+  console.log("rendering");
 
   useEffect(() => {
+      console.log("effect")
     // if (status === "idle") {
       dispatch(getASiteStock(siteId)); 
       dispatch(fetchModel(modelCode));
     // }
-  }, [dispatch, modelCode, siteId])
+  }, [dispatch, reload, modelCode, siteId])
 
 
   const openModal = () => setOpen(true);
@@ -255,7 +258,7 @@ export const StockLevelForm = () => {
     e.preventDefault();
     let toUpdate = {};
     const rfidArr = rfid.trim().split(" ");
-    // console.log(rfidArr);
+
     // add 
     if (selected.id === 1) {
       Object.entries(rfidArr).forEach(([key, value]) => {
@@ -268,7 +271,7 @@ export const StockLevelForm = () => {
         toUpdate[value] = 0;
       });
     }
-    // console.log(toUpdate);
+
 
     dispatch(editStock({toUpdate: toUpdate, siteId: siteId}))
       .unwrap()
@@ -277,7 +280,7 @@ export const StockLevelForm = () => {
           appearance: "success",
           autoDismiss: true,
         });
-        closeModal();
+        setReload(reload + 1)
       })
       .catch((err) => {
         addToast(`${err.message}`, {

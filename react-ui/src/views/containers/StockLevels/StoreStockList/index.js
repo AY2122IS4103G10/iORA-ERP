@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getASiteStock, selectCurrSiteStock } from '../../../../stores/slices/stocklevelSlice';
 import { selectUserSite } from '../../../../stores/slices/userSlice';
@@ -32,6 +33,7 @@ const columns = [
   },
 ]
 
+
 export const MyStoreStock = (subsys) => {
   const id = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
@@ -48,11 +50,22 @@ export const MyStoreStock = (subsys) => {
     { name: 'By Products', href: `/${subsys.subsys}/stocklevels/products`, current: false },
   ]
 
+  const EditStockButton = () => {
+    return <Link to={`/${subsys.subsys}/stocklevels/edit`}>
+      <button
+        type="button"
+        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+      >
+        Edit Stock
+      </button>
+    </Link>
+  }
+  
   const path = `/${subsys.subsys}/stocklevels/my`;
 
   return (
     <>
-      <SectionHeading header="Stock Levels" tabs={tabs} />
+      <SectionHeading header="Stock Levels" tabs={tabs} button={<EditStockButton/>} />
       {Boolean(siteStock) && (
         <div className="min-h-full">
           <main className="py-8 ml-2">

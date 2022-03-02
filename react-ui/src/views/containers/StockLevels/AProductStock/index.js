@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { api } from "../../../../environments/Api";
 
 import { getProductStockLevel, selectAProduct, selectProductSL } from "../../../../stores/slices/productSlice";
 import { getAProduct } from "../../../../stores/slices/productSlice";
@@ -45,7 +44,7 @@ export const AProductStock = (subsys) => {
       dispatch(getAProduct(id));
       dispatch(getProductStockLevel(id));
       dispatch(getAllSites());
-  }, []);
+  }, [dispatch, id]);
 
   const path = "/" + subsys.subsys.subsys + "/stocklevels";
 

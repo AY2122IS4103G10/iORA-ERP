@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSites, getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
+import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 
 import { SectionHeading } from "../../../components/HeadingWithTabs";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";

@@ -396,7 +396,7 @@ export const StockTransferForm = (subsys) => {
             dispatch(getASiteStock(from.id));
         }
         dispatch(fetchProducts());
-    }, [from])
+    }, [dispatch, from])
 
     //editing 
     function mapLineItemsToSelectedRows(data) {

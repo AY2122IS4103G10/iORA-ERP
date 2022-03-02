@@ -12,6 +12,7 @@ import { ProductStocks } from "./views/containers/StockLevels/ByProduct/index.js
 import { AsiteStock } from "./views/containers/StockLevels/ASiteStock/index.js";
 import { AProductStock } from "./views/containers/StockLevels/AProductStock/index.js";
 import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList/index.js";
+import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel/index.js";
 import { Login } from "./views/containers/Auth/Login";
 import { Home } from "./views/containers/Auth/Home";
 import { HomeIndex } from "./views/containers/Index/HomeIndex";
@@ -148,6 +149,7 @@ function App() {
             <Route path="stocklevels">
              <Route path="my/:id" element={<StockLevelForm subsys="str"/>} />
               <Route path="my" element={<MyStoreStock subsys="str"/>} />
+              <Route path="edit" element={<EditStockLevel subsys="str"/>}/>
               <Route path="sites" element={<SiteStocks subsys="str"/>} />
               <Route path="products" element={<ProductStocks subsys="str" />} />
               <Route path=":id" element={<AsiteStock />} />
@@ -244,6 +246,7 @@ function App() {
             <Route path="stocklevels">
               <Route path="my/:id" element={<StockLevelForm subsys="wh"/>} />
               <Route path="my" element={<MyStoreStock subsys="wh"/>} />
+              <Route path="edit" element={<EditStockLevel subsys="wh"/>}/>
               <Route path="sites" element={<SiteStocks subsys="wh"/>} />
               <Route path="products" element={<ProductStocks subsys="wh" />} />
               <Route path=":id" element={<AsiteStock />} />

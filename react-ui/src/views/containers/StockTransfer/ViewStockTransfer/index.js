@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
 import { Dialog } from "@headlessui/react";
 
@@ -74,10 +74,7 @@ export const VerifyItemsModal = ({ open, closeModal, lineItems, status, userSite
 export const StockTransferHeader = ({ order, userSiteId, openDeleteModal, openRejectModal, handleConfirmOrder, openVerifyItemsModal, handleDeliveringOrder }) => {
     let status = order.statusHistory[order.statusHistory.length - 1].status
     let orderMadeBy = order.statusHistory[0].actionBy.id
-    // console.log("Header:")
-    // console.log(status); 
-    // console.log(orderMadeBy);
-    // console.log("=================")
+  
 
     return (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
@@ -234,7 +231,7 @@ export const LineItems = ({ lineItems, status, userSiteId, fromSiteId, toSiteId,
                 }
             },
         ]
-    }, []);
+    }, [editable, fromSiteId, setLineItems, status,toSiteId, userSiteId]);
 
     return (
         <div className="mt-8 p-2">
@@ -311,7 +308,6 @@ export const StockTransferBody = ({ order, lineItems, userSiteId }) => {
 
 export const ViewStockTransfer = (subsys) => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const { id } = useParams();
     let userSiteId = useSelector(selectUserSite);
     var order = useSelector(selectStockTransferOrder);
@@ -320,13 +316,11 @@ export const ViewStockTransfer = (subsys) => {
     const [openReject, setOpenReject] = useState(false);
     const [openVerifyItems, setOpenVerifyItems] = useState(false);
     const {addToast} = useToasts();
-    const [reload, setReload] = useState(0);
 
-    console.log("rerendering");
 
     useEffect(() => {
         dispatch(getStockTransfer(id))
-    }, [dispatch, userSiteId])
+    }, [dispatch, userSiteId, id])
 
     useEffect(() => {
         setLineItems(order.lineItems)

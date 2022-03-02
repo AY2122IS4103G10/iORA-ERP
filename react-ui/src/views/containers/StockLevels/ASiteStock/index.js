@@ -6,29 +6,30 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { getASite, selectSite } from '../../../../stores/slices/siteSlice';
 import { SimpleTable } from '../../../components/Tables/SimpleTable';
+import { selectCurrSiteStock } from '../../../../stores/slices/stocklevelSlice';
 
 
-const stocklevel = {
-    id: 4,
-    productItems: [],
-    products: {
-      "ASK0009968A-1": 1,
-      "ASK0009968A-2": 2,
-      "ASK0009968A-3": 3, 
-    },
-    models: {
-      "ASK0009968A": 6,
-    },
-    reserveProducts: {
-      "ASK0009968A-1": 1
-    }
-}
+// const stocklevel = {
+//     id: 4,
+//     productItems: [],
+//     products: {
+//       "ASK0009968A-1": 1,
+//       "ASK0009968A-2": 2,
+//       "ASK0009968A-3": 3, 
+//     },
+//     models: {
+//       "ASK0009968A": 6,
+//     },
+//     reserveProducts: {
+//       "ASK0009968A-1": 1
+//     }
+// }
 
 const convertData = (data) => 
   Object.entries(data.products).map((key) => ({
     sku: key[0],
     qty: key[1],
-    reserve: data.reserveProducts[key[0]] === null ? 0 : stocklevel.reserveProducts[key[0]],
+    reserve: data.reserveProducts[key[0]] === null ? 0 : data.reserveProducts[key[0]],
   }))
 
 const columns = [
@@ -56,9 +57,11 @@ export const AsiteStock = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const site = useSelector(selectSite);
+    const stocklevel = useSelector(selectCurrSiteStock);
 
     useEffect(() => {
       dispatch(getASite(id));
+
     }, [dispatch, id])
 
     return(

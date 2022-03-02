@@ -16,11 +16,17 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       {
         Header: "Product Code",
         accessor: "modelCode",
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
       {
         Header: "Name",
         accessor: "name",
         width: 300,
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
       {
         Header: "Color",
@@ -58,24 +64,6 @@ export const ProductsTable = ({ data, handleOnClick }) => {
         width: 110,
         Cell: (e) => (e.value ? "Yes" : "No"),
       },
-      // {
-      //   Header: (
-      //     <div className="flex items-center">
-      //       <CogIcon className="h-4 w-4" />
-      //     </div>
-      //   ),
-      //   accessor: "accessor",
-      //   width: 80,
-      //   disableSortBy: true,
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/products",
-      //       },
-      //     ],
-      //   }),
-      // },
     ],
     []
   );

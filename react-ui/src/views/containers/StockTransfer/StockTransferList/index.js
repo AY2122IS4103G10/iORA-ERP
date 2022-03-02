@@ -1,3 +1,4 @@
+import moment from "moment";
 import { useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -5,7 +6,10 @@ import {
   getAllStockTransfer,
   selectAllOrders,
 } from "../../../../stores/slices/stocktransferSlice";
-import { selectUserSite, updateCurrSite} from "../../../../stores/slices/userSlice";
+import {
+  selectUserSite,
+  updateCurrSite,
+} from "../../../../stores/slices/userSlice";
 import {
   SelectableTable,
   SelectColumnFilter,
@@ -61,7 +65,7 @@ export const StockTransferList = ({ subsys }) => {
   const { pathname } = useLocation();
   let currSiteId = useSelector(selectUserSite);
 
-  const columns = useMemo(() => cols, [cols]);
+  const columns = useMemo(() => cols, []);
   const path = `/${subsys.subsys}/stocktransfer`;
 
   useEffect(() => {

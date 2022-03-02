@@ -35,6 +35,13 @@ export const Profile = () => {
 
   const onSaveClicked = (evt) => {
     evt.preventDefault();
+    console.log({
+      ...user,
+      firstName,
+      lastName,
+      dob,
+      contactNumber: contactNo,
+    })
     dispatch(
       updateAccount({
         ...user,

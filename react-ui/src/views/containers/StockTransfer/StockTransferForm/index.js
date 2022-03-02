@@ -391,12 +391,12 @@ export const StockTransferForm = (subsys) => {
 
 
     useEffect(() => {
+        dispatch(updateCurrSite());
         dispatch(getAllSites());
         if (!isObjectEmpty(from)) {
             dispatch(getASiteStock(from.id));
         }
         dispatch(fetchProducts());
-        dispatch(updateCurrSite());
     }, [dispatch, from])
 
     //editing 
@@ -421,7 +421,7 @@ export const StockTransferForm = (subsys) => {
             api.get("store/stockTransfer", id)
                 .then((response) => {
                     const { lineItems, fromSite, toSite } = response.data;
-                    console.log(lineItems);
+                    // console.log(lineItems);
                     setOriginalOrder(response.data)
                     setLineItems(mapLineItemsToSelectedRows(lineItems));
                     setFrom(fromSite);

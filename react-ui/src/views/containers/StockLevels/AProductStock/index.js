@@ -38,7 +38,7 @@ export const AProductStock = (subsys) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const prod = useSelector(selectAProduct);
-  const stockLevel = useSelector(selectProductSL);
+  const stocklevel = useSelector(selectProductSL);
   const sites = useSelector(selectAllSites);
 
   useEffect(() => {

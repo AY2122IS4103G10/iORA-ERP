@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getASiteStock, selectCurrSiteStock } from '../../../../stores/slices/stocklevelSlice';
 import { selectUserSite } from '../../../../stores/slices/userSlice';
 import { SelectableTable } from '../../../components/Tables/SelectableTable';
-import { selectCurrSiteStock, getASiteStock } from '../../../../stores/slices/stocklevelSlice';
 import { SectionHeading } from '../../../components/HeadingWithTabs';
 
 const convertData = (data) => {

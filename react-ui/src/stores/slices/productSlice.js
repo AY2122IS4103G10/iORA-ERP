@@ -5,7 +5,6 @@ const initialState = {
   products: [], //models
   model: null,
   currProduct: null, //selected product for stock level
-  prodStockLevel: null, //view product's stock level
   prodItem: null, 
   prodDetails: null, // Selective details for order summary
   status: "idle",
@@ -34,15 +33,6 @@ export const getAProduct = createAsyncThunk(
   "products/getAProduct",
   async (sku) => {
     const response = await api.get(`sam/product`, sku);
-    return response.data;
-  }
-);
-
-//get product's stock level
-export const getProductStockLevel = createAsyncThunk(
-  "products/getProductStockLevel",
-  async (sku) => {
-    const response = await api.get(`sam/viewStock/product`, sku);
     return response.data;
   }
 );
@@ -120,16 +110,6 @@ const productSlice = createSlice({
       state.currProduct = action.payload;
     });
     builder.addCase(getAProduct.rejected, (state, action) => {
-      state.status = "failed";
-    });
-    builder.addCase(getProductStockLevel.pending, (state, action) => {
-      state.status = "loading";
-    });
-    builder.addCase(getProductStockLevel.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.prodStockLevel = action.payload;
-    });
-    builder.addCase(getProductStockLevel.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewProduct.fulfilled, (state, action) => {

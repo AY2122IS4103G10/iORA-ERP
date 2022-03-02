@@ -6,14 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { getASite, selectSite } from '../../../../stores/slices/siteSlice';
 import { SimpleTable } from '../../../components/Tables/SimpleTable';
-import { selectCurrSiteStock } from '../../../../stores/slices/stocklevelSlice';
 
 
 const convertData = (data) => 
   Object.entries(data.products).map((key) => ({
     sku: key[0],
     qty: key[1],
-    reserve: data.reserveProducts[key[0]] === null ? 0 : data.reserveProducts[key[0]],
+    reserve: data.reserveProducts[key[0]] ?? 0,
   }))
 
 const columns = [
@@ -41,11 +40,11 @@ export const AsiteStock = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const site = useSelector(selectSite);
-    const stocklevel = useSelector(selectCurrSiteStock);
+    const status = useSelector((state) => state.sites.status)
+    
 
     useEffect(() => {
       dispatch(getASite(id));
-
     }, [dispatch, id])
 
     return(
@@ -56,7 +55,7 @@ export const AsiteStock = () => {
             <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
               <div className="flex items-center space-x-3">
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">{site != null ? site.name : "loading"}</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">{site.length !== 0 ? site.name : "loading"}</h1>
                   </div>
               </div>
             </div>
@@ -75,23 +74,23 @@ export const AsiteStock = () => {
                       <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
                         <div className="sm:col-span-1">
                           <dt className="text-sm font-medium text-gray-500">Site Code</dt>
-                          {site != null ? ( 
+                          {site.length !== 0  ? ( 
                             <dd className="mt-1 text-sm text-gray-900">{site.siteCode}</dd>
                           ): (<dd className="mt-1 text-sm text-gray-900">loading</dd>)}
                         </div>
                         <div className="sm:col-span-1">
                           <dt className="text-sm font-medium text-gray-500">Company</dt>
-                          { site != null && site.company != null ? (
+                          { site.length !== 0  ? (
                             <dd className="mt-1 text-sm text-gray-900">{site.company.name}</dd> 
                           ) : (<dd className="mt-1 text-sm text-gray-900">loading</dd> )}
                             </div>
                         <div className="sm:col-span-1">
                           <dt className="text-sm font-medium text-gray-500">Address</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{site != null && site.address != null ? processAddress(site.address) : "loading"}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{site.length !== 0  ? processAddress(site.address) : "loading"}</dd>
                         </div>
                         <div className="sm:col-span-1">
                           <dt className="text-sm font-medium text-gray-500">Telephone</dt>
-                          <dd className="mt-1 text-sm text-gray-900">{site.phoneNumber}</dd>
+                          <dd className="mt-1 text-sm text-gray-900">{site.length !== 0 ? site.phoneNumber : "loading"}</dd>
                         </div>
                       </dl>
                     </div>
@@ -104,8 +103,8 @@ export const AsiteStock = () => {
                         Stock Levels
                   </h2>
                   <div className="ml-2 mr-2">
-                    {stocklevel === undefined ? <p>loading</p> : 
-                      <SimpleTable columns={columns} data={convertData(stocklevel)}/>
+                    {status !== "succeeded" ? <p>loading</p> : 
+                      <SimpleTable columns={columns} data={convertData(site?.stockLevel)}/>
                     }
                   </div>
                 </section>

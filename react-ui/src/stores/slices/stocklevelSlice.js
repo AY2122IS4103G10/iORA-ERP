@@ -3,40 +3,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api, stockLevelApi } from "../../environments/Api";
 
 const initialState = {
-  currSiteStock: {
-    // id: 4,
-    // productItems: [
-    //   {
-    //     "rfid": "T1ZZ3OA60NOBK18H",
-    //     "available": true,
-    //     "productSKU": "AKV0010057J-1",
-    //     "stockLevel": null
-    //   },
-    //   {
-    //     "rfid": "NJCTRE9HI281F8B7",
-    //     "available": true,
-    //     "productSKU": "AKV0010057J-2",
-    //     "stockLevel": null
-    //   },
-    //   {
-    //     "rfid": "1HAC5IJD2Y8R2X4G",
-    //     "available": true,
-    //     "productSKU": "AKV0010057J-3",
-    //     "stockLevel": null
-    //   },
-    // ],
-    // products: {
-    //   "AKV0010057J-1": 1,
-    //   "AKV0010057J-2": 2,
-    //   "AKV0010057J-3": 3,
-    // },
-    // models: {
-    //   "AKV0010057J": 6,
-    // },
-    // reserveProducts: {
-    //   "AKV0010057J-2": 1
-    // }
-  },
+  currSiteStock: {},
+  prodStockLevel: {},
   status: "idle",
   error: null
 };
@@ -57,6 +25,15 @@ export const editStock = createAsyncThunk(
   }
 );
 
+//get product's stock level
+export const getProductStockLevel = createAsyncThunk(
+  "products/getProductStockLevel",
+  async (sku) => {
+    const response = await api.get(`sam/viewStock/product`, sku);
+    return response.data;
+  }
+);
+
 const stocklevelSlice = createSlice({
   name: "stocklevel",
   initialState,
@@ -69,6 +46,16 @@ const stocklevelSlice = createSlice({
       state.currSiteStock = action.payload;
     });
     builder.addCase(getASiteStock.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(getProductStockLevel.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(getProductStockLevel.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.prodStockLevel = action.payload;
+    });
+    builder.addCase(getProductStockLevel.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(editStock.pending, (state, action) => {
@@ -87,3 +74,5 @@ const stocklevelSlice = createSlice({
 export default stocklevelSlice.reducer;
 
 export const selectCurrSiteStock = (state) => state.stocklevel.currSiteStock;
+
+export const selectProductStock = (state) => state.stocklevel.prodStockLevel;

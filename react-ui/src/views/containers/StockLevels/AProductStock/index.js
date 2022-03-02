@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-import { getProductStockLevel, selectAProduct, selectProductSL } from "../../../../stores/slices/productSlice";
-import { getAProduct } from "../../../../stores/slices/productSlice";
+import { selectAProduct, getAProduct } from "../../../../stores/slices/productSlice";
+import { getProductStockLevel, selectProductStock } from "../../../../stores/slices/stocklevelSlice";
 import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
 
@@ -37,7 +37,8 @@ export const AProductStock = (subsys) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const prod = useSelector(selectAProduct);
-  const stocklevel = useSelector(selectProductSL);
+  const stocklevel = useSelector(selectProductStock);
+  const stockLevelStatus = useSelector((state) =>  state.stocklevel.status)
   const sites = useSelector(selectAllSites);
 
   useEffect(() => {
@@ -46,7 +47,9 @@ export const AProductStock = (subsys) => {
       dispatch(getAllSites());
   }, [dispatch, id]);
 
-  const path = "/" + subsys.subsys.subsys + "/stocklevels";
+  const path = "/" + subsys.subsys + "/stocklevels";
+
+  console.log(stocklevel);
 
   return (
     <div className="min-h-full">

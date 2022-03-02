@@ -14,24 +14,46 @@ import {
   ShieldCheckIcon,
   ShoppingBagIcon,
   TicketIcon,
+  UserGroupIcon,
 } from "@heroicons/react/outline";
 import { updateCurrSite } from "../../../../stores/slices/userSlice";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
-  { name: "Products", href: "/sm/products", icon: ShoppingBagIcon, current: false },
+  {
+    name: "Products",
+    href: "/sm/products",
+    icon: ShoppingBagIcon,
+    current: false,
+  },
   {
     name: "Stock Levels",
     href: "/sm/stocklevels/sites",
     icon: ScaleIcon,
     current: false,
   },
-  { name: "Stock Transfer", href: "/sm/stocktransfer", icon: ArchiveIcon, current: false },
-  { name: "Procurement", href: "/sm/procurements", icon: DocumentTextIcon, current: false },
+  {
+    name: "Stock Transfer",
+    href: "/sm/stocktransfer",
+    icon: ArchiveIcon,
+    current: false,
+  },
+  {
+    name: "Procurement",
+    href: "/sm/procurements",
+    icon: DocumentTextIcon,
+    current: false,
+  },
   {
     name: "Vouchers",
     href: "/sm/vouchers",
     icon: TicketIcon,
+    current: false,
+  },
+  {
+    name: "Customer Relations Management",
+    href: "/sm/customers",
+    icon: UserGroupIcon,
     current: false,
   },
   {
@@ -54,8 +76,7 @@ export const SMIndex = () => {
 
   useEffect(() => {
     dispatch(updateCurrSite(1));
-  },[dispatch])
-
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen bg-gray-100">

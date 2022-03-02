@@ -14,7 +14,7 @@ accessRightsPaths.set("STORE_BASIC", 4);
 accessRightsPaths.set("STORE_INVENTORY", 4);
 
 const accessRightsMap = (list) => {
-    return [...new Set(list.map(x => accessRightsPaths.get(x)))];
+    return [...new Set(list.map(x => accessRightsPaths.get(x)))].sort();
 }
 
 export default accessRightsMap;

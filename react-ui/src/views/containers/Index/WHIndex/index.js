@@ -32,7 +32,7 @@ export const WHIndex = () => {
 
   useEffect(() => {
     dispatch(updateCurrSite(2));
-  },[])
+  },[dispatch])
 
   return (
     <div className="min-h-screen bg-gray-100">

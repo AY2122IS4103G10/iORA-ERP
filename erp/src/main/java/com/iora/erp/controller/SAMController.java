@@ -508,8 +508,7 @@ public class SAMController {
     @PostMapping(path = "/membershipTier/create", consumes = "application/json")
     public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {
         try {
-            customerService.createMembershipTier(tier);
-            return ResponseEntity.ok("Membership Tier (" + tier.getName() + ") was successfully created.");
+            return ResponseEntity.ok(customerService.createMembershipTier(tier));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -537,9 +536,7 @@ public class SAMController {
     @PostMapping(path = "/customer/create", consumes = "application/json")
     public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
         try {
-            customerService.createCustomerAccount(customer);
-            ;
-            return ResponseEntity.ok("Customer with id " + customer.getId() + " was successfully created.");
+            return ResponseEntity.ok(customerService.createCustomerAccount(customer));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -550,7 +547,7 @@ public class SAMController {
         try {
             Customer customer = customerService.getCustomerById(id);
             customerService.blockCustomer(customer);
-            return ResponseEntity.ok("Customer with id " + id + " successfully blocked");
+            return ResponseEntity.ok(customer);
         } catch (CustomerException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -561,18 +558,18 @@ public class SAMController {
         try {
             Customer customer = customerService.getCustomerById(id);
             customerService.unblockCustomer(customer);
-            return ResponseEntity.ok("Customer with id " + id + " successfully blocked");
+            return ResponseEntity.ok(customer);
         } catch (CustomerException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @PutMapping(path = "/customer/edit", consumes = "application/json", produces = "application/json")
-    public Customer completeProcurementOrder(@RequestBody Customer customer) {
+    public ResponseEntity<Object> completeProcurementOrder(@RequestBody Customer customer) {
         try {
-            return customerService.editCustomerAccount(customer);
+            return ResponseEntity.ok(customerService.editCustomerAccount(customer));
         } catch (Exception ex) {
-            return null;
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 }

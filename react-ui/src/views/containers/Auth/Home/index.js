@@ -12,6 +12,7 @@ import accessRightsMap from "../../../../constants/accessRightsPaths";
 import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -44,7 +45,8 @@ export const EnterStoreModal = ({ open, closeModal, stores, store, setStore, sit
             className="flex-grow shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
             placeholder="Site Code"
             value={siteCode}
-            onChange={(e) => setSiteCode(e.target.value)}
+            onChange={setSiteCode}
+            onKeyPress={(e) => e.key === 'Enter' && handleEnterStore()}
           />
         </div>
         <div className="pt-5">
@@ -236,26 +238,36 @@ const paths = [
 
 export function Home() {
   const navigate = useNavigate();
+  const { addToast } = useToasts();
   const [openEnterStore, setOpenEnterStore] = useState(false);
   const [siteCode, setSiteCode] = useState("");
-  const [storeNames, setStoreNames] = useState({});
-  const stores = [{ id : 0, name : "Choose one" }, ...Object.keys(storeNames).map((key) => { return { id: key, name: storeNames[key] } })];
-  const [store, setStore] = useState({ id: 0, name: "" });
+  const [storeNames, setStoreNames] = useState({ 0 : "Choose one" });
+  const stores = Object.keys(storeNames).map((key) => { return { id: key, name: storeNames[key] } });
+  const [store, setStore] = useState(stores[0]);
 
   useEffect(() => {
+    localStorage.removeItem("siteId");
     api.getAll("/store/storeNames").then((response) => {
-      setStoreNames(response.data);
+      setStoreNames({0 : "Choose one", ...response.data});
     })
   }, [setStoreNames]);
 
   const handleEnterStore = () => {
-    api.getAll(`/store/storeLogin?id=${store.id}&siteCode=${siteCode}`).then((response) => {
+    api.getAll(`/store/storeLogin?id=${store.id}&siteCode=${siteCode}`)
+    .then((response) => {
       localStorage.setItem("siteId", response.data.id);
+      addToast(`Successfully logged in to ${store.name}`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      closeEnterStoreModal();
       navigate("/str");
     }).catch((err) => {
-      alert(err);
+      addToast(`Error: ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
     })
-    closeEnterStoreModal();
   }
 
   const openEnterStoreModal = () => setOpenEnterStore(true);
@@ -276,10 +288,10 @@ export function Home() {
         open={openEnterStore}
         closeModal={closeEnterStoreModal}
         stores={stores}
-        store={stores[0]}
-        setStore={setStore}
+        store={store}
+        setStore={(e) => setStore(e)}
         siteCode={siteCode}
-        setSiteCode={setSiteCode}
+        setSiteCode={(e) => setSiteCode(e.target.value)}
         handleEnterStore={handleEnterStore} />
     </>
   )

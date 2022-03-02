@@ -18,24 +18,36 @@ export const fetchEmployees = createAsyncThunk(
 export const addNewEmployee = createAsyncThunk(
   "employee/addNewEmployee",
   async (initialEmployee) => {
-    const response = await api.create("admin/addEmployee", initialEmployee);
-    return response.data;
+    try {
+      const response = await api.create("admin/addEmployee", initialEmployee);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const updateExistingEmployee = createAsyncThunk(
   "employee/updateExistingEmployee",
   async (existingEmployee) => {
-    const response = await api.update("admin/editEmployee", existingEmployee);
-    return response.data;
+    try {
+      const response = await api.update("admin/editEmployee", existingEmployee);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const deleteExistingEmployee = createAsyncThunk(
   "employee/deleteExistingEmployee",
   async (existingEmployeeId) => {
-    const response = await employeeApi.deleteEmployee(existingEmployeeId);
-    return response.data;
+    try {
+      const response = await employeeApi.deleteEmployee(existingEmployeeId);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
@@ -99,10 +111,8 @@ const employeeSlice = createSlice({
       }
     });
     builder.addCase(deleteExistingEmployee.fulfilled, (state, action) => {
-      // state.employee = state.employee.filter(
-      //   ({ employeeId }) => employeeId !== action.payload.id
-      // );
-      state.employee.status = "idle";
+      state.employee = state.employee.filter(({ id }) => id !== action.payload);
+      // state.employee.status = "idle";
     });
     builder.addCase(enableEmployee.fulfilled, (state, action) => {
       const { id, availStatus } = action.payload;

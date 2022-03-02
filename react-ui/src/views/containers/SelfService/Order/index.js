@@ -26,16 +26,16 @@ const OrderList = ({
                         Items in your shopping cart
                     </h2>
 
-                    <ul role="list" className="border-t border-b border-gray-200 divide-y divide-gray-200">
+                    <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
                         {products.map((product) => (
                             <li key={product.name} className="flex py-6">
                                 <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                                     <div>
                                         <div className="flex justify-between">
                                             <h4 className="text-lg">
-                                                <a className="font-medium text-gray-700 hover:text-gray-800">
+                                                <strong className="font-medium text-gray-700 hover:text-gray-800">
                                                     {product.name}
-                                                </a>
+                                                </strong>
                                             </h4>
                                             {console.log(product)}
                                             {'discountedPrice' in product ?

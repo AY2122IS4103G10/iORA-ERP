@@ -1,12 +1,9 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { CogIcon } from "@heroicons/react/outline";
-
-import { getASite, selectSite } from '../../../../stores/slices/siteSlice';
+import { getASiteStock, selectCurrSiteStock } from '../../../../stores/slices/stocklevelSlice';
 import { selectUserSite } from '../../../../stores/slices/userSlice';
 import { SelectableTable } from '../../../components/Tables/SelectableTable';
-import { selectCurrSiteStock, getASiteStock } from '../../../../stores/slices/stocklevelSlice';
+
 
 const convertData = (data) => {
   console.log(data);
@@ -34,26 +31,6 @@ const columns = [
     Header: "Reserved Qty",
     accessor: "reserve"
   },
-  // {
-  //   Header: (
-  //     <div className="flex items-center">
-  //       <CogIcon className="h-4 w-4" />
-  //     </div>
-  //   ),
-  //   id: "edit",
-  //   disableSortBy: true,
-  //   Cell: ({row}) => {
-  //     return (
-  //     <Link
-  //       className="inline-flex items-center px-2.5 py-1.5 border border-transparent 
-  //       text-xs font-medium rounded shadow-sm text-white 
-  //       bg-cyan-600 hover:bg-cyan-700 focus:outline-none 
-  //       focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-  //       to={`/str/stocklevels/`}
-  //     >Edit</Link>
-  //     );
-  //   }
-  // }
 ]
 
 export const MyStoreStock = (subsys) => {
@@ -65,7 +42,7 @@ export const MyStoreStock = (subsys) => {
 
   useEffect(() => {
       dispatch(getASiteStock(id));
-  }, [id])
+  }, [dispatch, id])
 
   const path = `/${subsys.subsys.subsys}/stocklevels/my`;
 

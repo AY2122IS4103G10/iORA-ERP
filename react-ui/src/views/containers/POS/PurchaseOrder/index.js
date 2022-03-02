@@ -1,9 +1,10 @@
-import {Link} from "react-router-dom";
-import {useState, useEffect} from "react";
-import {useDispatch} from "react-redux";
-import {Dialog, Listbox, Transition} from "@headlessui/react";
-import {getProductItem, getProductDetails} from "../../../../stores/slices/productSlice";
-import {XCircleIcon} from "@heroicons/react/solid";
+import { XCircleIcon } from "@heroicons/react/solid";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import {
+  getProductDetails,
+  getProductItem,
+} from "../../../../stores/slices/productSlice";
 
 const OrderList = ({
   products,
@@ -21,7 +22,10 @@ const OrderList = ({
     <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4 lg:px-0">
       <form>
         <div>
-          <label htmlFor="rfid" className="block mt-8 text-base font-medium text-gray-700">
+          <label
+            htmlFor="rfid"
+            className="block mt-8 text-base font-medium text-gray-700"
+          >
             RFID
           </label>
           <div className="mt-1 flex space-x-2">
@@ -40,7 +44,8 @@ const OrderList = ({
             <button
               type="submit"
               className="w-2/12 flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-sm rounded-md text-white bg-slate-600 hover:bg-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick={addRFIDClicked}>
+              onClick={addRFIDClicked}
+            >
               Add product
             </button>
           </div>
@@ -48,7 +53,10 @@ const OrderList = ({
             <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                  <XCircleIcon
+                    className="h-5 w-5 text-red-400"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-red-800">Product not found.</p>
@@ -69,20 +77,23 @@ const OrderList = ({
               Items Scanned
             </h2>
 
-            <ul role="list" className="border-t border-b border-gray-200">
+            <ul className="border-t border-b border-gray-200">
               {products.map((product) => (
                 <li key={product.name} className="flex py-6">
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                     <div>
                       <div className="flex justify-between">
                         <h4 className="text-lg w-9/12">
-                          <a className="font-medium text-gray-700 hover:text-gray-800">
+                          <strong className="font-medium text-gray-700 hover:text-gray-800">
                             {product.name}
-                          </a>
+                          </strong>
                           <p className="mt-1 flex text-sm text-gray-500">
                             {product.colour}&nbsp; -- &nbsp;
-                            {product.size !== null ? product.size : null} &nbsp; -- &nbsp;
-                            {product.promotion !== null ? product.promotion : null}
+                            {product.size !== null ? product.size : null} &nbsp;
+                            -- &nbsp;
+                            {product.promotion !== null
+                              ? product.promotion
+                              : null}
                           </p>
                         </h4>
                         {"discountedPrice" in product ? (
@@ -90,7 +101,10 @@ const OrderList = ({
                             <p className="line-through text-gray-500">
                               ${Number.parseFloat(product.price).toFixed(2)}
                             </p>
-                            ${Number.parseFloat(product.discountedPrice).toFixed(2)}
+                            $
+                            {Number.parseFloat(product.discountedPrice).toFixed(
+                              2
+                            )}
                           </div>
                         ) : (
                           <p className="ml-4 text-sm font-medium text-gray-900">
@@ -132,7 +146,8 @@ const OrderList = ({
           <button
             type="button"
             onClick={openModal}
-            className="w-2/12 mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500">
+            className="w-2/12 mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+          >
             Payment
           </button>
           <button
@@ -141,11 +156,10 @@ const OrderList = ({
             onClick={() => {
               if (window.confirm("Are you sure to clear ALL items?")) {
                 localStorage.clear();
-                {
-                  clear();
-                }
+                clear();
               }
-            }}>
+            }}
+          >
             Clear All Items
           </button>
         </div>
@@ -158,10 +172,10 @@ export const PosPurchaseOrder = () => {
   const [modalState, setModalState] = useState(false);
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
-  const [paymentType, setPaymentType] = useState("");
+  // const [paymentType, setPaymentType] = useState("");
   const [productItems, setProductItems] = useState([]);
   const [products, setProducts] = useState([]);
-  const [productQty, setProductQty] = useState([]);
+  // const [productQty, setProductQty] = useState([]);
   const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
   const [error, setError] = useState(false);
@@ -212,7 +226,8 @@ export const PosPurchaseOrder = () => {
         <button
           type="button"
           className="text-sm font-medium text-indigo-600 hover:text-red-500"
-          onClick={() => removeProduct(product)}>
+          onClick={() => removeProduct(product)}
+        >
           <span>Remove</span>
         </button>
       </div>

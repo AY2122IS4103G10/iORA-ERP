@@ -17,7 +17,7 @@ import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index
 import { StoreIndex } from "./views/containers/Index/StrIndex";
 import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
-import { ADRoute } from "./routes/ADRoute";
+// import { ADRoute } from "./routes/ADRoute";
 import { ManageSites } from "./views/containers/Sites/ManageSites";
 import { SiteForm } from "./views/containers/Sites/SiteForm";
 import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
@@ -49,6 +49,12 @@ import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
 import { Order } from "./views/containers/SelfService/Order";
+import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
+import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
+import { CustomerForm } from "./views/containers/Customer/CustomerForm";
+import { ManageMembershipTier } from "./views/containers/MembershipTier/ManageMembershipTier/index.js";
+import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails/index.js";
+import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm/index.js";
 
 function App() {
   return (
@@ -109,6 +115,18 @@ function App() {
               <Route path="create" element={<VoucherForm />} />
               <Route path="edit/:voucherId" element={<VoucherForm />} />
             </Route>
+            <Route path="customers" element={<Outlet />}>
+              <Route index element={<ManageCustomer />} />
+              <Route path=":customerId" element={<CustomerDetails />} />
+              <Route path="create" element={<CustomerForm />} />
+              <Route path="edit/:customerId" element={<CustomerForm />} />
+              <Route path="tiers" element={<Outlet />}>
+                <Route index element={<ManageMembershipTier />} />
+                <Route path=":name" element={<MembershipTierDetails />} />
+                <Route path="create" element={<MembershipTierForm />} />
+                <Route path="edit/:name" element={<MembershipTierForm />} />
+              </Route>
+            </Route>
           </Route>
 
           {/* Store Management Subsystem */}
@@ -164,7 +182,7 @@ function App() {
             </Route>
             <Route path="jobTitles" element={<Outlet />}>
               <Route index element={<ManageJobTitle />} />
-              <Route path=":title" element={<JobTitleDetails />} />
+              <Route path=":jobTitleId" element={<JobTitleDetails />} />
               <Route path="create" element={<JobTitleForm />} />
               <Route path="edit/:jobTitleId" element={<JobTitleForm />} />
             </Route>

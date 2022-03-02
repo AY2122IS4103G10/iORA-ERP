@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { PencilIcon } from "@heroicons/react/solid";
 import { TrashIcon } from "@heroicons/react/outline";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
@@ -20,6 +21,7 @@ const Header = ({
   onAcceptClicked,
   onCancelOrderClicked,
   onShippedClicked,
+  onFulfillClicked,
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
@@ -77,24 +79,24 @@ const Header = ({
             </button>
           </div>
         )
-      ) : status === "ACCEPTED" ? (
+      ) : status === "ACCEPTED" && pathname.includes("mf") ? (
         <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
           <button
             type="button"
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-            onClick={onShippedClicked}
-            disabled={status !== "READY"}
+            onClick={onFulfillClicked}
+            disabled={status !== "ACCEPTED"}
           >
             <span>Fulfill order</span>
           </button>
         </div>
-      ) : status === "READY" ? (
+      ) : status === "READY" && pathname.includes("mf") ? (
         <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
           <button
             type="button"
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
             onClick={onShippedClicked}
-            disabled={status !== "READY"}
+            disabled
           >
             <span>Ship order</span>
           </button>
@@ -111,7 +113,6 @@ const ItemsSummary = ({
   status,
   setData,
   pathname,
-  onVerifyItemsClicked,
   onVerifyReceivedClicked,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
@@ -156,26 +157,20 @@ const ItemsSummary = ({
         Header: "Fulfilled",
         accessor: "fulfilledQty",
         disableSortBy: true,
-        Cell: (row) => {
-          return status === "ACCEPTED" && pathname.includes("mf") ? (
-            <EditableCell
-              value={0}
-              row={row.row}
-              column={row.column}
-              updateMyData={updateMyData}
-            />
-          ) : status === "PENDING" || "CANCELLED" ? (
-            "-"
-          ) : (
-            row.row.original.fulfilledProductItems.length
-          );
-        },
+        Cell: (row) =>
+          status === "PENDING" ||
+          status === "CANCELLED" ||
+          status === "ACCEPTED"
+            ? "-"
+            : row.row.original.fulfilledProductItems.length,
       },
       {
         Header: "Shipped",
         accessor: "",
         Cell: (row) => {
-          return status === ("SHIPPED" || "VERIFIED" || "COMPLETED")
+          return status === "SHIPPED" ||
+            status === "VERIFIED" ||
+            status === "COMPLETED"
             ? row.row.original.fulfilledProductItems.length
             : "-";
         },
@@ -222,7 +217,6 @@ const ItemsSummary = ({
             columns={columns}
             data={data}
             skipPageReset={skipPageReset}
-            // hiddenColumns={["actualQty"]}
           />
         </div>
       )}
@@ -238,7 +232,7 @@ const ProcurementDetailsBody = ({
   warehouse,
   setLineItems,
   pathname,
-  onVerifyItemsClicked,
+  onFulfillClicked,
   onVerifyReceivedClicked,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
@@ -286,7 +280,7 @@ const ProcurementDetailsBody = ({
           status={status}
           setData={setLineItems}
           pathname={pathname}
-          onVerifyItemsClicked={onVerifyItemsClicked}
+          onFulfillClicked={onFulfillClicked}
           onVerifyReceivedClicked={onVerifyReceivedClicked}
         />
       </section>
@@ -295,6 +289,7 @@ const ProcurementDetailsBody = ({
 );
 
 export const ProcurementDetails = () => {
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -339,13 +334,20 @@ export const ProcurementDetails = () => {
     )
       .unwrap()
       .then(() => {
-        alert("Successfully deleted procurement");
+        addToast("Successfully deleted procurement order", {
+          appearance: "success",
+          autoDismiss: true,
+        });
         closeModal();
         navigate("/sm/procurements");
       })
-      .catch((err) => console.error("Failed to add procurement: ", err));
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
   };
-  // console.log(lineItems);
 
   const onAcceptClicked = () => {
     procurementApi
@@ -355,10 +357,16 @@ export const ProcurementDetails = () => {
         setStatus(statusHistory[statusHistory.length - 1].status);
       })
       .then(() => {
-        alert("Successfully accepted procurement");
+        addToast("Successfully accepted procurement order", {
+          appearance: "success",
+          autoDismiss: true,
+        });
       })
-      .catch((error) =>
-        console.error("Failed to accept procurement: ", error.message)
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
       );
   };
 
@@ -370,23 +378,24 @@ export const ProcurementDetails = () => {
         setStatus(statusHistory[statusHistory.length - 1].status);
       })
       .then(() => {
-        alert("Successfully cancelled procurement");
+        addToast("Successfully cancelled procurement order", {
+          appearance: "success",
+          autoDismiss: true,
+        });
       })
-      .catch((error) =>
-        console.error("Failed to cancel procurement: ", error.message)
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
       );
   };
 
-  const onVerifyItemsClicked = () => {
+  const onFulfillClicked = () => {
     procurementApi
       .fulfillOrder(manufacturing, {
         id: procurementId,
-        lineItems: lineItems.map(({ product, ...item }) => ({
-          ...item,
-          product: {
-            sku: product.sku,
-          },
-        })),
+        lineItems,
       })
       .then((response) => {
         const { lineItems, statusHistory } = response.data;
@@ -394,9 +403,17 @@ export const ProcurementDetails = () => {
         setLineItems(lineItems);
         setStatus(statusHistory[statusHistory.length - 1].status);
       })
-      .then(() => alert("Successfully verified items."))
-      .catch((error) =>
-        console.error("Failed to fulfill procurement: ", error.message)
+      .then(() =>
+        addToast("Successfully fulfilled procurement order", {
+          appearance: "success",
+          autoDismiss: true,
+        })
+      )
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
       );
   };
 
@@ -452,6 +469,7 @@ export const ProcurementDetails = () => {
             onAcceptClicked={onAcceptClicked}
             onCancelOrderClicked={onCancelOrderClicked}
             onShippedClicked={onShippedClicked}
+            onFulfillClicked={onFulfillClicked}
           />
           <ProcurementDetailsBody
             procurementId={procurementId}
@@ -462,7 +480,7 @@ export const ProcurementDetails = () => {
             lineItems={lineItems}
             setLineItems={setLineItems}
             pathname={pathname}
-            onVerifyItemsClicked={onVerifyItemsClicked}
+            onFulfillClicked={onFulfillClicked}
             onVerifyReceivedClicked={onVerifyReceivedClicked}
           />
         </div>

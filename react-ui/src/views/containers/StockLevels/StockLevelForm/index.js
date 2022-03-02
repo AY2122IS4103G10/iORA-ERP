@@ -260,13 +260,13 @@ export const StockLevelForm = () => {
     const rfidArr = rfid.trim().split(" ");
     // console.log(rfidArr);
     // add 
-    if (selected.id == 1) {
+    if (selected.id === 1) {
       Object.entries(rfidArr).forEach(([key, value]) => {
         toUpdate[value] = siteId;
       });
 
     // remove
-    } else if (selected.id == 2) {
+    } else if (selected.id === 2) {
       Object.entries(rfidArr).forEach(([key, value]) => {
         toUpdate[value] = 0;
       });
@@ -314,15 +314,15 @@ export const StockLevelForm = () => {
                   <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Name</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "loading" : model.name}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "loading" : model.name}</dd>
                     </div>
 
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Price</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.price}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "" : model.price}</dd>
                     </div>
                     {model != null && model.products != null ? (
-                      model?.products?.filter((prod) => prod.sku == id.trim())[0]?.productFields.map((field) => {
+                      model?.products?.filter((prod) => prod.sku === id.trim())[0]?.productFields.map((field) => {
                         return (
                           <div key={field.id} className="sm:col-span-1">
                             <dt className="text-sm font-medium text-gray-500">{field.fieldName}</dt>
@@ -334,15 +334,15 @@ export const StockLevelForm = () => {
 
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Online Exclusive</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.onlineOnly.toString().toUpperCase()}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "" : model.onlineOnly.toString().toUpperCase()}</dd>
                     </div>
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Available</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.available.toString().toUpperCase()}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "" : model.available.toString().toUpperCase()}</dd>
                     </div>
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Description</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.description}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "" : model.description}</dd>
                     </div>
                   </dl>
                 </div>

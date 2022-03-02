@@ -1,6 +1,6 @@
-import { Fragment, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationIcon, XIcon } from '@heroicons/react/outline'
+import { Fragment, useRef } from 'react'
 
 export default function ErrorModal({ open, closeModal, title, message }) {
 

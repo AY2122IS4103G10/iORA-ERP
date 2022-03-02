@@ -1,24 +1,18 @@
-import { useState, useEffect, useMemo, useRef } from "react";
 import { Dialog } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
-import { ExclamationCircleIcon } from "@heroicons/react/outline";
-
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import { ClickableRowTable, SelectColumnFilter, EditableCell } from "../../../components/Tables/ClickableRowTable";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { ExclamationCircleIcon, XIcon } from "@heroicons/react/outline";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { api } from "../../../../environments/Api";
+import { fetchProducts, selectAllProducts } from "../../../../stores/slices/productSlice";
 import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 import { getASiteStock, selectCurrSiteStock } from "../../../../stores/slices/stocklevelSlice";
-import ErrorModal from "../../../components/Modals/ErrorModal";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
-import { fetchProducts, selectAllProducts, selectProductByCode, selectProductBySkuList } from "../../../../stores/slices/productSlice";
-import { selectUserSite } from "../../../../stores/slices/userSlice";
-import { api } from "../../../../environments/Api";
-import { selectUserStore } from "../../../../stores/slices/userSlice";
 import { createStockTransfer, editStockTransfer } from "../../../../stores/slices/stocktransferSlice";
-import { useNavigate, useParams } from "react-router-dom";
-
-
+import { selectUserSite } from "../../../../stores/slices/userSlice";
+import ErrorModal from "../../../components/Modals/ErrorModal";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { ClickableRowTable, EditableCell, SelectColumnFilter } from "../../../components/Tables/ClickableRowTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const cols =
     [
@@ -59,12 +53,6 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
         ref.current.focus();
     }
 
-    let disableTo = true;
-    if (!isObjectEmpty(from)) {
-        disableTo = false;
-    } else {
-        disableTo = true;
-    }
     const onRowClick = (row) => {
         if (!isObjectEmpty(to) && to.id === from.id) {
             setError(true);
@@ -74,7 +62,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
 
         if (isObjectEmpty(from)) {
             //check if from and to sites are the same
-            if (row.id == to.id) {
+            if (row.id === to.id) {
                 setError(true);
             } else {
                 setFrom(row);
@@ -86,7 +74,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
 
         } else if (isObjectEmpty(to)) {
             //check if from and to sites are the same
-            if (row.id == from.id) {
+            if (row.id === from.id) {
                 setError(true);
             } else {
                 setTo(row);
@@ -199,8 +187,6 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                             </div>
                         </div>
                     </div>
-
-
                     <ClickableRowTable columns={columns} data={data} onRowClick={onRowClick} />
                 </div>
             </div>
@@ -308,7 +294,6 @@ function prepareStockLevel(stocklevel, allModels) {
         stock.name = model?.name;
         stock.product = model?.products.find((prod) => prod.sku === stock.sku);
     })
-    console.log(stocklevel);
     return stocklevel;
 }
 
@@ -384,13 +369,13 @@ export const StockTransferForm = (subsys) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
+    let isEditing = false;
     const [from, setFrom] = useState({});
     const [to, setTo] = useState({});
     const [openSites, setOpenSites] = useState(false);
     const [openItems, setOpenItems] = useState(false);
     const [openErrorModal, setErrorModal] = useState(false);
     const [lineItems, setLineItems] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [originalOrder, setOriginalOrder] = useState({});
     const currSite = useSelector(selectUserSite);
@@ -400,10 +385,14 @@ export const StockTransferForm = (subsys) => {
     const allModels = useSelector(selectAllProducts);
     const prodTableData = isObjectEmpty(stocklevel) ? [] : prepareStockLevel(convertData(stocklevel), allModels);
 
+
     useEffect(() => {
+        if (id === undefined || id === null) {
+            isEditing = true;
+        }
         dispatch(getAllSites());
-        if (from !== undefined) {
-            dispatch(getASiteStock(from?.id));
+        if (!isObjectEmpty(from)) {
+            dispatch(getASiteStock(from.id));
         }
         dispatch(fetchProducts());
     }, [from])
@@ -429,8 +418,8 @@ export const StockTransferForm = (subsys) => {
             api.get("store/stockTransfer", id)
                 .then((response) => {
                     const { lineItems, fromSite, toSite } = response.data;
+                    console.log(lineItems);
                     setOriginalOrder(response.data)
-                    setIsEditing(true);
                     setLineItems(mapLineItemsToSelectedRows(lineItems));
                     setFrom(fromSite);
                     setTo(toSite);
@@ -445,7 +434,6 @@ export const StockTransferForm = (subsys) => {
     const sites = useSelector(selectAllSites);
     const openSitesModal = () => setOpenSites(true);
     const closeSitesModal = () => setOpenSites(false);
-
 
     //open items modal
     const openItemsModal = () => {
@@ -490,7 +478,7 @@ export const StockTransferForm = (subsys) => {
             fromSite: from,
             toSite: to
         }
-        console.log(JSON.stringify(stockTransferOrder));
+        console.log("Order created: ", stockTransferOrder)
         dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
             .then(() => {
@@ -533,7 +521,7 @@ export const StockTransferForm = (subsys) => {
     }
 
     return (
-        <>
+        Boolean(originalOrder) && (<>
             <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                 <div className="mt-4 grid grid-cols-1 gap-4 items-start lg:gap-8">
                     <section aria-labelledby="stocktransfer-form">
@@ -596,6 +584,7 @@ export const StockTransferForm = (subsys) => {
                                                             value={isObjectEmpty(to) ? "" : to.name}
                                                             className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
                                                             placeholder="Search Site"
+                                                            readOnly
                                                         >
                                                         </input>
                                                         <button
@@ -685,5 +674,5 @@ export const StockTransferForm = (subsys) => {
                 message="Please choose a from site before adding items." />
 
         </>
-    );
+    ))
 }

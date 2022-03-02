@@ -48,6 +48,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private SiteService siteService;
     @Autowired
+    private CustomerService customerService;
+    @Autowired
     private CustomerOrderService customerOrderService;
     @PersistenceContext
     private EntityManager em;
@@ -611,7 +613,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void loadProducts(List<Object> productsJSON)
-            throws ProductException, ProductFieldException, ProductItemException {
+            throws ProductException, ProductFieldException, ProductItemException, CustomerException {
         Currency sgd = getCurrency("SGD");
 
         for (Object j : productsJSON) {

@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
+import DatePicker from "react-datepicker";
+
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
-import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-
 import { api } from "../../../../environments/Api";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import {
   addNewCustomer,
   updateExistingCustomer,
 } from "../../../../stores/slices/customerSlice";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 const CustomerFormBody = ({
   isEditing,
@@ -21,8 +22,6 @@ const CustomerFormBody = ({
   onLastNameChanged,
   dob,
   onDobChanged,
-  availStatus,
-  onAvailStatusChanged,
   email,
   onEmailChanged,
   contactNumber,
@@ -31,13 +30,15 @@ const CustomerFormBody = ({
   onPasswordChanged,
   onAddCustomerClicked,
   onCancelClicked,
+  membershipTier,
+  onMembershipTierChanged,
   membershipPoints,
   onMembershipPointsChanged,
   storeCredit,
   onStoreCreditChanged,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-    <h1 className="sr-only">Create New Customer</h1>
+    <h1 className="sr-only">{!isEditing ? "Add New" : "Edit"} Customer</h1>
     {/* Main 3 column grid */}
     <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
       {/* Left column */}
@@ -56,7 +57,7 @@ const CustomerFormBody = ({
                     </div>
                     <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
                       <SimpleInputGroup
-                        label="Customer Name"
+                        label="Customer First Name"
                         inputField="firstName"
                         className="sm:mt-0 sm:col-span-2"
                       >
@@ -71,17 +72,17 @@ const CustomerFormBody = ({
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
-                        label="Available Status"
-                        inputField="availStatus"
+                        label="Customer Last Name"
+                        inputField="lastName"
                         className="sm:mt-0 sm:col-span-2"
                       >
                         <SimpleInputBox
                           type="text"
-                          name="availStatus"
-                          id="availStatus"
-                          autoComplete="availStatus"
-                          value={availStatus}
-                          onChange={onAvailStatusChanged}
+                          name="lastName"
+                          id="lastName"
+                          autoComplete="lastName"
+                          value={lastName}
+                          onChange={onLastNameChanged}
                           required
                         />
                       </SimpleInputGroup>
@@ -101,21 +102,6 @@ const CustomerFormBody = ({
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
-                        label="Last Name"
-                        inputField="lastName"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="lastName"
-                          id="lastName"
-                          autoComplete="lastName"
-                          value={lastName}
-                          onChange={onLastNameChanged}
-                          required
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
                         label="Password"
                         inputField="password"
                         className="sm:mt-0 sm:col-span-2"
@@ -127,7 +113,8 @@ const CustomerFormBody = ({
                           autoComplete="password"
                           value={password}
                           onChange={onPasswordChanged}
-                          required
+                          disabled={isEditing}
+                          className={isEditing ? "bg-gray-200" : ""}
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
@@ -135,14 +122,10 @@ const CustomerFormBody = ({
                         inputField="dob"
                         className="sm:mt-0 sm:col-span-2"
                       >
-                        <SimpleInputBox
-                          type="text"
-                          name="dob"
-                          id="dob"
-                          autoComplete="dob"
-                          value={dob}
+                        <DatePicker
+                          className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                          selected={dob}
                           onChange={onDobChanged}
-                          required
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
@@ -161,6 +144,23 @@ const CustomerFormBody = ({
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
+                        label="Membership Tier"
+                        inputField="membershipTier"
+                        className="sm:mt-0 sm:col-span-2"
+                      >
+                        <SimpleInputBox
+                          type="text"
+                          name="membershipTier"
+                          id="membershipTier"
+                          autoComplete="membershipTier"
+                          value={membershipTier.name}
+                          onChange={onMembershipTierChanged}
+                          className="bg-gray-200"
+                          disabled
+                          required
+                        />
+                      </SimpleInputGroup>
+                      <SimpleInputGroup
                         label="Membership Points"
                         inputField="membershipPoints"
                         className="sm:mt-0 sm:col-span-2"
@@ -172,7 +172,8 @@ const CustomerFormBody = ({
                           autoComplete="membershipPoints"
                           value={membershipPoints}
                           onChange={onMembershipPointsChanged}
-                          required
+                          className="bg-gray-200"
+                          disabled
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
@@ -187,7 +188,8 @@ const CustomerFormBody = ({
                           autoComplete="storeCredit"
                           value={storeCredit}
                           onChange={onStoreCreditChanged}
-                          required
+                          className="bg-gray-200"
+                          disabled
                         />
                       </SimpleInputGroup>
                     </div>
@@ -208,7 +210,7 @@ const CustomerFormBody = ({
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                       onClick={onAddCustomerClicked}
                     >
-                      {!isEditing ? "Add" : "Save"} customer
+                      {!isEditing ? "Add" : "Save"} Customer
                     </button>
                   </div>
                 </div>
@@ -223,28 +225,28 @@ const CustomerFormBody = ({
 
 export const CustomerForm = () => {
   const { customerId } = useParams();
+  const { addToast } = useToasts();
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [dob, setDob] = useState("");
   const [contactNumber, setContactNumber] = useState("");
-  const [availStatus, setAvailStatus] = useState("");
   const [email, setEmail] = useState("");
-  const [active, setActive] = useState(false);
-  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
-  const [membershipPoints, setMembershipPoints] = useState("");
-  const [storeCredit, setStoreCredit] = useState("");
+  const [membershipTier, setMembershipTier] = useState("BASIC");
+  const [membershipPoints, setMembershipPoints] = useState("0");
+  const [storeCredit, setStoreCredit] = useState("0");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const onFirstNameChanged = (e) => setFirstName(e.target.value);
-  const onAvailStatusChanged = (e) => setAvailStatus(e.target.value);
   const onEmailChanged = (e) => setEmail(e.target.value);
   const onLastNameChanged = (e) => setLastName(e.target.value);
   const onPasswordChanged = (e) => setPassword(e.target.value);
   const onDobChanged = (e) => setDob(e.target.value);
   const onContactNumberChanged = (e) => setContactNumber(e.target.value);
+  const onMembershipTierChanged = (e) => setMembershipTier(e.target.value);
   const onMembershipPointsChanged = (e) => setMembershipPoints(e.target.value);
   const onStoreCreditChanged = (e) => setStoreCredit(e.target.value);
 
@@ -252,14 +254,10 @@ export const CustomerForm = () => {
   const canAdd =
     [
       firstName,
-      storeCredit,
-      availStatus,
-      email,
       lastName,
-      password,
       dob,
       contactNumber,
-      membershipPoints,
+      email,
     ].every(Boolean) && requestStatus === "idle";
 
   const onAddCustomerClicked = (evt) => {
@@ -271,34 +269,57 @@ export const CustomerForm = () => {
           dispatch(
             addNewCustomer({
               firstName,
-              availStatus,
-              email,
               lastName,
-              password,
               dob,
               contactNumber,
+              availStatus: true,
+              email,
+              password,
+              membershipTier,
               membershipPoints,
               storeCredit,
             })
-          ).unwrap();
+          )
+            .unwrap()
+            .then(() => {
+              addToast("Successfully added customer", {
+                appearance: "success",
+                autoDismiss: true,
+              });
+              navigate("/sm/customers");
+            })
+            .catch((err) => {
+              addToast(`Error: ${err.message}`, {
+                appearance: "error",
+                autoDismiss: true,
+              });
+            });
         } else {
           dispatch(
             updateExistingCustomer({
+              id: customerId,
               firstName,
-              storeCredit,
-              availStatus,
-              email,
               lastName,
-              password,
               dob,
               contactNumber,
-              membershipPoints,
+              email,
             })
-          ).unwrap();
+          )
+            .unwrap()
+            .then(() => {
+              addToast("Successfully updated customer", {
+                appearance: "success",
+                autoDismiss: true,
+              });
+              navigate(`/sm/customers/${customerId}`);
+            })
+            .catch((err) => {
+              addToast(`Error: ${err.message}`, {
+                appearance: "error",
+                autoDismiss: true,
+              });
+            });
         }
-        alert("Successfully added customer");
-        setFirstName("");
-        navigate(!isEditing ? "/crm/customer" : `/crm/customer/${customerId}`);
       } catch (err) {
         console.error("Failed to add customer: ", err);
       } finally {
@@ -307,33 +328,30 @@ export const CustomerForm = () => {
   };
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/crm/customer" : `/crm/customer/${customerId}`);
+    navigate(!isEditing ? "/sm/customers" : `/sm/customers/${customerId}`);
 
   useEffect(() => {
     Boolean(customerId) &&
-      api.get("admin/viewCustomer", customerId).then((response) => {
+      api.get("sam/customer/view", customerId).then((response) => {
         const {
           firstName,
-          membershipPoints,
-          availStatus,
-          email,
           lastName,
-          password,
           dob,
           contactNumber,
+          email,
+          membershipTier,
+          membershipPoints,
           storeCredit,
         } = response.data;
         setIsEditing(true);
         setFirstName(firstName);
-        setStoreCredit,(storeCredit);
-        setAvailStatus(availStatus);
-        setEmail(email);
         setLastName(lastName);
-        setPassword(password);
         setDob(dob);
         setContactNumber(contactNumber);
+        setEmail(email);
+        setMembershipTier(membershipTier);
         setMembershipPoints(membershipPoints);
-        setActive(active);
+        setStoreCredit(storeCredit);
       });
   }, [customerId]);
 
@@ -346,14 +364,14 @@ export const CustomerForm = () => {
       onContactNumberChanged={onContactNumberChanged}
       firstName={firstName}
       onFirstNameChanged={onFirstNameChanged}
-      availStatus={availStatus}
-      onAvailStatusChanged={onAvailStatusChanged}
       email={email}
       onEmailChanged={onEmailChanged}
       lastName={lastName}
       onLastNameChanged={onLastNameChanged}
       password={password}
       onPasswordChanged={onPasswordChanged}
+      membershipTier={membershipTier}
+      onMembershipTierChanged={onMembershipTierChanged}
       membershipPoints={membershipPoints}
       onMembershipPointsChanged={onMembershipPointsChanged}
       storeCredit={storeCredit}

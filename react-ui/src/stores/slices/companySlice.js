@@ -58,34 +58,9 @@ const companySlice = createSlice({
       state.companies.push(action.payload);
     });
     builder.addCase(updateExistingCompany.fulfilled, (state, action) => {
-      const {
-        companyId,
-        name,
-        address,
-        registerNumber,
-        telephone,
-        active,
-        departments,
-        vendors,
-      } = action.payload;
-      const existingProd = state.companies.find(
-        (prod) => prod.companyId === companyId
-      );
-      if (existingProd) {
-        existingProd.name = name;
-        existingProd.address = address;
-        existingProd.registerNumber = registerNumber;
-        existingProd.telephone = telephone;
-        existingProd.active = active;
-        existingProd.departments = departments;
-        existingProd.vendors = vendors;
-      }
-      // state.status = "idle";
+      state.status = "idle";
     });
     builder.addCase(deleteExistingCompany.fulfilled, (state, action) => {
-      // state.companies = state.companies.filter(
-      //   ({ companyId }) => companyId !== action.payload.companyId
-      // );
       state.status = "idle";
     });
   },

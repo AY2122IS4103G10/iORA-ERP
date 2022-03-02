@@ -48,7 +48,7 @@ export const login = createAsyncThunk("auth/login", async (credentials) => {
   }
 });
 
-export const updateCurrSite = createAction("updateCurrSite");
+// export const updateCurrSite = createAction("updateCurrSite");
 
 const userSlice = createSlice({
   name: "user",
@@ -58,6 +58,11 @@ const userSlice = createSlice({
       localStorage.removeItem("user");
       state.loggedIn = false;
       state.user = { ...guest };
+    },
+    updateCurrSite(state, action) {
+      state.currSite = localStorage.getItem("siteId")
+        ? JSON.parse(localStorage.getItem("siteId"))
+        : 0;
     },
   },
   extraReducers(builder) {
@@ -80,13 +85,13 @@ const userSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.error = "Login failed";
     });
-    builder.addCase(updateCurrSite, (state, action) => {
-      state.currSite = action.payload;
-    });
+    // builder.addCase(updateCurrSite, (state, action) => {
+    //   state.currSite = action.payload;
+    // });
   },
 });
 
-export const { logout } = userSlice.actions;
+export const { logout, updateCurrSite } = userSlice.actions;
 
 export const selectUserLoggedIn = (state) => state.user.loggedIn;
 

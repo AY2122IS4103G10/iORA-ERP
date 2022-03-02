@@ -250,80 +250,67 @@ export const CustomerForm = () => {
   const onMembershipPointsChanged = (e) => setMembershipPoints(e.target.value);
   const onStoreCreditChanged = (e) => setStoreCredit(e.target.value);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-  const canAdd =
-    [
-      firstName,
-      lastName,
-      dob,
-      contactNumber,
-      email,
-    ].every(Boolean) && requestStatus === "idle";
+  const canAdd = [firstName, lastName, dob, contactNumber, email].every(
+    Boolean
+  );
 
   const onAddCustomerClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
-      try {
-        setRequestStatus("pending");
-        if (!isEditing) {
-          dispatch(
-            addNewCustomer({
-              firstName,
-              lastName,
-              dob,
-              contactNumber,
-              availStatus: true,
-              email,
-              password,
-              membershipTier,
-              membershipPoints,
-              storeCredit,
-            })
-          )
-            .unwrap()
-            .then(() => {
-              addToast("Successfully added customer", {
-                appearance: "success",
-                autoDismiss: true,
-              });
-              navigate("/sm/customers");
-            })
-            .catch((err) => {
-              addToast(`Error: ${err.message}`, {
-                appearance: "error",
-                autoDismiss: true,
-              });
+      if (!isEditing) {
+        dispatch(
+          addNewCustomer({
+            firstName,
+            lastName,
+            dob,
+            contactNumber,
+            availStatus: true,
+            email,
+            password,
+            membershipTier,
+            membershipPoints,
+            storeCredit,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully added customer", {
+              appearance: "success",
+              autoDismiss: true,
             });
-        } else {
-          dispatch(
-            updateExistingCustomer({
-              id: customerId,
-              firstName,
-              lastName,
-              dob,
-              contactNumber,
-              email,
-            })
-          )
-            .unwrap()
-            .then(() => {
-              addToast("Successfully updated customer", {
-                appearance: "success",
-                autoDismiss: true,
-              });
-              navigate(`/sm/customers/${customerId}`);
-            })
-            .catch((err) => {
-              addToast(`Error: ${err.message}`, {
-                appearance: "error",
-                autoDismiss: true,
-              });
+            navigate("/sm/customers");
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
             });
-        }
-      } catch (err) {
-        console.error("Failed to add customer: ", err);
-      } finally {
-        setRequestStatus("idle");
+          });
+      } else {
+        dispatch(
+          updateExistingCustomer({
+            id: customerId,
+            firstName,
+            lastName,
+            dob,
+            contactNumber,
+            email,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully updated customer", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            navigate(`/sm/customers/${customerId}`);
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+          });
       }
   };
 

@@ -13,6 +13,9 @@ import {
 } from "@heroicons/react/outline";
 
 import MainWrapper from "../../../components/MainWrapper";
+import { useEffect } from "react";
+import { updateCurrSite } from "../../../../stores/slices/userSlice";
+import { useDispatch } from "react-redux";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
@@ -52,20 +55,28 @@ const secondaryNavigation = [
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];
 
-export const StoreIndex = () => (
-  <div className="h-screen bg-gray-100">
-    <MainWrapper
-      navigation={navigation}
-      secondaryNavigation={secondaryNavigation}
-      badge={
-        <div className="flex-1 flex py-4">
-          <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
-            Store
-          </span>
-        </div>
-      }
-    >
-      <Outlet />
-    </MainWrapper>
-  </div>
-);
+export const StoreIndex = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(updateCurrSite());
+  }, [dispatch]);
+
+  return (
+    <div className="h-screen bg-gray-100">
+      <MainWrapper
+        navigation={navigation}
+        secondaryNavigation={secondaryNavigation}
+        badge={
+          <div className="flex-1 flex py-4">
+            <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
+              Store
+            </span>
+          </div>
+        }
+      >
+        <Outlet />
+      </MainWrapper>
+    </div>
+  );
+};

@@ -16,6 +16,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import com.iora.erp.enumeration.PaymentType;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.NoStockLevelException;
@@ -709,23 +710,23 @@ public class ProductServiceImpl implements ProductService {
 
         // Customer Order
         CustomerOrderLI coli1 = new CustomerOrderLI();
-		coli1.setProductItems(getProductItemsBySKU("BPD0010528A-1").stream().collect(Collectors.toList()));
-		customerOrderService.createCustomerOrderLI(coli1);
+        coli1.setProductItems(getProductItemsBySKU("BPD0010528A-1").stream().collect(Collectors.toList()));
+        customerOrderService.createCustomerOrderLI(coli1);
 
-		CustomerOrderLI coli2 = new CustomerOrderLI();
-		coli2.setProductItems(getProductItemsBySKU("BPS0009808X-1").stream().collect(Collectors.toList()));
-		customerOrderService.createCustomerOrderLI(coli2);
+        CustomerOrderLI coli2 = new CustomerOrderLI();
+        coli2.setProductItems(getProductItemsBySKU("BPS0009808X-1").stream().collect(Collectors.toList()));
+        customerOrderService.createCustomerOrderLI(coli2);
 
-		Payment payment1 = new Payment(300.15, "241563");
+        Payment payment1 = new Payment(300.15, "241563", PaymentType.VISA);
         customerOrderService.createPayment(payment1);
 
-		CustomerOrder co1 = new CustomerOrder();
-		co1.setCustomerId(1L);
-		co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-		co1.addLineItem(coli1);
-		co1.addLineItem(coli2);
-		co1.setStoreSiteId(3L);
-		co1.addPayment(payment1);
-		customerOrderService.createCustomerOrder(co1);
+        CustomerOrder co1 = new CustomerOrder();
+        co1.setCustomerId(1L);
+        co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        co1.addLineItem(coli1);
+        co1.addLineItem(coli2);
+        co1.setStoreSiteId(3L);
+        co1.addPayment(payment1);
+        customerOrderService.createCustomerOrder(co1);
     }
 }

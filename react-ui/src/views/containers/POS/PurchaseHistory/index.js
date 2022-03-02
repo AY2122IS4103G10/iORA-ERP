@@ -18,11 +18,11 @@ const columns = [
   },
   {
     Header: "Amount",
-    accessor: (row) => row.payments.amount,
+    accessor: "totalAmount",
   },
   {
     Header: "Customer Number",
-    accessor: (row) => row.customer.id,
+    accessor: (row) => row.customerId,
   },
 ];
 
@@ -35,6 +35,7 @@ export const PosPurchaseHistory = (subsys) => {
   const site = useSelector(selectSite);
 
   useEffect(() => {
+    console.log(siteId);
     orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
   }, [orderStatus, siteId]);
 

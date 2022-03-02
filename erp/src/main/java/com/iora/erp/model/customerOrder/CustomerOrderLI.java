@@ -25,7 +25,6 @@ public class CustomerOrderLI {
     @OneToMany
     private List<ProductItem> productItems;
 
-
     public CustomerOrderLI() {
         this.qty = 0;
         productItems = new ArrayList<>();
@@ -60,5 +59,5 @@ public class CustomerOrderLI {
     public void removeProductItem(ProductItem productItem) {
         this.productItems.remove(productItem);
         this.qty = this.productItems.size();
-    }    
+    }
 }

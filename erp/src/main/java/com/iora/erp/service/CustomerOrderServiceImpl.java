@@ -62,8 +62,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public List<OnlineOrder> getOnlineOrdersBySiteDate(Long siteId, String date) {
-        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.storeSiteId = :siteId AND SUBSTRING(oo.dateTime, 0, 10) = :date",
-        OnlineOrder.class);
+        TypedQuery<OnlineOrder> q = em.createQuery(
+                "SELECT oo FROM OnlineOrder oo WHERE oo.storeSiteId = :siteId AND SUBSTRING(oo.dateTime, 0, 10) = :date",
+                OnlineOrder.class);
         q.setParameter("siteId", siteId);
         q.setParameter("date", date);
         return q.getResultList();
@@ -89,7 +90,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date) {
-        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId AND SUBSTRING(co.dateTime, 0, 10) = :date",
+        TypedQuery<CustomerOrder> q = em.createQuery(
+                "SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId AND SUBSTRING(co.dateTime, 0, 10) = :date",
                 CustomerOrder.class);
         q.setParameter("siteId", siteId);
         q.setParameter("date", date);
@@ -98,7 +100,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
-        //updateMembershipPoints(customerOrder);
+        // updateMembershipPoints(customerOrder);
         em.persist(customerOrder);
         return customerOrder;
     }
@@ -240,7 +242,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     // TODO: fix this method, and update after currency amount added to payments
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
-        Customer customer =  customerService.getCustomerById(order.getCustomerId());
+        Customer customer = customerService.getCustomerById(order.getCustomerId());
 
         Currency currency = em.find(Currency.class, "SGD");
         Double spending = em
@@ -270,9 +272,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (currentMonth == cal.get(Calendar.MONTH)) {
             Integer ordersThisMonth = em
                     .createQuery("SELECT o FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
-                    CustomerOrder.class)
+                            CustomerOrder.class)
                     .setParameter("id", customer.getId())
-                    .setParameter("date", Timestamp.valueOf(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())), TemporalType.TIMESTAMP)
+                    .setParameter("date",
+                            Timestamp.valueOf(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())),
+                            TemporalType.TIMESTAMP)
                     .getResultList()
                     .size();
             if (ordersThisMonth == 0) {
@@ -281,7 +285,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
         Integer membershipPoints = customer.getMembershipPoints();
         for (Payment p : order.getPayments()) {
-            membershipPoints = Integer.sum(membershipPoints, (int) (p.getAmount() * bdayMultiplier * membershipTier.getMultiplier()));
+            membershipPoints = Integer.sum(membershipPoints,
+                    (int) (p.getAmount() * bdayMultiplier * membershipTier.getMultiplier()));
         }
         customer.setMembershipPoints(membershipPoints);
 

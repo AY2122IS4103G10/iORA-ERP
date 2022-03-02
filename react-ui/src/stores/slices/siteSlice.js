@@ -167,37 +167,21 @@ const siteSlice = createSlice({
     });
     builder.addCase(addNewSite.fulfilled, (state, action) => {
       state.sites.push(action.payload);
+      state.hqStatus = "idle";
+      state.manStatus = "idle";
+      state.warStatus = "idle";
     });
     builder.addCase(updateExistingSite.fulfilled, (state, action) => {
-      const {
-        id,
-        name,
-        address,
-        siteCode,
-        phoneNumber,
-        active,
-        stockLevel,
-        company,
-        procurementOrders,
-      } = action.payload;
-      const existingProd = state.sites.find((site) => site.id === id);
-      if (existingProd) {
-        existingProd.name = name;
-        existingProd.address = address;
-        existingProd.siteCode = siteCode;
-        existingProd.phoneNumber = phoneNumber;
-        existingProd.active = active;
-        existingProd.stockLevel = stockLevel;
-        existingProd.company = company;
-        existingProd.procurementOrders = procurementOrders;
-      }
+      state.status = "idle";
+      state.hqStatus = "idle";
+      state.manStatus = "idle";
+      state.warStatus = "idle";
     });
     builder.addCase(deleteExistingSite.fulfilled, (state, action) => {
-      // console.log(action.payload)
-      // state.sites = state.sites.filter(
-      //   ({ id }) => id !== action.payload.id
-      // );
       state.status = "idle";
+      state.hqStatus = "idle";
+      state.manStatus = "idle";
+      state.warStatus = "idle";
     });
   },
 });

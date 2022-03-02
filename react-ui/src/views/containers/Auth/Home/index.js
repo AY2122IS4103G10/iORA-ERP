@@ -22,9 +22,9 @@ export const EnterStoreModal = ({ open, closeModal, stores, store, setStore, sit
 
   return (
     <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+      <div className="inline-block align-bottom bg-white h-80 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
         <div>
-          <div className="m-2">
+          <div className="m-4 mt-2">
             <Dialog.Title
               as="h3"
               className="text-center text-lg leading-6 font-medium text-gray-900"
@@ -49,21 +49,22 @@ export const EnterStoreModal = ({ open, closeModal, stores, store, setStore, sit
             onKeyPress={(e) => e.key === 'Enter' && handleEnterStore()}
           />
         </div>
-        <div className="pt-5">
-          <div className="flex justify-end">
+        <div className="pt-4">
+          <div className="mt-5 grid grid-cols-1 gap-2 justify-center">
+          <button
+              type="submit"
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              onClick={handleEnterStore}
+            >
+              Enter
+            </button>
+            
             <button
               type="button"
               className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
               onClick={closeModal}
             >
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={handleEnterStore}
-            >
-              Enter
             </button>
           </div>
         </div>

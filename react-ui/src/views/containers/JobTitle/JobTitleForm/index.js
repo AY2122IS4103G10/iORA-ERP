@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
@@ -133,6 +134,7 @@ const JobTitleFormBody = ({
 );
 
 export const JobTitleForm = () => {
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { jobTitleId } = useParams();
@@ -183,40 +185,55 @@ export const JobTitleForm = () => {
 
   const onAddJobTitleClicked = (evt) => {
     evt.preventDefault();
-    if (canAdd)
-      try {
-        setRequestStatus("pending");
-        const rights = [];
-        accessRights.forEach(
-          (value, index) => rightsCheckedState[index] && rights.push(value)
-        );
-        if (!isEditing) {
-          dispatch(
-            addNewJobTitle({
-              title,
-              description,
-              responsibility: rights,
+    if (canAdd) {
+      setRequestStatus("pending");
+      const rights = [];
+      accessRights.forEach(
+        (value, index) => rightsCheckedState[index] && rights.push(value)
+      );
+      if (!isEditing) {
+        dispatch(
+          addNewJobTitle({
+            title,
+            description,
+            responsibility: rights,
+          })
+        ).unwrap()
+          .then(() => {
+            addToast("Successfully created job title,", {
+              appearance: "success",
+              autoDismiss: true,
             })
-          ).unwrap();
-          alert("Successfully added job title");
-        } else {
-          dispatch(
-            updateExistingJobTitle({
-              id: jobTitleId,
-              title,
-              description,
-              responsibility: rights,
+            navigate("/ad/jobTitles");
+          }).catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            }))
+      } else {
+        dispatch(
+          updateExistingJobTitle({
+            id: jobTitleId,
+            title,
+            description,
+            responsibility: rights,
+          })
+        ).unwrap()
+          .then(() => {
+            addToast("Successfully edited job title,", {
+              appearance: "success",
+              autoDismiss: true,
             })
-          ).unwrap();
-          alert("Successfully edited job title");
-        }
-        navigate("/ad/jobTitles");
-      } catch (err) {
-        console.error("Failed to add job title: ", err);
-      } finally {
+            navigate(`/ad/jobTitles/${jobTitleId}`);
+          }).catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            }))
         setRequestStatus("idle");
       }
-  };
+    }
+  }
 
   const onCancelClicked = () =>
     window.confirm("Confirm cancel?") && navigate("/ad/jobTitles");
@@ -235,4 +252,4 @@ export const JobTitleForm = () => {
       onCancelClicked={onCancelClicked}
     />
   );
-};
+}

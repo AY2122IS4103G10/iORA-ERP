@@ -6,6 +6,7 @@ import { SideBar } from "../../../components/SideBar";
 import {
   ArchiveIcon,
   CogIcon,
+  CollectionIcon,
   DocumentReportIcon,
   DocumentTextIcon,
   HomeIcon,
@@ -29,7 +30,7 @@ const navigation = [
   {
     name: "Stock Levels",
     href: "/sm/stocklevels/sites",
-    icon: ScaleIcon,
+    icon: CollectionIcon,
     current: false,
   },
   {

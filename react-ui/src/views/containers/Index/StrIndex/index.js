@@ -1,8 +1,10 @@
 import { Outlet } from "react-router-dom";
 import {
+  ArchiveIcon,
   HomeIcon,
   CogIcon,
   ClockIcon,
+  CollectionIcon,
   ScaleIcon,
   CreditCardIcon,
   QuestionMarkCircleIcon,
@@ -26,10 +28,13 @@ const navigation = [
   {
     name: "Stock Levels",
     href: "/str/stocklevels/my",
-    icon: ScaleIcon,
+    icon: CollectionIcon,
     current: false,
   },
-  { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },
+  { name: "Stock Transfer", 
+    href: "/str/stocktransfer", 
+    icon: ArchiveIcon, 
+    current: false },
   {
     name: "Pickup Orders",
     href: "/str/pickup",

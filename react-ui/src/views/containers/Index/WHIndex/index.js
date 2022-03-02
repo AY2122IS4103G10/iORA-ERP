@@ -6,6 +6,8 @@ import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 import {
   CogIcon,
+  CollectionIcon,
+  DocumentTextIcon,
   HomeIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,

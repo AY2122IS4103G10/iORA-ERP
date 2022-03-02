@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
 import { Dialog } from "@headlessui/react";
 
@@ -20,10 +20,11 @@ import { EditableCell } from "../../../components/Tables/SimpleTable";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { XIcon } from "@heroicons/react/solid";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { useToasts } from "react-toast-notifications";
 
 export const VerifyItemsModal = ({ open, closeModal, lineItems, status, userSiteId,
     fromSiteId, toSiteId, setLineItems, handleReadyOrder, handleCompleteOrder }) => {
-    console.log("VERIFY")
+    // console.log("VERIFY")
 
     return (
         <SimpleModal open={open} closeModal={closeModal}>
@@ -70,16 +71,10 @@ export const VerifyItemsModal = ({ open, closeModal, lineItems, status, userSite
     );
 }
 
-
-
-
 export const StockTransferHeader = ({ order, userSiteId, openDeleteModal, openRejectModal, handleConfirmOrder, openVerifyItemsModal, handleDeliveringOrder }) => {
     let status = order.statusHistory[order.statusHistory.length - 1].status
     let orderMadeBy = order.statusHistory[0].actionBy.id
-    // console.log("Header:")
-    // console.log(status); 
-    // console.log(orderMadeBy);
-    // console.log("=================")
+  
 
     return (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
@@ -162,7 +157,7 @@ export const StockTransferHeader = ({ order, userSiteId, openDeleteModal, openRe
                     {userSiteId === order.toSite.id && (status === "DELIVERING") ?
                         (<button
                             type="button"
-                            className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                            className="inline-flex items-center px-4 py-2.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none"
                             onClick={openVerifyItemsModal}
                         >
                             {/* Enter actual qty received */}
@@ -231,12 +226,12 @@ export const LineItems = ({ lineItems, status, userSiteId, fromSiteId, toSiteId,
                 disableSortBy: true,
                 Cell: (row) => {
                     return (status === "READY" || status === "DELIVERING") && userSiteId === toSiteId && editable ? (
-                        <EditableCell value={0} row={row.row} column={row.column} updateMyData={updateMyData} />
-                    ) : ("-");
+                        <EditableCell value={row.row.original.actualQty} row={row.row} column={row.column} updateMyData={updateMyData} />
+                        ) : (`${row.row.original.actualQty === null ? "-" : row.row.original.actualQty}`);
                 }
             },
         ]
-    }, []);
+    }, [editable, fromSiteId, setLineItems, status,toSiteId, userSiteId]);
 
     return (
         <div className="mt-8 p-2">
@@ -258,8 +253,6 @@ export const LineItems = ({ lineItems, status, userSiteId, fromSiteId, toSiteId,
 export const StockTransferBody = ({ order, lineItems, userSiteId }) => {
     let status = order.statusHistory[order.statusHistory.length - 1].status;
     let orderMadeBy = order.statusHistory[0].actionBy.name;
-
-    // console.log(lineItems);
 
     return (
         <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
@@ -315,26 +308,19 @@ export const StockTransferBody = ({ order, lineItems, userSiteId }) => {
 
 export const ViewStockTransfer = (subsys) => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const { id } = useParams();
-    const { pathname } = useLocation();
     let userSiteId = useSelector(selectUserSite);
-
     var order = useSelector(selectStockTransferOrder);
     const [lineItems, setLineItems] = useState({});
     const [openDelete, setOpenDelete] = useState(false);
     const [openReject, setOpenReject] = useState(false);
     const [openVerifyItems, setOpenVerifyItems] = useState(false);
-    const stoStatus = useSelector((state) => state.stocktransfer.status)
+    const {addToast} = useToasts();
 
-    console.log("rendering");
-    // console.log("Order: ", order);
-    // console.log("Line Items: ", lineItems);
-    // console.log("========================");
 
     useEffect(() => {
         dispatch(getStockTransfer(id))
-    }, [dispatch, ])
+    }, [dispatch, userSiteId, id])
 
     useEffect(() => {
         setLineItems(order.lineItems)
@@ -369,6 +355,30 @@ export const ViewStockTransfer = (subsys) => {
 
     const closeVerifyItemsModal = () => setOpenVerifyItems(false);
 
+
+    const handleConfirmOrder = (e) => {
+        e.preventDefault();
+        dispatch(confirmStockTransfer({ orderId: id, siteId: userSiteId }))
+            .unwrap()
+            .then(() => {
+                addToast(`Confirmed Stock Transfer Order`, {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                closeDeleteModal();
+                dispatch(getStockTransfer(id))
+            })
+            .catch((error) => {
+                addToast(`Confirm Stock Transfer Order failed. ${error.message}`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                });
+            })
+
+    }
+
+
+
     const handleReadyOrder = (e) => {
         e.preventDefault();
         let temp = { ...order }
@@ -376,8 +386,22 @@ export const ViewStockTransfer = (subsys) => {
         order = temp;
         dispatch(readyStockTransfer({ order: order, siteId: userSiteId }))
             .unwrap()
-            .then(() => alert("Order is ready for delivery"))
-            .catch((err) => alert(err.message));
+            .then(() => {
+                addToast(`Stock Transfer Order Ready for Delivery`, {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                // navigate(`/${subsys.subsys}/stocktransfer/${id}`)
+                // setReload(reload + 1);
+                dispatch(getStockTransfer(id))
+
+            })
+            .catch((err) => {
+                addToast(`${err.message}`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                });
+            });
 
         closeVerifyItemsModal();
     }
@@ -386,10 +410,21 @@ export const ViewStockTransfer = (subsys) => {
         e.preventDefault();
         dispatch(deliverStockTransfer({ order: order, siteId: userSiteId }))
             .unwrap()
-            .then(() => alert("Order is Delivering"))
-            .catch((err) => alert(err.message));
-
-
+            .then(() => {
+                addToast(`Stock Transfer Order is being delivered`, {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                // navigate(`/${subsys.subsys}/stocktransfer/${id}`)
+                // setReload(reload + 1);
+                dispatch(getStockTransfer(id))
+            })
+            .catch((err) => {
+                addToast(`${err.message}`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                });
+            });
     }
 
     const handleCompleteOrder = (e) => {
@@ -399,11 +434,21 @@ export const ViewStockTransfer = (subsys) => {
         order = temp;
         dispatch(completeStockTransfer({ order: order, siteId: userSiteId }))
             .unwrap()
-            .then(() => alert("Order is completed"))
-            .catch((err) => alert(err.message));
+            .then((response) => {
+                addToast(`Stock Transfer Order is completed`, {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                dispatch(getStockTransfer(id))
+            })
+            .catch((err) => {
+                addToast(`${err.message}`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                });
+            });
 
         setOpenVerifyItems(false);
-        navigate(pathname);
     }
 
     const handleConfirmCancel = (e) => {
@@ -411,13 +456,19 @@ export const ViewStockTransfer = (subsys) => {
         dispatch(cancelStockTransfer({ orderId: id, siteId: userSiteId }))
             .unwrap()
             .then(() => {
-                alert("Successfully cancelled stock transfer order");
+                addToast(`Stock Transfer Order is successfully cancelled`, {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
                 closeDeleteModal();
-                navigate(`/${subsys.subsys}/stocktransfer`);
+                dispatch(getStockTransfer(id))
             })
             .catch((error) => {
-                alert(error.message);
-            })
+                addToast(`${error.message}`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                });
+            })        
     }
 
     const handleRejectOrder = (e) => {
@@ -425,29 +476,21 @@ export const ViewStockTransfer = (subsys) => {
         dispatch(rejectStockTransfer({ orderId: id, siteId: userSiteId }))
             .unwrap()
             .then(() => {
-                alert("Successfully rejected stock transfer order");
+                addToast(`Stock Transfer Order is successfully rejected`, {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
                 closeDeleteModal();
-                navigate(`/${subsys.subsys}/stocktransfer`);
+                dispatch(getStockTransfer(id))
             })
             .catch((error) => {
-                alert(error.message);
+                addToast(`${error.message}`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                });
             })
-        dispatch(getStockTransfer(id))
     }
 
-    const handleConfirmOrder = (e) => {
-        e.preventDefault();
-        dispatch(confirmStockTransfer({ orderId: id, siteId: userSiteId }))
-            .unwrap()
-            .then(() => {
-                alert("Successfully confirmed stock transfer order");
-                closeDeleteModal();
-            })
-            .catch((error) => {
-                alert(error.message);
-            })
-        dispatch(getStockTransfer(id));
-    }
 
 
     return (

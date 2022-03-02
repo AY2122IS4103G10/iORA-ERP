@@ -6,11 +6,11 @@ import { Dialog, Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 import { XIcon } from '@heroicons/react/outline'
 
-import { selectUserSite, selectUserStore } from "../../../../stores/slices/userSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { getASiteStock, selectCurrSiteStock, editStock } from "../../../../stores/slices/stocklevelSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchModel, selectModel } from "../../../../stores/slices/productSlice";
-import { api } from "../../../../environments/Api";
+import { useToasts } from "react-toast-notifications";
 
 
 function classNames(...classes) {
@@ -19,14 +19,14 @@ function classNames(...classes) {
 
 
 export const getProductItem = (data, sku) => {
-  console.log(data); 
-  console.log(sku);
-  console.log(data.productItems[2]);
-  console.log(data.productItems.filter((item) => {
-    // console.log(item);
-    return item.productSKU === sku.trim();
+  // console.log(data); 
+  // console.log(sku);
+  // console.log(data.productItems[2]);
+  // console.log(data.productItems.filter((item) => {
+  //   // console.log(item);
+  //   return item.productSKU === sku.trim();
     
-  }));
+  // }));
   return data.productItems.filter((item) => item.productSKU?.trim() === sku.trim());
 }
 
@@ -229,26 +229,23 @@ export const StockLevelForm = () => {
   const { id } = useParams(); //sku code
   const siteId = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
-  const status = useSelector((state) => state.stocklevel.status)
-  const prodStatus = useSelector((state) => state.products.status)
   const siteStock = useSelector(selectCurrSiteStock);
   const [open, setOpen] = useState(false);
   const [rfid, setRfid] = useState("");
   const [selected, setSelected] = useState(actions[0]);
+  const {addToast} = useToasts();
 
   //get product information
   const modelCode = id.substring(0, id.indexOf('-'));
   const model = useSelector(selectModel);
 
-  console.log(siteId); 
-  console.log(siteStock);
 
   useEffect(() => {
     // if (status === "idle") {
       dispatch(getASiteStock(siteId)); 
       dispatch(fetchModel(modelCode));
     // }
-  }, [siteId])
+  }, [dispatch, modelCode, siteId])
 
 
   const openModal = () => setOpen(true);
@@ -276,10 +273,18 @@ export const StockLevelForm = () => {
     dispatch(editStock({toUpdate: toUpdate, siteId: siteId}))
       .unwrap()
       .then((response) => {
-        alert("Successfully edited stock levels");
+        addToast("Successfully created Stock Transfer order", {
+          appearance: "success",
+          autoDismiss: true,
+        });
         closeModal();
       })
-      .catch((err) => alert(err.message))
+      .catch((err) => {
+        addToast(`${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+      });
+      })
   }
 
   return (

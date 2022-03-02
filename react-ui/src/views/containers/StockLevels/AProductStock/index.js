@@ -1,14 +1,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import {
-  getAProduct,
-  selectAProduct,
-} from "../../../../stores/slices/productSlice";
-import {
-  getAllSites,
-  selectAllSites,
-} from "../../../../stores/slices/siteSlice";
+
+import { getProductStockLevel, selectAProduct, selectProductSL } from "../../../../stores/slices/productSlice";
+import { getAProduct } from "../../../../stores/slices/productSlice";
+import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
 
 const columns = [
@@ -26,13 +22,6 @@ const columns = [
   },
 ];
 
-const stocklevel = {
-  1: 1,
-  2: 5,
-  3: 6,
-  4: 9,
-};
-
 function convertData(data, sites) {
   return Object.entries(data).map((pair) => ({
     id: pair[0],
@@ -48,13 +37,13 @@ export const AProductStock = (subsys) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const prod = useSelector(selectAProduct);
-  // const stockLevel = useSelector(selectProductSL);
+  const stocklevel = useSelector(selectProductSL);
   const sites = useSelector(selectAllSites);
 
   useEffect(() => {
-    dispatch(getAProduct(id));
-    // dispatch(getProductStockLevel(id));
-    dispatch(getAllSites());
+      dispatch(getAProduct(id));
+      dispatch(getProductStockLevel(id));
+      dispatch(getAllSites());
   }, [dispatch, id]);
 
   const path = "/" + subsys.subsys.subsys + "/stocklevels";

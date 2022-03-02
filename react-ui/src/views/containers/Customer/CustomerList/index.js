@@ -16,28 +16,28 @@ export const CustomerTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
+        Header: "#",
         accessor: "id",
       },
       {
-        Header: "Customer Name",
+        Header: "Name",
         accessor: (row) => `${row.firstName} ${row.lastName}`,
       },
       {
-        Header: "Date of Birth",
+        Header: "DOB",
         accessor: "dob",
         Cell: (e) => moment(e.value).format("DD/MM/YY"),
       },
       {
-        Header: "Contact Number",
+        Header: "Contact",
         accessor: "contactNumber",
       },
       {
-        Header: "Membership Points",
+        Header: "Member Points",
         accessor: "membershipPoints",
       },
       {
-        Header: "Membership Tier",
+        Header: "Member Tier",
         accessor: (row) => row.membershipTier.name,
         Filter: SelectColumnFilter,
         filter: "includes",
@@ -45,7 +45,15 @@ export const CustomerTable = ({ data, handleOnClick }) => {
       {
         Header: "Status",
         accessor: "availStatus",
-        Cell: (e) => (e.value ? "Available" : "Blocked"),
+        Cell: (e) => (e.value ? (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Active
+          </span>
+        ) : (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            Blocked
+          </span>
+        )),
         Filter: SelectColumnFilter,
         filter: "includes",
       },

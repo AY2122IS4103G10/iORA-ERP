@@ -12,6 +12,7 @@ import {
   ShieldCheckIcon,
   TruckIcon,
   UserGroupIcon,
+  UserIcon,
   UsersIcon,
 } from "@heroicons/react/outline";
 import { classNames } from "../../../../utilities/Util";
@@ -21,7 +22,7 @@ export const tabs = [
   { name: "Sites", href: "/ad/sites", icon: OfficeBuildingIcon, index: 1 },
   { name: "Companies", href: "/ad/companies", icon: LibraryIcon, index: 2 },
   { name: "Departments", href: "/ad/departments", icon: UserGroupIcon, index: 3 },
-  { name: "Job Titles", href: "/ad/jobTitles", icon: UserGroupIcon, index: 4 },
+  { name: "Job Titles", href: "/ad/jobTitles", icon: UserIcon, index: 4 },
   { name: "Vendors", href: "/ad/vendors", icon: TruckIcon, index: 5 },
   {
     name: "Reports & Analytics",

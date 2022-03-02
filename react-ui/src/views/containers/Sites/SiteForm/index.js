@@ -318,6 +318,23 @@ const SiteFormBody = ({
                       </h3>
                     </div>
                     <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                      <SimpleInputGroup
+                        label="Company"
+                        inputField="company"
+                        className="relative rounded-md sm:mt-0 sm:col-span-2"
+                      >
+                        {[companies, companySelected, setCompanySelected].every(
+                          Boolean
+                        ) ? (
+                          <SimpleSelectMenu
+                            options={companies}
+                            selected={companySelected}
+                            setSelected={setCompanySelected}
+                          />
+                        ) : (
+                          <div>No companies</div>
+                        )}
+                      </SimpleInputGroup>
                       {!isEditing && (
                         <SimpleInputGroup
                           label="Site Type"
@@ -399,24 +416,6 @@ const SiteFormBody = ({
                         billing={billing}
                         onBillingChanged={onBillingChanged}
                       />
-
-                      <SimpleInputGroup
-                        label="Company"
-                        inputField="company"
-                        className="relative rounded-md sm:mt-0 sm:col-span-2"
-                      >
-                        {[companies, companySelected, setCompanySelected].every(
-                          Boolean
-                        ) ? (
-                          <SimpleSelectMenu
-                            options={companies}
-                            selected={companySelected}
-                            setSelected={setCompanySelected}
-                          />
-                        ) : (
-                          <div>No companies</div>
-                        )}
-                      </SimpleInputGroup>
                     </div>
                   </div>
                 </div>

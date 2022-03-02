@@ -51,7 +51,7 @@ const navigation = [
     current: false,
   },
   {
-    name: "Customer Relations Management",
+    name: "Customers",
     href: "/sm/customers",
     icon: UserGroupIcon,
     current: false,

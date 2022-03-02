@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { PencilIcon } from "@heroicons/react/solid";
 import {
   fetchCustomers,
@@ -85,7 +86,9 @@ const CustomerDetailsBody = ({
           <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
             <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">First Name</dt>
+                <dt className="text-sm font-medium text-gray-500">
+                  First Name
+                </dt>
                 <dd className="mt-1 text-sm text-gray-900">{firstName}</dd>
               </div>
               <div className="sm:col-span-1">
@@ -100,12 +103,22 @@ const CustomerDetailsBody = ({
                 <dt className="text-sm font-medium text-gray-500">
                   Date of Birth
                 </dt>
-                <dd className="mt-1 text-sm text-gray-900">{moment(dob).format("DD/MM/YYYY")}</dd>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {moment(dob).format("DD/MM/YYYY")}
+                </dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Status</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {availStatus ? "Available" : "Blocked"}
+                  {availStatus ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      Blocked
+                    </span>
+                  )}
                 </dd>
               </div>
               <div className="sm:col-span-1">
@@ -136,10 +149,6 @@ const CustomerDetailsBody = ({
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">{storeCredit}</dd>
               </div>
-              {/* <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Membership Tier</dt>
-                <dd className="mt-1 text-sm text-gray-900">{membershipTier.name}</dd>
-              </div> */}
             </dl>
           </div>
         </div>
@@ -149,6 +158,7 @@ const CustomerDetailsBody = ({
 );
 
 export const CustomerDetails = () => {
+  const { addToast } = useToasts();
   const { customerId } = useParams();
   const customer = useSelector((state) =>
     selectCustomerById(state, parseInt(customerId))
@@ -165,15 +175,33 @@ export const CustomerDetails = () => {
     if (customer.availStatus === true) {
       dispatch(blockExistingCustomer(customerId))
         .then(() => {
+          addToast("Successfully blocked customer.", {
+            appearance: "success",
+            autoDismiss: true,
+          });
           navigate(`/sm/customers/${customerId}`);
         })
-        .catch((err) => console.error(err.message));
+        .catch((err) =>
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          })
+        );
     } else {
       dispatch(unblockExistingCustomer(customerId))
         .then(() => {
+          addToast("Successfully unblocked customer.", {
+            appearance: "success",
+            autoDismiss: true,
+          });
           navigate(`/sm/customers/${customerId}`);
         })
-        .catch((err) => console.error(err.message));
+        .catch((err) =>
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          })
+        );
     }
   };
 

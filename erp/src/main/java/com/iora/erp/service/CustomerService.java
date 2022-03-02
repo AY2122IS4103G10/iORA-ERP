@@ -13,6 +13,8 @@ public interface CustomerService {
 
     public abstract Customer updateCustomerAccount(Customer customer) throws CustomerException;
 
+    public abstract Customer editCustomerAccount(Customer customer) throws CustomerException;
+
     public abstract void blockCustomer(Customer customer) throws CustomerException;
 
     public abstract void unblockCustomer(Customer customer) throws CustomerException;

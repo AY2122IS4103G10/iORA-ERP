@@ -52,6 +52,9 @@ import { Order } from "./views/containers/SelfService/Order";
 import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
 import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
 import { CustomerForm } from "./views/containers/Customer/CustomerForm";
+import { ManageMembershipTier } from "./views/containers/MembershipTier/ManageMembershipTier/index.js";
+import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails/index.js";
+import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm/index.js";
 
 function App() {
   return (
@@ -106,17 +109,23 @@ function App() {
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
             </Route>
-            <Route path="customers" element={<Outlet />}>
-              <Route index element={<ManageCustomer />} />
-              <Route path=":customerId" element={<CustomerDetails />} />
-              <Route path="create" element={<CustomerForm />} />
-              <Route path="edit/:customerId" element={<CustomerForm />} />
-            </Route>
             <Route path="vouchers" element={<Outlet />}>
               <Route index element={<ManageVouchers />} />
               <Route path=":voucherCode" element={<VoucherDetails />} />
               <Route path="create" element={<VoucherForm />} />
               <Route path="edit/:voucherId" element={<VoucherForm />} />
+            </Route>
+            <Route path="customers" element={<Outlet />}>
+              <Route index element={<ManageCustomer />} />
+              <Route path=":customerId" element={<CustomerDetails />} />
+              <Route path="create" element={<CustomerForm />} />
+              <Route path="edit/:customerId" element={<CustomerForm />} />
+              <Route path="tiers" element={<Outlet />}>
+                <Route index element={<ManageMembershipTier />} />
+                <Route path=":name" element={<MembershipTierDetails />} />
+                <Route path="create" element={<MembershipTierForm />} />
+                <Route path="edit/:name" element={<MembershipTierForm />} />
+              </Route>
             </Route>
           </Route>
 

@@ -1,19 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-  PencilIcon,
-} from "@heroicons/react/solid";
+import { PencilIcon } from "@heroicons/react/solid";
 import { TrashIcon } from "@heroicons/react/outline";
 import {
   fetchMembershipTiers,
-  deleteExistingMembershipTier,
-  selectMembershipTierById,
+  selectMembershipTierByName,
 } from "../../../../stores/slices/membershipTierSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useState } from "react";
-import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 
-const Header = ({ membershipTierId, name, openModal }) => {
+const Header = ({ name, openModal }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <div className="flex items-center space-x-3">
@@ -22,7 +18,7 @@ const Header = ({ membershipTierId, name, openModal }) => {
         </div>
       </div>
       <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-        <Link to={`/sm/procurements/edit/${membershipTierId}`}>
+        {/* <Link to={`/sm/customers/tiers/edit/${name}`}>
           <button
             type="button"
             className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
@@ -33,27 +29,13 @@ const Header = ({ membershipTierId, name, openModal }) => {
             />
             <span>Edit</span>
           </button>
-        </Link>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
-          onClick={openModal}
-        >
-          <TrashIcon
-            className="-ml-1 mr-2 h-5 w-5 text-white"
-            aria-hidden="true"
-          />
-          <span>Delete</span>
-        </button>
+        </Link> */}
       </div>
     </div>
   );
 };
 
-const MembershipTierDetailsBody = ({
-  multiplier,
-  threshold
-}) => (
+const MembershipTierDetailsBody = ({ multiplier, threshold }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
       {/* MembershipTier Information*/}
@@ -69,14 +51,22 @@ const MembershipTierDetailsBody = ({
           </div>
           <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
             <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Multiplier</dt>
+              <div className="sm:col-span-2">
+                <dt className="text-sm font-medium text-gray-500">
+                  Multiplier
+                </dt>
                 <dd className="mt-1 text-sm text-gray-900">{multiplier}</dd>
               </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Threshold</dt>
-                <dd className="mt-1 text-sm text-gray-900">{threshold}</dd>
-              </div>
+              {Object.keys(threshold).map((key) => (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Threshold in {key.split(",")[1]} ({key.split(",")[0]})
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {threshold[key]}
+                  </dd>
+                </div>
+              ))}
             </dl>
           </div>
         </div>
@@ -86,47 +76,32 @@ const MembershipTierDetailsBody = ({
 );
 
 export const MembershipTierDetails = () => {
-  const { username } = useParams();
-  const membershipTier = useSelector((state) => selectMembershipTierById(state, username));
-  const [openDelete, setOpenDelete] = useState(false);
+  const { name } = useParams();
+  const membershipTier = useSelector((state) =>
+    selectMembershipTierByName(state, name)
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const memStatus = useSelector((state) => state.membershipTier.status);
+  const memStatus = useSelector((state) => state.membershipTiers.status);
 
   useEffect(() => {
     memStatus === "idle" && dispatch(fetchMembershipTiers());
   }, [memStatus, dispatch]);
 
-  const onDeleteMembershipTierClicked = () => {
-    dispatch(deleteExistingMembershipTier(membershipTier.name));
-    closeModal();
-    navigate("/crm/membershipTier");
-  };
-
-  const openModal = () => setOpenDelete(true);
-  const closeModal = () => setOpenDelete(false);
-
   return (
     Boolean(membershipTier) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="MembershipTiers" path={-1} />
+          <NavigatePrev page="Membership Tiers" path="/sm/customers/tiers" />
           <Header
             membershipTierId={membershipTier.id}
             name={membershipTier.name}
-            openModal={openModal}
           />
           <MembershipTierDetailsBody
             multiplier={membershipTier.multiplier}
             threshold={membershipTier.threshold}
           />
         </div>
-        <ConfirmDelete
-          item={membershipTier.name}
-          open={openDelete}
-          closeModal={closeModal}
-          onConfirm={onDeleteMembershipTierClicked}
-        />
       </>
     )
   );

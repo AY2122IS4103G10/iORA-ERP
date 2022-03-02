@@ -6,24 +6,12 @@ import { CogIcon } from "@heroicons/react/outline";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
   fetchMembershipTiers,
-  selectAllMembershipTier,
+  selectAllMembershipTiers,
 } from "../../../../stores/slices/membershipTierSlice";
 
 export const MembershipTierTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
-      {
-        Header: "Id",
-        accessor: "id",
-        // Cell: (e) => (
-        //   <Link
-        //     to={`/admin/membershipTier/${e.value}`}
-        //     className="hover:text-gray-700 hover:underline"
-        //   >
-        //     {e.value}
-        //   </Link>
-        // ),name, department, companyCode, status, email
-      },
       {
         Header: "Membership Tier",
         accessor: "name",
@@ -33,24 +21,13 @@ export const MembershipTierTable = ({ data, handleOnClick }) => {
         accessor: "multiplier",
       },
       {
-        Header: "Threshold",
-        accessor: "threshold",
-        // Cell: (e) => (e.value ? "Yes" : "No"),
-        // Filter: SelectColumnFilter,
-        // filter: "includes",
+        Header: "Threshold (SGD)",
+        accessor: (e) => e.threshold["SGD,Singapore Dollar"],
       },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/membershipTier",
-      //       },
-      //     ],
-      //   }),
-      // },
+      {
+        Header: "Threshold (RM)",
+        accessor: (e) => e.threshold["RM,Malaysian Ringgit"],
+      },
     ],
     []
   );
@@ -71,13 +48,13 @@ export const MembershipTierTable = ({ data, handleOnClick }) => {
 export const MembershipTierList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const data = useSelector(selectAllMembershipTier);
-  const membershipTierStatus = useSelector((state) => state.membershipTier.status);
+  const data = useSelector(selectAllMembershipTiers);
+  const membershipTierStatus = useSelector((state) => state.membershipTiers.status);
   useEffect(() => {
     membershipTierStatus === "idle" && dispatch(fetchMembershipTiers());
   }, [membershipTierStatus, dispatch]);
   
-  const handleOnClick = (row) => navigate(`/crm/membershipTier/${row.original.id}`);
+  const handleOnClick = (row) => navigate(`/sm/customers/tiers/${row.original.name}`);
 
   return <MembershipTierTable data={data} handleOnClick={handleOnClick} />;
 };

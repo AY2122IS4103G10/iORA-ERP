@@ -12,7 +12,7 @@ import {
   addNewMembershipTier,
   updateExistingMembershipTier,
 } from "../../../../stores/slices/membershipTierSlice";
-
+import { useToasts } from "react-toast-notifications";
 
 const MembershipTierFormBody = ({
   isEditing,
@@ -26,7 +26,9 @@ const MembershipTierFormBody = ({
   onCancelClicked,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-    <h1 className="sr-only">Create New Membership Tier</h1>
+    <h1 className="sr-only">
+      {!isEditing ? "Create New" : "Edit"} Membership Tier
+    </h1>
     {/* Main 3 column grid */}
     <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
       {/* Left column */}
@@ -64,15 +66,23 @@ const MembershipTierFormBody = ({
                         inputField="threshold"
                         className="sm:mt-0 sm:col-span-2"
                       >
-                        <SimpleInputBox
-                          type="text"
-                          name="threshold"
-                          id="threshold"
-                          autoComplete="threshold"
-                          value={threshold}
-                          onChange={onThresholdChanged}
-                          required
-                        />
+                        {Object.keys(threshold).map((k) => (
+                          <SimpleInputGroup
+                            label={`${k}`}
+                            key={`${k}`}
+                            inputField={`${k}`}
+                            className="sm:mt-0 sm:col-span-1"
+                          >
+                            <SimpleInputBox
+                              type="text"
+                              name={`${k}`}
+                              id={`${k}`}
+                              value={threshold[k]}
+                              onChange={(e) => onThresholdChanged(k, e)}
+                              required
+                            />
+                          </SimpleInputGroup>
+                        ))}
                       </SimpleInputGroup>
                       <SimpleInputGroup
                         label="Multiplier"
@@ -107,7 +117,7 @@ const MembershipTierFormBody = ({
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                       onClick={onAddMembershipTierClicked}
                     >
-                      {!isEditing ? "Add" : "Save"} membershipTier
+                      {!isEditing ? "Add" : "Save"} Membership Tier
                     </button>
                   </div>
                 </div>
@@ -121,78 +131,98 @@ const MembershipTierFormBody = ({
 );
 
 export const MembershipTierForm = () => {
-  const { membershipTierId } = useParams();
+  const { name: tierName } = useParams();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(tierName);
   const [multiplier, setMultiplier] = useState("");
-  const [threshold, setThreshold] = useState("");
-  const [active, setActive] = useState(false);
+  const [threshold, setThreshold] = useState({
+    "SGD,Singapore Dollar": 0,
+    "RM,Malaysian Ringgit": 0,
+  });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useToasts();
 
   const onNameChanged = (e) => setName(e.target.value);
-  const onThresholdChanged = (e) => setThreshold(e.target.value);
+  const onThresholdChanged = (k, e) => {
+    const newT = {...threshold}
+    newT[k] = e.target.value
+    setThreshold(newT);
+  };
   const onMultiplierChanged = (e) => setMultiplier(e.target.value);
 
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
-    [
-      name,
-      threshold,
-      multiplier,
-    ].every(Boolean) && requestStatus === "idle";
+    [name, threshold, multiplier].every(Boolean) && requestStatus === "idle";
 
   const onAddMembershipTierClicked = (evt) => {
     evt.preventDefault();
-    if (canAdd)
-      try {
-        setRequestStatus("pending");
-        if (!isEditing) {
-          dispatch(
-            addNewMembershipTier({
-              name,
-              threshold,
-              multiplier,
-            })
-          ).unwrap();
-        } else {
-          dispatch(
-            updateExistingMembershipTier({
-              name,
-              threshold,
-              multiplier,
-            })
-          ).unwrap();
-        }
-        alert("Successfully added membership tier");
-        setName("");
-        navigate(!isEditing ? "/crm/membershipTier" : `/crm/membershipTier/${membershipTierId}`);
-      } catch (err) {
-        console.error("Failed to add membership tier: ", err);
-      } finally {
-        setRequestStatus("idle");
+    if (canAdd) {
+      setRequestStatus("pending");
+      if (!isEditing) {
+        dispatch(
+          addNewMembershipTier({
+            name,
+            threshold,
+            multiplier,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully added membership tier", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            navigate("/sm/customers/tiers");
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+          });
+      } else {
+        dispatch(
+          updateExistingMembershipTier({
+            name,
+            threshold,
+            multiplier,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully updated membership tier", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            navigate(`/sm/customers/tiers/${tierName}`);
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+          });
       }
+    }
   };
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/crm/membershipTier" : `/crm/membershipTier/${membershipTierId}`);
+    navigate(
+      !isEditing ? "/sm/customers/tiers" : `/sm/customers/tiers/${tierName}`
+    );
 
   useEffect(() => {
-    Boolean(membershipTierId) &&
-      api.get("admin/viewMembershipTier", membershipTierId).then((response) => {
-        const {
-          name,
-          threshold,
-          multiplier,
-        } = response.data;
+    Boolean(tierName) &&
+      api.get("sam/membershipTier/", `?name=${tierName}`).then((response) => {
+        const { name, threshold, multiplier } = response.data;
         setIsEditing(true);
         setName(name);
         setThreshold(threshold);
         setMultiplier(multiplier);
-        setActive(active);
       });
-  }, [membershipTierId]);
+  }, [tierName]);
 
   return (
     <MembershipTierFormBody

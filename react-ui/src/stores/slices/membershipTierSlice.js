@@ -2,54 +2,43 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  membershipTier: [],
+  membershipTiers: [],
   status: "idle",
   error: null,
 };
-// {
-//     "name": "PLATINUM",
-//     "multiplier": "0.06",
-//     "threshold": {
-//       "SGD,Singapore Dollar": "1500",
-//       "RM,Malaysian Ringgit": "4500"
-//     }
-//   }
-  
 
 export const fetchMembershipTiers = createAsyncThunk(
-  "membershipTier/fetchMembershipTiers",
+  "membershipTiers/fetchMembershipTiers",
   async () => {
-    const response = await api.getAll("admin/viewMembershipTiers?search=");
+    const response = await api.getAll("sam/membershipTier/all");
     return response.data;
   }
 );
 
 export const addNewMembershipTier = createAsyncThunk(
-  "membershipTier/addNewMembershipTier",
-  async (initialMembershipTier) => {
-    const response = await api.create("admin/addMembershipTier", initialMembershipTier);
+  "membershipTiers/addNewMembershipTier",
+  async (newMembershipTier) => {
+    const response = await api.create(
+      "sam/membershipTier/create",
+      newMembershipTier
+    );
     return response.data;
   }
 );
 
 export const updateExistingMembershipTier = createAsyncThunk(
-  "membershipTier/updateExistingMembershipTier",
+  "membershipTiers/updateExistingMembershipTier",
   async (existingMembershipTier) => {
-    const response = await api.update("admin/editMembershipTier", existingMembershipTier);
-    return response.data;
-  }
-);
-
-export const deleteExistingMembershipTier = createAsyncThunk(
-  "membershipTier/deleteExistingMembershipTier",
-  async (existingMembershipTierId) => {
-    const response = await api.delete("admin/deleteMembershipTier", existingMembershipTierId);
+    const response = await api.update(
+      "sam/membershipTier/edit",
+      existingMembershipTier
+    );
     return response.data;
   }
 );
 
 const membershipTierSlice = createSlice({
-  name: "membershipTier",
+  name: "membershipTiers",
   initialState,
   extraReducers(builder) {
     builder.addCase(fetchMembershipTiers.pending, (state, action) => {
@@ -57,42 +46,37 @@ const membershipTierSlice = createSlice({
     });
     builder.addCase(fetchMembershipTiers.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.membershipTier = state.membershipTier.concat(action.payload);
+      state.membershipTiers = state.membershipTiers.concat(action.payload);
     });
     builder.addCase(fetchMembershipTiers.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewMembershipTier.fulfilled, (state, action) => {
-      state.membershipTier.push(action.payload);
+      state.membershipTiers.push(action.payload);
+      state.membershipTiers.sort((x, y) => x.multiplier - y.multiplier);
     });
     builder.addCase(updateExistingMembershipTier.fulfilled, (state, action) => {
-      const {
-        membershipTierId,
-        name,
-        multiplier,
-        threshold,
-      } = action.payload;
+      const { name, multiplier, threshold } = action.payload;
       console.log(action.payload);
-      const existingMembershipTier = state.membershipTier.find((emp) => emp.membershipTierId === membershipTierId);
+      const existingMembershipTier = state.membershipTiers.find(
+        (tier) => tier.name === name
+      );
       if (existingMembershipTier) {
-        existingMembershipTier.name = name;
         existingMembershipTier.multiplier = multiplier;
         existingMembershipTier.threshold = threshold;
       }
+      state.membershipTiers.sort((x) => x.multiplier);
       // state.status = "idle";
-    });
-    builder.addCase(deleteExistingMembershipTier.fulfilled, (state, action) => {
-      state.membershipTier = state.membershipTier.filter(
-        ({ membershipTierId }) => membershipTierId !== action.payload.membershipTierId
-      );
-      // state.status = "idle"
     });
   },
 });
 
 export default membershipTierSlice.reducer;
 
-export const selectAllMembershipTier = (state) => state.membershipTier.membershipTier;
+export const selectAllMembershipTiers = (state) =>
+  state.membershipTiers.membershipTiers;
 
-export const selectMembershipTierById = (state, membershipTierId) =>
-  state.membershipTier.membershipTier.find((membershipTier) => membershipTier.membershipTierId === membershipTierId);
+export const selectMembershipTierByName = (state, membershipTierName) =>
+  state.membershipTiers.membershipTiers.find(
+    (mt) => mt.name === membershipTierName
+  );

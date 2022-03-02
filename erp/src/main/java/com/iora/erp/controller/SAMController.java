@@ -508,8 +508,7 @@ public class SAMController {
     @PostMapping(path = "/membershipTier/create", consumes = "application/json")
     public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {
         try {
-            customerService.createMembershipTier(tier);
-            return ResponseEntity.ok("Membership Tier (" + tier.getName() + ") was successfully created.");
+            return ResponseEntity.ok(customerService.createMembershipTier(tier));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

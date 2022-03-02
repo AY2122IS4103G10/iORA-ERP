@@ -47,5 +47,5 @@ public interface CustomerService {
 
     public abstract MembershipTier findMembershipTierById(String name);
 
-    public abstract void createMembershipTier(MembershipTier membershipTier);
+    public abstract MembershipTier createMembershipTier(MembershipTier membershipTier);
 }

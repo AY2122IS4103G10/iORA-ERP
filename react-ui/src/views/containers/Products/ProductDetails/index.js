@@ -1,18 +1,14 @@
 import { CurrencyDollarIcon } from "@heroicons/react/outline";
-import {
-  PencilIcon
-} from "@heroicons/react/solid";
+import { PencilIcon } from "@heroicons/react/solid";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import {
   fetchProducts,
-  selectProductByCode
+  selectProductByCode,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import {
-  SimpleTable
-} from "../../../components/Tables/SimpleTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const fieldSection = ({ fieldName, fields }) => {
   return Boolean(fields.length) ? (
@@ -228,18 +224,36 @@ export const ProductDetails = () => {
           name={product.name}
           description={product.description}
           price={product.price}
-          colors={product.productFields.filter(
-            (field) => field.fieldName === "COLOUR"
-          )}
+          colors={product.productFields
+            .filter((field) => field.fieldName === "COLOUR")
+            .sort((f1, f2) =>
+              f1.fieldValue < f2.fieldValue
+                ? -1
+                : f1.fieldValue > f2.fieldValue
+                ? 1
+                : 0
+            )}
           sizes={product.productFields.filter(
             (field) => field.fieldName === "SIZE"
           )}
-          tags={product.productFields.filter(
-            (field) => field.fieldName === "TAG"
-          )}
-          categories={product.productFields.filter(
-            (field) => field.fieldName === "CATEGORY"
-          )}
+          tags={product.productFields
+            .filter((field) => field.fieldName === "TAG")
+            .sort((f1, f2) =>
+              f1.fieldValue < f2.fieldValue
+                ? -1
+                : f1.fieldValue > f2.fieldValue
+                ? 1
+                : 0
+            )}
+          categories={product.productFields
+            .filter((field) => field.fieldName === "CATEGORY")
+            .sort((f1, f2) =>
+              f1.fieldValue < f2.fieldValue
+                ? -1
+                : f1.fieldValue > f2.fieldValue
+                ? 1
+                : 0
+            )}
           available={product.available}
           products={product.products}
         />

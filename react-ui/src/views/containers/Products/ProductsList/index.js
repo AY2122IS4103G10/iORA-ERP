@@ -30,7 +30,7 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       },
       {
         Header: "Color",
-        width: 278,
+        width: 268,
         accessor: (row) =>
           row.productFields
             .filter((field) => field.fieldName === "COLOUR")
@@ -61,8 +61,17 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       {
         Header: "Available",
         accessor: "available",
-        width: 110,
-        Cell: (e) => (e.value ? "Yes" : "No"),
+        width: 120,
+        Cell: (e) =>
+          e.value ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              Available
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Unavailable
+            </span>
+          ),
       },
     ],
     []
@@ -89,7 +98,8 @@ export const ProductsList = () => {
   const prodStatus = useSelector((state) => state.products.status);
   const error = useSelector((state) => state.products.error);
 
-  const handleOnClick = (row) => navigate(`${pathname}/${row.original.modelCode}`);
+  const handleOnClick = (row) =>
+    navigate(`${pathname}/${row.original.modelCode}`);
 
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { addNewProductField } from "../../../../stores/slices/prodFieldSlice";
 
@@ -498,6 +498,7 @@ const AddProductFormBody = ({
 };
 
 export const ProductForm = () => {
+  const {pathname} = useLocation()
   const { addToast } = useToasts();
   const dispatch = useDispatch();
   const navigate = useNavigate();

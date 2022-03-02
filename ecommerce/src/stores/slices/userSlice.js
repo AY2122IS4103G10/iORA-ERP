@@ -109,7 +109,6 @@ const userSlice = createSlice({
       action.payload.hashPass !== undefined && delete action.payload.hashPass;
       state.user = action.payload;
       state.status = "succeeded";
-      state.loggedIn = true;
     });
     builder.addCase(updateAccount.rejected, (state, action) => {
       state.error = "Update failed";

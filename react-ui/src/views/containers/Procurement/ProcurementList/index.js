@@ -4,7 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../../../environments/Api";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import {
-  SelectColumnFilter, SimpleTable
+  SelectColumnFilter,
+  SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 
 export const ProcurementTable = ({ data, handleOnClick }) => {
@@ -38,8 +39,10 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
         Header: "Updated",
         accessor: (row) =>
           moment
-            .unix(row.statusHistory[row.statusHistory.length - 1].timeStamp / 1000)
-            .format("DD/MM/YY, h:mm:ss a"),
+            .unix(
+              row.statusHistory[row.statusHistory.length - 1].timeStamp / 1000
+            )
+            .format("DD/MM/YY, HH:mm:ss"),
       },
     ],
     []

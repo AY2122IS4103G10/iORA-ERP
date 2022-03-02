@@ -18,34 +18,50 @@ export const fetchVouchers = createAsyncThunk(
 export const addNewVouchers = createAsyncThunk(
   "vouchers/addNewVouchers",
   async (initialVoucher) => {
-    const response = await api.create("sam/voucher", initialVoucher);
-    return response.data;
+    try {
+      const response = await api.create("sam/voucher", initialVoucher);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const issueVoucher = createAsyncThunk(
   "vouchers/issueVoucher",
   async (voucherCode) => {
-    const response = await voucherApi.issue(voucherCode);
-    return response.data;
+    try {
+      const response = await voucherApi.issue(voucherCode);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 export const redeemVoucher = createAsyncThunk(
   "vouchers/redeemVoucher",
   async (voucherCode) => {
-    const response = await voucherApi.redeem(voucherCode);
-    return response.data;
+    try {
+      const response = await voucherApi.redeem(voucherCode);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const deleteExistingVoucher = createAsyncThunk(
   "vouchers/deleteExistingVoucher",
   async (existingVoucherCode) => {
-    const response = await api.delete(
-      "sam/voucher/delete",
-      existingVoucherCode
-    );
-    return response.data;
+    try {
+      const response = await api.delete(
+        "sam/voucher/delete",
+        existingVoucherCode
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
@@ -86,9 +102,7 @@ const voucherSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(deleteExistingVoucher.fulfilled, (state, action) => {
-      state.vouchers = state.vouchers.filter(
-        ({ voucherCode }) => voucherCode !== action.payload
-      );
+      state.status = "idle";
     });
   },
 });

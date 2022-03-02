@@ -20,13 +20,13 @@ const navigation = [
   {
     name: "Stock Levels",
     href: "/wh/stocklevels/my",
-    icon: TruckIcon,
+    icon: CollectionIcon,
     current: false,
   },
   {
     name: "Procurement",
     href: "/wh/procurements",
-    icon: TruckIcon,
+    icon: DocumentTextIcon,
     current: false,
   },
   {

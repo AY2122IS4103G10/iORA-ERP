@@ -162,7 +162,7 @@ export function FrontPage() {
         dispatch(getCustomerByPhone(phone))
             .unwrap()
             .then((data) => {
-                window.localStorage.setItem("customer", JSON.stringify(data));
+                window.localStorage.setItem("customer", JSON.stringify(data[0]));
             })
             .then(wait())
             .catch(error => setError(true))

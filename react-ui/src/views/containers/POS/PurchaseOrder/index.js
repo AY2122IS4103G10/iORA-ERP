@@ -4,6 +4,8 @@ import {Fragment} from "react";
 import {useDispatch} from "react-redux";
 import {Dialog, Transition} from "@headlessui/react";
 import {getProductDetails, getProductItem} from "../../../../stores/slices/productSlice";
+import {useToasts} from "react-toast-notifications";
+import {useMountedLayoutEffect} from "react-table";
 
 export const SimpleModal = ({open, closeModal, children}) => {
   return (
@@ -186,15 +188,17 @@ const OrderList = ({
 );
 
 export const PosPurchaseOrder = () => {
+  const dispatch = useDispatch();
   const [modalState, setModalState] = useState(false);
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
   const [productItems, setProductItems] = useState([]);
+  const [rfidList, setRfidList] = useState([]);
   const [products, setProducts] = useState([]);
   const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
   const [error, setError] = useState(false);
-  const dispatch = useDispatch();
+  const {addToast} = useToasts();
 
   const onRfidChanged = (e) => setRfid(e.target.value);
 
@@ -207,7 +211,13 @@ export const PosPurchaseOrder = () => {
         "discountedPrice" in data
           ? setAmount(amount + data.discountedPrice)
           : setAmount(amount + data.price);
-        setError(false);
+        //setError(false);
+      })
+      .catch((err) => {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
       });
   };
 
@@ -216,11 +226,23 @@ export const PosPurchaseOrder = () => {
     dispatch(getProductItem(rfid))
       .unwrap()
       .then((data) => {
-        productItems.push(data);
-        setProductItems(productItems);
-        addProduct(rfid);
+        if (rfidList.includes(rfid) === false) {
+          console.log(productItems.includes(data));
+          productItems.push(data);
+          setProductItems(productItems);
+          rfidList.push(rfid);
+          setRfidList(rfidList);
+          addProduct(rfid);
+        } else {
+          throw new Error("Error: Duplicate RFID");
+        }
       })
-      .catch((err) => setError(true));
+      .catch((err) => {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
     setRfid("");
   };
 

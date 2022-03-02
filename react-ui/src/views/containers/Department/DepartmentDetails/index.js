@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { PencilIcon } from "@heroicons/react/solid";
 import { TrashIcon } from "@heroicons/react/outline";
 import {
@@ -99,6 +100,7 @@ const JobTitleTable = ({ data }) => {
 };
 
 export const DepartmentDetails = () => {
+  const { addToast } = useToasts();
   const { departmentId } = useParams();
   const department = useSelector((state) =>
     selectDepartmentById(state, parseInt(departmentId))
@@ -113,10 +115,22 @@ export const DepartmentDetails = () => {
   }, [depStatus, dispatch]);
 
   const onDeleteDepartmentClicked = () => {
-    dispatch(deleteExistingDepartment(departmentId)).then(() => {
-      closeModal();
-      navigate("/ad/departments");
-    });
+    dispatch(deleteExistingDepartment(departmentId))
+      .unwrap()
+      .then(() => {
+        addToast("Successfully deleted company", {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        closeModal();
+        navigate("/ad/departments");
+      })
+      .catch((err) => {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
   };
 
   const openModal = () => setOpenDelete(true);

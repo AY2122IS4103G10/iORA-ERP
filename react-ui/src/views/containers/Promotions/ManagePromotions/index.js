@@ -78,6 +78,7 @@ const PromoModal = ({
                       onChange={onDiscPriceChanged}
                       required
                       step="0.01"
+                      min="0"
                       aria-describedby="price-currency"
                       disabled={modalState === "view"}
                     />

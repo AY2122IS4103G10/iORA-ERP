@@ -2,6 +2,7 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/outline";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import {
   deleteExistingCompany,
   fetchCompanies,
@@ -14,7 +15,7 @@ import {
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 
-const Header = ({ company, openModal }) => {
+const Header = ({ company, openModal, available }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <div className="flex items-center space-x-3">
@@ -35,17 +36,19 @@ const Header = ({ company, openModal }) => {
             <span>Edit</span>
           </button>
         </Link>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
-          onClick={openModal}
-        >
-          <TrashIcon
-            className="-ml-1 mr-2 h-5 w-5 text-white"
-            aria-hidden="true"
-          />
-          <span>Delete</span>
-        </button>
+        {available && (
+          <button
+            type="button"
+            className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+            onClick={openModal}
+          >
+            <TrashIcon
+              className="-ml-1 mr-2 h-5 w-5 text-white"
+              aria-hidden="true"
+            />
+            <span>Delete</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -135,6 +138,7 @@ const VendorTable = ({ data }) => {
 };
 
 export const CompanyDetails = () => {
+  const { addToast } = useToasts();
   const { companyId } = useParams();
   const company = useSelector((state) =>
     selectCompanyById(state, parseInt(companyId))
@@ -151,13 +155,18 @@ export const CompanyDetails = () => {
   const onDeleteCompanyClicked = () => {
     dispatch(deleteExistingCompany(companyId))
       .then(() => {
-        alert("Successfully deleted company");
+        addToast("Successfully deleted company", {
+          appearance: "success",
+          autoDismiss: true,
+        });
         closeModal();
         navigate("/ad/companies");
       })
       .catch((err) => {
-        alert("Failed to add company: ", err);
-        console.error("Failed to add company: ", err);
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
       });
   };
   const openModal = () => setOpenDelete(true);
@@ -168,7 +177,11 @@ export const CompanyDetails = () => {
       <>
         <div className="py-8 xl:py-10">
           <NavigatePrev page="Companies" path="/ad/companies" />
-          <Header company={company} openModal={openModal} />
+          <Header
+            company={company}
+            openModal={openModal}
+            available={company.available}
+          />
           <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
             <div className="space-y-6 lg:col-start-1 lg:col-span-2">
               {/* Site Information list*/}

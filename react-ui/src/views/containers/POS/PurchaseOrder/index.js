@@ -211,7 +211,6 @@ export const PosPurchaseOrder = () => {
         "discountedPrice" in data
           ? setAmount(amount + data.discountedPrice)
           : setAmount(amount + data.price);
-        //setError(false);
       })
       .catch((err) => {
         addToast(`Error: ${err.message}`, {
@@ -227,7 +226,6 @@ export const PosPurchaseOrder = () => {
       .unwrap()
       .then((data) => {
         if (rfidList.includes(rfid) === false) {
-          console.log(productItems.includes(data));
           productItems.push(data);
           setProductItems(productItems);
           rfidList.push(rfid);
@@ -273,6 +271,7 @@ export const PosPurchaseOrder = () => {
   const clear = () => {
     setProducts([]);
     setProductItems([]);
+    setRfidList([]);
     setAmount(0);
   };
 

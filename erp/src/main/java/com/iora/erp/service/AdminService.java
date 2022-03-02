@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.iora.erp.exception.AddressException;
 import com.iora.erp.exception.CompanyException;
@@ -21,6 +22,7 @@ public interface AdminService {
     public abstract void deleteJobTitle(Long id) throws JobTitleException;
     public abstract List<JobTitle> listOfJobTitles() throws JobTitleException;
     public abstract List<JobTitle> getJobTitlesByFields(String search) throws JobTitleException;
+    public abstract List<String> getAccessRights();
     public abstract JobTitle getJobTitleById(Long id)  throws JobTitleException;
     public abstract JobTitle getJobTitlesByName(String name) throws JobTitleException;
 

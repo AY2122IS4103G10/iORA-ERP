@@ -34,10 +34,7 @@ export const updateExistingJobTitle = createAsyncThunk(
 export const deleteExistingJobTitle = createAsyncThunk(
   "jobTitle/deleteExistingJobTitle",
   async (existingJobTitleId) => {
-    const response = await api.deleteJobTitle(
-      "admin/deleteEmployee",
-      existingJobTitleId
-    );
+    const response = await api.delete("admin/deleteJobTitle",existingJobTitleId);
     return response.data;
   }
 );
@@ -88,4 +85,4 @@ export default jobTitleSlice.reducer;
 export const selectAllJobTitle = (state) => state.jobTitle.jobTitle;
 
 export const selectJobTitleById = (state, jobTitleId) =>
-  state.jobTitle.jobTitle.find((jTitle) => jTitle.jobTitleId === jobTitleId);
+  state.jobTitle.jobTitle.find((jobTitle) => jobTitle.id === jobTitleId);

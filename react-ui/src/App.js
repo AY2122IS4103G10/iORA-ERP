@@ -173,7 +173,7 @@ function App() {
             </Route>
             <Route path="jobTitles" element={<Outlet />}>
               <Route index element={<ManageJobTitle />} />
-              <Route path=":title" element={<JobTitleDetails />} />
+              <Route path=":jobTitleId" element={<JobTitleDetails />} />
               <Route path="create" element={<JobTitleForm />} />
               <Route path="edit/:jobTitleId" element={<JobTitleForm />} />
             </Route>

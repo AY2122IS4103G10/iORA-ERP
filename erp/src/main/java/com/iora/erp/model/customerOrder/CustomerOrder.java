@@ -26,6 +26,9 @@ public class CustomerOrder {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime dateTime;
 
+    @Column(nullable = false)
+    private Double totalAmount;
+
     @OneToMany
     private List<CustomerOrderLI> lineItems;
 
@@ -47,6 +50,7 @@ public class CustomerOrder {
         this.payments = new ArrayList<>();
         this.refundedLIs = new ArrayList<>();
         this.exhcangedLIs = new ArrayList<>();
+        this.totalAmount = 0.0;
     }
 
     public Long getId() {
@@ -87,6 +91,7 @@ public class CustomerOrder {
 
     public void addPayment(Payment payment) {
         this.payments.add(payment);
+        this.totalAmount += payment.getAmount();
     }
 
     public List<RefundLI> getRefundedLIs() {
@@ -127,5 +132,13 @@ public class CustomerOrder {
 
     public void setStoreSiteId(Long storeSiteId) {
         this.storeSiteId = storeSiteId;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

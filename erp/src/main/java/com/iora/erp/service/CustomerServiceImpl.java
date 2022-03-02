@@ -138,7 +138,7 @@ public class CustomerServiceImpl implements CustomerService {
          * , Customer.class);
          */
         return em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.email) LIKE :email OR " +
-                "LOWER(c.LastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact",
+                "LOWER(c.lastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact",
                 Customer.class)
                 .setParameter("email", "%" + search.toLowerCase() + "%")
                 .setParameter("last", "%" + search.toLowerCase() + "%")

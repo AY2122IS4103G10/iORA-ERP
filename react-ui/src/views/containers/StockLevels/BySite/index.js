@@ -11,6 +11,10 @@ export const SiteTables = (subsys) => {
     const columns = useMemo(
         () => [
             {
+                Header: "Site ID",
+                accessor: "id"
+            },
+            {
                 Header: "Name",
                 accessor: "name"
             },

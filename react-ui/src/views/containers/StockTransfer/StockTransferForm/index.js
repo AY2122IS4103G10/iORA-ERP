@@ -267,13 +267,6 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
                         >
                             Select Items
                         </Dialog.Title>
-                        <button
-                            type="button"
-                            className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
-                            onClick={closeModal}
-                        >
-                            <XIcon className="h-5 w-5" />
-                        </button>
                     </div>
                     <div className="border-b border-gray-200 m-5">
                         <ItemsList
@@ -506,15 +499,16 @@ export const StockTransferForm = (subsys) => {
         console.log("Order created: ", stockTransferOrder)
         dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
-            .then(() => {
+            .then((response) => {
                 addToast("Successfully created Stock Transfer order", {
                     appearance: "success",
                     autoDismiss: true,
                 });
-                navigate(`/${subsys.subsys}/stocktransfer`);
+                console.log(response)
+                navigate(`/${subsys.subsys}/stocktransfer/${response.id}`);
             })
             .catch((error) => {
-                addToast(`Creating stock transfer failed. ${error.message}`, {
+                addToast(`${error.message}`, {
                     appearance: "error",
                     autoDismiss: true,
                 });

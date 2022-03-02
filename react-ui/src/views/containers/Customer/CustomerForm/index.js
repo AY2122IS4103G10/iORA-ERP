@@ -297,14 +297,12 @@ export const CustomerForm = () => {
         } else {
           dispatch(
             updateExistingCustomer({
+              id: customerId,
               firstName,
               lastName,
               dob,
               contactNumber,
               email,
-              membershipTier,
-              membershipPoints,
-              storeCredit,
             })
           )
             .unwrap()

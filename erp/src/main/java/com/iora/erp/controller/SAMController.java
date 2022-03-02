@@ -565,11 +565,11 @@ public class SAMController {
     }
 
     @PutMapping(path = "/customer/edit", consumes = "application/json", produces = "application/json")
-    public Customer completeProcurementOrder(@RequestBody Customer customer) {
+    public ResponseEntity<Object> completeProcurementOrder(@RequestBody Customer customer) {
         try {
-            return customerService.editCustomerAccount(customer);
+            return ResponseEntity.ok(customerService.editCustomerAccount(customer));
         } catch (Exception ex) {
-            return null;
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 }

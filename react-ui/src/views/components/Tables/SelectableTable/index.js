@@ -37,7 +37,7 @@ const GlobalFilter = ({preGlobalFilteredRows, globalFilter, setGlobalFilter}) =>
       <span className="text-gray-700">Search: </span>
       <input
         type="text"
-        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
         value={value || ""}
         onChange={(e) => {
           setValue(e.target.value);
@@ -65,7 +65,7 @@ export const SelectColumnFilter = ({
     <label className="flex gap-x-2 items-baseline">
       <span className="text-gray-700">{render("Header")}: </span>
       <select
-        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
         name={id}
         id={id}
         value={filterValue}

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { api } from "../../../../environments/Api";
 
-import { getProductStockLevel, selectAProduct } from "../../../../stores/slices/productSlice";
+import { getProductStockLevel, selectAProduct, selectProductSL } from "../../../../stores/slices/productSlice";
 import { getAProduct } from "../../../../stores/slices/productSlice";
 import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
@@ -27,13 +27,6 @@ const columns =[
   }
 ]
 
-const stocklevel = {
-    1: 1,
-    2: 5,
-    3: 6,
-    4: 9,
-}
-
 function convertData(data, sites) {
   return Object.entries(data).map((pair) => ({
     id: pair[0],
@@ -48,12 +41,12 @@ export const AProductStock = (subsys) => {
   const {id} = useParams();
   const dispatch = useDispatch();
   const prod = useSelector(selectAProduct);
-  // const stockLevel = useSelector(selectProductSL);
+  const stockLevel = useSelector(selectProductSL);
   const sites = useSelector(selectAllSites);
 
   useEffect(() => {
       dispatch(getAProduct(id));
-      // dispatch(getProductStockLevel(id));
+      dispatch(getProductStockLevel(id));
       dispatch(getAllSites());
   }, []);
 
@@ -110,8 +103,8 @@ export const AProductStock = (subsys) => {
             {/* Stock Levels By Products*/}
             <section aria-labelledby="stocks-level">
                 <div className="m-1">
-                {sites.length == 0 || stocklevel == undefined ? <p>loading</p> : 
-                  <SelectableTable columns={columns} data={convertData(stocklevel, sites)} path={path}/>
+                {sites.length == 0 || stockLevel == undefined ? <p>loading</p> : 
+                  <SelectableTable columns={columns} data={convertData(stockLevel, sites)} path={path}/>
                 }
                 </div>
             </section>

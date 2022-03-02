@@ -17,6 +17,7 @@ import { api } from "../../../../environments/Api";
 import { selectUserStore } from "../../../../stores/slices/userSlice";
 import { createStockTransfer, editStockTransfer, getStockTransfer, selectStockTransferOrder } from "../../../../stores/slices/stocktransferSlice";
 import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 
 
 
@@ -259,21 +260,21 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
         <SimpleModal open={open} closeModal={closeModal}>
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-max">
                 <div>
-                        <div className="flex justify-between border-b border-gray-200">
-                            <Dialog.Title
-                                as="h3"
-                                className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
-                            >
-                                Select Items
-                            </Dialog.Title>
-                            <button
-                                type="button"
-                                className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
-                                onClick={closeModal}
-                            >
-                                <XIcon className="h-5 w-5" />
-                            </button>
-                        </div>
+                    <div className="flex justify-between border-b border-gray-200">
+                        <Dialog.Title
+                            as="h3"
+                            className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
+                        >
+                            Select Items
+                        </Dialog.Title>
+                        <button
+                            type="button"
+                            className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
+                            onClick={closeModal}
+                        >
+                            <XIcon className="h-5 w-5" />
+                        </button>
+                    </div>
                     <div className="border-b border-gray-200 m-5">
                         <ItemsList
                             cols={itemCols}
@@ -398,6 +399,7 @@ export const StockTransferForm = (subsys) => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [originalOrder, setOriginalOrder] = useState({});
     const currSite = useSelector(selectUserSite);
+    const { addToast } = useToasts();
 
     //get stock level and product information
     const stocklevel = useSelector(selectCurrSiteStock);
@@ -480,6 +482,12 @@ export const StockTransferForm = (subsys) => {
         closeItemsModal();
     }
 
+    const validateForm = () => {
+        if (isObjectEmpty(from) || isObjectEmpty(to)) {
+            return false;
+        }
+        //check negative quantity
+    }
 
     //Handle Create Order product
     const handleSubmit = (e) => {
@@ -499,11 +507,17 @@ export const StockTransferForm = (subsys) => {
         dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
             .then(() => {
-                alert("Successfully created stock transfer order");
+                addToast("Successfully created Stock Transfer order", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
                 navigate(`/${subsys.subsys}/stocktransfer`);
             })
             .catch((error) => {
-                alert(error.message);
+                addToast(`Creating stock transfer failed. ${error.message}`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                });
             })
     }
 
@@ -522,10 +536,18 @@ export const StockTransferForm = (subsys) => {
         dispatch(editStockTransfer({ order: originalOrder, siteId: currSite }))
             .unwrap()
             .then(() => {
-                alert("Successfully edited stock transfer order");
+                addToast("Successfully edited stock transfer order", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
                 navigate(`/${subsys.subsys}/stocktransfer/${id}`);
             })
-            .catch((error) => alert(error.message))
+            .catch((error) => {
+                addToast(`Edit stock transfer failed. ${error.message}`, {
+                appearance: "error",
+                autoDismiss: true,
+                })
+            });
     }
 
     //cancel 

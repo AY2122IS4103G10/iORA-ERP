@@ -42,11 +42,16 @@ export const SiteTables = (subsys) => {
 
 export const SiteStocks = (subsys) => {
 
-    const tabs = [
+    let tabs = [
         { name: 'My Site', href: `/${subsys.subsys}/stocklevels/my`, current: false },
         { name: 'By Sites', href: `/${subsys.subsys}/stocklevels/sites`, current: true },
         { name: 'By Products', href: `/${subsys.subsys}/stocklevels/products`, current: false },
     ]
+
+    if (subsys.subsys === "sm") {
+        tabs = tabs.slice(1);
+    }
+
     return (
         <>
             <SectionHeading header="Stock Levels" tabs={tabs} />

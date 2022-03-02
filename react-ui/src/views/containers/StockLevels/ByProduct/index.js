@@ -13,6 +13,9 @@ const columns = [
     Header: "Name",
     accessor: "name"
   },
+  // {
+  //   Header: "Total Qty"
+  // }
 ]
 
 
@@ -29,7 +32,7 @@ export const ProductTable = (subsys) => {
 
   useEffect(() => {
     dispatch(fetchProducts());
-  }, []);
+  }, [dispatch]);
 
   const path = "/" + subsys.subsys.subsys + "/stocklevels/products";
   return (
@@ -43,11 +46,16 @@ export const ProductTable = (subsys) => {
 
 export const ProductStocks = (subsys) => {
 
-  const tabs = [
+  let tabs = [
     { name: 'My Site', href: `/${subsys.subsys}/stocklevels/my`, current: false },
     { name: 'By Sites', href: `/${subsys.subsys}/stocklevels/sites`, current: false },
     { name: 'By Products', href: `/${subsys.subsys}/stocklevels/products`, current: true },
   ]
+
+
+  if (subsys.subsys === "sm") {
+    tabs = tabs.slice(1);
+  }
 
   return (
     <>

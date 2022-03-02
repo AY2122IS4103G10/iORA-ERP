@@ -7,7 +7,6 @@ import { WHIndex } from "./views/containers/Index/WHIndex";
 import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
-import { ViewStockLevels } from "./views/containers/StockLevels/ManageStockLevels";
 import { SiteStocks } from "./views/containers/StockLevels/BySite/index.js";
 import { ProductStocks } from "./views/containers/StockLevels/ByProduct/index.js";
 import { AsiteStock } from "./views/containers/StockLevels/ASiteStock/index.js";
@@ -30,7 +29,6 @@ import { ManageProcurement } from "./views/containers/Procurement/ManageProcurem
 import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
 import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { SiteDetails } from "./views/containers/Sites/SiteDetails";
-import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
 import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
 import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
@@ -47,7 +45,7 @@ import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/ind
 import Error from "./views/containers/Auth/Error";
 import { Auth } from "./views/containers/Auth/Auth";
 import { ManagePOS } from "./views/containers/POS/ManagePOS";
-import { StockLevelForm } from "./views/containers/StockLevels/StockLevelForm";
+import { StockLevelForm } from "./views/containers/StockLevels/ProdStockLevelForm";
 import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTransfer";
 import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
 import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
@@ -139,7 +137,7 @@ function App() {
             }
           >
             <Route path="stocklevels">
-              <Route path="my/:id" element={<StockLevelForm subsys="str"/>} />
+             <Route path="my/:id" element={<StockLevelForm subsys="str"/>} />
               <Route path="my" element={<MyStoreStock subsys="str"/>} />
               <Route path="sites" element={<SiteStocks subsys="str"/>} />
               <Route path="products" element={<ProductStocks subsys="str" />} />

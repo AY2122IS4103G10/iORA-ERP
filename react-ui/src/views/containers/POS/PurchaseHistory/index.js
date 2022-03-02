@@ -1,4 +1,4 @@
-import {Link} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useState, useEffect, useMemo} from "react";
 import {useSelector, useDispatch} from "react-redux";
 import {SimpleTable} from "../../../components/Tables/SimpleTable";
@@ -27,12 +27,16 @@ const columns = [
 ];
 
 export const PosPurchaseHistory = (subsys) => {
+  const {pathname} = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const data = useSelector(selectAllOrder);
   const orderStatus = useSelector((state) => state.pos.status);
   const siteStatus = useSelector((state) => state.sites.status);
   const siteId = useSelector(selectUserSite);
   const site = useSelector(selectSite);
+
+  const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
 
   useEffect(() => {
     console.log(siteId);
@@ -64,7 +68,7 @@ export const PosPurchaseHistory = (subsys) => {
                   {data == undefined ? (
                     <p>No Records</p>
                   ) : (
-                    <SimpleTable columns={columns} data={data} />
+                    <SimpleTable columns={columns} data={data} handleOnClick={handleOnClick} />
                   )}
                 </div>
               </section>

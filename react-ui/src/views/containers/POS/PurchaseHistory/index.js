@@ -18,11 +18,11 @@ const columns = [
   },
   {
     Header: "Amount",
-    accessor: (row) => row.payments.amount,
+    accessor: "totalAmount",
   },
   {
     Header: "Customer Number",
-    accessor: (row) => row.customer.id,
+    accessor: (row) => row.customerId,
   },
 ];
 

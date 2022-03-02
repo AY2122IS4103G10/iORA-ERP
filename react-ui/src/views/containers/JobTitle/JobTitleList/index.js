@@ -16,18 +16,34 @@ export const JobTitleTable = ({ data, handleOnClick }) => {
       {
         Header: "#",
         accessor: "id",
+        width: 80,
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
       {
         Header: "Job Title",
         accessor: "title",
+        width: 250,
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
       {
         Header: "Description",
         accessor: "description",
+        width: 350,
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
       {
-        Header: "Responsibility",
+        Header: "Responsibilities",
         accessor: (row) => row.responsibility.join(", "),
+        width: 408,
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
     ],
     []
@@ -35,7 +51,7 @@ export const JobTitleTable = ({ data, handleOnClick }) => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        <SimpleTable columns={columns} data={data} handleOnClick={handleOnClick} />
+        <SimpleTable columns={columns} data={data} flex={true} handleOnClick={handleOnClick} />
       </div>
     </div>
   );

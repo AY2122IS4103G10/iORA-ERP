@@ -238,7 +238,7 @@ export const AddressField = ({
           </div>
         </div>
       </div>
-      <div className="py-2 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+      {/* <div className="py-2 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
         <div className="sm:col-span-3">
           <div className="relative flex items-start py-4">
             <div className="min-w-0 flex-1 text-sm">
@@ -259,7 +259,7 @@ export const AddressField = ({
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </SimpleInputGroup>
   );
 };

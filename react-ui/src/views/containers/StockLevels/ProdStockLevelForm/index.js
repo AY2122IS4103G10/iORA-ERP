@@ -6,7 +6,7 @@ import { Dialog, Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 import { XIcon } from '@heroicons/react/outline'
 
-import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
 import { getASiteStock, selectCurrSiteStock, editStock } from "../../../../stores/slices/stocklevelSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchModel, selectModel } from "../../../../stores/slices/productSlice";
@@ -273,7 +273,7 @@ export const StockLevelForm = () => {
     dispatch(editStock({toUpdate: toUpdate, siteId: siteId}))
       .unwrap()
       .then((response) => {
-        addToast("Successfully created Stock Transfer order", {
+        addToast("Successfully created edit stock levels", {
           appearance: "success",
           autoDismiss: true,
         });

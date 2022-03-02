@@ -8,7 +8,7 @@ import { fetchProducts, selectAllProducts } from "../../../../stores/slices/prod
 import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 import { getASiteStock, selectCurrSiteStock } from "../../../../stores/slices/stocklevelSlice";
 import { createStockTransfer, editStockTransfer } from "../../../../stores/slices/stocktransferSlice";
-import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { selectUserSite, updateCurrSite} from "../../../../stores/slices/userSlice";
 import ErrorModal from "../../../components/Modals/ErrorModal";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { ClickableRowTable, EditableCell, SelectColumnFilter } from "../../../components/Tables/ClickableRowTable";
@@ -396,6 +396,7 @@ export const StockTransferForm = (subsys) => {
             dispatch(getASiteStock(from.id));
         }
         dispatch(fetchProducts());
+        dispatch(updateCurrSite());
     }, [dispatch, from])
 
     //editing 

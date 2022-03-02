@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getASiteStock, selectCurrSiteStock } from '../../../../stores/slices/stocklevelSlice';
-import { selectUserSite } from '../../../../stores/slices/userSlice';
+import { selectUserSite, updateCurrSite } from '../../../../stores/slices/userSlice';
 import { SelectableTable } from '../../../components/Tables/SelectableTable';
 import { SectionHeading } from '../../../components/HeadingWithTabs';
 
@@ -40,6 +40,7 @@ export const MyStoreStock = (subsys) => {
   const siteStock = useSelector(selectCurrSiteStock);
 
   useEffect(() => {
+      dispatch(updateCurrSite());
       dispatch(getASiteStock(id));
   }, [dispatch, id])
 

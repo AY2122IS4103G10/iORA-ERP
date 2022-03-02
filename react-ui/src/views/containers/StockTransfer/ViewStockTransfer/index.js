@@ -14,7 +14,7 @@ import {
     completeStockTransfer,
     deliverStockTransfer
 } from "../../../../stores/slices/stocktransferSlice";
-import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
 import Confirmation from "../../../components/Modals/Confirmation";
 import { EditableCell } from "../../../components/Tables/SimpleTable";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
@@ -319,6 +319,7 @@ export const ViewStockTransfer = (subsys) => {
 
 
     useEffect(() => {
+        dispatch(updateCurrSite());
         dispatch(getStockTransfer(id))
     }, [dispatch, userSiteId, id])
 

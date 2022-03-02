@@ -5,7 +5,7 @@ import {
   getAllStockTransfer,
   selectAllOrders,
 } from "../../../../stores/slices/stocktransferSlice";
-import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { selectUserSite, updateCurrSite} from "../../../../stores/slices/userSlice";
 import {
   SelectableTable,
   SelectColumnFilter,
@@ -65,6 +65,7 @@ export const StockTransferList = ({ subsys }) => {
   const path = `/${subsys.subsys}/stocktransfer`;
 
   useEffect(() => {
+    dispatch(updateCurrSite());
     dispatch(getAllStockTransfer(currSiteId));
   }, [dispatch, currSiteId]);
   return (

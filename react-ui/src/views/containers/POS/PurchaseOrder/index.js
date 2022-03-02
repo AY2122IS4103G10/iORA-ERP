@@ -1,7 +1,7 @@
 import {XCircleIcon} from "@heroicons/react/solid";
 import {useState} from "react";
-import {useDispatch} from "react-redux";
 import {Fragment} from "react";
+import {useDispatch} from "react-redux";
 import {Dialog, Transition} from "@headlessui/react";
 import {getProductDetails, getProductItem} from "../../../../stores/slices/productSlice";
 
@@ -189,10 +189,8 @@ export const PosPurchaseOrder = () => {
   const [modalState, setModalState] = useState(false);
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
-  // const [paymentType, setPaymentType] = useState("");
   const [productItems, setProductItems] = useState([]);
   const [products, setProducts] = useState([]);
-  // const [productQty, setProductQty] = useState([]);
   const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
   const [error, setError] = useState(false);

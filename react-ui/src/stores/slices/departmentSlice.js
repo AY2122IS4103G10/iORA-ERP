@@ -10,35 +10,56 @@ const initialState = {
 export const fetchDepartments = createAsyncThunk(
   "department/fetchDepartments",
   async () => {
-    const response = await api.getAll("admin/viewDepartments?search=");
-    return response.data;
+    try {
+      const response = await api.getAll("admin/viewDepartments?search=");
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const addNewDepartment = createAsyncThunk(
   "department/addDepartment",
   async (initialDepartment) => {
-    const response = await api.create("admin/addDepartment", initialDepartment);
-    return response.data;
+    try {
+      const response = await api.create(
+        "admin/addDepartment",
+        initialDepartment
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const updateExistingDepartment = createAsyncThunk(
   "department/updateExistingDepartment",
   async (existingDepartment) => {
-    const response = await api.update(
-      "admin/editDepartment",
-      existingDepartment
-    );
-    return response.data;
+    try {
+      const response = await api.update(
+        "admin/editDepartment",
+        existingDepartment
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const deleteExistingDepartment = createAsyncThunk(
   "department/deleteExistingDepartment",
   async (existingDepartmentId) => {
-    const response = await departmentApi.deleteDepartment(existingDepartmentId);
-    return response.data;
+    try {
+      const response = await departmentApi.deleteDepartment(
+        existingDepartmentId
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 

@@ -18,25 +18,37 @@ export const fetchCompanies = createAsyncThunk(
 export const addNewCompany = createAsyncThunk(
   "companies/addNewCompany",
   async (initialCompany) => {
-    const response = await api.create("admin/addCompany", initialCompany);
-    if (response.data === "") return Promise.reject(response.error);
-    return response.data;
+    try {
+      const response = await api.create("admin/addCompany", initialCompany);
+      if (response.data === "") return Promise.reject(response.error);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const updateExistingCompany = createAsyncThunk(
   "companies/updateExistingCompany",
   async (existingCompany) => {
-    const response = await api.update("admin/editCompany", existingCompany);
-    return response.data;
+    try {
+      const response = await api.update("admin/editCompany", existingCompany);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const deleteExistingCompany = createAsyncThunk(
   "companies/deleteExistingCompany",
   async (existingCompanyId) => {
-    const response = await companyApi.deleteCompany(existingCompanyId);
-    return response.data;
+    try {
+      const response = await companyApi.deleteCompany(existingCompanyId);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 

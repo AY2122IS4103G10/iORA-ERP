@@ -774,7 +774,7 @@ export const ProductForm = () => {
       )
         .unwrap()
         .then(() => {
-          addToast("Successfully created procurement order", {
+          addToast("Successfully created field", {
             appearance: "success",
             autoDismiss: true,
           });

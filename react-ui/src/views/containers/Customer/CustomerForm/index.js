@@ -57,7 +57,7 @@ const CustomerFormBody = ({
                     </div>
                     <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
                       <SimpleInputGroup
-                        label="Customer First Name"
+                        label="First name"
                         inputField="firstName"
                         className="sm:mt-0 sm:col-span-2"
                       >
@@ -72,7 +72,7 @@ const CustomerFormBody = ({
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
-                        label="Customer Last Name"
+                        label="Last name"
                         inputField="lastName"
                         className="sm:mt-0 sm:col-span-2"
                       >
@@ -107,7 +107,7 @@ const CustomerFormBody = ({
                         className="sm:mt-0 sm:col-span-2"
                       >
                         <SimpleInputBox
-                          type="text"
+                          type="password"
                           name="password"
                           id="password"
                           autoComplete="password"
@@ -118,7 +118,7 @@ const CustomerFormBody = ({
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
-                        label="Date of Birth"
+                        label="Date of birth"
                         inputField="dob"
                         className="sm:mt-0 sm:col-span-2"
                       >
@@ -129,7 +129,7 @@ const CustomerFormBody = ({
                         />
                       </SimpleInputGroup>
                       <SimpleInputGroup
-                        label="Contact Number"
+                        label="Contact number"
                         inputField="contactNumber"
                         className="sm:mt-0 sm:col-span-2"
                       >
@@ -244,7 +244,7 @@ export const CustomerForm = () => {
   const onEmailChanged = (e) => setEmail(e.target.value);
   const onLastNameChanged = (e) => setLastName(e.target.value);
   const onPasswordChanged = (e) => setPassword(e.target.value);
-  const onDobChanged = (e) => setDob(e.target.value);
+  const onDobChanged = (e) => setDob(e);
   const onContactNumberChanged = (e) => setContactNumber(e.target.value);
   const onMembershipTierChanged = (e) => setMembershipTier(e.target.value);
   const onMembershipPointsChanged = (e) => setMembershipPoints(e.target.value);

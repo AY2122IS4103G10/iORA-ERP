@@ -37,6 +37,7 @@ export const PosPurchaseHistory = (subsys) => {
   useEffect(() => {
     console.log(siteId);
     orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
+    console.log(siteId);
   }, [orderStatus, siteId]);
 
   useEffect(() => {

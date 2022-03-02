@@ -48,7 +48,7 @@ export const WHIndex = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(updateCurrSite());
+    dispatch(updateCurrSite(2));
   }, [dispatch]);
 
   return (

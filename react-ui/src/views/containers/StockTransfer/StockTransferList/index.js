@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllStockTransfer,
@@ -54,14 +54,15 @@ const cols = [
   },
 ];
 
-export const StockTransferList = ({subsys}) => {
-    const dispatch = useDispatch();
-    // const status = useSelector((state) => state.stocktransfer.status)
-    const sto = useSelector(selectAllOrders);
-    let currSiteId = useSelector(selectUserSite);
+export const StockTransferList = ({ subsys }) => {
+  const dispatch = useDispatch();
+  // const status = useSelector((state) => state.stocktransfer.status)
+  const sto = useSelector(selectAllOrders);
+  const { pathname } = useLocation();
+  let currSiteId = useSelector(selectUserSite);
 
-    const columns = useMemo(() => cols, [])
-    const path = `/${subsys.subsys}/stocktransfer`;
+  const columns = useMemo(() => cols, [cols]);
+  const path = `/${subsys.subsys}/stocktransfer`;
 
   useEffect(() => {
     dispatch(getAllStockTransfer(currSiteId));

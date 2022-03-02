@@ -508,8 +508,7 @@ public class SAMController {
     @PostMapping(path = "/membershipTier/create", consumes = "application/json")
     public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {
         try {
-            customerService.createMembershipTier(tier);
-            return ResponseEntity.ok("Membership Tier (" + tier.getName() + ") was successfully created.");
+            return ResponseEntity.ok(customerService.createMembershipTier(tier));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -561,6 +560,15 @@ public class SAMController {
             customerService.unblockCustomer(customer);
             return ResponseEntity.ok(customer);
         } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/customer/edit", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> completeProcurementOrder(@RequestBody Customer customer) {
+        try {
+            return ResponseEntity.ok(customerService.editCustomerAccount(customer));
+        } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

@@ -79,6 +79,30 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Customer editCustomerAccount(Customer customer) throws CustomerException {
+        Customer old = em.find(Customer.class, customer.getId());
+
+        if (old == null) {
+            throw new CustomerException("Customer not found");
+        }
+
+        try {
+            old.setEmail(customer.getEmail());
+        } catch (Exception ex) {
+            throw new CustomerException("Email " + customer.getEmail() + " has been used!");
+        }
+
+        old.setContactNumber(customer.getContactNumber());
+        old.setDob(customer.getDob());
+        old.setFirstName(customer.getFirstName());
+        old.setLastName(customer.getLastName());
+        old.setMembershipPoints(customer.getMembershipPoints());
+        old.setStoreCredit(customer.getStoreCredit());
+
+        return old;
+    }
+
+    @Override
     public void blockCustomer(Customer customer) throws CustomerException {
         Customer c = em.find(Customer.class, customer.getId());
 
@@ -250,7 +274,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<MembershipTier> listOfMembershipTier() {
-        return em.createQuery("SELECT m FROM MembershipTier m", MembershipTier.class).getResultList();
+        return em.createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class).getResultList();
     }
 
     @Override
@@ -259,11 +283,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void createMembershipTier(MembershipTier membershipTier) {
+    public MembershipTier createMembershipTier(MembershipTier membershipTier) {
         if (membershipTier.getBirthday() == null) {
             membershipTier.setBirthday(em.find(BirthdayPoints.class, "STANDARD"));
         }
-        em.merge(membershipTier);
+        return(em.merge(membershipTier));
     }
 
     private byte[] saltGeneration() {

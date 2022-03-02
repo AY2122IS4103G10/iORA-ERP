@@ -18,18 +18,18 @@ export const Tabs = ({tabs}) => {
             <nav className="-mb-px flex space-x-8">
                 {tabs.map((tab, i) => (
                     <Link
-                    key={tabs[i].name}
-                    to={tabs[i].href}
+                    key={tab.name}
+                    to={tab.href}
                     className={classNames(
                     path.endsWith(tabs[i].href)
                         ? 'border-cyan-500 text-cyan-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
                     'whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm'
                     )}
-                    aria-current={tabs[i].current ? 'page' : undefined}
+                    aria-current={tab.current ? 'page' : undefined}
                     onClick={() => changeTab(i)}
                     >
-                        {tabs[i].name}
+                        {tab.name}
                     </Link>
                 ))}
                 

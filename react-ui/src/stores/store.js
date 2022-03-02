@@ -15,14 +15,16 @@ import jobTitleReducer from "./slices/jobTitleSlice";
 import departmentReducer from "./slices/departmentSlice";
 import vendorReducer from "./slices/vendorSlice";
 import posReducer from "./slices/posSlice";
+import membershipTierReducer from "./slices/membershipTierSlice";
 
 export default configureStore({
   reducer: {
     companies: companyReducer,
     customers: customerReducer,
+    department: departmentReducer,
     employee: employeeReducer,
     jobTitle: jobTitleReducer,
-    department: departmentReducer,
+    membershipTiers: membershipTierReducer,
     products: productReducer,
     prodFields: prodFieldReducer,
     procurements: procurementReducer,

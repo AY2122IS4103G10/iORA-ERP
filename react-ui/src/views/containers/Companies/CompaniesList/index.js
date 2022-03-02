@@ -1,14 +1,12 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CogIcon } from "@heroicons/react/outline";
-
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   fetchCompanies,
-  selectAllCompanies,
+  selectAllCompanies
 } from "../../../../stores/slices/companySlice";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
+
 
 export const CompaniesTable = ({ data, handleOnClick }) => {
   const columns = useMemo(

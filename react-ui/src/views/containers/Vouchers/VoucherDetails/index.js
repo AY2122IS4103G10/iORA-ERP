@@ -1,24 +1,23 @@
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
 import {
   CalendarIcon as CalendarIconSolid,
   CheckCircleIcon,
-  PencilIcon,
+  PencilIcon
 } from "@heroicons/react/solid";
 import moment from "moment";
-import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   deleteExistingVoucher,
   fetchVouchers,
   issueVoucher,
   redeemVoucher,
-  selectVoucherByCode,
-  voucherDeleted,
+  selectVoucherByCode
 } from "../../../../stores/slices/voucherSlice";
-import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useEffect, useState } from "react";
-import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 import { classNames } from "../../../../utilities/Util";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 
 const VoucherDetailsBody = ({
   voucherCode,

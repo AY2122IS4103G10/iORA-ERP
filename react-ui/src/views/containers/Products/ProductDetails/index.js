@@ -1,19 +1,17 @@
+import { CurrencyDollarIcon } from "@heroicons/react/outline";
+import {
+  PencilIcon
+} from "@heroicons/react/solid";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import {
-  CurrencyDollarIcon as CurrencyDollarIconSolid,
-  PencilIcon,
-} from "@heroicons/react/solid";
-import { CurrencyDollarIcon } from "@heroicons/react/outline";
-import {
   fetchProducts,
-  selectProductByCode,
+  selectProductByCode
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useEffect, useMemo } from "react";
 import {
-  SelectColumnFilter,
-  SimpleTable,
+  SimpleTable
 } from "../../../components/Tables/SimpleTable";
 
 const fieldSection = ({ fieldName, fields }) => {

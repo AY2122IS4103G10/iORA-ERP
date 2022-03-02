@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api, sitesApi, stockTransferApi } from "../../environments/Api";
+import { api, stockTransferApi } from "../../environments/Api";
 
 
 

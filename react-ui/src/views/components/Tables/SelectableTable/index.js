@@ -3,27 +3,19 @@
  * React Table Part 1: https://www.samuelliedtke.com/blog/react-table-tutorial-part-1/
  * React Table Part 2: https://www.samuelliedtke.com/blog/react-table-tutorial-part-2/
  */
-import {useState, useMemo} from "react";
-import {useNavigate} from "react-router-dom";
 import {
-  useTable,
-  useGlobalFilter,
-  useAsyncDebounce,
-  useFilters,
-  useSortBy,
-  usePagination,
-  useRowSelect,
-} from "react-table";
-import {
-  ChevronDoubleRightIcon,
-  ChevronDoubleLeftIcon,
-  ChevronRightIcon,
-  ChevronLeftIcon,
+  ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronLeftIcon, ChevronRightIcon
 } from "@heroicons/react/outline";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  useAsyncDebounce,
+  useFilters, useGlobalFilter, usePagination, useSortBy, useTable
+} from "react-table";
+import { PageButton } from "../../Buttons/PageButton";
+import { SimpleButton } from "../../Buttons/SimpleButton";
+import { SortDownIcon, SortIcon, SortUpIcon } from "../Icons";
 
-import {SimpleButton} from "../../Buttons/SimpleButton";
-import {PageButton} from "../../Buttons/PageButton";
-import {SortDownIcon, SortUpIcon, SortIcon} from "../Icons";
 
 const GlobalFilter = ({preGlobalFilteredRows, globalFilter, setGlobalFilter}) => {
   const count = preGlobalFilteredRows.length;
@@ -104,7 +96,7 @@ export const SelectableTable = ({columns, data, path}) => {
   } = useTable({columns, data}, useFilters, useGlobalFilter, useSortBy, usePagination);
   const navigate = useNavigate();
   const handleRowClick = (row) => {
-    if (row.original.id == undefined) {
+    if (row.original.id === undefined) {
       navigate(`${path}/${row.original.sku}`);
     } else {
       navigate(`${path}/${row.original.id}`);

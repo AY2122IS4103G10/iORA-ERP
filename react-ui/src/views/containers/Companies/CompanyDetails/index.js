@@ -142,7 +142,7 @@ export const CompanyDetails = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const sitesStatus = useSelector((state) => state.sites.status);
+  const sitesStatus = useSelector((state) => state.companies.status);
 
   useEffect(() => {
     sitesStatus === "idle" && dispatch(fetchCompanies());

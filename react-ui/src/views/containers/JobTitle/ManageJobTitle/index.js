@@ -15,7 +15,7 @@ const AddJobTitleButton = () => {
 export const ManageJobTitle = () => {
   return (
     <>
-      {<Header button={<AddJobTitleButton />} title="JobTitles" />}
+      {<Header button={<AddJobTitleButton />} title="Job Titles" />}
       {<JobTitleList />}
     </>
   );

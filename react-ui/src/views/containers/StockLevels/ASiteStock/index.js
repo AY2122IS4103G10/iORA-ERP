@@ -9,22 +9,6 @@ import { SimpleTable } from '../../../components/Tables/SimpleTable';
 import { selectCurrSiteStock } from '../../../../stores/slices/stocklevelSlice';
 
 
-// const stocklevel = {
-//     id: 4,
-//     productItems: [],
-//     products: {
-//       "ASK0009968A-1": 1,
-//       "ASK0009968A-2": 2,
-//       "ASK0009968A-3": 3, 
-//     },
-//     models: {
-//       "ASK0009968A": 6,
-//     },
-//     reserveProducts: {
-//       "ASK0009968A-1": 1
-//     }
-// }
-
 const convertData = (data) => 
   Object.entries(data.products).map((key) => ({
     sku: key[0],

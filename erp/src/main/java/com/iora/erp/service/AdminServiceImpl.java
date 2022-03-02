@@ -1,7 +1,11 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -10,6 +14,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
+import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.AddressException;
 import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.DepartmentException;
@@ -110,6 +115,13 @@ public class AdminServiceImpl implements AdminService {
         }
         return em.createQuery("SELECT e FROM JobTitle e WHERE LOWER(e.title) LIKE :title", JobTitle.class)
                 .setParameter("title", "%" + search.toLowerCase() + "%").getResultList();
+    }
+
+    @Override
+    public List<String> getAccessRights() {
+        return Stream.of(AccessRights.values())
+                .map(AccessRights::name)
+                .collect(Collectors.toList());
     }
 
     @Override

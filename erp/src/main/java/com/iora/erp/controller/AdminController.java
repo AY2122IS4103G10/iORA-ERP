@@ -2,6 +2,7 @@ package com.iora.erp.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -67,14 +68,19 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping(path = "/deleteJobTitle")
-    public ResponseEntity<Object> deleteJobTitle(@RequestParam Long jobTitleId) {
+    @DeleteMapping(path = "/deleteJobTitle/{jobTitleId}")
+    public ResponseEntity<Object> deleteJobTitle(@PathVariable Long jobTitleId) {
         try {
             adminService.deleteJobTitle(jobTitleId);
             return ResponseEntity.ok("Job Tiltle with ID " + jobTitleId + " has been successfully deleted.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    @GetMapping(path = "/accessRights", produces = "application/json")
+    public List<String> getAccessRights() {
+        return adminService.getAccessRights();
     }
 
     @GetMapping(path = "/viewJobTitles", produces = "application/json")
@@ -89,8 +95,8 @@ public class AdminController {
         }
     }
 
-    @GetMapping(path = "/viewJobTitle", produces = "application/json")
-    public JobTitle viewJobTitle(@RequestParam Long id) {
+    @GetMapping(path = "/viewJobTitle/{id}", produces = "application/json")
+    public JobTitle viewJobTitle(@PathVariable Long id) {
         try {
             return adminService.getJobTitleById(id);
         } catch (Exception e) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
@@ -9,6 +9,8 @@ import {
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/outline";
+import { useDispatch } from "react-redux";
+import { updateCurrSite } from "../../../../stores/slices/userSlice";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
@@ -23,6 +25,12 @@ const secondaryNavigation = [
 
 export const MFIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(updateCurrSite(21));
+  }, [dispatch]);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <SideBar

@@ -60,9 +60,14 @@ const userSlice = createSlice({
       state.user = { ...guest };
     },
     updateCurrSite(state, action) {
-      state.currSite = localStorage.getItem("siteId")
-        ? JSON.parse(localStorage.getItem("siteId"))
-        : 0;
+      if (action.payload) {
+        state.currSite = action.payload;
+        localStorage.setItem("siteId", action.payload);
+      } else {
+        state.currSite = localStorage.getItem("siteId")
+          ? JSON.parse(localStorage.getItem("siteId"))
+          : 0;
+      }
     },
   },
   extraReducers(builder) {

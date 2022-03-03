@@ -1,14 +1,11 @@
-import {useState, useEffect} from "react";
-import {useDispatch} from "react-redux";
-import {Dialog, Transition} from "@headlessui/react";
-import {XIcon, CashIcon, CreditCardIcon, DeviceMobileIcon} from "@heroicons/react/outline";
-import {XCircleIcon} from "@heroicons/react/solid";
-import {Fragment} from "react";
-import {getProductDetails, getProductItem} from "../../../../stores/slices/productSlice";
-import {useToasts} from "react-toast-notifications";
-import {produceWithPatches} from "immer";
-import {SimpleModal} from "../../../components/Modals/SimpleModal";
-import {useMountedLayoutEffect} from "react-table";
+import { Dialog } from "@headlessui/react";
+import { CashIcon, CreditCardIcon, DeviceMobileIcon, XIcon } from "@heroicons/react/outline";
+import { XCircleIcon } from "@heroicons/react/solid";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useToasts } from "react-toast-notifications";
+import { getProductDetails, getProductItem } from "../../../../stores/slices/productSlice";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
 const paymentTypes = [
   {

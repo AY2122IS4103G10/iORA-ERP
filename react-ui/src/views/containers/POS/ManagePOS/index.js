@@ -1,9 +1,6 @@
-import { Outlet, Route, Routes } from "react-router-dom";
-
-import { PosPurchaseHistory } from "../PurchaseHistory";
-import { PosPurchaseOrder } from "../PurchaseOrder";
+import { Outlet } from "react-router-dom";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
-import { OrderDetails } from "../OrderDetails";
+
 
 const tabs = [
   { name: "Order", href: "orderPurchase", current: true },

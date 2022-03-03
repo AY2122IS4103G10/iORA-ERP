@@ -1,12 +1,11 @@
-import {useLocation, useNavigate} from "react-router-dom";
-import {useEffect} from "react";
-import {useSelector, useDispatch} from "react-redux";
 import moment from "moment";
-import {SimpleTable} from "../../../components/Tables/SimpleTable";
-import {selectAllOrder} from "../../../../stores/slices/posSlice";
-import {selectUserSite} from "../../../../stores/slices/userSlice";
-import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
-import {getASite, selectSite} from "../../../../stores/slices/siteSlice";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { fetchSiteOrders, selectAllOrder } from "../../../../stores/slices/posSlice";
+import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const columns = [
   {
@@ -34,8 +33,8 @@ export const PosPurchaseHistory = (subsys) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const data = useSelector(selectAllOrder);
-  const orderStatus = useSelector((state) => state.pos.status);
-  const siteStatus = useSelector((state) => state.sites.status);
+  // const orderStatus = useSelector((state) => state.pos.status);
+  // const siteStatus = useSelector((state) => state.sites.status);
   const siteId = useSelector(selectUserSite);
   const site = useSelector(selectSite);
 

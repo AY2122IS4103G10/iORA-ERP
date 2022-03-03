@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/solid";
+import { PrinterIcon } from "@heroicons/react/solid";
 import { Dialog } from "@headlessui/react";
 
 import {
@@ -207,11 +208,11 @@ export const LineItems = ({ lineItems, status, userSiteId, fromSiteId, toSiteId,
                         .fieldValue,
             },
             {
-                Header: "Requested Qty",
+                Header: "Requested",
                 accessor: "requestedQty"
             },
             {
-                Header: "Sent Qty",
+                Header: "Sent",
                 accessor: "sentQty",
                 disableSortBy: true,
                 Cell: (row) => {
@@ -221,7 +222,7 @@ export const LineItems = ({ lineItems, status, userSiteId, fromSiteId, toSiteId,
                 }
             },
             {
-                Header: "Received Qty",
+                Header: "Received",
                 accessor: "actualQty",
                 disableSortBy: true,
                 Cell: (row) => {
@@ -263,6 +264,10 @@ export const StockTransferBody = ({ order, lineItems, userSiteId }) => {
                             <h2 id="applicant-information-title" className="text-lg leading-6 font-medium text-gray-900">
                                 Order Information
                             </h2>
+                            <button className=" text-sm flex justify-end" onClick={() => window.print()}>
+                                Print 
+                                <PrinterIcon className="h-5 w-5" aria-hidden="true" />
+                            </button>
                         </div>
 
                         <div className="border-t border-gray-200 px-4 py-5 sm:px-6">

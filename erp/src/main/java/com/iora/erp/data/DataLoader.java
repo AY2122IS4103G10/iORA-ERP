@@ -1,7 +1,5 @@
 package com.iora.erp.data;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -25,21 +23,14 @@ import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
-import com.iora.erp.model.customerOrder.CustomerOrder;
-import com.iora.erp.model.customerOrder.CustomerOrderLI;
-import com.iora.erp.model.customerOrder.Payment;
-import com.iora.erp.model.product.Product;
-import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
-import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.EmployeeService;
-import com.iora.erp.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -56,10 +47,6 @@ public class DataLoader implements CommandLineRunner {
 	private AdminService adminService;
 	@Autowired
 	private EmployeeService employeeService;
-	@Autowired
-	private ProductService productService;
-	@Autowired
-	private CustomerOrderService customerOrderService;
 	@PersistenceContext
 	private EntityManager em;
 

@@ -45,6 +45,8 @@ public class CustomerServiceImpl implements CustomerService {
 
         } catch (CustomerException ex) {
             newC.setMembershipTier(findMembershipTierById("BASIC"));
+            newC.setMembershipPoints(0);
+            newC.setStoreCredit(0.00);
             newC.setAvailStatus(true);
             byte[] salt = saltGeneration();
             newC.setSalt(salt.toString());

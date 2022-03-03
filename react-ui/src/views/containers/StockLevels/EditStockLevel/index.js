@@ -156,7 +156,7 @@ export const EditStockLevel = () => {
     const [selected, setSelected] = useState(actions[0]);
     const { addToast } = useToasts();
 
-    const openModal = () => setOpen(true);
+    // const openModal = () => setOpen(true);
     const closeModal = () => setOpen(false);
 
     const handleEditStock = (e) => {

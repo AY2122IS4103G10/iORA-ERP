@@ -244,7 +244,7 @@ export const StockLevelForm = (subsys) => {
 
   useEffect(() => {
       console.log("effect")
-    // if (status === "idle") {
+      dispatch(updateCurrSite())
       dispatch(getASiteStock(siteId)); 
       dispatch(fetchModel(modelCode));
     // }

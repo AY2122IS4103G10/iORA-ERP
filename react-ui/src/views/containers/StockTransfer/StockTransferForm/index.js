@@ -467,12 +467,12 @@ export const StockTransferForm = (subsys) => {
         closeItemsModal();
     }
 
-    const validateForm = () => {
-        if (isObjectEmpty(from) || isObjectEmpty(to)) {
-            return false;
-        }
-        //check negative quantity
-    }
+    // const validateForm = () => {
+    //     if (isObjectEmpty(from) || isObjectEmpty(to)) {
+    //         return false;
+    //     }
+    //     //check negative quantity
+    // }
 
     //Handle Create Order product
     const handleSubmit = (e) => {

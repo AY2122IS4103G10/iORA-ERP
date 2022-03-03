@@ -15,7 +15,7 @@ To start the Spring Boot Application, follow these instructions:
 2. Open the iORA-ERP folder and navigate to [ErpApplication.java](erp\src\main\java\com\iora\erp\ErpApplication.java).
 3. Wait for Java Projects to complete loading (bottom right pop-up).
 4. Either:  
-  a. Click on run above the main method; or
+  a. Click on run above the main method; or  
   b. Open the Spring Boot Dashboard in the Explorer Panel and select run beside the project 'erp'.
 5. Hurray! The Maven project will be running in your Terminal/Debug Console.
 
@@ -41,5 +41,5 @@ To run the E-Commerce Web application for the iORA Key System Integration:
 1. Navigate into the folder "`/iORA-ERP/ecommerce`".
 2. Run `npm install` to install the required node modules.
 3. Run `npm start` to start the application on port 3000.  
-**Select Y to launch the E-Commerce con-currently on port 3001.*
+**Select Y to launch the E-Commerce concurrently on port 3001.*
 4. Do not run both web applications on the same browser as there may be some conflict in the use of localStorage.

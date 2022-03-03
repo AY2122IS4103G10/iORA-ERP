@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Fragment, useState } from 'react'
 import { Dialog, Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
@@ -240,11 +240,9 @@ export const StockLevelForm = (subsys) => {
   const modelCode = id.substring(0, id.indexOf('-'));
   const model = useSelector(selectModel);
 
-  console.log("rendering");
 
   useEffect(() => {
-      console.log("effect")
-    // if (status === "idle") {
+      dispatch(updateCurrSite())
       dispatch(getASiteStock(siteId)); 
       dispatch(fetchModel(modelCode));
     // }
@@ -283,7 +281,7 @@ export const StockLevelForm = (subsys) => {
         setReload(reload + 1)
       })
       .catch((err) => {
-        addToast(`${err.message}`, {
+        addToast(`Edit Stock Failed - Could be Invalid RFID tag`, {
           appearance: "error",
           autoDismiss: true,
       });

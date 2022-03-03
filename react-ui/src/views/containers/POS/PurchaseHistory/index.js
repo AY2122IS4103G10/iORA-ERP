@@ -3,7 +3,7 @@ import {useState, useEffect, useMemo} from "react";
 import {useSelector, useDispatch} from "react-redux";
 import {SimpleTable} from "../../../components/Tables/SimpleTable";
 import {selectAllOrder} from "../../../../stores/slices/posSlice";
-import {selectUserSite} from "../../../../stores/slices/userSlice";
+import {selectUserSite, updateCurrSite} from "../../../../stores/slices/userSlice";
 import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
 import {getASite, selectSite, selectSiteById} from "../../../../stores/slices/siteSlice";
 
@@ -39,14 +39,12 @@ export const PosPurchaseHistory = (subsys) => {
   const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
 
   useEffect(() => {
-    console.log(siteId);
-    orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
-    console.log(siteId);
-  }, [orderStatus, siteId]);
+    dispatch(fetchSiteOrders(siteId));
+  }, [siteId]);
 
   useEffect(() => {
-    siteStatus === "idle" && dispatch(getASite(siteId));
-  }, [siteStatus, site]);
+    dispatch(getASite(siteId));
+  }, [site]);
 
   return (
     <>
@@ -56,7 +54,7 @@ export const PosPurchaseHistory = (subsys) => {
             <div className="flex items-center space-x-3">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {siteId != null ? site.name : "No Reocrds"}
+                  {siteId != null ? site.name : "No Records"}
                 </h1>
               </div>
             </div>
@@ -65,7 +63,7 @@ export const PosPurchaseHistory = (subsys) => {
             <div className="space-y-6 lg:col-start-1 lg:col-span-2">
               <section aria-labelledby="stocks-level">
                 <div className="ml-2 mr-2">
-                  {data == undefined ? (
+                  {data === undefined ? (
                     <p>No Records</p>
                   ) : (
                     <SimpleTable columns={columns} data={data} handleOnClick={handleOnClick} />

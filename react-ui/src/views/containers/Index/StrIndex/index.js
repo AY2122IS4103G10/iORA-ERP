@@ -1,21 +1,13 @@
-import { Outlet } from "react-router-dom";
 import {
-  ArchiveIcon,
-  HomeIcon,
-  CogIcon,
-  ClockIcon,
-  CollectionIcon,
-  ScaleIcon,
-  CreditCardIcon,
-  QuestionMarkCircleIcon,
-  ShieldCheckIcon,
-  DocumentReportIcon,
+  ArchiveIcon, ClockIcon, CogIcon, CollectionIcon, CreditCardIcon, DocumentReportIcon, HomeIcon, QuestionMarkCircleIcon,
+  ShieldCheckIcon
 } from "@heroicons/react/outline";
-
-import MainWrapper from "../../../components/MainWrapper";
 import { useEffect } from "react";
-import { updateCurrSite } from "../../../../stores/slices/userSlice";
 import { useDispatch } from "react-redux";
+import { Outlet } from "react-router-dom";
+import { updateCurrSite } from "../../../../stores/slices/userSlice";
+import MainWrapper from "../../../components/MainWrapper";
+
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },

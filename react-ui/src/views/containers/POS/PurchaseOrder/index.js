@@ -7,6 +7,7 @@ import {useDispatch} from "react-redux";
 import {Dialog, Transition} from "@headlessui/react";
 import {getProductDetails, getProductItem} from "../../../../stores/slices/productSlice";
 import {useToasts} from "react-toast-notifications";
+import {produceWithPatches} from "immer";
 
 export const SimpleModal = ({open, closeModal, children}) => {
   return (
@@ -270,8 +271,24 @@ export const PosPurchaseOrder = () => {
 
     const removeProduct = (product) => {
       const index = products.indexOf(product);
-      products.splice(index, 1);
-      setProducts(products);
+      let i = qty.reduce((total, num) => total + num, 0);
+
+      if (qty[index] === 1) {
+        rfidList.splice(i - 1, 1);
+        setRfidList(rfidList);
+        sku.splice(index, 1);
+        setSku(sku);
+        qty.splice(index, 1);
+        setQty(qty);
+        products.splice(index, 1);
+        setProducts(products);
+      } else {
+        rfidList.splice(i - 1, 1);
+        setRfidList(rfidList);
+        let newQty = [...qty];
+        newQty[index] = qty[index] - 1;
+        setQty(newQty);
+      }
       "discountedPrice" in product
         ? setAmount(amount - product.discountedPrice)
         : setAmount(amount - product.price);

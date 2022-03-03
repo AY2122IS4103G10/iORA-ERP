@@ -8,8 +8,9 @@ import {
 } from "../../../../stores/slices/posSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 
-const Header = ({ order, openModal }) => {
+const Header = ({ order }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <div className="flex items-center space-x-3">
@@ -60,17 +61,18 @@ export const OrderDetails = () => {
   const order = useSelector((state) =>
     selectOrderById(state, parseInt(orderId))
   );
+  const siteId = useSelector(selectUserSite);
   const dispatch = useDispatch();
   const orderStatus = useSelector((state) => state.pos.status);
 
   useEffect(() => {
-    orderStatus === "idle" && dispatch(fetchSiteOrders());
-  }, [orderStatus, dispatch]);
+    orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
+  }, [orderStatus, dispatch, siteId]);
 
   return (
     Boolean(order) && (
       <>
-        <div className="py-8 xl:py-10">
+        <div className="py-4 xl:py-6">
           <NavigatePrev page="Order History" path="/str/pos/orderHistory" />
           <Header order={order} />
           <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">

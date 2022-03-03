@@ -53,6 +53,7 @@ const OrderList = ({
   clear,
   openModal,
   closeModal,
+  qty,
 }) => (
   <main>
     <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4 lg:px-0">
@@ -107,7 +108,7 @@ const OrderList = ({
             </h2>
 
             <ul className="border-t border-b border-gray-200">
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <li key={product.name} className="flex py-6">
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                     <div>
@@ -120,6 +121,12 @@ const OrderList = ({
                             {product.colour}&nbsp; -- &nbsp;
                             {product.size !== null ? product.size : null} &nbsp; -- &nbsp;
                             {product.promotion !== null ? product.promotion : null}
+                          </p>
+                        </h4>
+                        <h4 className="text-lg w-1/12 ">
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">QTY</p>
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">
+                            {qty[index]}
                           </p>
                         </h4>
                         {"discountedPrice" in product ? (
@@ -194,8 +201,8 @@ export const PosPurchaseOrder = () => {
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
   const [sku, setSku] = useState([]);
-  const [rfidList, setRfidList] = useState([]);
   const [products, setProducts] = useState([]);
+  const [rfidList, setRfidList] = useState([]);
   const [qty, setQty] = useState([]);
   const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
@@ -222,8 +229,7 @@ export const PosPurchaseOrder = () => {
         });
       });
   };
-  //{dataProduc}
-  //{sku, listRFID, qty}
+
   const addRFIDClicked = (evt) => {
     evt.preventDefault();
     dispatch(getProductItem(rfid))
@@ -235,15 +241,16 @@ export const PosPurchaseOrder = () => {
           let currentSKU = data.productSKU;
 
           if (sku.includes(currentSKU) === true) {
-            let newArr = [...qty];
             let i = sku.indexOf(currentSKU);
-            newArr[i] = qty[i] + 1;
-            setQty(newArr);
+            let newQty = [...qty];
+            newQty[i] = qty[i] + 1;
+            setQty(newQty);
           } else {
             sku.push(currentSKU);
-            addProduct(rfid, sku.indexOf(currentSKU));
+            setSku(sku);
             qty.push(1);
             setQty(qty);
+            addProduct(rfid, sku.indexOf(currentSKU));
           }
         } else {
           throw new Error("Error: Duplicate RFID");
@@ -286,8 +293,8 @@ export const PosPurchaseOrder = () => {
     setProducts([]);
     setSku([]);
     setRfidList([]);
-    setAmount(0);
     setQty([]);
+    setAmount(0);
   };
 
   return (
@@ -303,6 +310,7 @@ export const PosPurchaseOrder = () => {
         clear={clear}
         openModal={openModal}
         closeModal={closeModal}
+        qty={qty}
       />
     </div>
   );

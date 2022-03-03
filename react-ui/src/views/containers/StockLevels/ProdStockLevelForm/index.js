@@ -274,7 +274,7 @@ export const StockLevelForm = (subsys) => {
     dispatch(editStock({toUpdate: toUpdate, siteId: siteId}))
       .unwrap()
       .then((response) => {
-        addToast("Successfully created edit stock levels", {
+        addToast("Successfully updated stock levels", {
           appearance: "success",
           autoDismiss: true,
         });

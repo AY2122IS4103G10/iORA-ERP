@@ -1,14 +1,14 @@
-import { XCircleIcon } from "@heroicons/react/solid";
-import { useState } from "react";
-import { Fragment } from "react";
-import { useDispatch } from "react-redux";
-import { Dialog, Transition } from "@headlessui/react";
-import { XIcon, CashIcon, CreditCardIcon, DeviceMobileIcon } from "@heroicons/react/outline";
-
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import { getProductDetails, getProductItem } from "../../../../stores/slices/productSlice";
-import { useToasts } from "react-toast-notifications";
-import { useMountedLayoutEffect } from "react-table";
+import {useState, useEffect} from "react";
+import {useDispatch} from "react-redux";
+import {Dialog, Transition} from "@headlessui/react";
+import {XIcon, CashIcon, CreditCardIcon, DeviceMobileIcon} from "@heroicons/react/outline";
+import {XCircleIcon} from "@heroicons/react/solid";
+import {Fragment} from "react";
+import {getProductDetails, getProductItem} from "../../../../stores/slices/productSlice";
+import {useToasts} from "react-toast-notifications";
+import {produceWithPatches} from "immer";
+import {SimpleModal} from "../../../components/Modals/SimpleModal";
+import {useMountedLayoutEffect} from "react-table";
 
 const paymentTypes = [
   {
@@ -29,19 +29,19 @@ const paymentTypes = [
   },
   {
     name: "PAYLAH",
-    icon: DeviceMobileIcon
+    icon: DeviceMobileIcon,
   },
   {
     name: "GRABPAY",
-    icon: DeviceMobileIcon
+    icon: DeviceMobileIcon,
   },
   {
     name: "FAVE",
-    icon: DeviceMobileIcon
-  }
-]
+    icon: DeviceMobileIcon,
+  },
+];
 
-export const PaymentModal = ({ open, closeModal }) => {
+export const PaymentModal = ({open, closeModal}) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
       <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
@@ -49,15 +49,13 @@ export const PaymentModal = ({ open, closeModal }) => {
           <div className="flex justify-between">
             <Dialog.Title
               as="h3"
-              className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
-            >
+              className="m-3 text-center text-lg leading-6 font-medium text-gray-900">
               Payment Option
             </Dialog.Title>
             <button
               type="button"
               className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
-              onClick={closeModal}
-            >
+              onClick={closeModal}>
               <XIcon className="h-5 w-5" />
             </button>
           </div>
@@ -66,26 +64,21 @@ export const PaymentModal = ({ open, closeModal }) => {
             {paymentTypes.map((type, index) => (
               <div
                 key={index}
-                className='m-2 border shadow rounded-lg align-middle sm:rounded-md relative bg-white p-8 
-                focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500'
-              >
+                className="m-2 border shadow rounded-lg align-middle sm:rounded-md relative bg-white p-8 
+                focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500">
                 <div className="m-0 flex justify-center">
-                    <button >
-                      {/* Extend touch target to entire panel */}
-                      <span className="absolute inset-0" aria-hidden="true" />
+                  <button>
+                    {/* Extend touch target to entire panel */}
+                    <span className="absolute inset-0" aria-hidden="true" />
 
-                      <div className="flex justify-center align-middle ">
-                        <span>
-                          {type.name}
-                        </span>
-                        <type.icon
-                          className="ml-2 inline-flex h-6 w-6 text-cyan-500 row-span-1"
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </button>
-
-
+                    <div className="flex justify-center align-middle ">
+                      <span>{type.name}</span>
+                      <type.icon
+                        className="ml-2 inline-flex h-6 w-6 text-cyan-500 row-span-1"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </button>
                 </div>
                 {/* <span
                   className="pointer-events-none absolute top-6 right-6 text-gray-300 group-hover:text-gray-400"
@@ -115,6 +108,7 @@ const OrderList = ({
   clear,
   openModal,
   closeModal,
+  qty,
 }) => (
   <main>
     <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4 lg:px-0">
@@ -169,7 +163,7 @@ const OrderList = ({
             </h2>
 
             <ul className="border-t border-b border-gray-200">
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <li key={product.name} className="flex py-6">
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                     <div>
@@ -182,6 +176,12 @@ const OrderList = ({
                             {product.colour}&nbsp; -- &nbsp;
                             {product.size !== null ? product.size : null} &nbsp; -- &nbsp;
                             {product.promotion !== null ? product.promotion : null}
+                          </p>
+                        </h4>
+                        <h4 className="text-lg w-1/12 ">
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">QTY</p>
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">
+                            {qty[index]}
                           </p>
                         </h4>
                         {"discountedPrice" in product ? (
@@ -255,13 +255,14 @@ export const PosPurchaseOrder = () => {
   const [modalState, setModalState] = useState(false);
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
-  const [productItems, setProductItems] = useState([]);
-  const [rfidList, setRfidList] = useState([]);
+  const [sku, setSku] = useState([]);
   const [products, setProducts] = useState([]);
+  const [rfidList, setRfidList] = useState([]);
+  const [qty, setQty] = useState([]);
   const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
   const [error, setError] = useState(false);
-  const { addToast } = useToasts();
+  const {addToast} = useToasts();
 
   const onRfidChanged = (e) => setRfid(e.target.value);
 
@@ -269,12 +270,31 @@ export const PosPurchaseOrder = () => {
     dispatch(getProductDetails(rfid))
       .unwrap()
       .then((data) => {
+        console.log(data);
         products.push(data);
         setProducts(products);
         "discountedPrice" in data
           ? setAmount(amount + data.discountedPrice)
           : setAmount(amount + data.price);
-        //setError(false);
+      })
+      .catch((err) => {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
+  };
+
+  const updateIncrAmount = (rfid, i) => {
+    dispatch(getProductDetails(rfid))
+      .unwrap()
+      .then((data) => {
+        let newQty = [...qty];
+        newQty[i] = qty[i] + 1;
+        setQty(newQty);
+        "discountedPrice" in data
+          ? setAmount(amount + data.discountedPrice)
+          : setAmount(amount + data.price);
       })
       .catch((err) => {
         addToast(`Error: ${err.message}`, {
@@ -290,12 +310,20 @@ export const PosPurchaseOrder = () => {
       .unwrap()
       .then((data) => {
         if (rfidList.includes(rfid) === false) {
-          console.log(productItems.includes(data));
-          productItems.push(data);
-          setProductItems(productItems);
           rfidList.push(rfid);
           setRfidList(rfidList);
-          addProduct(rfid);
+          let currentSKU = data.productSKU;
+
+          if (sku.includes(currentSKU) === true) {
+            let i = sku.indexOf(currentSKU);
+            updateIncrAmount(rfid, i);
+          } else {
+            sku.push(currentSKU);
+            setSku(sku);
+            qty.push(1);
+            setQty(qty);
+            addProduct(rfid, sku.indexOf(currentSKU));
+          }
         } else {
           throw new Error("Error: Duplicate RFID");
         }
@@ -309,13 +337,45 @@ export const PosPurchaseOrder = () => {
     setRfid("");
   };
 
+  const decrTotalAmount = (rfid) => {
+    dispatch(getProductDetails(rfid))
+      .unwrap()
+      .then((data) => {
+        "discountedPrice" in data
+          ? setAmount(amount - data.discountedPrice)
+          : setAmount(amount - data.price);
+      })
+      .catch((err) => {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
+  };
+
   function Remove(props) {
     const product = props.product;
 
     const removeProduct = (product) => {
       const index = products.indexOf(product);
-      products.splice(index, 1);
-      setProducts(products);
+      let i = qty.reduce((total, num) => total + num, 0);
+      let removeRFID = rfidList[i - 1];
+      decrTotalAmount(removeRFID);
+      rfidList.splice(i - 1, 1);
+      setRfidList(rfidList);
+
+      if (qty[index] === 1) {
+        sku.splice(index, 1);
+        setSku(sku);
+        qty.splice(index, 1);
+        setQty(qty);
+        products.splice(index, 1);
+        setProducts(products);
+      } else {
+        let newQty = [...qty];
+        newQty[index] = qty[index] - 1;
+        setQty(newQty);
+      }
       "discountedPrice" in product
         ? setAmount(amount - product.discountedPrice)
         : setAmount(amount - product.price);
@@ -335,7 +395,9 @@ export const PosPurchaseOrder = () => {
 
   const clear = () => {
     setProducts([]);
-    setProductItems([]);
+    setSku([]);
+    setRfidList([]);
+    setQty([]);
     setAmount(0);
   };
 
@@ -352,6 +414,7 @@ export const PosPurchaseOrder = () => {
         clear={clear}
         openModal={openModal}
         closeModal={closeModal}
+        qty={qty}
       />
       <PaymentModal open={modalState} closeModal={closeModal} />
     </>

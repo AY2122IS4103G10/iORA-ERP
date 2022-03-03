@@ -1,10 +1,11 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
-import { fetchSiteOrders, selectAllOrder } from "../../../../stores/slices/posSlice";
-import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
-import { selectUserSite } from "../../../../stores/slices/userSlice";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import {useLocation, useNavigate} from "react-router-dom";
+import {useState, useEffect, useMemo} from "react";
+import {useSelector, useDispatch} from "react-redux";
+import {SimpleTable} from "../../../components/Tables/SimpleTable";
+import {selectAllOrder} from "../../../../stores/slices/posSlice";
+import {selectUserSite, updateCurrSite} from "../../../../stores/slices/userSlice";
+import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
+import {getASite, selectSite, selectSiteById} from "../../../../stores/slices/siteSlice";
 
 const columns = [
   {
@@ -38,12 +39,12 @@ export const PosPurchaseHistory = (subsys) => {
   const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
 
   useEffect(() => {
-    orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
-  }, [dispatch, orderStatus, siteId]);
+    dispatch(fetchSiteOrders(siteId));
+  }, [siteId]);
 
   useEffect(() => {
-    siteStatus === "idle" && dispatch(getASite(siteId));
-  }, [dispatch, siteStatus, siteId]);
+    dispatch(getASite(siteId));
+  }, [site]);
 
   return (
     <>

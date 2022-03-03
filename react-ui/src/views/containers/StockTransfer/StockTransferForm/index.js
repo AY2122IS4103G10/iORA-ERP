@@ -429,7 +429,10 @@ export const StockTransferForm = (subsys) => {
                     setTo(toSite);
                 })
                 .catch((error) => {
-                    alert(error.message);
+                    addToast(`${error.message}`, {
+                        appearance: "error",
+                        autoDismiss: true,
+                    });
                 })
         }
     }, [id])

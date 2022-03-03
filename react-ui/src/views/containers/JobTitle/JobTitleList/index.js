@@ -61,10 +61,9 @@ export const JobTitleList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const data = useSelector(selectAllJobTitle);
-  const jobTitleStatus = useSelector((state) => state.jobTitle.status);
   useEffect(() => {
-    jobTitleStatus === "idle" && dispatch(fetchJobTitles());
-  }, [jobTitleStatus, dispatch]);
+     dispatch(fetchJobTitles());
+  }, [dispatch]);
   const handleOnClick = (row) => navigate(`/ad/jobTitles/${row.original.id}`);
 
   return <JobTitleTable data={data} handleOnClick={handleOnClick} />;

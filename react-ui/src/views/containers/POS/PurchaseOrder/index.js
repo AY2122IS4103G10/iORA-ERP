@@ -1,11 +1,12 @@
 import {XCircleIcon} from "@heroicons/react/solid";
 import {useState} from "react";
 import {Fragment} from "react";
+import {useEffect} from "react";
+import {updateCurrSite} from "../../../../stores/slices/userSlice";
 import {useDispatch} from "react-redux";
 import {Dialog, Transition} from "@headlessui/react";
 import {getProductDetails, getProductItem} from "../../../../stores/slices/productSlice";
 import {useToasts} from "react-toast-notifications";
-import {useMountedLayoutEffect} from "react-table";
 
 export const SimpleModal = ({open, closeModal, children}) => {
   return (
@@ -192,9 +193,10 @@ export const PosPurchaseOrder = () => {
   const [modalState, setModalState] = useState(false);
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
-  const [productItems, setProductItems] = useState([]);
+  const [sku, setSku] = useState([]);
   const [rfidList, setRfidList] = useState([]);
   const [products, setProducts] = useState([]);
+  const [qty, setQty] = useState([]);
   const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
   const [error, setError] = useState(false);
@@ -206,6 +208,7 @@ export const PosPurchaseOrder = () => {
     dispatch(getProductDetails(rfid))
       .unwrap()
       .then((data) => {
+        console.log(data);
         products.push(data);
         setProducts(products);
         "discountedPrice" in data
@@ -219,18 +222,29 @@ export const PosPurchaseOrder = () => {
         });
       });
   };
-
+  //{dataProduc}
+  //{sku, listRFID, qty}
   const addRFIDClicked = (evt) => {
     evt.preventDefault();
     dispatch(getProductItem(rfid))
       .unwrap()
       .then((data) => {
         if (rfidList.includes(rfid) === false) {
-          productItems.push(data);
-          setProductItems(productItems);
           rfidList.push(rfid);
           setRfidList(rfidList);
-          addProduct(rfid);
+          let currentSKU = data.productSKU;
+
+          if (sku.includes(currentSKU) === true) {
+            let newArr = [...qty];
+            let i = sku.indexOf(currentSKU);
+            newArr[i] = qty[i] + 1;
+            setQty(newArr);
+          } else {
+            sku.push(currentSKU);
+            addProduct(rfid, sku.indexOf(currentSKU));
+            qty.push(1);
+            setQty(qty);
+          }
         } else {
           throw new Error("Error: Duplicate RFID");
         }
@@ -270,9 +284,10 @@ export const PosPurchaseOrder = () => {
 
   const clear = () => {
     setProducts([]);
-    setProductItems([]);
+    setSku([]);
     setRfidList([]);
     setAmount(0);
+    setQty([]);
   };
 
   return (

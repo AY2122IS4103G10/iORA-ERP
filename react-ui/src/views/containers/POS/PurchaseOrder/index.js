@@ -231,6 +231,25 @@ export const PosPurchaseOrder = () => {
       });
   };
 
+  const updateIncrAmount = (rfid, i) => {
+    dispatch(getProductDetails(rfid))
+      .unwrap()
+      .then((data) => {
+        let newQty = [...qty];
+        newQty[i] = qty[i] + 1;
+        setQty(newQty);
+        "discountedPrice" in data
+          ? setAmount(amount + data.discountedPrice)
+          : setAmount(amount + data.price);
+      })
+      .catch((err) => {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
+  };
+
   const addRFIDClicked = (evt) => {
     evt.preventDefault();
     dispatch(getProductItem(rfid))
@@ -243,9 +262,7 @@ export const PosPurchaseOrder = () => {
 
           if (sku.includes(currentSKU) === true) {
             let i = sku.indexOf(currentSKU);
-            let newQty = [...qty];
-            newQty[i] = qty[i] + 1;
-            setQty(newQty);
+            updateIncrAmount(rfid, i);
           } else {
             sku.push(currentSKU);
             setSku(sku);
@@ -266,16 +283,34 @@ export const PosPurchaseOrder = () => {
     setRfid("");
   };
 
+  const decrTotalAmount = (rfid) => {
+    dispatch(getProductDetails(rfid))
+      .unwrap()
+      .then((data) => {
+        "discountedPrice" in data
+          ? setAmount(amount - data.discountedPrice)
+          : setAmount(amount - data.price);
+      })
+      .catch((err) => {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
+  };
+
   function Remove(props) {
     const product = props.product;
 
     const removeProduct = (product) => {
       const index = products.indexOf(product);
       let i = qty.reduce((total, num) => total + num, 0);
+      let removeRFID = rfidList[i - 1];
+      decrTotalAmount(removeRFID);
+      rfidList.splice(i - 1, 1);
+      setRfidList(rfidList);
 
       if (qty[index] === 1) {
-        rfidList.splice(i - 1, 1);
-        setRfidList(rfidList);
         sku.splice(index, 1);
         setSku(sku);
         qty.splice(index, 1);
@@ -283,8 +318,6 @@ export const PosPurchaseOrder = () => {
         products.splice(index, 1);
         setProducts(products);
       } else {
-        rfidList.splice(i - 1, 1);
-        setRfidList(rfidList);
         let newQty = [...qty];
         newQty[index] = qty[index] - 1;
         setQty(newQty);

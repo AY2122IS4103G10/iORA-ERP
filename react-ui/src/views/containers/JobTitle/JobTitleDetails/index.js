@@ -135,7 +135,7 @@ export const JobTitleDetails = () => {
     Boolean(jobTitle) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="JobTitles" path={-1} />
+          <NavigatePrev page="Job Titles" path={-1} />
           <Header
             jobTitlesId={jobTitle.id}
             openModal={openModal}

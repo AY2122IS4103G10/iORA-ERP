@@ -6,6 +6,7 @@ import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 import { Listbox, Transition } from '@headlessui/react'
 import { editStock } from "../../../../stores/slices/stocklevelSlice";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { useNavigate } from "react-router-dom";
 
 
 function classNames(...classes) {
@@ -86,7 +87,7 @@ const ActionList = ({ actions, selected, setSelected }) => {
 }
 
 
-const EditStockForm = ({ open, selected, setSelected, rfid, setRfid, handleEditStock }) => {
+const EditStockForm = ({ selected, setSelected, rfid, setRfid, onCancelClicked, handleEditStock }) => {
 
     return (
         <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -125,6 +126,7 @@ const EditStockForm = ({ open, selected, setSelected, rfid, setRfid, handleEditS
                                         <button
                                             type="button"
                                             className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                            onClick={onCancelClicked}
                                         >
                                             Cancel
                                         </button>
@@ -150,6 +152,7 @@ const EditStockForm = ({ open, selected, setSelected, rfid, setRfid, handleEditS
 
 export const EditStockLevel = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate()
     const siteId = useSelector(selectUserSite);
     const [open, setOpen] = useState(false);
     const [rfid, setRfid] = useState("");
@@ -158,6 +161,7 @@ export const EditStockLevel = () => {
 
     // const openModal = () => setOpen(true);
     const closeModal = () => setOpen(false);
+    const onCancelClicked = () => navigate(-1)
 
     const handleEditStock = (e) => {
         e.preventDefault();
@@ -181,7 +185,7 @@ export const EditStockLevel = () => {
         dispatch(editStock({ toUpdate: toUpdate, siteId: siteId }))
             .unwrap()
             .then((response) => {
-                addToast(`Sucessfully Edited Stock`, {
+                addToast(`Sucessfully updated stock`, {
                     appearance: "success",
                     autoDismiss: true,
                 });
@@ -202,6 +206,7 @@ export const EditStockLevel = () => {
             setSelected={setSelected} 
             rfid={rfid} 
             setRfid={setRfid} 
+            onCancelClicked={onCancelClicked}
             handleEditStock={handleEditStock}
         />
     )

@@ -120,7 +120,7 @@ const OrderList = ({
               name="rfid"
               id="rfid"
               autoComplete="rfid"
-              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-10/12 sm:text-sm border-gray-300 rounded-md"
+              className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-10/12 sm:text-sm border-gray-300 rounded-md"
               placeholder="10-0001234-0XXXXX-0000XXXXX"
               value={rfid}
               onChange={onRfidChanged}
@@ -129,7 +129,7 @@ const OrderList = ({
             />
             <button
               type="submit"
-              className="w-2/12 flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-sm rounded-md text-white bg-slate-600 hover:bg-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-2/12 flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-sm rounded-md text-white bg-slate-600 hover:bg-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
               onClick={addRFIDClicked}>
               Add product
             </button>
@@ -211,7 +211,7 @@ const OrderList = ({
             <div>
               <dl className="space-y-8 flex flex-row-reverse">
                 <div className="flex items-right justify-between">
-                  <dd className="ml-4 text-xl font-bold font-medium text-red-800">
+                  <dd className="ml-4 text-xl font-medium text-red-800">
                     Total Amount: &emsp;$
                     {Number.parseFloat(amount).toFixed(2)}
                   </dd>

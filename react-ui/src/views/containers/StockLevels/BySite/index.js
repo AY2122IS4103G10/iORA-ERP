@@ -11,7 +11,7 @@ export const SiteTables = (subsys) => {
     const columns = useMemo(
         () => [
             {
-                Header: "Site ID",
+                Header: "#",
                 accessor: "id"
             },
             {
@@ -32,7 +32,7 @@ export const SiteTables = (subsys) => {
     const siteStatus = useSelector((state) => state.sites.status);
     useEffect(() => {
         siteStatus === "idle" && dispatch(getAllSites());
-    }, [siteStatus])
+    }, [dispatch, siteStatus])
 
     const path = "/" + subsys.subsys.subsys + "/stocklevels";
     return (

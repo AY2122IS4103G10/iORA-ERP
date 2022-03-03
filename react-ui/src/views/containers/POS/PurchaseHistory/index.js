@@ -1,27 +1,30 @@
 import {useLocation, useNavigate} from "react-router-dom";
-import {useState, useEffect, useMemo} from "react";
+import {useEffect} from "react";
 import {useSelector, useDispatch} from "react-redux";
+import moment from "moment";
 import {SimpleTable} from "../../../components/Tables/SimpleTable";
 import {selectAllOrder} from "../../../../stores/slices/posSlice";
-import {selectUserSite, updateCurrSite} from "../../../../stores/slices/userSlice";
+import {selectUserSite} from "../../../../stores/slices/userSlice";
 import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
-import {getASite, selectSite, selectSiteById} from "../../../../stores/slices/siteSlice";
+import {getASite, selectSite} from "../../../../stores/slices/siteSlice";
 
 const columns = [
   {
-    Header: "OrderId",
+    Header: "#",
     accessor: "id",
   },
   {
-    Header: "DateTime",
-    accessor: "dateTime",
+    Header: "Transaction Date",
+    accessor: (row) => moment(row.dateTime).format("DD/MM/YYYY"),
+
   },
   {
-    Header: "Amount",
+    Header: "Total Amount",
     accessor: "totalAmount",
+    Cell: (row) => `$${row.value.toFixed(2)}`
   },
   {
-    Header: "Customer Number",
+    Header: "Customer No.",
     accessor: (row) => row.customerId,
   },
 ];
@@ -36,15 +39,15 @@ export const PosPurchaseHistory = (subsys) => {
   const siteId = useSelector(selectUserSite);
   const site = useSelector(selectSite);
 
-  const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
+  const handleOnClick = (row) => navigate(`/str/pos/${row.original.id}`);
 
   useEffect(() => {
     dispatch(fetchSiteOrders(siteId));
-  }, [siteId]);
+  }, [dispatch, siteId]);
 
   useEffect(() => {
     dispatch(getASite(siteId));
-  }, [site]);
+  }, [dispatch, siteId]);
 
   return (
     <>

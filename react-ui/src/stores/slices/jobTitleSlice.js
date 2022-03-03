@@ -72,10 +72,7 @@ const jobTitleSlice = createSlice({
       }
     });
     builder.addCase(deleteExistingJobTitle.fulfilled, (state, action) => {
-      state.jobTitle = state.jobTitle.filter(
-        ({ jobTitleId }) => jobTitleId !== action.payload.jobTitleId
-      );
-      // state.status = "idle"
+      state.status = "idle"
     });
   },
 });

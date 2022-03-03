@@ -76,9 +76,7 @@ function App() {
             path="sm"
             element={
               <PrivateRoute>
-                <SMRoute>
-                  <SMIndex />
-                </SMRoute>
+                <SMIndex />
               </PrivateRoute>
             }
           >
@@ -90,12 +88,15 @@ function App() {
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
             <Route path="stocklevels">
-              <Route path="my/:id" element={<StockLevelForm subsys="sm"/>} />
-              <Route path="my" element={<MyStoreStock subsys="sm"/>} />
-              <Route path="sites" element={<SiteStocks subsys="sm"/>} />
+              <Route path="my/:id" element={<StockLevelForm subsys="sm" />} />
+              <Route path="my" element={<MyStoreStock subsys="sm" />} />
+              <Route path="sites" element={<SiteStocks subsys="sm" />} />
               <Route path="products" element={<ProductStocks subsys="sm" />} />
               <Route path=":id" element={<AsiteStock />} />
-              <Route path="products/:id" element={<AProductStock subsys="sm" />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="sm" />}
+              />
             </Route>
 
             <Route path="stocktransfer" element={<Outlet />}>
@@ -147,20 +148,29 @@ function App() {
             }
           >
             <Route path="stocklevels">
-             <Route path="my/:id" element={<StockLevelForm subsys="str"/>} />
-              <Route path="my" element={<MyStoreStock subsys="str"/>} />
-              <Route path="edit" element={<EditStockLevel subsys="str"/>}/>
-              <Route path="sites" element={<SiteStocks subsys="str"/>} />
+              <Route path="my/:id" element={<StockLevelForm subsys="str" />} />
+              <Route path="my" element={<MyStoreStock subsys="str" />} />
+              <Route path="edit" element={<EditStockLevel subsys="str" />} />
+              <Route path="sites" element={<SiteStocks subsys="str" />} />
               <Route path="products" element={<ProductStocks subsys="str" />} />
               <Route path=":id" element={<AsiteStock />} />
-              <Route path="products/:id" element={<AProductStock subsys="str" />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="str" />}
+              />
             </Route>
 
             <Route path="stocktransfer" element={<Outlet />}>
               <Route index element={<ManageStockTransfer subsys="str" />} />
-              <Route path="create" element={<StockTransferForm subsys="str"/>}/>
+              <Route
+                path="create"
+                element={<StockTransferForm subsys="str" />}
+              />
               <Route path=":id" element={<ViewStockTransfer subsys="str" />} />
-              <Route path="edit/:id" element={<StockTransferForm subsys="str" />}/>
+              <Route
+                path="edit/:id"
+                element={<StockTransferForm subsys="str" />}
+              />
             </Route>
             <Route path="pos/*" element={<ManagePOS />} />
           </Route>
@@ -242,13 +252,16 @@ function App() {
             }
           >
             <Route path="stocklevels">
-              <Route path="my/:id" element={<StockLevelForm subsys="wh"/>} />
-              <Route path="my" element={<MyStoreStock subsys="wh"/>} />
-              <Route path="edit" element={<EditStockLevel subsys="wh"/>}/>
-              <Route path="sites" element={<SiteStocks subsys="wh"/>} />
+              <Route path="my/:id" element={<StockLevelForm subsys="wh" />} />
+              <Route path="my" element={<MyStoreStock subsys="wh" />} />
+              <Route path="edit" element={<EditStockLevel subsys="wh" />} />
+              <Route path="sites" element={<SiteStocks subsys="wh" />} />
               <Route path="products" element={<ProductStocks subsys="wh" />} />
               <Route path=":id" element={<AsiteStock />} />
-              <Route path="products/:id" element={<AProductStock subsys="wh" />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="wh" />}
+              />
             </Route>
 
             <Route path="procurements" element={<Outlet />}>
@@ -260,9 +273,14 @@ function App() {
 
             <Route path="stocktransfer" element={<Outlet />}>
               <Route index element={<ManageStockTransfer subsys="wh" />} />
-              <Route path="create" element={<StockTransferForm subsys="wh"/>}/>
+              <Route
+                path="create"
+                element={<StockTransferForm subsys="wh" />}
+              />
               <Route path=":id" element={<ViewStockTransfer subsys="wh" />} />
-              <Route path="edit/:id" element={<StockTransferForm subsys="wh" />}
+              <Route
+                path="edit/:id"
+                element={<StockTransferForm subsys="wh" />}
               />
             </Route>
           </Route>

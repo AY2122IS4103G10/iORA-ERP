@@ -240,7 +240,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     // Helper methods
 
-    // TODO: fix this method, and update after currency amount added to payments
+    // do this: implement updated method upon payment, and update after currency amount added to payments
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 

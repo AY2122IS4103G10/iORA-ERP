@@ -292,11 +292,11 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
 }
 
 function prepareStockLevel(stocklevel, allModels) {
-    stocklevel.map((stock) => {
-        let model = allModels?.find((model) => model.modelCode === stock.sku.slice(0, -2));
-        stock.name = model?.name;
-        stock.product = model?.products.find((prod) => prod.sku === stock.sku);
-    })
+    for (let i = 0; i < stocklevel.length; i++) {
+        let model = allModels?.find((model) => model.modelCode === stocklevel[i].sku.slice(0, -2));
+        stocklevel[i].name = model?.name;
+        stocklevel[i].product = model?.products.find((prod) => prod.sku === stocklevel[i].sku);
+    }
     return stocklevel;
 }
 
@@ -402,7 +402,8 @@ export const StockTransferForm = (subsys) => {
     //editing 
     function mapLineItemsToSelectedRows(data) {
         let selectedRows = {};
-        data.map((item) => {
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
             let product = prodTableData.find((data) => data.sku === item.product.sku);
             item.name = product.name;
             item.qty = product.qty;
@@ -410,7 +411,7 @@ export const StockTransferForm = (subsys) => {
             //update selectedRows
             let index = prodTableData.findIndex((data) => data.sku === item.product.sku);
             selectedRows[index] = true;
-        })
+        }
         setSelectedRows(selectedRows);
         return data;
     }
@@ -431,7 +432,7 @@ export const StockTransferForm = (subsys) => {
                     alert(error.message);
                 })
         }
-    }, [])
+    }, [id])
 
 
     //selecting sites

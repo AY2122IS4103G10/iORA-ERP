@@ -1,8 +1,3 @@
-import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { NavBar } from "../../../components/NavBar";
-import { SideBar } from "../../../components/SideBar";
 import {
   ArchiveIcon,
   CogIcon,
@@ -10,14 +5,17 @@ import {
   DocumentReportIcon,
   DocumentTextIcon,
   HomeIcon,
-  QuestionMarkCircleIcon,
-  ScaleIcon,
-  ShieldCheckIcon,
+  QuestionMarkCircleIcon, ShieldCheckIcon,
   ShoppingBagIcon,
   TicketIcon,
-  UserGroupIcon,
+  UserGroupIcon
 } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Outlet } from "react-router-dom";
 import { updateCurrSite } from "../../../../stores/slices/userSlice";
+import { NavBar } from "../../../components/NavBar";
+import { SideBar } from "../../../components/SideBar";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },

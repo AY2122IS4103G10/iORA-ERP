@@ -1,11 +1,10 @@
-import {useLocation, useNavigate} from "react-router-dom";
-import {useState, useEffect, useMemo} from "react";
-import {useSelector, useDispatch} from "react-redux";
-import {SimpleTable} from "../../../components/Tables/SimpleTable";
-import {selectAllOrder} from "../../../../stores/slices/posSlice";
-import {selectUserSite} from "../../../../stores/slices/userSlice";
-import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
-import {getASite, selectSite, selectSiteById} from "../../../../stores/slices/siteSlice";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { fetchSiteOrders, selectAllOrder } from "../../../../stores/slices/posSlice";
+import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const columns = [
   {
@@ -39,14 +38,12 @@ export const PosPurchaseHistory = (subsys) => {
   const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
 
   useEffect(() => {
-    console.log(siteId);
     orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
-    console.log(siteId);
-  }, [orderStatus, siteId]);
+  }, [dispatch, orderStatus, siteId]);
 
   useEffect(() => {
     siteStatus === "idle" && dispatch(getASite(siteId));
-  }, [siteStatus, site]);
+  }, [dispatch, siteStatus, siteId]);
 
   return (
     <>
@@ -65,7 +62,7 @@ export const PosPurchaseHistory = (subsys) => {
             <div className="space-y-6 lg:col-start-1 lg:col-span-2">
               <section aria-labelledby="stocks-level">
                 <div className="ml-2 mr-2">
-                  {data == undefined ? (
+                  {data === undefined ? (
                     <p>No Records</p>
                   ) : (
                     <SimpleTable columns={columns} data={data} handleOnClick={handleOnClick} />

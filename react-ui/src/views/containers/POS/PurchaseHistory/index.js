@@ -53,7 +53,7 @@ export const PosPurchaseHistory = (subsys) => {
             <div className="flex items-center space-x-3">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {siteId != null ? site.name : "No Reocrds"}
+                  {siteId != null ? site.name : "No Records"}
                 </h1>
               </div>
             </div>

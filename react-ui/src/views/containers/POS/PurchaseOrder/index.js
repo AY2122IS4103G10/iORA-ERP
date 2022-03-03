@@ -1,43 +1,106 @@
-import {XCircleIcon} from "@heroicons/react/solid";
-import {useState} from "react";
-import {Fragment} from "react";
-import {useDispatch} from "react-redux";
-import {Dialog, Transition} from "@headlessui/react";
-import {getProductDetails, getProductItem} from "../../../../stores/slices/productSlice";
-import {useToasts} from "react-toast-notifications";
-import {useMountedLayoutEffect} from "react-table";
+import { XCircleIcon } from "@heroicons/react/solid";
+import { useState } from "react";
+import { Fragment } from "react";
+import { useDispatch } from "react-redux";
+import { Dialog, Transition } from "@headlessui/react";
+import { XIcon, CashIcon, CreditCardIcon, DeviceMobileIcon } from "@heroicons/react/outline";
 
-export const SimpleModal = ({open, closeModal, children}) => {
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { getProductDetails, getProductItem } from "../../../../stores/slices/productSlice";
+import { useToasts } from "react-toast-notifications";
+import { useMountedLayoutEffect } from "react-table";
+
+const paymentTypes = [
+  {
+    name: "CASH",
+    icon: CashIcon,
+  },
+  {
+    name: "MASTERCARD",
+    icon: CreditCardIcon,
+  },
+  {
+    name: "VISA",
+    icon: CreditCardIcon,
+  },
+  {
+    name: "NETS",
+    icon: CreditCardIcon,
+  },
+  {
+    name: "PAYLAH",
+    icon: DeviceMobileIcon
+  },
+  {
+    name: "GRABPAY",
+    icon: DeviceMobileIcon
+  },
+  {
+    name: "FAVE",
+    icon: DeviceMobileIcon
+  }
+]
+
+export const PaymentModal = ({ open, closeModal }) => {
   return (
-    <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={closeModal}>
-        <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0">
-            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          </Transition.Child>
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        <div>
+          <div className="flex justify-between">
+            <Dialog.Title
+              as="h3"
+              className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
+            >
+              Payment Option
+            </Dialog.Title>
+            <button
+              type="button"
+              className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
+              onClick={closeModal}
+            >
+              <XIcon className="h-5 w-5" />
+            </button>
+          </div>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
-          <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
-            &#8203;
-          </span>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            enterTo="opacity-100 translate-y-0 sm:scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"></Transition.Child>
+          <div className="rounded-lg bg-white overflow-hidden divide-y divide-gray-200 sm:divide-y-0 sm:grid sm:grid-cols-3 sm:gap-0">
+            {paymentTypes.map((type, index) => (
+              <div
+                key={index}
+                className='m-2 border shadow rounded-lg align-middle sm:rounded-md relative bg-white p-8 
+                focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500'
+              >
+                <div className="m-0 flex justify-center">
+                    <button >
+                      {/* Extend touch target to entire panel */}
+                      <span className="absolute inset-0" aria-hidden="true" />
+
+                      <div className="flex justify-center align-middle ">
+                        <span>
+                          {type.name}
+                        </span>
+                        <type.icon
+                          className="ml-2 inline-flex h-6 w-6 text-cyan-500 row-span-1"
+                          aria-hidden="true"
+                        />
+                      </div>
+                    </button>
+
+
+                </div>
+                {/* <span
+                  className="pointer-events-none absolute top-6 right-6 text-gray-300 group-hover:text-gray-400"
+                  aria-hidden="true"
+                >
+                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
+                  </svg>
+                </span> */}
+              </div>
+            ))}
+          </div>
         </div>
-      </Dialog>
-    </Transition.Root>
+      </div>
+    </SimpleModal>
   );
 };
 
@@ -198,7 +261,7 @@ export const PosPurchaseOrder = () => {
   const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
   const [error, setError] = useState(false);
-  const {addToast} = useToasts();
+  const { addToast } = useToasts();
 
   const onRfidChanged = (e) => setRfid(e.target.value);
 
@@ -277,7 +340,7 @@ export const PosPurchaseOrder = () => {
   };
 
   return (
-    <div>
+    <>
       <OrderList
         products={products}
         amount={amount}
@@ -290,6 +353,7 @@ export const PosPurchaseOrder = () => {
         openModal={openModal}
         closeModal={closeModal}
       />
-    </div>
+      <PaymentModal open={modalState} closeModal={closeModal} />
+    </>
   );
 };

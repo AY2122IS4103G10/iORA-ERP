@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 
 import { PosPurchaseHistory } from "../PurchaseHistory";
 import { PosPurchaseOrder } from "../PurchaseOrder";
@@ -14,17 +14,7 @@ export const ManagePOS = (subsys) => {
   return (
     <>
       <SectionHeading header="POS" tabs={tabs} />
-      <Routes>
-        <Route
-          path="orderHistory"
-          element={<PosPurchaseHistory subsys={subsys} />}
-        />
-        <Route path=":orderId" element={<OrderDetails />} />
-        <Route
-          path="orderPurchase"
-          element={<PosPurchaseOrder subsys={subsys} />}
-        />
-      </Routes>
+      <Outlet />
     </>
   );
 };

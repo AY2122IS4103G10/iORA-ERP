@@ -39,7 +39,7 @@ export const PosPurchaseHistory = (subsys) => {
   const siteId = useSelector(selectUserSite);
   const site = useSelector(selectSite);
 
-  const handleOnClick = (row) => navigate(`/str/pos/${row.original.id}`);
+  const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
 
   useEffect(() => {
     dispatch(fetchSiteOrders(siteId));

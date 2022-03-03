@@ -59,6 +59,9 @@ import { CustomerForm } from "./views/containers/Customer/CustomerForm";
 import { ManageMembershipTier } from "./views/containers/MembershipTier/ManageMembershipTier/index.js";
 import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails/index.js";
 import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm/index.js";
+import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory/index.js";
+import { OrderDetails } from "./views/containers/POS/OrderDetails/index.js";
+import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder/index.js";
 
 function App() {
   return (
@@ -172,7 +175,13 @@ function App() {
                 element={<StockTransferForm subsys="str" />}
               />
             </Route>
-            <Route path="pos/*" element={<ManagePOS />} />
+            <Route path="pos" element={<ManagePOS />}>
+              <Route path="orderHistory" element={<Outlet />}>
+                <Route index element={<PosPurchaseHistory />} />
+                <Route path=":orderId" element={<OrderDetails />} />
+              </Route>
+              <Route path="orderPurchase" element={<PosPurchaseOrder />} />
+            </Route>
           </Route>
 
           {/* Admin Subsystem */}

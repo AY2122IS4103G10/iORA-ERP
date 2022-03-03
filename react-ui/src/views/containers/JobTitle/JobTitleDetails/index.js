@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import { useToasts } from "react-toast-notifications";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   PencilIcon,
@@ -98,22 +99,33 @@ const JobTitleDetailsBody = ({
 );
 
 export const JobTitleDetails = () => {
+  const { addToast } = useToasts();
   const { jobTitleId } = useParams();
   const jobTitle = useSelector((state) => selectJobTitleById(state, parseInt(jobTitleId)));
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const memStatus = useSelector((state) => state.jobTitle.status);
 
   useEffect(() => {
-    memStatus === "idle" && dispatch(fetchJobTitles());
-  }, [memStatus, dispatch]);
+    dispatch(fetchJobTitles());
+  }, [dispatch]);
 
   const onDeleteJobTitleClicked = () => {
-    dispatch(deleteExistingJobTitle(jobTitleId)).then(() => {
-      closeModal();
-      navigate("/ad/jobTitles");
-    })
+    dispatch(deleteExistingJobTitle(jobTitleId))
+      .unwrap()
+      .then(() => {
+        addToast("Successfully deleted job title", {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        closeModal();
+        navigate("/ad/jobTitles");
+      })
+      .catch((err) =>
+        addToast(`Error: Job Title cannot be deleted as it is being used.`, {
+          appearance: "error",
+          autoDismiss: true,
+        }))
   }
 
   const openModal = () => setOpenDelete(true);
@@ -123,7 +135,7 @@ export const JobTitleDetails = () => {
     Boolean(jobTitle) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="JobTitles" path={-1} />
+          <NavigatePrev page="Job Titles" path={-1} />
           <Header
             jobTitlesId={jobTitle.id}
             openModal={openModal}

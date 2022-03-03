@@ -48,8 +48,6 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private SiteService siteService;
     @Autowired
-    private CustomerService customerService;
-    @Autowired
     private CustomerOrderService customerOrderService;
     @PersistenceContext
     private EntityManager em;

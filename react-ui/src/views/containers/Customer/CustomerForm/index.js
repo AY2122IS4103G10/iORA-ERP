@@ -233,7 +233,7 @@ export const CustomerForm = () => {
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [membershipTier, setMembershipTier] = useState("BASIC");
+  const [membershipTier, setMembershipTier] = useState({name: "BASIC"});
   const [membershipPoints, setMembershipPoints] = useState("0");
   const [storeCredit, setStoreCredit] = useState("0");
 
@@ -267,9 +267,6 @@ export const CustomerForm = () => {
             availStatus: true,
             email,
             password,
-            membershipTier,
-            membershipPoints,
-            storeCredit,
           })
         )
           .unwrap()

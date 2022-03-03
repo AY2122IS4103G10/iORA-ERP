@@ -9,7 +9,7 @@ import { SimpleTable } from '../../../components/Tables/SimpleTable';
 
 
 const convertData = (data) => 
-  Object.entries(data.products).map((key) => ({
+  Object.entries(data?.products).map((key) => ({
     sku: key[0],
     qty: key[1],
     reserve: data.reserveProducts[key[0]] ?? 0,
@@ -48,7 +48,7 @@ export const AsiteStock = () => {
     }, [dispatch, id])
 
     return(
-      <>
+      status === "succeeded" ? (<>
       <div className="min-h-full">
           <main className="py-10">
             {/* Page header */}
@@ -103,8 +103,8 @@ export const AsiteStock = () => {
                         Stock Levels
                   </h2>
                   <div className="ml-2 mr-2">
-                    {status !== "succeeded" ? <p>loading</p> : 
-                      <SimpleTable columns={columns} data={convertData(site?.stockLevel)}/>
+                    {site?.stockLevel === null || site?.stockLevel === undefined  ? <p>loading</p> : 
+                      <SimpleTable columns={columns} data={convertData(site.stockLevel)}/>
                     }
                   </div>
                 </section>
@@ -112,6 +112,6 @@ export const AsiteStock = () => {
             </div>
           </main>
         </div>
-      </>
+      </>) : <p>loading</p>
   )
 }

@@ -23,6 +23,7 @@ import {
   selectAllManufacturing,
   selectAllWarehouse,
 } from "../../../../stores/slices/siteSlice";
+import { classNames } from "../../../../utilities/Util";
 
 const addModalColumns = [
   {
@@ -207,6 +208,7 @@ const ProcurementFormBody = ({
   openProducts,
   onSaveOrderClicked,
   onCancelClicked,
+  canAdd,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <div className="rounded-lg bg-white overflow-hidden shadow">
@@ -323,7 +325,10 @@ const ProcurementFormBody = ({
               </button>
               <button
                 type="submit"
-                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                className={classNames(
+                  canAdd ? "bg-cyan-600 hover:bg-cyan-700" : "bg-cyan-800",
+                  "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500")}
+                disabled={!canAdd}
               >
                 {!isEditing ? "Create" : "Save"} order
               </button>
@@ -413,7 +418,7 @@ export const ProcurementForm = () => {
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);
 
-  const canAdd = [manufacturingSelected, warehouseSelected, lineItems].every(
+  const canAdd = [hqSelected, manufacturingSelected, warehouseSelected, lineItems.length].every(
     Boolean
   );
 
@@ -522,6 +527,7 @@ export const ProcurementForm = () => {
         openProducts={openModal}
         onSaveOrderClicked={onSaveOrderClicked}
         onCancelClicked={onCancelClicked}
+        canAdd={canAdd}
       />
       <AddProductItemModal
         items={skus}

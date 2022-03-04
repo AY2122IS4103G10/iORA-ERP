@@ -49,11 +49,12 @@ public class AdminController {
      */
 
     @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
-    public JobTitle addJobTitle(@RequestBody JobTitle jt) {
+    public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {
         try {
-            return adminService.createJobTitle(jt);
+            return ResponseEntity.ok(adminService.createJobTitle(jt));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -224,11 +225,12 @@ public class AdminController {
     }
 
     @PostMapping(path = "/addDepartment", consumes = "application/json", produces = "application/json")
-    public Department addDepartment(@RequestBody Department d) {
+    public ResponseEntity<Object> addDepartment(@RequestBody Department d) {
         try {
-            return adminService.createDepartment(d);
+            return ResponseEntity.ok(adminService.createDepartment(d));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 

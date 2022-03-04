@@ -18,8 +18,13 @@ export const fetchJobTitles = createAsyncThunk(
 export const addNewJobTitle = createAsyncThunk(
   "jobTitle/addNewJobTitle",
   async (initialJobTitle) => {
-    const response = await api.create("admin/addJobTitle", initialJobTitle);
-    return response.data;
+    try {
+
+      const response = await api.create("admin/addJobTitle", initialJobTitle);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data)
+    }
   }
 );
 

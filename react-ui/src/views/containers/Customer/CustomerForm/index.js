@@ -39,14 +39,12 @@ const CustomerFormBody = ({
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">{!isEditing ? "Add New" : "Edit"} Customer</h1>
-    {/* Main 3 column grid */}
-    <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
       {/* Left column */}
       <div className="grid grid-cols-1 gap-4 lg:col-span-2">
         {/* Form */}
         <section aria-labelledby="profile-overview-title">
           <div className="rounded-lg bg-white overflow-hidden shadow">
-            <form>
+            <form onSubmit={onAddCustomerClicked}>
               <div className="p-8 space-y-8 divide-y divide-gray-200">
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
@@ -208,7 +206,6 @@ const CustomerFormBody = ({
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={onAddCustomerClicked}
                     >
                       {!isEditing ? "Add" : "Save"} Customer
                     </button>
@@ -219,7 +216,7 @@ const CustomerFormBody = ({
           </div>
         </section>
       </div>
-    </div>
+    
   </div>
 );
 

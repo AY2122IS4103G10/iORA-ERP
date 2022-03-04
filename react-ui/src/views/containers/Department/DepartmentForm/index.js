@@ -27,7 +27,7 @@ const DepartmentFormBody = ({
         {/* Form */}
         <section aria-labelledby="profile-overview-title">
           <div className="rounded-lg bg-white overflow-hidden shadow">
-            <form>
+            <form onSubmit={onAddDepartmentClicked}>
               <div className="p-8 space-y-8 divide-y divide-gray-200">
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
@@ -68,7 +68,6 @@ const DepartmentFormBody = ({
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={onAddDepartmentClicked}
                     >
                       {!isEditing ? "Add" : "Save"} Department
                     </button>

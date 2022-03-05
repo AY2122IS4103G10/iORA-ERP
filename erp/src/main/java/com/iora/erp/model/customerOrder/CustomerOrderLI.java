@@ -3,12 +3,12 @@ package com.iora.erp.model.customerOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import com.iora.erp.model.product.ProductItem;
 
@@ -18,12 +18,11 @@ public class CustomerOrderLI {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Transient
     private int qty;
 
     @OneToMany
     private List<ProductItem> productItems;
-
 
     public CustomerOrderLI() {
         this.qty = 0;
@@ -39,7 +38,7 @@ public class CustomerOrderLI {
     }
 
     public int getQty() {
-        return this.qty;
+        return this.productItems.size();
     }
 
     public List<ProductItem> getProductItems() {
@@ -59,5 +58,5 @@ public class CustomerOrderLI {
     public void removeProductItem(ProductItem productItem) {
         this.productItems.remove(productItem);
         this.qty = this.productItems.size();
-    }    
+    }
 }

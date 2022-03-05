@@ -9,10 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.iora.erp.model.customer.Customer;
 
 @Entity
 public class CustomerOrder {
@@ -26,6 +24,9 @@ public class CustomerOrder {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime dateTime;
 
+    @Column(nullable = false)
+    private Double totalAmount;
+
     @OneToMany
     private List<CustomerOrderLI> lineItems;
 
@@ -38,8 +39,8 @@ public class CustomerOrder {
     @OneToMany
     private List<ExchangeLI> exhcangedLIs;
 
-    @ManyToOne
-    private Customer customer;
+    @Column
+    private Long customerId;
 
     public CustomerOrder() {
         dateTime = LocalDateTime.now();
@@ -47,6 +48,7 @@ public class CustomerOrder {
         this.payments = new ArrayList<>();
         this.refundedLIs = new ArrayList<>();
         this.exhcangedLIs = new ArrayList<>();
+        this.totalAmount = 0.0;
     }
 
     public Long getId() {
@@ -87,6 +89,7 @@ public class CustomerOrder {
 
     public void addPayment(Payment payment) {
         this.payments.add(payment);
+        this.totalAmount += payment.getAmount();
     }
 
     public List<RefundLI> getRefundedLIs() {
@@ -113,11 +116,27 @@ public class CustomerOrder {
         this.exhcangedLIs.add(exchangedLI);
     }
 
-    public Customer getCustomer() {
-        return this.customer;
+    public Long getCustomerId() {
+        return this.customerId;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public Long getStoreSiteId() {
+        return storeSiteId;
+    }
+
+    public void setStoreSiteId(Long storeSiteId) {
+        this.storeSiteId = storeSiteId;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

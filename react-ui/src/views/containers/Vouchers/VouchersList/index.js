@@ -1,46 +1,22 @@
+import moment from "moment";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import moment from "moment";
-import { CogIcon } from "@heroicons/react/outline";
-
-import {
-  SimpleTable,
-  SelectColumnFilter,
-  OptionsCell,
-} from "../../../components/Tables/SimpleTable";
-import { SelectableTable } from "../../../components/Tables/SelectableTable";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   fetchVouchers,
   selectAllVouchers,
 } from "../../../../stores/slices/voucherSlice";
+import {
+  SelectColumnFilter,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 
-export const VouchersTable = () => {
+export const VouchersTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
-      // {
-      //   Header: "Id",
-      //   accessor: "id",
-      //   Cell: (e) => (
-      //     <Link
-      //       to={`/sm/vouchers/${e.value}`}
-      //       className="hover:text-gray-700 hover:underline"
-      //     >
-      //       {e.value}
-      //     </Link>
-      //   ),
-      // },
       {
         Header: "Voucher Code",
         accessor: "voucherCode",
-        Cell: (e) => (
-          <Link
-            to={`/sm/vouchers/${e.value}`}
-            className="hover:text-gray-700 hover:underline"
-          >
-            {e.value}
-          </Link>
-        ),
       },
       {
         Header: "Value",
@@ -50,7 +26,7 @@ export const VouchersTable = () => {
       {
         Header: "Expiry Date",
         accessor: "expiry",
-        Cell: (e) => moment(e.value).subtract(1, 'months').format("DD/MM/YY"),
+        Cell: (e) => moment(e.value).add(1, "days").subtract(1, "months").format("DD/MM/yy"),
       },
       {
         Header: "Issued",
@@ -65,36 +41,37 @@ export const VouchersTable = () => {
         Filter: SelectColumnFilter,
         filter: "includes",
       },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/products",
-      //       },
-      //     ],
-      //   }),
-      // },
     ],
     []
   );
-  const dispatch = useDispatch();
-  const data = useSelector(selectAllVouchers);
-  const voucherStatus = useSelector((state) => state.vouchers.status);
-  useEffect(() => {
-    voucherStatus === "idle" && dispatch(fetchVouchers());
-  }, [voucherStatus, dispatch]);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        <SimpleTable columns={columns} data={data} path={`/sm/vouchers`}/>
+        <SimpleTable
+          columns={columns}
+          data={data}
+          path={`/sm/vouchers`}
+          handleOnClick={handleOnClick}
+        />
       </div>
     </div>
   );
 };
 
 export const VouchersList = () => {
-  return <VouchersTable />;
+  const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const data = useSelector(selectAllVouchers);
+  const voucherStatus = useSelector((state) => state.vouchers.status);
+
+  const handleOnClick = (row) =>
+    navigate(`${pathname}/${row.original.voucherCode}`);
+
+  useEffect(() => {
+    voucherStatus === "idle" && dispatch(fetchVouchers());
+  }, [voucherStatus, dispatch]);
+
+  return <VouchersTable data={data} handleOnClick={handleOnClick} />;
 };

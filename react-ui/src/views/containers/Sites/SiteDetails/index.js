@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { PencilIcon } from "@heroicons/react/solid";
 import { TrashIcon } from "@heroicons/react/outline";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
@@ -92,25 +93,35 @@ const SiteDetailsBody = ({ address, siteCode, phone, company }) => (
 );
 
 export const SiteDetails = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { siteId } = useParams();
   const site = useSelector((state) => selectSiteById(state, parseInt(siteId)));
   const [openDelete, setOpenDelete] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const { addToast } = useToasts();
+
   const sitesStatus = useSelector((state) => state.sites.status);
   useEffect(() => {
     sitesStatus === "idle" && dispatch(fetchSites());
   }, [sitesStatus, dispatch]);
 
   const onDeleteSiteClicked = () => {
-    try {
-      dispatch(deleteExistingSite(siteId));
-      alert("Successfully deleted site");
-      closeModal();
-      navigate("/ad/sites");
-    } catch (err) {
-      console.error("Failed to add site: ", err);
-    }
+    dispatch(deleteExistingSite(siteId))
+      .unwrap()
+      .then(() => {
+        addToast("Successfully deleted site.", {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        closeModal();
+        navigate("/ad/sites");
+      })
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
   };
 
   const openModal = () => setOpenDelete(true);

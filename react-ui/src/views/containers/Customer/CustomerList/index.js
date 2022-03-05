@@ -1,69 +1,66 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { CogIcon } from "@heroicons/react/outline";
 
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import {
+  SelectColumnFilter,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 import {
   fetchCustomers,
-  selectAllCustomer,
+  selectAllCustomers,
 } from "../../../../stores/slices/customerSlice";
+import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 export const CustomerTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
+        Header: "#",
         accessor: "id",
       },
       {
-        Header: "Customer Name",
-        accessor: "lastName",
+        Header: "Name",
+        accessor: (row) => `${row.firstName} ${row.lastName}`,
       },
       {
-        Header: "Date of Birth",
+        Header: "DOB",
         accessor: "dob",
-        //Cell: (e) => `$${e.value}`,
+        Cell: (e) => moment(e.value).format("DD/MM/YY"),
       },
       {
-        Header: "Contact Number",
+        Header: "Contact",
         accessor: "contactNumber",
-        //Cell: (e) => moment(e.value).format("lll"),
       },
       {
-        Header: "Membership Points",
+        Header: "Member Points",
         accessor: "membershipPoints",
-        //Cell: (e) => moment(e.value).format("lll"),
       },
-    //   {
-    //     Header: "Membership Tier",
-    //     accessor: (row) => row.membershipTier.name,
-    //     //Cell: (e) => moment(e.value).format("lll"),
-    //   },
+      {
+        Header: "Member Tier",
+        accessor: (row) => row.membershipTier.name,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
       {
         Header: "Status",
         accessor: "availStatus",
-        Cell: (e) => (e.value ? "Available" : "Not available"),
+        Cell: (e) => (e.value ? (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Active
+          </span>
+        ) : (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            Blocked
+          </span>
+        )),
+        Filter: SelectColumnFilter,
+        filter: "includes",
       },
       {
         Header: "Email",
         accessor: "email",
-        // Cell: (e) => (e.value ? "Yes" : "No"),
-        // Filter: SelectColumnFilter,
-        // filter: "includes",
       },
-      // {
-      //   Header: CogIcon,
-      //   accessor: "accessor",
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/customer",
-      //       },
-      //     ],
-      //   }),
-      // },
     ],
     []
   );
@@ -84,13 +81,13 @@ export const CustomerTable = ({ data, handleOnClick }) => {
 export const CustomerList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const data = useSelector(selectAllCustomer);
-  const customerStatus = useSelector((state) => state.customer.status);
+  const data = useSelector(selectAllCustomers);
+  const customerStatus = useSelector((state) => state.customers.status);
   useEffect(() => {
     customerStatus === "idle" && dispatch(fetchCustomers());
   }, [customerStatus, dispatch]);
-  
-  const handleOnClick = (row) => navigate(`/crm/customer/${row.original.id}`);
+
+  const handleOnClick = (row) => navigate(`/sm/customers/${row.original.id}`);
 
   return <CustomerTable data={data} handleOnClick={handleOnClick} />;
 };

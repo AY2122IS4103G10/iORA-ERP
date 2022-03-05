@@ -7,7 +7,12 @@ import { WHIndex } from "./views/containers/Index/WHIndex";
 import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
-import { ViewStockLevels } from "./views/containers/StockLevels/ManageStockLevels";
+import { SiteStocks } from "./views/containers/StockLevels/BySite/index.js";
+import { ProductStocks } from "./views/containers/StockLevels/ByProduct/index.js";
+import { AsiteStock } from "./views/containers/StockLevels/ASiteStock/index.js";
+import { AProductStock } from "./views/containers/StockLevels/AProductStock/index.js";
+import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList/index.js";
+import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel/index.js";
 import { Login } from "./views/containers/Auth/Login";
 import { Home } from "./views/containers/Auth/Home";
 import { HomeIndex } from "./views/containers/Index/HomeIndex";
@@ -15,9 +20,9 @@ import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
 import { StoreIndex } from "./views/containers/Index/StrIndex";
-import { SMRoute } from "./routes/SMRoute";
+// import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
-import { ADRoute } from "./routes/ADRoute";
+// import { ADRoute } from "./routes/ADRoute";
 import { ManageSites } from "./views/containers/Sites/ManageSites";
 import { SiteForm } from "./views/containers/Sites/SiteForm";
 import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
@@ -25,7 +30,6 @@ import { ManageProcurement } from "./views/containers/Procurement/ManageProcurem
 import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
 import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { SiteDetails } from "./views/containers/Sites/SiteDetails";
-import { ViewStoreStock } from "./views/containers/StockLevels/ManageStoreStock";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
 import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
 import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
@@ -42,13 +46,22 @@ import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/ind
 import Error from "./views/containers/Auth/Error";
 import { Auth } from "./views/containers/Auth/Auth";
 import { ManagePOS } from "./views/containers/POS/ManagePOS";
-import { StockLevelForm } from "./views/containers/StockLevels/StockLevelForm";
+import { StockLevelForm } from "./views/containers/StockLevels/ProdStockLevelForm";
 import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTransfer";
 import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
 import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
 import { Order } from "./views/containers/SelfService/Order";
+import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
+import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
+import { CustomerForm } from "./views/containers/Customer/CustomerForm";
+import { ManageMembershipTier } from "./views/containers/MembershipTier/ManageMembershipTier/index.js";
+import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails/index.js";
+import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm/index.js";
+import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory/index.js";
+import { OrderDetails } from "./views/containers/POS/OrderDetails/index.js";
+import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder/index.js";
 
 function App() {
   return (
@@ -66,9 +79,7 @@ function App() {
             path="sm"
             element={
               <PrivateRoute>
-                <SMRoute>
-                  <SMIndex />
-                </SMRoute>
+                <SMIndex />
               </PrivateRoute>
             }
           >
@@ -79,10 +90,17 @@ function App() {
               <Route path="edit/:prodId" element={<ProductForm />} />
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
-            <Route
-              path="stocklevels/*"
-              element={<ViewStockLevels subsys="sm" />}
-            />
+            <Route path="stocklevels">
+              <Route path="my/:id" element={<StockLevelForm subsys="sm" />} />
+              <Route path="my" element={<MyStoreStock subsys="sm" />} />
+              <Route path="sites" element={<SiteStocks subsys="sm" />} />
+              <Route path="products" element={<ProductStocks subsys="sm" />} />
+              <Route path=":id" element={<AsiteStock />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="sm" />}
+              />
+            </Route>
 
             <Route path="stocktransfer" element={<Outlet />}>
               <Route index element={<ManageStockTransfer subsys="sm" />} />
@@ -109,6 +127,18 @@ function App() {
               <Route path="create" element={<VoucherForm />} />
               <Route path="edit/:voucherId" element={<VoucherForm />} />
             </Route>
+            <Route path="customers" element={<Outlet />}>
+              <Route index element={<ManageCustomer />} />
+              <Route path=":customerId" element={<CustomerDetails />} />
+              <Route path="create" element={<CustomerForm />} />
+              <Route path="edit/:customerId" element={<CustomerForm />} />
+              <Route path="tiers" element={<Outlet />}>
+                <Route index element={<ManageMembershipTier />} />
+                <Route path=":name" element={<MembershipTierDetails />} />
+                <Route path="create" element={<MembershipTierForm />} />
+                <Route path="edit/:name" element={<MembershipTierForm />} />
+              </Route>
+            </Route>
           </Route>
 
           {/* Store Management Subsystem */}
@@ -120,16 +150,38 @@ function App() {
               </PrivateRoute>
             }
           >
-            <Route path="stocklevels/*" element={<ViewStoreStock />} />
+            <Route path="stocklevels">
+              <Route path="my/:id" element={<StockLevelForm subsys="str" />} />
+              <Route path="my" element={<MyStoreStock subsys="str" />} />
+              <Route path="edit" element={<EditStockLevel subsys="str" />} />
+              <Route path="sites" element={<SiteStocks subsys="str" />} />
+              <Route path="products" element={<ProductStocks subsys="str" />} />
+              <Route path=":id" element={<AsiteStock />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="str" />}
+              />
+            </Route>
+
             <Route path="stocktransfer" element={<Outlet />}>
               <Route index element={<ManageStockTransfer subsys="str" />} />
+              <Route
+                path="create"
+                element={<StockTransferForm subsys="str" />}
+              />
               <Route path=":id" element={<ViewStockTransfer subsys="str" />} />
               <Route
                 path="edit/:id"
                 element={<StockTransferForm subsys="str" />}
               />
             </Route>
-            <Route path="pos/*" element={<ManagePOS />} />
+            <Route path="pos" element={<ManagePOS />}>
+              <Route path="orderHistory" element={<Outlet />}>
+                <Route index element={<PosPurchaseHistory />} />
+                <Route path=":orderId" element={<OrderDetails />} />
+              </Route>
+              <Route path="orderPurchase" element={<PosPurchaseOrder />} />
+            </Route>
           </Route>
 
           {/* Admin Subsystem */}
@@ -164,7 +216,7 @@ function App() {
             </Route>
             <Route path="jobTitles" element={<Outlet />}>
               <Route index element={<ManageJobTitle />} />
-              <Route path=":title" element={<JobTitleDetails />} />
+              <Route path=":jobTitleId" element={<JobTitleDetails />} />
               <Route path="create" element={<JobTitleForm />} />
               <Route path="edit/:jobTitleId" element={<JobTitleForm />} />
             </Route>
@@ -208,10 +260,19 @@ function App() {
               </PrivateRoute>
             }
           >
-            <Route
-              path="stocklevels/*"
-              element={<ViewStoreStock subsys="wh" />}
-            />
+            <Route path="stocklevels">
+              <Route path="my/:id" element={<StockLevelForm subsys="wh" />} />
+              <Route path="my" element={<MyStoreStock subsys="wh" />} />
+              <Route path="edit" element={<EditStockLevel subsys="wh" />} />
+              <Route path="sites" element={<SiteStocks subsys="wh" />} />
+              <Route path="products" element={<ProductStocks subsys="wh" />} />
+              <Route path=":id" element={<AsiteStock />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="wh" />}
+              />
+            </Route>
+
             <Route path="procurements" element={<Outlet />}>
               <Route index element={<ManageProcurement />} />
               <Route path=":procurementId" element={<ProcurementDetails />} />
@@ -221,6 +282,10 @@ function App() {
 
             <Route path="stocktransfer" element={<Outlet />}>
               <Route index element={<ManageStockTransfer subsys="wh" />} />
+              <Route
+                path="create"
+                element={<StockTransferForm subsys="wh" />}
+              />
               <Route path=":id" element={<ViewStockTransfer subsys="wh" />} />
               <Route
                 path="edit/:id"

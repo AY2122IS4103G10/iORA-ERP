@@ -18,24 +18,37 @@ export const fetchCompanies = createAsyncThunk(
 export const addNewCompany = createAsyncThunk(
   "companies/addNewCompany",
   async (initialCompany) => {
-    const response = await api.create("admin/addCompany", initialCompany);
-    return response.data;
+    try {
+      const response = await api.create("admin/addCompany", initialCompany);
+      if (response.data === "") return Promise.reject(response.error);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const updateExistingCompany = createAsyncThunk(
   "companies/updateExistingCompany",
   async (existingCompany) => {
-    const response = await api.update("admin/editCompany", existingCompany);
-    return response.data;
+    try {
+      const response = await api.update("admin/editCompany", existingCompany);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const deleteExistingCompany = createAsyncThunk(
   "companies/deleteExistingCompany",
   async (existingCompanyId) => {
-    const response = await companyApi.deleteCompany(existingCompanyId);
-    return response.data;
+    try {
+      const response = await companyApi.deleteCompany(existingCompanyId);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
@@ -57,35 +70,10 @@ const companySlice = createSlice({
       state.companies.push(action.payload);
     });
     builder.addCase(updateExistingCompany.fulfilled, (state, action) => {
-      const {
-        companyId,
-        name,
-        address,
-        registerNumber,
-        telephone,
-        active,
-        departments,
-        vendors,
-      } = action.payload;
-      const existingProd = state.companies.find(
-        (prod) => prod.companyId === companyId
-      );
-      if (existingProd) {
-        existingProd.name = name;
-        existingProd.address = address;
-        existingProd.registerNumber = registerNumber;
-        existingProd.telephone = telephone;
-        existingProd.active = active;
-        existingProd.departments = departments;
-        existingProd.vendors = vendors;
-      }
-      // state.status = "idle";
+      state.status = "idle";
     });
     builder.addCase(deleteExistingCompany.fulfilled, (state, action) => {
-      // state.companies = state.companies.filter(
-      //   ({ companyId }) => companyId !== action.payload.companyId
-      // );
-      state.status = "idle"
+      state.status = "idle";
     });
   },
 });

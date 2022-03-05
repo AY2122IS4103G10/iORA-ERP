@@ -1,6 +1,4 @@
-import {useMatch, Route, Routes, Link} from "react-router-dom";
-import {useState} from "react";
-
+import {Route, Routes} from "react-router-dom";
 import {SiteStocks} from "../BySite";
 import {ProductStocks} from "../ByProduct";
 import {AsiteStock} from "../ASiteStock";

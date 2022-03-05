@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,11 +49,12 @@ public class AdminController {
      */
 
     @PostMapping(path = "/addJobTitle", consumes = "application/json", produces = "application/json")
-    public JobTitle addJobTitle(@RequestBody JobTitle jt) {
+    public ResponseEntity<Object> addJobTitle(@RequestBody JobTitle jt) {
         try {
-            return adminService.createJobTitle(jt);
+            return ResponseEntity.ok(adminService.createJobTitle(jt));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -65,14 +67,19 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping(path = "/deleteJobTitle")
-    public ResponseEntity<Object> deleteJobTitle(@RequestParam Long jobTitleId) {
+    @DeleteMapping(path = "/deleteJobTitle/{jobTitleId}")
+    public ResponseEntity<Object> deleteJobTitle(@PathVariable Long jobTitleId) {
         try {
             adminService.deleteJobTitle(jobTitleId);
             return ResponseEntity.ok("Job Tiltle with ID " + jobTitleId + " has been successfully deleted.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    @GetMapping(path = "/accessRights", produces = "application/json")
+    public List<String> getAccessRights() {
+        return adminService.getAccessRights();
     }
 
     @GetMapping(path = "/viewJobTitles", produces = "application/json")
@@ -87,8 +94,8 @@ public class AdminController {
         }
     }
 
-    @GetMapping(path = "/viewJobTitle", produces = "application/json")
-    public JobTitle viewJobTitle(@RequestParam Long id) {
+    @GetMapping(path = "/viewJobTitle/{id}", produces = "application/json")
+    public JobTitle viewJobTitle(@PathVariable Long id) {
         try {
             return adminService.getJobTitleById(id);
         } catch (Exception e) {
@@ -146,11 +153,12 @@ public class AdminController {
     }
 
     @PostMapping(path = "/addCompany", consumes = "application/json", produces = "application/json")
-    public Company addCompany(@RequestBody Company company) {
+    public ResponseEntity<Object> addCompany(@RequestBody Company company) {
         try {
-            return adminService.createCompany(company);
+            return ResponseEntity.ok(adminService.createCompany(company));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -176,12 +184,12 @@ public class AdminController {
     }
 
     @PutMapping(path = "/editCompany", consumes = "application/json", produces = "application/json")
-    public Company editCompany(@RequestBody Company company) {
+    public ResponseEntity<Object> editCompany(@RequestBody Company company) {
         try {
-
-            return adminService.editCompany(company);
+            return ResponseEntity.ok(adminService.editCompany(company));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -189,7 +197,7 @@ public class AdminController {
     public ResponseEntity<Object> deleteCompany(@RequestParam Long id) {
         try {
             adminService.deleteCompany(id);
-            return ResponseEntity.ok("Company with ID " + id + " has been successfully deleted.");
+            return ResponseEntity.ok(id);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -217,11 +225,12 @@ public class AdminController {
     }
 
     @PostMapping(path = "/addDepartment", consumes = "application/json", produces = "application/json")
-    public Department addDepartment(@RequestBody Department d) {
+    public ResponseEntity<Object> addDepartment(@RequestBody Department d) {
         try {
-            return adminService.createDepartment(d);
+            return ResponseEntity.ok(adminService.createDepartment(d));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -266,11 +275,12 @@ public class AdminController {
     }
 
     @PostMapping(path = "/addEmployee", consumes = "application/json", produces = "application/json")
-    public Employee addEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<Object> addEmployee(@RequestBody Employee employee) {
         try {
-            return employeeService.createEmployee(employee);
+            return ResponseEntity.ok(employeeService.createEmployee(employee));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -326,11 +336,12 @@ public class AdminController {
     }
 
     @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
-    public Employee editEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<Object> editEmployee(@RequestBody Employee employee) {
         try {
-            return employeeService.updateEmployeeAccount(employee);
+            return ResponseEntity.ok(employeeService.updateEmployeeAccount(employee));
         } catch (Exception ex) {
-            return null;
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -338,7 +349,7 @@ public class AdminController {
     public ResponseEntity<Object> deleteEmployee(@RequestParam Long id) {
         try {
             employeeService.removeEmployee(id);
-            return ResponseEntity.ok("Employee with employee ID " + id + " is successfully deleted.");
+            return ResponseEntity.ok(id);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

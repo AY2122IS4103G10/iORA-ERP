@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, createAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { authApi } from "../../environments/Api";
 
 const guest = {
@@ -21,8 +21,12 @@ const guest = {
   },
 };
 
-const initialUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : guest;
-const initialStore = localStorage.getItem("siteId") ? JSON.parse(localStorage.getItem("siteId")) : 0;
+const initialUser = localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user"))
+  : guest;
+const initialStore = localStorage.getItem("siteId")
+  ? JSON.parse(localStorage.getItem("siteId"))
+  : 0;
 
 const initialState = {
   user: { ...initialUser },
@@ -32,21 +36,19 @@ const initialState = {
   error: "null",
 };
 
-export const login = createAsyncThunk(
-  "auth/login",
-  async (credentials) => {
+export const login = createAsyncThunk("auth/login", async (credentials) => {
+  try {
     const response = await authApi.login(
       credentials.username,
       credentials.password
     );
-    if (response.data === "") {
-      return Promise.reject(response.error);
-    }
     return response.data;
+  } catch (error) {
+    return Promise.reject(error.response.data);
   }
-);
+});
 
-export const updateCurrSite = createAction('updateCurrSite');
+// export const updateCurrSite = createAction("updateCurrSite");
 
 const userSlice = createSlice({
   name: "user",
@@ -57,13 +59,25 @@ const userSlice = createSlice({
       state.loggedIn = false;
       state.user = { ...guest };
     },
-
+    updateCurrSite(state, action) {
+      if (action.payload) {
+        state.currSite = action.payload;
+        localStorage.setItem("siteId", action.payload);
+      } else {
+        state.currSite = localStorage.getItem("siteId")
+          ? JSON.parse(localStorage.getItem("siteId"))
+          : 0;
+      }
+    },
   },
   extraReducers(builder) {
     builder.addCase(login.fulfilled, (state, action) => {
-      action.payload.department.jobTitles !== undefined && delete action.payload.department.jobTitles;
-      action.payload.company.departments !== undefined && delete action.payload.company.departments;
-      action.payload.company.vendors !== undefined && delete action.payload.company.vendors;
+      action.payload.department.jobTitles !== undefined &&
+        delete action.payload.department.jobTitles;
+      action.payload.company.departments !== undefined &&
+        delete action.payload.company.departments;
+      action.payload.company.vendors !== undefined &&
+        delete action.payload.company.vendors;
       action.payload.salt !== undefined && delete action.payload.salt;
       action.payload.password !== undefined && delete action.payload.password;
       state = {
@@ -76,17 +90,19 @@ const userSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.error = "Login failed";
     });
-    builder.addCase(updateCurrSite, (state, action) => {
-      state.currSite = action.payload;
-    });
+    // builder.addCase(updateCurrSite, (state, action) => {
+    //   state.currSite = action.payload;
+    // });
   },
 });
 
-export const { logout } = userSlice.actions;
+export const { logout, updateCurrSite } = userSlice.actions;
 
 export const selectUserLoggedIn = (state) => state.user.loggedIn;
 
-export const selectUser = (state) => { return { ...state.user.user } };
+export const selectUser = (state) => {
+  return { ...state.user.user };
+};
 
 export const selectUserId = (state) => state.user.user.id;
 

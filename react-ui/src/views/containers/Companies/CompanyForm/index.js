@@ -1,6 +1,7 @@
+import { useToasts } from "react-toast-notifications";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { api, companyApi } from "../../../../environments/Api";
@@ -11,7 +12,7 @@ import {
 } from "../../../../stores/slices/companySlice";
 import { FormCheckboxes } from "../../Products/ProductForm";
 
-const RightColSection = ({
+export const RightColSection = ({
   fieldName,
   children,
   path = "/",
@@ -31,11 +32,13 @@ const RightColSection = ({
             {children}
           </div>
           {!disableButton && (
-            <div className="mt-6">
-              <button className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Add {fieldName.toLowerCase()}
-              </button>
-            </div>
+            <Link to={path}>
+              <div className="mt-6">
+                <button className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  Add {fieldName.toLowerCase()}
+                </button>
+              </div>
+            </Link>
           )}
         </div>
       </div>
@@ -71,14 +74,12 @@ const CompanyFormBody = ({
   onLongitudeChanged,
   billing,
   onBillingChanged,
-  departments,
+  depts,
   onDepartmentsChanged,
   deptCheckedState,
-  vendors,
+  vends,
   onVendorsChanged,
   vendorCheckedState,
-  setFieldNameSelected,
-  openModal,
   onAddCompanyClicked,
   onCancelClicked,
 }) => (
@@ -89,7 +90,7 @@ const CompanyFormBody = ({
       <div className="grid grid-cols-1 gap-4 lg:col-span-2">
         <section aria-labelledby="profile-overview-title">
           <div className="rounded-lg bg-white overflow-hidden shadow">
-            <form>
+            <form onSubmit={onAddCompanyClicked}>
               <div className="p-8 space-y-8 divide-y divide-gray-200">
                 <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                   <div>
@@ -181,7 +182,6 @@ const CompanyFormBody = ({
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={onAddCompanyClicked}
                     >
                       {!isEditing ? "Add" : "Save"} company
                     </button>
@@ -196,10 +196,10 @@ const CompanyFormBody = ({
       <div className="grid grid-cols-1 gap-4">
         {/* Departments */}
         <RightColSection fieldName="Department" path="/ad/departments/create">
-          {departments.length ? (
+          {depts.length ? (
             <FormCheckboxes
               legend="Department"
-              options={departments}
+              options={depts}
               inputField="Department"
               onFieldsChanged={onDepartmentsChanged}
               fieldValues={deptCheckedState}
@@ -210,10 +210,10 @@ const CompanyFormBody = ({
         </RightColSection>
         {/* Vendors */}
         <RightColSection fieldName="Vendor" path="/ad/vendors/create">
-          {vendors.length ? (
+          {vends.length ? (
             <FormCheckboxes
               legend="Vendor"
-              options={vendors}
+              options={vends}
               inputField="Vendor"
               onFieldsChanged={onVendorsChanged}
               fieldValues={vendorCheckedState}
@@ -245,10 +245,12 @@ export const CompanyForm = () => {
   const [billing, setBilling] = useState(false);
   const [registerNo, setRegisterNo] = useState("");
   const [phone, setPhone] = useState("");
-  const [departments, setDepartments] = useState([]);
+  const [depts, setDepartments] = useState([]);
   const [deptCheckedState, setDeptCheckedState] = useState([]);
-  const [vendors, setVendors] = useState([]);
+  const [vends, setVendors] = useState([]);
   const [vendorCheckedState, setVendorCheckedState] = useState([]);
+  const [addressId, setAddressId] = useState(null)
+  const { addToast } = useToasts();
 
   useEffect(() => {
     api.getAll("admin/viewDepartments?search=").then((response) => {
@@ -299,50 +301,26 @@ export const CompanyForm = () => {
   };
   const canAdd = [
     name,
-    country,
-    city,
-    building,
-    state,
-    unit,
-    address1,
-    postalCode,
-    latitude,
-    longitude,
+    // country,
+    // city,
+    // building,
+    // state,
+    // unit,
+    // address1,
+    // postalCode,
+    // latitude,
+    // longitude,
     registerNo,
     phone,
   ].every(Boolean);
-
   const onAddCompanyClicked = (evt) => {
     evt.preventDefault();
-    const depts = [],
-      vends = [];
-    departments.forEach(
-      (dept, index) => deptCheckedState[index] && depts.push(dept)
+    const d = [],
+      v = [];
+    depts.forEach((dept, index) => deptCheckedState[index] && d.push(dept));
+    vends.forEach(
+      (vendor, index) => vendorCheckedState[index] && v.push(vendor)
     );
-    vendors.forEach(
-      (vendor, index) => vendorCheckedState[index] && vends.push(vendor)
-    );
-    console.log({
-      name,
-      address: {
-        country:
-          country.charAt(0).toUpperCase() + country.slice(1).toLowerCase(),
-        city,
-        building,
-        state,
-        unit,
-        road: address1,
-        postalCode,
-        billing: false,
-        latitude,
-        longitude,
-      },
-      registerNumber: registerNo,
-      telephone: phone,
-      active: true,
-      departments: depts,
-      vendors: vends,
-    });
     if (canAdd)
       if (!isEditing)
         dispatch(
@@ -365,22 +343,31 @@ export const CompanyForm = () => {
             registerNumber: registerNo,
             telephone: phone,
             active: true,
-            departments: depts,
-            vendors: vends,
+            departments: d.map((dept) => ({ id: dept.id })),
+            vendors: v.map((vendor) => ({ id: vendor.id })),
           })
         )
           .unwrap()
           .then(() => {
-            alert("Successfully added company");
+            addToast("Successfully created company", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate("/ad/companies");
           })
-          .catch((err) => console.error(err));
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
       else
         dispatch(
           updateExistingCompany({
             id: companyId,
             name,
             address: {
+              id: addressId,
               country,
               city,
               building,
@@ -395,16 +382,24 @@ export const CompanyForm = () => {
             registerNumber: registerNo,
             telephone: phone,
             active: true,
-            departments: [],
-            vendors: [],
+            departments: d.map((dept) => ({ id: dept.id })),
+            vendors: v.map((vendor) => ({ id: vendor.id })),
           })
         )
           .unwrap()
           .then(() => {
-            alert("Successfully updated company");
+            addToast("Successfully updated company", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate(`/ad/companies/${companyId}`);
           })
-          .catch((err) => console.error(err));
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
   };
 
   const onCancelClicked = () =>
@@ -413,11 +408,18 @@ export const CompanyForm = () => {
   useEffect(() => {
     Boolean(companyId) &&
       companyApi.getCompany(companyId).then((response) => {
-        const { name, address, registerNumber, telephone, depts, vends } =
-          response.data;
+        const {
+          name,
+          address,
+          registerNumber,
+          telephone,
+          departments,
+          vendors,
+        } = response.data;
         setIsEditing(true);
         setName(name);
         setRegisterNo(registerNumber);
+        setAddressId(address.id)
         setAddress1(address.road);
         setBuilding(address.building);
         setUnit(address.unit);
@@ -428,18 +430,14 @@ export const CompanyForm = () => {
         setLatitude(address.latitude);
         setLongitude(address.longitude);
         setPhone(telephone);
-        // setDepartments(
-        //   departments.map((dept) =>
-        //     depts.map((d) => d.deptName).includes(dept.deptName)
-        //   )
-        // );
-        // setVendors(
-        //   vendors.map((vend) =>
-        //     vends.map((v) => v.companyName).includes(vend.companyName)
-        //   )
-        // );
+        setDeptCheckedState(
+          depts.map((dept) => departments.map((d) => d.id).includes(dept.id))
+        );
+        setVendorCheckedState(
+          vends.map((vendor) => vendors.map((v) => v.id).includes(vendor.id))
+        );
       });
-  }, [companyId]);
+  }, [companyId, depts, vends]);
 
   return (
     <CompanyFormBody
@@ -470,10 +468,10 @@ export const CompanyForm = () => {
       onLongitudeChanged={onLongitudeChanged}
       billing={billing}
       onBillingChanged={onBillingChanged}
-      departments={departments}
+      depts={depts}
       onDepartmentsChanged={onDepartmentsChanged}
       deptCheckedState={deptCheckedState}
-      vendors={vendors}
+      vends={vends}
       onVendorsChanged={onVendorsChanged}
       vendorCheckedState={vendorCheckedState}
       onAddCompanyClicked={onAddCompanyClicked}

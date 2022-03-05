@@ -1,16 +1,14 @@
+import { CurrencyDollarIcon } from "@heroicons/react/outline";
+import { PencilIcon } from "@heroicons/react/solid";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-import {
-  CurrencyDollarIcon as CurrencyDollarIconSolid,
-  PencilIcon,
-} from "@heroicons/react/solid";
-import { CurrencyDollarIcon } from "@heroicons/react/outline";
 import {
   fetchProducts,
   selectProductByCode,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useEffect } from "react";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const fieldSection = ({ fieldName, fields }) => {
   return Boolean(fields.length) ? (
@@ -38,6 +36,31 @@ const fieldSection = ({ fieldName, fields }) => {
     <div>No {fieldName}</div>
   );
 };
+
+export const SKUTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "SKU",
+        accessor: "sku",
+      },
+      {
+        Header: "Color",
+        accessor: (row) =>
+          row.productFields.find((field) => field.fieldName === "COLOUR")
+            .fieldValue,
+      },
+      {
+        Header: "Size",
+        accessor: (row) =>
+          row.productFields.find((field) => field.fieldName === "SIZE")
+            .fieldValue,
+      },
+    ],
+    []
+  );
+  return <SimpleTable columns={columns} data={data} />;
+};
 const ProductDetailsBody = ({
   prodCode,
   name,
@@ -48,6 +71,7 @@ const ProductDetailsBody = ({
   tags,
   categories,
   available,
+  products,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
@@ -121,6 +145,23 @@ const ProductDetailsBody = ({
               </div>
             </div>
           </div>
+          <section aria-labelledby="activity-title" className="mt-8 xl:mt-10">
+            <div>
+              <div className="divide-y divide-gray-200">
+                <div className="pb-4">
+                  <h2
+                    id="activity-title"
+                    className="text-lg font-medium text-gray-900"
+                  >
+                    SKUs
+                  </h2>
+                </div>
+                <div className="pt-6">
+                  <SKUTable data={products} />
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
         <aside className="hidden xl:block xl:pl-8">
           <h2 className="sr-only">Details</h2>
@@ -183,19 +224,38 @@ export const ProductDetails = () => {
           name={product.name}
           description={product.description}
           price={product.price}
-          colors={product.productFields.filter(
-            (field) => field.fieldName === "COLOUR"
-          )}
+          colors={product.productFields
+            .filter((field) => field.fieldName === "COLOUR")
+            .sort((f1, f2) =>
+              f1.fieldValue < f2.fieldValue
+                ? -1
+                : f1.fieldValue > f2.fieldValue
+                ? 1
+                : 0
+            )}
           sizes={product.productFields.filter(
             (field) => field.fieldName === "SIZE"
           )}
-          tags={product.productFields.filter(
-            (field) => field.fieldName === "TAG"
-          )}
-          categories={product.productFields.filter(
-            (field) => field.fieldName === "CATEGORY"
-          )}
+          tags={product.productFields
+            .filter((field) => field.fieldName === "TAG")
+            .sort((f1, f2) =>
+              f1.fieldValue < f2.fieldValue
+                ? -1
+                : f1.fieldValue > f2.fieldValue
+                ? 1
+                : 0
+            )}
+          categories={product.productFields
+            .filter((field) => field.fieldName === "CATEGORY")
+            .sort((f1, f2) =>
+              f1.fieldValue < f2.fieldValue
+                ? -1
+                : f1.fieldValue > f2.fieldValue
+                ? 1
+                : 0
+            )}
           available={product.available}
+          products={product.products}
         />
       </>
     )

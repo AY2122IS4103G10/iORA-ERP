@@ -1,7 +1,8 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/outline";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import {
   deleteExistingCompany,
   fetchCompanies,
@@ -9,8 +10,12 @@ import {
 } from "../../../../stores/slices/companySlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
+import {
+  SelectColumnFilter,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 
-const Header = ({ company, openModal }) => {
+const Header = ({ company, openModal, available }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <div className="flex items-center space-x-3">
@@ -31,23 +36,109 @@ const Header = ({ company, openModal }) => {
             <span>Edit</span>
           </button>
         </Link>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
-          onClick={openModal}
-        >
-          <TrashIcon
-            className="-ml-1 mr-2 h-5 w-5 text-white"
-            aria-hidden="true"
-          />
-          <span>Delete</span>
-        </button>
+        {available && (
+          <button
+            type="button"
+            className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+            onClick={openModal}
+          >
+            <TrashIcon
+              className="-ml-1 mr-2 h-5 w-5 text-white"
+              aria-hidden="true"
+            />
+            <span>Delete</span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const DepartmentTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Id",
+        accessor: "id",
+      },
+      {
+        Header: "Name",
+        accessor: "deptName",
+      },
+      {
+        Header: "Job Titles",
+        accessor: (row) => row.jobTitles.map((title) => title.title).join(", "),
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Departments
+        </h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
+const VendorTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "#",
+        accessor: "id",
+        Cell: (e) => (
+          <Link
+            to={`/ad/vendors/${e.value}`}
+            className="hover:text-gray-700 hover:underline"
+          >
+            {e.value}
+          </Link>
+        ),
+      },
+      {
+        Header: "Company Name",
+        accessor: "companyName",
+      },
+      {
+        Header: "Email",
+        accessor: "email",
+      },
+      {
+        Header: "Telephone",
+        accessor: "telephone",
+      },
+      {
+        Header: "Country",
+        accessor: (row) => row.address[0].country,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">Vendors</h3>
+      </div>
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
       </div>
     </div>
   );
 };
 
 export const CompanyDetails = () => {
+  const { addToast } = useToasts();
   const { companyId } = useParams();
   const company = useSelector((state) =>
     selectCompanyById(state, parseInt(companyId))
@@ -55,7 +146,7 @@ export const CompanyDetails = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const sitesStatus = useSelector((state) => state.sites.status);
+  const sitesStatus = useSelector((state) => state.companies.status);
 
   useEffect(() => {
     sitesStatus === "idle" && dispatch(fetchCompanies());
@@ -64,13 +155,18 @@ export const CompanyDetails = () => {
   const onDeleteCompanyClicked = () => {
     dispatch(deleteExistingCompany(companyId))
       .then(() => {
-        alert("Successfully deleted company");
+        addToast("Successfully deleted company", {
+          appearance: "success",
+          autoDismiss: true,
+        });
         closeModal();
         navigate("/ad/companies");
       })
       .catch((err) => {
-        alert("Failed to add company: ", err);
-        console.error("Failed to add company: ", err);
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
       });
   };
   const openModal = () => setOpenDelete(true);
@@ -81,7 +177,11 @@ export const CompanyDetails = () => {
       <>
         <div className="py-8 xl:py-10">
           <NavigatePrev page="Companies" path="/ad/companies" />
-          <Header company={company} openModal={openModal} />
+          <Header
+            company={company}
+            openModal={openModal}
+            available={company.active}
+          />
           <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
             <div className="space-y-6 lg:col-start-1 lg:col-span-2">
               {/* Site Information list*/}
@@ -128,6 +228,16 @@ export const CompanyDetails = () => {
                   </div>
                 </div>
               </section>
+              {Boolean(company.departments.length) && (
+                <section aria-labelledby="departments">
+                  <DepartmentTable data={company.departments} />
+                </section>
+              )}
+              {Boolean(company.vendors.length) && (
+                <section aria-labelledby="vendors">
+                  <VendorTable data={company.vendors} />
+                </section>
+              )}
             </div>
           </div>
         </div>

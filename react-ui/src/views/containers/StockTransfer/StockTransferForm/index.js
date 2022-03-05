@@ -1,31 +1,24 @@
-import { useState, useEffect, useMemo, useRef } from "react";
 import { Dialog } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
-import { ExclamationCircleIcon } from "@heroicons/react/outline";
-
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import { ClickableRowTable, SelectColumnFilter, EditableCell } from "../../../components/Tables/ClickableRowTable";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { ExclamationCircleIcon, XIcon } from "@heroicons/react/outline";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { api } from "../../../../environments/Api";
+import { fetchProducts, selectAllProducts } from "../../../../stores/slices/productSlice";
 import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
 import { getASiteStock, selectCurrSiteStock } from "../../../../stores/slices/stocklevelSlice";
-import ErrorModal from "../../../components/Modals/ErrorModal";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
-import { fetchProducts, selectAllProducts, selectProductByCode, selectProductBySkuList } from "../../../../stores/slices/productSlice";
-import { selectUserSite } from "../../../../stores/slices/userSlice";
-import { api } from "../../../../environments/Api";
-import { selectUserStore } from "../../../../stores/slices/userSlice";
 import { createStockTransfer, editStockTransfer } from "../../../../stores/slices/stocktransferSlice";
-import { useNavigate, useParams } from "react-router-dom";
+import { selectUserSite, updateCurrSite} from "../../../../stores/slices/userSlice";
+import ErrorModal from "../../../components/Modals/ErrorModal";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { ClickableRowTable, EditableCell, SelectColumnFilter } from "../../../components/Tables/ClickableRowTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { useToasts } from "react-toast-notifications";
 
 
 
 const cols =
     [
-        {
-            Header: "Site Code",
-            accessor: "siteCode"
-        },
         {
             Header: "Name",
             accessor: "name"
@@ -59,12 +52,6 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
         ref.current.focus();
     }
 
-    let disableTo = true;
-    if (!isObjectEmpty(from)) {
-        disableTo = false;
-    } else {
-        disableTo = true;
-    }
     const onRowClick = (row) => {
         if (!isObjectEmpty(to) && to.id === from.id) {
             setError(true);
@@ -74,7 +61,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
 
         if (isObjectEmpty(from)) {
             //check if from and to sites are the same
-            if (row.id == to.id) {
+            if (row.id === to.id) {
                 setError(true);
             } else {
                 setFrom(row);
@@ -86,7 +73,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
 
         } else if (isObjectEmpty(to)) {
             //check if from and to sites are the same
-            if (row.id == from.id) {
+            if (row.id === from.id) {
                 setError(true);
             } else {
                 setTo(row);
@@ -136,7 +123,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                                             ref={fromRef}
                                             type="text"
                                             value={isObjectEmpty(from) ? "" : from.name}
-                                            className="block w-full h-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                                            className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
                                             placeholder="Select From Site"
                                             readOnly
                                             autoFocus
@@ -157,7 +144,6 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                                     <div className="flex mt-2">
                                         <span className="mr-1 ml-1 text-sm text-red-600" id="same-site-error">
                                             From and To Site cannot be the same.
-
                                         </span>
                                         <ExclamationCircleIcon className="h-5 w-5 text-red-500" aria-hidden="true" />
                                     </div> : ""}
@@ -182,7 +168,7 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                                             ref={toRef}
                                             type="text"
                                             value={isObjectEmpty(to) ? "" : to.name}
-                                            className="block w-full h-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                                            className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
                                             placeholder="Select To Site"
                                             readOnly
                                         >
@@ -198,10 +184,11 @@ export const SelectSiteModal = ({ open, closeModal, data, from, to, setFrom, set
                                 </div>
                             </div>
                         </div>
+
                     </div>
-
-
-                    <ClickableRowTable columns={columns} data={data} onRowClick={onRowClick} />
+                    <div className="m-5">
+                        <ClickableRowTable columns={columns} data={data} onRowClick={onRowClick} />
+                    </div>
                 </div>
             </div>
         </SimpleModal>
@@ -263,13 +250,15 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
         <SimpleModal open={open} closeModal={closeModal}>
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-max">
                 <div>
-                    <div className="mt-3 sm:mt-5">
+                    <div className="flex justify-between border-b border-gray-200">
                         <Dialog.Title
                             as="h3"
-                            className="text-center text-lg leading-6 font-medium text-gray-900"
+                            className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
                         >
-                            Add Items
+                            Select Items
                         </Dialog.Title>
+                    </div>
+                    <div className="border-b border-gray-200 m-5">
                         <ItemsList
                             cols={itemCols}
                             data={data}
@@ -279,7 +268,7 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
                         />
                     </div>
                 </div>
-                <div className="pt-5">
+                <div>
                     <div className="flex justify-end">
                         <button
                             type="button"
@@ -303,12 +292,11 @@ const AddItemsModal = ({ items, open, closeModal, data, setData,
 }
 
 function prepareStockLevel(stocklevel, allModels) {
-    stocklevel.map((stock) => {
-        let model = allModels?.find((model) => model.modelCode === stock.sku.slice(0, -2));
-        stock.name = model?.name;
-        stock.product = model?.products.find((prod) => prod.sku === stock.sku);
-    })
-    console.log(stocklevel);
+    for (let i = 0; i < stocklevel.length; i++) {
+        let model = allModels?.find((model) => model.modelCode === stocklevel[i].sku.slice(0, -2));
+        stocklevel[i].name = model?.name;
+        stocklevel[i].product = model?.products.find((prod) => prod.sku === stocklevel[i].sku);
+    }
     return stocklevel;
 }
 
@@ -384,34 +372,38 @@ export const StockTransferForm = (subsys) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
+    const [isEditing, setIsEditing] = useState(false)
     const [from, setFrom] = useState({});
     const [to, setTo] = useState({});
     const [openSites, setOpenSites] = useState(false);
     const [openItems, setOpenItems] = useState(false);
     const [openErrorModal, setErrorModal] = useState(false);
     const [lineItems, setLineItems] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [originalOrder, setOriginalOrder] = useState({});
     const currSite = useSelector(selectUserSite);
+    const { addToast } = useToasts();
 
     //get stock level and product information
     const stocklevel = useSelector(selectCurrSiteStock);
     const allModels = useSelector(selectAllProducts);
     const prodTableData = isObjectEmpty(stocklevel) ? [] : prepareStockLevel(convertData(stocklevel), allModels);
 
+
     useEffect(() => {
+        dispatch(updateCurrSite());
         dispatch(getAllSites());
-        if (from !== undefined) {
-            dispatch(getASiteStock(from?.id));
+        if (!isObjectEmpty(from)) {
+            dispatch(getASiteStock(from.id));
         }
         dispatch(fetchProducts());
-    }, [from])
+    }, [dispatch, from])
 
     //editing 
     function mapLineItemsToSelectedRows(data) {
         let selectedRows = {};
-        data.map((item) => {
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
             let product = prodTableData.find((data) => data.sku === item.product.sku);
             item.name = product.name;
             item.qty = product.qty;
@@ -419,26 +411,31 @@ export const StockTransferForm = (subsys) => {
             //update selectedRows
             let index = prodTableData.findIndex((data) => data.sku === item.product.sku);
             selectedRows[index] = true;
-        })
+        }
         setSelectedRows(selectedRows);
         return data;
     }
 
     useEffect(() => {
-        Boolean(id) &&
+        if (id !== undefined) {
+            setIsEditing(true);
             api.get("store/stockTransfer", id)
                 .then((response) => {
                     const { lineItems, fromSite, toSite } = response.data;
+                    // console.log(lineItems);
                     setOriginalOrder(response.data)
-                    setIsEditing(true);
                     setLineItems(mapLineItemsToSelectedRows(lineItems));
                     setFrom(fromSite);
                     setTo(toSite);
                 })
                 .catch((error) => {
-                    alert(error.message);
+                    addToast(`${error.message}`, {
+                        appearance: "error",
+                        autoDismiss: true,
+                    });
                 })
-    }, [])
+        }
+    }, [id])
 
 
     //selecting sites
@@ -446,14 +443,12 @@ export const StockTransferForm = (subsys) => {
     const openSitesModal = () => setOpenSites(true);
     const closeSitesModal = () => setOpenSites(false);
 
-
     //open items modal
     const openItemsModal = () => {
         if (isObjectEmpty(from)) {
             setErrorModal(true);
         } else {
             setOpenItems(true);
-            // dispatch(getASiteStock(from.id));
         }
     }
     const closeItemsModal = () => setOpenItems(false);
@@ -475,6 +470,12 @@ export const StockTransferForm = (subsys) => {
         closeItemsModal();
     }
 
+    // const validateForm = () => {
+    //     if (isObjectEmpty(from) || isObjectEmpty(to)) {
+    //         return false;
+    //     }
+    //     //check negative quantity
+    // }
 
     //Handle Create Order product
     const handleSubmit = (e) => {
@@ -490,15 +491,22 @@ export const StockTransferForm = (subsys) => {
             fromSite: from,
             toSite: to
         }
-        console.log(JSON.stringify(stockTransferOrder));
+        console.log("Order created: ", stockTransferOrder)
         dispatch(createStockTransfer({ order: stockTransferOrder, siteId: currSite }))
             .unwrap()
-            .then(() => {
-                alert("Successfully created stock transfer order");
-                navigate(`/${subsys.subsys}/stocktransfer`);
+            .then((response) => {
+                addToast("Successfully created Stock Transfer order", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                console.log(response)
+                navigate(`/${subsys.subsys}/stocktransfer/${response.id}`);
             })
             .catch((error) => {
-                alert(error.message);
+                addToast(`${error.message}`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                });
             })
     }
 
@@ -517,10 +525,18 @@ export const StockTransferForm = (subsys) => {
         dispatch(editStockTransfer({ order: originalOrder, siteId: currSite }))
             .unwrap()
             .then(() => {
-                alert("Successfully edited stock transfer order");
+                addToast("Successfully edited stock transfer order", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
                 navigate(`/${subsys.subsys}/stocktransfer/${id}`);
             })
-            .catch((error) => alert(error.message))
+            .catch((error) => {
+                addToast(`Edit stock transfer failed. ${error.message}`, {
+                appearance: "error",
+                autoDismiss: true,
+                })
+            });
     }
 
     //cancel 
@@ -533,7 +549,7 @@ export const StockTransferForm = (subsys) => {
     }
 
     return (
-        <>
+        Boolean(originalOrder) && (<>
             <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                 <div className="mt-4 grid grid-cols-1 gap-4 items-start lg:gap-8">
                     <section aria-labelledby="stocktransfer-form">
@@ -596,6 +612,7 @@ export const StockTransferForm = (subsys) => {
                                                             value={isObjectEmpty(to) ? "" : to.name}
                                                             className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
                                                             placeholder="Search Site"
+                                                            readOnly
                                                         >
                                                         </input>
                                                         <button
@@ -685,5 +702,5 @@ export const StockTransferForm = (subsys) => {
                 message="Please choose a from site before adding items." />
 
         </>
-    );
+        ))
 }

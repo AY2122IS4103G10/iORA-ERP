@@ -2,16 +2,16 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useToasts } from "react-toast-notifications";
 import {
   selectUser,
   updateAccount,
 } from "../../../../../stores/slices/userSlice";
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 export const Profile = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const { addToast } = useToasts();
   const user = useSelector(selectUser);
 
   const [firstName, setFirstName] = useState("");
@@ -41,7 +41,7 @@ export const Profile = () => {
       lastName,
       dob,
       contactNumber: contactNo,
-    });
+    })
     dispatch(
       updateAccount({
         ...user,
@@ -51,12 +51,22 @@ export const Profile = () => {
         contactNumber: contactNo,
       })
     )
-      .then((data) => {
-        alert("Successfully updated account details.");
-        data.id !== -1 && navigate("/");
+      .then(({payload}) => {
+        setFirstName(payload.firstName);
+        setLastName(payload.lastName);
+        setContactNo(payload.contactNo);
+        setDob(payload.dob);
+        addToast("Successfully updated account.", {
+          appearance: "success",
+          autoDismiss: true,
+        });
       })
-      .catch((err) => console.error(err));
-    // .then(() => navigate("/"))
+      .catch((error) =>
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
   };
   return (
     <div className="space-y-6 sm:px-6 lg:px-0 lg:col-span-9">

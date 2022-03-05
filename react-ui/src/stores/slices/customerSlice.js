@@ -1,54 +1,63 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { api, customerApi } from "../../environments/Api";
 
 const initialState = {
-  customer: [],
+  customers: [],
   status: "idle",
   error: null,
 };
 
 export const fetchCustomers = createAsyncThunk(
-  "customer/fetchCustomers",
+  "customers/fetchCustomers",
   async () => {
-    const response = await api.getAll("admin/viewCustomers?search=");
+    const response = await api.getAll("sam/customer/view/all");
     return response.data;
   }
 );
 
 export const getCustomerByPhone = createAsyncThunk(
-  "customer/getCustomerByPhone",
+  "customers/getCustomerByPhone",
   async (phone) => {
-    const response = await api.get("store/member", phone);
+    const response = await api.get("sam/customer/search", phone);
     return response.data;
   }
 );
 
 export const addNewCustomer = createAsyncThunk(
-  "customer/addNewCustomer",
+  "customers/addNewCustomer",
   async (initialCustomer) => {
-    const response = await api.create("admin/addCustomer", initialCustomer);
+    const response = await api.create("sam/customer/create", initialCustomer);
+    // Email to ask customer to change password
     return response.data;
   }
 );
 
 export const updateExistingCustomer = createAsyncThunk(
-  "customer/updateExistingCustomer",
+  "customers/updateExistingCustomer",
   async (existingCustomer) => {
-    const response = await api.update("admin/editCustomer", existingCustomer);
+    const response = await api.update("sam/customer/edit", existingCustomer);
     return response.data;
   }
 );
 
-export const deleteExistingCustomer = createAsyncThunk(
-  "customer/deleteExistingCustomer",
+export const blockExistingCustomer = createAsyncThunk(
+  "customers/blockExistingCustomer",
   async (existingCustomerId) => {
-    const response = await api.delete("admin/deleteCustomer", existingCustomerId);
+    const response = await customerApi.blockCustomer(existingCustomerId);
+    return response.data;
+  }
+);
+
+export const unblockExistingCustomer = createAsyncThunk(
+  "customers/unblockExistingCustomer",
+  async (existingCustomerId) => {
+    const response = await customerApi.unblockCustomer(existingCustomerId);
     return response.data;
   }
 );
 
 const customerSlice = createSlice({
-  name: "customer",
+  name: "customers",
   initialState,
   extraReducers(builder) {
     builder.addCase(fetchCustomers.pending, (state, action) => {
@@ -56,17 +65,17 @@ const customerSlice = createSlice({
     });
     builder.addCase(fetchCustomers.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.customer = state.customer.concat(action.payload);
+      state.customers = state.customers.concat(action.payload);
     });
     builder.addCase(fetchCustomers.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(addNewCustomer.fulfilled, (state, action) => {
-      state.customer.push(action.payload);
+      state.customers.push(action.payload);
     });
     builder.addCase(updateExistingCustomer.fulfilled, (state, action) => {
       const {
-        customerId,
+        id,
         firstName,
         lastName,
         email,
@@ -78,8 +87,7 @@ const customerSlice = createSlice({
         storeCredit,
         availStatus
       } = action.payload;
-      console.log(action.payload);
-      const existingCustomer = state.customer.find((cus) => cus.customerId === customerId);
+      const existingCustomer = state.customers.find((cus) => cus.id === id);
       if (existingCustomer) {
         existingCustomer.firstName = firstName;
         existingCustomer.email = email;
@@ -94,18 +102,34 @@ const customerSlice = createSlice({
       }
       // state.status = "idle";
     });
-    builder.addCase(deleteExistingCustomer.fulfilled, (state, action) => {
-      state.customer = state.customer.filter(
-        ({ customerId }) => customerId !== action.payload.customerId
-      );
-      // state.status = "idle"
+    builder.addCase(blockExistingCustomer.fulfilled, (state, action) => {
+      const {
+        id,
+        availStatus
+      } = action.payload;
+      const existingCustomer = state.customers.find((cus) => cus.id === id);
+      if (existingCustomer) {
+        existingCustomer.availStatus = availStatus;
+      }
+      // state.status = "idle";
+    });
+    builder.addCase(unblockExistingCustomer.fulfilled, (state, action) => {
+      const {
+        id,
+        availStatus
+      } = action.payload;
+      const existingCustomer = state.customers.find((cus) => cus.id === id);
+      if (existingCustomer) {
+        existingCustomer.availStatus = availStatus;
+      }
+      // state.status = "idle";
     });
   },
 });
 
 export default customerSlice.reducer;
 
-export const selectAllCustomer = (state) => state.customer.customer;
+export const selectAllCustomers = (state) => state.customers.customers;
 
 export const selectCustomerById = (state, customerId) =>
-  state.customer.customer.find((customer) => customer.customerId === customerId);
+  state.customers.customers.find((customer) => customer.id === customerId);

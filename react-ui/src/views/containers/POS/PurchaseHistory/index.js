@@ -1,46 +1,52 @@
-import {Link} from "react-router-dom";
-import {useState, useEffect, useMemo} from "react";
-import {useSelector, useDispatch} from "react-redux";
-import {SimpleTable} from "../../../components/Tables/SimpleTable";
-import {selectAllOrder} from "../../../../stores/slices/posSlice";
-import {selectUserSite} from "../../../../stores/slices/userSlice";
-import {fetchSiteOrders} from "../../../../stores/slices/posSlice";
-import {getASite, selectSite, selectSiteById} from "../../../../stores/slices/siteSlice";
+import moment from "moment";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { fetchSiteOrders, selectAllOrder } from "../../../../stores/slices/posSlice";
+import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const columns = [
   {
-    Header: "OrderId",
+    Header: "#",
     accessor: "id",
   },
   {
-    Header: "DateTime",
-    accessor: "dateTime",
+    Header: "Transaction Date",
+    accessor: (row) => moment(row.dateTime).format("DD/MM/YYYY"),
+
   },
   {
-    Header: "Amount",
-    accessor: (row) => row.payments.amount,
+    Header: "Total Amount",
+    accessor: "totalAmount",
+    Cell: (row) => `$${row.value.toFixed(2)}`
   },
   {
-    Header: "Customer Number",
-    accessor: (row) => row.customer.id,
+    Header: "Customer No.",
+    accessor: (row) => row.customerId,
   },
 ];
 
 export const PosPurchaseHistory = (subsys) => {
+  const {pathname} = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const data = useSelector(selectAllOrder);
-  const orderStatus = useSelector((state) => state.pos.status);
-  const siteStatus = useSelector((state) => state.sites.status);
+  // const orderStatus = useSelector((state) => state.pos.status);
+  // const siteStatus = useSelector((state) => state.sites.status);
   const siteId = useSelector(selectUserSite);
   const site = useSelector(selectSite);
 
-  useEffect(() => {
-    orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
-  }, [orderStatus, siteId]);
+  const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
 
   useEffect(() => {
-    siteStatus === "idle" && dispatch(getASite(siteId));
-  }, [siteStatus, site]);
+    dispatch(fetchSiteOrders(siteId));
+  }, [dispatch, siteId]);
+
+  useEffect(() => {
+    dispatch(getASite(siteId));
+  }, [dispatch, siteId]);
 
   return (
     <>
@@ -50,7 +56,7 @@ export const PosPurchaseHistory = (subsys) => {
             <div className="flex items-center space-x-3">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {siteId != null ? site.name : "No Reocrds"}
+                  {siteId != null ? site.name : "No Records"}
                 </h1>
               </div>
             </div>
@@ -59,10 +65,10 @@ export const PosPurchaseHistory = (subsys) => {
             <div className="space-y-6 lg:col-start-1 lg:col-span-2">
               <section aria-labelledby="stocks-level">
                 <div className="ml-2 mr-2">
-                  {data == undefined ? (
+                  {data === undefined ? (
                     <p>No Records</p>
                   ) : (
-                    <SimpleTable columns={columns} data={data} />
+                    <SimpleTable columns={columns} data={data} handleOnClick={handleOnClick} />
                   )}
                 </div>
               </section>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { PromotionsList } from "../PromotionsList";
 import { classNames } from "../../../../utilities/Util";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
@@ -77,6 +78,7 @@ const PromoModal = ({
                       onChange={onDiscPriceChanged}
                       required
                       step="0.01"
+                      min="0"
                       aria-describedby="price-currency"
                       disabled={modalState === "view"}
                     />
@@ -200,6 +202,7 @@ const Header = ({ openModal, setModalState }) => {
 };
 
 export const ManagePromotions = () => {
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const [modalState, setModalState] = useState("view");
   const [promoId, setPromoId] = useState(null);
@@ -212,44 +215,55 @@ export const ManagePromotions = () => {
   const openModal = () => setOpenPromo(true);
   const closeModal = () => setOpenPromo(false);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-  const canSave = name && discPrice && requestStatus === "idle";
+  const canSave = name && discPrice;
   const onSaveClicked = (evt) => {
     evt.preventDefault();
     if (canSave)
-      try {
-        if (modalState === "add")
-          dispatch(
-            addNewPromotion({
-              fieldName: "category",
-              fieldValue: name,
-              discountedPrice: discPrice,
-            })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully added promotion");
-              closeModal();
+      if (modalState === "add")
+        dispatch(
+          addNewPromotion({
+            fieldName: "category",
+            fieldValue: name,
+            discountedPrice: discPrice,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully added promotion", {
+              appearance: "success",
+              autoDismiss: true,
             });
-        else if (modalState === "edit")
-          dispatch(
-            updateExistingPromotion({
-              id: promoId,
-              fieldName: "category",
-              fieldValue: name,
-              discountedPrice: discPrice,
+            closeModal();
+          })
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
             })
-          )
-            .unwrap()
-            .then(() => {
-              alert("Successfully saved promotion");
-              closeModal();
+          );
+      else if (modalState === "edit")
+        dispatch(
+          updateExistingPromotion({
+            id: promoId,
+            fieldName: "category",
+            fieldValue: name,
+            discountedPrice: discPrice,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully updated promotion", {
+              appearance: "success",
+              autoDismiss: true,
             });
-      } catch (err) {
-        console.error("Failed to add promo: ", err);
-      } finally {
-        setRequestStatus("idle");
-      }
+            closeModal();
+          })
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
   };
   return (
     <>

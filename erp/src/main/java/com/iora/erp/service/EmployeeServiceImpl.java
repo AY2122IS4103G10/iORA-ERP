@@ -78,7 +78,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         usernameAvailability(employee.getUsername()) == true) ||
                         old.getUsername().equals(employee.getUsername())) {
 
-                    if (!old.getEmail().equals(employee.getEmail()) ||
+                    if (old.getEmail().equals(employee.getEmail()) ||
                             (!old.getEmail().equals(employee.getEmail())
                                     && emailAvailability(old.getEmail()) == true)) {
 

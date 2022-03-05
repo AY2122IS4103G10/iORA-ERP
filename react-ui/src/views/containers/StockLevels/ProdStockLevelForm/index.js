@@ -6,11 +6,11 @@ import { Dialog, Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 import { XIcon } from '@heroicons/react/outline'
 
-import { selectUserSite, selectUserStore } from "../../../../stores/slices/userSlice";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
 import { getASiteStock, selectCurrSiteStock, editStock } from "../../../../stores/slices/stocklevelSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchModel, selectModel } from "../../../../stores/slices/productSlice";
-import { api } from "../../../../environments/Api";
+import { useToasts } from "react-toast-notifications";
 
 
 function classNames(...classes) {
@@ -19,14 +19,14 @@ function classNames(...classes) {
 
 
 export const getProductItem = (data, sku) => {
-  console.log(data); 
-  console.log(sku);
-  console.log(data.productItems[2]);
-  console.log(data.productItems.filter((item) => {
-    // console.log(item);
-    return item.productSKU === sku.trim();
+  // console.log(data); 
+  // console.log(sku);
+  // console.log(data.productItems[2]);
+  // console.log(data.productItems.filter((item) => {
+  //   // console.log(item);
+  //   return item.productSKU === sku.trim();
     
-  }));
+  // }));
   return data.productItems.filter((item) => item.productSKU?.trim() === sku.trim());
 }
 
@@ -225,30 +225,28 @@ export const Slideover = ({ open, closeModal, handleEditStock, rfid, setRfid, se
 }
 
 
-export const StockLevelForm = () => {
+export const StockLevelForm = (subsys) => {
   const { id } = useParams(); //sku code
   const siteId = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
-  const status = useSelector((state) => state.stocklevel.status)
-  const prodStatus = useSelector((state) => state.products.status)
   const siteStock = useSelector(selectCurrSiteStock);
   const [open, setOpen] = useState(false);
   const [rfid, setRfid] = useState("");
   const [selected, setSelected] = useState(actions[0]);
+  const [reload, setReload] = useState(0);
+  const {addToast} = useToasts();
 
   //get product information
   const modelCode = id.substring(0, id.indexOf('-'));
   const model = useSelector(selectModel);
 
-  console.log(siteId); 
-  console.log(siteStock);
 
   useEffect(() => {
-    // if (status === "idle") {
+      dispatch(updateCurrSite())
       dispatch(getASiteStock(siteId)); 
       dispatch(fetchModel(modelCode));
     // }
-  }, [siteId])
+  }, [dispatch, reload, modelCode, siteId])
 
 
   const openModal = () => setOpen(true);
@@ -258,28 +256,36 @@ export const StockLevelForm = () => {
     e.preventDefault();
     let toUpdate = {};
     const rfidArr = rfid.trim().split(" ");
-    // console.log(rfidArr);
+
     // add 
-    if (selected.id == 1) {
+    if (selected.id === 1) {
       Object.entries(rfidArr).forEach(([key, value]) => {
         toUpdate[value] = siteId;
       });
 
     // remove
-    } else if (selected.id == 2) {
+    } else if (selected.id === 2) {
       Object.entries(rfidArr).forEach(([key, value]) => {
         toUpdate[value] = 0;
       });
     }
-    // console.log(toUpdate);
+
 
     dispatch(editStock({toUpdate: toUpdate, siteId: siteId}))
       .unwrap()
       .then((response) => {
-        alert("Successfully edited stock levels");
-        closeModal();
+        addToast("Successfully updated stock levels", {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        setReload(reload + 1)
       })
-      .catch((err) => alert(err.message))
+      .catch((err) => {
+        addToast(`Edit Stock Failed - Could be Invalid RFID tag`, {
+          appearance: "error",
+          autoDismiss: true,
+      });
+      })
   }
 
   return (
@@ -314,15 +320,15 @@ export const StockLevelForm = () => {
                   <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Name</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "loading" : model.name}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "loading" : model.name}</dd>
                     </div>
 
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Price</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.price}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "" : model.price}</dd>
                     </div>
                     {model != null && model.products != null ? (
-                      model?.products?.filter((prod) => prod.sku == id.trim())[0]?.productFields.map((field) => {
+                      model?.products?.filter((prod) => prod.sku === id.trim())[0]?.productFields.map((field) => {
                         return (
                           <div key={field.id} className="sm:col-span-1">
                             <dt className="text-sm font-medium text-gray-500">{field.fieldName}</dt>
@@ -334,15 +340,15 @@ export const StockLevelForm = () => {
 
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Online Exclusive</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.onlineOnly.toString().toUpperCase()}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "" : model.onlineOnly.toString().toUpperCase()}</dd>
                     </div>
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Available</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.available.toString().toUpperCase()}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "" : model.available.toString().toUpperCase()}</dd>
                     </div>
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Description</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{model == null ? "" : model.description}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">{model === null ? "" : model.description}</dd>
                     </div>
                   </dl>
                 </div>

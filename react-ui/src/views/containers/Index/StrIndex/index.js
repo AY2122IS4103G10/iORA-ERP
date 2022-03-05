@@ -1,16 +1,13 @@
-import { Outlet } from "react-router-dom";
 import {
-  HomeIcon,
-  CogIcon,
-  ClockIcon,
-  ScaleIcon,
-  CreditCardIcon,
-  QuestionMarkCircleIcon,
-  ShieldCheckIcon,
-  DocumentReportIcon,
+  ArchiveIcon, ClockIcon, CogIcon, CollectionIcon, CreditCardIcon, DocumentReportIcon, HomeIcon, QuestionMarkCircleIcon,
+  ShieldCheckIcon
 } from "@heroicons/react/outline";
-
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Outlet } from "react-router-dom";
+import { updateCurrSite } from "../../../../stores/slices/userSlice";
 import MainWrapper from "../../../components/MainWrapper";
+
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
@@ -23,10 +20,13 @@ const navigation = [
   {
     name: "Stock Levels",
     href: "/str/stocklevels/my",
-    icon: ScaleIcon,
+    icon: CollectionIcon,
     current: false,
   },
-  { name: "Stock Orders", href: "#", icon: CreditCardIcon, current: false },
+  { name: "Stock Transfer", 
+    href: "/str/stocktransfer", 
+    icon: ArchiveIcon, 
+    current: false },
   {
     name: "Pickup Orders",
     href: "/str/pickup",
@@ -47,20 +47,28 @@ const secondaryNavigation = [
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];
 
-export const StoreIndex = () => (
-  <div className="h-screen bg-gray-100">
-    <MainWrapper
-      navigation={navigation}
-      secondaryNavigation={secondaryNavigation}
-      badge={
-        <div className="flex-1 flex py-4">
-          <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
-            Store
-          </span>
-        </div>
-      }
-    >
-      <Outlet />
-    </MainWrapper>
-  </div>
-);
+export const StoreIndex = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(updateCurrSite());
+  }, [dispatch]);
+
+  return (
+    <div className="h-screen bg-gray-100">
+      <MainWrapper
+        navigation={navigation}
+        secondaryNavigation={secondaryNavigation}
+        badge={
+          <div className="flex-1 flex py-4">
+            <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
+              Store
+            </span>
+          </div>
+        }
+      >
+        <Outlet />
+      </MainWrapper>
+    </div>
+  );
+};

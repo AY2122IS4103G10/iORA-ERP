@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
 import { api } from "../../../../environments/Api";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
-import { addNewJobTitle, updateExistingJobTitle } from "../../../../stores/slices/jobTitleSlice";
+import {
+  addNewJobTitle,
+  updateExistingJobTitle,
+} from "../../../../stores/slices/jobTitleSlice";
 
 const JobTitleFormBody = ({
   isEditing,
@@ -16,6 +19,7 @@ const JobTitleFormBody = ({
   onDescriptionChanged,
   responsibility,
   onResponsibilityChanged,
+  responsibilityCheckedState,
   onAddJobTitleClicked,
   onCancelClicked,
 }) => (
@@ -25,7 +29,7 @@ const JobTitleFormBody = ({
       {/* Form */}
       <section aria-labelledby="profile-overview-title">
         <div className="rounded-lg bg-white overflow-hidden shadow">
-          <form>
+          <form onSubmit={onAddJobTitleClicked}>
             <div className="p-8 space-y-8 divide-y divide-gray-200">
               <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                 <div>
@@ -64,19 +68,40 @@ const JobTitleFormBody = ({
                         required
                       />
                     </SimpleInputGroup>
+
                     <SimpleInputGroup
                       label="Responsibilities"
                       inputField="responsibility"
                       className="relative rounded-md sm:mt-0 sm:col-span-2"
                     >
-                      <SimpleInputBox
-                        type="text"
-                        name="responsibility"
-                        id="responsibility"
-                        value={responsibility}
-                        onChange={onResponsibilityChanged}
-                        required
-                      />
+                      <fieldset className="space-y-5">
+                        <legend className="sr-only">Responsibility</legend>
+
+                        {responsibility.map((option, index) => {
+                          return (
+                            <div key={index} className="relative flex items-start">
+                              <div className="flex items-center h-5">
+                                <input
+                                  id="Responsibility"
+                                  aria-describedby="Responsibility"
+                                  name="Responsibility"
+                                  type="checkbox"
+                                  className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                                  checked={
+                                    Boolean(responsibilityCheckedState.length) ? responsibilityCheckedState[index] : false
+                                  }
+                                  onChange={() => onResponsibilityChanged(index)}
+                                />
+                              </div>
+                              <div className="ml-3 text-sm">
+                                <label htmlFor="comments" className="font-medium text-gray-700">
+                                  {option}
+                                </label>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </fieldset>
                     </SimpleInputGroup>
                   </div>
                 </div>
@@ -94,9 +119,8 @@ const JobTitleFormBody = ({
                   <button
                     type="submit"
                     className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                    onClick={onAddJobTitleClicked}
                   >
-                    {!isEditing ? "Add" : "Save"} jobTitle
+                    {!isEditing ? "Add" : "Save"} Job Title
                   </button>
                 </div>
               </div>
@@ -109,61 +133,33 @@ const JobTitleFormBody = ({
 );
 
 export const JobTitleForm = () => {
+  const { addToast } = useToasts();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { jobTitleId } = useParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [responsibility, setResponsibility] = useState("");
+  const [accessRights, setAccessRights] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [rightsCheckedState, setRightsCheckedState] = useState([]);
 
   const onTitleChanged = (e) => setTitle(e.target.value);
   const onDescriptionChanged = (e) => setDescription(e.target.value);
-  const onResponsibilityChanged = (e) => setResponsibility(e.target.value);
-
-  const [requestStatus, setRequestStatus] = useState("idle");
-  const canAdd =
-    [
-      title,
-      description,
-      responsibility,
-    ].every(Boolean) && requestStatus === "idle";
-
-    const onAddJobTitleClicked = (evt) => {
-        evt.preventDefault();
-        if (canAdd)
-            try {
-                setRequestStatus("pending");
-                if (!isEditing) {
-                    dispatch(
-                      addNewJobTitle({
-                        title,
-                        description,
-                        responsibility,
-                      })
-                    ).unwrap();
-                  } else {
-                    dispatch(
-                      updateExistingJobTitle({
-                        title,
-                        description,
-                        responsibility,
-                      })
-                    ).unwrap();
-                  }
-        alert("Successfully added job title");
-        navigate(!isEditing ? "/ad/jobTitle" : `/ad/jobTitle/${jobTitleId}`);
-      } catch (err) {
-        console.error("Failed to add job title: ", err);
-      } finally {
-        setRequestStatus("idle");
-      }
+  const onAccessRightsChanged = (pos) => {
+    rightsCheckedState[pos] = !rightsCheckedState[pos];
+    setRightsCheckedState([...rightsCheckedState])
   };
+  const [requestStatus, setRequestStatus] = useState("idle");
 
-  const onCancelClicked = () =>
-    navigate(!isEditing ? "/ad/jobTitle" : `/ad/jobTitle/${jobTitleId}`);
+  useEffect(() => {
+    api.getAll("admin/accessRights").then((response) => {
+      setAccessRights(response.data);
+      setRightsCheckedState(new Array(response.data.length).fill(false));
+    });
+  }, []);
 
+  // load JobTitle if editing
   useEffect(() => {
     Boolean(jobTitleId) &&
       api.get("admin/viewJobTitle", jobTitleId).then((response) => {
@@ -172,9 +168,74 @@ export const JobTitleForm = () => {
         setIsEditing(true);
         setTitle(title);
         setDescription(description);
-        setResponsibility(responsibility);
-      });
-  }, [jobTitleId]);
+        setRightsCheckedState(
+          accessRights.map((value) =>
+            value = responsibility.includes(value)
+          ))
+      })
+  }, [jobTitleId, accessRights])
+
+  const canAdd =
+    [
+      title,
+      description,
+      accessRights,
+    ].every(Boolean) && requestStatus === "idle";
+
+  const onAddJobTitleClicked = (evt) => {
+    evt.preventDefault();
+    if (canAdd) {
+      setRequestStatus("pending");
+      const rights = [];
+      accessRights.forEach(
+        (value, index) => rightsCheckedState[index] && rights.push(value)
+      );
+      if (!isEditing) {
+        dispatch(
+          addNewJobTitle({
+            title,
+            description,
+            responsibility: rights,
+          })
+        ).unwrap()
+          .then(() => {
+            addToast("Successfully created job title,", {
+              appearance: "success",
+              autoDismiss: true,
+            })
+            navigate("/ad/jobTitles");
+          }).catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            }))
+      } else {
+        dispatch(
+          updateExistingJobTitle({
+            id: jobTitleId,
+            title,
+            description,
+            responsibility: rights,
+          })
+        ).unwrap()
+          .then(() => {
+            addToast("Successfully edited job title,", {
+              appearance: "success",
+              autoDismiss: true,
+            })
+            navigate(`/ad/jobTitles/${jobTitleId}`);
+          }).catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            }))
+        setRequestStatus("idle");
+      }
+    }
+  }
+
+  const onCancelClicked = () =>
+    window.confirm("Confirm cancel?") && navigate(-1);
 
   return (
     <JobTitleFormBody
@@ -183,10 +244,11 @@ export const JobTitleForm = () => {
       onTitleChanged={onTitleChanged}
       description={description}
       onDescriptionChanged={onDescriptionChanged}
-      responsibility={responsibility}
-      onResponsibilityChanged={onResponsibilityChanged}
+      responsibility={accessRights}
+      onResponsibilityChanged={onAccessRightsChanged}
+      responsibilityCheckedState={rightsCheckedState}
       onAddJobTitleClicked={onAddJobTitleClicked}
       onCancelClicked={onCancelClicked}
     />
   );
-};
+}

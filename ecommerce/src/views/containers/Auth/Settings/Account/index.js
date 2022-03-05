@@ -2,6 +2,7 @@ import { ExclamationCircleIcon, XCircleIcon } from "@heroicons/react/solid";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useToasts } from "react-toast-notifications";
 import {
   selectUser,
   updateAccount,
@@ -15,7 +16,7 @@ export const Account = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
-  const [submitError, setSubmitError] = useState(null);
+  const { addToast } = useToasts();
 
   const onEmailChanged = (e) => setEmail(e.target.value);
   const onPasswordChanged = (e) => setPassword(e.target.value);
@@ -45,24 +46,32 @@ export const Account = () => {
             // hashPass: password,
           })
         )
-          .then(() => {
-            alert("Successfully updated account.");
+          .then((data) => {
+            setEmail(data.email)
+            addToast("Successfully updated account.", {
+              appearance: "success",
+              autoDismiss: true,
+            });
           })
           .catch((error) => {
-            if (!error.response)
-              setSubmitError(new Error("Failed to connect to server"));
-            if (error.response.status === 404)
-              setSubmitError(new Error("Email address already in use"));
-            else
-              setSubmitError(
-                new Error("Something went wrong. Please try again later.")
-              );
+            // if (!error.response)
+            //   setSubmitError(new Error("Failed to connect to server"));
+            // if (error.response.status === 404)
+            //   setSubmitError(new Error("Email address already in use"));
+            // else
+            //   setSubmitError(
+            //     new Error("Something went wrong. Please try again later.")
+            //   );
+            addToast(`Error: ${error.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
           });
     }
   };
   return (
     <>
-      {submitError && (
+      {/* {submitError && (
         <div className="py-4">
           <div className="rounded-md bg-red-50 p-4">
             <div className="flex">
@@ -83,7 +92,7 @@ export const Account = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       <div className="space-y-6 sm:px-6 lg:px-0 lg:col-span-9">
         <section aria-labelledby="payment-details-heading">
           <form onSubmit={onSaveClicked}>

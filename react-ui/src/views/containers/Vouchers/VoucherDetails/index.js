@@ -1,24 +1,24 @@
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { CodeIcon, TrashIcon } from "@heroicons/react/outline";
 import {
   CalendarIcon as CalendarIconSolid,
   CheckCircleIcon,
   PencilIcon,
 } from "@heroicons/react/solid";
 import moment from "moment";
-import { CurrencyDollarIcon, TrashIcon } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import {
   deleteExistingVoucher,
   fetchVouchers,
   issueVoucher,
   redeemVoucher,
   selectVoucherByCode,
-  voucherDeleted,
 } from "../../../../stores/slices/voucherSlice";
-import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useEffect, useState } from "react";
-import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 import { classNames } from "../../../../utilities/Util";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 
 const VoucherDetailsBody = ({
   voucherCode,
@@ -46,8 +46,8 @@ const VoucherDetailsBody = ({
               <button
                 type="button"
                 className={classNames(
-                  !issued && "hover:bg-gray-50",
-                  "inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
+                  !issued ? "bg-white hover:bg-gray-50" : "bg-gray-200",
+                  "inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                 )}
                 onClick={onIssueClicked}
                 disabled={issued}
@@ -60,9 +60,12 @@ const VoucherDetailsBody = ({
               </button>
               <button
                 type="button"
-                className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                className={classNames(
+                  !redeemed && issued ? "bg-white hover:bg-gray-50" : "bg-gray-200",
+                  "inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                )}
                 onClick={onRedeemClicked}
-                disabled={redeemed}
+                disabled={redeemed || !issued}
               >
                 <PencilIcon
                   className="-ml-1 mr-2 h-5 w-5 text-gray-400"
@@ -70,24 +73,26 @@ const VoucherDetailsBody = ({
                 />
                 <span>Redeem</span>
               </button>
-              <button
-                type="button"
-                className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                onClick={openModal}
-              >
-                <TrashIcon
-                  className="-ml-1 mr-2 h-5 w-5 text-white"
-                  aria-hidden="true"
-                />
-                <span>Delete</span>
-              </button>
+              {!issued && (
+                <button
+                  type="button"
+                  className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  onClick={openModal}
+                >
+                  <TrashIcon
+                    className="-ml-1 mr-2 h-5 w-5 text-white"
+                    aria-hidden="true"
+                  />
+                  <span>Delete</span>
+                </button>
+              )}
             </div>
           </div>
           <aside className="mt-8">
             <h2 className="sr-only">Details</h2>
             <div className="space-y-5">
               <div className="flex items-center space-x-2">
-                <CurrencyDollarIcon
+                <CodeIcon
                   className="h-5 w-5 text-gray-400"
                   aria-hidden="true"
                 />
@@ -122,6 +127,7 @@ const VoucherDetailsBody = ({
 );
 
 export const VoucherDetails = () => {
+  const { addToast } = useToasts();
   const { voucherCode } = useParams();
   const voucher = useSelector((state) =>
     selectVoucherByCode(state, voucherCode)
@@ -137,41 +143,57 @@ export const VoucherDetails = () => {
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 
-  const [requestStatus, setRequestStatus] = useState("idle");
-
   const onIssueClicked = () => {
-    if (!voucher.issued && requestStatus === "idle")
-      try {
-        setRequestStatus("pending");
-        dispatch(issueVoucher(voucherCode)).unwrap();
-        alert("Successfully issued voucher");
-      } catch (err) {
-        console.error("Failed to issue voucher: ", err);
-      } finally {
-        setRequestStatus("idle");
-      }
+    if (!voucher.issued)
+      dispatch(issueVoucher(voucherCode))
+        .unwrap()
+        .then(() =>
+          addToast("Successfully issued voucher", {
+            appearance: "success",
+            autoDismiss: true,
+          })
+        )
+        .catch((err) =>
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          })
+        );
   };
   const onRedeemClicked = () => {
-    if (!voucher.redeemed && requestStatus === "idle")
-      try {
-        setRequestStatus("pending");
-        dispatch(redeemVoucher(voucherCode)).unwrap();
-        alert("Successfully redeemed voucher");
-      } catch (err) {
-        console.error("Failed to redeem voucher: ", err);
-      } finally {
-        setRequestStatus("idle");
-      }
+    if (!voucher.redeemed)
+      dispatch(redeemVoucher(voucherCode))
+        .unwrap()
+        .then(() =>
+          addToast("Successfully redeemed voucher", {
+            appearance: "success",
+            autoDismiss: true,
+          })
+        )
+        .catch((err) =>
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          })
+        );
   };
 
   const onDeleteVoucherClicked = () => {
-    try {
-      dispatch(deleteExistingVoucher(voucherCode)).unwrap();
-      alert("Successfully deleted voucher");
-      navigate("/sm/vouchers");
-    } catch (err) {
-      console.error("Failed to delete voucher: ", err);
-    } 
+    dispatch(deleteExistingVoucher(voucherCode))
+      .unwrap()
+      .then(() => {
+        addToast("Successfully deleted voucher", {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        navigate("/sm/vouchers");
+      })
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
   };
 
   return (

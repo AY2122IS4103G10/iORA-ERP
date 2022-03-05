@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
-import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-
-import { api, employeeApi } from "../../../../environments/Api";
+import { employeeApi } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import {
   addNewEmployee,
@@ -68,6 +66,63 @@ const EmployeeFormBody = ({
                         </h3>
                       </div>
                       <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                        <SimpleInputGroup
+                          label="Company"
+                          inputField="company"
+                          className="relative rounded-md sm:mt-0 sm:col-span-2"
+                        >
+                          {[
+                            companies,
+                            companySelected,
+                            setCompanySelected,
+                          ].every(Boolean) ? (
+                            <SimpleSelectMenu
+                              options={companies}
+                              selected={companySelected}
+                              setSelected={setCompanySelected}
+                            />
+                          ) : (
+                            <div>No companies</div>
+                          )}
+                        </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Department"
+                          inputField="department"
+                          className="relative rounded-md sm:mt-0 sm:col-span-2"
+                        >
+                          {[
+                            departments.length,
+                            departmentSelected,
+                            setDepartmentSelected,
+                          ].every(Boolean) ? (
+                            <SimpleSelectMenu
+                              options={departments}
+                              selected={departmentSelected}
+                              setSelected={setDepartmentSelected}
+                            />
+                          ) : (
+                            <div>No departments</div>
+                          )}
+                        </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Job Title"
+                          inputField="jobTitle"
+                          className="relative rounded-md sm:mt-0 sm:col-span-2"
+                        >
+                          {[
+                            jobTitles.length,
+                            jobTitleSelected,
+                            setJobTitleSelected,
+                          ].every(Boolean) ? (
+                            <SimpleSelectMenu
+                              options={jobTitles}
+                              selected={jobTitleSelected}
+                              setSelected={setJobTitleSelected}
+                            />
+                          ) : (
+                            <div>No job titles</div>
+                          )}
+                        </SimpleInputGroup>
                         <SimpleInputGroup
                           label="Employee Name"
                           inputField="name"
@@ -181,63 +236,6 @@ const EmployeeFormBody = ({
                             </span>
                           </div>
                         </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Department"
-                          inputField="department"
-                          className="relative rounded-md sm:mt-0 sm:col-span-2"
-                        >
-                          {[
-                            departments.length,
-                            departmentSelected,
-                            setDepartmentSelected,
-                          ].every(Boolean) ? (
-                            <SimpleSelectMenu
-                              options={departments}
-                              selected={departmentSelected}
-                              setSelected={setDepartmentSelected}
-                            />
-                          ) : (
-                            <div>No departments</div>
-                          )}
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Job Title"
-                          inputField="jobTitle"
-                          className="relative rounded-md sm:mt-0 sm:col-span-2"
-                        >
-                          {[
-                            jobTitles.length,
-                            jobTitleSelected,
-                            setJobTitleSelected,
-                          ].every(Boolean) ? (
-                            <SimpleSelectMenu
-                              options={jobTitles}
-                              selected={jobTitleSelected}
-                              setSelected={setJobTitleSelected}
-                            />
-                          ) : (
-                            <div>No job titles</div>
-                          )}
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Company"
-                          inputField="company"
-                          className="relative rounded-md sm:mt-0 sm:col-span-2"
-                        >
-                          {[
-                            companies,
-                            companySelected,
-                            setCompanySelected,
-                          ].every(Boolean) ? (
-                            <SimpleSelectMenu
-                              options={companies}
-                              selected={companySelected}
-                              setSelected={setCompanySelected}
-                            />
-                          ) : (
-                            <div>No companies</div>
-                          )}
-                        </SimpleInputGroup>
                       </div>
                     </div>
                   </div>
@@ -270,6 +268,8 @@ const EmployeeFormBody = ({
 };
 
 export const EmployeeForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { employeeId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
@@ -283,15 +283,29 @@ export const EmployeeForm = () => {
   const [departments, setDepartments] = useState([]);
   const [departmentSelected, setDepartmentSelected] = useState(null);
   const [companySelected, setCompanySelected] = useState(null);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const { addToast } = useToasts();
 
   const onNameChanged = (e) => setName(e.target.value);
   const onEmailChanged = (e) => setEmail(e.target.value);
   const onUsernameChanged = (e) => setUsername(e.target.value);
   const onPasswordChanged = (e) => setPassword(e.target.value);
   const onSalaryChanged = (e) => setSalary(e.target.value);
+  const onCompanyChanged = (company) => {
+    setCompanySelected(company);
+    const departments = company.departments.map((dept) => ({
+      id: dept.id,
+      name: dept.deptName,
+      jobTitles: dept.jobTitles,
+    }));
+    setDepartments(departments);
+    setDepartmentSelected(departments[0]);
+    const jobTitles = departments[0].jobTitles.map((jobTitle) => ({
+      id: jobTitle.id,
+      name: jobTitle.title,
+    }));
+    setJobTitles(jobTitles);
+    setJobTitleSelected(jobTitles[0]);
+  };
   const onDeptChanged = (e) => {
     setDepartmentSelected(e);
     const jobTitles = e.jobTitles.map((jobTitle) => ({
@@ -303,9 +317,17 @@ export const EmployeeForm = () => {
   };
   const onJobTitleChanged = (e) => setJobTitleSelected(e);
 
+  const companies = useSelector(selectAllCompanies);
+  const company = companies[0];
+  const companyStatus = useSelector((state) => state.companies.status);
   useEffect(() => {
-    api.getAll("admin/viewDepartments?search=").then((response) => {
-      const departments = response.data.map((dept) => ({
+    companyStatus === "idle" && dispatch(fetchCompanies());
+  }, [companyStatus, dispatch]);
+
+  useEffect(() => {
+    if (company) {
+      setCompanySelected(company);
+      const departments = company.departments.map((dept) => ({
         id: dept.id,
         name: dept.deptName,
         jobTitles: dept.jobTitles,
@@ -318,22 +340,13 @@ export const EmployeeForm = () => {
       }));
       setJobTitles(jobTitles);
       setJobTitleSelected(jobTitles[0]);
-    });
-  }, []);
-
-  const companies = useSelector(selectAllCompanies);
-  const company = companies[0];
-  const companyStatus = useSelector((state) => state.companies.status);
-  useEffect(() => {
-    companyStatus === "idle" && dispatch(fetchCompanies());
-  }, [companyStatus, dispatch]);
-
-  useEffect(() => {
-    company && setCompanySelected(company);
+    }
   }, [company]);
 
   const canAdd = [
     name,
+    companySelected,
+    jobTitleSelected,
     departmentSelected,
     email,
     payTypeSelected,
@@ -343,21 +356,6 @@ export const EmployeeForm = () => {
 
   const onAddEmployeeClicked = (evt) => {
     evt.preventDefault();
-    console.log({
-      name,
-      availStatus: true,
-      email,
-      username: Boolean(username.length) ? username : email,
-      password,
-      payType: payTypeSelected.value,
-      salary,
-      department: {
-        id: departmentSelected.id,
-      },
-      jobTitle: {
-        id: jobTitleSelected.id,
-      },
-    });
     if (canAdd)
       if (!isEditing) {
         dispatch(
@@ -380,36 +378,51 @@ export const EmployeeForm = () => {
         )
           .unwrap()
           .then(() => {
-            alert("Successfully added employee");
+            addToast("Successfully added employee", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate("/ad/employees");
           })
-          .catch((err) => console.error("Failed to add employee: ", err));
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
       } else {
-        dispatch(
-          updateExistingEmployee({
-            id: employeeId,
-            name,
-            availStatus: true,
-            email,
-            username: Boolean(username.length) ? username : email,
-            password,
-            payType: payTypeSelected.value,
-            salary,
-            department: {
-              id: departmentSelected.id,
-            },
-            jobTitle: {
-              id: jobTitleSelected.id,
-            },
-            company: { id: companySelected.id },
-          })
-        )
+        const employee = {
+          id: employeeId,
+          name,
+          availStatus: true,
+          email,
+          username: Boolean(username.length) ? username : email,
+          payType: payTypeSelected.value,
+          salary,
+          department: {
+            id: departmentSelected.id,
+          },
+          jobTitle: {
+            id: jobTitleSelected.id,
+          },
+          company: { id: companySelected.id },
+        };
+        if (Boolean(password.length)) employee[password] = password;
+        dispatch(updateExistingEmployee(employee))
           .unwrap()
           .then(() => {
-            alert("Successfully updated employee");
+            addToast("Successfully update employee", {
+              appearance: "success",
+              autoDismiss: true,
+            });
             navigate(`/ad/employees/${employeeId}`);
           })
-          .catch((err) => console.error("Failed to update employee: ", err));
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
       }
   };
 
@@ -466,7 +479,7 @@ export const EmployeeForm = () => {
       jobTitles={jobTitles}
       companies={companies}
       companySelected={companySelected}
-      setCompanySelected={setCompanySelected}
+      setCompanySelected={onCompanyChanged}
       email={email}
       onEmailChanged={onEmailChanged}
       username={username}

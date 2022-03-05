@@ -2,6 +2,7 @@ package com.iora.erp.service;
 
 import java.util.List;
 
+import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
@@ -64,5 +65,5 @@ public interface ProductService {
     public abstract Currency getCurrency(String code);
 
     // Data Loading
-    public abstract void loadProducts(List<Object> productsJSON) throws ProductException, ProductFieldException, ProductItemException;
+    public abstract void loadProducts(List<Object> productsJSON) throws ProductException, ProductFieldException, ProductItemException, CustomerException;
 }

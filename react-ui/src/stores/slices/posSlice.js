@@ -1,16 +1,19 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {api, posApi} from "../../environments/Api";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { posApi } from "../../environments/Api";
 
 const initialState = {
-  pos: [],
+  posOrders: [],
   status: "idle",
   error: null,
 };
 
-export const fetchSiteOrders = createAsyncThunk("store/customerOrder", async (siteId) => {
-  const response = await posApi.getOrders(siteId);
-  return response.data;
-});
+export const fetchSiteOrders = createAsyncThunk(
+  "store/customerOrder",
+  async (siteId) => {
+    const response = await posApi.getOrders(siteId);
+    return response.data;
+  }
+);
 
 const posSlice = createSlice({
   name: "pos",
@@ -34,3 +37,5 @@ const posSlice = createSlice({
 export default posSlice.reducer;
 
 export const selectAllOrder = (state) => state.pos.posOrders;
+export const selectOrderById = (state, id) =>
+  state.pos.posOrders.find((order) => order.id === id);

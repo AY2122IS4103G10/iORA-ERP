@@ -16,15 +16,21 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       {
         Header: "Product Code",
         accessor: "modelCode",
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
       {
         Header: "Name",
         accessor: "name",
         width: 300,
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
       {
         Header: "Color",
-        width: 278,
+        width: 268,
         accessor: (row) =>
           row.productFields
             .filter((field) => field.fieldName === "COLOUR")
@@ -55,27 +61,18 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       {
         Header: "Available",
         accessor: "available",
-        width: 110,
-        Cell: (e) => (e.value ? "Yes" : "No"),
+        width: 120,
+        Cell: (e) =>
+          e.value ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              Available
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Unavailable
+            </span>
+          ),
       },
-      // {
-      //   Header: (
-      //     <div className="flex items-center">
-      //       <CogIcon className="h-4 w-4" />
-      //     </div>
-      //   ),
-      //   accessor: "accessor",
-      //   width: 80,
-      //   disableSortBy: true,
-      //   Cell: OptionsCell({
-      //     options: [
-      //       {
-      //         name: "Delete",
-      //         navigate: "/products",
-      //       },
-      //     ],
-      //   }),
-      // },
     ],
     []
   );
@@ -101,7 +98,8 @@ export const ProductsList = () => {
   const prodStatus = useSelector((state) => state.products.status);
   const error = useSelector((state) => state.products.error);
 
-  const handleOnClick = (row) => navigate(`${pathname}/${row.original.modelCode}`);
+  const handleOnClick = (row) =>
+    navigate(`${pathname}/${row.original.modelCode}`);
 
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());

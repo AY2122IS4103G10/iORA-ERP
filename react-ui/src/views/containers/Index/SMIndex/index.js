@@ -1,37 +1,58 @@
-import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { NavBar } from "../../../components/NavBar";
-import { SideBar } from "../../../components/SideBar";
 import {
   ArchiveIcon,
   CogIcon,
+  CollectionIcon,
   DocumentReportIcon,
   DocumentTextIcon,
   HomeIcon,
-  QuestionMarkCircleIcon,
-  ScaleIcon,
-  ShieldCheckIcon,
+  QuestionMarkCircleIcon, ShieldCheckIcon,
   ShoppingBagIcon,
   TicketIcon,
+  UserGroupIcon
 } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Outlet } from "react-router-dom";
 import { updateCurrSite } from "../../../../stores/slices/userSlice";
+import { NavBar } from "../../../components/NavBar";
+import { SideBar } from "../../../components/SideBar";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
-  { name: "Products", href: "/sm/products", icon: ShoppingBagIcon, current: false },
+  {
+    name: "Products",
+    href: "/sm/products",
+    icon: ShoppingBagIcon,
+    current: false,
+  },
   {
     name: "Stock Levels",
     href: "/sm/stocklevels/sites",
-    icon: ScaleIcon,
+    icon: CollectionIcon,
     current: false,
   },
-  { name: "Stock Transfer", href: "/sm/stocktransfer", icon: ArchiveIcon, current: false },
-  { name: "Procurement", href: "/sm/procurements", icon: DocumentTextIcon, current: false },
+  {
+    name: "Stock Transfer",
+    href: "/sm/stocktransfer",
+    icon: ArchiveIcon,
+    current: false,
+  },
+  {
+    name: "Procurement",
+    href: "/sm/procurements",
+    icon: DocumentTextIcon,
+    current: false,
+  },
   {
     name: "Vouchers",
     href: "/sm/vouchers",
     icon: TicketIcon,
+    current: false,
+  },
+  {
+    name: "Customers",
+    href: "/sm/customers",
+    icon: UserGroupIcon,
     current: false,
   },
   {
@@ -54,8 +75,7 @@ export const SMIndex = () => {
 
   useEffect(() => {
     dispatch(updateCurrSite(1));
-  },[dispatch])
-
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen bg-gray-100">

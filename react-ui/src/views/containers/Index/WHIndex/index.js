@@ -6,6 +6,8 @@ import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 import {
   CogIcon,
+  CollectionIcon,
+  DocumentTextIcon,
   HomeIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
@@ -15,9 +17,24 @@ import { updateCurrSite } from "../../../../stores/slices/userSlice";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
-  { name: "Stock Levels", href: "/wh/stocklevels/my", icon: TruckIcon, current: false },
-  { name: "Procurement", href: "/wh/procurements", icon: TruckIcon, current: false },
-  { name: "Stock Transfer Order", href: "/wh/stocktransfer", icon: TruckIcon, current: true}
+  {
+    name: "Stock Levels",
+    href: "/wh/stocklevels/my",
+    icon: CollectionIcon,
+    current: false,
+  },
+  {
+    name: "Procurement",
+    href: "/wh/procurements",
+    icon: DocumentTextIcon,
+    current: false,
+  },
+  {
+    name: "Stock Transfer Order",
+    href: "/wh/stocktransfer",
+    icon: TruckIcon,
+    current: true,
+  },
 ];
 
 const secondaryNavigation = [
@@ -32,7 +49,7 @@ export const WHIndex = () => {
 
   useEffect(() => {
     dispatch(updateCurrSite(2));
-  },[])
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen bg-gray-100">

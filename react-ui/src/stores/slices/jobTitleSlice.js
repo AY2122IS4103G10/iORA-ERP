@@ -18,8 +18,13 @@ export const fetchJobTitles = createAsyncThunk(
 export const addNewJobTitle = createAsyncThunk(
   "jobTitle/addNewJobTitle",
   async (initialJobTitle) => {
-    const response = await api.create("admin/addJobTitle", initialJobTitle);
-    return response.data;
+    try {
+
+      const response = await api.create("admin/addJobTitle", initialJobTitle);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data)
+    }
   }
 );
 
@@ -34,10 +39,7 @@ export const updateExistingJobTitle = createAsyncThunk(
 export const deleteExistingJobTitle = createAsyncThunk(
   "jobTitle/deleteExistingJobTitle",
   async (existingJobTitleId) => {
-    const response = await api.delete(
-      "admin/deleteEmployee",
-      existingJobTitleId
-    );
+    const response = await api.delete("admin/deleteJobTitle",existingJobTitleId);
     return response.data;
   }
 );
@@ -60,23 +62,22 @@ const jobTitleSlice = createSlice({
       state.jobTitle.push(action.payload);
     });
     builder.addCase(updateExistingJobTitle.fulfilled, (state, action) => {
-      const { jobTitleId, title, description, responsibility } = action.payload;
+      const {
+        jobTitleId,
+        title,
+        description,
+        responsibility,
+      } = action.payload;
       console.log(action.payload);
-      const existingJobTitle = state.jobTitle.find(
-        (jobTitle) => jobTitle.jobTitleId === jobTitleId
-      );
+      const existingJobTitle = state.jobTitle.find((job) => job.jobTitleId === jobTitleId);
       if (existingJobTitle) {
         existingJobTitle.title = title;
         existingJobTitle.description = description;
         existingJobTitle.responsibility = responsibility;
       }
-      // state.status = "idle";
     });
     builder.addCase(deleteExistingJobTitle.fulfilled, (state, action) => {
-      state.jobTitle = state.jobTitle.filter(
-        ({ jobTitleId }) => jobTitleId !== action.payload.jobTitleId
-      );
-      // state.status = "idle"
+      state.status = "idle"
     });
   },
 });
@@ -86,4 +87,4 @@ export default jobTitleSlice.reducer;
 export const selectAllJobTitle = (state) => state.jobTitle.jobTitle;
 
 export const selectJobTitleById = (state, jobTitleId) =>
-  state.jobTitle.jobTitle.find((jTitle) => jTitle.jobTitleId === jobTitleId);
+  state.jobTitle.jobTitle.find((jobTitle) => jobTitle.id === jobTitleId);

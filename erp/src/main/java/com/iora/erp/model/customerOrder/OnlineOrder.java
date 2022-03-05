@@ -11,17 +11,17 @@ import com.iora.erp.model.site.StoreSite;
 
 @Entity
 public class OnlineOrder extends CustomerOrder {
-    @Column(nullable = false)
+    @Column
     private Long onlineStoreSiteId;
 
-    @Column(nullable = false)
+    @Column
     @Enumerated(EnumType.STRING)
     private OnlineOrderStatus status;
 
-    @Column(nullable = false)
+    @Column
     private boolean delivery;
 
-    @Column(nullable = false)
+    @Column
     @Enumerated(EnumType.STRING)
     private Country country;
 

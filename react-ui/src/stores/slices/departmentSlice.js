@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { api, departmentApi } from "../../environments/Api";
 
 const initialState = {
   department: [],
@@ -10,38 +10,56 @@ const initialState = {
 export const fetchDepartments = createAsyncThunk(
   "department/fetchDepartments",
   async () => {
-    const response = await api.getAll("admin/viewDepartments?search=");
-    return response.data;
+    try {
+      const response = await api.getAll("admin/viewDepartments?search=");
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const addNewDepartment = createAsyncThunk(
   "department/addDepartment",
   async (initialDepartment) => {
-    const response = await api.create("admin/addDepartment", initialDepartment);
-    return response.data;
+    try {
+      const response = await api.create(
+        "admin/addDepartment",
+        initialDepartment
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const updateExistingDepartment = createAsyncThunk(
   "department/updateExistingDepartment",
   async (existingDepartment) => {
-    const response = await api.update(
-      "admin/editDepartment",
-      existingDepartment
-    );
-    return response.data;
+    try {
+      const response = await api.update(
+        "admin/editDepartment",
+        existingDepartment
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const deleteExistingDepartment = createAsyncThunk(
   "department/deleteExistingDepartment",
   async (existingDepartmentId) => {
-    const response = await api.delete(
-      "admin/deleteDepartment",
-      existingDepartmentId
-    );
-    return response.data;
+    try {
+      const response = await departmentApi.deleteDepartment(
+        existingDepartmentId
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
@@ -63,21 +81,10 @@ const departmentSlice = createSlice({
       state.department.push(action.payload);
     });
     builder.addCase(updateExistingDepartment.fulfilled, (state, action) => {
-      const { departmentId, name } = action.payload;
-      console.log(action.payload);
-      const existingDepartment = state.department.find(
-        (department) => department.departmentId === departmentId
-      );
-      if (existingDepartment) {
-        existingDepartment.name = name;
-      }
-      // state.status = "idle";
+      state.status = "idle";
     });
     builder.addCase(deleteExistingDepartment.fulfilled, (state, action) => {
-      state.department = state.department.filter(
-        ({ departmentId }) => departmentId !== action.payload.departmenteId
-      );
-      // state.status = "idle"
+      state.status = "idle";
     });
   },
 });
@@ -88,5 +95,5 @@ export const selectAllDepartment = (state) => state.department.department;
 
 export const selectDepartmentById = (state, departmentId) =>
   state.department.department.find(
-    (dpartment) => dpartment.departmentId === departmentId
+    (dpartment) => dpartment.id === departmentId
   );

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api, sitesApi, stockTransferApi } from "../../environments/Api";
+import { api, stockTransferApi } from "../../environments/Api";
 
 
 
@@ -13,7 +13,7 @@ const initialState = {
 export const getAllStockTransfer = createAsyncThunk(
     "stocktransfer/getAllOrders",
     async (currSiteId) => {
-        // console.log(currSiteId);
+        console.log(currSiteId);
         if (currSiteId === 1) { //if by hq then get all stock transfer
             const response = await api.getAll("store/stockTransfer/all");
             return response.data;

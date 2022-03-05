@@ -16,6 +16,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
+import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
@@ -35,14 +36,17 @@ public class CustomerServiceImpl implements CustomerService {
     private EntityManager em;
 
     @Override
-    public Customer createCustomerAccount(Customer customer) throws CustomerException {
+    public Customer createCustomerAccount(Customer customer) throws RegistrationException {
         Customer newC = customer;
 
         try {
             getCustomerByEmail(customer.getEmail());
-            throw new CustomerException("Account with " + customer.getEmail() + " has already been created");
-        } catch (Exception ex) {
+            throw new RegistrationException("Account with " + customer.getEmail() + " has already been created");
+
+        } catch (CustomerException ex) {
             newC.setMembershipTier(findMembershipTierById("BASIC"));
+            newC.setMembershipPoints(0);
+            newC.setStoreCredit(0.00);
             newC.setAvailStatus(true);
             byte[] salt = saltGeneration();
             newC.setSalt(salt.toString());
@@ -72,6 +76,30 @@ public class CustomerServiceImpl implements CustomerService {
         old.setDob(customer.getDob());
         old.setFirstName(customer.getFirstName());
         old.setLastName(customer.getLastName());
+
+        return old;
+    }
+
+    @Override
+    public Customer editCustomerAccount(Customer customer) throws CustomerException {
+        Customer old = em.find(Customer.class, customer.getId());
+
+        if (old == null) {
+            throw new CustomerException("Customer not found");
+        }
+
+        try {
+            old.setEmail(customer.getEmail());
+        } catch (Exception ex) {
+            throw new CustomerException("Email " + customer.getEmail() + " has been used!");
+        }
+
+        old.setContactNumber(customer.getContactNumber());
+        old.setDob(customer.getDob());
+        old.setFirstName(customer.getFirstName());
+        old.setLastName(customer.getLastName());
+        old.setMembershipPoints(customer.getMembershipPoints());
+        old.setStoreCredit(customer.getStoreCredit());
 
         return old;
     }
@@ -112,7 +140,7 @@ public class CustomerServiceImpl implements CustomerService {
          * , Customer.class);
          */
         return em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.email) LIKE :email OR " +
-                "LOWER(c.LastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact",
+                "LOWER(c.lastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact",
                 Customer.class)
                 .setParameter("email", "%" + search.toLowerCase() + "%")
                 .setParameter("last", "%" + search.toLowerCase() + "%")
@@ -248,7 +276,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<MembershipTier> listOfMembershipTier() {
-        return em.createQuery("SELECT m FROM MembershipTier m", MembershipTier.class).getResultList();
+        return em.createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class).getResultList();
     }
 
     @Override
@@ -257,11 +285,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void createMembershipTier(MembershipTier membershipTier) {
+    public MembershipTier createMembershipTier(MembershipTier membershipTier) {
         if (membershipTier.getBirthday() == null) {
             membershipTier.setBirthday(em.find(BirthdayPoints.class, "STANDARD"));
         }
-        em.merge(membershipTier);
+        return(em.merge(membershipTier));
     }
 
     private byte[] saltGeneration() {

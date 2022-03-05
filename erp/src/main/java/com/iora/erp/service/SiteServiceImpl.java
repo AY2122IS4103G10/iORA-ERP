@@ -209,10 +209,15 @@ public class SiteServiceImpl implements SiteService {
         StockLevel stockLevel = getStockLevelOfSite(siteId);
         ProductItem item = em.find(ProductItem.class, productItemId);
         try {
-            if (item.getStockLevel() != null) {
+            if (item.getStockLevel() == null) {
+                addToStockLevel(stockLevel, item);
+            } else {
+                if (item.getStockLevel().getId() == siteId) {
+                    return;
+                }
                 removeFromStockLevel(item);
-            }
-            addToStockLevel(stockLevel, item);
+                addToStockLevel(stockLevel, item);
+            }   
         } catch (IllegalTransferException ex) {
             System.err.println(ex.getMessage());
         }

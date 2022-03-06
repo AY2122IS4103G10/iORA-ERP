@@ -33,11 +33,13 @@ public class CustomerOrder {
     @OneToMany
     private List<Payment> payments;
 
+    private Boolean paid = false;
+
     @OneToMany
     private List<RefundLI> refundedLIs;
 
     @OneToMany
-    private List<ExchangeLI> exhcangedLIs;
+    private List<ExchangeLI> exchangedLIs;
 
     @Column
     private Long customerId;
@@ -47,7 +49,7 @@ public class CustomerOrder {
         this.lineItems = new ArrayList<>();
         this.payments = new ArrayList<>();
         this.refundedLIs = new ArrayList<>();
-        this.exhcangedLIs = new ArrayList<>();
+        this.exchangedLIs = new ArrayList<>();
         this.totalAmount = 0.0;
     }
 
@@ -92,6 +94,14 @@ public class CustomerOrder {
         this.totalAmount += payment.getAmount();
     }
 
+    public Boolean isPaid() {
+        return this.paid;
+    }
+
+    public void setPaid(Boolean paid) {
+        this.paid = paid;
+    }
+
     public List<RefundLI> getRefundedLIs() {
         return this.refundedLIs;
     }
@@ -104,16 +114,16 @@ public class CustomerOrder {
         this.refundedLIs.add(refundedLI);
     }
 
-    public List<ExchangeLI> getExhcangedLIs() {
-        return this.exhcangedLIs;
+    public List<ExchangeLI> getExchangedLIs() {
+        return this.exchangedLIs;
     }
 
-    public void setExhcangedLIs(List<ExchangeLI> exhcangedLIs) {
-        this.exhcangedLIs = exhcangedLIs;
+    public void setExchangedLIs(List<ExchangeLI> exchangedLIs) {
+        this.exchangedLIs = exchangedLIs;
     }
 
     public void addExchangedLI(ExchangeLI exchangedLI) {
-        this.exhcangedLIs.add(exchangedLI);
+        this.exchangedLIs.add(exchangedLI);
     }
 
     public Long getCustomerId() {

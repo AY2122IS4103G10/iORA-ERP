@@ -50,4 +50,6 @@ public interface CustomerService {
     public abstract MembershipTier findMembershipTierById(String name);
 
     public abstract MembershipTier createMembershipTier(MembershipTier membershipTier);
+
+    public abstract void deleteMembershipTier(String name);
 }

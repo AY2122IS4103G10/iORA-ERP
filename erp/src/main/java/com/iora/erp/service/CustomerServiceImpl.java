@@ -276,7 +276,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<MembershipTier> listOfMembershipTier() {
-        return em.createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class).getResultList();
+        return em.createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
+                .getResultList();
     }
 
     @Override
@@ -289,7 +290,15 @@ public class CustomerServiceImpl implements CustomerService {
         if (membershipTier.getBirthday() == null) {
             membershipTier.setBirthday(em.find(BirthdayPoints.class, "STANDARD"));
         }
-        return(em.merge(membershipTier));
+        return em.merge(membershipTier);
+    }
+
+    @Override
+    public void deleteMembershipTier(String name) {
+        MembershipTier membershipTier = em.find(MembershipTier.class, name);
+        if (membershipTier != null) {
+            em.remove(membershipTier);
+        }
     }
 
     private byte[] saltGeneration() {

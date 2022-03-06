@@ -3,6 +3,7 @@ package com.iora.erp.service;
 import java.util.List;
 
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
@@ -24,11 +25,14 @@ public interface CustomerOrderService {
 
     public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder);
     public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
+    public abstract CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder, List<Payment> payments)
+            throws CustomerOrderException, InsufficientPaymentException;
     
     public abstract CustomerOrderLI getCustomerOrderLI(Long id) throws CustomerOrderException;
     public abstract List<CustomerOrderLI> getCustomerOrderLIs(CustomerOrder customerOrder);
     public abstract CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI);
     public abstract CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException;
+    public abstract List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfid);
 
     public abstract Payment getPayment(Long id) throws CustomerOrderException;
     public abstract List<Payment> getAllPayments();

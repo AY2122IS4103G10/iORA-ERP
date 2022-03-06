@@ -134,18 +134,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PromotionField getPromoField(String fieldName, String fieldValue, double discountedPrice)
+    public PromotionField getPromoField(String fieldName, String fieldValue)
             throws ProductFieldException {
-        Query q = em.createQuery(
-                "SELECT prf FROM PromotionField prf WHERE " +
-                        "LOWER(prf.fieldName) LIKE :fieldName AND LOWER(prf.fieldValue) LIKE :fieldValue AND prf.discountedPrice = :price");
-        q.setParameter("fieldName", fieldName.trim().toLowerCase());
-        q.setParameter("fieldValue", fieldValue.trim().toLowerCase());
-        q.setParameter("price", discountedPrice);
-
         try {
-            PromotionField prf = (PromotionField) q.getSingleResult();
-            return prf;
+            return em.createQuery(
+                    "SELECT prf FROM PromotionField prf WHERE LOWER(prf.fieldName) LIKE :fieldName AND "
+                            + " LOWER(prf.fieldValue) LIKE :fieldValue",
+                    PromotionField.class)
+                    .setParameter("fieldName", fieldName.trim().toLowerCase())
+                    .setParameter("fieldValue", fieldValue.trim().toLowerCase()).getSingleResult();
+
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new ProductFieldException("PromotionField does not exist.");
         }
@@ -182,49 +180,35 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PromotionField createPromoField(String fieldName, String fieldValue, double price) {
-        try {
-            PromotionField prf = getPromoField(fieldName, fieldValue, price);
-            return prf;
-        } catch (ProductFieldException e) {
-            PromotionField prf = new PromotionField(fieldName, fieldValue, price);
-            em.persist(prf);
-            return prf;
-        }
-    }
-
-    @Override
     public PromotionField updatePromoField(PromotionField promotionField) throws ProductFieldException {
         PromotionField old = em.find(PromotionField.class, promotionField.getId());
         if (old == null) {
             throw new ProductFieldException("Promotion Field cannot be found.");
         }
-        old.setFieldValue(promotionField.getFieldValue());
-        old.setDiscountedPrice(promotionField.getDiscountedPrice());
-        old.setAvailable(promotionField.isAvailable());
-        em.merge(old);
-        return old;
+        promotionField.setFieldName(old.getFieldName());
+        return em.merge(promotionField);
     }
 
-    @Override
-    public Model addPromoCategory(String modelCode, String category, double discountedPrice)
-            throws ModelException {
-        Model model = getModel(modelCode);
+    // @Override
+    // public Model addPromoCategory(String modelCode, String category, double
+    // discountedPrice)
+    // throws ModelException {
+    // Model model = getModel(modelCode);
 
-        try {
-            ProductField pf = getPromoField("category", category, discountedPrice);
-            model.addProductField(pf);
-            return model;
-        } catch (ProductFieldException ex) {
-            PromotionField prf = new PromotionField();
-            prf.setFieldName("category");
-            prf.setFieldValue(category);
-            prf.setDiscountedPrice(discountedPrice);
-            em.persist(prf);
-            model.addProductField(prf);
-            return model;
-        }
-    }
+    // try {
+    // ProductField pf = getPromoField("category", category, discountedPrice);
+    // model.addProductField(pf);
+    // return model;
+    // } catch (ProductFieldException ex) {
+    // PromotionField prf = new PromotionField();
+    // prf.setFieldName("category");
+    // prf.setFieldValue(category);
+    // prf.setDiscountedPrice(discountedPrice);
+    // em.persist(prf);
+    // model.addProductField(prf);
+    // return model;
+    // }
+    // }
 
     @Override
     public Model createModel(Model model) throws ModelException {
@@ -427,7 +411,8 @@ public class ProductServiceImpl implements ProductService {
         old.setAvailable(model.isAvailable());
         old.setName(model.getName());
         old.setOnlineOnly(model.isOnlineOnly());
-        old.setPrice(model.getPrice());
+        old.setListPrice(model.getListPrice());
+        old.setDiscountPrice(model.getDiscountPrice());
         old.setProductFields(model.getProductFields());
         return old;
     }
@@ -585,22 +570,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public JSONObject getProductCartDetails(String rfid)
-            throws ProductItemException, ProductException, ModelException, JSONException, ProductFieldException {
+            throws ProductItemException, ProductException, ModelException, JSONException,
+            ProductFieldException {
         ProductItem pi = getProductItem(rfid);
         Product p = getProduct(pi.getProductSKU());
         Model m = getModelByProduct(p);
         JSONObject jo = new JSONObject();
         jo.put("name", m.getName());
-        jo.put("price", m.getPrice());
+        jo.put("listPrice", m.getListPrice());
+        jo.put("discountedPrice", m.getDiscountPrice());
         jo.put("colour", getProductFieldValue(p, "COLOUR"));
         jo.put("size", getProductFieldValue(p, "SIZE"));
-        try {
-            PromotionField prf = getPromoFieldOfModel(m);
-            jo.put("discountedPrice", prf.getDiscountedPrice());
-            jo.put("promotion", prf.getFieldValue());
-        } catch (ProductFieldException ex) {
-            // do nothing
-        }
         return jo;
     }
 
@@ -629,13 +609,15 @@ public class ProductServiceImpl implements ProductService {
 
             LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
             List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
-            double price = Double.parseDouble((String) priceList.get(0));
+            double listPrice = Double.parseDouble((String) priceList.get(0));
 
             LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
             List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
                     .collect(Collectors.toList());
+            double discountPrice = discountedPriceList.isEmpty() ? listPrice
+                    : Double.parseDouble((String) discountedPriceList.get(0));
 
-            Model model = new Model(modelCode, name, description, price, sgd,
+            Model model = new Model(modelCode, name, description, listPrice, discountPrice, sgd,
                     categories.contains("SALE FROM $10"), true);
             List<ProductField> productFields = new ArrayList<>();
 
@@ -662,26 +644,8 @@ public class ProductServiceImpl implements ProductService {
             }
 
             for (String cat : categories) {
-                ProductField category;
-                if (cat.equals("2 FOR S$ 49")) {
-                    category = createPromoField("category", cat, 24.5);
-                    model.addProductField(category);
-                    productFields.add(category);
-                } else if (cat.equals("2 FOR S$ 29")) {
-                    category = createPromoField("category", cat, 14.5);
-                    model.addProductField(category);
-                    productFields.add(category);
-                } else if (cat.equals("SALE FROM $10")) {
-                    if (!discountedPriceList.isEmpty()) {
-                        category = createPromoField("category", cat,
-                                Double.parseDouble((String) discountedPriceList.get(0)));
-                        model.addProductField(category);
-                        productFields.add(category);
-                    } else {
-                        continue;
-                    }
-                } else {
-                    category = createProductField("category", cat);
+                if (cat.contains("S$")) {
+                    ProductField category = getPromoField("category", cat);
                     model.addProductField(category);
                     productFields.add(category);
                 }

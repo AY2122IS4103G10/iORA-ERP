@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
-
+    private EmailService emailService;
     @PersistenceContext
     private EntityManager em;
 
@@ -195,7 +195,15 @@ public class CustomerServiceImpl implements CustomerService {
         } catch (Exception ex) {
             throw new CustomerException("Authentication Fail. Invalid Username or Password.");
         }
+    }
 
+    @Override
+    public void resetPassword(Long id) throws CustomerException {
+        Customer c = getCustomerById(id);
+        String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+        c.sethashPass(StringGenerator.generateProtectedPassword(c.getSalt(), tempPassword));
+
+        emailService.sendCustomerPassword(c, tempPassword);
     }
 
     @Override

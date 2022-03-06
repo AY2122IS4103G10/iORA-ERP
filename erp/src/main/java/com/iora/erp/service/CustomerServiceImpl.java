@@ -1,8 +1,5 @@
 package com.iora.erp.service;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +18,7 @@ import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,9 +46,8 @@ public class CustomerServiceImpl implements CustomerService {
             newC.setMembershipPoints(0);
             newC.setStoreCredit(0.00);
             newC.setAvailStatus(true);
-            byte[] salt = saltGeneration();
-            newC.setSalt(salt.toString());
-            newC.sethashPass(generateProtectedPassword(salt.toString(), customer.gethashPass()));
+            newC.setSalt(StringGenerator.saltGeneration());
+            newC.sethashPass(StringGenerator.generateProtectedPassword(newC.getSalt(), customer.gethashPass()));
             em.persist(newC);
 
             return newC;
@@ -190,7 +187,7 @@ public class CustomerServiceImpl implements CustomerService {
 
             Customer c = getCustomerByEmail(email);
 
-            if (c.authentication(generateProtectedPassword(c.getSalt(), password))) {
+            if (c.authentication(StringGenerator.generateProtectedPassword(c.getSalt(), password))) {
                 return c;
             } else {
                 throw new CustomerException("Authentication Fail");
@@ -276,7 +273,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<MembershipTier> listOfMembershipTier() {
-        return em.createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class).getResultList();
+        return em.createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
+                .getResultList();
     }
 
     @Override
@@ -289,29 +287,6 @@ public class CustomerServiceImpl implements CustomerService {
         if (membershipTier.getBirthday() == null) {
             membershipTier.setBirthday(em.find(BirthdayPoints.class, "STANDARD"));
         }
-        return(em.merge(membershipTier));
+        return (em.merge(membershipTier));
     }
-
-    private byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
-    }
-
-    private String generateProtectedPassword(String salt, String password) {
-        String generatedPassword;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.reset();
-            md.update((salt + password).getBytes("utf8"));
-
-            generatedPassword = String.format("%0129x", new BigInteger(1, md.digest()));
-            return generatedPassword;
-
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
 }

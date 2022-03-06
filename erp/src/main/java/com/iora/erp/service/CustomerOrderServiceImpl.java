@@ -2,8 +2,10 @@ package com.iora.erp.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -255,7 +257,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     // Helper methods
 
-    // do this: implement updated method upon payment, and update after currency amount added to payments
+    // do this: implement updated method upon payment, and update after currency
+    // amount added to payments
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
@@ -283,7 +286,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         double bdayMultiplier = 1;
         int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
         Calendar cal = Calendar.getInstance();
-        cal.setTime(customer.getDob());
+        cal.setTime(Date.from(customer.getDob().atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant()));
         if (currentMonth == cal.get(Calendar.MONTH)) {
             Integer ordersThisMonth = em
                     .createQuery("SELECT o FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",

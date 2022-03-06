@@ -6,6 +6,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import com.iora.erp.model.company.Employee;
+import com.iora.erp.model.customer.Customer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -54,6 +55,15 @@ public class EmailServiceImpl implements EmailService {
                 employee.getEmail(),
                 "Your iORA Account Details",
                 "Hello " + employee.getName() + ", your login username is: " + employee.getUsername() + " and your temporary password is : "
+                        + tempPassword + ". Please login and change your password immediately.");
+    }
+
+    @Override
+    public void sendCustomerPassword(Customer customer, String tempPassword) {
+        sendSimpleMessage(
+        customer.getEmail(),
+                "iORA Password Reset",
+                "Hello " + customer.getLastName() + ", your new password is : "
                         + tempPassword + ". Please login and change your password immediately.");
     }
 }

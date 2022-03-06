@@ -44,7 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employee.setSalt(StringGenerator.saltGeneration());
                 employee.setPassword(StringGenerator.generateProtectedPassword(employee.getSalt(), tempPassword));
                 em.persist(employee);
-                emailService.sendEmployeeCreated(employee, tempPassword);
+                emailService.sendTemporaryPassword(employee, tempPassword);
             } else {
                 throw new EmployeeException("Job Title selected for the Employee: " + employee.getName()
                         + " is not applicable for the choosen department");
@@ -234,5 +234,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         } catch (EmployeeException ex) {
             throw new AuthenticationException("Authentication Fail. Invalid Username or Password.");
         }
+    }
+
+    @Override
+    public void resetPassword(Long id) throws EmployeeException {
+        Employee e = getEmployeeById(id);
+        String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+        e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(), tempPassword));
+
+        emailService.sendTemporaryPassword(e, tempPassword);
     }
 }

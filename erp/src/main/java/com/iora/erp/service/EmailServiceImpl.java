@@ -5,6 +5,9 @@ import java.io.File;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.iora.erp.model.company.Employee;
+import com.iora.erp.model.customer.Customer;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
@@ -29,7 +32,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment) throws MessagingException {
+    public void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment)
+            throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -43,5 +47,23 @@ public class EmailServiceImpl implements EmailService {
         helper.addAttachment("Invoice", file);
 
         emailSender.send(message);
+    }
+
+    @Override
+    public void sendTemporaryPassword(Employee employee, String tempPassword) {
+        sendSimpleMessage(
+                employee.getEmail(),
+                "Your iORA Account Details",
+                "Hello " + employee.getName() + ", your login username is: " + employee.getUsername() + " and your temporary password is : "
+                        + tempPassword + ". Please login and change your password immediately.");
+    }
+
+    @Override
+    public void sendCustomerPassword(Customer customer, String tempPassword) {
+        sendSimpleMessage(
+        customer.getEmail(),
+                "iORA Password Reset",
+                "Hello " + customer.getLastName() + ", your new password is : "
+                        + tempPassword + ". Please login and change your password immediately.");
     }
 }

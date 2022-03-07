@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -24,6 +23,7 @@ import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.WarehouseSite;
+import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -168,15 +168,6 @@ public class ProcurementServiceImpl implements ProcurementService {
         return em.merge(procurementOrder);
     }
 
-    private String generateRFID(String sku) {
-        return "10-0001234-0" + sku.substring(5, 10) + "-0000" +
-                new Random().ints(48, 91)
-                        .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                        .limit(5)
-                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                        .toString();
-    }
-
     @Override
     public ProcurementOrder fulfilProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException,
@@ -198,7 +189,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         for (ProcurementOrderLI poli : procurementOrder.getLineItems()) {
             for (int i = 0; i < poli.getRequestedQty(); i++) {
                 try {
-                    ProductItem pi = productService.createProductItem(generateRFID(poli.getProduct().getsku()), poli.getProduct().getsku());
+                    ProductItem pi = productService.createProductItem(StringGenerator.generateRFID(poli.getProduct().getsku()), poli.getProduct().getsku());
                     allProductItems.add(pi);
                     poli.addFulfilledProductItems(pi);
                 } catch (ProductItemException e) {

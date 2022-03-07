@@ -1,7 +1,5 @@
 package com.iora.erp.service;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,6 +19,7 @@ import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
-
+    private EmailService emailService;
     @PersistenceContext
     private EntityManager em;
 
@@ -48,9 +47,8 @@ public class CustomerServiceImpl implements CustomerService {
             newC.setMembershipPoints(0);
             newC.setStoreCredit(0.00);
             newC.setAvailStatus(true);
-            byte[] salt = saltGeneration();
-            newC.setSalt(salt.toString());
-            newC.sethashPass(generateProtectedPassword(salt.toString(), customer.gethashPass()));
+            newC.setSalt(StringGenerator.saltGeneration());
+            newC.sethashPass(StringGenerator.generateProtectedPassword(newC.getSalt(), customer.gethashPass()));
             em.persist(newC);
 
             return newC;
@@ -190,7 +188,7 @@ public class CustomerServiceImpl implements CustomerService {
 
             Customer c = getCustomerByEmail(email);
 
-            if (c.authentication(generateProtectedPassword(c.getSalt(), password))) {
+            if (c.authentication(StringGenerator.generateProtectedPassword(c.getSalt(), password))) {
                 return c;
             } else {
                 throw new CustomerException("Authentication Fail");
@@ -198,7 +196,15 @@ public class CustomerServiceImpl implements CustomerService {
         } catch (Exception ex) {
             throw new CustomerException("Authentication Fail. Invalid Username or Password.");
         }
+    }
 
+    @Override
+    public void resetPassword(Long id) throws CustomerException {
+        Customer c = getCustomerById(id);
+        String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+        c.sethashPass(StringGenerator.generateProtectedPassword(c.getSalt(), tempPassword));
+
+        emailService.sendCustomerPassword(c, tempPassword);
     }
 
     @Override
@@ -307,20 +313,4 @@ public class CustomerServiceImpl implements CustomerService {
         random.nextBytes(salt);
         return salt;
     }
-
-    private String generateProtectedPassword(String salt, String password) {
-        String generatedPassword;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.reset();
-            md.update((salt + password).getBytes("utf8"));
-
-            generatedPassword = String.format("%0129x", new BigInteger(1, md.digest()));
-            return generatedPassword;
-
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
 }

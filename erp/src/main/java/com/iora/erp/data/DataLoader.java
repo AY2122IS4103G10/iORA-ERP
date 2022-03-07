@@ -1,5 +1,6 @@
 package com.iora.erp.data;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.EmployeeService;
+import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -79,7 +81,7 @@ public class DataLoader implements CommandLineRunner {
 		ar1.add(AccessRights.WAREHOUSE_ORDER);
 		ar1.add(AccessRights.STORE_BASIC);
 		ar1.add(AccessRights.STORE_INVENTORY);
-		JobTitle jobTitle1 = new JobTitle("IT Admin", "Managing all IT", ar1);
+		JobTitle jobTitle1 = new JobTitle("IT Admin", "Superuser", ar1);
 		em.persist(jobTitle1);
 
 		Set<AccessRights> ar2 = new HashSet<>();
@@ -174,6 +176,8 @@ public class DataLoader implements CommandLineRunner {
 		sora.setAddress(a1);
 		em.persist(sora);
 
+		
+		
 		// Employee
 		Employee e1 = new Employee("Darth Vader", "darthV", "password");
 		e1.setEmail("darth.vader@gmail.com");
@@ -182,7 +186,9 @@ public class DataLoader implements CommandLineRunner {
 		e1.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e1.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e1.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e1);
+		e1.setSalt(StringGenerator.saltGeneration());
+		e1.setPassword(StringGenerator.generateProtectedPassword(e1.getSalt(), "password"));
+		em.persist(e1);
 
 		Employee e2 = new Employee("Sharon KS", "sharonE", "password");
 		e2.setEmail("sharonMS.12@gmail.com");
@@ -191,7 +197,9 @@ public class DataLoader implements CommandLineRunner {
 		e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(2)));
 		e2.setDepartment(adminService.getDepartmentById(Long.valueOf(2)));
 		e2.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e2);
+		e2.setSalt(StringGenerator.saltGeneration());
+		e2.setPassword(StringGenerator.generateProtectedPassword(e2.getSalt(), "password"));
+		em.persist(e2);
 
 		Employee e3 = new Employee("Manuel Manny", "manu", "password");
 		e3.setEmail("MannyManuel@gmail.com");
@@ -200,7 +208,9 @@ public class DataLoader implements CommandLineRunner {
 		e3.setJobTitle(adminService.getJobTitleById(Long.valueOf(3)));
 		e3.setDepartment(adminService.getDepartmentById(Long.valueOf(4)));
 		e3.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e3);
+		e3.setSalt(StringGenerator.saltGeneration());
+		e3.setPassword(StringGenerator.generateProtectedPassword(e3.getSalt(), "password"));
+		em.persist(e3);
 
 		Employee e4 = new Employee("Warren Ho", "warren", "password");
 		e4.setEmail("WarrenHoHoHo@gmail.com");
@@ -209,7 +219,9 @@ public class DataLoader implements CommandLineRunner {
 		e4.setJobTitle(adminService.getJobTitleById(Long.valueOf(4)));
 		e4.setDepartment(adminService.getDepartmentById(Long.valueOf(5)));
 		e4.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e4);
+		e4.setSalt(StringGenerator.saltGeneration());
+		e4.setPassword(StringGenerator.generateProtectedPassword(e4.getSalt(), "password"));
+		em.persist(e4);
 
 		Employee e5 = new Employee("Storm", "storm", "password");
 		e5.setEmail("storm@gmail.com");
@@ -218,7 +230,9 @@ public class DataLoader implements CommandLineRunner {
 		e5.setJobTitle(adminService.getJobTitleById(Long.valueOf(5)));
 		e5.setDepartment(adminService.getDepartmentById(Long.valueOf(6)));
 		e5.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e5);
+		e5.setSalt(StringGenerator.saltGeneration());
+		e5.setPassword(StringGenerator.generateProtectedPassword(e5.getSalt(), "password"));
+		em.persist(e5);
 
 		Employee e6 = new Employee("Goh Hong Pei", "hongpei", "password");
 		e6.setEmail("hongpeiisrandom@gmail.com");
@@ -227,7 +241,9 @@ public class DataLoader implements CommandLineRunner {
 		e6.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e6.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e6.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e6);
+		e6.setSalt(StringGenerator.saltGeneration());
+		e6.setPassword(StringGenerator.generateProtectedPassword(e6.getSalt(), "password"));
+		em.persist(e6);
 
 		Employee e7 = new Employee("Delven Wong", "delven", "password");
 		e7.setEmail("pengyu_33@msn.com");
@@ -236,7 +252,9 @@ public class DataLoader implements CommandLineRunner {
 		e7.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e7.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e7.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e7);
+		e7.setSalt(StringGenerator.saltGeneration());
+		e7.setPassword(StringGenerator.generateProtectedPassword(e7.getSalt(), "password"));
+		em.persist(e7);
 
 		Employee e8 = new Employee("Adeline Tan", "adeline", "password");
 		e8.setEmail("tan.adelinejy@gmail.com");
@@ -245,7 +263,9 @@ public class DataLoader implements CommandLineRunner {
 		e8.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e8.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e8.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e8);
+		e8.setSalt(StringGenerator.saltGeneration());
+		e8.setPassword(StringGenerator.generateProtectedPassword(e8.getSalt(), "password"));
+		em.persist(e8);
 
 		Employee e9 = new Employee("Louis Misson", "louis", "password");
 		e9.setEmail("louismisson8@gmail.com");
@@ -254,7 +274,9 @@ public class DataLoader implements CommandLineRunner {
 		e9.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e9.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e9.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e9);
+		e9.setSalt(StringGenerator.saltGeneration());
+		e9.setPassword(StringGenerator.generateProtectedPassword(e9.getSalt(), "password"));
+		em.persist(e9);
 
 		Employee e10 = new Employee("Remus Kwan", "remus", "password");
 		e10.setEmail("remuskwan23@gmail.com");
@@ -263,7 +285,9 @@ public class DataLoader implements CommandLineRunner {
 		e10.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e10.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e10.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e10);
+		e10.setSalt(StringGenerator.saltGeneration());
+		e10.setPassword(StringGenerator.generateProtectedPassword(e10.getSalt(), "password"));
+		em.persist(e10);
 
 		Employee e11 = new Employee("Ruth Chong", "ruth", "password");
 		e11.setEmail("ruth.cjn@gmail.com");
@@ -272,7 +296,9 @@ public class DataLoader implements CommandLineRunner {
 		e11.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e11.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e11.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e11);
+		e11.setSalt(StringGenerator.saltGeneration());
+		e11.setPassword(StringGenerator.generateProtectedPassword(e11.getSalt(), "password"));
+		em.persist(e11);
 
 		// Adding Sites
 		HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", "+65-63610056", iora);

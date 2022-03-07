@@ -2,7 +2,6 @@ package com.iora.erp.service;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +16,7 @@ import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
+import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,35 +28,28 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @PersistenceContext
     private EntityManager em;
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private AdminService adminService;
 
     @Override
     public Employee createEmployee(Employee employee) throws EmployeeException {
-        String password = employee.getPassword();
-        Employee e = employee;
-
         try {
             if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
                     employee.getJobTitle().getId()) == true) {
 
-                String salt = saltGeneration().toString();
-                e.setSalt(salt);
-                e.setPassword(generateProtectedPassword(salt, password));
-                em.persist(e);
-                e.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
-                e.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
-                e.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
+                String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+                employee.setSalt(StringGenerator.saltGeneration());
+                employee.setPassword(StringGenerator.generateProtectedPassword(employee.getSalt(), tempPassword));
+                em.persist(employee);
+                emailService.sendTemporaryPassword(employee, tempPassword);
             } else {
-                throw new EmployeeException();
+                throw new EmployeeException("Job Title selected for the Employee: " + employee.getName()
+                        + " is not applicable for the choosen department");
             }
-
-            return e;
-
-        } catch (EmployeeException ex) {
-            throw new EmployeeException("Job Title selected for the Employee: " + e.getName()
-                    + " is not applicable for the choosen department");
+            return employee;
         } catch (Exception ex) {
             throw new EmployeeException("Employee has already been created" + ex.toString());
         }
@@ -86,7 +79,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         old.setEmail(employee.getEmail());
 
                         if (employee.getPassword() != null && employee.getPassword() != "") {
-                            old.setPassword(generateProtectedPassword(salt, employee.getPassword()));
+                            old.setPassword(StringGenerator.generateProtectedPassword(salt, employee.getPassword()));
                         }
                         old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
                         old.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
@@ -227,7 +220,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee c = getEmployeeByUsername(username);
 
-            if (c.authentication(generateProtectedPassword(c.getSalt(), password))) {
+            if (c.authentication(StringGenerator.generateProtectedPassword(c.getSalt(), password))) {
                 if (c.getAvailStatus() == true) {
                     return c;
                 } else {
@@ -241,28 +234,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         } catch (EmployeeException ex) {
             throw new AuthenticationException("Authentication Fail. Invalid Username or Password.");
         }
-
     }
 
-    private String generateProtectedPassword(String salt, String password) {
-        String generatedPassword;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.reset();
-            md.update((salt + password).getBytes("utf8"));
+    @Override
+    public void resetPassword(Long id) throws EmployeeException {
+        Employee e = getEmployeeById(id);
+        String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+        e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(), tempPassword));
 
-            generatedPassword = String.format("%0129x", new BigInteger(1, md.digest()));
-            return generatedPassword;
-
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    private byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
+        emailService.sendTemporaryPassword(e, tempPassword);
     }
 }

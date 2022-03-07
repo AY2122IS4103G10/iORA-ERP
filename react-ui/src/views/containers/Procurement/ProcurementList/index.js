@@ -55,7 +55,6 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
 export const ProcurementList = ({ pathname }) => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-
   useEffect(() => {
     api.getAll(`sam/procurementOrder/all`).then((response) => {
       setData(response.data);

@@ -25,12 +25,12 @@ const navigation = [
   },
   {
     name: "Procurement",
-    href: "/wh/procurements",
+    href: "/wh/procurements/search",
     icon: DocumentTextIcon,
     current: false,
   },
   {
-    name: "Stock Transfer Order",
+    name: "Stock Transfer",
     href: "/wh/stocktransfer",
     icon: TruckIcon,
     current: true,

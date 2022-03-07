@@ -39,7 +39,7 @@ const navigation = [
   },
   {
     name: "Procurement",
-    href: "/sm/procurements",
+    href: "/sm/procurements/search",
     icon: DocumentTextIcon,
     current: false,
   },

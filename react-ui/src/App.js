@@ -62,8 +62,12 @@ import { MembershipTierForm } from "./views/containers/MembershipTier/Membership
 import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory/index.js";
 import { OrderDetails } from "./views/containers/POS/OrderDetails/index.js";
 import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder/index.js";
+import { ProcurementList } from "./views/containers/Procurement/ProcurementList/index.js";
+import { useLocation } from "react-router-dom";
+import { ProcurementSearch } from "./views/containers/Procurement/ProcurementSearch/index.js";
 
 function App() {
+  const { pathname } = useLocation();
   return (
     <div>
       <Routes>
@@ -116,7 +120,22 @@ function App() {
             </Route>
 
             <Route path="procurements" element={<Outlet />}>
-              <Route index element={<ManageProcurement />} />
+              <Route
+                index
+                element={
+                  <ManageProcurement>
+                    <ProcurementList pathname={pathname} />
+                  </ManageProcurement>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageProcurement>
+                    <ProcurementSearch />
+                  </ManageProcurement>
+                }
+              />
               <Route path=":procurementId" element={<ProcurementDetails />} />
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
@@ -244,7 +263,22 @@ function App() {
             }
           >
             <Route path="procurements" element={<Outlet />}>
-              <Route index element={<ManageProcurement />} />
+              <Route
+                index
+                element={
+                  <ManageProcurement>
+                    <ProcurementList pathname={pathname} />
+                  </ManageProcurement>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageProcurement>
+                    <ProcurementSearch />
+                  </ManageProcurement>
+                }
+              />
               <Route path=":procurementId" element={<ProcurementDetails />} />
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<VoucherForm />} />
@@ -274,7 +308,22 @@ function App() {
             </Route>
 
             <Route path="procurements" element={<Outlet />}>
-              <Route index element={<ManageProcurement />} />
+              <Route
+                index
+                element={
+                  <ManageProcurement>
+                    <ProcurementList pathname={pathname} />
+                  </ManageProcurement>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageProcurement>
+                    <ProcurementSearch />
+                  </ManageProcurement>
+                }
+              />
               <Route path=":procurementId" element={<ProcurementDetails />} />
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<VoucherForm />} />

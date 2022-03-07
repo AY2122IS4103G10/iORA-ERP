@@ -3,7 +3,14 @@
  * React Table Part 1: https://www.samuelliedtke.com/blog/react-table-tutorial-part-1/
  * React Table Part 2: https://www.samuelliedtke.com/blog/react-table-tutorial-part-2/
  */
-import {useState, useMemo, Fragment, forwardRef, useRef, useEffect} from "react";
+import {
+  useState,
+  useMemo,
+  Fragment,
+  forwardRef,
+  useRef,
+  useEffect,
+} from "react";
 import {
   useTable,
   useGlobalFilter,
@@ -15,7 +22,7 @@ import {
   useMountedLayoutEffect,
   useFlexLayout,
 } from "react-table";
-import {Menu, Transition} from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 import {
   ChevronDoubleRightIcon,
   ChevronDoubleLeftIcon,
@@ -24,15 +31,20 @@ import {
   TrashIcon,
   CheckIcon,
 } from "@heroicons/react/outline";
-import {DotsHorizontalIcon} from "@heroicons/react/solid";
+import { DotsHorizontalIcon } from "@heroicons/react/solid";
 
-import {SimpleButton} from "../../Buttons/SimpleButton";
-import {PageButton} from "../../Buttons/PageButton";
-import {SortDownIcon, SortUpIcon, SortIcon} from "../Icons";
-import {classNames} from "../../../../utilities/Util";
-import {Link} from "react-router-dom";
+import { SimpleButton } from "../../Buttons/SimpleButton";
+import { PageButton } from "../../Buttons/PageButton";
+import { SortDownIcon, SortUpIcon, SortIcon } from "../Icons";
+import { classNames } from "../../../../utilities/Util";
+import { Link } from "react-router-dom";
 
-const GlobalFilter = ({preGlobalFilteredRows, globalFilter, setGlobalFilter, headerButton}) => {
+const GlobalFilter = ({
+  preGlobalFilteredRows,
+  globalFilter,
+  setGlobalFilter,
+  headerButton,
+}) => {
   const count = preGlobalFilteredRows.length;
   const [value, setValue] = useState(globalFilter);
   const onChange = useAsyncDebounce((value) => {
@@ -60,7 +72,7 @@ const GlobalFilter = ({preGlobalFilteredRows, globalFilter, setGlobalFilter, hea
 };
 
 export const SelectColumnFilter = ({
-  column: {filterValue, setFilter, preFilteredRows, id, render},
+  column: { filterValue, setFilter, preFilteredRows, id, render },
 }) => {
   const options = useMemo(() => {
     const options = new Set();
@@ -81,7 +93,8 @@ export const SelectColumnFilter = ({
         value={filterValue}
         onChange={(e) => {
           setFilter(e.target.value || undefined);
-        }}>
+        }}
+      >
         <option value="">All</option>
         {options.map((option, i) => (
           <option key={i} value={option}>
@@ -93,7 +106,7 @@ export const SelectColumnFilter = ({
   );
 };
 
-export const OptionsCell = ({options = []}) => {
+export const OptionsCell = ({ options = [] }) => {
   return (
     <Menu as="div" className="relative z-10 inline-block text-left">
       <div>
@@ -110,19 +123,21 @@ export const OptionsCell = ({options = []}) => {
         enterTo="transform opacity-100 scale-100"
         leave="transition ease-in duration-75"
         leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95">
+        leaveTo="transform opacity-0 scale-95"
+      >
         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             {options.length &&
               options.map((option) => (
                 <Menu.Item>
-                  {({active}) => (
+                  {({ active }) => (
                     <Link
                       to={option.navigate}
                       className={classNames(
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                         "block px-4 py-2 text-sm"
-                      )}>
+                      )}
+                    >
                       {option.name}
                     </Link>
                   )}
@@ -135,28 +150,35 @@ export const OptionsCell = ({options = []}) => {
   );
 };
 
-export const DeleteCell = ({onClick}) => {
+export const DeleteCell = ({ onClick }) => {
   return (
     <button
       className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-      onClick={onClick}>
+      onClick={onClick}
+    >
       <span className="sr-only">Delete</span>
       <TrashIcon className="h-5 w-5" aria-hidden="true" />
     </button>
   );
 };
 
-export const CheckCell = ({onClick}) => {
+export const CheckCell = ({ onClick }) => {
   return (
     <button
       className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-      onClick={onClick}>
+      onClick={onClick}
+    >
       <span className="sr-only">Delete</span>
       <CheckIcon className="h-5 w-5" aria-hidden="true" />
     </button>
   );
 };
-export const EditableCell = ({value: initialValue, row: {index}, column: {id}, updateMyData}) => {
+export const EditableCell = ({
+  value: initialValue,
+  row: { index },
+  column: { id },
+  updateMyData,
+}) => {
   const [value, setValue] = useState(initialValue);
 
   const onChange = (e) => {
@@ -183,7 +205,7 @@ export const EditableCell = ({value: initialValue, row: {index}, column: {id}, u
   );
 };
 
-const IndeterminateCheckbox = forwardRef(({indeterminate, ...rest}, ref) => {
+const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
   const defaultRef = useRef();
   const resolvedRef = ref || defaultRef;
 
@@ -214,6 +236,9 @@ export const SimpleTable = ({
   flex = false,
   handleOnClick,
   hiddenColumns = [],
+  globalFilter = true,
+  sortBy = true,
+  filters = true,
 }) => {
   const {
     getTableProps,
@@ -232,7 +257,7 @@ export const SimpleTable = ({
     state,
     preGlobalFilteredRows,
     setGlobalFilter,
-    state: {selectedRowIds},
+    state: { selectedRowIds },
   } = useTable(
     {
       columns,
@@ -243,9 +268,9 @@ export const SimpleTable = ({
         hiddenColumns: hiddenColumns,
       },
     },
-    useFilters,
-    useGlobalFilter,
-    useSortBy,
+    filters && useFilters,
+    globalFilter && useGlobalFilter,
+    sortBy && useSortBy,
     usePagination,
     useRowSelect,
     flex && useFlexLayout,
@@ -254,12 +279,12 @@ export const SimpleTable = ({
         hooks.visibleColumns.push((columns) => [
           {
             id: "selection",
-            Header: ({getToggleAllRowsSelectedProps}) => (
+            Header: ({ getToggleAllRowsSelectedProps }) => (
               <div>
                 <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
               </div>
             ),
-            Cell: ({row}) => (
+            Cell: ({ row }) => (
               <div>
                 <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
               </div>
@@ -276,27 +301,33 @@ export const SimpleTable = ({
   return (
     <>
       <div className="sm:flex justify-between sm:gap-x-2">
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-          headerButton={headerButton}
-        />
-        {headerGroups.map((headerGroup) =>
-          headerGroup.headers.map((column) =>
-            column.Filter ? (
-              <div className="mt-2 sm:mt-0" key={column.id}>
-                {column.render("Filter")}
-              </div>
-            ) : null
-          )
+        {globalFilter && (
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={state.globalFilter}
+            setGlobalFilter={setGlobalFilter}
+            headerButton={headerButton}
+          />
         )}
+        {filters &&
+          headerGroups.map((headerGroup) =>
+            headerGroup.headers.map((column) =>
+              column.Filter ? (
+                <div className="mt-2 sm:mt-0" key={column.id}>
+                  {column.render("Filter")}
+                </div>
+              ) : null
+            )
+          )}
       </div>
       <div className="mt-4 flex flex-col">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
             <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-              <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
+              <table
+                {...getTableProps()}
+                className="min-w-full divide-y divide-gray-200"
+              >
                 <thead className="bg-gray-200">
                   {headerGroups.map((headerGroup) => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
@@ -304,13 +335,17 @@ export const SimpleTable = ({
                         <th
                           scope="col"
                           className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
-                          {...column.getHeaderProps(column.getSortByToggleProps(), {
-                            style: {
-                              maxWidth: column.maxWidth,
-                              minWidth: column.minWidth,
-                              width: column.width,
-                            },
-                          })}>
+                          {...column.getHeaderProps(
+                            sortBy && column.getSortByToggleProps(),
+                            {
+                              style: {
+                                maxWidth: column.maxWidth,
+                                minWidth: column.minWidth,
+                                width: column.width,
+                              },
+                            }
+                          )}
+                        >
                           <div className="flex items-center justify-between">
                             {column.render("Header")}
                             {/* Sort direction indicator */}
@@ -339,13 +374,20 @@ export const SimpleTable = ({
                         {...row.getRowProps()}
                         className={[
                           i % 2 === 0 ? "bg-white" : "bg-gray-50",
-                          Boolean(handleOnClick) && "cursor-pointer hover:bg-gray-100",
+                          Boolean(handleOnClick) &&
+                            "cursor-pointer hover:bg-gray-100",
                         ].join(" ")}
-                        onClick={Boolean(handleOnClick) ? () => handleOnClick(row) : undefined}>
+                        onClick={
+                          Boolean(handleOnClick)
+                            ? () => handleOnClick(row)
+                            : undefined
+                        }
+                      >
                         {row.cells.map((cell) => (
                           <td
                             {...cell.getCellProps()}
-                            className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                          >
                             {cell.render("Cell")}
                           </td>
                         ))}
@@ -358,9 +400,13 @@ export const SimpleTable = ({
           </div>
         </div>
       </div>
+
       <div className="py-3 flex items-center justify-between">
         <div className="flex-1 flex justify-between sm:hidden">
-          <SimpleButton onClick={() => previousPage()} disabled={!canPreviousPage}>
+          <SimpleButton
+            onClick={() => previousPage()}
+            disabled={!canPreviousPage}
+          >
             Previous
           </SimpleButton>
           <SimpleButton onClick={() => nextPage()} disabled={!canNextPage}>
@@ -380,7 +426,8 @@ export const SimpleTable = ({
                 value={state.pageSize}
                 onChange={(e) => {
                   setPageSize(Number(e.target.value));
-                }}>
+                }}
+              >
                 {[5, 10, 20].map((pageSize) => (
                   <option key={pageSize} value={pageSize}>
                     Show {pageSize}
@@ -392,15 +439,20 @@ export const SimpleTable = ({
           <div>
             <nav
               className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-              aria-label="Pagination">
+              aria-label="Pagination"
+            >
               <PageButton
                 className="rounded-l-md"
                 onClick={() => gotoPage(0)}
-                disabled={!canPreviousPage}>
+                disabled={!canPreviousPage}
+              >
                 <span className="sr-only">First</span>
                 <ChevronDoubleLeftIcon className="h-5 w-5" aria-hidden="true" />
               </PageButton>
-              <PageButton onClick={() => previousPage()} disabled={!canPreviousPage}>
+              <PageButton
+                onClick={() => previousPage()}
+                disabled={!canPreviousPage}
+              >
                 <span className="sr-only">Previous</span>
                 <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
               </PageButton>
@@ -411,9 +463,13 @@ export const SimpleTable = ({
               <PageButton
                 className="rounded-r-md"
                 onClick={() => gotoPage(pageCount - 1)}
-                disabled={!canNextPage}>
+                disabled={!canNextPage}
+              >
                 <span className="sr-only">Last</span>
-                <ChevronDoubleRightIcon className="h-5 w-5" aria-hidden="true" />
+                <ChevronDoubleRightIcon
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                />
               </PageButton>
             </nav>
           </div>

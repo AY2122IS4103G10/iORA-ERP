@@ -30,7 +30,7 @@ public interface ProductService {
     public abstract PromotionField getPromoFieldOfModel(Model model) throws ProductFieldException;
     public abstract PromotionField createPromoField(PromotionField promotionField) throws ProductFieldException;
     public abstract PromotionField updatePromoField(PromotionField promotionField) throws ProductFieldException;
-    // public abstract Model addPromoCategory(String modelCode, String category, double discountedPrice) throws ModelException;
+    public abstract Model addPromoLink(String modelCode, String category) throws ModelException;
 
     public abstract Model createModel(Model model) throws ModelException;
     public abstract Model getModel(String modelCode) throws ModelException;

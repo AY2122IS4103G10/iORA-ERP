@@ -190,26 +190,21 @@ public class ProductServiceImpl implements ProductService {
         return em.merge(promotionField);
     }
 
-    // @Override
-    // public Model addPromoCategory(String modelCode, String category, double
-    // discountedPrice)
-    // throws ModelException {
-    // Model model = getModel(modelCode);
+    @Override
+    public Model addPromoLink(String modelCode, String category) throws ModelException {
+        Model model = getModel(modelCode);
 
-    // try {
-    // ProductField pf = getPromoField("category", category, discountedPrice);
-    // model.addProductField(pf);
-    // return model;
-    // } catch (ProductFieldException ex) {
-    // PromotionField prf = new PromotionField();
-    // prf.setFieldName("category");
-    // prf.setFieldValue(category);
-    // prf.setDiscountedPrice(discountedPrice);
-    // em.persist(prf);
-    // model.addProductField(prf);
-    // return model;
-    // }
-    // }
+        try {
+            PromotionField pf = getPromoField("category", category);
+            if (pf.getQuota() > 1) {
+                model.getProductFields().removeIf(x -> (x instanceof PromotionField)  && ((PromotionField) x).getQuota() > 1);
+            }
+            model.addProductField(pf);
+            return model;
+        } catch (ProductFieldException ex) {
+            return model;
+        }
+    }
 
     @Override
     public Model createModel(Model model) throws ModelException {

@@ -58,17 +58,16 @@ public class StockTransferServiceImpl implements StockTransferService {
             throws SiteConfirmationException {
         Site actionBy = em.find(Site.class, siteId);
         System.out.println(stockTransferOrder.getFromSite());
-        
+
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else {
             List<STOStatus> statusHistory = new ArrayList<>();
-            statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDING));
+            statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDINGALL));
             stockTransferOrder.setStatusHistory(statusHistory);
             em.persist(stockTransferOrder);
             return stockTransferOrder;
         }
-
     }
 
     @Override
@@ -79,29 +78,28 @@ public class StockTransferServiceImpl implements StockTransferService {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else {
             List<STOStatus> statusHistory = stockTransferOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.PENDING) {
+            if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.PENDINGALL) {
                 throw new StockTransferException(
                         "Stock Transfer Order has been received by the other party and cannot be amended.");
             }
-            statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDING));
+            statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDINGALL));
             stockTransferOrder.setStatusHistory(statusHistory);
             return em.merge(stockTransferOrder);
         }
     }
 
     @Override
-    public StockTransferOrder cancelStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder cancelStockTransferOrder(Long id, Long siteId)
+            throws SiteConfirmationException, StockTransferException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
-        } else if (actionBy != stOrder.getStatusHistory().get(0).getActionBy()) {
-            throw new SiteConfirmationException(
-                    "Site is not the creator of this Stock Transfer Order and therefore cannot delete it.");
         } else {
             List<STOStatus> statusHistory = stOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.PENDING) {
+            StockTransferStatus prevStatus = statusHistory.get(statusHistory.size() - 1).getStatus();
+            if (prevStatus != StockTransferStatus.PENDINGALL || prevStatus != StockTransferStatus.PENDINGONE) {
                 throw new StockTransferException(
                         "Stock Transfer Order has been responded to by the other party and cannot be deleted.");
             }
@@ -112,7 +110,8 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public StockTransferOrder rejectStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException {
+    public StockTransferOrder rejectStockTransferOrder(Long id, Long siteId)
+            throws StockTransferException, SiteConfirmationException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
@@ -120,10 +119,11 @@ public class StockTransferServiceImpl implements StockTransferService {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else {
             List<STOStatus> statusHistory = stOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.PENDING) {
+            StockTransferStatus prevStatus = statusHistory.get(statusHistory.size() - 1).getStatus();
+            if (prevStatus != StockTransferStatus.PENDINGALL || prevStatus != StockTransferStatus.PENDINGONE) {
                 throw new StockTransferException(
                         "Stock Transfer Order has already been confirmed and cannot be rejected.");
-            } 
+            }
 
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
             stOrder.setStatusHistory(statusHistory);
@@ -132,27 +132,32 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public StockTransferOrder confirmStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder confirmStockTransferOrder(Long id, Long siteId)
+            throws SiteConfirmationException, StockTransferException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
+        List<STOStatus> statusHistory = stOrder.getStatusHistory();
+        StockTransferStatus prevStatus = statusHistory.get(statusHistory.size() - 1).getStatus();
+
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
+        } else if (prevStatus != StockTransferStatus.PENDINGALL || prevStatus != StockTransferStatus.PENDINGONE) {
+            throw new StockTransferException(
+                    "Stock Transfer Order is not pending for approval.");
+        } else if (prevStatus == StockTransferStatus.PENDINGALL) {
+            statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDINGONE));
+            stOrder.setStatusHistory(statusHistory);
         } else {
-            List<STOStatus> statusHistory = stOrder.getStatusHistory();
-            if (statusHistory.get(statusHistory.size() - 1).getStatus() != StockTransferStatus.PENDING) {
-                throw new StockTransferException(
-                        "Stock Transfer Order is not pending for approval.");
-            }
-
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CONFIRMED));
             stOrder.setStatusHistory(statusHistory);
-            return em.merge(stOrder);
         }
+        return em.merge(stOrder);
     }
 
     @Override
-    public StockTransferOrder fulfilStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder fulfilStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
+            throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null) {
@@ -174,7 +179,8 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public StockTransferOrder deliverStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder deliverStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
+            throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null) {
@@ -196,7 +202,8 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public StockTransferOrder completeStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws StockTransferException, SiteConfirmationException {
+    public StockTransferOrder completeStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
+            throws StockTransferException, SiteConfirmationException {
         // StockTransferOrder stockTransferOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 

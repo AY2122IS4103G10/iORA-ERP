@@ -15,7 +15,7 @@ import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
-import com.iora.erp.model.Currency;
+import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -24,6 +24,7 @@ import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.RefundLI;
+import com.iora.erp.model.product.ProductItem;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -117,7 +118,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
-        // updateMembershipPoints(customerOrder);
+        customerOrder.setPaid(false);
         em.persist(customerOrder);
         return customerOrder;
     }
@@ -127,10 +128,26 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         CustomerOrder old = getCustomerOrder(customerOrder.getId());
         old.setDateTime(customerOrder.getDateTime());
         old.setLineItems(customerOrder.getLineItems());
-        old.setPayments(customerOrder.getPayments());
-        old.setExhcangedLIs(customerOrder.getExhcangedLIs());
+        old.setExchangedLIs(customerOrder.getExchangedLIs());
         old.setRefundedLIs(customerOrder.getRefundedLIs());
         return em.merge(old);
+    }
+
+    @Override
+    public CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder, List<Payment> payments)
+            throws CustomerOrderException, InsufficientPaymentException {
+        CustomerOrder old = getCustomerOrder(customerOrder.getId());
+        if (payments.stream().mapToDouble(x -> x.getAmount()).sum() < old.getTotalAmount()) {
+            throw new InsufficientPaymentException("Insufficient Payment");
+        }
+        old.setPaid(true);
+        old.setPayments(payments);
+        try {
+            updateMembershipPoints(old);
+        } catch (CustomerException e) {
+            old.setCustomerId(null);
+        }
+        return em.merge(customerOrder);
     }
 
     @Override
@@ -160,6 +177,22 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         CustomerOrderLI old = getCustomerOrderLI(customerOrderLI.getId());
         old.setProductItems(customerOrderLI.getProductItems());
         return em.merge(old);
+    }
+
+    @Override
+    public List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfid) {
+        // Get Product Item
+        ProductItem item = em.find(ProductItem.class, rfid);
+        if (item == null) {
+            return lineItems;
+        }
+        // Check if Item is already inside
+        if (lineItems.stream().flatMap(x -> x.getProductItems().stream())
+                .anyMatch(x -> x.getRfid().equals(item.getRfid()))) {
+            return lineItems;
+        }
+        // TODO: Update Customer Order Line Items (includes promotion line items)
+        return lineItems;
     }
 
     @Override
@@ -257,12 +290,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     // Helper methods
 
-    // do this: implement updated method upon payment, and update after currency
     // amount added to payments
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
-        Currency currency = em.find(Currency.class, "SGD");
         Double spending = em
                 .createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
                         Payment.class)
@@ -277,7 +308,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 .getResultList();
         MembershipTier membershipTier = tiers.get(0);
         for (MembershipTier tier : tiers) {
-            if (spending > tier.getThreshold().get(currency)) {
+            if (spending > tier.getMinSpend()) {
                 membershipTier = tier;
             }
         }
@@ -304,12 +335,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             }
         }
         Integer membershipPoints = customer.getMembershipPoints();
-        for (Payment p : order.getPayments()) {
-            membershipPoints = Integer.sum(membershipPoints,
-                    (int) (p.getAmount() * bdayMultiplier * membershipTier.getMultiplier()));
-        }
+        membershipPoints = Integer.sum(membershipPoints,
+                (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier()));
         customer.setMembershipPoints(membershipPoints);
-
     }
 
 }

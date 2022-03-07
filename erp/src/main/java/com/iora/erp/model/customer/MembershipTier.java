@@ -1,36 +1,33 @@
 package com.iora.erp.model.customer;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.ElementCollection;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.iora.erp.model.Currency;
-import com.iora.erp.model.CurrencyDeserializer;
 
 @Entity
 public class MembershipTier {
     @Id
     private String name;
+    @Column(nullable = false)
     private double multiplier;
-    @ElementCollection
-    @JsonDeserialize(keyUsing = CurrencyDeserializer.class)
-    private Map<Currency, Integer> threshold;
+    @ManyToOne
+    private Currency currency;
+    @Column(nullable = false)
+    private double minSpend;
     @ManyToOne
     private BirthdayPoints birthday;
 
     public MembershipTier() {
-        threshold = new HashMap<>();
     }
 
-    public MembershipTier(String name, double multiplier, Map<Currency, Integer> threshold, BirthdayPoints birthday) {
-        this.name = name.toUpperCase();
+    public MembershipTier(String name, double multiplier, Currency currency, double minSpend, BirthdayPoints birthday) {
+        this.name = name;
         this.multiplier = multiplier;
-        this.threshold = threshold;
+        this.currency = currency;
+        this.minSpend = minSpend;
         this.birthday = birthday;
     }
 
@@ -39,7 +36,7 @@ public class MembershipTier {
     }
 
     public void setName(String name) {
-        this.name = name.toUpperCase();
+        this.name = name;
     }
 
     public double getMultiplier() {
@@ -50,12 +47,20 @@ public class MembershipTier {
         this.multiplier = multiplier;
     }
 
-    public Map<Currency, Integer> getThreshold() {
-        return this.threshold;
+    public Currency getCurrency() {
+        return this.currency;
     }
 
-    public void setThreshold(Map<Currency, Integer> threshold) {
-        this.threshold = threshold;
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public double getMinSpend() {
+        return this.minSpend;
+    }
+
+    public void setMinSpend(double minSpend) {
+        this.minSpend = minSpend;
     }
 
     public BirthdayPoints getBirthday() {
@@ -65,4 +70,5 @@ public class MembershipTier {
     public void setBirthday(BirthdayPoints birthday) {
         this.birthday = birthday;
     }
+    
 }

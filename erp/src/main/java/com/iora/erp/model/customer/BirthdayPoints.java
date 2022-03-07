@@ -1,10 +1,9 @@
 package com.iora.erp.model.customer;
 
-import java.util.Map;
-
-import javax.persistence.ElementCollection;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 import com.iora.erp.model.Currency;
 
@@ -12,17 +11,23 @@ import com.iora.erp.model.Currency;
 public class BirthdayPoints {
     @Id
     private String name;
-    @ElementCollection
-    private Map<Currency,Integer> birthday;
+    @OneToOne
+    private Currency currency;
+    @Column(nullable = false)
+    private double birthdaySpend;
+    @Column(nullable = false)
     private int quota;
+    @Column(nullable = false)
     private double multiplier;
 
     public BirthdayPoints() {
     }
 
-    public BirthdayPoints(String name, Map<Currency,Integer> birthday, int quota, double multiplier) {
+    public BirthdayPoints(String name, Currency currency, double birthdaySpend, int quota, double multiplier) {
         this.name = name;
-        this.birthday = birthday;
+        this.currency = currency;
+        this.birthdaySpend = birthdaySpend;
+        this.quota = quota;
         this.multiplier = multiplier;
     }
 
@@ -34,20 +39,28 @@ public class BirthdayPoints {
         this.name = name;
     }
 
-    public Map<Currency,Integer> getBirthday() {
-        return this.birthday;
-    }
-
-    public void setBirthday(Map<Currency,Integer> birthday) {
-        this.birthday = birthday;
-    }
-
     public int getQuota() {
         return this.quota;
     }
 
     public void setQuota(int quota) {
         this.quota = quota;
+    }
+
+    public Currency getCurrency() {
+        return this.currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public double getBirthdaySpend() {
+        return this.birthdaySpend;
+    }
+
+    public void setBirthdaySpend(double birthdaySpend) {
+        this.birthdaySpend = birthdaySpend;
     }
 
     public double getMultiplier() {

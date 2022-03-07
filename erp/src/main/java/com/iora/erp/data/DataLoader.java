@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -24,6 +23,7 @@ import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
@@ -401,19 +401,18 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(m1);
 
 		// Adding birthday points and membership tiers
-		Currency rm = new Currency("RM", "Malaysian Ringgit");
-		Currency sgd = new Currency("SGD", "Singapore Dollar");
+		Currency rm = new Currency("RM", "Malaysian Ringgit", Country.Malaysia);
+		Currency sgd = new Currency("SGD", "Singapore Dollar", Country.Singapore);
 		em.persist(rm);
 		em.persist(sgd);
 
-		Map<Currency, Integer> birthday = Map.of(rm, 500, sgd, 200);
-		BirthdayPoints bday = new BirthdayPoints("STANDARD", birthday, 1, 2.00);
+		BirthdayPoints bday = new BirthdayPoints("STANDARD", sgd, 200, 1, 2.00);
 		em.persist(bday);
 
-		MembershipTier basic = new MembershipTier("BASIC", 0.00, Map.of(rm, 0, sgd, 0), bday);
-		MembershipTier silver = new MembershipTier("SILVER", 0.03, Map.of(rm, 500, sgd, 200), bday);
-		MembershipTier gold = new MembershipTier("GOLD", 0.05, Map.of(rm, 3000, sgd, 1000), bday);
-		MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, Map.of(rm, 7500, sgd, 2500), bday);
+		MembershipTier basic = new MembershipTier("BASIC", 0.00, sgd, 0, bday);
+		MembershipTier silver = new MembershipTier("SILVER", 0.03, sgd, 200, bday);
+		MembershipTier gold = new MembershipTier("GOLD", 0.05, sgd, 1000, bday);
+		MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, sgd, 2500, bday);
 		em.persist(basic);
 		em.persist(silver);
 		em.persist(gold);
@@ -477,6 +476,10 @@ public class DataLoader implements CommandLineRunner {
 
 		// emailService.sendSimpleMessage("pengyu_33@msn.com", "testing testing", "this is sent by Spring Boot Framework :D");
 
+		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5), false, false, true);
+		PromotionField pf2 = new PromotionField("category", "2 FOR S$ 49", 2, List.of(0.00, 0.00), List.of(24.5, 24.5), false, false, true);
+		em.persist(pf1);
+		em.persist(pf2);
 	}
 
 }

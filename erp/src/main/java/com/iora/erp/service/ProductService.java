@@ -26,12 +26,11 @@ public interface ProductService {
     public abstract ProductField createProductField(String name, String value);
     public abstract List<ProductField> getAllProductFields();
     
-    public abstract PromotionField getPromoField(String fieldName, String fieldValue, double discountedPrice) throws ProductFieldException;
+    public abstract PromotionField getPromoField(String fieldName, String fieldValue) throws ProductFieldException;
     public abstract PromotionField getPromoFieldOfModel(Model model) throws ProductFieldException;
     public abstract PromotionField createPromoField(PromotionField promotionField) throws ProductFieldException;
-    public abstract PromotionField createPromoField(String fieldName, String fieldValue, double price);
     public abstract PromotionField updatePromoField(PromotionField promotionField) throws ProductFieldException;
-    public abstract Model addPromoCategory(String modelCode, String category, double discountedPrice) throws ModelException;
+    // public abstract Model addPromoCategory(String modelCode, String category, double discountedPrice) throws ModelException;
 
     public abstract Model createModel(Model model) throws ModelException;
     public abstract Model getModel(String modelCode) throws ModelException;

@@ -304,18 +304,18 @@ public class SAMController {
         }
     }
 
-    // Links a PromotionField to Model.
-    // A new PromotionField will be created if it does not exist.
-    @PutMapping(path = "/promo/add/{modelCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addPromoCategory(@PathVariable String modelCode,
-            @RequestBody Map<String, String> body) {
-        try {
-            return ResponseEntity.ok(productService.addPromoCategory(modelCode, body.get("category"),
-                    Double.parseDouble(body.get("discountedPrice"))));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
+    // // Links a PromotionField to Model.
+    // // A new PromotionField will be created if it does not exist.
+    // @PutMapping(path = "/promo/add/{modelCode}", consumes = "application/json", produces = "application/json")
+    // public ResponseEntity<Object> addPromoCategory(@PathVariable String modelCode,
+    //         @RequestBody Map<String, String> body) {
+    //     try {
+    //         return ResponseEntity.ok(productService.addPromoCategory(modelCode, body.get("category"),
+    //                 Double.parseDouble(body.get("discountedPrice"))));
+    //     } catch (Exception ex) {
+    //         return ResponseEntity.badRequest().body(ex.getMessage());
+    //     }
+    // }
 
     @GetMapping(path = "/voucher/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> getVoucher(@PathVariable String voucherCode) {
@@ -509,6 +509,25 @@ public class SAMController {
     public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {
         try {
             return ResponseEntity.ok(customerService.createMembershipTier(tier));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/membershipTier/edit", consumes = "application/json")
+    public ResponseEntity<Object> editMembershipTier(@RequestBody MembershipTier tier) {
+        try {
+            return ResponseEntity.ok(customerService.createMembershipTier(tier));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/membershipTier/delete/{name}")
+    public ResponseEntity<Object> deleteMembershipTier(@PathVariable String name) {
+        try {
+            customerService.deleteMembershipTier(name);
+            return ResponseEntity.ok(customerService.listOfMembershipTier());
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

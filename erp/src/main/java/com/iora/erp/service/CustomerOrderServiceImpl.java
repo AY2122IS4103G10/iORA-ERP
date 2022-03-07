@@ -4,9 +4,18 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -23,8 +32,12 @@ import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
+import com.iora.erp.model.customerOrder.PromotionLI;
 import com.iora.erp.model.customerOrder.RefundLI;
+import com.iora.erp.model.product.Model;
+import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.PromotionField;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -180,19 +193,146 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfid) {
+    public List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfid) {
         // Get Product Item
         ProductItem item = em.find(ProductItem.class, rfid);
         if (item == null) {
-            return lineItems;
+            return List.of(lineItems, new ArrayList<>());
         }
         // Check if Item is already inside
         if (lineItems.stream().flatMap(x -> x.getProductItems().stream())
                 .anyMatch(x -> x.getRfid().equals(item.getRfid()))) {
-            return lineItems;
+            return List.of(lineItems, new ArrayList<>());
         }
-        // TODO: Update Customer Order Line Items (includes promotion line items)
-        return lineItems;
+
+        // Add ProductItem to Line Items and Get Set of Promotions
+        Model mdl = em.find(Model.class, item.getProductSKU().split("-")[0]);
+        boolean added = false;
+        for (int i = 0; i < lineItems.size(); i++) {
+            if (lineItems.get(i).getProductItems().get(0).getProductSKU().equals(item.getProductSKU())) {
+                lineItems.get(i).addProductItem(item);
+                lineItems.get(i).setSubTotal(lineItems.get(i).getSubTotal() + mdl.getDiscountPrice());
+                added = true;
+            }
+        }
+        if (!added) {
+            CustomerOrderLI li = new CustomerOrderLI();
+            li.setProductItems(List.of(item));
+            li.setSubTotal(mdl.getDiscountPrice());
+            lineItems.add(li);
+        }
+
+        List<Model> models = lineItems.stream().parallel()
+                .map(x -> x.getProductItems().get(0).getProductSKU().split("-")[0])
+                .map(x -> em.find(Model.class, x))
+                .collect(Collectors.toList());
+        List<ProductItem> items = lineItems.stream().parallel().flatMap(x -> x.getProductItems().stream())
+                .collect(Collectors.toList());
+        Set<PromotionField> promotions = new HashSet<>();
+        for (Model m : models) {
+            for (ProductField pf : m.getProductFields()) {
+                if (pf instanceof PromotionField) {
+                    promotions.add((PromotionField) pf);
+                }
+            }
+        }
+        Map<PromotionField, List<Model>> promotionsMap = new HashMap<>();
+        promotions.forEach(x -> promotionsMap.put(x, new ArrayList<Model>()));
+        models.forEach(m -> m.getProductFields().stream().parallel().filter(x -> (x instanceof PromotionField))
+                .map(x -> (PromotionField) x).forEach(x -> promotionsMap.get(x).add(m)));
+
+        List<CustomerOrderLI> newLineItems = new ArrayList<>(lineItems);
+        List<CustomerOrderLI> promotionLIs = new ArrayList<>();
+
+        // Useful Maps
+        Map<ProductItem, Model> modelMap = new HashMap<>();
+        Map<ProductItem, Double> prices = new HashMap<>();
+        items.forEach(new Consumer<ProductItem>() {
+            public void accept(ProductItem p) {
+                Model m = models.stream().filter(mod -> mod.getModelCode().equals(p.getProductSKU().split("-")[0]))
+                        .findFirst()
+                        .get();
+                modelMap.put(p, m);
+                prices.put(p, m.getDiscountPrice());
+            }
+        });
+
+        // Find best promotions of quota 1
+        Map<ProductItem, PromotionLI> bestOnes = new HashMap<>();
+        for (Map.Entry<PromotionField, List<Model>> entry : promotionsMap.entrySet()) {
+            PromotionField pf = entry.getKey();
+            if (pf.getQuota() != 1) {
+                continue;
+            }
+            for (ProductItem p : items) {
+                Model m = modelMap.get(p);
+                Double newPrice = pf.getCoefficients().get(0) * m.getDiscountPrice() + pf.getConstants().get(0);
+                Double discount = m.getDiscountPrice() - newPrice;
+                if (!bestOnes.containsKey(p) || bestOnes.get(p).getSubTotal() > discount) {
+                    PromotionLI pli = new PromotionLI(pf);
+                    pli.setProductItems(List.of(p));
+                    pli.setSubTotal(discount);
+                    bestOnes.put(p, pli);
+                    promotionLIs.add(pli);
+                    prices.put(p, newPrice);
+                }
+            }
+        }
+
+        items.sort(new Comparator<ProductItem>() {
+            public int compare(ProductItem p1, ProductItem p2) {
+                double price1 = prices.get(p1);
+                double price2 = prices.get(p2);
+                return price2 > price1 ? -1 : 1;
+            }
+        });
+
+        // Find best promotions with quota > 1
+        for (Map.Entry<PromotionField, List<Model>> entry : promotionsMap.entrySet()) {
+            PromotionField pf = entry.getKey();
+            if (pf.getQuota() <= 1) {
+                continue;
+            }
+            List<Model> promotionModels = entry.getValue();
+            promotionModels.sort((x, y) -> (int) (100 * (y.getDiscountPrice() - x.getDiscountPrice())));
+
+            // Sort Product Item by Curr Price
+            List<ProductItem> applicableItems = items.stream().filter(p -> promotionModels.contains(modelMap.get(p)))
+                    .collect(Collectors.toList());
+
+            int pointer = 0;
+            while (applicableItems.size() >= pointer + pf.getQuota()) {
+                double origPrices = 0;
+                double currPrices = 0;
+                double newPrices = 0;
+                List<ProductItem> usedOn = new ArrayList<>();
+                for (int j = 0; j < pf.getQuota(); j++) {
+                    ProductItem p = applicableItems.get(pointer + j);
+                    Model m = modelMap.get(p);
+                    origPrices += m.getDiscountPrice();
+                    currPrices += prices.get(p);
+                    newPrices += pf.getCoefficients().get(0) * m.getDiscountPrice() + pf.getConstants().get(0);
+                    usedOn.add(p);
+                }
+                if (newPrices < currPrices) {
+                    PromotionLI pli = new PromotionLI(pf);
+                    pli.setProductItems(usedOn);
+                    pli.setSubTotal(newPrices - origPrices);
+                    for (int j = 0; j < pf.getQuota(); j++) {
+                        ProductItem p = applicableItems.get(pointer + j);
+                        promotionLIs.remove(bestOnes.get(p));
+                        bestOnes.put(p, pli);
+                    }
+                    promotionLIs.add(pli);
+                    pointer += pf.getQuota();
+                } else {
+                    pointer++;
+                }
+            }
+
+        }
+
+        return List.of(newLineItems, promotionLIs);
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
@@ -92,12 +93,13 @@ public class StoreController {
     }
 
     @PostMapping(path = "/editStock/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> editStock(@RequestBody Map<String,Long> toUpdate, @PathVariable Long siteId) {
+    public ResponseEntity<Object> editStock(@RequestBody Map<String, Long> toUpdate, @PathVariable Long siteId) {
         List<String> errors = new ArrayList<>();
-        for (Map.Entry<String,Long> entry : toUpdate.entrySet()) {
+        for (Map.Entry<String, Long> entry : toUpdate.entrySet()) {
             try {
                 if (entry.getValue().equals(0L)) {
-                    siteService.removeProductItemFromSite(entry.getKey());;
+                    siteService.removeProductItemFromSite(entry.getKey());
+                    ;
                 } else {
                     siteService.addProductItemToSite(entry.getValue(), entry.getKey());
                 }
@@ -232,7 +234,8 @@ public class StoreController {
     }
 
     @PutMapping(path = "/stockTransfer/complete/{siteId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> completeStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder, @PathVariable Long siteId) {
+    public ResponseEntity<Object> completeStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
+            @PathVariable Long siteId) {
         try {
             return ResponseEntity
                     .ok(stockTransferService.completeStockTransferOrder(stockTransferOrder, siteId));
@@ -267,7 +270,18 @@ public class StoreController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-    
+
+    @PostMapping(path = "/customerOrder/add/{rfid}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addItemToLineItems(@RequestBody List<CustomerOrderLI> lineItems,
+            @PathVariable String rfid) {
+        try {
+            return ResponseEntity.ok(customerOrderService.addToCustomerOrderLIs(lineItems, rfid));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/productDetails/{rfid}", produces = "application/json")
     public ResponseEntity<Object> getProductDetails(@PathVariable String rfid) {
         try {

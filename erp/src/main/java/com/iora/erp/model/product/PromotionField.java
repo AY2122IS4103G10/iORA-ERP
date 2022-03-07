@@ -1,6 +1,7 @@
 package com.iora.erp.model.product;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -89,4 +90,16 @@ public class PromotionField extends ProductField {
     public void setAvailable(boolean available) {
         this.available = available;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof PromotionField)) {
+            return false;
+        }
+        PromotionField promotionField = (PromotionField) o;
+        return quota == promotionField.quota && Objects.equals(this.getFieldValue(), promotionField.getFieldValue());
+    }
+
 }

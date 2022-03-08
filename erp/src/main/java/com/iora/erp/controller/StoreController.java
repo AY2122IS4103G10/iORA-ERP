@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
+import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerOrderService;
@@ -88,20 +90,34 @@ public class StoreController {
     }
 
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
+    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
 
     @PostMapping(path = "/editStock/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> editStock(@RequestBody Map<String, Long> toUpdate, @PathVariable Long siteId) {
+    public ResponseEntity<Object> editStock(@RequestBody List<Map<String, Long>> toUpdate, @PathVariable Long siteId) {
         List<String> errors = new ArrayList<>();
-        for (Map.Entry<String, Long> entry : toUpdate.entrySet()) {
+
+        for (Map.Entry<String, Long> entry : toUpdate.get(0).entrySet()) {
             try {
-                if (entry.getValue().equals(0L)) {
-                    siteService.removeProductItemFromSite(entry.getKey());
-                    ;
+                Product p = productService.getProduct(entry.getKey());
+                if (entry.getValue() < 0) {
+                    siteService.removeProducts(entry.getValue(), p.getSku(), entry.getValue());
                 } else {
-                    siteService.addProductItemToSite(entry.getValue(), entry.getKey());
+                    siteService.addProducts(entry.getValue(), p.getSku(), entry.getValue());
+                }
+            } catch (Exception ex) {
+                errors.add(ex.getMessage());
+            }
+        }
+
+        for (Map.Entry<String, Long> entry : toUpdate.get(1).entrySet()) {
+            try {
+                ProductItem pi = productService.getProductItem(entry.getKey());
+                if (entry.getValue().equals(0L)) {
+                    siteService.removeProductsWithRfid(entry.getValue(), pi.getProduct().getSku(), List.of(pi));
+                } else {
+                    siteService.addProductsWithRfid(entry.getValue(), pi.getProduct().getSku(), List.of(pi));
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());
@@ -112,29 +128,6 @@ public class StoreController {
             return ResponseEntity.ok(viewStock(siteId));
         } else {
             System.err.println(errors);
-            return ResponseEntity.badRequest().body(String.join("\n", errors));
-        }
-    }
-
-    @PostMapping(path = "/editStockList/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> editStockList(@RequestBody List<ProductItem> toUpdate, @PathVariable Long siteId) {
-        List<String> errors = new ArrayList<>();
-        for (ProductItem item : toUpdate) {
-            try {
-                if (item.getStockLevel() == null) {
-                    siteService.removeProductItemFromSite(item.getRfid());
-                } else {
-                    siteService.addToStockLevel(item.getStockLevel(), item);
-                }
-            } catch (Exception ex) {
-                errors.add(ex.getMessage());
-            }
-        }
-
-        if (errors.isEmpty()) {
-            return ResponseEntity.ok(viewStock(siteId));
-        } else {
-            System.out.println("Error" + String.join("\n", errors));
             return ResponseEntity.badRequest().body(String.join("\n", errors));
         }
     }

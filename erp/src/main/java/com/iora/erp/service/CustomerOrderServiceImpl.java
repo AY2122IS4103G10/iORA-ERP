@@ -425,7 +425,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException {
         RefundLI old = getRefundLI(refundLI.getId());
-        old.setRefundedItem(refundLI.getRefundedItem());
+        old.setProduct(refundLI.getProduct());
         return em.merge(old);
     }
 

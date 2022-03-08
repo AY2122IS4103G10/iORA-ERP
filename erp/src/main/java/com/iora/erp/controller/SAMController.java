@@ -16,6 +16,7 @@ import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
+import com.iora.erp.model.site.StockLevelLI;
 // import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
@@ -426,7 +427,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
+    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
 

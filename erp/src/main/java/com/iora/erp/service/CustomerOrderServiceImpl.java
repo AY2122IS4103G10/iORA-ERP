@@ -34,6 +34,7 @@ import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.PromotionLI;
 import com.iora.erp.model.customerOrder.RefundLI;
 import com.iora.erp.model.product.Model;
+import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
@@ -187,20 +188,28 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException {
         CustomerOrderLI old = getCustomerOrderLI(customerOrderLI.getId());
-        old.setProductItems(customerOrderLI.getProductItems());
+        old.setProduct(customerOrderLI.getProduct());
+        old.setQty(customerOrderLI.getQty());
+        old.setSubTotal(customerOrderLI.getSubTotal());
         return em.merge(old);
     }
 
+    /* Need Hong Pei huge brains to do this
     @Override
-    public List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfid) {
-        // Get Product Item
-        ProductItem item = em.find(ProductItem.class, rfid);
-        if (item == null) {
+    public List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidSKU) {
+        // Get Product
+        ProductItem item = em.find(ProductItem.class, rfidSKU);
+        Product product = em.find(Product.class, rfidSKU);
+
+        if (item == null && product == null) {
             return List.of(lineItems, new ArrayList<>());
+        } else if (product == null) {
+            product = item.getProduct();
         }
+
         // Check if Item is already inside
-        if (lineItems.stream().flatMap(x -> x.getProductItems().stream())
-                .anyMatch(x -> x.getRfid().equals(item.getRfid()))) {
+        if (lineItems.stream().flatMap(x -> x.getProduct())
+                .anyMatch(x -> x.getProduct().equals(product))) {
             return List.of(lineItems, new ArrayList<>());
         }
 
@@ -335,6 +344,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         return List.of(newLineItems, promotionLIs);
     }
+    */
 
     @Override
     public Payment getPayment(Long id) throws CustomerOrderException {
@@ -425,7 +435,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException {
         RefundLI old = getRefundLI(refundLI.getId());
-        old.setRefundedItem(refundLI.getRefundedItem());
+        old.setProduct(refundLI.getProduct());
         return em.merge(old);
     }
 

@@ -229,9 +229,8 @@ public class StockTransferServiceImpl implements StockTransferService {
                         "Site is not responsible for receiving this order.");
             }
 
-            // This loop is for simulating that all received qty = shipped qty
+            // This loop is to simulate all received qty = shipped qty
             for (StockTransferOrderLI stoli : stockTransferOrder.getLineItems()) {
-                stoli.setActualProductItems(stoli.getSentProductItems());
                 stoli.setActualQty(stoli.getSentQty());
             }
 

@@ -435,7 +435,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
+    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
 

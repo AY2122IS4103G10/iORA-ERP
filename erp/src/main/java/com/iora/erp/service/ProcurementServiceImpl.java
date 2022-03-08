@@ -12,6 +12,7 @@ import javax.persistence.PersistenceContext;
 import com.iora.erp.enumeration.ProcurementOrderStatus;
 import com.iora.erp.exception.IllegalPOModificationException;
 import com.iora.erp.exception.IllegalTransferException;
+import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProcurementOrderException;
 import com.iora.erp.exception.ProductItemException;
 import com.iora.erp.exception.SiteConfirmationException;
@@ -196,6 +197,12 @@ public class ProcurementServiceImpl implements ProcurementService {
                     System.err.println(e.getMessage());
                 }
             }
+
+            try {
+                siteService.addProducts(actionBy.getId(), poli.getProduct().getSku(), Long.valueOf(poli.getRequestedQty()));
+            } catch (NoStockLevelException e) {
+                System.err.println(e.getMessage());
+            }
         }
 
         // List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
@@ -207,7 +214,6 @@ public class ProcurementServiceImpl implements ProcurementService {
         //         System.err.println(e.getMessage());
         //     }
         // }
-        siteService.addManyToStockLevel(actionBy.getStockLevel(), allProductItems);
         procurementOrder.setHeadquarters(oldOrder.getHeadquarters());
         procurementOrder.setManufacturing(oldOrder.getManufacturing());
         procurementOrder.setWarehouse(oldOrder.getWarehouse());
@@ -235,7 +241,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
                 .flatMap(Collection::stream).collect(Collectors.toList());
-        siteService.removeManyFromStockLevel(productItems);
+        // siteService.removeManyFromStockLevel(productItems);
         procurementOrder.setHeadquarters(oldOrder.getHeadquarters());
         procurementOrder.setManufacturing(oldOrder.getManufacturing());
         procurementOrder.setWarehouse(oldOrder.getWarehouse());
@@ -263,7 +269,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
                 .flatMap(Collection::stream).collect(Collectors.toList());
-        siteService.addManyToStockLevel(actionBy.getStockLevel(), productItems);
+        // siteService.addManyToStockLevel(actionBy.getStockLevel(), productItems);
         procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.VERIFIED));
 

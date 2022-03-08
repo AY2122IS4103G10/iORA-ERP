@@ -1,15 +1,19 @@
 package com.iora.erp.model.product;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.iora.erp.model.site.StockLevel;
+import com.iora.erp.model.site.StockLevelLI;
 
 @Entity
 public class Product {
@@ -21,8 +25,8 @@ public class Product {
     private Set<ProductField> productFields;
 
     @JsonBackReference
-    @ManyToOne
-    private StockLevel stockLevel;
+    @OneToMany(mappedBy = "product")
+    private List<StockLevelLI> stockLevels;
 
     public Product() {
     }
@@ -30,6 +34,7 @@ public class Product {
     public Product(String sku) {
         this.sku = sku;
         this.productFields = new HashSet<>();
+        this.stockLevels = new ArrayList<>();
     }
 
     public String getSku() {
@@ -52,28 +57,22 @@ public class Product {
         this.productFields.add(productField);
     }
 
-    public StockLevel getStockLevel() {
-        return this.stockLevel;
+    public List<StockLevelLI> getStockLevels() {
+        return this.stockLevels;
     }
 
-    public void setStockLevel(StockLevel stockLevel) {
-        this.stockLevel = stockLevel;
+    public void setStockLevels(List<StockLevelLI> stockLevels) {
+        this.stockLevels = stockLevels;
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (object == this) {
+    public boolean equals(Object o) {
+        if (o == this)
             return true;
-        }
-        if (!(object instanceof Product)) {
+        if (!(o instanceof Product)) {
             return false;
         }
-        Product other = (Product) object;
-        return this.sku == other.sku;
-    }
-
-    @Override
-    public String toString() {
-        return "entity.Field[ sku=" + sku + " ]";
+        Product product = (Product) o;
+        return Objects.equals(sku, product.sku);
     }
 }

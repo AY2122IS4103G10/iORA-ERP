@@ -21,8 +21,6 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.InsufficientPaymentException;
-import com.iora.erp.exception.ProductException;
-import com.iora.erp.exception.ProductItemException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -45,8 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("customerOrderServiceImpl")
 @Transactional
 public class CustomerOrderServiceImpl implements CustomerOrderService {
-    @Autowired
-    ProductService productService;
     @Autowired
     CustomerService customerService;
     @PersistenceContext
@@ -504,16 +500,13 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException {
-        Product product;
-        try {
-            product = productService.getProduct(rfidsku);
-        } catch (ProductException e) {
-            try {
-                ProductItem productItem = productService.getProductItem(rfidsku);
-                product = productItem.getProduct();
-            } catch (ProductItemException e1) {
-                throw new CustomerOrderException("Item scanned cannot be found.");
-            }
+        Product product = em.find(Product.class, rfidsku);
+        ProductItem productItem = em.find(ProductItem.class, rfidsku);
+
+        if (product == null && productItem == null) {
+            throw new CustomerOrderException("Item scanned cannot be found.");
+        } else if (product == null) {
+            product = productItem.getProduct();
         }
 
         List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();

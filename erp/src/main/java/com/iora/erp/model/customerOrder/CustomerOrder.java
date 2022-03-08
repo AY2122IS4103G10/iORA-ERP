@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -33,7 +34,7 @@ public class CustomerOrder {
 
     @OneToMany
     private List<CustomerOrderLI> lineItems;
-
+    @ElementCollection
     private List<CustomerOrderLI> packedLineItems;
 
     @OneToMany
@@ -52,6 +53,7 @@ public class CustomerOrder {
     public CustomerOrder() {
         dateTime = LocalDateTime.now();
         this.lineItems = new ArrayList<>();
+        this.packedLineItems = new ArrayList<>();
         this.payments = new ArrayList<>();
         this.refundedLIs = new ArrayList<>();
         this.exchangedLIs = new ArrayList<>();

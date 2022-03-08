@@ -1,6 +1,5 @@
 package com.iora.erp.data;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,7 +30,6 @@ import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
-import com.iora.erp.service.EmployeeService;
 import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +45,6 @@ public class DataLoader implements CommandLineRunner {
 	private CustomerService customerService;
 	@Autowired
 	private AdminService adminService;
-	@Autowired
-	private EmployeeService employeeService;
 	@PersistenceContext
 	private EntityManager em;
 

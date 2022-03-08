@@ -15,6 +15,7 @@ import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevelLI;
+import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;

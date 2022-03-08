@@ -33,7 +33,7 @@ public class OnlineOrder extends CustomerOrder {
 
     public OnlineOrder() {
         super();
-        this.status = OnlineOrderStatus.PENDING;
+        this.status = OnlineOrderStatus.CONFIRMED;
     }
 
     public OnlineOrder(boolean delivery, Country country) {

@@ -1,11 +1,14 @@
 package com.iora.erp.enumeration;
 
 public enum OnlineOrderStatus implements StatusEnum {
-    PENDING("Order has been received. We are preparing your order."),
-    SHIPPING_TO_WAREHOUSE("Order is on its way to our warehouse."),
-    READY_FOR_DELIVERY("Order is ready and will be out for delivery on the next available slot."),
-    OUT_FOR_DELIVERY("Order is on its way to you."),
-    READY_FOR_COLLECTION("Order is ready for collection at your designated outlet."),
+    CONFIRMED("Order has been confirmed and will be prepared soon."),
+    PICKING("Items are being picked by warehouse staff."),
+    PICKED("Items are picked and is ready to be packed"),
+    PACKING("Items are being packed by warehouse staff."),
+    PACKED("Items are packed and is ready to be processed."),
+    READY("Order is ready and will be out for delivery on the next available slot."),
+    DELIVERING("Order is on its way to its destination."),
+    READY_FOR_COLLECTION("Order is ready for collection at the designated outlet."),
     COLLECTED("Order has been collected."),
     DELIVERED("Order has been delivered."),
     CANCELLED("Order has been cancelled.");

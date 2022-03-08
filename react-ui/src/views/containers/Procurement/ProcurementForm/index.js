@@ -296,22 +296,6 @@ const ProcurementFormBody = ({
                 />
               )}
             </div>
-
-            {/* <div className="pt-8">
-              <div className="md:flex md:items-center md:justify-between">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Stores
-                </h3>
-                <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-                  <button
-                    type="button"
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                  >
-                    Add store
-                  </button>
-                </div>
-              </div>
-            </div> */}
           </div>
 
           <div className="pt-5">
@@ -415,9 +399,7 @@ export const ProcurementForm = () => {
     );
     closeModal();
   };
-  const openModal = () => setOpenProducts(true);
-  const closeModal = () => setOpenProducts(false);
-
+  
   const canAdd = [hqSelected, manufacturingSelected, warehouseSelected, lineItems.length].every(
     Boolean
   );
@@ -509,6 +491,11 @@ export const ProcurementForm = () => {
       });
   }, [orderId]);
 
+  const openModal = () => setOpenProducts(true);
+  const closeModal = () => setOpenProducts(false);
+  // const openInvoiceModal = () => setOpenInvoice(true)
+  // const closeInvoiceModal = () => setOpenInvoice(false)
+  
   return (
     <>
       <ProcurementFormBody

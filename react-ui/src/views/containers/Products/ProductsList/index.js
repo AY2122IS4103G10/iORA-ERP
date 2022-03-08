@@ -54,7 +54,7 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       },
       {
         Header: "List Price",
-        accessor: "price",
+        accessor: "listPrice",
         width: 120,
         Cell: (e) => `$${e.value}`,
       },

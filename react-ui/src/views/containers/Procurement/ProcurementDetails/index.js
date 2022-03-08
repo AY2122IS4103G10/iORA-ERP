@@ -1,8 +1,9 @@
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
 import { PencilIcon } from "@heroicons/react/solid";
-import { TrashIcon } from "@heroicons/react/outline";
+import {  PrinterIcon, TrashIcon, XIcon } from "@heroicons/react/outline";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useMemo, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
@@ -12,6 +13,10 @@ import {
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 import { api, procurementApi } from "../../../../environments/Api";
+import { useRef } from "react";
+import { ProcurementInvoice } from "../ProcurementInvoice";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import Confirmation from "../../../components/Modals/Confirmation";
 
 const Header = ({
   pathname,
@@ -21,7 +26,11 @@ const Header = ({
   onAcceptClicked,
   onCancelOrderClicked,
   onShippedClicked,
-  onFulfillClicked,
+  onFulfilClicked,
+  handlePrint,
+  openInvoice,
+  setAction,
+  openConfirm,
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
@@ -30,68 +39,99 @@ const Header = ({
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${procurementId}`}</h1>
         </div>
       </div>
-      {status === "PENDING" ? (
-        pathname.includes("/sm/procurements") ? (
-          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-            <Link to={`/sm/procurements/edit/${procurementId}`}>
+      <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+        <button
+          type="button"
+          className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+          onClick={openInvoice}
+        >
+          <span>View Invoice</span>
+        </button>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+          onClick={handlePrint}
+        >
+          <PrinterIcon
+            className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+            aria-hidden="true"
+          />
+          <span>Print</span>
+        </button>
+        {status === "PENDING" ? (
+          pathname.includes("/sm/procurements") ? (
+            <>
+              <Link to={`/sm/procurements/edit/${procurementId}`}>
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+                  disabled={status !== "PENDING"}
+                >
+                  <PencilIcon
+                    className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  <span>Edit</span>
+                </button>
+              </Link>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+                onClick={openModal}
+                disabled={status !== "PENDING"}
+              >
+                <TrashIcon
+                  className="-ml-1 mr-2 h-5 w-5 text-white"
+                  aria-hidden="true"
+                />
+                <span>Delete</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+                onClick={() => {
+                  setAction({ name: "Accept", action: onAcceptClicked });
+                  openConfirm();
+                }}
+                disabled={status !== "PENDING"}
+              >
+                <span>Accept order</span>
+              </button>
               <button
                 type="button"
                 className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+                onClick={() => {
+                  setAction({
+                    name: "Cancel",
+                    action: onCancelOrderClicked,
+                  });
+                  openConfirm();
+                }}
                 disabled={status !== "PENDING"}
               >
-                <PencilIcon
-                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-                <span>Edit</span>
+                <span>Cancel order</span>
               </button>
-            </Link>
-            <button
-              type="button"
-              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
-              onClick={openModal}
-              disabled={status !== "PENDING"}
-            >
-              <TrashIcon
-                className="-ml-1 mr-2 h-5 w-5 text-white"
-                aria-hidden="true"
-              />
-              <span>Delete</span>
-            </button>
-          </div>
-        ) : (
-          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-              onClick={onAcceptClicked}
-              disabled={status !== "PENDING"}
-            >
-              <span>Accept order</span>
-            </button>
-            <button
-              type="button"
-              className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-              onClick={onCancelOrderClicked}
-              disabled={status !== "PENDING"}
-            >
-              <span>Cancel order</span>
-            </button>
-          </div>
-        )
-      ) : status === "ACCEPTED" && pathname.includes("mf") ? (
-        <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+            </>
+          )
+        ) : status === "ACCEPTED" && pathname.includes("mf") ? (
           <button
             type="button"
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-            onClick={onFulfillClicked}
+            onClick={() => {
+              setAction({
+                name: "Fulfil",
+                action: onFulfilClicked,
+              });
+              openConfirm();
+            }}
             disabled={status !== "ACCEPTED"}
           >
-            <span>Fulfill order</span>
+            <span>Fulfil order</span>
           </button>
-        </div>
-      ) : status === "READY" && pathname.includes("mf") ? (
-        <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+        ) : status === "READY" && pathname.includes("mf") ? (
           <button
             type="button"
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
@@ -100,10 +140,10 @@ const Header = ({
           >
             <span>Ship order</span>
           </button>
-        </div>
-      ) : (
-        <div></div>
-      )}
+        ) : (
+          <div></div>
+        )}
+      </div>
     </div>
   );
 };
@@ -232,7 +272,7 @@ const ProcurementDetailsBody = ({
   warehouse,
   setLineItems,
   pathname,
-  onFulfillClicked,
+  onFulfilClicked,
   onVerifyReceivedClicked,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
@@ -255,20 +295,22 @@ const ProcurementDetailsBody = ({
                 <dd className="mt-1 text-sm text-gray-900">{status}</dd>
               </div>
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">HQ</dt>
-                <dd className="mt-1 text-sm text-gray-900">{headquarters}</dd>
-              </div>
-              <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
-                  Manufacturing
+                  Created by
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {manufacturing ? manufacturing : "-"}
+                  {headquarters.name}
                 </dd>
               </div>
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Warehouse</dt>
-                <dd className="mt-1 text-sm text-gray-900">{warehouse}</dd>
+                <dt className="text-sm font-medium text-gray-500">From</dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {manufacturing ? manufacturing.name : "-"}
+                </dd>
+              </div>
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-medium text-gray-500">To</dt>
+                <dd className="mt-1 text-sm text-gray-900">{warehouse.name}</dd>
               </div>
             </dl>
           </div>
@@ -280,7 +322,7 @@ const ProcurementDetailsBody = ({
           status={status}
           setData={setLineItems}
           pathname={pathname}
-          onFulfillClicked={onFulfillClicked}
+          onFulfilClicked={onFulfilClicked}
           onVerifyReceivedClicked={onVerifyReceivedClicked}
         />
       </section>
@@ -288,8 +330,64 @@ const ProcurementDetailsBody = ({
   </div>
 );
 
+export const InvoiceModal = ({
+  open,
+  closeModal,
+  orderId,
+  orderStatus,
+  data,
+  qrValue,
+  company,
+  headquarters,
+  manufacturing,
+  warehouse,
+  handlePrint,
+}) => {
+  return (
+    [company, headquarters, manufacturing, warehouse].every(Boolean) && (
+      <SimpleModal open={open} closeModal={closeModal}>
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+          <div className="sm:block absolute top-0 right-0 pt-4 pr-4">
+            <button
+              type="button"
+              className="mr-10 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+              onClick={handlePrint}
+            >
+              <PrinterIcon
+                className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+              <span>Print</span>
+            </button>
+            <button
+              type="button"
+              className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              onClick={closeModal}
+            >
+              <span className="sr-only">Close</span>
+              <XIcon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
+          <ProcurementInvoice
+            orderId={orderId}
+            orderStatus={orderStatus}
+            company={company}
+            headquarters={headquarters}
+            manufacturing={manufacturing}
+            warehouse={warehouse}
+            data={data}
+            qrValue={qrValue}
+          />
+        </div>
+      </SimpleModal>
+    )
+  );
+};
+
 export const ProcurementDetails = () => {
   const { addToast } = useToasts();
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({ content: () => componentRef.current });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -300,6 +398,10 @@ export const ProcurementDetails = () => {
   const [lineItems, setLineItems] = useState([]);
   const [status, setStatus] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
+  const [qrValue, setQrValue] = useState("");
+  const [open, setOpen] = useState(false);
+  const [action, setAction] = useState(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
   useEffect(() => {
     api.get("sam/procurementOrder", procurementId).then((response) => {
@@ -310,9 +412,15 @@ export const ProcurementDetails = () => {
         lineItems,
         statusHistory,
       } = response.data;
-      setHeadquarters(headquarters);
-      setManufacturing(manufacturing);
-      setWarehouse(warehouse);
+      api
+        .get("sam/viewSite", headquarters)
+        .then((response) => setHeadquarters(response.data));
+      api
+        .get("sam/viewSite", manufacturing)
+        .then((response) => setManufacturing(response.data));
+      api
+        .get("sam/viewSite", warehouse)
+        .then((response) => setWarehouse(response.data));
       setLineItems(
         lineItems.map((item) => ({
           ...item,
@@ -322,14 +430,19 @@ export const ProcurementDetails = () => {
           },
         }))
       );
-      setStatus(statusHistory[statusHistory.length - 1].status);
+      setStatus({
+        status: statusHistory[statusHistory.length - 1].status,
+        timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+      });
+      setQrValue(procurementId);
     });
   }, [procurementId]);
+
   const onDeleteSiteClicked = () => {
     dispatch(
       deleteExistingProcurement({
         orderId: procurementId,
-        siteId: headquarters,
+        siteId: headquarters.id,
       })
     )
       .unwrap()
@@ -351,16 +464,21 @@ export const ProcurementDetails = () => {
 
   const onAcceptClicked = () => {
     procurementApi
-      .acceptOrder(procurementId, manufacturing)
+      .acceptOrder(procurementId, manufacturing.id)
       .then((response) => {
         const { statusHistory } = response.data;
-        setStatus(statusHistory[statusHistory.length - 1].status);
+        setStatus({
+          status: statusHistory[statusHistory.length - 1].status,
+          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+        });
       })
       .then(() => {
         addToast("Successfully accepted procurement order", {
           appearance: "success",
           autoDismiss: true,
         });
+        closeConfirmModal();
+        openInvoice();
       })
       .catch((err) =>
         addToast(`Error: ${err.message}`, {
@@ -372,16 +490,20 @@ export const ProcurementDetails = () => {
 
   const onCancelOrderClicked = () => {
     procurementApi
-      .cancelOrder(procurementId, manufacturing)
+      .cancelOrder(procurementId, manufacturing.id)
       .then((response) => {
         const { statusHistory } = response.data;
-        setStatus(statusHistory[statusHistory.length - 1].status);
+        setStatus({
+          status: statusHistory[statusHistory.length - 1].status,
+          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+        });
       })
       .then(() => {
         addToast("Successfully cancelled procurement order", {
           appearance: "success",
           autoDismiss: true,
         });
+        closeConfirmModal();
       })
       .catch((err) =>
         addToast(`Error: ${err.message}`, {
@@ -391,24 +513,27 @@ export const ProcurementDetails = () => {
       );
   };
 
-  const onFulfillClicked = () => {
+  const onFulfilClicked = () => {
     procurementApi
-      .fulfillOrder(manufacturing, {
+      .fulfillOrder(manufacturing.id, {
         id: procurementId,
         lineItems,
       })
       .then((response) => {
         const { lineItems, statusHistory } = response.data;
-        console.log(lineItems);
         setLineItems(lineItems);
-        setStatus(statusHistory[statusHistory.length - 1].status);
+        setStatus({
+          status: statusHistory[statusHistory.length - 1].status,
+          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+        });
       })
-      .then(() =>
+      .then(() => {
         addToast("Successfully fulfilled procurement order", {
           appearance: "success",
           autoDismiss: true,
-        })
-      )
+        });
+        closeConfirmModal();
+      })
       .catch((err) =>
         addToast(`Error: ${err.message}`, {
           appearance: "error",
@@ -417,14 +542,9 @@ export const ProcurementDetails = () => {
       );
   };
 
-  const onVerifyReceivedClicked = () => {};
   const onShippedClicked = () => {
-    console.log({
-      id: procurementId,
-      lineItems,
-    });
     procurementApi
-      .shipOrder(manufacturing, {
+      .shipOrder(manufacturing.id, {
         id: procurementId,
         lineItems,
       })
@@ -438,17 +558,27 @@ export const ProcurementDetails = () => {
         //   ...item,
         //   actualQuantity: fulfilledProductItems.length,
         // }))
-        setStatus(statusHistory[statusHistory.length - 1].status);
+        setStatus({
+          status: statusHistory[statusHistory.length - 1].status,
+          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+        });
       })
       .catch((error) =>
         console.error("Failed to ship procurement: ", error.message)
       );
   };
+
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 
+  const openInvoice = () => setOpen(true);
+  const closeInvoice = () => setOpen(false);
+
+  const openConfirmModal = () => setOpenConfirm(true);
+  const closeConfirmModal = () => setOpenConfirm(false);
+
   return (
-    Boolean(procurementId) && (
+    [procurementId, headquarters, manufacturing, warehouse].every(Boolean) && (
       <>
         <div className="py-8 xl:py-10">
           <NavigatePrev
@@ -464,24 +594,27 @@ export const ProcurementDetails = () => {
           <Header
             pathname={pathname}
             procurementId={procurementId}
-            status={status}
+            status={status.status}
             openModal={openModal}
             onAcceptClicked={onAcceptClicked}
             onCancelOrderClicked={onCancelOrderClicked}
             onShippedClicked={onShippedClicked}
-            onFulfillClicked={onFulfillClicked}
+            onFulfilClicked={onFulfilClicked}
+            handlePrint={handlePrint}
+            openInvoice={openInvoice}
+            setAction={setAction}
+            openConfirm={openConfirmModal}
           />
           <ProcurementDetailsBody
             procurementId={procurementId}
-            status={status}
+            status={status.status}
             manufacturing={manufacturing}
             headquarters={headquarters}
             warehouse={warehouse}
             lineItems={lineItems}
             setLineItems={setLineItems}
             pathname={pathname}
-            onFulfillClicked={onFulfillClicked}
-            onVerifyReceivedClicked={onVerifyReceivedClicked}
+            onFulfilClicked={onFulfilClicked}
           />
         </div>
         <ConfirmDelete
@@ -490,6 +623,41 @@ export const ProcurementDetails = () => {
           closeModal={closeModal}
           onConfirm={onDeleteSiteClicked}
         />
+        <div className="hidden">
+          <ProcurementInvoice
+            ref={componentRef}
+            orderId={procurementId}
+            orderStatus={status}
+            company={headquarters.company}
+            headquarters={headquarters}
+            manufacturing={manufacturing}
+            warehouse={warehouse}
+            data={lineItems}
+            qrValue={qrValue}
+          />
+        </div>
+        <InvoiceModal
+          open={open}
+          closeModal={closeInvoice}
+          orderId={procurementId}
+          orderStatus={status}
+          company={headquarters.company}
+          headquarters={headquarters}
+          manufacturing={manufacturing}
+          warehouse={warehouse}
+          data={lineItems}
+          qrValue={qrValue}
+          handlePrint={handlePrint}
+        />
+        {Boolean(action) && (
+          <Confirmation
+            title={`${action.name} "Order #${procurementId}"`}
+            body={`Are you sure you want to ${action.name.toLowerCase()} "Order #${procurementId}"? This action cannot be undone.`}
+            open={openConfirm}
+            closeModal={closeConfirmModal}
+            onConfirm={action.action}
+          />
+        )}
       </>
     )
   );

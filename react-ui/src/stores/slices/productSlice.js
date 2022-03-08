@@ -4,8 +4,8 @@ import { api } from "../../environments/Api";
 const initialState = {
   products: [], //models
   model: null,
-  currProduct: null, 
-  prodItem: null, 
+  currProduct: null,
+  prodItem: null,
   prodDetails: null, // Selective details for order summary
   status: "idle",
   error: null,
@@ -116,28 +116,7 @@ const productSlice = createSlice({
       state.products.push(action.payload);
     });
     builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
-      const {
-        modelCode,
-        name,
-        description,
-        price,
-        onlineOnly,
-        available,
-        products,
-        productFields,
-      } = action.payload;
-      const existingProd = state.products.find(
-        (prod) => prod.modelCode === modelCode
-      );
-      if (existingProd) {
-        existingProd.name = name;
-        existingProd.description = description;
-        existingProd.price = price;
-        existingProd.onlineOnly = onlineOnly;
-        existingProd.available = available;
-        existingProd.products = products;
-        existingProd.productFields = productFields;
-      }
+      state.status = "idle";
     });
     builder.addCase(deleteExistingProduct.fulfilled, (state, action) => {
       state.products = state.products.filter(

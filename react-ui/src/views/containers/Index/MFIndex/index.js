@@ -14,7 +14,7 @@ import { updateCurrSite } from "../../../../stores/slices/userSlice";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
-  { name: "Procurement", href: "/mf/procurements", icon: CreditCardIcon, current: false },
+  { name: "Procurement", href: "/mf/procurements/search", icon: CreditCardIcon, current: false },
 ];
 
 const secondaryNavigation = [

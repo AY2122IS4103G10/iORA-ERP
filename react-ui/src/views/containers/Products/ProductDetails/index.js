@@ -1,5 +1,8 @@
 import { CurrencyDollarIcon } from "@heroicons/react/outline";
-import { PencilIcon } from "@heroicons/react/solid";
+import {
+  PencilIcon,
+  CurrencyDollarIcon as CurrencyDollarSolid,
+} from "@heroicons/react/solid";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -65,7 +68,8 @@ const ProductDetailsBody = ({
   prodCode,
   name,
   description,
-  price,
+  listPrice,
+  discountPrice,
   colors,
   sizes,
   tags,
@@ -118,7 +122,16 @@ const ProductDetailsBody = ({
                     aria-hidden="true"
                   />
                   <span className="text-gray-900 text-sm font-medium">
-                    {`List Price: $${price}`}
+                    {`List Price: $${listPrice}`}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CurrencyDollarIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  <span className="text-gray-900 text-sm font-medium">
+                    {`Discount Price: $${discountPrice}`}
                   </span>
                 </div>
               </div>
@@ -181,7 +194,16 @@ const ProductDetailsBody = ({
                 aria-hidden="true"
               />
               <span className="text-gray-900 text-sm font-medium">
-                {`List Price: $${price}`}
+                {`List Price: $${listPrice}`}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CurrencyDollarSolid
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+              <span className="text-gray-900 text-sm font-medium">
+                {`Discount Price: $${discountPrice}`}
               </span>
             </div>
           </div>
@@ -223,7 +245,8 @@ export const ProductDetails = () => {
           prodCode={prodCode}
           name={product.name}
           description={product.description}
-          price={product.price}
+          listPrice={product.listPrice}
+          discountPrice={product.discountPrice}
           colors={product.productFields
             .filter((field) => field.fieldName === "COLOUR")
             .sort((f1, f2) =>

@@ -9,8 +9,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.iora.erp.model.site.Site;
 
 @Entity
 public class CustomerOrder {
@@ -18,17 +21,20 @@ public class CustomerOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long storeSiteId;
-
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime dateTime;
 
-    @Column(nullable = false)
+    @Column(nullable = false, scale = 2)
     private Double totalAmount;
+
+    @JsonBackReference
+    @ManyToOne
+    private Site site;
 
     @OneToMany
     private List<CustomerOrderLI> lineItems;
+
+    private List<CustomerOrderLI> packedLineItems;
 
     @OneToMany
     private List<Payment> payments;
@@ -41,7 +47,6 @@ public class CustomerOrder {
     @OneToMany
     private List<ExchangeLI> exchangedLIs;
 
-    @Column
     private Long customerId;
 
     public CustomerOrder() {
@@ -69,6 +74,14 @@ public class CustomerOrder {
         this.dateTime = dateTime;
     }
 
+    public Site getSite() {
+        return this.site;
+    }
+
+    public void setSite(Site site) {
+        this.site = site;
+    }
+
     public List<CustomerOrderLI> getLineItems() {
         return this.lineItems;
     }
@@ -81,12 +94,27 @@ public class CustomerOrder {
         this.lineItems.add(lineItem);
     }
 
+    public List<CustomerOrderLI> getPackedLineItems() {
+        return this.packedLineItems;
+    }
+
+    public void setPackedLineItems(List<CustomerOrderLI> packedLineItems) {
+        this.packedLineItems = packedLineItems;
+    }
+
+    public void addPackedLineItems(CustomerOrderLI packedLineItem) {
+        this.packedLineItems.add(packedLineItem);
+    }
+
     public List<Payment> getPayments() {
         return this.payments;
     }
 
     public void setPayments(List<Payment> payments) {
         this.payments = payments;
+        for (Payment p : payments) {
+            this.totalAmount += p.getAmount();
+        }
     }
 
     public void addPayment(Payment payment) {
@@ -126,27 +154,15 @@ public class CustomerOrder {
         this.exchangedLIs.add(exchangedLI);
     }
 
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
     public Long getCustomerId() {
         return this.customerId;
     }
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
-    }
-
-    public Long getStoreSiteId() {
-        return storeSiteId;
-    }
-
-    public void setStoreSiteId(Long storeSiteId) {
-        this.storeSiteId = storeSiteId;
-    }
-
-    public Double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(Double totalAmount) {
-        this.totalAmount = totalAmount;
     }
 }

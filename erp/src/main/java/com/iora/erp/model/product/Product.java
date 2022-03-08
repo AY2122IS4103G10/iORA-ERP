@@ -72,6 +72,6 @@ public class Product {
             return false;
         }
         Product product = (Product) o;
-        return Objects.equals(sku, product.sku);
+        return product.getSku().equals(this.sku);
     }
 }

@@ -21,6 +21,8 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.InsufficientPaymentException;
+import com.iora.erp.exception.ProductException;
+import com.iora.erp.exception.ProductItemException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -33,6 +35,7 @@ import com.iora.erp.model.customerOrder.RefundLI;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
+import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("customerOrderServiceImpl")
 @Transactional
 public class CustomerOrderServiceImpl implements CustomerOrderService {
+    @Autowired
+    ProductService productService;
     @Autowired
     CustomerService customerService;
     @PersistenceContext
@@ -127,7 +132,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
-        customerOrder.setPaid(false);
         em.persist(customerOrder);
         return customerOrder;
     }
@@ -331,7 +335,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         List<CustomerOrderLI> promotionList = new ArrayList<CustomerOrderLI>();
-        for(Map.Entry<CustomerOrderLI,PromotionField> entry : bestSinglePromos.entrySet()) {
+        for (Map.Entry<CustomerOrderLI, PromotionField> entry : bestSinglePromos.entrySet()) {
             CustomerOrderLI coli = entry.getKey();
             if (bestSinglePromosUsed.get(coli) > 0) {
                 PromotionLI pli = new PromotionLI(entry.getValue());
@@ -490,6 +494,57 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         membershipPoints = Integer.sum(membershipPoints,
                 (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier()));
         customer.setMembershipPoints(membershipPoints);
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * Online Order Statuses Methods
+     * ---------------------------------------------------------
+     */
+
+    @Override
+    public OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException {
+        Product product;
+        try {
+            product = productService.getProduct(rfidsku);
+        } catch (ProductException e) {
+            try {
+                ProductItem productItem = productService.getProductItem(rfidsku);
+                product = productItem.getProduct();
+            } catch (ProductItemException e1) {
+                throw new CustomerOrderException("Item scanned cannot be found.");
+            }
+        }
+
+        List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
+        List<CustomerOrderLI> packedLineItems = onlineOrder.getPackedLineItems();
+
+        for (CustomerOrderLI coli : packedLineItems) {
+            if (coli.getProduct().equals(product)) {
+                int requiredQty = lineItems.stream()
+                        .filter(x -> x.getProduct().equals(coli.getProduct()))
+                        .findAny()
+                        .get()
+                        .getQty();
+                if (coli.getQty() + qty > requiredQty) {
+                    throw new CustomerOrderException("There will be too many quantity of this product.");
+                } else {
+                    coli.setQty(coli.getQty() + qty);
+                    onlineOrder.setPackedLineItems(packedLineItems);
+                    return em.merge(onlineOrder);
+                }
+            }
+        }
+
+        for (CustomerOrderLI coli : lineItems) {
+            if (coli.getProduct().equals(product)) {
+                CustomerOrderLI lineItem = new CustomerOrderLI(qty, product);
+                onlineOrder.addPackedLineItems(lineItem);
+                return em.merge(onlineOrder);
+            }
+        }
+
+        throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
     }
 
 }

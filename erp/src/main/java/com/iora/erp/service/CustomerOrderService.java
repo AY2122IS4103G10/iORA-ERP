@@ -15,12 +15,12 @@ public interface CustomerOrderService {
     public abstract CustomerOrder getCustomerOrder(Long id) throws CustomerOrderException;
     public abstract List<CustomerOrder> searchCustomerOrders(String id);
 
-    public abstract List<OnlineOrder> getAllOnlineOrders();
-    public abstract List<OnlineOrder> getOnlineOrdersBySite(Long siteId);
+    public abstract List<OnlineOrder> getAllOnlineOrders(); // todo: change this to search
+    public abstract List<OnlineOrder> getOnlineOrdersBySite(Long siteId); // todo: change this to search
     public abstract List<OnlineOrder> getOnlineOrdersBySiteDate(Long siteId, String date);
 
-    public abstract List<CustomerOrder> getAllInStoreOrders();
-    public abstract List<CustomerOrder> getInStoreOrdersBySite(Long siteId);
+    public abstract List<CustomerOrder> getAllInStoreOrders(); // todo: change this to search
+    public abstract List<CustomerOrder> getInStoreOrdersBySite(Long siteId); // todo: change this to search
     public abstract List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date);
 
     public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder);
@@ -47,4 +47,6 @@ public interface CustomerOrderService {
     public abstract List<RefundLI> getAllRefundLIs();
     public abstract RefundLI createRefundLI(RefundLI refundLI);
     public abstract RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
+
+    public abstract CustomerOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException;
 }

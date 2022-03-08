@@ -671,12 +671,12 @@ public class ProductServiceImpl implements ProductService {
         customerOrderService.createPayment(payment1);
 
         CustomerOrder co1 = new CustomerOrder();
-        co1.setCustomerId(1L);
         co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         co1.addLineItem(coli1);
         co1.addLineItem(coli2);
-        co1.setStoreSiteId(3L);
         co1.addPayment(payment1);
+        co1.setPaid(true);
+        co1.setSite(siteService.getSite(3L));
         customerOrderService.createCustomerOrder(co1);
     }
 }

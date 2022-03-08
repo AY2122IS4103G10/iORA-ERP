@@ -23,10 +23,15 @@ public class CustomerOrderLI {
     @ManyToOne(optional = false)
     private Product product;
 
-    @Column(nullable = false, scale = 2)
+    @Column(scale = 2)
     private double subTotal;
 
     public CustomerOrderLI() {
+    }
+
+    public CustomerOrderLI(int qty, Product product) {
+        this.qty = qty;
+        this.product = product;
     }
 
     public CustomerOrderLI(int qty, Product product, double subTotal) {

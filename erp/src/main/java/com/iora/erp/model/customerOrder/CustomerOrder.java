@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,8 +33,6 @@ public class CustomerOrder {
 
     @OneToMany
     private List<CustomerOrderLI> lineItems;
-    @ElementCollection
-    private List<CustomerOrderLI> packedLineItems;
 
     @OneToMany
     private List<Payment> payments;
@@ -53,7 +50,6 @@ public class CustomerOrder {
     public CustomerOrder() {
         dateTime = LocalDateTime.now();
         this.lineItems = new ArrayList<>();
-        this.packedLineItems = new ArrayList<>();
         this.payments = new ArrayList<>();
         this.refundedLIs = new ArrayList<>();
         this.exchangedLIs = new ArrayList<>();
@@ -94,18 +90,6 @@ public class CustomerOrder {
 
     public void addLineItem(CustomerOrderLI lineItem) {
         this.lineItems.add(lineItem);
-    }
-
-    public List<CustomerOrderLI> getPackedLineItems() {
-        return this.packedLineItems;
-    }
-
-    public void setPackedLineItems(List<CustomerOrderLI> packedLineItems) {
-        this.packedLineItems = packedLineItems;
-    }
-
-    public void addPackedLineItems(CustomerOrderLI packedLineItem) {
-        this.packedLineItems.add(packedLineItem);
     }
 
     public List<Payment> getPayments() {

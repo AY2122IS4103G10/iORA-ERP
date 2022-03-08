@@ -1,6 +1,9 @@
 package com.iora.erp.model.customerOrder;
 
-import javax.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,16 +17,20 @@ public class OnlineOrder extends CustomerOrder {
     @Enumerated(EnumType.STRING)
     private OnlineOrderStatus status;
 
-    @Column(nullable = false)
     private boolean delivery;
+
+    @ElementCollection
+    private List<CustomerOrderLI> packedLineItems;
 
     @Enumerated(EnumType.STRING)
     private Country country;
+    
     private String deliveryAddress;
 
     public OnlineOrder() {
         super();
         this.status = OnlineOrderStatus.CONFIRMED;
+        this.packedLineItems = new ArrayList<>();
     }
 
     public OnlineOrder(boolean delivery, Country country) {
@@ -46,6 +53,18 @@ public class OnlineOrder extends CustomerOrder {
 
     public boolean getDelivery() {
         return this.delivery;
+    }
+    
+    public List<CustomerOrderLI> getPackedLineItems() {
+        return this.packedLineItems;
+    }
+
+    public void setPackedLineItems(List<CustomerOrderLI> packedLineItems) {
+        this.packedLineItems = packedLineItems;
+    }
+
+    public void addPackedLineItems(CustomerOrderLI packedLineItem) {
+        this.packedLineItems.add(packedLineItem);
     }
 
     public void setDelivery(boolean delivery) {

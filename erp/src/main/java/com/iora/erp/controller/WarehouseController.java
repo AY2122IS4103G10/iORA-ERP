@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
+import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
@@ -18,6 +21,7 @@ import com.iora.erp.service.SiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -36,8 +40,8 @@ public class WarehouseController {
     private ProductService productService;
     @Autowired
     private ProcurementService procurementService;
-    // @Autowired
-    // private StockTransferService stockTransferService;
+    @Autowired
+    private CustomerOrderService customerOrderService;
 
     /*
      * ---------------------------------------------------------
@@ -125,6 +129,25 @@ public class WarehouseController {
             @PathVariable Long siteId) {
         try {
             return ResponseEntity.ok(procurementService.verifyProcurementOrder(procurementOrder, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createCustomerOrder(@RequestBody CustomerOrder customerOrder) {
+        try {
+            return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PatchMapping(path = "/scan/{rfidsku}/{qty}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> scanProduct(@RequestBody OnlineOrder onlineOrder, @PathVariable String rfidsku,
+            @PathVariable int qty) {
+        try {
+            return ResponseEntity.ok(customerOrderService.scanProduct(onlineOrder, rfidsku, qty));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

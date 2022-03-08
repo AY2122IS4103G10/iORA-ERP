@@ -45,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Autowired
     CustomerService customerService;
+    @Autowired
+    SiteService siteService;
     @PersistenceContext
     private EntityManager em;
 
@@ -80,7 +82,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public List<OnlineOrder> getOnlineOrdersBySite(Long siteId) {
-        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.onlineStoreSiteId = :siteId",
+        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.site.id = :siteId",
                 OnlineOrder.class);
         q.setParameter("siteId", siteId);
         return q.getResultList();
@@ -109,7 +111,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public List<CustomerOrder> getInStoreOrdersBySite(Long siteId) {
-        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId",
+        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.site.id = :siteId",
                 CustomerOrder.class);
         q.setParameter("siteId", siteId);
         return q.getResultList();

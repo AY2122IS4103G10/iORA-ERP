@@ -198,7 +198,8 @@ public class ProductServiceImpl implements ProductService {
         try {
             PromotionField pf = getPromoField("category", category);
             if (pf.getQuota() > 1) {
-                model.getProductFields().removeIf(x -> (x instanceof PromotionField)  && ((PromotionField) x).getQuota() > 1);
+                model.getProductFields()
+                        .removeIf(x -> (x instanceof PromotionField) && ((PromotionField) x).getQuota() > 1);
             }
             model.addProductField(pf);
             return model;
@@ -522,41 +523,46 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    /* Depracated
-    @Override
-    public List<ProductItem> getProductItemsBySKU(String sku) throws ProductException {
-        Product p = getProduct(sku);
-        return p.getProductItems();
-    }
-
-    @Override
-    public List<ProductItem> searchProductItems(String rfid) {
-        TypedQuery<ProductItem> q;
-
-        if (rfid != null) {
-            q = em.createQuery("SELECT pi FROM ProductItem pi WHERE LOWER(pi.rfid) LIKE :rfid", ProductItem.class);
-            q.setParameter("rfid", "%" + rfid.toLowerCase() + "%");
-        } else {
-            q = em.createQuery("SELECT pi FROM ProductItem pi", ProductItem.class);
-        }
-
-        return q.getResultList();
-    }
-
-    @Override
-    public void sellProductItem(String rfid) throws ProductItemException {
-        rfid = rfid.trim();
-        ProductItem pi = getProductItem(rfid);
-        pi.setAvailable(false);
-    }
-
-    @Override
-    public void returnProductItem(String rfid) throws ProductItemException {
-        rfid = rfid.trim();
-        ProductItem pi = getProductItem(rfid);
-        pi.setAvailable(true);
-    }
-    */
+    /*
+     * Depracated
+     * 
+     * @Override
+     * public List<ProductItem> getProductItemsBySKU(String sku) throws
+     * ProductException {
+     * Product p = getProduct(sku);
+     * return p.getProductItems();
+     * }
+     * 
+     * @Override
+     * public List<ProductItem> searchProductItems(String rfid) {
+     * TypedQuery<ProductItem> q;
+     * 
+     * if (rfid != null) {
+     * q = em.
+     * createQuery("SELECT pi FROM ProductItem pi WHERE LOWER(pi.rfid) LIKE :rfid",
+     * ProductItem.class);
+     * q.setParameter("rfid", "%" + rfid.toLowerCase() + "%");
+     * } else {
+     * q = em.createQuery("SELECT pi FROM ProductItem pi", ProductItem.class);
+     * }
+     * 
+     * return q.getResultList();
+     * }
+     * 
+     * @Override
+     * public void sellProductItem(String rfid) throws ProductItemException {
+     * rfid = rfid.trim();
+     * ProductItem pi = getProductItem(rfid);
+     * pi.setAvailable(false);
+     * }
+     * 
+     * @Override
+     * public void returnProductItem(String rfid) throws ProductItemException {
+     * rfid = rfid.trim();
+     * ProductItem pi = getProductItem(rfid);
+     * pi.setAvailable(true);
+     * }
+     */
 
     @Override
     public JSONObject getProductCartDetails(String rfid)
@@ -641,7 +647,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = searchProductsBySKU(null);
         for (Product p : products) {
             Random r = new Random();
-            int stockLevel = r.nextInt(27) + 3;
+            int stockLevel = r.nextInt(7) + 3;
 
             for (int i = 0; i < stockLevel; i++) {
                 String rfid = StringGenerator.generateRFID(p.getSku());
@@ -677,6 +683,6 @@ public class ProductServiceImpl implements ProductService {
         co1.addPayment(payment1);
         co1.setPaid(true);
         co1.setSite(siteService.getSite(3L));
-        customerOrderService.createCustomerOrder(co1);
+        em.persist(co1);
     }
 }

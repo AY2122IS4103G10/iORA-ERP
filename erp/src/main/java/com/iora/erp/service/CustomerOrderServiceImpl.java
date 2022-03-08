@@ -227,10 +227,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 .collect(Collectors.toList());
         List<ProductItem> items = lineItems.stream().parallel().flatMap(x -> x.getProductItems().stream())
                 .collect(Collectors.toList());
-        Set<PromotionField> promotions = new HashSet<>();
+        Set<PromotionField> promotions = new HashSet<>(
+                em.createQuery("SELECT pf FROM PromotionField pf WHERE pf.global = TRUE", PromotionField.class)
+                        .getResultList());
         for (Model m : models) {
             for (ProductField pf : m.getProductFields()) {
-                if (pf instanceof PromotionField) {
+                if (pf instanceof PromotionField && ((PromotionField) pf).getAvailable()) {
                     promotions.add((PromotionField) pf);
                 }
             }

@@ -173,6 +173,9 @@ public class ProductServiceImpl implements ProductService {
         try {
             getProductFieldByNameValue(promotionField.getFieldName(), promotionField.getFieldValue());
         } catch (ProductFieldException ex) {
+            if (promotionField.getQuota() > 1 && promotionField.isGlobal()) {
+                throw new ProductFieldException("Invalid Global Product Field. Needs to have quota = 1");
+            }
             em.persist(promotionField);
             return promotionField;
         }

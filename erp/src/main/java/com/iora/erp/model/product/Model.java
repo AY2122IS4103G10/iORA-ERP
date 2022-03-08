@@ -9,11 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
-
-import com.iora.erp.model.Currency;
 
 @Entity
 public class Model {
@@ -29,10 +26,10 @@ public class Model {
     private String description;
 
     @Column(nullable = false, scale = 2)
-    private double price;
+    private double listPrice;
 
-    @ManyToOne
-    private Currency currency;
+    @Column(nullable = false, scale = 2)
+    private double discountPrice;
 
     @Column(nullable = false)
     private boolean onlineOnly;
@@ -55,13 +52,14 @@ public class Model {
         productFields = new HashSet<>();
     }
 
-    public Model(String modelCode, String name, String description, double price, Currency currency, boolean onlineOnly,
+    public Model(String modelCode, String name, String description, double listPrice, double discountPrice,
+            boolean onlineOnly,
             boolean available) {
         this(modelCode);
         this.name = name;
         this.description = description;
-        this.price = price;
-        this.currency = currency;
+        this.listPrice = listPrice;
+        this.discountPrice = discountPrice;
         this.onlineOnly = onlineOnly;
         this.available = available;
     }
@@ -90,12 +88,24 @@ public class Model {
         this.description = description;
     }
 
-    public double getPrice() {
-        return this.price;
+    public double getListPrice() {
+        return this.listPrice;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setListPrice(double listPrice) {
+        this.listPrice = listPrice;
+    }
+
+    public double getDiscountPrice() {
+        return this.discountPrice;
+    }
+
+    public void setDiscountPrice(double discountPrice) {
+        this.discountPrice = discountPrice;
+    }
+
+    public boolean getAvailable() {
+        return this.available;
     }
 
     public boolean isOnlineOnly() {
@@ -142,7 +152,8 @@ public class Model {
             return false;
         }
         Model model = (Model) o;
-        if ((this.modelCode == null && model.modelCode == null) || (this.modelCode == null && !this.modelCode.equals(model.modelCode))) {
+        if ((this.modelCode == null && model.modelCode == null)
+                || (this.modelCode == null && !this.modelCode.equals(model.modelCode))) {
             return false;
         }
         return true;

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -13,6 +12,7 @@ import javax.persistence.PersistenceContext;
 import com.iora.erp.enumeration.ProcurementOrderStatus;
 import com.iora.erp.exception.IllegalPOModificationException;
 import com.iora.erp.exception.IllegalTransferException;
+import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProcurementOrderException;
 import com.iora.erp.exception.ProductItemException;
 import com.iora.erp.exception.SiteConfirmationException;
@@ -24,6 +24,7 @@ import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.WarehouseSite;
+import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -168,15 +169,6 @@ public class ProcurementServiceImpl implements ProcurementService {
         return em.merge(procurementOrder);
     }
 
-    private String generateRFID(String sku) {
-        return "10-0001234-0" + sku.substring(5, 10) + "-0000" +
-                new Random().ints(48, 91)
-                        .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                        .limit(5)
-                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                        .toString();
-    }
-
     @Override
     public ProcurementOrder fulfilProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException,
@@ -198,12 +190,18 @@ public class ProcurementServiceImpl implements ProcurementService {
         for (ProcurementOrderLI poli : procurementOrder.getLineItems()) {
             for (int i = 0; i < poli.getRequestedQty(); i++) {
                 try {
-                    ProductItem pi = productService.createProductItem(generateRFID(poli.getProduct().getsku()), poli.getProduct().getsku());
+                    ProductItem pi = productService.createProductItem(StringGenerator.generateRFID(poli.getProduct().getSku()), poli.getProduct().getSku());
                     allProductItems.add(pi);
                     poli.addFulfilledProductItems(pi);
                 } catch (ProductItemException e) {
                     System.err.println(e.getMessage());
                 }
+            }
+
+            try {
+                siteService.addProducts(actionBy.getId(), poli.getProduct().getSku(), Long.valueOf(poli.getRequestedQty()));
+            } catch (NoStockLevelException e) {
+                System.err.println(e.getMessage());
             }
         }
 
@@ -216,7 +214,6 @@ public class ProcurementServiceImpl implements ProcurementService {
         //         System.err.println(e.getMessage());
         //     }
         // }
-        siteService.addManyToStockLevel(actionBy.getStockLevel(), allProductItems);
         procurementOrder.setHeadquarters(oldOrder.getHeadquarters());
         procurementOrder.setManufacturing(oldOrder.getManufacturing());
         procurementOrder.setWarehouse(oldOrder.getWarehouse());
@@ -244,7 +241,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
                 .flatMap(Collection::stream).collect(Collectors.toList());
-        siteService.removeManyFromStockLevel(productItems);
+        // siteService.removeManyFromStockLevel(productItems);
         procurementOrder.setHeadquarters(oldOrder.getHeadquarters());
         procurementOrder.setManufacturing(oldOrder.getManufacturing());
         procurementOrder.setWarehouse(oldOrder.getWarehouse());
@@ -272,7 +269,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
                 .flatMap(Collection::stream).collect(Collectors.toList());
-        siteService.addManyToStockLevel(actionBy.getStockLevel(), productItems);
+        // siteService.addManyToStockLevel(actionBy.getStockLevel(), productItems);
         procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.VERIFIED));
 

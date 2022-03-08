@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.iora.erp.exception.CustomerException;
-// import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
@@ -13,19 +12,15 @@ import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
-import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
-// import com.iora.erp.model.stockTransfer.StockTransferOrder;
+import com.iora.erp.model.site.StockLevelLI;
+import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
-// import com.iora.erp.service.StockTransferService;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,6 +29,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("sam")
@@ -270,52 +268,63 @@ public class SAMController {
         }
     }
 
-    @GetMapping(path = "/productItem/sku/{sku}", produces = "application/json")
-    public ResponseEntity<Object> getProductItemByProduct(@PathVariable String sku) {
-        try {
-            return ResponseEntity.ok(productService.getProductItemsBySKU(sku));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
+    /*
+     * Deprecated
+     * 
+     * @GetMapping(path = "/productItem/sku/{sku}", produces = "application/json")
+     * public ResponseEntity<Object> getProductItemsByProduct(@PathVariable String
+     * sku) {
+     * try {
+     * return ResponseEntity.ok(productService.getProductItemsBySKU(sku));
+     * } catch (Exception ex) {
+     * return ResponseEntity.badRequest().body(ex.getMessage());
+     * }
+     * }
+     * 
+     * @GetMapping(path = "/productItem", produces = "application/json")
+     * public List<ProductItem> searchProductItems(@RequestParam String rfid) {
+     * return productService.searchProductItems(rfid);
+     * }
+     * 
+     * @PutMapping(path = "/productItem/sell/{rfid}", produces = "application/json")
+     * public ResponseEntity<Object> sellProductItem(@PathVariable String rfid) {
+     * try {
+     * productService.sellProductItem(rfid);
+     * return ResponseEntity.ok("Product Item with RFID " + rfid.trim() +
+     * " is successfully marked as sold.");
+     * } catch (Exception ex) {
+     * return ResponseEntity.badRequest().body(ex.getMessage());
+     * }
+     * }
+     * 
+     * @PutMapping(path = "/productItem/return/{rfid}", produces =
+     * "application/json")
+     * public ResponseEntity<Object> returnProductItem(@PathVariable String rfid) {
+     * try {
+     * productService.returnProductItem(rfid);
+     * return ResponseEntity.ok("Product Item with RFID " + rfid.trim() +
+     * " is successfully marked as unsold.");
+     * } catch (Exception ex) {
+     * return ResponseEntity.badRequest().body(ex.getMessage());
+     * }
+     * }
+     */
 
-    @GetMapping(path = "/productItem", produces = "application/json")
-    public List<ProductItem> searchProductItems(@RequestParam String rfid) {
-        return productService.searchProductItems(rfid);
-    }
-
-    @PutMapping(path = "/productItem/sell/{rfid}", produces = "application/json")
-    public ResponseEntity<Object> sellProductItem(@PathVariable String rfid) {
-        try {
-            productService.sellProductItem(rfid);
-            return ResponseEntity.ok("Product Item with RFID " + rfid.trim() + " is successfully marked as sold.");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PutMapping(path = "/productItem/return/{rfid}", produces = "application/json")
-    public ResponseEntity<Object> returnProductItem(@PathVariable String rfid) {
-        try {
-            productService.returnProductItem(rfid);
-            return ResponseEntity.ok("Product Item with RFID " + rfid.trim() + " is successfully marked as unsold.");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    // Links a PromotionField to Model.
-    // A new PromotionField will be created if it does not exist.
-    @PutMapping(path = "/promo/add/{modelCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addPromoCategory(@PathVariable String modelCode,
-            @RequestBody Map<String, String> body) {
-        try {
-            return ResponseEntity.ok(productService.addPromoCategory(modelCode, body.get("category"),
-                    Double.parseDouble(body.get("discountedPrice"))));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
+    // // Links a PromotionField to Model.
+    // // A new PromotionField will be created if it does not exist.
+    // @PutMapping(path = "/promo/add/{modelCode}", consumes = "application/json",
+    // produces = "application/json")
+    // public ResponseEntity<Object> addPromoCategory(@PathVariable String
+    // modelCode,
+    // @RequestBody Map<String, String> body) {
+    // try {
+    // return ResponseEntity.ok(productService.addPromoCategory(modelCode,
+    // body.get("category"),
+    // Double.parseDouble(body.get("discountedPrice"))));
+    // } catch (Exception ex) {
+    // return ResponseEntity.badRequest().body(ex.getMessage());
+    // }
+    // }
 
     @GetMapping(path = "/voucher/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> getVoucher(@PathVariable String voucherCode) {
@@ -424,7 +433,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public Map<Long, Long> viewStockByProduct(@PathVariable String sku) {
+    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
 
@@ -509,6 +518,25 @@ public class SAMController {
     public ResponseEntity<Object> createMembershipTier(@RequestBody MembershipTier tier) {
         try {
             return ResponseEntity.ok(customerService.createMembershipTier(tier));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/membershipTier/edit", consumes = "application/json")
+    public ResponseEntity<Object> editMembershipTier(@RequestBody MembershipTier tier) {
+        try {
+            return ResponseEntity.ok(customerService.createMembershipTier(tier));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/membershipTier/delete/{name}")
+    public ResponseEntity<Object> deleteMembershipTier(@PathVariable String name) {
+        try {
+            customerService.deleteMembershipTier(name);
+            return ResponseEntity.ok(customerService.listOfMembershipTier());
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

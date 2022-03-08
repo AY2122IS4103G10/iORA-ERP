@@ -1,11 +1,12 @@
 package com.iora.erp.model.customer;
 
 import java.time.LocalDate;
-import java.util.Random;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import com.iora.erp.utils.StringGenerator;
 
 @Entity
 public class Voucher {
@@ -29,26 +30,11 @@ public class Voucher {
 
     public Voucher(double amount, LocalDate expiry) {
         this();
-        this.voucherCode = generateVoucherCode();
+        this.voucherCode = StringGenerator.generateRandom(48, 122, 10);
         this.amount = amount;
         this.expiry = expiry;
         this.issued = false;
         this.redeemed = false;
-    }
-
-    private String generateVoucherCode() {
-        int leftLimit = 48;
-        int rightLimit = 122;
-        int targetStringLength = 10;
-        Random random = new Random();
-
-        String generatedString = random.ints(leftLimit, rightLimit + 1)
-                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-
-        return generatedString;
     }
 
     public String getVoucherCode() {

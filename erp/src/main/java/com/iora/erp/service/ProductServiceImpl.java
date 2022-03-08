@@ -19,11 +19,9 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.enumeration.PaymentType;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.ModelException;
-import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
-import com.iora.erp.model.Currency;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.Payment;
@@ -32,6 +30,7 @@ import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
+import com.iora.erp.utils.StringGenerator;
 
 import org.hibernate.NonUniqueResultException;
 import org.json.JSONException;
@@ -134,18 +133,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PromotionField getPromoField(String fieldName, String fieldValue, double discountedPrice)
+    public PromotionField getPromoField(String fieldName, String fieldValue)
             throws ProductFieldException {
-        Query q = em.createQuery(
-                "SELECT prf FROM PromotionField prf WHERE " +
-                        "LOWER(prf.fieldName) LIKE :fieldName AND LOWER(prf.fieldValue) LIKE :fieldValue AND prf.discountedPrice = :price");
-        q.setParameter("fieldName", fieldName.trim().toLowerCase());
-        q.setParameter("fieldValue", fieldValue.trim().toLowerCase());
-        q.setParameter("price", discountedPrice);
-
         try {
-            PromotionField prf = (PromotionField) q.getSingleResult();
-            return prf;
+            return em.createQuery(
+                    "SELECT prf FROM PromotionField prf WHERE LOWER(prf.fieldName) LIKE :fieldName AND "
+                            + " LOWER(prf.fieldValue) LIKE :fieldValue",
+                    PromotionField.class)
+                    .setParameter("fieldName", fieldName.trim().toLowerCase())
+                    .setParameter("fieldValue", fieldValue.trim().toLowerCase()).getSingleResult();
+
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new ProductFieldException("PromotionField does not exist.");
         }
@@ -174,6 +171,9 @@ public class ProductServiceImpl implements ProductService {
         try {
             getProductFieldByNameValue(promotionField.getFieldName(), promotionField.getFieldValue());
         } catch (ProductFieldException ex) {
+            if (promotionField.getQuota() > 1 && promotionField.isGlobal()) {
+                throw new ProductFieldException("Invalid Global Product Field. Needs to have quota = 1");
+            }
             em.persist(promotionField);
             return promotionField;
         }
@@ -182,46 +182,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PromotionField createPromoField(String fieldName, String fieldValue, double price) {
-        try {
-            PromotionField prf = getPromoField(fieldName, fieldValue, price);
-            return prf;
-        } catch (ProductFieldException e) {
-            PromotionField prf = new PromotionField(fieldName, fieldValue, price);
-            em.persist(prf);
-            return prf;
-        }
-    }
-
-    @Override
     public PromotionField updatePromoField(PromotionField promotionField) throws ProductFieldException {
         PromotionField old = em.find(PromotionField.class, promotionField.getId());
         if (old == null) {
             throw new ProductFieldException("Promotion Field cannot be found.");
         }
-        old.setFieldValue(promotionField.getFieldValue());
-        old.setDiscountedPrice(promotionField.getDiscountedPrice());
-        old.setAvailable(promotionField.isAvailable());
-        em.merge(old);
-        return old;
+        promotionField.setFieldName(old.getFieldName());
+        return em.merge(promotionField);
     }
 
     @Override
-    public Model addPromoCategory(String modelCode, String category, double discountedPrice)
-            throws ModelException {
+    public Model addPromoLink(String modelCode, String category) throws ModelException {
         Model model = getModel(modelCode);
 
         try {
-            ProductField pf = getPromoField("category", category, discountedPrice);
+            PromotionField pf = getPromoField("category", category);
+            if (pf.getQuota() > 1) {
+                model.getProductFields().removeIf(x -> (x instanceof PromotionField)  && ((PromotionField) x).getQuota() > 1);
+            }
             model.addProductField(pf);
             return model;
         } catch (ProductFieldException ex) {
-            PromotionField prf = new PromotionField();
-            prf.setFieldName("category");
-            prf.setFieldValue(category);
-            prf.setDiscountedPrice(discountedPrice);
-            em.persist(prf);
-            model.addProductField(prf);
             return model;
         }
     }
@@ -387,6 +368,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
     public List<Model> getModelsByTag(String tag) {
         try {
             TypedQuery<Model> q;
@@ -401,6 +383,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
     public List<Model> getModelsByCategory(String category) {
         try {
             TypedQuery<Model> q;
@@ -427,7 +410,8 @@ public class ProductServiceImpl implements ProductService {
         old.setAvailable(model.isAvailable());
         old.setName(model.getName());
         old.setOnlineOnly(model.isOnlineOnly());
-        old.setPrice(model.getPrice());
+        old.setListPrice(model.getListPrice());
+        old.setDiscountPrice(model.getDiscountPrice());
         old.setProductFields(model.getProductFields());
         return old;
     }
@@ -491,15 +475,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product updateProduct(Product product) throws ProductException {
-        Product old = em.find(Product.class, product.getsku());
+        Product old = em.find(Product.class, product.getSku());
 
         if (old == null) {
             throw new ProductException("Product not found");
         }
 
-        old.setProductItems(product.getProductItems());
         old.setProductFields(product.getProductFields());
-        return old;
+        return em.merge(old);
     }
 
     @Override
@@ -507,15 +490,25 @@ public class ProductServiceImpl implements ProductService {
         try {
             Product p = getProduct(sku);
             ProductItem pi = new ProductItem(rfid);
-            pi.setProductSKU(sku);
+            pi.setProduct(p);
             em.persist(pi);
-            p.addProductItem(pi);
             return pi;
         } catch (EntityExistsException ex) {
             throw new ProductItemException("ProductItem with rfid " + rfid + " already exist.");
         } catch (ProductException ex) {
             throw new ProductItemException("Product with sku " + sku + " does not exist.");
         }
+    }
+
+    @Override
+    public List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException {
+        List<ProductItem> piList = new ArrayList<>();
+        for (int i = 0; i < qty; i++) {
+            String rfid = StringGenerator.generateRFID(sku);
+            ProductItem pi = createProductItem(rfid, sku);
+            piList.add(pi);
+        }
+        return piList;
     }
 
     @Override
@@ -529,6 +522,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /* Depracated
     @Override
     public List<ProductItem> getProductItemsBySKU(String sku) throws ProductException {
         Product p = getProduct(sku);
@@ -562,57 +556,27 @@ public class ProductServiceImpl implements ProductService {
         ProductItem pi = getProductItem(rfid);
         pi.setAvailable(true);
     }
-
-    @Override
-    public List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException {
-        List<ProductItem> piList = new ArrayList<>();
-        for (int i = 0; i < qty; i++) {
-            String rfid = generateRFID(sku);
-            ProductItem pi = createProductItem(rfid, sku);
-            piList.add(pi);
-        }
-        return piList;
-    }
-
-    private String generateRFID(String sku) {
-        return "10-0001234-0" + sku.substring(5, 10) + "-0000" +
-                new Random().ints(48, 91)
-                        .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                        .limit(5)
-                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                        .toString();
-    }
+    */
 
     @Override
     public JSONObject getProductCartDetails(String rfid)
-            throws ProductItemException, ProductException, ModelException, JSONException, ProductFieldException {
+            throws ProductItemException, ProductException, ModelException, JSONException,
+            ProductFieldException {
         ProductItem pi = getProductItem(rfid);
-        Product p = getProduct(pi.getProductSKU());
+        Product p = pi.getProduct();
         Model m = getModelByProduct(p);
         JSONObject jo = new JSONObject();
         jo.put("name", m.getName());
-        jo.put("price", m.getPrice());
+        jo.put("listPrice", m.getListPrice());
+        jo.put("discountedPrice", m.getDiscountPrice());
         jo.put("colour", getProductFieldValue(p, "COLOUR"));
         jo.put("size", getProductFieldValue(p, "SIZE"));
-        try {
-            PromotionField prf = getPromoFieldOfModel(m);
-            jo.put("discountedPrice", prf.getDiscountedPrice());
-            jo.put("promotion", prf.getFieldValue());
-        } catch (ProductFieldException ex) {
-            // do nothing
-        }
         return jo;
-    }
-
-    @Override
-    public Currency getCurrency(String code) {
-        return em.find(Currency.class, code);
     }
 
     @Override
     public void loadProducts(List<Object> productsJSON)
             throws ProductException, ProductFieldException, ProductItemException, CustomerException {
-        Currency sgd = getCurrency("SGD");
 
         for (Object j : productsJSON) {
             LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
@@ -629,13 +593,15 @@ public class ProductServiceImpl implements ProductService {
 
             LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
             List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
-            double price = Double.parseDouble((String) priceList.get(0));
+            double listPrice = Double.parseDouble((String) priceList.get(0));
 
             LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
             List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
                     .collect(Collectors.toList());
+            double discountPrice = discountedPriceList.isEmpty() ? listPrice
+                    : Double.parseDouble((String) discountedPriceList.get(0));
 
-            Model model = new Model(modelCode, name, description, price, sgd,
+            Model model = new Model(modelCode, name, description, listPrice, discountPrice,
                     categories.contains("SALE FROM $10"), true);
             List<ProductField> productFields = new ArrayList<>();
 
@@ -662,26 +628,8 @@ public class ProductServiceImpl implements ProductService {
             }
 
             for (String cat : categories) {
-                ProductField category;
-                if (cat.equals("2 FOR S$ 49")) {
-                    category = createPromoField("category", cat, 24.5);
-                    model.addProductField(category);
-                    productFields.add(category);
-                } else if (cat.equals("2 FOR S$ 29")) {
-                    category = createPromoField("category", cat, 14.5);
-                    model.addProductField(category);
-                    productFields.add(category);
-                } else if (cat.equals("SALE FROM $10")) {
-                    if (!discountedPriceList.isEmpty()) {
-                        category = createPromoField("category", cat,
-                                Double.parseDouble((String) discountedPriceList.get(0)));
-                        model.addProductField(category);
-                        productFields.add(category);
-                    } else {
-                        continue;
-                    }
-                } else {
-                    category = createProductField("category", cat);
+                if (cat.contains("S$")) {
+                    ProductField category = getPromoField("category", cat);
                     model.addProductField(category);
                     productFields.add(category);
                 }
@@ -696,11 +644,11 @@ public class ProductServiceImpl implements ProductService {
             int stockLevel = r.nextInt(27) + 3;
 
             for (int i = 0; i < stockLevel; i++) {
-                String rfid = generateRFID(p.getsku());
-                createProductItem(rfid, p.getsku());
+                String rfid = StringGenerator.generateRFID(p.getSku());
+                ProductItem pi = createProductItem(rfid, p.getSku());
                 try {
-                    siteService.addProductItemToSite(Long.valueOf(r.nextInt(20)) + 1, rfid);
-                } catch (NoStockLevelException ex) {
+                    siteService.addProductsWithRfid(Long.valueOf(r.nextInt(20)) + 1, p.getSku(), List.of(pi));
+                } catch (Exception ex) {
                     // do nothing
                 }
             }
@@ -708,14 +656,18 @@ public class ProductServiceImpl implements ProductService {
 
         // Customer Order
         CustomerOrderLI coli1 = new CustomerOrderLI();
-        coli1.setProductItems(getProductItemsBySKU("BPD0010528A-1").stream().collect(Collectors.toList()));
+        coli1.setProduct(getProduct("BPD0010528A-1"));
+        coli1.setQty(2);
+        coli1.setSubTotal(98.0);
         customerOrderService.createCustomerOrderLI(coli1);
 
         CustomerOrderLI coli2 = new CustomerOrderLI();
-        coli2.setProductItems(getProductItemsBySKU("BPS0009808X-1").stream().collect(Collectors.toList()));
+        coli2.setProduct(getProduct("BPS0009808X-1"));
+        coli2.setQty(1);
+        coli2.setSubTotal(29.0);
         customerOrderService.createCustomerOrderLI(coli2);
 
-        Payment payment1 = new Payment(300.15, "241563", PaymentType.VISA);
+        Payment payment1 = new Payment(127.0, "241563", PaymentType.VISA);
         customerOrderService.createPayment(payment1);
 
         CustomerOrder co1 = new CustomerOrder();

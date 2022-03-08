@@ -1,10 +1,9 @@
 package com.iora.erp.data;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -23,6 +22,7 @@ import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
@@ -30,7 +30,7 @@ import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
-import com.iora.erp.service.EmployeeService;
+import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -45,8 +45,6 @@ public class DataLoader implements CommandLineRunner {
 	private CustomerService customerService;
 	@Autowired
 	private AdminService adminService;
-	@Autowired
-	private EmployeeService employeeService;
 	@PersistenceContext
 	private EntityManager em;
 
@@ -79,7 +77,7 @@ public class DataLoader implements CommandLineRunner {
 		ar1.add(AccessRights.WAREHOUSE_ORDER);
 		ar1.add(AccessRights.STORE_BASIC);
 		ar1.add(AccessRights.STORE_INVENTORY);
-		JobTitle jobTitle1 = new JobTitle("IT Admin", "Managing all IT", ar1);
+		JobTitle jobTitle1 = new JobTitle("IT Admin", "Superuser", ar1);
 		em.persist(jobTitle1);
 
 		Set<AccessRights> ar2 = new HashSet<>();
@@ -174,6 +172,8 @@ public class DataLoader implements CommandLineRunner {
 		sora.setAddress(a1);
 		em.persist(sora);
 
+		
+		
 		// Employee
 		Employee e1 = new Employee("Darth Vader", "darthV", "password");
 		e1.setEmail("darth.vader@gmail.com");
@@ -182,7 +182,9 @@ public class DataLoader implements CommandLineRunner {
 		e1.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e1.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e1.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e1);
+		e1.setSalt(StringGenerator.saltGeneration());
+		e1.setPassword(StringGenerator.generateProtectedPassword(e1.getSalt(), "password"));
+		em.persist(e1);
 
 		Employee e2 = new Employee("Sharon KS", "sharonE", "password");
 		e2.setEmail("sharonMS.12@gmail.com");
@@ -191,7 +193,9 @@ public class DataLoader implements CommandLineRunner {
 		e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(2)));
 		e2.setDepartment(adminService.getDepartmentById(Long.valueOf(2)));
 		e2.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e2);
+		e2.setSalt(StringGenerator.saltGeneration());
+		e2.setPassword(StringGenerator.generateProtectedPassword(e2.getSalt(), "password"));
+		em.persist(e2);
 
 		Employee e3 = new Employee("Manuel Manny", "manu", "password");
 		e3.setEmail("MannyManuel@gmail.com");
@@ -200,7 +204,9 @@ public class DataLoader implements CommandLineRunner {
 		e3.setJobTitle(adminService.getJobTitleById(Long.valueOf(3)));
 		e3.setDepartment(adminService.getDepartmentById(Long.valueOf(4)));
 		e3.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e3);
+		e3.setSalt(StringGenerator.saltGeneration());
+		e3.setPassword(StringGenerator.generateProtectedPassword(e3.getSalt(), "password"));
+		em.persist(e3);
 
 		Employee e4 = new Employee("Warren Ho", "warren", "password");
 		e4.setEmail("WarrenHoHoHo@gmail.com");
@@ -209,7 +215,9 @@ public class DataLoader implements CommandLineRunner {
 		e4.setJobTitle(adminService.getJobTitleById(Long.valueOf(4)));
 		e4.setDepartment(adminService.getDepartmentById(Long.valueOf(5)));
 		e4.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e4);
+		e4.setSalt(StringGenerator.saltGeneration());
+		e4.setPassword(StringGenerator.generateProtectedPassword(e4.getSalt(), "password"));
+		em.persist(e4);
 
 		Employee e5 = new Employee("Storm", "storm", "password");
 		e5.setEmail("storm@gmail.com");
@@ -218,7 +226,75 @@ public class DataLoader implements CommandLineRunner {
 		e5.setJobTitle(adminService.getJobTitleById(Long.valueOf(5)));
 		e5.setDepartment(adminService.getDepartmentById(Long.valueOf(6)));
 		e5.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		employeeService.createEmployee(e5);
+		e5.setSalt(StringGenerator.saltGeneration());
+		e5.setPassword(StringGenerator.generateProtectedPassword(e5.getSalt(), "password"));
+		em.persist(e5);
+
+		Employee e6 = new Employee("Goh Hong Pei", "hongpei", "password");
+		e6.setEmail("hongpeiisrandom@gmail.com");
+		e6.setSalary(1200.0);
+		e6.setPayType(PayType.MONTHLY);
+		e6.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
+		e6.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
+		e6.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+		e6.setSalt(StringGenerator.saltGeneration());
+		e6.setPassword(StringGenerator.generateProtectedPassword(e6.getSalt(), "password"));
+		em.persist(e6);
+
+		Employee e7 = new Employee("Delven Wong", "delven", "password");
+		e7.setEmail("pengyu_33@msn.com");
+		e7.setSalary(1200.0);
+		e7.setPayType(PayType.MONTHLY);
+		e7.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
+		e7.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
+		e7.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+		e7.setSalt(StringGenerator.saltGeneration());
+		e7.setPassword(StringGenerator.generateProtectedPassword(e7.getSalt(), "password"));
+		em.persist(e7);
+
+		Employee e8 = new Employee("Adeline Tan", "adeline", "password");
+		e8.setEmail("tan.adelinejy@gmail.com");
+		e8.setSalary(1200.0);
+		e8.setPayType(PayType.MONTHLY);
+		e8.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
+		e8.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
+		e8.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+		e8.setSalt(StringGenerator.saltGeneration());
+		e8.setPassword(StringGenerator.generateProtectedPassword(e8.getSalt(), "password"));
+		em.persist(e8);
+
+		Employee e9 = new Employee("Louis Misson", "louis", "password");
+		e9.setEmail("louismisson8@gmail.com");
+		e9.setSalary(1200.0);
+		e9.setPayType(PayType.MONTHLY);
+		e9.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
+		e9.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
+		e9.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+		e9.setSalt(StringGenerator.saltGeneration());
+		e9.setPassword(StringGenerator.generateProtectedPassword(e9.getSalt(), "password"));
+		em.persist(e9);
+
+		Employee e10 = new Employee("Remus Kwan", "remus", "password");
+		e10.setEmail("remuskwan23@gmail.com");
+		e10.setSalary(1200.0);
+		e10.setPayType(PayType.MONTHLY);
+		e10.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
+		e10.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
+		e10.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+		e10.setSalt(StringGenerator.saltGeneration());
+		e10.setPassword(StringGenerator.generateProtectedPassword(e10.getSalt(), "password"));
+		em.persist(e10);
+
+		Employee e11 = new Employee("Ruth Chong", "ruth", "password");
+		e11.setEmail("ruth.cjn@gmail.com");
+		e11.setSalary(1200.0);
+		e11.setPayType(PayType.MONTHLY);
+		e11.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
+		e11.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
+		e11.setCompany(adminService.getCompanyById(Long.valueOf(1)));
+		e11.setSalt(StringGenerator.saltGeneration());
+		e11.setPassword(StringGenerator.generateProtectedPassword(e11.getSalt(), "password"));
+		em.persist(e11);
 
 		// Adding Sites
 		HeadquartersSite iorahq = new HeadquartersSite("HQ", a1, "123456", "+65-63610056", iora);
@@ -321,33 +397,72 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(m1);
 
 		// Adding birthday points and membership tiers
-		Currency rm = new Currency("RM", "Malaysian Ringgit");
-		Currency sgd = new Currency("SGD", "Singapore Dollar");
+		Currency rm = new Currency("RM", "Malaysian Ringgit", Country.Malaysia);
+		Currency sgd = new Currency("SGD", "Singapore Dollar", Country.Singapore);
 		em.persist(rm);
 		em.persist(sgd);
 
-		Map<Currency, Integer> birthday = Map.of(rm, 500, sgd, 200);
-		BirthdayPoints bday = new BirthdayPoints("STANDARD", birthday, 1, 2.00);
+		BirthdayPoints bday = new BirthdayPoints("STANDARD", sgd, 200, 1, 2.00);
 		em.persist(bday);
 
-		MembershipTier basic = new MembershipTier("BASIC", 0.00, Map.of(rm, 0, sgd, 0), bday);
-		MembershipTier silver = new MembershipTier("SILVER", 0.03, Map.of(rm, 500, sgd, 200), bday);
-		MembershipTier gold = new MembershipTier("GOLD", 0.05, Map.of(rm, 3000, sgd, 1000), bday);
-		MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, Map.of(rm, 7500, sgd, 2500), bday);
+		MembershipTier basic = new MembershipTier("BASIC", 0.00, sgd, 0, bday);
+		MembershipTier silver = new MembershipTier("SILVER", 0.03, sgd, 200, bday);
+		MembershipTier gold = new MembershipTier("GOLD", 0.05, sgd, 1000, bday);
+		MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, sgd, 2500, bday);
 		em.persist(basic);
 		em.persist(silver);
 		em.persist(gold);
 		em.persist(diamond);
 
 		// Customer
-		Customer customer = new Customer("Steven", "Lim");
-		customer.setContactNumber("91234567");
-		customer.setDob(new Date(655530832000L));
-		customer.setEmail("stevenlim@gmail.com");
-		customer.sethashPass("password");
-		customer.setMembershipPoints(0);
-		customer.setStoreCredit(0.0);
-		customerService.createCustomerAccount(customer);
+		Customer c1 = new Customer("Goh", "Hong Pei");
+		c1.setContactNumber("83940775");
+		c1.setDob(LocalDate.of(2000, 1, 1));
+		c1.setEmail("hongpeiisrandom@gmail.com");
+		c1.sethashPass("password");
+		customerService.createCustomerAccount(c1);
+
+		Customer c2 = new Customer("Delven", "Wong");
+		c2.setContactNumber("92711363");
+		c2.setDob(LocalDate.of(2000, 1, 1));
+		c2.setEmail("pengyu_33@msn.com");
+		c2.sethashPass("password");
+		customerService.createCustomerAccount(c2);
+
+		Customer c3 = new Customer("Adeline", "Tan");
+		c3.setContactNumber("93834898");
+		c3.setDob(LocalDate.of(2000, 1, 1));
+		c3.setEmail("tan.adelinejy@gmail.com");
+		c3.sethashPass("password");
+		customerService.createCustomerAccount(c3);
+
+		Customer c4 = new Customer("Louis", "Misson");
+		c4.setContactNumber("98550432");
+		c4.setDob(LocalDate.of(2000, 1, 1));
+		c4.setEmail("louismisson8@gmail.com");
+		c4.sethashPass("password");
+		customerService.createCustomerAccount(c4);
+
+		Customer c5 = new Customer("Remus", "Kwan");
+		c5.setContactNumber("90556630");
+		c5.setDob(LocalDate.of(2000, 1, 1));
+		c5.setEmail("remuskwan23@gmail.com");
+		c5.sethashPass("password");
+		customerService.createCustomerAccount(c5);
+
+		Customer c6 = new Customer("Ruth", "Chong");
+		c6.setContactNumber("86065278");
+		c6.setDob(LocalDate.of(2000, 1, 1));
+		c6.setEmail("ruth.cjn@gmail.com");
+		c6.sethashPass("password");
+		customerService.createCustomerAccount(c6);
+
+		Customer c7 = new Customer("Steven", "Lim");
+		c7.setContactNumber("91234567");
+		c7.setDob(LocalDate.of(2000, 1, 1));
+		c7.setEmail("stevenlim@gmail.com");
+		c7.sethashPass("password");
+		customerService.createCustomerAccount(c7);
 
 		// Generate 10 $10 vouchers
 		customerService.generateVouchers(10, 10, "2022-02-16");
@@ -355,29 +470,12 @@ public class DataLoader implements CommandLineRunner {
 		// Generate 10 $5 vouchers
 		customerService.generateVouchers(5, 10, "2022-02-16");
 
-		// Customer Order
-		
-		
-		// Customer Order
-		// Product pdt = new Product("Test01 Product");
-		// em.persist(pdt);
+		// emailService.sendSimpleMessage("pengyu_33@msn.com", "testing testing", "this is sent by Spring Boot Framework :D");
 
-		// ProductItem pi = new ProductItem("10-1003939-1-30-test");
-		// pi.setProductSKU("Test01 Product");
-		// em.persist(pi);
-
-		// pdt.getProductItems().add(pi);
-
-		// CustomerOrderLI co = new CustomerOrderLI();
-		// em.persist(co);
-		// co.addProductItem(pi);
-		
-		// CustomerOrder coo = new CustomerOrder();
-		// coo.setStoreSiteId(Long.valueOf(1));
-		// em.persist(coo);
-		// coo.getLineItems().add(co);
-		 
-
+		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5), false, false, true);
+		PromotionField pf2 = new PromotionField("category", "2 FOR S$ 49", 2, List.of(0.00, 0.00), List.of(24.5, 24.5), false, false, true);
+		em.persist(pf1);
+		em.persist(pf2);
 	}
 
 }

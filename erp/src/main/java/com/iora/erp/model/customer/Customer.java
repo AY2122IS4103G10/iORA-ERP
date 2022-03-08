@@ -1,7 +1,7 @@
 package com.iora.erp.model.customer;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -12,8 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.iora.erp.model.customerOrder.CustomerOrder;
 
@@ -29,8 +27,9 @@ public class Customer implements Serializable {
     private String lastName;
     @Column(nullable = false, unique = true)
     private String email;
-    @Temporal(TemporalType.DATE)
-    private Date dob;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    private LocalDate dob;
+    @Column(nullable = false, unique = true)
     private String contactNumber;
     private Integer membershipPoints;
     @ManyToOne
@@ -51,7 +50,7 @@ public class Customer implements Serializable {
         storeCredit = 0.0;
     }
 
-    public Customer(String firstName, String lastName, String email, Date dob, String contactNumber,
+    public Customer(String firstName, String lastName, String email, LocalDate dob, String contactNumber,
             MembershipTier membershipTier, String hashPass, String salt) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -124,11 +123,11 @@ public class Customer implements Serializable {
         this.email = email;
     }
 
-    public Date getDob() {
+    public LocalDate getDob() {
         return this.dob;
     }
 
-    public void setDob(Date dob) {
+    public void setDob(LocalDate dob) {
         this.dob = dob;
     }
 

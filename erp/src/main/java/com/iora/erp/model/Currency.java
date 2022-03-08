@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.iora.erp.enumeration.Country;
 
 @Entity
 public class Currency {
@@ -12,19 +12,16 @@ public class Currency {
     private String code;
     @Column(nullable = false, unique = true)
     private String name;
+    @Column(nullable = false)
+    private Country country;
 
     public Currency() {
     }
 
-    public Currency(String key) {
-        String[] pair = key.split(",");
-        this.code = pair[0];
-        this.name = pair[1];
-    }
-
-    public Currency(String code, String name) {
+    public Currency(String code, String name, Country country) {
         this.code = code;
         this.name = name;
+        this.country = country;
     }
 
     public String getCode() {
@@ -43,8 +40,15 @@ public class Currency {
         this.name = name;
     }
 
+    public Country getCountry() {
+        return this.country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
     @Override
-    @JsonValue
     public String toString() {
         return this.code + "," + this.name;
     }

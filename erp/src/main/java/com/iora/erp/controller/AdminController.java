@@ -373,6 +373,16 @@ public class AdminController {
         }
     }
 
+    @PostMapping(path = "/resetpw/{id}", produces = "application/json")
+    public ResponseEntity<Object> resetPassword(@PathVariable Long id) {
+        try {
+            employeeService.resetPassword(id);
+            return ResponseEntity.ok("Email with temporary password has been sent.");
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PostMapping(path = "/addSite/{storeType}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addSite(@RequestBody Site site, @PathVariable String storeType) {
         try {

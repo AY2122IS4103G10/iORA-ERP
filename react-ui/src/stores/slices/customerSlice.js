@@ -75,7 +75,7 @@ const customerSlice = createSlice({
     });
     builder.addCase(updateExistingCustomer.fulfilled, (state, action) => {
       const {
-        customerId,
+        id,
         firstName,
         lastName,
         email,
@@ -87,7 +87,7 @@ const customerSlice = createSlice({
         storeCredit,
         availStatus
       } = action.payload;
-      const existingCustomer = state.customers.find((cus) => cus.customerId === customerId);
+      const existingCustomer = state.customers.find((cus) => cus.id === id);
       if (existingCustomer) {
         existingCustomer.firstName = firstName;
         existingCustomer.email = email;
@@ -104,59 +104,23 @@ const customerSlice = createSlice({
     });
     builder.addCase(blockExistingCustomer.fulfilled, (state, action) => {
       const {
-        customerId,
-        firstName,
-        lastName,
-        email,
-        dob,
-        password,
-        contactNumber,
-        membershipPoints,
-        //membershipTier,
-        storeCredit,
+        id,
         availStatus
       } = action.payload;
-      const existingCustomer = state.customers.find((cus) => cus.customerId === customerId);
+      const existingCustomer = state.customers.find((cus) => cus.id === id);
       if (existingCustomer) {
-        existingCustomer.firstName = firstName;
-        existingCustomer.email = email;
-        existingCustomer.dob = dob;
-        existingCustomer.lastName = lastName;
-        existingCustomer.password = password;
         existingCustomer.availStatus = availStatus;
-        existingCustomer.contactNumber = contactNumber;
-        //existingCustomer.membershipTier = membershipTier;
-        existingCustomer.membershipPoints = membershipPoints;
-        existingCustomer.storeCredit = storeCredit;
       }
       // state.status = "idle";
     });
     builder.addCase(unblockExistingCustomer.fulfilled, (state, action) => {
       const {
-        customerId,
-        firstName,
-        lastName,
-        email,
-        dob,
-        password,
-        contactNumber,
-        membershipPoints,
-        //membershipTier,
-        storeCredit,
+        id,
         availStatus
       } = action.payload;
-      const existingCustomer = state.customers.find((cus) => cus.customerId === customerId);
+      const existingCustomer = state.customers.find((cus) => cus.id === id);
       if (existingCustomer) {
-        existingCustomer.firstName = firstName;
-        existingCustomer.email = email;
-        existingCustomer.dob = dob;
-        existingCustomer.lastName = lastName;
-        existingCustomer.password = password;
         existingCustomer.availStatus = availStatus;
-        existingCustomer.contactNumber = contactNumber;
-        //existingCustomer.membershipTier = membershipTier;
-        existingCustomer.membershipPoints = membershipPoints;
-        existingCustomer.storeCredit = storeCredit;
       }
       // state.status = "idle";
     });

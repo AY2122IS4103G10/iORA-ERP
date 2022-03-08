@@ -1,16 +1,15 @@
 package com.iora.erp.model.customerOrder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
+import javax.persistence.ManyToOne;
 
-import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.Product;
 
 @Entity
 public class CustomerOrderLI {
@@ -18,15 +17,22 @@ public class CustomerOrderLI {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Transient
+    @Column(nullable = false)
     private int qty;
 
-    @OneToMany
-    private List<ProductItem> productItems;
+    @ManyToOne(optional = false)
+    private Product product;
+
+    @Column(nullable = false, scale = 2)
+    private double subTotal;
 
     public CustomerOrderLI() {
-        this.qty = 0;
-        productItems = new ArrayList<>();
+    }
+
+    public CustomerOrderLI(int qty, Product product, double subTotal) {
+        this.qty = qty;
+        this.product = product;
+        this.subTotal = subTotal;
     }
 
     public Long getId() {
@@ -38,25 +44,37 @@ public class CustomerOrderLI {
     }
 
     public int getQty() {
-        return this.productItems.size();
+        return this.qty;
     }
 
-    public List<ProductItem> getProductItems() {
-        return this.productItems;
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 
-    public void setProductItems(List<ProductItem> productItems) {
-        this.productItems = productItems;
-        this.qty = this.productItems.size();
+    public Product getProduct() {
+        return this.product;
     }
 
-    public void addProductItem(ProductItem productItem) {
-        this.productItems.add(productItem);
-        this.qty = this.productItems.size();
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
-    public void removeProductItem(ProductItem productItem) {
-        this.productItems.remove(productItem);
-        this.qty = this.productItems.size();
+    public double getSubTotal() {
+        return this.subTotal;
+    }
+
+    public void setSubTotal(double subTotal) {
+        this.subTotal = subTotal;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof CustomerOrderLI)) {
+            return false;
+        }
+        CustomerOrderLI customerOrderLI = (CustomerOrderLI) o;
+        return Objects.equals(product, customerOrderLI.product) && Objects.equals(qty, customerOrderLI.qty);
     }
 }

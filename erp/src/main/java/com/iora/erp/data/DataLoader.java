@@ -34,6 +34,7 @@ import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,8 @@ public class DataLoader implements CommandLineRunner {
 	private AdminService adminService;
 	@PersistenceContext
 	private EntityManager em;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -182,8 +185,9 @@ public class DataLoader implements CommandLineRunner {
 		e1.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e1.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e1.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e1.setSalt(StringGenerator.saltGeneration());
-		e1.setPassword(StringGenerator.generateProtectedPassword(e1.getSalt(), "password"));
+		// e1.setSalt(StringGenerator.saltGeneration());
+		// e1.setPassword(StringGenerator.generateProtectedPassword(e1.getSalt(), "password"));
+		e1.setPassword(passwordEncoder.encode("password"));
 		em.persist(e1);
 
 		Employee e2 = new Employee("Sharon KS", "sharonE", "password");
@@ -193,8 +197,9 @@ public class DataLoader implements CommandLineRunner {
 		e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(2)));
 		e2.setDepartment(adminService.getDepartmentById(Long.valueOf(2)));
 		e2.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e2.setSalt(StringGenerator.saltGeneration());
-		e2.setPassword(StringGenerator.generateProtectedPassword(e2.getSalt(), "password"));
+		// e2.setSalt(StringGenerator.saltGeneration());
+		// e2.setPassword(StringGenerator.generateProtectedPassword(e2.getSalt(), "password"));
+		e2.setPassword(passwordEncoder.encode("password"));
 		em.persist(e2);
 
 		Employee e3 = new Employee("Manuel Manny", "manu", "password");
@@ -204,8 +209,9 @@ public class DataLoader implements CommandLineRunner {
 		e3.setJobTitle(adminService.getJobTitleById(Long.valueOf(3)));
 		e3.setDepartment(adminService.getDepartmentById(Long.valueOf(4)));
 		e3.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e3.setSalt(StringGenerator.saltGeneration());
-		e3.setPassword(StringGenerator.generateProtectedPassword(e3.getSalt(), "password"));
+		// e3.setSalt(StringGenerator.saltGeneration());
+		// e3.setPassword(StringGenerator.generateProtectedPassword(e3.getSalt(), "password"));
+		e3.setPassword(passwordEncoder.encode("password"));
 		em.persist(e3);
 
 		Employee e4 = new Employee("Warren Ho", "warren", "password");
@@ -215,8 +221,9 @@ public class DataLoader implements CommandLineRunner {
 		e4.setJobTitle(adminService.getJobTitleById(Long.valueOf(4)));
 		e4.setDepartment(adminService.getDepartmentById(Long.valueOf(5)));
 		e4.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e4.setSalt(StringGenerator.saltGeneration());
-		e4.setPassword(StringGenerator.generateProtectedPassword(e4.getSalt(), "password"));
+		// e4.setSalt(StringGenerator.saltGeneration());
+		// e4.setPassword(StringGenerator.generateProtectedPassword(e4.getSalt(), "password"));
+		e4.setPassword(passwordEncoder.encode("password"));
 		em.persist(e4);
 
 		Employee e5 = new Employee("Storm", "storm", "password");
@@ -226,8 +233,9 @@ public class DataLoader implements CommandLineRunner {
 		e5.setJobTitle(adminService.getJobTitleById(Long.valueOf(5)));
 		e5.setDepartment(adminService.getDepartmentById(Long.valueOf(6)));
 		e5.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e5.setSalt(StringGenerator.saltGeneration());
-		e5.setPassword(StringGenerator.generateProtectedPassword(e5.getSalt(), "password"));
+		// e5.setSalt(StringGenerator.saltGeneration());
+		// e5.setPassword(StringGenerator.generateProtectedPassword(e5.getSalt(), "password"));
+		e5.setPassword(passwordEncoder.encode("password"));
 		em.persist(e5);
 
 		Employee e6 = new Employee("Goh Hong Pei", "hongpei", "password");
@@ -237,8 +245,9 @@ public class DataLoader implements CommandLineRunner {
 		e6.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e6.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e6.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e6.setSalt(StringGenerator.saltGeneration());
-		e6.setPassword(StringGenerator.generateProtectedPassword(e6.getSalt(), "password"));
+		// e6.setSalt(StringGenerator.saltGeneration());
+		// e6.setPassword(StringGenerator.generateProtectedPassword(e6.getSalt(), "password"));
+		e6.setPassword(passwordEncoder.encode("password"));
 		em.persist(e6);
 
 		Employee e7 = new Employee("Delven Wong", "delven", "password");
@@ -248,8 +257,9 @@ public class DataLoader implements CommandLineRunner {
 		e7.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e7.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e7.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e7.setSalt(StringGenerator.saltGeneration());
-		e7.setPassword(StringGenerator.generateProtectedPassword(e7.getSalt(), "password"));
+		// e7.setSalt(StringGenerator.saltGeneration());
+		// e7.setPassword(StringGenerator.generateProtectedPassword(e7.getSalt(), "password"));
+		e7.setPassword(passwordEncoder.encode("password"));
 		em.persist(e7);
 
 		Employee e8 = new Employee("Adeline Tan", "adeline", "password");
@@ -259,8 +269,9 @@ public class DataLoader implements CommandLineRunner {
 		e8.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e8.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e8.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e8.setSalt(StringGenerator.saltGeneration());
-		e8.setPassword(StringGenerator.generateProtectedPassword(e8.getSalt(), "password"));
+		// e8.setSalt(StringGenerator.saltGeneration());
+		// e8.setPassword(StringGenerator.generateProtectedPassword(e8.getSalt(), "password"));
+		e8.setPassword(passwordEncoder.encode("password"));
 		em.persist(e8);
 
 		Employee e9 = new Employee("Louis Misson", "louis", "password");
@@ -270,8 +281,9 @@ public class DataLoader implements CommandLineRunner {
 		e9.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e9.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e9.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e9.setSalt(StringGenerator.saltGeneration());
-		e9.setPassword(StringGenerator.generateProtectedPassword(e9.getSalt(), "password"));
+		// e9.setSalt(StringGenerator.saltGeneration());
+		// e9.setPassword(StringGenerator.generateProtectedPassword(e9.getSalt(), "password"));
+		e9.setPassword(passwordEncoder.encode("password"));
 		em.persist(e9);
 
 		Employee e10 = new Employee("Remus Kwan", "remus", "password");
@@ -281,8 +293,9 @@ public class DataLoader implements CommandLineRunner {
 		e10.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e10.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e10.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e10.setSalt(StringGenerator.saltGeneration());
-		e10.setPassword(StringGenerator.generateProtectedPassword(e10.getSalt(), "password"));
+		// e10.setSalt(StringGenerator.saltGeneration());
+		// e10.setPassword(StringGenerator.generateProtectedPassword(e10.getSalt(), "password"));
+		e10.setPassword(passwordEncoder.encode("password"));
 		em.persist(e10);
 
 		Employee e11 = new Employee("Ruth Chong", "ruth", "password");
@@ -292,8 +305,9 @@ public class DataLoader implements CommandLineRunner {
 		e11.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e11.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e11.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		e11.setSalt(StringGenerator.saltGeneration());
-		e11.setPassword(StringGenerator.generateProtectedPassword(e11.getSalt(), "password"));
+		// e11.setSalt(StringGenerator.saltGeneration());
+		// e11.setPassword(StringGenerator.generateProtectedPassword(e11.getSalt(), "password"));
+		e11.setPassword(passwordEncoder.encode("password"));
 		em.persist(e11);
 
 		// Adding Sites

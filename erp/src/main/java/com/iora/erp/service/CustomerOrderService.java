@@ -25,14 +25,13 @@ public interface CustomerOrderService {
 
     public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder);
     public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
-    public abstract CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder, List<Payment> payments)
-            throws CustomerOrderException, InsufficientPaymentException;
+    public abstract CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder, List<Payment> payments) throws CustomerOrderException, InsufficientPaymentException;
     
     public abstract CustomerOrderLI getCustomerOrderLI(Long id) throws CustomerOrderException;
     public abstract List<CustomerOrderLI> getCustomerOrderLIs(CustomerOrder customerOrder);
     public abstract CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI);
     public abstract CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException;
-    public abstract List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfid);
+    //public abstract List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfid);
 
     public abstract Payment getPayment(Long id) throws CustomerOrderException;
     public abstract List<Payment> getAllPayments();

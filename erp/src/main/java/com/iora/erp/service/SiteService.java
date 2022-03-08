@@ -19,7 +19,6 @@ public interface SiteService {
     public abstract List<Site> searchAllSites(List<String> siteTypes, String country, String company);
     public abstract List<? extends Site> searchHeadquarters(String country, String company);
     public abstract List<? extends Site> searchManufacturing(String country, String company);
-    public abstract List<? extends Site> searchOnlineStores(String country, String company);
     public abstract List<? extends Site> searchStores(String country, String company);
     public abstract List<? extends Site> searchWarehouses(String country, String company);
     public abstract Site updateSite(Site site);

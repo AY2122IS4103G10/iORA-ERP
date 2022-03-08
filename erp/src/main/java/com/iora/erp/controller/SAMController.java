@@ -410,8 +410,6 @@ public class SAMController {
                 return siteService.searchHeadquarters(country, company);
             case "Manufacturing":
                 return siteService.searchManufacturing(country, company);
-            case "OnlineStore":
-                return siteService.searchOnlineStores(country, company);
             case "Store":
                 return siteService.searchStores(country, company);
             case "Warehouse":

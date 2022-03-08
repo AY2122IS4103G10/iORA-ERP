@@ -7,28 +7,18 @@ import javax.persistence.Enumerated;
 
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.enumeration.OnlineOrderStatus;
-import com.iora.erp.model.site.StoreSite;
 
 @Entity
 public class OnlineOrder extends CustomerOrder {
-    @Column
-    private Long onlineStoreSiteId;
 
-    @Column
     @Enumerated(EnumType.STRING)
     private OnlineOrderStatus status;
 
-    @Column
+    @Column(nullable = false)
     private boolean delivery;
 
-    @Column
     @Enumerated(EnumType.STRING)
     private Country country;
-
-    @Column
-    private StoreSite pickupSite;
-
-    @Column
     private String deliveryAddress;
 
     public OnlineOrder() {
@@ -68,14 +58,6 @@ public class OnlineOrder extends CustomerOrder {
 
     public void setCountry(Country country) {
         this.country = country;
-    }
-
-    public StoreSite getPickupSite() {
-        return this.pickupSite;
-    }
-
-    public void setPickupSite(StoreSite pickupSite) {
-        this.pickupSite = pickupSite;
     }
 
     public String getDeliveryAddress() {

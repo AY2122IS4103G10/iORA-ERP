@@ -13,7 +13,6 @@ import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
-import com.iora.erp.model.site.OnlineStoreSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
@@ -43,11 +42,6 @@ public class SiteServiceImpl implements SiteService {
                 ManufacturingSite manufacturing = new ManufacturingSite(site);
                 em.persist(manufacturing);
                 return manufacturing;
-
-            case "OnlineStore":
-                OnlineStoreSite onlineStore = new OnlineStoreSite(site);
-                em.persist(onlineStore);
-                return onlineStore;
 
             case "Store":
                 StoreSite store = new StoreSite(site);
@@ -97,15 +91,6 @@ public class SiteServiceImpl implements SiteService {
         List<? extends Site> resultList = em
                 .createQuery(siteQuery("SELECT s FROM ManufacturingSite s", country, company),
                         ManufacturingSite.class)
-                .getResultList();
-        return resultList;
-    }
-
-    @Override
-    public List<? extends Site> searchOnlineStores(String country, String company) {
-        List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM OnlineStoreSite s", country, company),
-                        OnlineStoreSite.class)
                 .getResultList();
         return resultList;
     }

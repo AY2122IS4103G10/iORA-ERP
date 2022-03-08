@@ -1,5 +1,7 @@
 package com.iora.erp.model.customerOrder;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -63,5 +65,16 @@ public class CustomerOrderLI {
 
     public void setSubTotal(double subTotal) {
         this.subTotal = subTotal;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof CustomerOrderLI)) {
+            return false;
+        }
+        CustomerOrderLI customerOrderLI = (CustomerOrderLI) o;
+        return Objects.equals(product, customerOrderLI.product) && Objects.equals(qty, customerOrderLI.qty);
     }
 }

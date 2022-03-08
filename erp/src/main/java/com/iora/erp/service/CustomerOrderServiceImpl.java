@@ -6,15 +6,12 @@ import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -36,7 +33,6 @@ import com.iora.erp.model.customerOrder.RefundLI;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
-import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -194,157 +190,162 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         return em.merge(old);
     }
 
-    /* Need Hong Pei huge brains to do this
     @Override
-    public List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidSKU) {
+    public List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String sku) {
         // Get Product
-        ProductItem item = em.find(ProductItem.class, rfidSKU);
-        Product product = em.find(Product.class, rfidSKU);
+        Product product = em.find(Product.class, sku);
 
-        if (item == null && product == null) {
-            return List.of(lineItems, new ArrayList<>());
-        } else if (product == null) {
-            product = item.getProduct();
-        }
-
-        // Check if Item is already inside
-        if (lineItems.stream().flatMap(x -> x.getProduct())
-                .anyMatch(x -> x.getProduct().equals(product))) {
+        if (product == null) {
             return List.of(lineItems, new ArrayList<>());
         }
 
         // Add ProductItem to Line Items and Get Set of Promotions
-        Model mdl = em.find(Model.class, item.getProduct().getSku().split("-")[0]);
+        Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
         boolean added = false;
         for (int i = 0; i < lineItems.size(); i++) {
-            if (lineItems.get(i).getProductItems().get(0).getProduct().equals(item.getProduct())) {
-                lineItems.get(i).addProductItem(item);
+            if (lineItems.get(i).getProduct().equals(product)) {
+                lineItems.get(i).setQty(lineItems.get(i).getQty() + 1);
                 lineItems.get(i).setSubTotal(lineItems.get(i).getSubTotal() + mdl.getDiscountPrice());
                 added = true;
             }
         }
         if (!added) {
             CustomerOrderLI li = new CustomerOrderLI();
-            li.setProductItems(List.of(item));
+            li.setProduct(product);
+            li.setQty(1);
             li.setSubTotal(mdl.getDiscountPrice());
             lineItems.add(li);
         }
 
-        List<Model> models = lineItems.stream().parallel()
-                .map(x -> x.getProductItems().get(0).getProduct().getSku().split("-")[0])
-                .map(x -> em.find(Model.class, x))
-                .collect(Collectors.toList());
-        List<ProductItem> items = lineItems.stream().parallel().flatMap(x -> x.getProductItems().stream())
-                .collect(Collectors.toList());
+        List<CustomerOrderLI> newLineItems = new ArrayList<>(lineItems);
+
+        // Map for Line Item to Model
+        Map<CustomerOrderLI, Model> modelMap = new HashMap<>();
+        Map<CustomerOrderLI, PromotionField> bestSinglePromos = new HashMap<>();
+        Map<CustomerOrderLI, Integer> bestSinglePromosUsed = new HashMap<>();
+        Map<CustomerOrderLI, Double> bestPrices = new HashMap<>();
+        Map<CustomerOrderLI, Double> bestDiscounts = new HashMap<>();
+        List<PromotionLI> bestMultiPromosUsed = new ArrayList<>();
+
+        for (CustomerOrderLI coli : lineItems) {
+            Model m = em.find(Model.class, coli.getProduct().getSku().split("-")[0]);
+            modelMap.put(coli, m);
+            bestPrices.put(coli, m.getDiscountPrice());
+        }
+
+        // Get all possible promotions
         Set<PromotionField> promotions = new HashSet<>(
                 em.createQuery("SELECT pf FROM PromotionField pf WHERE pf.global = TRUE", PromotionField.class)
                         .getResultList());
-        for (Model m : models) {
+        for (CustomerOrderLI coli : lineItems) {
+            Model m = modelMap.get(coli);
+            // Get best possible single promotion
+            Set<PromotionField> singlePromotionsSet = new HashSet<>(promotions);
             for (ProductField pf : m.getProductFields()) {
-                if (pf instanceof PromotionField && ((PromotionField) pf).getAvailable()) {
+                if (pf instanceof PromotionField && ((PromotionField) pf).getAvailable()
+                        && ((PromotionField) pf).getQuota() == 1) {
                     promotions.add((PromotionField) pf);
                 }
             }
-        }
-        Map<PromotionField, List<Model>> promotionsMap = new HashMap<>();
-        promotions.forEach(x -> promotionsMap.put(x, new ArrayList<Model>()));
-        models.forEach(m -> m.getProductFields().stream().parallel().filter(x -> (x instanceof PromotionField))
-                .map(x -> (PromotionField) x).forEach(x -> promotionsMap.get(x).add(m)));
 
-        List<CustomerOrderLI> newLineItems = new ArrayList<>(lineItems);
-        List<CustomerOrderLI> promotionLIs = new ArrayList<>();
-
-        // Useful Maps
-        Map<ProductItem, Model> modelMap = new HashMap<>();
-        Map<ProductItem, Double> prices = new HashMap<>();
-        items.forEach(new Consumer<ProductItem>() {
-            public void accept(ProductItem p) {
-                Model m = models.stream().filter(mod -> mod.getModelCode().equals(p.getProduct().getSku().split("-")[0]))
-                        .findFirst()
-                        .get();
-                modelMap.put(p, m);
-                prices.put(p, m.getDiscountPrice());
-            }
-        });
-
-        // Find best promotions of quota 1
-        Map<ProductItem, PromotionLI> bestOnes = new HashMap<>();
-        for (Map.Entry<PromotionField, List<Model>> entry : promotionsMap.entrySet()) {
-            PromotionField pf = entry.getKey();
-            if (pf.getQuota() != 1) {
-                continue;
-            }
-            for (ProductItem p : items) {
-                Model m = modelMap.get(p);
+            // Find best possible single promotion
+            PromotionField bestPf = null;
+            Double bestPrice = m.getDiscountPrice();
+            Double bestDiscount = 0.0;
+            List<PromotionField> singlePromotionsList = new ArrayList<>(singlePromotionsSet);
+            for (PromotionField pf : singlePromotionsList) {
                 Double newPrice = pf.getCoefficients().get(0) * m.getDiscountPrice() + pf.getConstants().get(0);
-                Double discount = m.getDiscountPrice() - newPrice;
-                if (!bestOnes.containsKey(p) || bestOnes.get(p).getSubTotal() > discount) {
-                    PromotionLI pli = new PromotionLI(pf);
-                    pli.setProductItems(List.of(p));
-                    pli.setSubTotal(discount);
-                    bestOnes.put(p, pli);
-                    promotionLIs.add(pli);
-                    prices.put(p, newPrice);
+                if (newPrice < bestPrice) {
+                    bestPf = pf;
+                    bestPrice = newPrice;
+                    bestDiscount = m.getDiscountPrice() - newPrice;
+                }
+            }
+
+            if (bestPf != null) {
+                bestPrices.put(coli, bestPrice);
+                bestDiscounts.put(coli, bestDiscount);
+                bestSinglePromos.put(coli, bestPf);
+                bestSinglePromosUsed.put(coli, coli.getQty());
+            }
+        }
+
+        // Get all possible multi-item promotions
+        Map<PromotionField, List<CustomerOrderLI>> multiPromotionsMap = new HashMap<>();
+        for (CustomerOrderLI coli : lineItems) {
+            Model m = modelMap.get(coli);
+            for (ProductField pf : m.getProductFields()) {
+                if (pf instanceof PromotionField && ((PromotionField) pf).getAvailable()
+                        && ((PromotionField) pf).getQuota() > 1) {
+                    PromotionField prf = (PromotionField) pf;
+                    if (!multiPromotionsMap.containsKey(prf)) {
+                        multiPromotionsMap.put(prf, new ArrayList<>());
+                    }
+                    multiPromotionsMap.get(prf).add(coli);
                 }
             }
         }
 
-        items.sort(new Comparator<ProductItem>() {
-            public int compare(ProductItem p1, ProductItem p2) {
-                double price1 = prices.get(p1);
-                double price2 = prices.get(p2);
-                return price2 > price1 ? -1 : 1;
-            }
-        });
-
-        // Find best promotions with quota > 1
-        for (Map.Entry<PromotionField, List<Model>> entry : promotionsMap.entrySet()) {
+        for (Map.Entry<PromotionField, List<CustomerOrderLI>> entry : multiPromotionsMap.entrySet()) {
             PromotionField pf = entry.getKey();
-            if (pf.getQuota() <= 1) {
-                continue;
-            }
-            List<Model> promotionModels = entry.getValue();
-            promotionModels.sort((x, y) -> (int) (100 * (y.getDiscountPrice() - x.getDiscountPrice())));
+            List<CustomerOrderLI> priceDesc = entry.getValue();
+            priceDesc
+                    .sort((x, y) -> (modelMap.get(y).getDiscountPrice() > modelMap.get(x).getDiscountPrice() ? -1 : 1));
 
-            // Sort Product Item by Curr Price
-            List<ProductItem> applicableItems = items.stream().filter(p -> promotionModels.contains(modelMap.get(p)))
-                    .collect(Collectors.toList());
+            List<CustomerOrderLI> lineItemRef = new ArrayList<>();
+            for (CustomerOrderLI coli : priceDesc) {
+                for (int i = 0; i < coli.getQty(); i++) {
+                    lineItemRef.add(coli);
+                }
+            }
 
             int pointer = 0;
-            while (applicableItems.size() >= pointer + pf.getQuota()) {
+            while (lineItemRef.size() >= pf.getQuota() + pointer) {
                 double origPrices = 0;
                 double currPrices = 0;
                 double newPrices = 0;
-                List<ProductItem> usedOn = new ArrayList<>();
                 for (int j = 0; j < pf.getQuota(); j++) {
-                    ProductItem p = applicableItems.get(pointer + j);
-                    Model m = modelMap.get(p);
+                    CustomerOrderLI coli = lineItemRef.get(j + pointer);
+                    Model m = modelMap.get(coli);
                     origPrices += m.getDiscountPrice();
-                    currPrices += prices.get(p);
-                    newPrices += pf.getCoefficients().get(0) * m.getDiscountPrice() + pf.getConstants().get(0);
-                    usedOn.add(p);
+                    currPrices += bestPrices.get(coli);
+                    newPrices += pf.getCoefficients().get(j) * m.getDiscountPrice() + pf.getConstants().get(j);
                 }
                 if (newPrices < currPrices) {
                     PromotionLI pli = new PromotionLI(pf);
-                    pli.setProductItems(usedOn);
+                    pli.setQty(1);
+                    pli.setProduct(lineItemRef.get(pointer).getProduct());
                     pli.setSubTotal(newPrices - origPrices);
                     for (int j = 0; j < pf.getQuota(); j++) {
-                        ProductItem p = applicableItems.get(pointer + j);
-                        promotionLIs.remove(bestOnes.get(p));
-                        bestOnes.put(p, pli);
+                        CustomerOrderLI coli = lineItemRef.get(j + pointer);
+                        if (bestSinglePromosUsed.containsKey(coli)) {
+                            bestSinglePromosUsed.put(coli, bestSinglePromosUsed.get(coli) - 1);
+                        }
                     }
-                    promotionLIs.add(pli);
+                    bestMultiPromosUsed.add(pli);
                     pointer += pf.getQuota();
                 } else {
                     pointer++;
                 }
             }
-
         }
 
-        return List.of(newLineItems, promotionLIs);
+        List<CustomerOrderLI> promotionList = new ArrayList<CustomerOrderLI>();
+        for(Map.Entry<CustomerOrderLI,PromotionField> entry : bestSinglePromos.entrySet()) {
+            CustomerOrderLI coli = entry.getKey();
+            if (bestSinglePromosUsed.get(coli) > 0) {
+                PromotionLI pli = new PromotionLI(entry.getValue());
+                pli.setQty(bestSinglePromosUsed.get(coli));
+                pli.setSubTotal(modelMap.get(coli).getDiscountPrice() - bestPrices.get(coli));
+                pli.setProduct(coli.getProduct());
+                promotionList.add(pli);
+            }
+        }
+        for (PromotionLI multiPromo : bestMultiPromosUsed) {
+            promotionList.add(multiPromo);
+        }
+        return List.of(newLineItems, promotionList);
     }
-    */
 
     @Override
     public Payment getPayment(Long id) throws CustomerOrderException {

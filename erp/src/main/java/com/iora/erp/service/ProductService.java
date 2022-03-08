@@ -7,7 +7,6 @@ import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
-import com.iora.erp.model.Currency;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
@@ -54,14 +53,14 @@ public interface ProductService {
     public abstract ProductItem createProductItem(String rfid, String sku) throws ProductItemException;
     public abstract List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException;
     public abstract ProductItem getProductItem(String rfid) throws ProductItemException;
-    // public abstract List<ProductItem> getProductItemsBySKU(String sku) throws ProductException;
-    // public abstract List<ProductItem> searchProductItems(String rfid);
-    // public abstract void sellProductItem(String rfid) throws ProductItemException;
-    // public abstract void returnProductItem(String rfid) throws ProductItemException;
+    /* Deprecated
+    public abstract List<ProductItem> getProductItemsBySKU(String sku) throws ProductException;
+    public abstract List<ProductItem> searchProductItems(String rfid);
+    public abstract void sellProductItem(String rfid) throws ProductItemException;
+    public abstract void returnProductItem(String rfid) throws ProductItemException;
+    */
 
     public abstract JSONObject getProductCartDetails(String rfid) throws ProductItemException, ProductException, ModelException, JSONException, ProductFieldException;
-
-    public abstract Currency getCurrency(String code);
 
     // Data Loading
     public abstract void loadProducts(List<Object> productsJSON) throws ProductException, ProductFieldException, ProductItemException, CustomerException;

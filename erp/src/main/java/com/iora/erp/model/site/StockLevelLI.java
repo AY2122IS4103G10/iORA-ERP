@@ -22,7 +22,6 @@ public class StockLevelLI {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonManagedReference
     @ManyToOne
     private Product product;
 

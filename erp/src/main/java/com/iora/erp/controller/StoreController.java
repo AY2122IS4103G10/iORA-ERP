@@ -264,16 +264,16 @@ public class StoreController {
         }
     }
 
-    @PostMapping(path = "/customerOrder/add/{rfid}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addItemToLineItems(@RequestBody List<CustomerOrderLI> lineItems,
-            @PathVariable String rfid) {
-        try {
-            return ResponseEntity.ok(customerOrderService.addToCustomerOrderLIs(lineItems, rfid));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
+    // @PostMapping(path = "/customerOrder/add/{rfid}", consumes = "application/json", produces = "application/json")
+    // public ResponseEntity<Object> addItemToLineItems(@RequestBody List<CustomerOrderLI> lineItems,
+    //         @PathVariable String rfid) {
+    //     try {
+    //         return ResponseEntity.ok(customerOrderService.addToCustomerOrderLIs(lineItems, rfid));
+    //     } catch (Exception ex) {
+    //         ex.printStackTrace();
+    //         return ResponseEntity.badRequest().body(ex.getMessage());
+    //     }
+    // }
 
     @GetMapping(path = "/productDetails/{rfid}", produces = "application/json")
     public ResponseEntity<Object> getProductDetails(@PathVariable String rfid) {

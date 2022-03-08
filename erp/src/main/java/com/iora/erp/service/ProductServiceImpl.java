@@ -19,11 +19,9 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.enumeration.PaymentType;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.ModelException;
-import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
-import com.iora.erp.model.Currency;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.Payment;
@@ -370,6 +368,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
     public List<Model> getModelsByTag(String tag) {
         try {
             TypedQuery<Model> q;
@@ -384,6 +383,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
     public List<Model> getModelsByCategory(String category) {
         try {
             TypedQuery<Model> q;
@@ -501,6 +501,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException {
+        List<ProductItem> piList = new ArrayList<>();
+        for (int i = 0; i < qty; i++) {
+            String rfid = StringGenerator.generateRFID(sku);
+            ProductItem pi = createProductItem(rfid, sku);
+            piList.add(pi);
+        }
+        return piList;
+    }
+
+    @Override
     public ProductItem getProductItem(String rfid) throws ProductItemException {
         ProductItem pi = em.find(ProductItem.class, rfid);
 
@@ -548,17 +559,6 @@ public class ProductServiceImpl implements ProductService {
     */
 
     @Override
-    public List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException {
-        List<ProductItem> piList = new ArrayList<>();
-        for (int i = 0; i < qty; i++) {
-            String rfid = StringGenerator.generateRFID(sku);
-            ProductItem pi = createProductItem(rfid, sku);
-            piList.add(pi);
-        }
-        return piList;
-    }
-
-    @Override
     public JSONObject getProductCartDetails(String rfid)
             throws ProductItemException, ProductException, ModelException, JSONException,
             ProductFieldException {
@@ -572,11 +572,6 @@ public class ProductServiceImpl implements ProductService {
         jo.put("colour", getProductFieldValue(p, "COLOUR"));
         jo.put("size", getProductFieldValue(p, "SIZE"));
         return jo;
-    }
-
-    @Override
-    public Currency getCurrency(String code) {
-        return em.find(Currency.class, code);
     }
 
     @Override
@@ -659,26 +654,29 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        // To fix other methods first
         // Customer Order
-        // CustomerOrderLI coli1 = new CustomerOrderLI();
-        // coli1.setProductItems(getProductItemsBySKU("BPD0010528A-1").stream().collect(Collectors.toList()));
-        // customerOrderService.createCustomerOrderLI(coli1);
+        CustomerOrderLI coli1 = new CustomerOrderLI();
+        coli1.setProduct(getProduct("BPD0010528A-1"));
+        coli1.setQty(2);
+        coli1.setSubTotal(98.0);
+        customerOrderService.createCustomerOrderLI(coli1);
 
-        // CustomerOrderLI coli2 = new CustomerOrderLI();
-        // coli2.setProductItems(getProductItemsBySKU("BPS0009808X-1").stream().collect(Collectors.toList()));
-        // customerOrderService.createCustomerOrderLI(coli2);
+        CustomerOrderLI coli2 = new CustomerOrderLI();
+        coli2.setProduct(getProduct("BPS0009808X-1"));
+        coli2.setQty(1);
+        coli2.setSubTotal(29.0);
+        customerOrderService.createCustomerOrderLI(coli2);
 
-        // Payment payment1 = new Payment(300.15, "241563", PaymentType.VISA);
-        // customerOrderService.createPayment(payment1);
+        Payment payment1 = new Payment(127.0, "241563", PaymentType.VISA);
+        customerOrderService.createPayment(payment1);
 
-        // CustomerOrder co1 = new CustomerOrder();
-        // co1.setCustomerId(1L);
-        // co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        // co1.addLineItem(coli1);
-        // co1.addLineItem(coli2);
-        // co1.setStoreSiteId(3L);
-        // co1.addPayment(payment1);
-        // customerOrderService.createCustomerOrder(co1);
+        CustomerOrder co1 = new CustomerOrder();
+        co1.setCustomerId(1L);
+        co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        co1.addLineItem(coli1);
+        co1.addLineItem(coli2);
+        co1.setStoreSiteId(3L);
+        co1.addPayment(payment1);
+        customerOrderService.createCustomerOrder(co1);
     }
 }

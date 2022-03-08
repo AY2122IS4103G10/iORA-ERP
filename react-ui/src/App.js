@@ -66,6 +66,8 @@ import { ProcurementList } from "./views/containers/Procurement/ProcurementList/
 import { useLocation } from "react-router-dom";
 import { ProcurementSearch } from "./views/containers/Procurement/ProcurementSearch/index.js";
 import { LGIndex } from "./views/containers/Index/LGIndex/index.js";
+import { ProductsList } from "./views/containers/Products/ProductsList/index.js";
+import { ProductPrint } from "./views/containers/Products/ProductPrint/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -89,7 +91,14 @@ function App() {
             }
           >
             <Route path="products" element={<Outlet />}>
-              <Route index element={<ManageProducts />} />
+              <Route
+                index
+                element={
+                  <ManageProducts subsys="sm">
+                    <ProductsList />
+                  </ManageProducts>
+                }
+              />
               <Route path=":prodCode" element={<ProductDetails />} />
               <Route path="create" element={<ProductForm />} />
               <Route path="edit/:prodId" element={<ProductForm />} />
@@ -124,16 +133,16 @@ function App() {
               <Route
                 index
                 element={
-                  <ManageProcurement>
-                    <ProcurementList pathname={pathname} />
+                  <ManageProcurement subsys="sm">
+                    <ProcurementList pathname={pathname} subsys="sm" />
                   </ManageProcurement>
                 }
               />
               <Route
                 path="search"
                 element={
-                  <ManageProcurement>
-                    <ProcurementSearch />
+                  <ManageProcurement subsys="sm">
+                    <ProcurementSearch subsys="sm" />
                   </ManageProcurement>
                 }
               />
@@ -267,16 +276,16 @@ function App() {
               <Route
                 index
                 element={
-                  <ManageProcurement>
-                    <ProcurementList pathname={pathname} />
+                  <ManageProcurement subsys="mf">
+                    <ProcurementList pathname={pathname} subsys="mf" />
                   </ManageProcurement>
                 }
               />
               <Route
                 path="search"
                 element={
-                  <ManageProcurement>
-                    <ProcurementSearch />
+                  <ManageProcurement subsys="mf">
+                    <ProcurementSearch subsys="mf" />
                   </ManageProcurement>
                 }
               />
@@ -295,6 +304,16 @@ function App() {
               </PrivateRoute>
             }
           >
+            <Route path="products" element={<Outlet />}>
+              <Route
+                path="print"
+                element={
+                  <ManageProducts subsys="wh">
+                    <ProductPrint subsys="wh" />
+                  </ManageProducts>
+                }
+              />
+            </Route>
             <Route path="stocklevels">
               <Route path="my/:id" element={<StockLevelForm subsys="wh" />} />
               <Route path="my" element={<MyStoreStock subsys="wh" />} />
@@ -312,22 +331,23 @@ function App() {
               <Route
                 index
                 element={
-                  <ManageProcurement>
-                    <ProcurementList pathname={pathname} />
+                  <ManageProcurement subsys="wh">
+                    <ProcurementList pathname={pathname} subsys="wh" />
                   </ManageProcurement>
                 }
               />
               <Route
                 path="search"
                 element={
-                  <ManageProcurement>
-                    <ProcurementSearch />
+                  <ManageProcurement subsys="wh">
+                    <ProcurementSearch subsys="wh" />
                   </ManageProcurement>
                 }
               />
-              <Route path=":procurementId" element={<ProcurementDetails />} />
-              <Route path="create" element={<ProcurementForm />} />
-              <Route path="edit/:orderId" element={<VoucherForm />} />
+              <Route
+                path=":procurementId"
+                element={<ProcurementDetails subsys="wh" />}
+              />
             </Route>
 
             <Route path="stocktransfer" element={<Outlet />}>
@@ -343,7 +363,7 @@ function App() {
               />
             </Route>
           </Route>
-          
+
           {/* Logistics Subsystem */}
           <Route
             path="lg"
@@ -359,6 +379,7 @@ function App() {
             </Route>
           </Route>
         </Route>
+
         {/* Self Service Kiosk*/}
         <Route path="ss" element={<Outlet />}>
           <Route index element={<FrontPage />} />

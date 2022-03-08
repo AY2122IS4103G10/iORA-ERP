@@ -9,12 +9,20 @@ import {
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/outline";
-import { useDispatch } from "react-redux";
-import { updateCurrSite } from "../../../../stores/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+import { useToasts } from "react-toast-notifications";
+import { sitesApi } from "../../../../environments/Api";
+import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
-  { name: "Procurement", href: "/mf/procurements/search", icon: CreditCardIcon, current: false },
+  {
+    name: "Procurement",
+    href: "/mf/procurements/search",
+    icon: CreditCardIcon,
+    current: false,
+  },
 ];
 
 const secondaryNavigation = [
@@ -24,12 +32,48 @@ const secondaryNavigation = [
 ];
 
 export const MFIndex = () => {
+  const dispatch = useDispatch()
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+  const siteId = useSelector(selectUserSite);
+  const [sites, setSites] = useState([]);
+  const [siteSelected, setSiteSelected] = useState(sites[0]);
+  const [siteCode, setSiteCode] = useState("");
+  const { addToast } = useToasts();
   
   useEffect(() => {
-    dispatch(updateCurrSite(21));
-  }, [dispatch]);
+    sitesApi
+      .searchByType("Manufacturing")
+      .then((response) => {
+        setSites(response.data);
+        setSiteSelected(response.data[0]);
+      })
+      .then(() => siteId === 0 && openSiteModal());
+  }, [siteId]);
+
+  const handleEnterSite = (evt) => {
+    evt.preventDefault();
+    if (siteSelected.siteCode === siteCode.trim()) {
+      localStorage.setItem("siteId", siteSelected.id);
+      addToast(`Logged in to ${siteSelected.name}`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      dispatch(updateCurrSite())
+      setSiteCode("");
+      closeSiteModal();
+    } else {
+      addToast("Error: Invalid site code. Please try again.", {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
+
+  const onSiteCodeChanged = (e) => setSiteCode(e.target.value);
+
+  const openSiteModal = () => setOpen(true);
+  const closeSiteModal = () => setOpen(false);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -51,7 +95,21 @@ export const MFIndex = () => {
           }
         />
         <main className="flex-1 pb-8">
-          <Outlet />
+          <>
+            <Outlet />
+            {[sites, siteSelected, setSiteSelected].every(Boolean) && (
+              <EnterSiteModal
+                open={open}
+                closeModal={siteId !== 0 ? closeSiteModal : openSiteModal}
+                sites={sites}
+                siteSelected={siteSelected}
+                setSiteSelected={setSiteSelected}
+                siteCode={siteCode}
+                onSiteCodeChanged={onSiteCodeChanged}
+                handleEnterSite={handleEnterSite}
+              />
+            )}
+          </>
         </main>
       </div>
     </div>

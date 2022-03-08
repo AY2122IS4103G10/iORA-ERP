@@ -10,9 +10,7 @@ import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { api } from "../../../../environments/Api";
-import {
-  selectUserSite,
-} from "../../../../stores/slices/userSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
@@ -33,7 +31,6 @@ const secondaryNavigation = [
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];
 
-
 export const LGIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -42,7 +39,7 @@ export const LGIndex = () => {
   const [siteSelected, setSiteSelected] = useState(sites[0]);
   const [siteCode, setSiteCode] = useState("");
   const { addToast } = useToasts();
-  
+
   useEffect(() => {
     api
       .getAll("admin/viewSites/all")
@@ -61,6 +58,7 @@ export const LGIndex = () => {
         appearance: "success",
         autoDismiss: true,
       });
+      setSiteCode("");
       closeSiteModal();
     } else {
       addToast("Error: Invalid site code. Please try again.", {

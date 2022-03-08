@@ -31,6 +31,10 @@ const PromoModal = ({
   onConstantsChanged,
   onSaveClicked,
   setModalState,
+  global,
+  onGlobalChanged,
+  stackable,
+  onStackableChanged,
 }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
@@ -115,6 +119,62 @@ const PromoModal = ({
                       required
                       disabled={modalState === "view"}
                     />
+                  </SimpleInputGroup>
+                  <SimpleInputGroup
+                    label="Options"
+                    inputField="global-stackable"
+                    className="relative rounded-md sm:mt-0"
+                  >
+                    <div className="py-2 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                      <div className="sm:col-span-1">
+                        <div className="relative flex items-start">
+                          <div className="flex items-center h-5">
+                            <input
+                              type="checkbox"
+                              name="global"
+                              id="global"
+                              className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                              checked={global}
+                              onChange={onGlobalChanged}
+                              aria-describedby="global"
+                              disabled={modalState === "view"}
+                            />
+                          </div>
+                          <div className="ml-3 text-sm">
+                            <label
+                              htmlFor="global"
+                              className="font-medium text-gray-700"
+                            >
+                              Global
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="sm:col-span-1">
+                        <div className="relative flex items-start">
+                          <div className="flex items-center h-5">
+                            <input
+                              type="checkbox"
+                              name="stackable"
+                              id="stackable"
+                              className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                              checked={stackable}
+                              onChange={onStackableChanged}
+                              aria-describedby="stackable"
+                              disabled={modalState === "view"}
+                            />
+                          </div>
+                          <div className="ml-3 text-sm">
+                            <label
+                              htmlFor="stackable"
+                              className="font-medium text-gray-700"
+                            >
+                              Stackable
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </SimpleInputGroup>
                 </div>
               </div>
@@ -229,12 +289,16 @@ export const ManagePromotions = () => {
   const [quota, setQuota] = useState("");
   const [coefficients, setCoefficients] = useState("");
   const [constants, setConstants] = useState("");
+  const [global, setGlobal] = useState(false);
+  const [stackable, setStackable] = useState(false);
   const [openPromo, setOpenPromo] = useState(false);
 
   const onNameChanged = (e) => setName(e.target.value);
   const onQuotaChanged = (e) => setQuota(e.target.value);
   const onCoefficientsChanged = (e) => setCoefficients(e.target.value);
   const onConstantsChanged = (e) => setConstants(e.target.value);
+  const onGlobalChanged = () => setGlobal(!global);
+  const onStackableChanged = () => setStackable(!stackable);
   const openModal = () => setOpenPromo(true);
   const closeModal = () => {
     setPromoId(null);
@@ -242,6 +306,8 @@ export const ManagePromotions = () => {
     setQuota("");
     setCoefficients("");
     setConstants("");
+    setGlobal(false);
+    setStackable(false);
     setOpenPromo(false);
   };
   const canSave = [name, quota, coefficients, constants].every(Boolean);
@@ -260,6 +326,8 @@ export const ManagePromotions = () => {
             constants: constants
               .split(",")
               .map((constant) => parseFloat(constant.trim())),
+            global,
+            stackable,
           })
         )
           .unwrap()
@@ -289,6 +357,8 @@ export const ManagePromotions = () => {
             constants: constants
               .split(",")
               .map((constant) => parseFloat(constant.trim())),
+            global,
+            stackable,
           })
         )
           .unwrap()
@@ -319,6 +389,8 @@ export const ManagePromotions = () => {
         setConstants={setConstants}
         setPromoId={setPromoId}
         setModalState={setModalState}
+        setGlobal={setGlobal}
+        setStackable={setStackable}
       />
       <PromoModal
         open={openPromo}
@@ -332,7 +404,10 @@ export const ManagePromotions = () => {
         onCoefficientsChanged={onCoefficientsChanged}
         constants={constants}
         onConstantsChanged={onConstantsChanged}
-        setPromoId={setPromoId}
+        global={global}
+        onGlobalChanged={onGlobalChanged}
+        stackable={stackable}
+        onStackableChanged={onStackableChanged}
         onSaveClicked={onSaveClicked}
         setModalState={setModalState}
       />

@@ -6,6 +6,7 @@ public enum PaymentType {
     VISA,
     NETS,
     PAYLAH,
+    PAYNOW,
     GRABPAY,
     FAVE;
 

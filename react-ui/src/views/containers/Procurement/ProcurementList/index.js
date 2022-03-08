@@ -1,7 +1,9 @@
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../../../environments/Api";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import {
   SelectColumnFilter,
@@ -55,12 +57,19 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
 export const ProcurementList = ({ pathname }) => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-
+  const currSiteId = parseInt(useSelector(selectUserSite));
   useEffect(() => {
-    api.getAll(`sam/procurementOrder/all`).then((response) => {
-      setData(response.data);
-    });
-  }, []);
+    api
+      .getAll(
+        pathname.includes("sm")
+          ? "sam/procurementOrder/all"
+          : `sam/procurementOrder/site/${currSiteId}`
+      )
+      .then((response) => {
+        setData(response.data);
+      });
+  }, [pathname, currSiteId]);
+  
   const handleOnClick = (row) => navigate(`${pathname}/${row.original.id}`);
 
   return (

@@ -23,8 +23,12 @@ const PromoModal = ({
   modalState,
   name,
   onNameChanged,
-  discPrice,
-  onDiscPriceChanged,
+  quota,
+  onQuotaChanged,
+  coefficients,
+  onCoefficientsChanged,
+  constants,
+  onConstantsChanged,
   onSaveClicked,
   setModalState,
 }) => {
@@ -60,36 +64,57 @@ const PromoModal = ({
                     />
                   </SimpleInputGroup>
                   <SimpleInputGroup
-                    label="Discounted Price"
-                    inputField="discPrice"
+                    label="Quota"
+                    inputField="quota"
                     className="relative rounded-md sm:mt-0 sm:col-span-2"
                   >
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 sm:text-sm">$</span>
-                    </div>
-                    <input
+                    <SimpleInputBox
                       type="number"
-                      name="price"
-                      id="price"
-                      autoComplete="price"
-                      className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                      placeholder="0.00"
-                      value={discPrice}
-                      onChange={onDiscPriceChanged}
+                      name="quota"
+                      id="quota"
+                      value={quota}
+                      onChange={onQuotaChanged}
                       required
-                      step="0.01"
-                      min="0"
-                      aria-describedby="price-currency"
                       disabled={modalState === "view"}
                     />
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <span
-                        className="text-gray-500 sm:text-sm"
-                        id="price-currency"
-                      >
-                        SGD
-                      </span>
-                    </div>
+                  </SimpleInputGroup>
+                  <SimpleInputGroup
+                    label="Coefficients"
+                    inputField="coefficients"
+                    className="relative rounded-md sm:mt-0 sm:col-span-2"
+                  >
+                    <SimpleInputBox
+                      type="text"
+                      name="coefficients"
+                      id="coefficients"
+                      value={coefficients}
+                      onChange={onCoefficientsChanged}
+                      helper={
+                        modalState !== "view" &&
+                        `Enter coefficients separated with a comma ",".`
+                      }
+                      required
+                      disabled={modalState === "view"}
+                    />
+                  </SimpleInputGroup>
+                  <SimpleInputGroup
+                    label="Constants"
+                    inputField="constants"
+                    className="relative rounded-md sm:mt-0 sm:col-span-2"
+                  >
+                    <SimpleInputBox
+                      type="text"
+                      name="constants"
+                      id="constants"
+                      value={constants}
+                      onChange={onConstantsChanged}
+                      helper={
+                        modalState !== "view" &&
+                        `Enter constants separated with a comma ",".`
+                      }
+                      required
+                      disabled={modalState === "view"}
+                    />
                   </SimpleInputGroup>
                 </div>
               </div>
@@ -133,19 +158,15 @@ const PromoModal = ({
 };
 
 const Header = ({ openModal, setModalState }) => {
-  const [currTab, setCurrTab] = useState(0);
-  const changeTab = (tabnumber) => setCurrTab(tabnumber);
   return (
     <div className="bg-white shadow">
       <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
         <div className="py-6 md:flex md:items-center md:justify-between lg:border-t lg:border-gray-200">
           <div className="flex-1 min-w-0">
             <div className="flex items-center">
-              <div className="flex items-center">
-                <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                  Promotions
-                </h1>
-              </div>
+              <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
+                Promotions
+              </h1>
             </div>
           </div>
           <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
@@ -174,7 +195,6 @@ const Header = ({ openModal, setModalState }) => {
                   "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
                 )}
                 aria-current={tabs[0].current ? "page" : undefined}
-                onClick={() => changeTab(0)}
               >
                 {tabs[0].name}
               </Link>
@@ -189,7 +209,6 @@ const Header = ({ openModal, setModalState }) => {
                   "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
                 )}
                 aria-current={tabs[1].current ? "page" : undefined}
-                onClick={() => changeTab(1)}
               >
                 {tabs[1].name}
               </Link>
@@ -207,24 +226,40 @@ export const ManagePromotions = () => {
   const [modalState, setModalState] = useState("view");
   const [promoId, setPromoId] = useState(null);
   const [name, setName] = useState("");
-  const [discPrice, setDiscPrice] = useState("");
+  const [quota, setQuota] = useState("");
+  const [coefficients, setCoefficients] = useState("");
+  const [constants, setConstants] = useState("");
   const [openPromo, setOpenPromo] = useState(false);
 
   const onNameChanged = (e) => setName(e.target.value);
-  const onDiscPriceChanged = (e) => setDiscPrice(e.target.value);
+  const onQuotaChanged = (e) => setQuota(e.target.value);
+  const onCoefficientsChanged = (e) => setCoefficients(e.target.value);
+  const onConstantsChanged = (e) => setConstants(e.target.value);
   const openModal = () => setOpenPromo(true);
-  const closeModal = () => setOpenPromo(false);
-
-  const canSave = name && discPrice;
+  const closeModal = () => {
+    setPromoId(null);
+    setName("");
+    setQuota("");
+    setCoefficients("");
+    setConstants("");
+    setOpenPromo(false);
+  };
+  const canSave = [name, quota, coefficients, constants].every(Boolean);
   const onSaveClicked = (evt) => {
     evt.preventDefault();
-    if (canSave)
+    if (canSave) {
       if (modalState === "add")
         dispatch(
           addNewPromotion({
             fieldName: "category",
             fieldValue: name,
-            discountedPrice: discPrice,
+            quota: quota,
+            coefficients: constants
+              .split(",")
+              .map((coeff) => parseFloat(coeff.trim())),
+            constants: constants
+              .split(",")
+              .map((constant) => parseFloat(constant.trim())),
           })
         )
           .unwrap()
@@ -247,7 +282,13 @@ export const ManagePromotions = () => {
             id: promoId,
             fieldName: "category",
             fieldValue: name,
-            discountedPrice: discPrice,
+            quota: quota,
+            coefficients: coefficients
+              .split(",")
+              .map((coeff) => parseFloat(coeff.trim())),
+            constants: constants
+              .split(",")
+              .map((constant) => parseFloat(constant.trim())),
           })
         )
           .unwrap()
@@ -264,6 +305,7 @@ export const ManagePromotions = () => {
               autoDismiss: true,
             })
           );
+    }
   };
   return (
     <>
@@ -272,7 +314,9 @@ export const ManagePromotions = () => {
         dispatch={dispatch}
         openModal={openModal}
         setName={setName}
-        setDiscPrice={setDiscPrice}
+        setQuota={setQuota}
+        setCoefficients={setCoefficients}
+        setConstants={setConstants}
         setPromoId={setPromoId}
         setModalState={setModalState}
       />
@@ -282,8 +326,12 @@ export const ManagePromotions = () => {
         modalState={modalState}
         name={name}
         onNameChanged={onNameChanged}
-        discPrice={discPrice}
-        onDiscPriceChanged={onDiscPriceChanged}
+        quota={quota}
+        onQuotaChanged={onQuotaChanged}
+        coefficients={coefficients}
+        onCoefficientsChanged={onCoefficientsChanged}
+        constants={constants}
+        onConstantsChanged={onConstantsChanged}
         setPromoId={setPromoId}
         onSaveClicked={onSaveClicked}
         setModalState={setModalState}

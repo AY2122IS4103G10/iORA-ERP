@@ -1,7 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
-import { ProcurementList } from "../ProcurementList";
+import { Tabs } from "../../../components/Tabs";
 
 const Header = ({ pathname }) => {
+  const tabs = [
+    {
+      id: 1,
+      name: "Search Order",
+      href: `${pathname.slice(0, 3)}/procurements/search`,
+      current: false,
+    },
+    {
+      id: 2,
+      name: "All Orders",
+      href: `${pathname.slice(0, 3)}/procurements`,
+      current: true,
+    },
+  ];
   return (
     <div className="bg-white shadow">
       <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
@@ -18,24 +32,28 @@ const Header = ({ pathname }) => {
               <Link to={`${pathname}/create`}>
                 <button
                   type="button"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                >
                   Create order
                 </button>
               </Link>
             </div>
           )}
         </div>
+        <div className="ml-3">
+          <Tabs tabs={tabs} />
+        </div>
       </div>
     </div>
   );
 };
 
-export const ManageProcurement = () => {
+export const ManageProcurement = ({ children }) => {
   const { pathname } = useLocation();
   return (
     <>
       {<Header pathname={pathname} />}
-      {<ProcurementList pathname={pathname} />}
+      {children}
     </>
   );
 };

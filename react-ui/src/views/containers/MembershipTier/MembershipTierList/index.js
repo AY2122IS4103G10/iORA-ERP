@@ -20,12 +20,13 @@ export const MembershipTierTable = ({ data, handleOnClick }) => {
         accessor: "multiplier",
       },
       {
-        Header: "Threshold (SGD)",
-        accessor: (e) => e.threshold["SGD,Singapore Dollar"],
+        Header: "Min. Spend",
+        accessor: "minSpend",
       },
       {
-        Header: "Threshold (RM)",
-        accessor: (e) => e.threshold["RM,Malaysian Ringgit"],
+        Header: "Currency",
+        accessor: "currency",
+        Cell: (e) => `${e.value.name} (${e.value.code})`,
       },
     ],
     []

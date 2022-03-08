@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import DatePicker from "react-datepicker";
-
+import moment from "moment";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { api } from "../../../../environments/Api";
@@ -327,7 +327,7 @@ export const CustomerForm = () => {
         setIsEditing(true);
         setFirstName(firstName);
         setLastName(lastName);
-        setDob(dob);
+        setDob(moment(dob).toDate());
         setContactNumber(contactNumber);
         setEmail(email);
         setMembershipTier(membershipTier);

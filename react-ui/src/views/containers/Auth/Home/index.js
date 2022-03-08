@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import {
+  ArchiveIcon,
   CogIcon,
   FolderOpenIcon,
   ShoppingBagIcon,
@@ -13,10 +14,7 @@ import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import { classNames } from "../../../../utilities/Util";
 
 export const EnterStoreModal = ({
   open,
@@ -48,9 +46,9 @@ export const EnterStoreModal = ({
             />
           </div>
           <input
-            type="email"
-            name="email"
-            id="email"
+            type="text"
+            name="siteCode"
+            id="siteCode"
             className="flex-grow shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
             placeholder="Site Code"
             value={siteCode}
@@ -237,7 +235,7 @@ const paths = [
   {
     title: "Warehouse",
     href: "/wh",
-    icon: TruckIcon,
+    icon: ArchiveIcon,
     focus: "focus-within:ring-teal-500",
     iconForeground: "text-teal-700",
     iconBackground: "bg-teal-50",
@@ -251,6 +249,16 @@ const paths = [
     focus: "focus-within:ring-rose-500",
     iconForeground: "text-rose-700",
     iconBackground: "bg-rose-50",
+    description:
+      "Click here for the Point-of-Sale system and pages to view the store's stock.",
+  },
+  {
+    title: "Logistics",
+    href: "/lg",
+    icon: TruckIcon,
+    focus: "focus-within:ring-purple-500",
+    iconForeground: "text-purple-700",
+    iconBackground: "bg-purple-50",
     description:
       "Click here for the Point-of-Sale system and pages to view the store's stock.",
   },

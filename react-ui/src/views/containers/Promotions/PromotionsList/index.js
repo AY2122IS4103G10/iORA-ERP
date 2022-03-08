@@ -123,7 +123,9 @@ export const PromotionsTable = ({
   data,
   openModal,
   setName,
-  setDiscPrice,
+  setQuota,
+  setCoefficients,
+  setConstants,
   setPromoId,
   setModalState,
   onDeletePromoClicked,
@@ -145,7 +147,9 @@ export const PromotionsTable = ({
               onClick={() => {
                 setModalState("view");
                 setName(e.value);
-                setDiscPrice(e.row.original.discountedPrice);
+                setQuota(e.row.original.quota);
+                setCoefficients(e.row.original.coefficients.join(","))
+                setConstants(e.row.original.constants.join(","))
                 setPromoId(e.row.original.id);
                 openModal();
               }}
@@ -156,9 +160,18 @@ export const PromotionsTable = ({
         },
       },
       {
-        Header: "Discounted Price",
-        accessor: "discountedPrice",
-        Cell: (e) => `$${e.value}`,
+        Header: "Quota",
+        accessor: "quota",
+      },
+      {
+        Header: "Coeff.",
+        accessor: "coefficients",
+        Cell: (e) => e.value.join(", ")
+      },
+      {
+        Header: "Constants",
+        accessor: "constants",
+        Cell: (e) => e.value.join(", ")
       },
       {
         Header: "Status",
@@ -198,10 +211,12 @@ export const PromotionsTable = ({
     [
       openModal,
       setName,
-      setDiscPrice,
+      setQuota,
+      setCoefficients,
       setModalState,
       setPromoId,
       onDeletePromoClicked,
+      setConstants,
     ]
   );
   return (
@@ -217,7 +232,9 @@ export const PromotionsList = ({
   dispatch,
   openModal,
   setName,
-  setDiscPrice,
+  setQuota,
+  setCoefficients,
+  setConstants,
   setPromoId,
   setModalState,
 }) => {
@@ -291,7 +308,9 @@ export const PromotionsList = ({
         data={data}
         openModal={openModal}
         setName={setName}
-        setDiscPrice={setDiscPrice}
+        setQuota={setQuota}
+        setCoefficients={setCoefficients}
+        setConstants={setConstants}
         setPromoId={setPromoId}
         setModalState={setModalState}
         onDeletePromoClicked={onDeletePromoClicked}

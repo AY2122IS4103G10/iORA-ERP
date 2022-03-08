@@ -2,9 +2,18 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-import { selectAProduct, getAProduct } from "../../../../stores/slices/productSlice";
-import { getProductStockLevel, selectProductStock } from "../../../../stores/slices/stocklevelSlice";
-import { getAllSites, selectAllSites } from "../../../../stores/slices/siteSlice";
+import {
+  selectAProduct,
+  getAProduct,
+} from "../../../../stores/slices/productSlice";
+import {
+  getProductStockLevel,
+  selectProductStock,
+} from "../../../../stores/slices/stocklevelSlice";
+import {
+  getAllSites,
+  selectAllSites,
+} from "../../../../stores/slices/siteSlice";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
 
 const columns = [
@@ -22,16 +31,17 @@ const columns = [
   },
 ];
 
-function convertData(data, sites) {
-  return Object.entries(data).map((pair) => ({
-    id: pair[0],
-    siteCode: sites.find((site) => parseInt(site.id) === parseInt(pair[0]))
-      .siteCode,
-    siteName: sites.find((site) => parseInt(site.id) === parseInt(pair[0]))
-      .name,
-    qty: pair[1],
-  }));
-}
+const convertData = (data, sites) =>
+  Object.entries(data).map((pair) => {
+    return {
+      id: pair[0],
+      siteCode: sites.find((site) => parseInt(site.id) === parseInt(pair[0]))
+        .siteCode,
+      siteName: sites.find((site) => parseInt(site.id) === parseInt(pair[0]))
+        .name,
+      qty: pair[1],
+    };
+  });
 
 export const AProductStock = (subsys) => {
   const { id } = useParams();
@@ -42,9 +52,9 @@ export const AProductStock = (subsys) => {
   const sites = useSelector(selectAllSites);
 
   useEffect(() => {
-      dispatch(getAProduct(id));
-      dispatch(getProductStockLevel(id));
-      dispatch(getAllSites());
+    dispatch(getAProduct(id));
+    dispatch(getProductStockLevel(id));
+    dispatch(getAllSites());
   }, [dispatch, id]);
 
   const path = "/" + subsys.subsys + "/stocklevels";

@@ -233,7 +233,7 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
         try {
             Employee c = getEmployeeByUsername(username);
 
-            if (c.authentication(StringGenerator.generateProtectedPassword(c.getSalt(), password))) {
+            if (passwordEncoder().matches(password, c.getPassword())) {
                 if (c.getAvailStatus() == true) {
                     return c;
                 } else {

@@ -11,7 +11,9 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.enumeration.StockTransferStatus;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.exception.StockTransferException;
+import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.Site;
+import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.model.stockTransfer.STOStatus;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.model.stockTransfer.StockTransferOrderLI;
@@ -74,6 +76,7 @@ public class StockTransferServiceImpl implements StockTransferService {
     public StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
             throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
+
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else {
@@ -138,16 +141,23 @@ public class StockTransferServiceImpl implements StockTransferService {
         Site actionBy = em.find(Site.class, siteId);
 
         List<STOStatus> statusHistory = stOrder.getStatusHistory();
+        Site creator = statusHistory.get(0).getActionBy();
         StockTransferStatus prevStatus = statusHistory.get(statusHistory.size() - 1).getStatus();
+        Site from = stOrder.getFromSite();
+        Site to = stOrder.getToSite();
 
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else if (prevStatus != StockTransferStatus.PENDINGALL || prevStatus != StockTransferStatus.PENDINGONE) {
-            throw new StockTransferException(
-                    "Stock Transfer Order is not pending for approval.");
+            throw new StockTransferException("Stock Transfer Order is not pending for approval.");
         } else if (prevStatus == StockTransferStatus.PENDINGALL) {
-            statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDINGONE));
-            stOrder.setStatusHistory(statusHistory);
+            if (creator instanceof HeadquartersSite || to instanceof WarehouseSite || from instanceof WarehouseSite) {
+                statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDINGONE));
+                stOrder.setStatusHistory(statusHistory);
+            } else {
+                statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CONFIRMED));
+                stOrder.setStatusHistory(statusHistory);
+            }
         } else {
             statusHistory.add(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CONFIRMED));
             stOrder.setStatusHistory(statusHistory);

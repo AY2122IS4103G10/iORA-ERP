@@ -1,15 +1,15 @@
 package com.iora.erp.model.product;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.iora.erp.model.site.StockLevel;
 
 @Entity
 public class Product {
@@ -17,40 +17,27 @@ public class Product {
     @Id
     private String sku;
 
-    @OneToMany
-    @JoinColumn(name = "productSKU")
-    private List<ProductItem> productItems;
-
     @ManyToMany
     private Set<ProductField> productFields;
+
+    @JsonBackReference
+    @ManyToOne
+    private StockLevel stockLevel;
 
     public Product() {
     }
 
     public Product(String sku) {
         this.sku = sku;
-        this.productItems = new ArrayList<>();
         this.productFields = new HashSet<>();
     }
 
-    public String getsku() {
+    public String getSku() {
         return this.sku;
     }
 
-    public void setsku(String sku) {
+    public void setSku(String sku) {
         this.sku = sku;
-    }
-
-    public List<ProductItem> getProductItems() {
-        return this.productItems;
-    }
-
-    public void setProductItems(List<ProductItem> productItems) {
-        this.productItems = productItems;
-    }
-
-    public void addProductItem(ProductItem productItem) {
-        this.productItems.add(productItem);
     }
 
     public Set<ProductField> getProductFields() {
@@ -65,6 +52,14 @@ public class Product {
         this.productFields.add(productField);
     }
 
+    public StockLevel getStockLevel() {
+        return this.stockLevel;
+    }
+
+    public void setStockLevel(StockLevel stockLevel) {
+        this.stockLevel = stockLevel;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -74,10 +69,7 @@ public class Product {
             return false;
         }
         Product other = (Product) object;
-        if ((this.sku == null && other.sku == null) || (this.sku == null && !this.sku.equals(other.sku))) {
-            return false;
-        }
-        return true;
+        return this.sku == other.sku;
     }
 
     @Override

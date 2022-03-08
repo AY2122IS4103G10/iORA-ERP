@@ -472,15 +472,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product updateProduct(Product product) throws ProductException {
-        Product old = em.find(Product.class, product.getsku());
+        Product old = em.find(Product.class, product.getSku());
 
         if (old == null) {
             throw new ProductException("Product not found");
         }
 
-        old.setProductItems(product.getProductItems());
         old.setProductFields(product.getProductFields());
-        return old;
+        return em.merge(old);
     }
 
     @Override
@@ -488,9 +487,8 @@ public class ProductServiceImpl implements ProductService {
         try {
             Product p = getProduct(sku);
             ProductItem pi = new ProductItem(rfid);
-            pi.setProductSKU(sku);
+            pi.setProduct(p);
             em.persist(pi);
-            p.addProductItem(pi);
             return pi;
         } catch (EntityExistsException ex) {
             throw new ProductItemException("ProductItem with rfid " + rfid + " already exist.");
@@ -510,6 +508,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /* Depracated
     @Override
     public List<ProductItem> getProductItemsBySKU(String sku) throws ProductException {
         Product p = getProduct(sku);
@@ -543,6 +542,7 @@ public class ProductServiceImpl implements ProductService {
         ProductItem pi = getProductItem(rfid);
         pi.setAvailable(true);
     }
+    */
 
     @Override
     public List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException {
@@ -560,7 +560,7 @@ public class ProductServiceImpl implements ProductService {
             throws ProductItemException, ProductException, ModelException, JSONException,
             ProductFieldException {
         ProductItem pi = getProductItem(rfid);
-        Product p = getProduct(pi.getProductSKU());
+        Product p = pi.getProduct();
         Model m = getModelByProduct(p);
         JSONObject jo = new JSONObject();
         jo.put("name", m.getName());
@@ -579,7 +579,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void loadProducts(List<Object> productsJSON)
             throws ProductException, ProductFieldException, ProductItemException, CustomerException {
-        Currency sgd = getCurrency("SGD");
 
         for (Object j : productsJSON) {
             LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
@@ -604,7 +603,7 @@ public class ProductServiceImpl implements ProductService {
             double discountPrice = discountedPriceList.isEmpty() ? listPrice
                     : Double.parseDouble((String) discountedPriceList.get(0));
 
-            Model model = new Model(modelCode, name, description, listPrice, discountPrice, sgd,
+            Model model = new Model(modelCode, name, description, listPrice, discountPrice,
                     categories.contains("SALE FROM $10"), true);
             List<ProductField> productFields = new ArrayList<>();
 
@@ -647,8 +646,8 @@ public class ProductServiceImpl implements ProductService {
             int stockLevel = r.nextInt(27) + 3;
 
             for (int i = 0; i < stockLevel; i++) {
-                String rfid = StringGenerator.generateRFID(p.getsku());
-                createProductItem(rfid, p.getsku());
+                String rfid = StringGenerator.generateRFID(p.getSku());
+                createProductItem(rfid, p.getSku());
                 try {
                     siteService.addProductItemToSite(Long.valueOf(r.nextInt(20)) + 1, rfid);
                 } catch (NoStockLevelException ex) {
@@ -657,25 +656,26 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
+        // To fix other methods first
         // Customer Order
-        CustomerOrderLI coli1 = new CustomerOrderLI();
-        coli1.setProductItems(getProductItemsBySKU("BPD0010528A-1").stream().collect(Collectors.toList()));
-        customerOrderService.createCustomerOrderLI(coli1);
+        // CustomerOrderLI coli1 = new CustomerOrderLI();
+        // coli1.setProductItems(getProductItemsBySKU("BPD0010528A-1").stream().collect(Collectors.toList()));
+        // customerOrderService.createCustomerOrderLI(coli1);
 
-        CustomerOrderLI coli2 = new CustomerOrderLI();
-        coli2.setProductItems(getProductItemsBySKU("BPS0009808X-1").stream().collect(Collectors.toList()));
-        customerOrderService.createCustomerOrderLI(coli2);
+        // CustomerOrderLI coli2 = new CustomerOrderLI();
+        // coli2.setProductItems(getProductItemsBySKU("BPS0009808X-1").stream().collect(Collectors.toList()));
+        // customerOrderService.createCustomerOrderLI(coli2);
 
-        Payment payment1 = new Payment(300.15, "241563", PaymentType.VISA);
-        customerOrderService.createPayment(payment1);
+        // Payment payment1 = new Payment(300.15, "241563", PaymentType.VISA);
+        // customerOrderService.createPayment(payment1);
 
-        CustomerOrder co1 = new CustomerOrder();
-        co1.setCustomerId(1L);
-        co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        co1.addLineItem(coli1);
-        co1.addLineItem(coli2);
-        co1.setStoreSiteId(3L);
-        co1.addPayment(payment1);
-        customerOrderService.createCustomerOrder(co1);
+        // CustomerOrder co1 = new CustomerOrder();
+        // co1.setCustomerId(1L);
+        // co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        // co1.addLineItem(coli1);
+        // co1.addLineItem(coli2);
+        // co1.setStoreSiteId(3L);
+        // co1.addPayment(payment1);
+        // customerOrderService.createCustomerOrder(co1);
     }
 }

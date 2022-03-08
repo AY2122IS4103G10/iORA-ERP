@@ -270,6 +270,7 @@ public class SAMController {
         }
     }
 
+    /* Deprecated
     @GetMapping(path = "/productItem/sku/{sku}", produces = "application/json")
     public ResponseEntity<Object> getProductItemByProduct(@PathVariable String sku) {
         try {
@@ -303,6 +304,7 @@ public class SAMController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+    */
 
     // // Links a PromotionField to Model.
     // // A new PromotionField will be created if it does not exist.

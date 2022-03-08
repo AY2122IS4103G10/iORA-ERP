@@ -48,7 +48,7 @@ public class StockLevel {
         String modelCode;
         for (ProductItem item: productItems) {
             item.setStockLevel(this);
-            SKUCode = item.getProductSKU();
+            SKUCode = item.getProduct().getSku();
             modelCode = SKUCode.split("-")[0];
             products.merge(SKUCode, 1L, (x, y) -> x + y);
             models.merge(modelCode, 1L, (x,y) -> x + y);

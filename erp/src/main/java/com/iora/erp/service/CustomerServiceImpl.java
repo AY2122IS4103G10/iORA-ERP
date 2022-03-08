@@ -1,6 +1,5 @@
 package com.iora.erp.service;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -305,12 +304,5 @@ public class CustomerServiceImpl implements CustomerService {
         if (membershipTier != null) {
             em.remove(membershipTier);
         }
-    }
-
-    private byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
     }
 }

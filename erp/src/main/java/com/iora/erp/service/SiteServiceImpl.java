@@ -268,7 +268,7 @@ public class SiteServiceImpl implements SiteService {
             throw new IllegalTransferException("Product Item already added");
         }
         productItem.setStockLevel(stockLevel);
-        String SKUCode = productItem.getProductSKU();
+        String SKUCode = productItem.getProduct().getSku();
         String modelCode = SKUCode.split("-")[0];
         stockLevel.getProductItems().add(productItem);
         stockLevel.getProducts().put(SKUCode,
@@ -285,7 +285,7 @@ public class SiteServiceImpl implements SiteService {
             throw new IllegalTransferException("Product Item already detached");
         }
         StockLevel stockLevel = productItem.getStockLevel();
-        String SKUCode = productItem.getProductSKU();
+        String SKUCode = productItem.getProduct().getSku();
         String modelCode = SKUCode.split("-")[0];
         stockLevel.getProducts().merge(SKUCode, -1L, (x, y) -> x + y);
         stockLevel.getModels().merge(modelCode, -1L, (x, y) -> x + y);
@@ -305,7 +305,7 @@ public class SiteServiceImpl implements SiteService {
                 System.err.println("Error adding: " + productItem.getRfid());
             }
             productItem.setStockLevel(stockLevel);
-            String SKUCode = productItem.getProductSKU();
+            String SKUCode = productItem.getProduct().getSku();
             String modelCode = SKUCode.split("-")[0];
             stockLevel.getProductItems().add(productItem);
             stockLevel.getProducts().merge(SKUCode, 1L, (x, y) -> x + y);
@@ -325,7 +325,7 @@ public class SiteServiceImpl implements SiteService {
                 throw new IllegalTransferException("Product Item already detached");
             }
             StockLevel stockLevel = productItem.getStockLevel();
-            String SKUCode = productItem.getProductSKU();
+            String SKUCode = productItem.getProduct().getSku();
             String modelCode = SKUCode.split("-")[0];
             stockLevel.getProducts().merge(SKUCode, -1L, (x, y) -> x + y);
             stockLevel.getModels().merge(modelCode, -1L, (x, y) -> x + y);

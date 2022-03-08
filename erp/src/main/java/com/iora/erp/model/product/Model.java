@@ -9,11 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
-
-import com.iora.erp.model.Currency;
 
 @Entity
 public class Model {
@@ -30,12 +27,9 @@ public class Model {
 
     @Column(nullable = false, scale = 2)
     private double listPrice;
-    
+
     @Column(nullable = false, scale = 2)
     private double discountPrice;
-
-    @ManyToOne
-    private Currency currency;
 
     @Column(nullable = false)
     private boolean onlineOnly;
@@ -58,14 +52,14 @@ public class Model {
         productFields = new HashSet<>();
     }
 
-    public Model(String modelCode, String name, String description, double listPrice, double discountPrice, Currency currency, boolean onlineOnly,
+    public Model(String modelCode, String name, String description, double listPrice, double discountPrice,
+            boolean onlineOnly,
             boolean available) {
         this(modelCode);
         this.name = name;
         this.description = description;
         this.listPrice = listPrice;
         this.discountPrice = discountPrice;
-        this.currency = currency;
         this.onlineOnly = onlineOnly;
         this.available = available;
     }
@@ -110,19 +104,9 @@ public class Model {
         this.discountPrice = discountPrice;
     }
 
-    public Currency getCurrency() {
-        return this.currency;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
-
     public boolean getAvailable() {
         return this.available;
     }
-
 
     public boolean isOnlineOnly() {
         return this.onlineOnly;
@@ -168,7 +152,8 @@ public class Model {
             return false;
         }
         Model model = (Model) o;
-        if ((this.modelCode == null && model.modelCode == null) || (this.modelCode == null && !this.modelCode.equals(model.modelCode))) {
+        if ((this.modelCode == null && model.modelCode == null)
+                || (this.modelCode == null && !this.modelCode.equals(model.modelCode))) {
             return false;
         }
         return true;

@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -206,10 +205,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         // Add ProductItem to Line Items and Get Set of Promotions
-        Model mdl = em.find(Model.class, item.getProductSKU().split("-")[0]);
+        Model mdl = em.find(Model.class, item.getProduct().getSku().split("-")[0]);
         boolean added = false;
         for (int i = 0; i < lineItems.size(); i++) {
-            if (lineItems.get(i).getProductItems().get(0).getProductSKU().equals(item.getProductSKU())) {
+            if (lineItems.get(i).getProductItems().get(0).getProduct().equals(item.getProduct())) {
                 lineItems.get(i).addProductItem(item);
                 lineItems.get(i).setSubTotal(lineItems.get(i).getSubTotal() + mdl.getDiscountPrice());
                 added = true;
@@ -223,7 +222,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         List<Model> models = lineItems.stream().parallel()
-                .map(x -> x.getProductItems().get(0).getProductSKU().split("-")[0])
+                .map(x -> x.getProductItems().get(0).getProduct().getSku().split("-")[0])
                 .map(x -> em.find(Model.class, x))
                 .collect(Collectors.toList());
         List<ProductItem> items = lineItems.stream().parallel().flatMap(x -> x.getProductItems().stream())
@@ -249,7 +248,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         Map<ProductItem, Double> prices = new HashMap<>();
         items.forEach(new Consumer<ProductItem>() {
             public void accept(ProductItem p) {
-                Model m = models.stream().filter(mod -> mod.getModelCode().equals(p.getProductSKU().split("-")[0]))
+                Model m = models.stream().filter(mod -> mod.getModelCode().equals(p.getProduct().getSku().split("-")[0]))
                         .findFirst()
                         .get();
                 modelMap.put(p, m);

@@ -189,7 +189,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         for (ProcurementOrderLI poli : procurementOrder.getLineItems()) {
             for (int i = 0; i < poli.getRequestedQty(); i++) {
                 try {
-                    ProductItem pi = productService.createProductItem(StringGenerator.generateRFID(poli.getProduct().getsku()), poli.getProduct().getsku());
+                    ProductItem pi = productService.createProductItem(StringGenerator.generateRFID(poli.getProduct().getSku()), poli.getProduct().getSku());
                     allProductItems.add(pi);
                     poli.addFulfilledProductItems(pi);
                 } catch (ProductItemException e) {

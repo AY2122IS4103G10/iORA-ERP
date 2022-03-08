@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { addNewProductField } from "../../../../stores/slices/prodFieldSlice";
 
@@ -90,7 +90,7 @@ export const FormCheckboxes = ({
       <legend className="sr-only">{legend}</legend>
       {options.map((option, index) => {
         return (
-          <div key={index} className="relative flex items-start">
+          <div key={index} className="ml-1 relative flex items-start">
             <div className="flex items-center h-5">
               <input
                 id={inputField}
@@ -194,8 +194,10 @@ const AddProductFormBody = ({
   onNameChanged,
   description,
   onDescChanged,
-  price,
+  listPrice,
   onListPriceChanged,
+  discountPrice,
+  onDiscountPriceChanged,
   available,
   onAvailableChanged,
   onlineOnly,
@@ -215,9 +217,6 @@ const AddProductFormBody = ({
   promotions,
   onPromosChanged,
   promoCheckedState,
-  companies,
-  companySelected,
-  onCompanyChanged,
   onSaveClicked,
   onCancelClicked,
   openModal,
@@ -290,7 +289,7 @@ const AddProductFormBody = ({
                         </SimpleInputGroup>
                         <SimpleInputGroup
                           label="List Price"
-                          inputField="price"
+                          inputField="listPrice"
                           className="relative rounded-md sm:mt-0 sm:col-span-2"
                         >
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -298,22 +297,53 @@ const AddProductFormBody = ({
                           </div>
                           <input
                             type="number"
-                            name="price"
-                            id="price"
-                            autoComplete="price"
+                            name="listPrice"
+                            id="listPrice"
+                            autoComplete="listPrice"
                             className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                             placeholder="0.00"
                             min="0"
-                            value={price}
+                            value={listPrice}
                             onChange={onListPriceChanged}
                             required
                             step="0.01"
-                            aria-describedby="price-currency"
+                            aria-describedby="listPrice-currency"
                           />
                           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                             <span
                               className="text-gray-500 sm:text-sm"
-                              id="price-currency"
+                              id="listPrice-currency"
+                            >
+                              SGD
+                            </span>
+                          </div>
+                        </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Discount Price"
+                          inputField="discountPrice"
+                          className="relative rounded-md sm:mt-0 sm:col-span-2"
+                        >
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span className="text-gray-500 sm:text-sm">$</span>
+                          </div>
+                          <input
+                            type="number"
+                            name="discountPrice"
+                            id="discountPrice"
+                            autoComplete="discountPrice"
+                            className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                            placeholder="0.00"
+                            min="0"
+                            value={discountPrice}
+                            onChange={onDiscountPriceChanged}
+                            required
+                            step="0.01"
+                            aria-describedby="discountPrice-currency"
+                          />
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span
+                              className="text-gray-500 sm:text-sm"
+                              id="discountPrice-currency"
                             >
                               SGD
                             </span>
@@ -498,7 +528,6 @@ const AddProductFormBody = ({
 };
 
 export const ProductForm = () => {
-  const {pathname} = useLocation()
   const { addToast } = useToasts();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -507,7 +536,8 @@ export const ProductForm = () => {
   const [prodCode, setProdCode] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
+  const [listPrice, setListPrice] = useState("");
+  const [discountPrice, setDiscountPrice] = useState("");
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [available, setAvailable] = useState(true);
   const [products, setProducts] = useState([]);
@@ -539,7 +569,7 @@ export const ProductForm = () => {
       setSizeCheckedState(new Array(sizes.length).fill(false));
       setTagCheckedState(new Array(tags.length).fill(false));
       setCatCheckedState(new Array(categories.length).fill(false));
-      setCompanySelected(companies[0]);
+      // setCompanySelected(companies[0]);
     });
   }, []);
 
@@ -554,14 +584,15 @@ export const ProductForm = () => {
   const [sizeCheckedState, setSizeCheckedState] = useState([]);
   const [tagCheckedState, setTagCheckedState] = useState([]);
   const [catCheckedState, setCatCheckedState] = useState([]);
-  const [companySelected, setCompanySelected] = useState([]);
+  // const [companySelected, setCompanySelected] = useState([]);
   const [promoCheckedState, setPromoCheckedState] = useState([]);
 
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
-  const onListPriceChanged = (e) => setPrice(e.target.value);
-  const onCompanyChanged = (e) => setCompanySelected(e.currentTarget.value);
+  const onListPriceChanged = (e) => setListPrice(e.target.value);
+  const onDiscountPriceChanged = (e) => setDiscountPrice(e.target.value);
+  // const onCompanyChanged = (e) => setCompanySelected(e.currentTarget.value);
   const onOnlineOnlyChanged = () => setOnlineOnly(!onlineOnly);
   const onAvailableChanged = () => setAvailable(!available);
   const onColorsChanged = (pos) => {
@@ -595,7 +626,7 @@ export const ProductForm = () => {
     setPromoCheckedState(updateCheckedState);
   };
 
-  const canAdd = [prodCode, name, description, price].every(Boolean);
+  const canAdd = [prodCode, name, description, listPrice].every(Boolean);
 
   const onSaveClicked = (evt) => {
     evt.preventDefault();
@@ -620,7 +651,8 @@ export const ProductForm = () => {
             modelCode: prodCode,
             name,
             description,
-            price,
+            listPrice,
+            discountPrice,
             onlineOnly,
             available,
             products: [],
@@ -647,7 +679,8 @@ export const ProductForm = () => {
             modelCode: prodCode,
             name,
             description,
-            price,
+            listPrice,
+            discountPrice,
             onlineOnly,
             available,
             products,
@@ -681,7 +714,8 @@ export const ProductForm = () => {
           modelCode,
           name,
           description,
-          price,
+          listPrice,
+          discountPrice,
           onlineOnly,
           available,
           productFields,
@@ -691,7 +725,8 @@ export const ProductForm = () => {
         setProdCode(modelCode);
         setName(name);
         setDescription(description);
-        setPrice(price);
+        setListPrice(listPrice);
+        setDiscountPrice(discountPrice);
         setOnlineOnly(onlineOnly);
         setAvailable(available);
         setColorCheckedState(
@@ -732,7 +767,9 @@ export const ProductForm = () => {
                 .filter(
                   (field) =>
                     field.fieldName === "CATEGORY" &&
-                    !Boolean(field.discountedPrice)
+                    ![field.quota, field.coefficients, field.constants].some(
+                      Boolean
+                    )
                 )
                 .map((field) => field.fieldValue)
                 .includes(category)
@@ -746,14 +783,16 @@ export const ProductForm = () => {
                 .filter(
                   (field) =>
                     field.fieldName === "CATEGORY" &&
-                    Boolean(field.discountedPrice)
+                    [field.quota, field.coefficients, field.constants].some(
+                      Boolean
+                    )
                 )
                 .map((field) => field.fieldValue)
                 .includes(promo)
             )
         );
         setProducts(products);
-        setCompanySelected(companies[0]);
+        // setCompanySelected(companies[0]);
       });
   }, [prodId, colors, sizes, tags, categories, promotions, companies]);
 
@@ -800,8 +839,10 @@ export const ProductForm = () => {
         onNameChanged={onNameChanged}
         description={description}
         onDescChanged={onDescChanged}
-        price={price}
+        listPrice={listPrice}
         onListPriceChanged={onListPriceChanged}
+        discountPrice={discountPrice}
+        onDiscountPriceChanged={onDiscountPriceChanged}
         available={available}
         onAvailableChanged={onAvailableChanged}
         onlineOnly={onlineOnly}
@@ -821,9 +862,6 @@ export const ProductForm = () => {
         promotions={promotions}
         onPromosChanged={onPromosChanged}
         promoCheckedState={promoCheckedState}
-        companies={companies}
-        companySelected={companySelected}
-        onCompanyChanged={onCompanyChanged}
         onSaveClicked={onSaveClicked}
         onCancelClicked={onCancelClicked}
         openModal={openModal}

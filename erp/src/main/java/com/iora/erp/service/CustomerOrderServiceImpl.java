@@ -193,12 +193,15 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String sku) {
+    public List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException {
         // Get Product
-        Product product = em.find(Product.class, sku);
+        Product product = em.find(Product.class, rfidsku);
+        ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
-        if (product == null) {
-            return List.of(lineItems, new ArrayList<>());
+        if (product == null && productItem == null) {
+            throw new CustomerOrderException("Item scanned cannot be found.");
+        } else if (product == null) {
+            product = productItem.getProduct();
         }
 
         // Add ProductItem to Line Items and Get Set of Promotions
@@ -218,7 +221,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             li.setSubTotal(mdl.getDiscountPrice());
             lineItems.add(li);
         }
+        return lineItems;
+    }
 
+    @Override
+    public List<List<CustomerOrderLI>> calculatePromotions(List<CustomerOrderLI> lineItems) {
         List<CustomerOrderLI> newLineItems = new ArrayList<>(lineItems);
 
         // Map for Line Item to Model

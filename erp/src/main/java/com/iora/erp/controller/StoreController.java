@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
@@ -112,11 +113,10 @@ public class StoreController {
 
         for (Map.Entry<String, Long> entry : toUpdate.get(1).entrySet()) {
             try {
-                ProductItem pi = productService.getProductItem(entry.getKey());
                 if (entry.getValue().equals(0L)) {
-                    siteService.removeProductsWithRfid(entry.getValue(), pi.getProduct().getSku(), List.of(pi));
+                    siteService.removeProductsWithRfid(entry.getValue(), List.of(entry.getKey()));
                 } else {
-                    siteService.addProductsWithRfid(entry.getValue(), pi.getProduct().getSku(), List.of(pi));
+                    siteService.addProductsWithRfid(entry.getValue(), List.of(entry.getKey()));
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());
@@ -263,16 +263,38 @@ public class StoreController {
         }
     }
 
-    // @PostMapping(path = "/customerOrder/add/{rfid}", consumes = "application/json", produces = "application/json")
-    // public ResponseEntity<Object> addItemToLineItems(@RequestBody List<CustomerOrderLI> lineItems,
-    //         @PathVariable String rfid) {
-    //     try {
-    //         return ResponseEntity.ok(customerOrderService.addToCustomerOrderLIs(lineItems, rfid));
-    //     } catch (Exception ex) {
-    //         ex.printStackTrace();
-    //         return ResponseEntity.badRequest().body(ex.getMessage());
-    //     }
-    // }
+    @PostMapping(path = "/customerOrder/add/{rfidsku}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addItemToLineItems(@RequestBody List<CustomerOrderLI> lineItems,
+            @PathVariable String rfidsku) {
+        try {
+            return ResponseEntity.ok(customerOrderService.addToCustomerOrderLIs(lineItems, rfidsku));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/calculate", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> calculatePromotions(@RequestBody List<CustomerOrderLI> lineItems) {
+        try {
+            return ResponseEntity.ok(customerOrderService.calculatePromotions(lineItems));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/add/{rfidsku}/calculate", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addItemToLineItemsAndCalculatePromotions(@RequestBody List<CustomerOrderLI> lineItems,
+            @PathVariable String rfidsku) {
+        try {
+            List<CustomerOrderLI> newLineItems = customerOrderService.addToCustomerOrderLIs(lineItems, rfidsku);
+            return ResponseEntity.ok(customerOrderService.calculatePromotions(newLineItems));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
     @GetMapping(path = "/productDetails/{rfid}", produces = "application/json")
     public ResponseEntity<Object> getProductDetails(@PathVariable String rfid) {

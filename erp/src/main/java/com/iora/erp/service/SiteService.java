@@ -37,7 +37,7 @@ public interface SiteService {
     public abstract StockLevel removeProducts(Long siteId, String SKUCode, Long qty) throws NoStockLevelException, IllegalTransferException;
     public abstract Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId, Long toSiteId, String SKUCode, Long qty) throws NoStockLevelException, IllegalTransferException;
 
-    public abstract StockLevel addProductsWithRfid(Long siteId, String SKUCode, List<ProductItem> productItems) throws NoStockLevelException, IllegalTransferException;
-    public abstract StockLevel removeProductsWithRfid(Long siteId, String SKUCode, List<ProductItem> productItems) throws NoStockLevelException, IllegalTransferException;
-    public abstract Pair<StockLevel, StockLevel> moveProductsWithRfid(Long fromSiteId, Long toSiteId, String SKUCode, List<ProductItem> productItems) throws NoStockLevelException, IllegalTransferException;
+    public abstract StockLevel addProductsWithRfid(Long siteId, List<String> rfidskus) throws NoStockLevelException;
+    public abstract StockLevel removeProductsWithRfid(Long siteId, List<String> rfidskus) throws NoStockLevelException, IllegalTransferException;
+    public abstract Pair<StockLevel, StockLevel> moveProductsWithRfid(Long fromSiteId, Long toSiteId, List<String> rfidskus) throws NoStockLevelException, IllegalTransferException;
 }

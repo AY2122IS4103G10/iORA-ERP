@@ -651,9 +651,9 @@ public class ProductServiceImpl implements ProductService {
 
             for (int i = 0; i < stockLevel; i++) {
                 String rfid = StringGenerator.generateRFID(p.getSku());
-                ProductItem pi = createProductItem(rfid, p.getSku());
+                createProductItem(rfid, p.getSku());
                 try {
-                    siteService.addProductsWithRfid(Long.valueOf(r.nextInt(20)) + 1, p.getSku(), List.of(pi));
+                    siteService.addProductsWithRfid(Long.valueOf(r.nextInt(20)) + 1, List.of(rfid));
                 } catch (Exception ex) {
                     // do nothing
                 }

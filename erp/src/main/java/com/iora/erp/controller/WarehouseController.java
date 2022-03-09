@@ -89,11 +89,10 @@ public class WarehouseController {
 
         for (Map.Entry<String, Long> entry : toUpdate.get(1).entrySet()) {
             try {
-                ProductItem pi = productService.getProductItem(entry.getKey());
                 if (entry.getValue().equals(0L)) {
-                    siteService.removeProductsWithRfid(entry.getValue(), pi.getProduct().getSku(), List.of(pi));
+                    siteService.removeProductsWithRfid(entry.getValue(), List.of(entry.getKey()));
                 } else {
-                    siteService.addProductsWithRfid(entry.getValue(), pi.getProduct().getSku(), List.of(pi));
+                    siteService.addProductsWithRfid(entry.getValue(), List.of(entry.getKey()));
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());

@@ -31,7 +31,9 @@ public interface CustomerOrderService {
     public abstract List<CustomerOrderLI> getCustomerOrderLIs(CustomerOrder customerOrder);
     public abstract CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI);
     public abstract CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException;
-    public abstract List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String sku);
+    
+    public abstract List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException;
+    public abstract List<List<CustomerOrderLI>> calculatePromotions(List<CustomerOrderLI> lineItems);
 
     public abstract Payment getPayment(Long id) throws CustomerOrderException;
     public abstract List<Payment> getAllPayments();

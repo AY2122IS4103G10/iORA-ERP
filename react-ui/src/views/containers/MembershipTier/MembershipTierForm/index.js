@@ -11,10 +11,15 @@ import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 
 const currencies = [
-  { code: "SGD", name: "Singapore Dollar", country: "Singapore" },
-  { code: "RM", name: "Malaysian Ringgit", country: "Malaysia" },
-  { code: "RMB", name: "Chinese Yuan", country: "China" },
-  { code: "USD", name: "United States Dollar", country: "United States" },
+  { id: 1, code: "SGD", name: "Singapore Dollar", country: "Singapore" },
+  { id: 2, code: "RM", name: "Malaysian Ringgit", country: "Malaysia" },
+  { id: 3, code: "RMB", name: "Chinese Yuan", country: "China" },
+  {
+    id: 4,
+    code: "USD",
+    name: "United States Dollar",
+    country: "United States",
+  },
 ];
 
 const MembershipTierFormBody = ({
@@ -120,7 +125,7 @@ const MembershipTierFormBody = ({
                             onChange={onCurrencyChanged}
                           >
                             {currencies.map((currency) => (
-                              <option>
+                              <option key={currency.id}>
                                 {currency.name} ({currency.code})
                               </option>
                             ))}
@@ -187,7 +192,9 @@ const MembershipTierFormBody = ({
                                 onChange={onBirthdayCurrencyChanged}
                               >
                                 {currencies.map((currency) => (
-                                  <option>{currency.code}</option>
+                                  <option key={currency.id}>
+                                    {currency.code}
+                                  </option>
                                 ))}
                               </select>
                             </div>
@@ -382,17 +389,18 @@ export const MembershipTierForm = () => {
   useEffect(() => {
     Boolean(tierName) &&
       api.get("sam/membershipTier/", `?name=${tierName}`).then((response) => {
-        const { name, currency, multiplier, minSpend, birthday } = response.data;
+        const { name, currency, multiplier, minSpend, birthday } =
+          response.data;
         setIsEditing(true);
         setName(name);
         setMultiplier(multiplier);
         setCurrencySelected(currency);
-        setMinSpend(minSpend)
-        setBirthdayName(birthday.name)
-        setBirthdayCurrencySelected(birthday.currency)
-        setBirthdaySpend(birthday.birthdaySpend)
-        setBirthdayQuota(birthday.quota)
-        setBirthdayMultiplier(birthday.multiplier)
+        setMinSpend(minSpend);
+        setBirthdayName(birthday.name);
+        setBirthdayCurrencySelected(birthday.currency);
+        setBirthdaySpend(birthday.birthdaySpend);
+        setBirthdayQuota(birthday.quota);
+        setBirthdayMultiplier(birthday.multiplier);
       });
   }, [tierName]);
 

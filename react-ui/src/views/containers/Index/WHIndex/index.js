@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
@@ -13,10 +13,19 @@ import {
   ShieldCheckIcon,
   TruckIcon,
 } from "@heroicons/react/outline";
-import { updateCurrSite } from "../../../../stores/slices/userSlice";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+import { useToasts } from "react-toast-notifications";
+import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
+import { sitesApi } from "../../../../environments/Api";
 
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  {
+    name: "Products",
+    href: "/wh/products/print",
+    icon: CollectionIcon,
+    current: false,
+  },
   {
     name: "Stock Levels",
     href: "/wh/stocklevels/my",
@@ -44,12 +53,48 @@ const secondaryNavigation = [
 ];
 
 export const WHIndex = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const siteId = useSelector(selectUserSite);
+  const [sites, setSites] = useState([]);
+  const [siteSelected, setSiteSelected] = useState(sites[0]);
+  const [siteCode, setSiteCode] = useState("");
+  const { addToast } = useToasts();
 
   useEffect(() => {
-    dispatch(updateCurrSite(2));
-  }, [dispatch]);
+    sitesApi
+      .searchByType("Warehouse")
+      .then((response) => {
+        setSites(response.data);
+        setSiteSelected(response.data[0]);
+      })
+      .then(() => siteId === 0 && openSiteModal());
+  }, [siteId]);
+
+  const handleEnterSite = (evt) => {
+    evt.preventDefault();
+    if (siteSelected.siteCode === siteCode.trim()) {
+      localStorage.setItem("siteId", siteSelected.id);
+      addToast(`Logged in to ${siteSelected.name}`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      dispatch(updateCurrSite())
+      setSiteCode("");
+      closeSiteModal();
+    } else {
+      addToast("Error: Invalid site code. Please try again.", {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
+
+  const onSiteCodeChanged = (e) => setSiteCode(e.target.value);
+
+  const openSiteModal = () => setOpen(true);
+  const closeSiteModal = () => setOpen(false);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -71,7 +116,21 @@ export const WHIndex = () => {
           }
         />
         <main className="flex-1 pb-8 ">
+          <>
           <Outlet />
+          {[sites, siteSelected, setSiteSelected].every(Boolean) && (
+              <EnterSiteModal
+                open={open}
+                closeModal={siteId !== 0 ? closeSiteModal : openSiteModal}
+                sites={sites}
+                siteSelected={siteSelected}
+                setSiteSelected={setSiteSelected}
+                siteCode={siteCode}
+                onSiteCodeChanged={onSiteCodeChanged}
+                handleEnterSite={handleEnterSite}
+              />
+            )}
+          </>
         </main>
       </div>
     </div>

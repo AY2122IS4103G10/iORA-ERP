@@ -27,7 +27,7 @@ export const SimpleInputBox = ({
         {...rest}
       />
       {Boolean(helper) && (
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
           {helper}
         </p>
       )}

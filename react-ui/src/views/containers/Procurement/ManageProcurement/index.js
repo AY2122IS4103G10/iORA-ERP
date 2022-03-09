@@ -1,18 +1,21 @@
-import { Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { updateCurrSite } from "../../../../stores/slices/userSlice";
 import { Tabs } from "../../../components/Tabs";
 
-const Header = ({ pathname }) => {
+const Header = ({ subsys }) => {
   const tabs = [
     {
       id: 1,
       name: "Search Order",
-      href: `${pathname.slice(0, 3)}/procurements/search`,
+      href: `/${subsys}/procurements/search`,
       current: false,
     },
     {
       id: 2,
       name: "All Orders",
-      href: `${pathname.slice(0, 3)}/procurements`,
+      href: `/${subsys}/procurements`,
       current: true,
     },
   ];
@@ -27,9 +30,9 @@ const Header = ({ pathname }) => {
               </h1>
             </div>
           </div>
-          {pathname === "/sm/procurements" && (
+          {subsys === "sm" && (
             <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-              <Link to={`${pathname}/create`}>
+              <Link to={`/${subsys}/procurements/create`}>
                 <button
                   type="button"
                   className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -48,11 +51,17 @@ const Header = ({ pathname }) => {
   );
 };
 
-export const ManageProcurement = ({ children }) => {
-  const { pathname } = useLocation();
+export const ManageProcurement = ({ subsys, children }) => {
+  const dispatch = useDispatch();
+  const currSiteStatus = useSelector((state) => state.user.currSiteStatus);
+
+  useEffect(() => {
+    currSiteStatus === "idle" && dispatch(updateCurrSite());
+  }, [dispatch, currSiteStatus]);
+  
   return (
     <>
-      {<Header pathname={pathname} />}
+      {<Header subsys={subsys} />}
       {children}
     </>
   );

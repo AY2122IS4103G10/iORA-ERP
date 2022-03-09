@@ -55,7 +55,7 @@ export const companyApi = {
   },
   deleteCompany(id) {
     return axios.delete(`${REST_ENDPOINT}admin/deleteCompany?id=${id}`);
-  }
+  },
 };
 
 export const procurementApi = {
@@ -167,7 +167,9 @@ export const employeeApi = {
     return axios.get(`${REST_ENDPOINT}admin/viewEmployee?id=${employeeId}`);
   },
   deleteEmployee(employeeId) {
-    return axios.delete(`${REST_ENDPOINT}admin/deleteEmployee?id=${employeeId}`)
+    return axios.delete(
+      `${REST_ENDPOINT}admin/deleteEmployee?id=${employeeId}`
+    );
   },
   enableEmployee(employeeId) {
     return axios.put(`${REST_ENDPOINT}admin/enableEmployee?id=${employeeId}`);
@@ -184,13 +186,19 @@ export const customerApi = {
   unblockCustomer(customerId) {
     return axios.put(`${REST_ENDPOINT}sam/customer/unblock/${customerId}`);
   },
-}
+};
 
 export const departmentApi = {
   getDepartment(id) {
     return axios.get(`${REST_ENDPOINT}admin/viewDepartment?id=${id}`);
   },
   deleteDepartment(id) {
-    return axios.delete(`${REST_ENDPOINT}admin/deleteDepartment?id=${id}`)
+    return axios.delete(`${REST_ENDPOINT}admin/deleteDepartment?id=${id}`);
   },
-}
+};
+
+export const productApi = {
+  searchProductsBySku(sku) {
+    return axios.get(`${REST_ENDPOINT}sam/product?sku=${sku}`);
+  },
+};

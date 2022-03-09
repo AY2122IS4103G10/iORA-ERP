@@ -33,6 +33,7 @@ const initialState = {
   loggedIn: localStorage.getItem("user") ? true : false,
   currSite: initialStore,
   status: "idle",
+  currSiteStatus: "idle",
   error: "null",
 };
 
@@ -68,6 +69,7 @@ const userSlice = createSlice({
           ? JSON.parse(localStorage.getItem("siteId"))
           : 0;
       }
+      state.currSiteStatus = "succeeded"
     },
   },
   extraReducers(builder) {

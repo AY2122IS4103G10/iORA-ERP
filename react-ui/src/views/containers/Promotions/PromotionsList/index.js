@@ -121,13 +121,7 @@ import {
 
 export const PromotionsTable = ({
   data,
-  openModal,
-  setName,
-  setQuota,
-  setCoefficients,
-  setConstants,
-  setPromoId,
-  setModalState,
+  handleOnClick,
   onDeletePromoClicked,
   // openProductsModal,
 }) => {
@@ -140,24 +134,14 @@ export const PromotionsTable = ({
       {
         Header: "Name",
         accessor: "fieldValue",
-        Cell: (e) => {
-          return (
-            <button
-              className="hover:text-gray-700 hover:underline"
-              onClick={() => {
-                setModalState("view");
-                setName(e.value);
-                setQuota(e.row.original.quota);
-                setCoefficients(e.row.original.coefficients.join(","))
-                setConstants(e.row.original.constants.join(","))
-                setPromoId(e.row.original.id);
-                openModal();
-              }}
-            >
-              {e.value}
-            </button>
-          );
-        },
+        Cell: (e) => (
+          <button
+            className="font-medium hover:underline"
+            onClick={() => handleOnClick(e.row)}
+          >
+            {e.value}
+          </button>
+        ),
       },
       {
         Header: "Quota",
@@ -166,12 +150,12 @@ export const PromotionsTable = ({
       {
         Header: "Coeff.",
         accessor: "coefficients",
-        Cell: (e) => e.value.join(", ")
+        Cell: (e) => e.value.join(", "),
       },
       {
         Header: "Constants",
         accessor: "constants",
-        Cell: (e) => e.value.join(", ")
+        Cell: (e) => e.value.join(", "),
       },
       {
         Header: "Status",
@@ -208,16 +192,7 @@ export const PromotionsTable = ({
         },
       },
     ],
-    [
-      openModal,
-      setName,
-      setQuota,
-      setCoefficients,
-      setModalState,
-      setPromoId,
-      onDeletePromoClicked,
-      setConstants,
-    ]
+    [onDeletePromoClicked, handleOnClick]
   );
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
@@ -233,8 +208,12 @@ export const PromotionsList = ({
   openModal,
   setName,
   setQuota,
+  setPercent,
+  setFixed,
   setCoefficients,
   setConstants,
+  setGlobal,
+  setStackable,
   setPromoId,
   setModalState,
 }) => {
@@ -244,6 +223,20 @@ export const PromotionsList = ({
   useEffect(() => {
     promoStatus === "idle" && dispatch(fetchPromotions());
   }, [promoStatus, dispatch]);
+
+  const handleOnClick = (row) => {
+    setModalState("view");
+    setName(row.original.fieldValue);
+    setQuota(row.original.quota);
+    setPercent(!row.original.coefficients.every((val) => val === 0.0))
+    setFixed(!row.original.constants.every((val) => val === 0.0))
+    setCoefficients(row.original.coefficients.join(","));
+    setConstants(row.original.constants.join(","));
+    setGlobal(row.original.global);
+    setStackable(row.original.stackable);
+    setPromoId(row.original.id);
+    openModal();
+  };
 
   // const [openProdModal, setOpenProdModal] = useState(false);
   // const products = useSelector(selectAllProducts);
@@ -265,26 +258,17 @@ export const PromotionsList = ({
   //   closeProductsModal();
   // };
 
-  const onDeletePromoClicked = ({
-    id,
-    fieldName,
-    fieldValue,
-    discountedPrice,
-    available,
-  }) => {
+  const onDeletePromoClicked = (item) => {
     dispatch(
       updateExistingPromotion({
-        id,
-        fieldName,
-        fieldValue,
-        discountedPrice,
-        available: !available,
+        ...item,
+        available: !item.available,
       })
     )
       .unwrap()
       .then(() => {
         addToast(
-          `Successfully ${available ? "disabled" : "enabled"} promotion`,
+          `Successfully ${item.available ? "disabled" : "enabled"} promotion`,
           {
             appearance: "success",
             autoDismiss: true,
@@ -307,10 +291,7 @@ export const PromotionsList = ({
       <PromotionsTable
         data={data}
         openModal={openModal}
-        setName={setName}
-        setQuota={setQuota}
-        setCoefficients={setCoefficients}
-        setConstants={setConstants}
+        handleOnClick={handleOnClick}
         setPromoId={setPromoId}
         setModalState={setModalState}
         onDeletePromoClicked={onDeletePromoClicked}

@@ -1,21 +1,39 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { api } from "../../../../environments/Api";
 
-export const ProcurementSearch = () => {
+export const ProcurementSearch = ({ subsys }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const onSearchChanged = (e) => setSearch(e.target.value);
+  const { addToast } = useToasts();
+
+  const canSearch = Boolean(search);
   const onSearchClicked = (evt) => {
     evt.preventDefault();
-    api
-      .get("sam/procurementOrder", search.trim())
-      .then((response) =>
-        navigate(pathname.replace("search", response.data.id))
-      );
+    if (canSearch)
+      api
+        .get(
+          subsys === "sm"
+            ? "sam/procurementOrder"
+            : "manufacturing/procurementOrder",
+          search.trim()
+        )
+        .then((response) => {
+          if (response.data !== "")
+            navigate(pathname.replace("search", response.data.id));
+          else
+            addToast(`Error: Procurement Order not found.`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+        });
   };
+
+  const onSearchChanged = (e) => setSearch(e.target.value);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

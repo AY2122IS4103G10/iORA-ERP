@@ -3,7 +3,9 @@ package com.iora.erp.service;
 import java.util.List;
 
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
+import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
@@ -13,15 +15,9 @@ import com.iora.erp.model.customerOrder.RefundLI;
 
 public interface CustomerOrderService {
     public abstract CustomerOrder getCustomerOrder(Long id) throws CustomerOrderException;
-    public abstract List<CustomerOrder> searchCustomerOrders(String id);
-
-    public abstract List<OnlineOrder> getAllOnlineOrders(); // todo: change this to search
-    public abstract List<OnlineOrder> getOnlineOrdersBySite(Long siteId); // todo: change this to search
-    public abstract List<OnlineOrder> getOnlineOrdersBySiteDate(Long siteId, String date);
-
-    public abstract List<CustomerOrder> getAllInStoreOrders(); // todo: change this to search
-    public abstract List<CustomerOrder> getInStoreOrdersBySite(Long siteId); // todo: change this to search
-    public abstract List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date);
+    public abstract List<CustomerOrder> searchCustomerOrders(Long siteId, Long orderId);
+    public abstract List<CustomerOrder> searchStoreOrders(Long siteId, Long orderId);
+    public abstract List<OnlineOrder> searchOnlineOrders(Long siteId, Long orderId);
 
     public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder);
     public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
@@ -50,5 +46,5 @@ public interface CustomerOrderService {
     public abstract RefundLI createRefundLI(RefundLI refundLI);
     public abstract RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
 
-    public abstract CustomerOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException;
+    public abstract OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException;
 }

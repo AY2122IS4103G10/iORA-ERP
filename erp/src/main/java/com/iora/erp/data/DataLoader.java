@@ -315,6 +315,8 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(iorahq);
 		WarehouseSite wh = new WarehouseSite("Warehouse HQ", a1, "123457", "+65-63610056", iora);
 		em.persist(wh);
+		WarehouseSite who = new WarehouseSite("Warehouse HQ-Online", a1, "123458", "+65-63610056", iora);
+		em.persist(who);
 		StoreSite s1 = new StoreSite("iORA @ Bugis Junction", new Address(Country.Singapore, "Singapore",
 				"Bugis Junction", "Singapore", "#01-04", "200 Victoria Street", "Singapore 188021",
 				true, 1.299497,

@@ -9,8 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 @Entity
 public class StockLevel {
 
@@ -18,7 +16,6 @@ public class StockLevel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "stockLevel")
     private List<StockLevelLI> products;
 

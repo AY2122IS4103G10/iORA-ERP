@@ -16,7 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -50,7 +49,6 @@ public class Site implements Serializable {
     @ManyToOne
     private Company company;
 
-    @JsonManagedReference
     @OneToMany
     private List<CustomerOrder> customerOrders;
 

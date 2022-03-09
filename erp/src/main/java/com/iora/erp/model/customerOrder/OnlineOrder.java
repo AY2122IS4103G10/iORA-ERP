@@ -7,9 +7,12 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.enumeration.OnlineOrderStatus;
+import com.iora.erp.model.site.StoreSite;
 
 @Entity
 public class OnlineOrder extends CustomerOrder {
@@ -22,9 +25,13 @@ public class OnlineOrder extends CustomerOrder {
     @ElementCollection
     private List<CustomerOrderLI> packedLineItems;
 
+    @JsonBackReference(value="pickupSite-onlineOrder")
+    @ManyToOne
+    private StoreSite pickupSite;
+
     @Enumerated(EnumType.STRING)
     private Country country;
-    
+
     private String deliveryAddress;
 
     public OnlineOrder() {
@@ -69,6 +76,14 @@ public class OnlineOrder extends CustomerOrder {
 
     public void setDelivery(boolean delivery) {
         this.delivery = delivery;
+    }
+
+    public StoreSite getPickupSite() {
+        return this.pickupSite;
+    }
+
+    public void setPickupSite(StoreSite pickupSite) {
+        this.pickupSite = pickupSite;
     }
 
     public Country getCountry() {

@@ -16,20 +16,24 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import com.iora.erp.enumeration.Country;
 import com.iora.erp.enumeration.PaymentType;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.ModelException;
+import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
+import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.utils.StringGenerator;
 
 import org.hibernate.NonUniqueResultException;
@@ -582,7 +586,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void loadProducts(List<Object> productsJSON)
-            throws ProductException, ProductFieldException, ProductItemException, CustomerException {
+            throws ProductException, ProductFieldException, ProductItemException, CustomerException, NoStockLevelException {
 
         for (Object j : productsJSON) {
             LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
@@ -652,12 +656,8 @@ public class ProductServiceImpl implements ProductService {
             for (int i = 0; i < stockLevel; i++) {
                 String rfid = StringGenerator.generateRFID(p.getSku());
                 createProductItem(rfid, p.getSku());
-                try {
-                    siteService.addProductsWithRfid(Long.valueOf(r.nextInt(20)) + 1, List.of(rfid));
-                } catch (Exception ex) {
-                    // do nothing
-                }
             }
+            siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), Long.valueOf(stockLevel));
         }
 
         // Customer Order
@@ -673,8 +673,23 @@ public class ProductServiceImpl implements ProductService {
         coli2.setSubTotal(29.0);
         customerOrderService.createCustomerOrderLI(coli2);
 
-        Payment payment1 = new Payment(127.0, "241563", PaymentType.VISA);
+        CustomerOrderLI coli3 = new CustomerOrderLI();
+        coli3.setProduct(getProduct("BSK0009530X-1"));
+        coli3.setQty(1);
+        coli3.setSubTotal(29.0);
+        customerOrderService.createCustomerOrderLI(coli3);
+
+        CustomerOrderLI coli4 = new CustomerOrderLI();
+        coli4.setProduct(getProduct("BPD0010304X-1"));
+        coli4.setQty(1);
+        coli4.setSubTotal(49.0);
+        customerOrderService.createCustomerOrderLI(coli4);
+
+        Payment payment1 = new Payment(127, "241563", PaymentType.VISA);
         customerOrderService.createPayment(payment1);
+
+        Payment payment2 = new Payment(78, "546130", PaymentType.MASTERCARD);
+        customerOrderService.createPayment(payment2);
 
         CustomerOrder co1 = new CustomerOrder();
         co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
@@ -682,7 +697,17 @@ public class ProductServiceImpl implements ProductService {
         co1.addLineItem(coli2);
         co1.addPayment(payment1);
         co1.setPaid(true);
-        co1.setSite(siteService.getSite(3L));
+        co1.setSite(siteService.getSite(4L));
         em.persist(co1);
+
+        OnlineOrder oo1 = new OnlineOrder(false, Country.Singapore);
+        oo1.setCustomerId(2L);
+        oo1.setPickupSite((StoreSite) siteService.getSite(4L));
+        oo1.addLineItem(coli3);
+        oo1.addLineItem(coli4);
+        oo1.setPaid(true);
+        oo1.addPayment(payment2);
+        oo1.setSite(siteService.getSite(3L));
+        em.persist(oo1);
     }
 }

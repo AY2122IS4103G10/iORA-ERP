@@ -27,7 +27,7 @@ public class CustomerOrder {
     @Column(nullable = false, scale = 2)
     private Double totalAmount;
 
-    @JsonBackReference
+    @JsonBackReference(value="site-CustomerOrder")
     @ManyToOne
     private Site site;
 
@@ -37,7 +37,7 @@ public class CustomerOrder {
     @OneToMany
     private List<Payment> payments;
 
-    private Boolean paid = false;
+    private Boolean paid;
 
     @OneToMany
     private List<RefundLI> refundedLIs;

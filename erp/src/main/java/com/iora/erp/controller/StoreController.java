@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.product.Product;
-import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
@@ -242,18 +242,7 @@ public class StoreController {
      * ---------------------------------------------------------
      */
 
-    @GetMapping(path = "/customerOrder/{siteId}", produces = "application/json")
-    public List<CustomerOrder> getStoreOrders(@PathVariable Long siteId) {
-        return customerOrderService.getInStoreOrdersBySite(siteId);
-    }
-
-    // YYYY-MM-dd
-    @GetMapping(path = "/customerOrder/{siteId}/{date}", produces = "application/json")
-    public List<CustomerOrder> getStoreOrdersByDate(@PathVariable Long siteId, @PathVariable String date) {
-        return customerOrderService.getInStoreOrdersBySiteDate(siteId, date);
-    }
-
-    @GetMapping(path = "/customerOrder/view/{orderId}", produces = "application/json")
+    @GetMapping(path = "/customerOrder/{orderId}", produces = "application/json")
     public ResponseEntity<Object> getCustomerOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity
@@ -261,6 +250,36 @@ public class StoreController {
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+    
+    @GetMapping(path = "/customerOrder", produces = "application/json")
+    public List<CustomerOrder> searchCustomerOrders(@RequestParam String orderId) {
+        return customerOrderService.searchCustomerOrders(0L, (orderId == "") ? null : Long.parseLong(orderId));
+    }
+
+    @GetMapping(path = "/customerOrder/{siteId}", produces = "application/json")
+    public List<CustomerOrder> searchCustomerOrdersBySite(@PathVariable Long siteId, @RequestParam String orderId) {
+        return customerOrderService.searchCustomerOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
+    }
+
+    @GetMapping(path = "/storeOrder", produces = "application/json")
+    public List<CustomerOrder> searchStoreOrders(@RequestParam String orderId) {
+        return customerOrderService.searchStoreOrders(0L, (orderId == "") ? null : Long.parseLong(orderId));
+    }
+
+    @GetMapping(path = "/storeOrder/{siteId}", produces = "application/json")
+    public List<CustomerOrder> searchStoreOrdersBySite(@PathVariable Long siteId, @RequestParam String orderId) {
+        return customerOrderService.searchStoreOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
+    }
+
+    @GetMapping(path = "/onlineOrder", produces = "application/json")
+    public List<OnlineOrder> searchOnlineOrders(@RequestParam String orderId) {
+            return customerOrderService.searchOnlineOrders(0L, (orderId == "") ? null : Long.parseLong(orderId));
+    }
+
+    @GetMapping(path = "/onlineOrder/{siteId}", produces = "application/json")
+    public List<OnlineOrder> searchOnlineOrdersBySite(@PathVariable Long siteId, @RequestParam String orderId) {
+            return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
     @PostMapping(path = "/customerOrder/add/{rfidsku}", consumes = "application/json", produces = "application/json")

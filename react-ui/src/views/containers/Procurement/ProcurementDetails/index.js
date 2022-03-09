@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
 import { PencilIcon } from "@heroicons/react/solid";
-import {  PrinterIcon, TrashIcon, XIcon } from "@heroicons/react/outline";
+import { PrinterIcon, TrashIcon, XIcon } from "@heroicons/react/outline";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { useEffect, useMemo, useState } from "react";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete/index.js";
@@ -27,7 +27,6 @@ const Header = ({
   onCancelOrderClicked,
   onShippedClicked,
   onFulfilClicked,
-  handlePrint,
   openInvoice,
   setAction,
   openConfirm,
@@ -47,7 +46,7 @@ const Header = ({
         >
           <span>View Invoice</span>
         </button>
-        <button
+        {/* <button
           type="button"
           className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
           onClick={handlePrint}
@@ -57,7 +56,7 @@ const Header = ({
             aria-hidden="true"
           />
           <span>Print</span>
-        </button>
+        </button> */}
         {status === "PENDING" ? (
           pathname.includes("/sm/procurements") ? (
             <>
@@ -117,20 +116,25 @@ const Header = ({
             </>
           )
         ) : status === "ACCEPTED" && pathname.includes("mf") ? (
-          <button
-            type="button"
-            className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-            onClick={() => {
-              setAction({
-                name: "Fulfil",
-                action: onFulfilClicked,
-              });
-              openConfirm();
-            }}
-            disabled={status !== "ACCEPTED"}
-          >
-            <span>Fulfil order</span>
-          </button>
+          // <button
+          //   type="button"
+          //   className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+          //   onClick={() => {
+          //     setAction({
+          //       name: "Fulfil",
+          //       action: onFulfilClicked,
+          //     });
+          //     openConfirm();
+          //   }}
+          //   disabled={status !== "ACCEPTED"}
+          // >
+          //   <QrcodeIcon
+          //     className="-ml-1 mr-2 h-5 w-5 text-white"
+          //     aria-hidden="true"
+          //   />
+          //   <span>Scan</span>
+          // </button>
+          <div></div>
         ) : status === "READY" && pathname.includes("mf") ? (
           <button
             type="button"
@@ -264,14 +268,57 @@ const ItemsSummary = ({
   );
 };
 
+export const ScanItemsSection = ({ search, onSearchChanged, onScanClicked }) => {
+  return (
+    <div className="pt-8">
+      <div>
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Scan Items
+        </h3>
+        <div className="mt-2 max-w-xl text-sm text-gray-700">
+          <p>
+            Scan barcode or enter product SKU. Scan once to "pick", a second time
+            to "pack".
+          </p>
+        </div>
+        <form className="mt-5 sm:flex sm:items-center" onSubmit={onScanClicked}>
+          <div className="w-full sm:max-w-xs">
+            <label htmlFor="sku" className="sr-only">
+              SKU
+            </label>
+            <input
+              type="text"
+              name="sku"
+              id="sku"
+              className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              placeholder="XXXXXXXXXX-X"
+              value={search}
+              onChange={onSearchChanged}
+              autoFocus
+            />
+          </div>
+          <button
+            type="submit"
+            className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Scan
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
 const ProcurementDetailsBody = ({
+  pathname,
   status,
   lineItems,
   manufacturing,
   headquarters,
   warehouse,
   setLineItems,
-  pathname,
+  search,
+  onSearchChanged,
+  onScanClicked,
   onFulfilClicked,
   onVerifyReceivedClicked,
 }) => (
@@ -316,6 +363,15 @@ const ProcurementDetailsBody = ({
           </div>
         </div>
       </section>
+      {status === "ACCEPTED" && (
+        <section aria-labelledby="scan-items">
+          <ScanItemsSection
+            search={search}
+            onSearchChanged={onSearchChanged}
+            onScanClicked={onScanClicked}
+          />
+        </section>
+      )}
       <section aria-labelledby="order-summary">
         <ItemsSummary
           data={lineItems}
@@ -402,6 +458,7 @@ export const ProcurementDetails = () => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     api.get("sam/procurementOrder", procurementId).then((response) => {
@@ -438,7 +495,7 @@ export const ProcurementDetails = () => {
     });
   }, [procurementId]);
 
-  const onDeleteSiteClicked = () => {
+  const onDeleteProcurementClicked = () => {
     dispatch(
       deleteExistingProcurement({
         orderId: procurementId,
@@ -513,6 +570,8 @@ export const ProcurementDetails = () => {
       );
   };
 
+  const onScanClicked = () => {};
+
   const onFulfilClicked = () => {
     procurementApi
       .fulfillOrder(manufacturing.id, {
@@ -568,6 +627,8 @@ export const ProcurementDetails = () => {
       );
   };
 
+  const onSearchChanged = (e) => setSearch(e.target.value);
+
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 
@@ -615,13 +676,16 @@ export const ProcurementDetails = () => {
             setLineItems={setLineItems}
             pathname={pathname}
             onFulfilClicked={onFulfilClicked}
+            search={search}
+            onSearchChanged={onSearchChanged}
+            onScanClicked={onScanClicked}
           />
         </div>
         <ConfirmDelete
           item={`Order #${procurementId}`}
           open={openDelete}
           closeModal={closeModal}
-          onConfirm={onDeleteSiteClicked}
+          onConfirm={onDeleteProcurementClicked}
         />
         <div className="hidden">
           <ProcurementInvoice

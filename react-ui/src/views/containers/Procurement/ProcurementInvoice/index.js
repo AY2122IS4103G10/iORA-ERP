@@ -97,14 +97,12 @@ export const ProcurementInvoiceBody = ({
     <div className="max-w-3xl mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <div className="max-w-xl">
         <div className="space-y-2 sm:px-0 sm:flex sm:items-baseline sm:justify-between sm:space-y-0">
-          <h1 className="font-extrabold tracking-tight text-5xl">
-            Invoice
-          </h1>
+          <h1 className="font-extrabold tracking-tight text-5xl">Invoice</h1>
         </div>
 
         <h4 className="sr-only">Order Information</h4>
-        <dl className="grid grid-cols-2 gap-x-6 text-sm py-6">
-          <div className="col-span-1">
+        <dl className="grid grid-cols-2 gap-x-20 text-sm py-10">
+          <div>
             <dt className="font-medium text-gray-900">{company.name}</dt>
             <dd className="mt-2 text-gray-700">
               <address className="not-italic">
@@ -120,49 +118,51 @@ export const ProcurementInvoiceBody = ({
               </address>
             </dd>
           </div>
-          <div className="col-span-1">
-            <Barcode
-              value="barcode-example"
-              width={1}
-              height={40}
-              displayValue={false}
-              margin={0}
-            />
-            <dl className="mt-4 text-sm font-medium">
-              <dt className="text-gray-900">No.</dt>
-              <dd className="text-indigo-600 mt-2">{orderId}</dd>
-            </dl>
-            <dl className="mt-4 text-sm font-medium">
-              <dt className="text-gray-900">Date</dt>
-              <dd className="text-indigo-600 mt-2">
-                {moment
-                  .unix(orderStatus.timeStamp / 1000)
-                  .format("DD/MM/YYYY, hh:mm:ss")}
-              </dd>
-            </dl>
-            <dl className="mt-4 text-sm font-medium">
-              <dt className="text-gray-900">Status</dt>
-              <dd className="text-indigo-600 mt-2">{orderStatus.status}</dd>
-            </dl>
+          <div>
+            <dd>
+              <Barcode
+                value="barcode-example"
+                width={1}
+                height={40}
+                displayValue={false}
+                margin={0}
+              />
+              <dl className="mt-4 text-sm font-medium">
+                <dt className="text-gray-900">No.</dt>
+                <dd className="text-indigo-600 mt-2">{orderId}</dd>
+              </dl>
+              <dl className="mt-4 text-sm font-medium">
+                <dt className="text-gray-900">Date</dt>
+                <dd className="text-indigo-600 mt-2">
+                  {moment
+                    .unix(orderStatus.timeStamp / 1000)
+                    .format("DD/MM/YYYY, hh:mm:ss")}
+                </dd>
+              </dl>
+              <dl className="mt-4 text-sm font-medium">
+                <dt className="text-gray-900">Status</dt>
+                <dd className="text-indigo-600 mt-2">{orderStatus.status}</dd>
+              </dl>
 
-            <dl className="mt-4 text-sm font-medium">
-              <dt className="text-gray-900">Tracking number</dt>
-              <dd className="text-indigo-600 mt-2">51547878755545848512</dd>
-            </dl>
-            <dl className="mt-4 text-sm font-medium">
-              <dt className="text-gray-900">For enquiries, call</dt>
-              <dd className="text-gray-700 mt-2">
-                <address className="not-italic">
-                  <span className="block">{headquarters.name}</span>
-                  <span className="block">{headquarters.phoneNumber}</span>
-                </address>
-              </dd>
-            </dl>
+              <dl className="mt-4 text-sm font-medium">
+                <dt className="text-gray-900">Tracking number</dt>
+                <dd className="text-indigo-600 mt-2">51547878755545848512</dd>
+              </dl>
+              <dl className="mt-4 text-sm font-medium">
+                <dt className="text-gray-900">For enquiries, call</dt>
+                <dd className="text-gray-700 mt-2">
+                  <address className="not-italic">
+                    <span className="block">{headquarters.name}</span>
+                    <span className="block">{headquarters.phoneNumber}</span>
+                  </address>
+                </dd>
+              </dl>
+            </dd>
           </div>
         </dl>
       </div>
 
-      <div className="mt-4 border-t border-gray-200">
+      <div className="border-t border-gray-200">
         <h2 className="sr-only">Your order</h2>
         <div>
           <h4 className="sr-only">Addresses</h4>

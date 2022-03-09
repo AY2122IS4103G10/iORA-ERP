@@ -25,6 +25,10 @@ const PromoModal = ({
   onNameChanged,
   quota,
   onQuotaChanged,
+  percent,
+  setPercent,
+  fixed,
+  setFixed,
   coefficients,
   onCoefficientsChanged,
   constants,
@@ -39,7 +43,7 @@ const PromoModal = ({
   return (
     <SimpleModal open={open} closeModal={closeModal}>
       <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
-        <form>
+        <form onSubmit={onSaveClicked}>
           <div className="p-4 space-y-8 divide-y divide-gray-200">
             <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
               <div>
@@ -83,43 +87,111 @@ const PromoModal = ({
                     />
                   </SimpleInputGroup>
                   <SimpleInputGroup
-                    label="Coefficients"
-                    inputField="coefficients"
-                    className="relative rounded-md sm:mt-0 sm:col-span-2"
+                    label="Discount Type"
+                    inputField="global-stackable"
+                    className="relative rounded-md sm:mt-0"
                   >
-                    <SimpleInputBox
-                      type="text"
-                      name="coefficients"
-                      id="coefficients"
-                      value={coefficients}
-                      onChange={onCoefficientsChanged}
-                      helper={
-                        modalState !== "view" &&
-                        `Enter coefficients separated with a comma ",".`
-                      }
-                      required
-                      disabled={modalState === "view"}
-                    />
+                    <div className="py-2 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                      <div className="sm:col-span-1">
+                        <div className="relative flex items-start">
+                          <div className="flex items-center h-5">
+                            <input
+                              type="checkbox"
+                              name="percent"
+                              id="percent"
+                              className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                              checked={percent}
+                              onChange={() => setPercent(!percent)}
+                              aria-describedby="percent"
+                              disabled={modalState === "view"}
+                              required={!percent && !fixed}
+                            />
+                          </div>
+                          <div className="ml-3 text-sm">
+                            <label
+                              htmlFor="percent"
+                              className="font-medium text-gray-700"
+                            >
+                              Percentage
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="sm:col-span-1">
+                        <div className="relative flex items-start">
+                          <div className="flex items-center h-5">
+                            <input
+                              type="checkbox"
+                              name="fixed"
+                              id="fixed"
+                              className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                              checked={fixed}
+                              onChange={() => setFixed(!fixed)}
+                              aria-describedby="fixed"
+                              disabled={modalState === "view"}
+                              required={!percent && !fixed}
+                            />
+                          </div>
+                          <div className="ml-3 text-sm">
+                            <label
+                              htmlFor="fixed"
+                              className="font-medium text-gray-700"
+                            >
+                              Fixed
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </SimpleInputGroup>
-                  <SimpleInputGroup
-                    label="Constants"
-                    inputField="constants"
-                    className="relative rounded-md sm:mt-0 sm:col-span-2"
-                  >
-                    <SimpleInputBox
-                      type="text"
-                      name="constants"
-                      id="constants"
-                      value={constants}
-                      onChange={onConstantsChanged}
-                      helper={
-                        modalState !== "view" &&
-                        `Enter constants separated with a comma ",".`
-                      }
-                      required
-                      disabled={modalState === "view"}
-                    />
-                  </SimpleInputGroup>
+                  {percent && (
+                    <SimpleInputGroup
+                      label="% Discount(s)"
+                      inputField="coefficients"
+                      className="relative rounded-md sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="coefficients"
+                        id="coefficients"
+                        value={coefficients}
+                        onChange={onCoefficientsChanged}
+                        helper={
+                          modalState !== "view" && percent && fixed
+                            ? "Final price calculated using formula (100 - %disc) x price + fixedPrice."
+                            : `Enter percentage discount(s) separated with a comma ",".
+                          Eg. 10% off for items within quota: "10".
+                          Eg. 50% off second item: "100,50".
+                          Eg. 1 for 1: "100,0" (takes 100% of higher price)`
+                        }
+                        required
+                        disabled={modalState === "view"}
+                      />
+                    </SimpleInputGroup>
+                  )}
+                  {fixed && (
+                    <SimpleInputGroup
+                      label="Discounted Price(s)"
+                      inputField="constants"
+                      className="relative rounded-md sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="constants"
+                        id="constants"
+                        value={constants}
+                        onChange={onConstantsChanged}
+                        helper={
+                          modalState !== "view" && percent && fixed
+                            ? "Final price calculated using formula (100 - %disc) x price + fixedPrice."
+                            : `Enter fixed prices(s) separated with a comma ",".
+                          Eg. 2 for $49: "24.5, 24.5".`
+                        }
+                        required
+                        disabled={modalState === "view"}
+                      />
+                    </SimpleInputGroup>
+                  )}
                   <SimpleInputGroup
                     label="Options"
                     inputField="global-stackable"
@@ -202,7 +274,6 @@ const PromoModal = ({
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={onSaveClicked}
                     >
                       {modalState === "add" ? "Add" : "Save"} promotion
                     </button>
@@ -287,6 +358,8 @@ export const ManagePromotions = () => {
   const [promoId, setPromoId] = useState(null);
   const [name, setName] = useState("");
   const [quota, setQuota] = useState("");
+  const [percent, setPercent] = useState(false);
+  const [fixed, setFixed] = useState(false);
   const [coefficients, setCoefficients] = useState("");
   const [constants, setConstants] = useState("");
   const [global, setGlobal] = useState(false);
@@ -309,8 +382,12 @@ export const ManagePromotions = () => {
     setGlobal(false);
     setStackable(false);
     setOpenPromo(false);
+    setPercent(false);
+    setFixed(false);
   };
-  const canSave = [name, quota, coefficients, constants].every(Boolean);
+  const canSave =
+    [name, quota].every(Boolean) &&
+    ((percent && coefficients) || (fixed && constants));
   const onSaveClicked = (evt) => {
     evt.preventDefault();
     if (canSave) {
@@ -320,12 +397,16 @@ export const ManagePromotions = () => {
             fieldName: "category",
             fieldValue: name,
             quota: quota,
-            coefficients: constants
-              .split(",")
-              .map((coeff) => parseFloat(coeff.trim())),
-            constants: constants
-              .split(",")
-              .map((constant) => parseFloat(constant.trim())),
+            coefficients: percent
+              ? coefficients
+                  .split(",")
+                  .map((coeff) => 1 - parseFloat(coeff.trim()) / 100)
+              : new Array(quota).fill(0.0),
+            constants: fixed
+              ? constants
+                  .split(",")
+                  .map((constant) => parseFloat(constant.trim()))
+              : new Array(quota).fill(0.0),
             global,
             stackable,
           })
@@ -351,12 +432,16 @@ export const ManagePromotions = () => {
             fieldName: "category",
             fieldValue: name,
             quota: quota,
-            coefficients: coefficients
-              .split(",")
-              .map((coeff) => parseFloat(coeff.trim())),
-            constants: constants
-              .split(",")
-              .map((constant) => parseFloat(constant.trim())),
+            coefficients: percent
+              ? coefficients
+                  .split(",")
+                  .map((coeff) => 1 - parseFloat(coeff.trim()) / 100)
+              : new Array(quota).fill(0.0),
+            constants: fixed
+              ? constants
+                  .split(",")
+                  .map((constant) => parseFloat(constant.trim()))
+              : new Array(quota).fill(0.0),
             global,
             stackable,
           })
@@ -385,6 +470,8 @@ export const ManagePromotions = () => {
         openModal={openModal}
         setName={setName}
         setQuota={setQuota}
+        setPercent={setPercent}
+        setFixed={setFixed}
         setCoefficients={setCoefficients}
         setConstants={setConstants}
         setPromoId={setPromoId}
@@ -400,6 +487,10 @@ export const ManagePromotions = () => {
         onNameChanged={onNameChanged}
         quota={quota}
         onQuotaChanged={onQuotaChanged}
+        percent={percent}
+        setPercent={setPercent}
+        fixed={fixed}
+        setFixed={setFixed}
         coefficients={coefficients}
         onCoefficientsChanged={onCoefficientsChanged}
         constants={constants}

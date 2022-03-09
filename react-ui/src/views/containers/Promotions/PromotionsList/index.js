@@ -208,6 +208,8 @@ export const PromotionsList = ({
   openModal,
   setName,
   setQuota,
+  setPercent,
+  setFixed,
   setCoefficients,
   setConstants,
   setGlobal,
@@ -226,6 +228,8 @@ export const PromotionsList = ({
     setModalState("view");
     setName(row.original.fieldValue);
     setQuota(row.original.quota);
+    setPercent(!row.original.coefficients.every((val) => val === 0.0))
+    setFixed(!row.original.constants.every((val) => val === 0.0))
     setCoefficients(row.original.coefficients.join(","));
     setConstants(row.original.constants.join(","));
     setGlobal(row.original.global);

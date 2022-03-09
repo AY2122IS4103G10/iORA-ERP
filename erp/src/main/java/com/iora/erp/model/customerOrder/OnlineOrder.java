@@ -1,39 +1,43 @@
 package com.iora.erp.model.customerOrder;
 
-import javax.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.enumeration.OnlineOrderStatus;
 import com.iora.erp.model.site.StoreSite;
 
 @Entity
 public class OnlineOrder extends CustomerOrder {
-    @Column
-    private Long onlineStoreSiteId;
 
-    @Column
     @Enumerated(EnumType.STRING)
     private OnlineOrderStatus status;
 
-    @Column
     private boolean delivery;
 
-    @Column
+    @ElementCollection
+    private List<CustomerOrderLI> packedLineItems;
+
+    @JsonBackReference(value="pickupSite-onlineOrder")
+    @ManyToOne
+    private StoreSite pickupSite;
+
     @Enumerated(EnumType.STRING)
     private Country country;
 
-    @Column
-    private StoreSite pickupSite;
-
-    @Column
     private String deliveryAddress;
 
     public OnlineOrder() {
         super();
         this.status = OnlineOrderStatus.CONFIRMED;
+        this.packedLineItems = new ArrayList<>();
     }
 
     public OnlineOrder(boolean delivery, Country country) {
@@ -57,17 +61,21 @@ public class OnlineOrder extends CustomerOrder {
     public boolean getDelivery() {
         return this.delivery;
     }
+    
+    public List<CustomerOrderLI> getPackedLineItems() {
+        return this.packedLineItems;
+    }
+
+    public void setPackedLineItems(List<CustomerOrderLI> packedLineItems) {
+        this.packedLineItems = packedLineItems;
+    }
+
+    public void addPackedLineItems(CustomerOrderLI packedLineItem) {
+        this.packedLineItems.add(packedLineItem);
+    }
 
     public void setDelivery(boolean delivery) {
         this.delivery = delivery;
-    }
-
-    public Country getCountry() {
-        return this.country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
     }
 
     public StoreSite getPickupSite() {
@@ -76,6 +84,14 @@ public class OnlineOrder extends CustomerOrder {
 
     public void setPickupSite(StoreSite pickupSite) {
         this.pickupSite = pickupSite;
+    }
+
+    public Country getCountry() {
+        return this.country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
     }
 
     public String getDeliveryAddress() {

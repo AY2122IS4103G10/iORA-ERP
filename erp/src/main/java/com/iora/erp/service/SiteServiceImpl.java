@@ -2,6 +2,9 @@ package com.iora.erp.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -13,7 +16,6 @@ import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
-import com.iora.erp.model.site.OnlineStoreSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
@@ -43,11 +45,6 @@ public class SiteServiceImpl implements SiteService {
                 ManufacturingSite manufacturing = new ManufacturingSite(site);
                 em.persist(manufacturing);
                 return manufacturing;
-
-            case "OnlineStore":
-                OnlineStoreSite onlineStore = new OnlineStoreSite(site);
-                em.persist(onlineStore);
-                return onlineStore;
 
             case "Store":
                 StoreSite store = new StoreSite(site);
@@ -97,15 +94,6 @@ public class SiteServiceImpl implements SiteService {
         List<? extends Site> resultList = em
                 .createQuery(siteQuery("SELECT s FROM ManufacturingSite s", country, company),
                         ManufacturingSite.class)
-                .getResultList();
-        return resultList;
-    }
-
-    @Override
-    public List<? extends Site> searchOnlineStores(String country, String company) {
-        List<? extends Site> resultList = em
-                .createQuery(siteQuery("SELECT s FROM OnlineStoreSite s", country, company),
-                        OnlineStoreSite.class)
                 .getResultList();
         return resultList;
     }
@@ -214,7 +202,7 @@ public class SiteServiceImpl implements SiteService {
             return lineItem;
         } catch (NoResultException ex) {
             Product product = em.find(Product.class, SKUCode);
-            StockLevelLI lineItem = new StockLevelLI(product, stockLevel, 0L, 0L, new ArrayList<>());
+            StockLevelLI lineItem = new StockLevelLI(product, stockLevel, 0L, 0L);
             em.persist(lineItem);
             return lineItem;
         }
@@ -258,59 +246,76 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public StockLevel addProductsWithRfid(Long siteId, String SKUCode, List<ProductItem> productItems)
-            throws NoStockLevelException, IllegalTransferException {
-        try {
-            StockLevelLI lineItem = getStockLevelLI(siteId, SKUCode);
-            List<ProductItem> oldProductItems = lineItem.getProductItems();
-            int added = 0;
-            for (ProductItem item : productItems) {
-                added += oldProductItems.remove(item) ? 0 : 1;
-                oldProductItems.add(item);
+    public StockLevel addProductsWithRfid(Long siteId, List<String> rfidskus)
+            throws NoStockLevelException {
+        Map<String, Long> counter = rfidskus.stream().parallel().map(new Function<String, Product>() {
+            public Product apply(String rfidsku) {
+                Product product = em.find(Product.class, rfidsku);
+                if (product != null) {
+                    return product;
+                }
+                ProductItem productItem = em.find(ProductItem.class, rfidsku);
+                if (productItem == null) {
+                    return null;
+                } else {
+                    return productItem.getProduct();
+                }
             }
-            if (added == 0) {
-                throw new IllegalTransferException("No items were added");
-            }
-            lineItem.setProductItems(oldProductItems);
-            lineItem.setQty(lineItem.getQty() + added);
-            return em.find(Site.class, siteId).getStockLevel();
-        } catch (IllegalTransferException ex1) {
-            throw new IllegalTransferException(ex1.getMessage());
-        } catch (Exception ex2) {
-            throw new NoStockLevelException("Products cannot be added to stock level.");
+        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(), Collectors.counting()));
+
+        for (Map.Entry<String, Long> entry : counter.entrySet()) {
+            addProducts(siteId, entry.getKey(), entry.getValue());
         }
+        return em.find(Site.class, siteId).getStockLevel();
     }
 
     @Override
-    public StockLevel removeProductsWithRfid(Long siteId, String SKUCode, List<ProductItem> productItems)
+    public StockLevel removeProductsWithRfid(Long siteId, List<String> rfidskus)
             throws NoStockLevelException, IllegalTransferException {
-        try {
-            StockLevelLI lineItem = getStockLevelLI(siteId, SKUCode);
-            List<ProductItem> oldProductItems = lineItem.getProductItems();
-            int removed = 0;
-            for (ProductItem item : productItems) {
-                removed += oldProductItems.remove(item) ? 1 : 0;
+        Map<String, Long> counter = rfidskus.stream().parallel().map(new Function<String, Product>() {
+            public Product apply(String rfidsku) {
+                Product product = em.find(Product.class, rfidsku);
+                if (product != null) {
+                    return product;
+                }
+                ProductItem productItem = em.find(ProductItem.class, rfidsku);
+                if (productItem == null) {
+                    return null;
+                } else {
+                    return productItem.getProduct();
+                }
             }
-            if (removed == 0) {
-                throw new IllegalTransferException("No items were removed");
-            }
-            lineItem.setProductItems(oldProductItems);
-            lineItem.setQty(lineItem.getQty() - removed);
-            return em.find(Site.class, siteId).getStockLevel();
-        } catch (IllegalTransferException ex1) {
-            throw new IllegalTransferException(ex1.getMessage());
-        } catch (Exception ex2) {
-            throw new NoStockLevelException("Products cannot be removed from stock level.");
+        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(), Collectors.counting()));
+
+        for (Map.Entry<String, Long> entry : counter.entrySet()) {
+            removeProducts(siteId, entry.getKey(), entry.getValue());
         }
+        return em.find(Site.class, siteId).getStockLevel();
     }
 
     @Override
-    public Pair<StockLevel, StockLevel> moveProductsWithRfid(Long fromSiteId, Long toSiteId, String SKUCode,
-            List<ProductItem> productItems)
+    public Pair<StockLevel, StockLevel> moveProductsWithRfid(Long fromSiteId, Long toSiteId,
+            List<String> rfidskus)
             throws NoStockLevelException, IllegalTransferException {
-        StockLevel sl1 = removeProductsWithRfid(fromSiteId, SKUCode, productItems);
-        StockLevel sl2 = addProductsWithRfid(toSiteId, SKUCode, productItems);
-        return Pair.of(sl1, sl2);
+        Map<String, Long> counter = rfidskus.stream().parallel().map(new Function<String, Product>() {
+            public Product apply(String rfidsku) {
+                Product product = em.find(Product.class, rfidsku);
+                if (product != null) {
+                    return product;
+                }
+                ProductItem productItem = em.find(ProductItem.class, rfidsku);
+                if (productItem == null) {
+                    return null;
+                } else {
+                    return productItem.getProduct();
+                }
+            }
+        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(), Collectors.counting()));
+
+        for (Map.Entry<String, Long> entry : counter.entrySet()) {
+            moveProducts(fromSiteId, toSiteId, entry.getKey(), entry.getValue());
+        }
+        return Pair.of(em.find(Site.class, fromSiteId).getStockLevel(), em.find(Site.class, toSiteId).getStockLevel());
     }
 
 }

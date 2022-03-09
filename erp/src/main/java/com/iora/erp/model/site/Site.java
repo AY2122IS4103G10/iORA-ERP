@@ -1,6 +1,7 @@
 package com.iora.erp.model.site;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.CascadeType;
@@ -12,10 +13,12 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
+import com.iora.erp.model.customerOrder.CustomerOrder;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -45,6 +48,9 @@ public class Site implements Serializable {
 
     @ManyToOne
     private Company company;
+
+    @OneToMany
+    private List<CustomerOrder> customerOrders;
 
     protected Site() {
         this.stockLevel = new StockLevel();
@@ -127,6 +133,14 @@ public class Site implements Serializable {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public List<CustomerOrder> getCustomerOrders() {
+        return customerOrders;
+    }
+
+    public void addCustomerOrder(CustomerOrder customerOrder) {
+        this.customerOrders.add(customerOrder);
     }
 
     @Override

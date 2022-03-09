@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.ModelException;
+import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
@@ -63,5 +64,5 @@ public interface ProductService {
     public abstract JSONObject getProductCartDetails(String rfid) throws ProductItemException, ProductException, ModelException, JSONException, ProductFieldException;
 
     // Data Loading
-    public abstract void loadProducts(List<Object> productsJSON) throws ProductException, ProductFieldException, ProductItemException, CustomerException;
+    public abstract void loadProducts(List<Object> productsJSON) throws ProductException, ProductFieldException, ProductItemException, CustomerException, NoStockLevelException;
 }

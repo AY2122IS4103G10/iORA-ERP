@@ -1,19 +1,14 @@
 package com.iora.erp.model.site;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iora.erp.model.product.Product;
-import com.iora.erp.model.product.ProductItem;
 
 @Entity
 public class StockLevelLI {
@@ -34,19 +29,14 @@ public class StockLevelLI {
     @Column(nullable = false)
     private Long reserveQty;
 
-    // For RFIDs
-    @OneToMany
-    private List<ProductItem> productItems;
-
     public StockLevelLI() {
     }
 
-    public StockLevelLI(Product product, StockLevel stockLevel, Long qty, Long reserveQty, List<ProductItem> productItems) {
+    public StockLevelLI(Product product, StockLevel stockLevel, Long qty, Long reserveQty) {
         this.product = product;
         this.stockLevel = stockLevel;
         this.qty = qty;
         this.reserveQty = reserveQty;
-        this.productItems = productItems;
     }
 
     public Long getId() {
@@ -83,14 +73,6 @@ public class StockLevelLI {
 
     public void setQty(Long qty) {
         this.qty = qty;
-    }
-
-    public List<ProductItem> getProductItems() {
-        return this.productItems;
-    }
-
-    public void setProductItems(List<ProductItem> productItems) {
-        this.productItems = productItems;
     }
 
     public Long getReserveQty() {

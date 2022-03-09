@@ -1,5 +1,7 @@
 package com.iora.erp.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -17,20 +19,31 @@ import com.iora.erp.model.company.Employee;
 import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("employeeServiceImpl")
 @Transactional
-public class EmployeeServiceImpl implements EmployeeService {
+public class EmployeeServiceImpl implements EmployeeService, UserDetailsService {
 
     @PersistenceContext
     private EntityManager em;
     @Autowired
     private EmailService emailService;
-
     @Autowired
     private AdminService adminService;
+    @Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
     @Override
     public Employee createEmployee(Employee employee) throws EmployeeException {
@@ -39,8 +52,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                     employee.getJobTitle().getId()) == true) {
 
                 String tempPassword = StringGenerator.generateRandom(48, 122, 8);
-                employee.setSalt(StringGenerator.saltGeneration());
-                employee.setPassword(StringGenerator.generateProtectedPassword(employee.getSalt(), tempPassword));
+                // employee.setSalt(StringGenerator.saltGeneration());
+                // employee.setPassword(StringGenerator.generateProtectedPassword(employee.getSalt(), tempPassword));
+                employee.setPassword(passwordEncoder().encode(tempPassword));
                 em.persist(employee);
                 emailService.sendTemporaryPassword(employee, tempPassword);
             } else {
@@ -77,7 +91,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                         old.setEmail(employee.getEmail());
 
                         if (employee.getPassword() != null && employee.getPassword() != "") {
-                            old.setPassword(StringGenerator.generateProtectedPassword(salt, employee.getPassword()));
+                            // old.setPassword(StringGenerator.generateProtectedPassword(salt, employee.getPassword()));
+                            old.setPassword(passwordEncoder().encode(employee.getPassword()));
                         }
                         old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
                         old.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
@@ -218,7 +233,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             Employee c = getEmployeeByUsername(username);
 
-            if (c.authentication(StringGenerator.generateProtectedPassword(c.getSalt(), password))) {
+            if (passwordEncoder().matches(password, c.getPassword())) {
                 if (c.getAvailStatus() == true) {
                     return c;
                 } else {
@@ -238,8 +253,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void resetPassword(Long id) throws EmployeeException {
         Employee e = getEmployeeById(id);
         String tempPassword = StringGenerator.generateRandom(48, 122, 8);
-        e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(), tempPassword));
+        // e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(), tempPassword));
+        e.setPassword(passwordEncoder().encode(tempPassword));
 
         emailService.sendTemporaryPassword(e, tempPassword);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        try {
+            Employee employee = getEmployeeByUsername(username);
+            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            employee.getJobTitle().getResponsibility().forEach(accessRight -> {
+                authorities.add(new SimpleGrantedAuthority(accessRight.name()));
+            });
+            return new User(employee.getUsername(), employee.getPassword(), authorities);
+        } catch (EmployeeException ex) {
+            throw new UsernameNotFoundException("Employee not found in the database");
+        }
     }
 }

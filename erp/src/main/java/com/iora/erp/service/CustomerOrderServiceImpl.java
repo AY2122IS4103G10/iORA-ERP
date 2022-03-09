@@ -20,7 +20,9 @@ import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
+import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -33,6 +35,7 @@ import com.iora.erp.model.customerOrder.RefundLI;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
+import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Autowired
     CustomerService customerService;
+    @Autowired
+    SiteService siteService;
     @PersistenceContext
     private EntityManager em;
 
@@ -59,75 +64,82 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<CustomerOrder> searchCustomerOrders(String id) {
+    public List<CustomerOrder> searchCustomerOrders(Long siteId, Long orderId) {
         TypedQuery<CustomerOrder> q;
-        if (id != null) {
-            q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.id LIKE :id", CustomerOrder.class);
-            q.setParameter("id", "%" + Long.parseLong(id) + "%");
-        } else {
+
+        if (siteId == 0 && orderId == null) {
             q = em.createQuery("SELECT co FROM CustomerOrder co", CustomerOrder.class);
+        } else if (siteId == 0) {
+            q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.orderId LIKE :orderId", CustomerOrder.class);
+            q.setParameter("orderId", orderId);
+        } else if (orderId == null) {
+            q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.site.id = :siteId", CustomerOrder.class);
+            q.setParameter("siteId", siteId);
+        } else {
+            q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.site.id = :siteId AND co.id LIKE :orderId",
+                    CustomerOrder.class);
+            q.setParameter("siteId", siteId);
+            q.setParameter("orderId", orderId);
         }
 
         return q.getResultList();
     }
 
     @Override
-    public List<OnlineOrder> getAllOnlineOrders() {
-        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo", OnlineOrder.class);
-        return q.getResultList();
+    public List<CustomerOrder> searchStoreOrders(Long siteId, Long orderId) {
+        List<CustomerOrder> coList;
+        TypedQuery<CustomerOrder> q;
+
+        if (siteId == 0 && orderId == null) {
+            q = em.createQuery("SELECT co FROM CustomerOrder co", CustomerOrder.class);
+            coList = q.getResultList();
+            coList.removeAll(searchOnlineOrders(0L, null));
+        } else if (siteId == 0) {
+            q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.orderId LIKE :orderId", CustomerOrder.class);
+            q.setParameter("orderId", orderId);
+            coList = q.getResultList();
+            coList.removeAll(searchOnlineOrders(0L, orderId));
+        } else if (orderId == null) {
+            q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.site.id = :siteId", CustomerOrder.class);
+            q.setParameter("siteId", siteId);
+            coList = q.getResultList();
+            coList.removeAll(searchOnlineOrders(siteId, null));
+        } else {
+            q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.site.id = :siteId AND co.id LIKE :orderId",
+                    CustomerOrder.class);
+            q.setParameter("siteId", siteId);
+            q.setParameter("orderId", orderId);
+            coList = q.getResultList();
+            coList.removeAll(searchOnlineOrders(siteId, orderId));
+        }
+
+        return coList;
     }
 
     @Override
-    public List<OnlineOrder> getOnlineOrdersBySite(Long siteId) {
-        TypedQuery<OnlineOrder> q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.onlineStoreSiteId = :siteId",
-                OnlineOrder.class);
-        q.setParameter("siteId", siteId);
-        return q.getResultList();
-    }
+    public List<OnlineOrder> searchOnlineOrders(Long siteId, Long orderId) {
+        TypedQuery<OnlineOrder> q;
 
-    // Not working yet
-    @Override
-    public List<OnlineOrder> getOnlineOrdersBySiteDate(Long siteId, String date) {
-        TypedQuery<OnlineOrder> q = em.createQuery(
-                "SELECT oo FROM OnlineOrder oo WHERE oo.storeSiteId = :siteId AND SUBSTRING(oo.dateTime, 0, 10) = :date",
-                OnlineOrder.class);
-        q.setParameter("siteId", siteId);
-        q.setParameter("date", date);
-        return q.getResultList();
-    }
+        if (siteId == 0 && orderId == null) {
+            q = em.createQuery("SELECT oo FROM OnlineOrder oo", OnlineOrder.class);
+        } else if (siteId == 0) {
+            q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.id LIKE :orderId", OnlineOrder.class);
+            q.setParameter("orderId", orderId);
+        } else if (orderId == null) {
+            q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.site.id = :siteId", OnlineOrder.class);
+            q.setParameter("siteId", siteId);
+        } else {
+            q = em.createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.site.id = :siteId AND oo.id LIKE :orderId",
+                    OnlineOrder.class);
+            q.setParameter("siteId", siteId);
+            q.setParameter("orderId", orderId);
+        }
 
-    @Override
-    public List<CustomerOrder> getAllInStoreOrders() {
-        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co", CustomerOrder.class);
-        List<CustomerOrder> customerOrders = q.getResultList();
-
-        customerOrders.removeAll(getAllOnlineOrders());
-
-        return customerOrders;
-    }
-
-    @Override
-    public List<CustomerOrder> getInStoreOrdersBySite(Long siteId) {
-        TypedQuery<CustomerOrder> q = em.createQuery("SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId",
-                CustomerOrder.class);
-        q.setParameter("siteId", siteId);
-        return q.getResultList();
-    }
-
-    // Not working yet
-    @Override
-    public List<CustomerOrder> getInStoreOrdersBySiteDate(Long siteId, String date) {
-        TypedQuery<CustomerOrder> q = em.createQuery(
-                "SELECT co FROM CustomerOrder co WHERE co.storeSiteId = :siteId AND SUBSTRING(co.dateTime, 0, 10) = :date",
-                CustomerOrder.class);
-        q.setParameter("siteId", siteId);
-        q.setParameter("date", date);
         return q.getResultList();
     }
 
     @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
-        customerOrder.setPaid(false);
         em.persist(customerOrder);
         return customerOrder;
     }
@@ -191,12 +203,15 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<List<CustomerOrderLI>> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String sku) {
+    public List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException {
         // Get Product
-        Product product = em.find(Product.class, sku);
+        Product product = em.find(Product.class, rfidsku);
+        ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
-        if (product == null) {
-            return List.of(lineItems, new ArrayList<>());
+        if (product == null && productItem == null) {
+            throw new CustomerOrderException("Item scanned cannot be found.");
+        } else if (product == null) {
+            product = productItem.getProduct();
         }
 
         // Add ProductItem to Line Items and Get Set of Promotions
@@ -216,7 +231,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             li.setSubTotal(mdl.getDiscountPrice());
             lineItems.add(li);
         }
+        return lineItems;
+    }
 
+    @Override
+    public List<List<CustomerOrderLI>> calculatePromotions(List<CustomerOrderLI> lineItems) {
         List<CustomerOrderLI> newLineItems = new ArrayList<>(lineItems);
 
         // Map for Line Item to Model
@@ -331,7 +350,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         List<CustomerOrderLI> promotionList = new ArrayList<CustomerOrderLI>();
-        for(Map.Entry<CustomerOrderLI,PromotionField> entry : bestSinglePromos.entrySet()) {
+        for (Map.Entry<CustomerOrderLI, PromotionField> entry : bestSinglePromos.entrySet()) {
             CustomerOrderLI coli = entry.getKey();
             if (bestSinglePromosUsed.get(coli) > 0) {
                 PromotionLI pli = new PromotionLI(entry.getValue());
@@ -492,4 +511,54 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         customer.setMembershipPoints(membershipPoints);
     }
 
+    /*
+     * ---------------------------------------------------------
+     * Online Order Statuses Methods
+     * ---------------------------------------------------------
+     */
+
+    @Override
+    public OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException {
+        Product product = em.find(Product.class, rfidsku);
+        ProductItem productItem = em.find(ProductItem.class, rfidsku);
+
+        if (product == null && productItem == null) {
+            throw new CustomerOrderException("Item scanned cannot be found.");
+        } else if (product == null) {
+            product = productItem.getProduct();
+        }
+        
+        List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
+        List<CustomerOrderLI> packedLineItems = onlineOrder.getPackedLineItems();
+
+        for (CustomerOrderLI coli : packedLineItems) {
+            if (coli.getProduct().equals(product)) {
+                int requiredQty = lineItems.stream()
+                        .filter(x -> x.getProduct().equals(coli.getProduct()))
+                        .findAny()
+                        .get()
+                        .getQty();
+                if (coli.getQty() + qty > requiredQty) {
+                    throw new CustomerOrderException("There will be too many quantity of this product.");
+                } else {
+                    coli.setQty(coli.getQty() + qty);
+                    onlineOrder.setPackedLineItems(packedLineItems);
+                    //siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(), Long.valueOf(qty));
+                    return em.merge(onlineOrder);
+                }
+            }
+        }
+
+        for (CustomerOrderLI coli : lineItems) {
+            if (coli.getProduct().equals(product)) {
+                CustomerOrderLI lineItem = new CustomerOrderLI(qty, product);
+                createCustomerOrderLI(lineItem);
+                onlineOrder.addPackedLineItems(lineItem);
+                //siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(), Long.valueOf(qty));
+                return em.merge(onlineOrder);
+            }
+        }
+
+        throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
+    }
 }

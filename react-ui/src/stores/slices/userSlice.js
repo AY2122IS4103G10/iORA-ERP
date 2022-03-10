@@ -49,6 +49,18 @@ export const login = createAsyncThunk("auth/login", async (credentials) => {
   }
 });
 
+// export const loginJwt = createAsyncThunk(
+//   "auth/loginJwt",
+//   async (credentials) => {
+//     try {
+//       const response = await authApi.loginJwt(credentials);
+//       return response.data;
+//     } catch (error) {
+//       return Promise.reject(error.response.data);
+//     }
+//   }
+// );
+
 // export const updateCurrSite = createAction("updateCurrSite");
 
 const userSlice = createSlice({
@@ -69,7 +81,7 @@ const userSlice = createSlice({
           ? JSON.parse(localStorage.getItem("siteId"))
           : 0;
       }
-      state.currSiteStatus = "succeeded"
+      state.currSiteStatus = "succeeded";
     },
   },
   extraReducers(builder) {
@@ -92,6 +104,17 @@ const userSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.error = "Login failed";
     });
+    // builder.addCase(loginJwt.fulfilled, (state, action) => {
+    //   state = {
+    //     ...state,
+    //     user: { ...action.payload },
+    //     status: "succeeded",
+    //     loggedIn: true,
+    //   };
+    // });
+    // builder.addCase(loginJwt.rejected, (state, action) => {
+    //   state.error = "Login failed";
+    // });
     // builder.addCase(updateCurrSite, (state, action) => {
     //   state.currSite = action.payload;
     // });

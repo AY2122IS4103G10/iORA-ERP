@@ -4,6 +4,42 @@
 import axios from "axios";
 import { REST_ENDPOINT } from "../constants/restEndpoint";
 
+// const accessToken = localStorage.getItem("accessToken") ? JSON.parse(localStorage.getItem("accessToken")) : "";
+
+// axios.defaults.baseURL = REST_ENDPOINT;
+
+// export const axiosPrivate = axios.create({
+//   baseUrl: REST_ENDPOINT,
+//   headers: { 'Content-Type': 'application/json' },
+//   withCredentials: true
+// });
+
+// axiosPrivate.interceptors.request.use(
+//   config => {
+//       if (!config.headers['Authorization']) {
+//           config.headers['Authorization'] = `Bearer ${accessToken}`
+//       }
+//       return config;
+//   }, (error) => Promise.reject(error)
+// )
+
+// axiosPrivate.interceptors.response.use(
+//   response => response,
+//   async (error) => {
+//       const prevRequest = error?.config;
+//       if (error?.response?.status === 403 && !prevRequest?.sent) {
+//           prevRequest.sent = true;
+//           const tokenResponse = await axiosPublic.get("/api/refreshToken", {
+//             withCredentials: true,
+//           });
+//           const newAccessToken = tokenResponse.data.accessToken;
+//           prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+//           return axiosPrivate(prevRequest);
+//       }
+//       return Promise.reject(error);
+//   }
+// )
+
 export const api = {
   getAll(path) {
     return axios.get(`${REST_ENDPOINT}${path}`);
@@ -154,6 +190,9 @@ export const authApi = {
       `${REST_ENDPOINT}auth/empLogin?username=${username}&password=${password}`
     );
   },
+  // loginJwt(credentials) {
+  //   return axios.post('/auth/login', credentials);
+  // }
 };
 
 export const posApi = {

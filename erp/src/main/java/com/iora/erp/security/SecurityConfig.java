@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         AuthFilter authFilter = new AuthFilter(authenticationManagerBean());
         authFilter.setFilterProcessesUrl("/auth/login");
         http.csrf().disable();
+        http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         
         http.authorizeRequests().anyRequest().permitAll();

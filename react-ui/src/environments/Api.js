@@ -199,6 +199,12 @@ export const posApi = {
   getOrders(siteId) {
     return axios.get(`${REST_ENDPOINT}store/customerOrder/${siteId}`);
   },
+  addProductToLineItems(rfidsku, lineItems) {
+    return axios.post(`${REST_ENDPOINT}store/customerOrder/add/${rfidsku}`, lineItems);
+  },
+  removeProductFromLineItems(rfidsku, lineItems) {
+    return axios.post(`${REST_ENDPOINT}store/customerOrder/remove/${rfidsku}`, lineItems);
+  },
 };
 
 export const employeeApi = {

@@ -570,10 +570,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public JSONObject getProductCartDetails(String rfidsku)
-            throws ProductItemException, ProductException, ModelException, JSONException,
+            throws ProductException, ModelException, JSONException,
             ProductFieldException {
         JSONObject jo = new JSONObject();
-        ProductItem pi = getProductItem(rfidsku);
+        ProductItem pi = em.find(ProductItem.class, rfidsku);
         Product p = getProduct(rfidsku);
         if (pi == null && p == null) {
             return jo;

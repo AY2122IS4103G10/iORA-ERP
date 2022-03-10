@@ -1,10 +1,20 @@
 import { Dialog } from "@headlessui/react";
-import { CashIcon, CreditCardIcon, DeviceMobileIcon, XIcon } from "@heroicons/react/outline";
-import { XCircleIcon } from "@heroicons/react/solid";
+import {
+  CashIcon,
+  CreditCardIcon,
+  DeviceMobileIcon,
+  XIcon,
+} from "@heroicons/react/outline";
+import { MinusSmIcon, PlusSmIcon, XCircleIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
-import { getProductDetails, getProductItem } from "../../../../stores/slices/productSlice";
+import { api, posApi, productApi } from "../../../../environments/Api";
+import { addProductToLineItems } from "../../../../stores/slices/posSlice";
+import {
+  getProductDetails,
+  getProductItem,
+} from "../../../../stores/slices/productSlice";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
 const paymentTypes = [
@@ -38,7 +48,7 @@ const paymentTypes = [
   },
 ];
 
-export const PaymentModal = ({open, closeModal}) => {
+export const PaymentModal = ({ open, closeModal }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
       <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
@@ -46,13 +56,15 @@ export const PaymentModal = ({open, closeModal}) => {
           <div className="flex justify-between">
             <Dialog.Title
               as="h3"
-              className="m-3 text-center text-lg leading-6 font-medium text-gray-900">
+              className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
+            >
               Payment Option
             </Dialog.Title>
             <button
               type="button"
               className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
-              onClick={closeModal}>
+              onClick={closeModal}
+            >
               <XIcon className="h-5 w-5" />
             </button>
           </div>
@@ -62,7 +74,8 @@ export const PaymentModal = ({open, closeModal}) => {
               <div
                 key={index}
                 className="m-2 border shadow rounded-lg align-middle sm:rounded-md relative bg-white p-8 
-                focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500">
+                focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500"
+              >
                 <div className="m-0 flex justify-center">
                   <button>
                     {/* Extend touch target to entire panel */}
@@ -95,24 +108,28 @@ export const PaymentModal = ({open, closeModal}) => {
 };
 
 const OrderList = ({
-  products,
+  lineItems,
+  promotions,
+  productDetails,
   amount,
   rfid,
   onRfidChanged,
-  addRFIDClicked,
-  Remove,
-  error,
+  addRfidClicked,
+  Modify,
   clear,
   openModal,
   closeModal,
   qty,
 }) => (
   <main>
-    <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4 lg:px-0">
+    <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4">
       <form>
         <div>
-          <label htmlFor="rfid" className="block mt-8 text-base font-medium text-gray-700">
-            RFID
+          <label
+            htmlFor="rfid"
+            className="block mt-8 text-base font-medium text-gray-700"
+          >
+            SKU Code or RFID
           </label>
           <div className="mt-1 flex space-x-2">
             <input
@@ -121,7 +138,7 @@ const OrderList = ({
               id="rfid"
               autoComplete="rfid"
               className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-10/12 sm:text-sm border-gray-300 rounded-md"
-              placeholder="10-0001234-0XXXXX-0000XXXXX"
+              placeholder="10-0001234-0XXXXX-0000XXXXX or AA0009876-1"
               value={rfid}
               onChange={onRfidChanged}
               required
@@ -130,22 +147,11 @@ const OrderList = ({
             <button
               type="submit"
               className="w-2/12 flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-sm rounded-md text-white bg-slate-600 hover:bg-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
-              onClick={addRFIDClicked}>
+              onClick={addRfidClicked}
+            >
               Add product
             </button>
           </div>
-          {error && (
-            <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-800">Product not found.</p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </form>
 
@@ -160,40 +166,63 @@ const OrderList = ({
             </h2>
 
             <ul className="border-t border-b border-gray-200">
-              {products.map((product, index) => (
-                <li key={product.name} className="flex py-6">
+              {lineItems.map((lineItem, index) => (
+                <li key={lineItem.product.sku} className="flex py-6">
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                     <div>
                       <div className="flex justify-between">
-                        <h4 className="text-lg w-9/12">
+                        <h4 className="text-lg w-7/12">
                           <strong className="font-medium text-gray-700 hover:text-gray-800">
-                            {product.name}
+                            {productDetails.get(lineItem.product.sku)?.name}
                           </strong>
                           <p className="mt-1 flex text-sm text-gray-500">
-                            {product.colour}&nbsp; -- &nbsp;
-                            {product.size !== null ? product.size : null} &nbsp; -- &nbsp;
-                            {product.promotion !== null ? product.promotion : null}
+                            {productDetails.get(lineItem.product.sku)?.colour}
+                            &nbsp; -- &nbsp;
+                            {productDetails.get(lineItem.product.sku)?.size !==
+                            null
+                              ? productDetails.get(lineItem.product.sku)?.size
+                              : null}{" "}
+                            &nbsp;
                           </p>
                         </h4>
-                        <h4 className="text-lg w-1/12 ">
-                          <p className="mt-1 flex font-medium text-sm text-gray-500">QTY</p>
+                        <div className="text-lg w-1/12">
                           <p className="mt-1 flex font-medium text-sm text-gray-500">
-                            {qty[index]}
+                            QTY
+                          </p>
+                          <p className="mt-1 flex font-medium text-sm text-gray-900">
+                            {lineItem.qty}
+                          </p>
+                        </div>
+                        <Modify product={lineItem.product} />
+                        <h4 className="text-lg w-1/12">
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">
+                            PRICE
+                          </p>
+                          {productDetails[lineItem.product.sku]?.listPrice && (
+                            <p className="line-through text-gray-500">
+                              $
+                              {Number.parseFloat(
+                                productDetails.get(lineItem.product.sku)
+                                  ?.listPrice
+                              ).toFixed(2)}
+                            </p>
+                          )}
+                          <p className="mt-1 flex font-medium text-sm text-gray-900">
+                            $
+                            {Number.parseFloat(
+                              productDetails.get(lineItem.product.sku)
+                                ?.discountedPrice
+                            ).toFixed(2)}
                           </p>
                         </h4>
-                        {"discountedPrice" in product ? (
-                          <div>
-                            <p className="line-through text-gray-500">
-                              ${Number.parseFloat(product.price).toFixed(2)}
-                            </p>
-                            ${Number.parseFloat(product.discountedPrice).toFixed(2)}
-                          </div>
-                        ) : (
-                          <p className="ml-4 text-sm font-medium text-gray-900">
-                            ${Number.parseFloat(product.price).toFixed(2)}
+                        <h4 className="text-lg w-1/12">
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">
+                            SUBTOTAL
                           </p>
-                        )}
-                        <Remove product={product} />
+                          <p className="mt-1 flex font-medium text-sm text-gray-900">
+                            ${Number.parseFloat(lineItem.subTotal).toFixed(2)}
+                          </p>
+                        </h4>
                       </div>
                     </div>
                   </div>
@@ -228,7 +257,8 @@ const OrderList = ({
           <button
             type="button"
             onClick={openModal}
-            className="w-2/12 mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500">
+            className="w-2/12 mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+          >
             Payment
           </button>
           <button
@@ -238,7 +268,8 @@ const OrderList = ({
               if (window.confirm("Are you sure to clear ALL items?")) {
                 clear();
               }
-            }}>
+            }}
+          >
             Clear All Items
           </button>
         </div>
@@ -248,170 +279,98 @@ const OrderList = ({
 );
 
 export const PosPurchaseOrder = () => {
-  const dispatch = useDispatch();
   const [modalState, setModalState] = useState(false);
   const openModal = () => setModalState(true);
   const closeModal = () => setModalState(false);
-  const [sku, setSku] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [rfidList, setRfidList] = useState([]);
-  const [qty, setQty] = useState([]);
-  const [amount, setAmount] = useState(0);
   const [rfid, setRfid] = useState("");
-  const [error, setError] = useState(false);
-  const {addToast} = useToasts();
+  const [lineItems, setLineItems] = useState([]);
+  const [promotions, setPromotions] = useState([]);
+  const [productDetails, setProductDetails] = useState(new Map());
+  const [amount, setAmount] = useState(0);
+  const { addToast } = useToasts();
 
-  const onRfidChanged = (e) => setRfid(e.target.value);
-
-  const addProduct = (rfid) => {
-    dispatch(getProductDetails(rfid))
-      .unwrap()
-      .then((data) => {
-        console.log(data);
-        products.push(data);
-        setProducts(products);
-        "discountedPrice" in data
-          ? setAmount(amount + data.discountedPrice)
-          : setAmount(amount + data.price);
-      })
-      .catch((err) => {
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      });
+  const onRfidChanged = (e) => {
+    if (
+      e.target.value.length - rfid.length > 10 &&
+      e.target.value.includes("-")
+    ) {
+      addProduct(e.target.value);
+    }
+    setRfid(e.target.value);
   };
 
-  const updateIncrAmount = (rfid, i) => {
-    dispatch(getProductDetails(rfid))
-      .unwrap()
-      .then((data) => {
-        let newQty = [...qty];
-        newQty[i] = qty[i] + 1;
-        setQty(newQty);
-        "discountedPrice" in data
-          ? setAmount(amount + data.discountedPrice)
-          : setAmount(amount + data.price);
-      })
-      .catch((err) => {
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      });
-  };
-
-  const addRFIDClicked = (evt) => {
-    evt.preventDefault();
-    dispatch(getProductItem(rfid))
-      .unwrap()
-      .then((data) => {
-        if (rfidList.includes(rfid) === false) {
-          rfidList.push(rfid);
-          setRfidList(rfidList);
-          let currentSKU = data.productSKU;
-
-          if (sku.includes(currentSKU) === true) {
-            let i = sku.indexOf(currentSKU);
-            updateIncrAmount(rfid, i);
-          } else {
-            sku.push(currentSKU);
-            setSku(sku);
-            qty.push(1);
-            setQty(qty);
-            addProduct(rfid, sku.indexOf(currentSKU));
-          }
-        } else {
-          throw new Error("Error: Duplicate RFID");
-        }
-      })
-      .catch((err) => {
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      });
+  const addProduct = async (rfid) => {
+    const response = await posApi.addProductToLineItems(rfid, lineItems);
+    setLineItems(response.data);
+    const detail = await api.get("store/productDetails", rfid);
+    setProductDetails(productDetails.set(rfid, detail.data));
+    setAmount(response.data.map((x) => x.subTotal).reduce((x, y) => x + y));
     setRfid("");
   };
 
-  const decrTotalAmount = (rfid) => {
-    dispatch(getProductDetails(rfid))
-      .unwrap()
-      .then((data) => {
-        "discountedPrice" in data
-          ? setAmount(amount - data.discountedPrice)
-          : setAmount(amount - data.price);
-      })
-      .catch((err) => {
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      });
+  const removeProduct = async (rfid) => {
+    const response = await posApi.removeProductFromLineItems(rfid, lineItems);
+    setLineItems(response.data);
+    setAmount(
+      response.data.length === 0
+        ? 0
+        : response.data.map((x) => x.subTotal).reduce((x, y) => x + y)
+    );
   };
 
-  function Remove(props) {
-    const product = props.product;
+  const addRfidClicked = (e) => {
+    e.preventDefault();
+    addProduct(rfid);
+  };
 
-    const removeProduct = (product) => {
-      const index = products.indexOf(product);
-      let i = qty.reduce((total, num) => total + num, 0);
-      let removeRFID = rfidList[i - 1];
-      decrTotalAmount(removeRFID);
-      rfidList.splice(i - 1, 1);
-      setRfidList(rfidList);
-
-      if (qty[index] === 1) {
-        sku.splice(index, 1);
-        setSku(sku);
-        qty.splice(index, 1);
-        setQty(qty);
-        products.splice(index, 1);
-        setProducts(products);
-      } else {
-        let newQty = [...qty];
-        newQty[index] = qty[index] - 1;
-        setQty(newQty);
-      }
-      "discountedPrice" in product
-        ? setAmount(amount - product.discountedPrice)
-        : setAmount(amount - product.price);
-    };
+  function Modify(props) {
+    const { product } = props;
 
     return (
-      <div className="">
-        <button
-          type="button"
-          className="text-sm font-medium text-indigo-600 hover:text-red-500"
-          onClick={() => removeProduct(product)}>
-          <span>Remove</span>
-        </button>
+      <div className="text-md w-1/12">
+        <p>
+          <button
+            type="button"
+            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            onClick={() => addProduct(product.sku)}
+          >
+            <PlusSmIcon className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </p>
+        <p>
+          <button
+            type="button"
+            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            onClick={() => removeProduct(product.sku)}
+          >
+            <MinusSmIcon className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </p>
       </div>
     );
   }
 
   const clear = () => {
-    setProducts([]);
-    setSku([]);
-    setRfidList([]);
-    setQty([]);
+    setRfid("");
+    setLineItems([]);
+    setPromotions({});
     setAmount(0);
   };
 
   return (
     <>
       <OrderList
-        products={products}
-        amount={amount}
         rfid={rfid}
+        lineItems={lineItems}
+        productDetails={productDetails}
+        promotions={promotions}
+        amount={amount}
         onRfidChanged={onRfidChanged}
-        addRFIDClicked={addRFIDClicked}
-        Remove={Remove}
-        error={error}
+        addRfidClicked={addRfidClicked}
+        Modify={Modify}
         clear={clear}
         openModal={openModal}
         closeModal={closeModal}
-        qty={qty}
       />
       <PaymentModal open={modalState} closeModal={closeModal} />
     </>

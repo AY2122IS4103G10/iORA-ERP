@@ -29,6 +29,7 @@ public interface CustomerOrderService {
     public abstract CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException;
     
     public abstract List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException;
+    public abstract List<CustomerOrderLI> removeFromCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException;
     public abstract List<List<CustomerOrderLI>> calculatePromotions(List<CustomerOrderLI> lineItems);
 
     public abstract Payment getPayment(Long id) throws CustomerOrderException;

@@ -277,14 +277,14 @@ export function Home() {
 
   useEffect(() => {
     localStorage.removeItem("siteId");
-    api.getAll("/store/storeNames").then((response) => {
+    api.getAll("store/storeNames").then((response) => {
       setStoreNames({ 0: "Choose one", ...response.data });
     });
   }, [setStoreNames]);
 
   const handleEnterStore = () => {
     api
-      .getAll(`/store/storeLogin?id=${store.id}&siteCode=${siteCode}`)
+      .getAll(`store/storeLogin?id=${store.id}&siteCode=${siteCode}`)
       .then((response) => {
         localStorage.setItem("siteId", response.data.id);
         addToast(`Successfully logged in to ${store.name}`, {

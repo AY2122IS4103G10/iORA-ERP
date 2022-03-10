@@ -6,7 +6,7 @@ import {
   XIcon,
 } from "@heroicons/react/outline";
 import { MinusSmIcon, PlusSmIcon, XCircleIcon } from "@heroicons/react/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { api, posApi, productApi } from "../../../../environments/Api";
@@ -166,7 +166,7 @@ const OrderList = ({
             </h2>
 
             <ul className="border-t border-b border-gray-200">
-              {lineItems.map((lineItem, index) => (
+              {lineItems.map((lineItem) => (
                 <li key={lineItem.product.sku} className="flex py-6">
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                     <div>
@@ -221,6 +221,56 @@ const OrderList = ({
                           </p>
                           <p className="mt-1 flex font-medium text-sm text-gray-900">
                             ${Number.parseFloat(lineItem.subTotal).toFixed(2)}
+                          </p>
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {promotions.length > 0 && (
+              <p className="mt-1 mb-1 flex font-medium text-sm text-gray-500">
+                Promotions
+              </p>
+            )}
+            <ul className="border-t border-b border-gray-200">
+              {promotions.map((lineItem, index) => (
+                <li key={index} className="flex py-6">
+                  <div className="ml-4 flex-1 flex flex-col sm:ml-6">
+                    <div>
+                      <div className="flex justify-between">
+                        <h4 className="text-lg w-7/12">
+                          <strong className="font-medium text-gray-700 hover:text-gray-800">
+                            {lineItem.promotion.fieldValue}
+                          </strong>
+                        </h4>
+                        <div className="text-lg w-1/12">
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">
+                            QTY
+                          </p>
+                          <p className="mt-1 flex font-medium text-sm text-gray-900">
+                            {lineItem.qty}
+                          </p>
+                        </div>
+                        <p className="text-lg w-1/12"></p>
+                        <h4 className="text-lg w-1/12">
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">
+                            PRICE
+                          </p>
+                          <p className="mt-1 flex font-medium text-sm text-gray-900">
+                            -$
+                            {(
+                              Number.parseFloat(-lineItem.subTotal)
+                            ).toFixed(2)}
+                          </p>
+                        </h4>
+                        <h4 className="text-lg w-1/12">
+                          <p className="mt-1 flex font-medium text-sm text-gray-500">
+                            SUBTOTAL
+                          </p>
+                          <p className="mt-1 flex font-medium text-sm text-gray-900">
+                            -${Number.parseFloat(-lineItem.subTotal).toFixed(2)}
                           </p>
                         </h4>
                       </div>
@@ -318,12 +368,26 @@ export const PosPurchaseOrder = () => {
     );
   };
 
+  useEffect(() => {
+    async function calculate() {
+      const response = await posApi.calculatePromotions(lineItems);
+      setPromotions(response.data[1]);
+      setAmount(
+        response.data
+          .map((y) => y.map((x) => x.subTotal).reduce((x, y) => x + y, 0))
+          .reduce((x, y) => x + y, 0)
+      );
+    }
+
+    calculate();
+  }, [setPromotions, lineItems]);
+
   const addRfidClicked = (e) => {
     e.preventDefault();
     addProduct(rfid);
   };
 
-  function Modify(props) {
+  const Modify = (props) => {
     const { product } = props;
 
     return (
@@ -348,12 +412,12 @@ export const PosPurchaseOrder = () => {
         </p>
       </div>
     );
-  }
+  };
 
   const clear = () => {
     setRfid("");
     setLineItems([]);
-    setPromotions({});
+    setPromotions([]);
     setAmount(0);
   };
 

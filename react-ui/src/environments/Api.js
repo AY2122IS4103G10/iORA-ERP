@@ -205,6 +205,9 @@ export const posApi = {
   removeProductFromLineItems(rfidsku, lineItems) {
     return axios.post(`${REST_ENDPOINT}store/customerOrder/remove/${rfidsku}`, lineItems);
   },
+  calculatePromotions(lineItems) {
+    return axios.post(`${REST_ENDPOINT}store/customerOrder/calculate`, lineItems);
+  }
 };
 
 export const employeeApi = {

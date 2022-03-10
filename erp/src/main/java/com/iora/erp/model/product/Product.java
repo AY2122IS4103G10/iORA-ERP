@@ -3,7 +3,6 @@ package com.iora.erp.model.product;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Entity;

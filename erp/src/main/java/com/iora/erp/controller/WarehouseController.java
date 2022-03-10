@@ -8,7 +8,6 @@ import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Product;
-import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;

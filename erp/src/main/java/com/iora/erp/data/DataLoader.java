@@ -30,7 +30,6 @@ import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerService;
-import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

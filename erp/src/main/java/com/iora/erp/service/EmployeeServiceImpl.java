@@ -73,7 +73,7 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
         if (old == null) {
             throw new EmployeeException("Employee not found");
         }
-        String salt = old.getSalt();
+        // String salt = old.getSalt();
 
         try {
             if (adminService.checkJTInDepartment(employee.getDepartment().getId(),

@@ -569,13 +569,18 @@ public class ProductServiceImpl implements ProductService {
      */
 
     @Override
-    public JSONObject getProductCartDetails(String rfid)
-            throws ProductItemException, ProductException, ModelException, JSONException,
+    public JSONObject getProductCartDetails(String rfidsku)
+            throws ProductException, ModelException, JSONException,
             ProductFieldException {
-        ProductItem pi = getProductItem(rfid);
-        Product p = pi.getProduct();
-        Model m = getModelByProduct(p);
         JSONObject jo = new JSONObject();
+        ProductItem pi = em.find(ProductItem.class, rfidsku);
+        Product p = getProduct(rfidsku);
+        if (pi == null && p == null) {
+            return jo;
+        } else if (p == null) {
+            p = pi.getProduct();
+        }
+        Model m = getModelByProduct(p);
         jo.put("name", m.getName());
         jo.put("listPrice", m.getListPrice());
         jo.put("discountedPrice", m.getDiscountPrice());
@@ -586,7 +591,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void loadProducts(List<Object> productsJSON)
-            throws ProductException, ProductFieldException, ProductItemException, CustomerException, NoStockLevelException {
+            throws ProductException, ProductFieldException, ProductItemException, CustomerException,
+            NoStockLevelException {
 
         for (Object j : productsJSON) {
             LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;

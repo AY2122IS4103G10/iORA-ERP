@@ -16,6 +16,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -33,11 +34,18 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
-                password);
-        return authenticationManager.authenticate(authenticationToken);
+        try {
+            Map<String, String> data = new ObjectMapper().readValue(request.getReader(), HashMap.class);
+            String username = data.get("username");
+            String password = data.get("password");
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
+                    password);
+            return authenticationManager.authenticate(authenticationToken);
+        } catch (AuthenticationException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BadCredentialsException("Incorrectly filled fields.");
+        }
     }
 
     @Override
@@ -49,14 +57,15 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 20 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
-                .withClaim("accessRights", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .withClaim("accessRights",
+                        user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
         String refreshToken = JWT.create()
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 365 * 24 * 60 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
-        Map<String,String> tokens = new HashMap<>();
+        Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
         tokens.put("refreshToken", refreshToken);
         response.setContentType("application/json");

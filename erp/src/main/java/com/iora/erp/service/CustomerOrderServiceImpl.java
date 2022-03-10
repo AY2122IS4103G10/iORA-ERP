@@ -203,7 +203,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException {
+    public List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku)
+            throws CustomerOrderException {
         // Get Product
         Product product = em.find(Product.class, rfidsku);
         ProductItem productItem = em.find(ProductItem.class, rfidsku);
@@ -214,7 +215,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             product = productItem.getProduct();
         }
 
-        // Add ProductItem to Line Items and Get Set of Promotions
+        // Add ProductItem to Line Items
         Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
         boolean added = false;
         for (int i = 0; i < lineItems.size(); i++) {
@@ -230,6 +231,39 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             li.setQty(1);
             li.setSubTotal(mdl.getDiscountPrice());
             lineItems.add(li);
+        }
+        return lineItems;
+    }
+
+    @Override
+    public List<CustomerOrderLI> removeFromCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku)
+            throws CustomerOrderException {
+        // Get Product
+        Product product = em.find(Product.class, rfidsku);
+        ProductItem productItem = em.find(ProductItem.class, rfidsku);
+
+        if (product == null && productItem == null) {
+            throw new CustomerOrderException("Item scanned cannot be found.");
+        } else if (product == null) {
+            product = productItem.getProduct();
+        }
+
+        // Remove ProductItem from Line Items
+        Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
+        boolean removed = false;
+        for (int i = 0; i < lineItems.size(); i++) {
+            if (lineItems.get(i).getProduct().equals(product)) {
+                if (lineItems.get(i).getQty() > 1) {
+                    lineItems.get(i).setQty(lineItems.get(i).getQty() - 1);
+                    lineItems.get(i).setSubTotal(lineItems.get(i).getSubTotal() - mdl.getDiscountPrice());
+                } else {
+                    lineItems.remove(i);
+                }
+                removed = true;
+            }
+        }
+        if (!removed) {
+            throw new CustomerOrderException("Item scanned cannot be removed.");
         }
         return lineItems;
     }
@@ -518,7 +552,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
      */
 
     @Override
-    public OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException {
+    public OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty)
+            throws CustomerOrderException, NoStockLevelException, IllegalTransferException {
         Product product = em.find(Product.class, rfidsku);
         ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
@@ -527,7 +562,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         } else if (product == null) {
             product = productItem.getProduct();
         }
-        
+
         List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
         List<CustomerOrderLI> packedLineItems = onlineOrder.getPackedLineItems();
 
@@ -543,7 +578,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 } else {
                     coli.setQty(coli.getQty() + qty);
                     onlineOrder.setPackedLineItems(packedLineItems);
-                    //siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(), Long.valueOf(qty));
+                    // siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(),
+                    // Long.valueOf(qty));
                     return em.merge(onlineOrder);
                 }
             }
@@ -554,7 +590,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 CustomerOrderLI lineItem = new CustomerOrderLI(qty, product);
                 createCustomerOrderLI(lineItem);
                 onlineOrder.addPackedLineItems(lineItem);
-                //siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(), Long.valueOf(qty));
+                // siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(),
+                // Long.valueOf(qty));
                 return em.merge(onlineOrder);
             }
         }

@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 
-import { login } from "../../../../stores/slices/userSlice";
+import { login, loginJwt } from "../../../../stores/slices/userSlice";
 
 export function Login() {
   const dispatch = useDispatch();
@@ -36,6 +36,11 @@ export function Login() {
           autoDismiss: true,
         });
       });
+    // dispatch(loginJwt({ username: username, password: password }))
+    //   .unwrap()
+    //   .then((data) => {
+    //     console.log(data.json());
+    //   });
   };
 
   return (

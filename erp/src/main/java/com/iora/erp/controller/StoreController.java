@@ -242,7 +242,7 @@ public class StoreController {
      * ---------------------------------------------------------
      */
 
-    @GetMapping(path = "/customerOrder/{orderId}", produces = "application/json")
+    @GetMapping(path = "/customerOrder/view/{orderId}", produces = "application/json")
     public ResponseEntity<Object> getCustomerOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity
@@ -288,7 +288,16 @@ public class StoreController {
         try {
             return ResponseEntity.ok(customerOrderService.addToCustomerOrderLIs(lineItems, rfidsku));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/remove/{rfidsku}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> removeItemFromLineItems(@RequestBody List<CustomerOrderLI> lineItems,
+            @PathVariable String rfidsku) {
+        try {
+            return ResponseEntity.ok(customerOrderService.removeFromCustomerOrderLIs(lineItems, rfidsku));
+        } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

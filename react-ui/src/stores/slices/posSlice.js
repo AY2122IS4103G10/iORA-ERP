@@ -15,6 +15,14 @@ export const fetchSiteOrders = createAsyncThunk(
   }
 );
 
+export const addProductToLineItems = createAsyncThunk(
+  "store/addProductToLineItems",
+  async (rfidsku, lineItems) => {
+    const response = await posApi.addProductToLineItems(rfidsku, lineItems);
+    return response.data;
+  }
+);
+
 const posSlice = createSlice({
   name: "pos",
   initialState,

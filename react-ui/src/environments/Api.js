@@ -197,7 +197,7 @@ export const authApi = {
 
 export const posApi = {
   getOrders(siteId) {
-    return axios.get(`${REST_ENDPOINT}store/customerOrder/${siteId}`);
+    return axios.get(`${REST_ENDPOINT}store/customerOrder/${siteId}?orderId=`);
   },
   addProductToLineItems(rfidsku, lineItems) {
     return axios.post(`${REST_ENDPOINT}store/customerOrder/add/${rfidsku}`, lineItems);
@@ -250,3 +250,24 @@ export const productApi = {
     return axios.get(`${REST_ENDPOINT}sam/product?sku=${sku}`);
   },
 };
+
+export const onlineOrderApi = {
+  getAll() {
+    return axios.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=`)
+  },
+  get(orderId) {
+    return axios.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=${orderId}`)
+  },
+  getAllBySite(siteId) {
+    return axios.get(`${REST_ENDPOINT}sam/onlineOrder/${siteId}?orderId=`)
+  }
+}
+
+export const orderApi = {
+  getAll() {
+    return axios.get(`${REST_ENDPOINT}store/customerOrder?orderId=`)
+  },
+  get(orderId) {
+    return axios.get(`${REST_ENDPOINT}store/customerOrder?orderId=${orderId}`)
+  },
+}

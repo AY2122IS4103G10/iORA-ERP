@@ -68,6 +68,15 @@ import { ProcurementSearch } from "./views/containers/Procurement/ProcurementSea
 import { LGIndex } from "./views/containers/Index/LGIndex/index.js";
 import { ProductsList } from "./views/containers/Products/ProductsList/index.js";
 import { ProductPrint } from "./views/containers/Products/ProductPrint/index.js";
+import { ProcurementWrapper } from "./views/containers/Procurement/ProcurementWrapper/index.js";
+import { ProcurementPickPack } from "./views/containers/Procurement/ProcurementPickPack/index.js";
+import { ManageOnlineOrders } from "./views/containers/OnlineOrder/ManageOnlineOrders/index.js";
+import { OnlineOrderList } from "./views/containers/OnlineOrder/OnlineOrderList/index.js";
+import { OnlineOrderSearch } from "./views/containers/OnlineOrder/OnlineOrderSearch/index.js";
+import { ManageOrders } from "./views/containers/Orders/ManageOrders/index.js";
+import { OrderList } from "./views/containers/Orders/OrderList/index.js";
+import { OrderSearch } from "./views/containers/Orders/OrderSearch/index.js";
+import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -115,7 +124,7 @@ function App() {
                 element={<AProductStock subsys="sm" />}
               />
             </Route>
-
+            {/* Stock Transfer Orders */}
             <Route path="stocktransfer" element={<Outlet />}>
               <Route index element={<ManageStockTransfer subsys="sm" />} />
               <Route
@@ -129,6 +138,7 @@ function App() {
               />
             </Route>
 
+            {/* Procurement Orders */}
             <Route path="procurements" element={<Outlet />}>
               <Route
                 index
@@ -146,10 +156,47 @@ function App() {
                   </ManageProcurement>
                 }
               />
-              <Route path=":procurementId" element={<ProcurementDetails />} />
+              <Route
+                path=":procurementId"
+                element={<ProcurementWrapper subsys="sm" />}
+              >
+                <Route index element={<ProcurementDetails subsys="sm" />} />
+                <Route path="pick-pack" element={<ProcurementPickPack />} />
+              </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
             </Route>
+
+            {/* Customer Orders */}
+            <Route path="orders" element={<Outlet />}>
+              <Route
+                index
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" />
+                  </ManageOrders>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderSearch subsys="sm" />
+                  </ManageOrders>
+                }
+              />
+              <Route
+                path=":orderId"
+                element={<CustomerOrderWrapper subsys="sm" />}
+              >
+                <Route index element={<OrderDetails subsys="sm" />} />
+                <Route path="pick-pack" element={<ProcurementPickPack />} />
+              </Route>
+              <Route path="create" element={<ProcurementForm />} />
+              <Route path="edit/:orderId" element={<ProcurementForm />} />
+            </Route>
+
+            {/* Vouchers */}
             <Route path="vouchers" element={<Outlet />}>
               <Route index element={<ManageVouchers />} />
               <Route path=":voucherCode" element={<VoucherDetails />} />
@@ -289,7 +336,13 @@ function App() {
                   </ManageProcurement>
                 }
               />
-              <Route path=":procurementId" element={<ProcurementDetails />} />
+              <Route
+                path=":procurementId"
+                element={<ProcurementWrapper subsys="mf" />}
+              >
+                <Route index element={<ProcurementDetails subsys="mf" />} />
+                <Route path="pick-pack" element={<ProcurementPickPack />} />
+              </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<VoucherForm />} />
             </Route>
@@ -326,13 +379,13 @@ function App() {
                 element={<AProductStock subsys="wh" />}
               />
             </Route>
-
+            {/* Procurement Orders */}
             <Route path="procurements" element={<Outlet />}>
               <Route
                 index
                 element={
                   <ManageProcurement subsys="wh">
-                    <ProcurementList pathname={pathname} subsys="wh" />
+                    <ProcurementList subsys="wh" />
                   </ManageProcurement>
                 }
               />
@@ -346,8 +399,38 @@ function App() {
               />
               <Route
                 path=":procurementId"
-                element={<ProcurementDetails subsys="wh" />}
+                element={<ProcurementWrapper subsys="wh" />}
+              >
+                <Route index element={<ProcurementDetails subsys="wh" />} />
+                <Route path="pick-pack" element={<ProcurementPickPack />} />
+              </Route>
+            </Route>
+            {/* Online Orders */}
+            <Route path="online-orders" element={<Outlet />}>
+              <Route
+                index
+                element={
+                  <ManageOnlineOrders subsys="wh">
+                    <OnlineOrderList subsys="wh" />
+                  </ManageOnlineOrders>
+                }
               />
+
+              <Route
+                path="search"
+                element={
+                  <ManageOnlineOrders subsys="wh">
+                    <OnlineOrderSearch subsys="wh" />
+                  </ManageOnlineOrders>
+                }
+              />
+              {/* <Route
+                path=":procurementId"
+                element={<ProcurementWrapper subsys="wh" />}
+              >
+                <Route index element={<ProcurementDetails subsys="wh" />} />
+                <Route path="pick-pack" element={<ProcurementPickPack />} />
+              </Route> */}
             </Route>
 
             <Route path="stocktransfer" element={<Outlet />}>

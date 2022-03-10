@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
-import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;

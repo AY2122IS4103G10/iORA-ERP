@@ -61,7 +61,7 @@ public interface ProductService {
     public abstract void returnProductItem(String rfid) throws ProductItemException;
     */
 
-    public abstract JSONObject getProductCartDetails(String rfid) throws ProductItemException, ProductException, ModelException, JSONException, ProductFieldException;
+    public abstract JSONObject getProductCartDetails(String rfidsku) throws ProductItemException, ProductException, ModelException, JSONException, ProductFieldException;
 
     // Data Loading
     public abstract void loadProducts(List<Object> productsJSON) throws ProductException, ProductFieldException, ProductItemException, CustomerException, NoStockLevelException;

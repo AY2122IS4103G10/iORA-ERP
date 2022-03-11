@@ -32,6 +32,12 @@ const navigation = [
     current: false,
   },
   {
+    name: "Orders",
+    href: "/sm/orders",
+    icon: ArchiveIcon,
+    current: false,
+  },
+  {
     name: "Stock Transfer",
     href: "/sm/stocktransfer",
     icon: ArchiveIcon,

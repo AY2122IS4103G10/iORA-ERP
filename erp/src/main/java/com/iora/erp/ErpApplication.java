@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iora.erp.service.ProductService;
+import com.iora.erp.data.DataLoader;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -27,7 +27,7 @@ public class ErpApplication {
 
 	// read json and write to db
 	@Bean
-	CommandLineRunner runner(ProductService productService) {
+	CommandLineRunner runner(DataLoader dataLoader) {
 		return args -> {
 
 			ObjectMapper mapper = new ObjectMapper();
@@ -37,7 +37,7 @@ public class ErpApplication {
 			InputStream inputStream = resource.getInputStream();
 			try {
 				List<Object> productsJSON = mapper.readValue(inputStream, typeReference);
-				productService.loadProducts(productsJSON);
+				dataLoader.loadProducts(productsJSON);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Unable to save products: " + e.getMessage());
@@ -45,5 +45,4 @@ public class ErpApplication {
 		};
 	}
 
-	
 }

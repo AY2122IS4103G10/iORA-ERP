@@ -1,9 +1,9 @@
 import { forwardRef } from "react";
 import QRCode from "qrcode.react";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useMemo } from "react";
 import Barcode from "react-barcode";
 import moment from "moment";
+import { BasicTable } from "../../../components/Tables/BasicTable";
 
 const ItemsSummary = ({ data, status }) => {
   const columns = useMemo(() => {
@@ -26,38 +26,11 @@ const ItemsSummary = ({ data, status }) => {
             .fieldValue,
       },
       {
-        Header: "Requested",
+        Header: "Quantity",
         accessor: "requestedQty",
       },
-      {
-        Header: "Fulfilled",
-        accessor: "fulfilledQty",
-        disableSortBy: true,
-        Cell: (row) =>
-          status === "PENDING" ||
-          status === "CANCELLED" ||
-          status === "ACCEPTED"
-            ? "-"
-            : row.row.original.fulfilledProductItems.length,
-      },
-      {
-        Header: "Shipped",
-        accessor: "shippedQty",
-        Cell: (row) => {
-          return status === "SHIPPED" ||
-            status === "VERIFIED" ||
-            status === "COMPLETED"
-            ? row.row.original.fulfilledProductItems.length
-            : "-";
-        },
-      },
-      {
-        Header: "Received",
-        accessor: "actualQty",
-        Cell: "-",
-      },
     ];
-  }, [status]);
+  }, []);
   return (
     <div className="py-8 border-b border-gray-200">
       <div className="md:flex md:items-center md:justify-between">
@@ -65,18 +38,7 @@ const ItemsSummary = ({ data, status }) => {
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable
-            columns={columns}
-            data={data}
-            globalFilter={false}
-            filters={false}
-            sortBy={false}
-            hiddenColumns={[
-              status === "PENDING" && "fulfilledQty",
-              "shippedQty",
-              "actualQty",
-            ]}
-          />
+          <BasicTable columns={columns} data={data} />
         </div>
       )}
     </div>
@@ -95,13 +57,13 @@ export const ProcurementInvoiceBody = ({
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <div className="max-w-xl">
+      <div>
         <div className="space-y-2 sm:px-0 sm:flex sm:items-baseline sm:justify-between sm:space-y-0">
           <h1 className="font-extrabold tracking-tight text-5xl">Invoice</h1>
         </div>
 
         <h4 className="sr-only">Order Information</h4>
-        <dl className="grid grid-cols-2 gap-x-20 text-sm py-10">
+        <dl className="grid grid-cols-2 gap-x-6 text-sm py-10">
           <div>
             <dt className="font-medium text-gray-900">{company.name}</dt>
             <dd className="mt-2 text-gray-700">

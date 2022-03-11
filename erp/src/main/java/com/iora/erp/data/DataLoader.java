@@ -1,10 +1,15 @@
 package com.iora.erp.data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -12,6 +17,7 @@ import javax.persistence.PersistenceContext;
 import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.enumeration.PayType;
+import com.iora.erp.enumeration.PaymentType;
 import com.iora.erp.model.Currency;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
@@ -22,6 +28,13 @@ import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.OnlineOrder;
+import com.iora.erp.model.customerOrder.Payment;
+import com.iora.erp.model.product.Model;
+import com.iora.erp.model.product.Product;
+import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
@@ -29,7 +42,11 @@ import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.iora.erp.service.AdminService;
+import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.ProductService;
+import com.iora.erp.service.SiteService;
+import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -45,6 +62,12 @@ public class DataLoader implements CommandLineRunner {
 	private CustomerService customerService;
 	@Autowired
 	private AdminService adminService;
+	@Autowired
+	private ProductService productService;
+	@Autowired
+	private CustomerOrderService customerOrderService;
+	@Autowired
+	private SiteService siteService;
 	@PersistenceContext
 	private EntityManager em;
 	@Autowired
@@ -492,5 +515,130 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(pf1);
 		em.persist(pf2);
 	}
+
+	@SuppressWarnings("unchecked")
+	public void loadProducts(List<Object> productsJSON) throws Exception {
+        for (Object j : productsJSON) {
+            LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
+            List<Object> json = hashMap.values().stream().collect(Collectors.toList());
+            // Decoding JSON Object
+            String name = (String) json.get(0);
+            String modelCode = (String) json.get(1);
+            String description = (String) json.get(2);
+            List<String> colours = (ArrayList<String>) json.get(3);
+            List<String> sizes = (ArrayList<String>) json.get(4);
+            String company = (String) json.get(5);
+            List<String> tags = (ArrayList<String>) json.get(6);
+            List<String> categories = (ArrayList<String>) json.get(7);
+
+            LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
+            List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
+            double listPrice = Double.parseDouble((String) priceList.get(0));
+
+            LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
+            List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
+                    .collect(Collectors.toList());
+            double discountPrice = discountedPriceList.isEmpty() ? listPrice
+                    : Double.parseDouble((String) discountedPriceList.get(0));
+
+            Model model = new Model(modelCode, name, description, listPrice, discountPrice,
+                    categories.contains("SALE FROM $10"), true);
+            List<ProductField> productFields = new ArrayList<>();
+
+            for (String c : colours) {
+                ProductField colour = productService.createProductField("colour", c);
+                model.addProductField(colour);
+                productFields.add(colour);
+            }
+
+            for (String s : sizes) {
+                ProductField size = productService.createProductField("size", s);
+                model.addProductField(size);
+                productFields.add(size);
+            }
+
+            ProductField com = productService.createProductField("company", company);
+            model.addProductField(com);
+            productFields.add(com);
+
+            for (String t : tags) {
+                ProductField tag = productService.createProductField("tag", t);
+                model.addProductField(tag);
+                productFields.add(tag);
+            }
+
+            for (String cat : categories) {
+                if (cat.contains("S$")) {
+                    ProductField category = productService.getPromoField("category", cat);
+                    model.addProductField(category);
+                    productFields.add(category);
+                }
+            }
+            em.persist(model);
+            productService.createProduct(modelCode, productFields);
+        }
+
+        List<Product> products = productService.searchProductsBySKU(null);
+        for (Product p : products) {
+            Random r = new Random();
+            int stockLevel = r.nextInt(7) + 3;
+
+            for (int i = 0; i < stockLevel; i++) {
+                String rfid = StringGenerator.generateRFID(p.getSku());
+                productService.createProductItem(rfid, p.getSku());
+            }
+            siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), stockLevel);
+        }
+
+        // Customer Order
+        CustomerOrderLI coli1 = new CustomerOrderLI();
+        coli1.setProduct(productService.getProduct("BPD0010528A-1"));
+        coli1.setQty(2);
+        coli1.setSubTotal(98.0);
+        customerOrderService.createCustomerOrderLI(coli1);
+
+        CustomerOrderLI coli2 = new CustomerOrderLI();
+        coli2.setProduct(productService.getProduct("BPS0009808X-1"));
+        coli2.setQty(1);
+        coli2.setSubTotal(29.0);
+        customerOrderService.createCustomerOrderLI(coli2);
+
+        CustomerOrderLI coli3 = new CustomerOrderLI();
+        coli3.setProduct(productService.getProduct("BSK0009530X-1"));
+        coli3.setQty(1);
+        coli3.setSubTotal(29.0);
+        customerOrderService.createCustomerOrderLI(coli3);
+
+        CustomerOrderLI coli4 = new CustomerOrderLI();
+        coli4.setProduct(productService.getProduct("BPD0010304X-1"));
+        coli4.setQty(1);
+        coli4.setSubTotal(49.0);
+        customerOrderService.createCustomerOrderLI(coli4);
+
+        Payment payment1 = new Payment(127, "241563", PaymentType.VISA);
+        customerOrderService.createPayment(payment1);
+
+        Payment payment2 = new Payment(78, "546130", PaymentType.MASTERCARD);
+        customerOrderService.createPayment(payment2);
+
+        CustomerOrder co1 = new CustomerOrder();
+        co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        co1.addLineItem(coli1);
+        co1.addLineItem(coli2);
+        co1.addPayment(payment1);
+        co1.setPaid(true);
+        co1.setSite(siteService.getSite(4L));
+        em.persist(co1);
+
+        OnlineOrder oo1 = new OnlineOrder(false, Country.Singapore);
+        oo1.setCustomerId(2L);
+        oo1.setPickupSite((StoreSite) siteService.getSite(4L));
+        oo1.addLineItem(coli3);
+        oo1.addLineItem(coli4);
+        oo1.setPaid(true);
+        oo1.addPayment(payment2);
+        oo1.setSite(siteService.getSite(3L));
+        em.persist(oo1);
+    }
 
 }

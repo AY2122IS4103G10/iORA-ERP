@@ -33,6 +33,12 @@ const navigation = [
     current: false,
   },
   {
+    name: "Online Orders",
+    href: "/wh/online-orders/search",
+    icon: DocumentTextIcon,
+    current: false,
+  },
+  {
     name: "Procurement",
     href: "/wh/procurements/search",
     icon: DocumentTextIcon,

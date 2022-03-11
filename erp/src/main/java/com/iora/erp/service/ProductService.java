@@ -2,9 +2,7 @@ package com.iora.erp.service;
 
 import java.util.List;
 
-import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.ModelException;
-import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
@@ -45,7 +43,8 @@ public interface ProductService {
     public abstract Model updateModel(Model model) throws ModelException;
 
     public abstract List<Product> createProduct(String modelCode, List<ProductField> productFields) throws ProductException, ProductFieldException;
-    public abstract Product getProduct(String sku) throws ProductException;
+    public abstract Product getProduct(String rfidsku) throws ProductException;
+    public abstract List<Product> getProducts(List<String> rfidskus) throws ProductException;
     public abstract List<Product> searchProductsBySKU(String sku);
     public abstract List<Product> getProductsByModel(String modelCode) throws ProductException;
     public abstract List<Product> getProductsByFieldValue(String fieldName, String fieldValue);
@@ -63,6 +62,4 @@ public interface ProductService {
 
     public abstract JSONObject getProductCartDetails(String rfidsku) throws ProductItemException, ProductException, ModelException, JSONException, ProductFieldException;
 
-    // Data Loading
-    public abstract void loadProducts(List<Object> productsJSON) throws ProductException, ProductFieldException, ProductItemException, CustomerException, NoStockLevelException;
 }

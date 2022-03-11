@@ -36,7 +36,7 @@ public class OnlineOrder extends CustomerOrder {
 
     public OnlineOrder() {
         super();
-        this.status = OnlineOrderStatus.CONFIRMED;
+        this.status = OnlineOrderStatus.PENDING;
         this.packedLineItems = new ArrayList<>();
     }
 

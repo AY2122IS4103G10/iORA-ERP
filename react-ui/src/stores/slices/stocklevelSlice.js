@@ -12,7 +12,7 @@ const initialState = {
 export const getASiteStock = createAsyncThunk(
   "stocklevels/getASiteStock",
   async (id) => {
-    const response = await api.get(`/store/viewStock/sites`, id);
+    const response = await api.get(`store/viewStock/sites`, id);
     return response.data;
   }
 );

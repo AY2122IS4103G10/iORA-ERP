@@ -6,6 +6,7 @@ import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.exception.NoStockLevelException;
+import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
@@ -47,5 +48,5 @@ public interface CustomerOrderService {
     public abstract RefundLI createRefundLI(RefundLI refundLI);
     public abstract RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
 
-    public abstract OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException;
+    public abstract OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException;
 }

@@ -23,6 +23,7 @@ import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.exception.NoStockLevelException;
+import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -46,9 +47,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Autowired
-    CustomerService customerService;
+    private CustomerService customerService;
     @Autowired
-    SiteService siteService;
+    private ProductService productService;
     @PersistenceContext
     private EntityManager em;
 
@@ -552,17 +553,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
      */
 
     @Override
-    public OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty)
-            throws CustomerOrderException, NoStockLevelException, IllegalTransferException {
-        Product product = em.find(Product.class, rfidsku);
-        ProductItem productItem = em.find(ProductItem.class, rfidsku);
-
-        if (product == null && productItem == null) {
-            throw new CustomerOrderException("Item scanned cannot be found.");
-        } else if (product == null) {
-            product = productItem.getProduct();
-        }
-
+    public OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException {
+        Product product = productService.getProduct(rfidsku);
+        
         List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
         List<CustomerOrderLI> packedLineItems = onlineOrder.getPackedLineItems();
 

@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -102,9 +103,9 @@ public class StoreController {
             try {
                 Product p = productService.getProduct(entry.getKey());
                 if (entry.getValue() < 0) {
-                    siteService.removeProducts(entry.getValue(), p.getSku(), entry.getValue());
+                    siteService.removeProducts(entry.getValue(), p.getSku(), entry.getValue().intValue());
                 } else {
-                    siteService.addProducts(entry.getValue(), p.getSku(), entry.getValue());
+                    siteService.addProducts(entry.getValue(), p.getSku(), entry.getValue().intValue());
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());
@@ -203,34 +204,58 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransfer/ready/{siteId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> fulfilStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
-            @PathVariable Long siteId) {
+    @PutMapping(path = "/stockTransfer/pickpack/{orderId}/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> pickPackStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            return ResponseEntity
-                    .ok(stockTransferService.fulfilStockTransferOrder(stockTransferOrder, siteId));
+            return ResponseEntity.ok(stockTransferService.pickPackTransferOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PutMapping(path = "/stockTransfer/deliver/{siteId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> deliverStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
-            @PathVariable Long siteId) {
+    @PatchMapping(path = "/stockTransfer/scanFrom/{orderId}/{barcode}", produces = "application/json")
+    public ResponseEntity<Object> scanProductAtFromSite(@PathVariable Long orderId, @PathVariable String barcode) {
         try {
-            return ResponseEntity
-                    .ok(stockTransferService.deliverStockTransferOrder(stockTransferOrder, siteId));
+            if (barcode.contains("/")) {
+                return ResponseEntity.ok(stockTransferService.scanProductAtFromSite(orderId, barcode, 1));
+            } else {
+                return ResponseEntity.ok(
+                        stockTransferService.scanProductAtFromSite(orderId, barcode.substring(0, barcode.indexOf("/")),
+                                Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
+            }
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PutMapping(path = "/stockTransfer/complete/{siteId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> completeStockTransferOrder(@RequestBody StockTransferOrder stockTransferOrder,
-            @PathVariable Long siteId) {
+    @PutMapping(path = "/stockTransfer/deliver/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverStockTransferOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity
-                    .ok(stockTransferService.completeStockTransferOrder(stockTransferOrder, siteId));
+            return ResponseEntity.ok(stockTransferService.deliverStockTransferOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PatchMapping(path = "/stockTransfer/scanTo/{orderId}/{barcode}", produces = "application/json")
+    public ResponseEntity<Object> scanProductAtToSite(@PathVariable Long orderId, @PathVariable String barcode) {
+        try {
+            if (barcode.contains("/")) {
+                return ResponseEntity.ok(stockTransferService.scanProductAtFromSite(orderId, barcode, 1));
+            } else {
+                return ResponseEntity.ok(
+                        stockTransferService.scanProductAtFromSite(orderId, barcode.substring(0, barcode.indexOf("/")),
+                                Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
+            }
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/complete/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> completeStockTransferOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(stockTransferService.completeStockTransferOrder(orderId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -251,7 +276,7 @@ public class StoreController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-    
+
     @GetMapping(path = "/customerOrder", produces = "application/json")
     public List<CustomerOrder> searchCustomerOrders(@RequestParam String orderId) {
         return customerOrderService.searchCustomerOrders(0L, (orderId == "") ? null : Long.parseLong(orderId));
@@ -274,12 +299,12 @@ public class StoreController {
 
     @GetMapping(path = "/onlineOrder", produces = "application/json")
     public List<OnlineOrder> searchOnlineOrders(@RequestParam String orderId) {
-            return customerOrderService.searchOnlineOrders(0L, (orderId == "") ? null : Long.parseLong(orderId));
+        return customerOrderService.searchOnlineOrders(0L, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
     @GetMapping(path = "/onlineOrder/{siteId}", produces = "application/json")
     public List<OnlineOrder> searchOnlineOrdersBySite(@PathVariable Long siteId, @RequestParam String orderId) {
-            return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
+        return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
     @PostMapping(path = "/customerOrder/add/{rfidsku}", consumes = "application/json", produces = "application/json")

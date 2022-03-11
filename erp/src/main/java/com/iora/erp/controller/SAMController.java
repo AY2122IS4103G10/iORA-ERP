@@ -15,7 +15,6 @@ import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevelLI;
-import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
@@ -197,6 +196,15 @@ public class SAMController {
         }
     }
 
+    @GetMapping(path = "/model/name/{sku}", produces = "application/json")
+    public ResponseEntity<Object> getModelsNameBySKU(@PathVariable String sku) {
+        try {
+            return ResponseEntity.ok(productService.getModelByProduct(productService.getProduct(sku)).getName());
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/model", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> updateModel(@RequestBody Model model) {
         try {
@@ -210,6 +218,15 @@ public class SAMController {
     public ResponseEntity<Object> getProduct(@PathVariable String sku) {
         try {
             return ResponseEntity.ok(productService.getProduct(sku));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/products", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> getProducts(@RequestBody List<String> rfidskus) {
+        try {
+            return ResponseEntity.ok(productService.getProducts(rfidskus));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -452,8 +469,12 @@ public class SAMController {
     }
 
     @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
-    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
-        return procurementService.getProcurementOrder(orderId);
+    public ResponseEntity<Object> getProcurementOrderByOrderId(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(procurementService.getProcurementOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
     @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
@@ -478,15 +499,6 @@ public class SAMController {
     public ResponseEntity<Object> deleteProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
             return ResponseEntity.ok(procurementService.deleteProcurementOrder(orderId, siteId));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PutMapping(path = "/procurementOrder/complete/{orderId}/{siteId}")
-    public ResponseEntity<Object> completeProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
-        try {
-            return ResponseEntity.ok(procurementService.completeProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

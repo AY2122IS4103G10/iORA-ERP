@@ -28,6 +28,7 @@ public class ProcurementOrder {
     private List<POStatus> statusHistory;
     @OneToMany(cascade = CascadeType.ALL)
     private List<ProcurementOrderLI> lineItems;
+    private String notes;
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ManyToOne
@@ -83,6 +84,15 @@ public class ProcurementOrder {
         }
     }
 
+    @JsonIgnore
+    public Site getLastActor() {
+        try {
+            return this.statusHistory.get(this.statusHistory.size() - 1).getActionBy();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
     public void addStatus(POStatus status) {
         this.statusHistory.add(status);
     }
@@ -93,6 +103,14 @@ public class ProcurementOrder {
 
     public void setLineItems(List<ProcurementOrderLI> lineItems) {
         this.lineItems = lineItems;
+    }
+
+    public String getNotes() {
+        return this.notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public Site getManufacturing() {

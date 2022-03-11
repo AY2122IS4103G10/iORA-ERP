@@ -1,7 +1,7 @@
 package com.iora.erp.enumeration;
 
 public enum OnlineOrderStatus implements StatusEnum {
-    CONFIRMED("Order has been confirmed and will be prepared soon."),
+    PENDING("Order has been confirmed and will be prepared soon."),
     PICKING("Items are being picked by warehouse staff."),
     PICKED("Items are picked and is ready to be packed"),
     PACKING("Items are being packed by warehouse staff."),

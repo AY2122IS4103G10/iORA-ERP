@@ -24,13 +24,19 @@ const ProductList = ({
             <div className="px-4 py-4 flex items-center sm:px-6">
               <div className="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
                 <div className="truncate">
-                  <div className="flex text-sm">
+                  <button
+                    className="flex text-sm hover:underline hover:text-cyan-600"
+                    onClick={() => {
+                      onProductSelectedChanged(product);
+                      openModal();
+                    }}
+                  >
                     <p className="text-base font-medium text-cyan-600 truncate">
                       {product.sku}
                     </p>
-                  </div>
+                  </button>
                 </div>
-                <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
+                {/* <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
                   <button
                     type="button"
                     className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
@@ -41,7 +47,7 @@ const ProductList = ({
                   >
                     <span>View Sticker</span>
                   </button>
-                </div>
+                </div> */}
 
                 <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
                   <div>

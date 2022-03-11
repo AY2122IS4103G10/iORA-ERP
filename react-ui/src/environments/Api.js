@@ -268,6 +268,6 @@ export const orderApi = {
     return axios.get(`${REST_ENDPOINT}store/customerOrder?orderId=`)
   },
   get(orderId) {
-    return axios.get(`${REST_ENDPOINT}store/customerOrder?orderId=${orderId}`)
+    return axios.get(`${REST_ENDPOINT}store/customerOrder/view/${orderId}`)
   },
 }

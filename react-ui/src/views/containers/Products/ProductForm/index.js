@@ -12,6 +12,7 @@ import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGro
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
 import { api } from "../../../../environments/Api";
+
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
 const FieldModal = ({
@@ -198,8 +199,6 @@ const AddProductFormBody = ({
   onListPriceChanged,
   discountPrice,
   onDiscountPriceChanged,
-  available,
-  onAvailableChanged,
   onlineOnly,
   onOnlineOnlyChanged,
   colors,
@@ -347,24 +346,6 @@ const AddProductFormBody = ({
                             >
                               SGD
                             </span>
-                          </div>
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Available"
-                          inputField="available"
-                          className="sm:mt-0 sm:col-span-2"
-                        >
-                          <div className="flex items-center h-5">
-                            <input
-                              type="checkbox"
-                              name="available"
-                              id="available"
-                              autoComplete="available"
-                              className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
-                              checked={available}
-                              onChange={onAvailableChanged}
-                              aria-describedby="available"
-                            />
                           </div>
                         </SimpleInputGroup>
                         <SimpleInputGroup
@@ -539,7 +520,6 @@ export const ProductForm = () => {
   const [listPrice, setListPrice] = useState("");
   const [discountPrice, setDiscountPrice] = useState("");
   const [onlineOnly, setOnlineOnly] = useState(false);
-  const [available, setAvailable] = useState(true);
   const [products, setProducts] = useState([]);
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
@@ -594,7 +574,7 @@ export const ProductForm = () => {
   const onDiscountPriceChanged = (e) => setDiscountPrice(e.target.value);
   // const onCompanyChanged = (e) => setCompanySelected(e.currentTarget.value);
   const onOnlineOnlyChanged = () => setOnlineOnly(!onlineOnly);
-  const onAvailableChanged = () => setAvailable(!available);
+  // const onAvailableChanged = () => setAvailable(!available);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
       index === pos ? !item : item
@@ -654,7 +634,7 @@ export const ProductForm = () => {
             listPrice,
             discountPrice,
             onlineOnly,
-            available,
+            available: true,
             products: [],
             productFields: fields,
           })
@@ -682,7 +662,7 @@ export const ProductForm = () => {
             listPrice,
             discountPrice,
             onlineOnly,
-            available,
+            available: true,
             products,
             productFields: fields,
           })
@@ -717,7 +697,6 @@ export const ProductForm = () => {
           listPrice,
           discountPrice,
           onlineOnly,
-          available,
           productFields,
           products,
         } = response.data;
@@ -728,7 +707,6 @@ export const ProductForm = () => {
         setListPrice(listPrice);
         setDiscountPrice(discountPrice);
         setOnlineOnly(onlineOnly);
-        setAvailable(available);
         setColorCheckedState(
           colors
             .map((field) => field.fieldValue)
@@ -843,8 +821,6 @@ export const ProductForm = () => {
         onListPriceChanged={onListPriceChanged}
         discountPrice={discountPrice}
         onDiscountPriceChanged={onDiscountPriceChanged}
-        available={available}
-        onAvailableChanged={onAvailableChanged}
         onlineOnly={onlineOnly}
         onOnlineOnlyChanged={onOnlineOnlyChanged}
         colors={colors}

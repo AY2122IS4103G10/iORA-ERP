@@ -2,16 +2,13 @@ import { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 // import { PlusIcon } from "@heroicons/react/outline";
-import {
-  SimpleTable,
-  DeleteCell,
-  CheckCell,
-} from "../../../components/Tables/SimpleTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
   fetchPromotions,
   selectAllPromotions,
   updateExistingPromotion,
 } from "../../../../stores/slices/promotionsSlice";
+import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 // import {
 //   fetchProducts,
 //   selectAllProducts,
@@ -176,17 +173,15 @@ export const PromotionsTable = ({
         accessor: "accessor",
         disableSortBy: true,
         Cell: (e) => {
+          const { available } = e.row.original;
           return (
             <div className="flex">
-              {e.row.original.available ? (
-                <DeleteCell
-                  onClick={() => onDeletePromoClicked(e.row.original)}
-                />
-              ) : (
-                <CheckCell
-                  onClick={() => onDeletePromoClicked(e.row.original)}
-                />
-              )}
+              <ToggleLeftLabel
+                enabled={available}
+                onEnabledChanged={() => onDeletePromoClicked(e.row.original)}
+                label={!available ? "Enable" : "Disable"}
+                toggleColor="red"
+              />
             </div>
           );
         },
@@ -228,8 +223,8 @@ export const PromotionsList = ({
     setModalState("view");
     setName(row.original.fieldValue);
     setQuota(row.original.quota);
-    setPercent(!row.original.coefficients.every((val) => val === 0.0))
-    setFixed(!row.original.constants.every((val) => val === 0.0))
+    setPercent(!row.original.coefficients.every((val) => val === 0.0));
+    setFixed(!row.original.constants.every((val) => val === 0.0));
     setCoefficients(row.original.coefficients.join(","));
     setConstants(row.original.constants.join(","));
     setGlobal(row.original.global);

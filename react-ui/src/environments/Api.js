@@ -94,7 +94,9 @@ export const procurementApi = {
 
 export const vendorApi = {
   search(keyword) {
-    return axiosPrivate.get(`${REST_ENDPOINT}admin/viewVendors?search=${keyword}`);
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}admin/viewVendors?search=${keyword}`
+    );
   },
   generateItems(sku, quantity) {
     return axiosPrivate.post(
@@ -184,7 +186,9 @@ export const authApi = {
 
 export const posApi = {
   getOrders(siteId) {
-    return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder/${siteId}?orderId=`);
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/customerOrder/${siteId}?orderId=`
+    );
   },
   addProductToLineItems(rfidsku, lineItems) {
     return axiosPrivate.post(
@@ -208,7 +212,9 @@ export const posApi = {
 
 export const employeeApi = {
   getEmployee(employeeId) {
-    return axiosPrivate.get(`${REST_ENDPOINT}admin/viewEmployee?id=${employeeId}`);
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}admin/viewEmployee?id=${employeeId}`
+    );
   },
   deleteEmployee(employeeId) {
     return axiosPrivate.delete(
@@ -216,10 +222,14 @@ export const employeeApi = {
     );
   },
   enableEmployee(employeeId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}admin/enableEmployee?id=${employeeId}`);
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}admin/enableEmployee?id=${employeeId}`
+    );
   },
   disableEmployee(employeeId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}admin/disableEmployee?id=${employeeId}`);
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}admin/disableEmployee?id=${employeeId}`
+    );
   },
 };
 
@@ -228,7 +238,9 @@ export const customerApi = {
     return axiosPrivate.put(`${REST_ENDPOINT}sam/customer/block/${customerId}`);
   },
   unblockCustomer(customerId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}sam/customer/unblock/${customerId}`);
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}sam/customer/unblock/${customerId}`
+    );
   },
 };
 
@@ -237,33 +249,44 @@ export const departmentApi = {
     return axiosPrivate.get(`${REST_ENDPOINT}admin/viewDepartment?id=${id}`);
   },
   deleteDepartment(id) {
-    return axiosPrivate.delete(`${REST_ENDPOINT}admin/deleteDepartment?id=${id}`);
+    return axiosPrivate.delete(
+      `${REST_ENDPOINT}admin/deleteDepartment?id=${id}`
+    );
   },
 };
 
 export const productApi = {
-  searchProductsBySku(sku) {
+  searchProductBySku(sku) {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/product?sku=${sku}`);
+  },
+  searchProductsBySku(skus) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/products`, skus);
   },
 };
 
 export const onlineOrderApi = {
   getAll() {
-    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=`)
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=`);
   },
   get(orderId) {
-    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=${orderId}`)
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/onlineOrder?orderId=${orderId}`
+    );
   },
   getAllBySite(siteId) {
-    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder/${siteId}?orderId=`)
-  }
-}
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/onlineOrder/${siteId}?orderId=`
+    );
+  },
+};
 
 export const orderApi = {
   getAll() {
-    return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder?orderId=`)
+    return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder?orderId=`);
   },
   get(orderId) {
-    return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder/view/${orderId}`)
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/customerOrder/view/${orderId}`
+    );
   },
-}
+};

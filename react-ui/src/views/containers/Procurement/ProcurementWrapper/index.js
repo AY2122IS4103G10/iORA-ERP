@@ -1,4 +1,9 @@
-import { PencilIcon, PrinterIcon, TrashIcon, XIcon } from "@heroicons/react/outline";
+import {
+  PencilIcon,
+  PrinterIcon,
+  TrashIcon,
+  XIcon,
+} from "@heroicons/react/outline";
 import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -35,9 +40,9 @@ const Header = ({
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev
-            page="Procurement Orders"
-            path={`/${subsys}/procurements`}
-          />
+        page="Procurement Orders"
+        path={`/${subsys}/procurements`}
+      />
       <div className="relative pb-5 border-b border-gray-200 sm:pb-0">
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${procurementId}`}</h1>
@@ -91,7 +96,7 @@ const Header = ({
                     <span>Delete</span>
                   </button>
                 </div>
-              ) : (
+              ) : subsys === "mf" ? (
                 <div>
                   <button
                     type="button"
@@ -119,6 +124,8 @@ const Header = ({
                     <span>Cancel order</span>
                   </button>
                 </div>
+              ) : (
+                <div></div>
               )
             ) : status === "ACCEPTED" && subsys === "mf" ? (
               <div></div>
@@ -413,7 +420,11 @@ export const ProcurementWrapper = ({ subsys }) => {
       href: `/${subsys}/procurements/${procurementId}`,
       current: true,
     },
-    { name: "Pick / Pack", href: `/${subsys}/procurements/${procurementId}/pick-pack`, current: false },
+    {
+      name: "Pick / Pack",
+      href: `/${subsys}/procurements/${procurementId}/pick-pack`,
+      current: false,
+    },
     { name: "Delivery", href: "#", current: false },
   ];
 

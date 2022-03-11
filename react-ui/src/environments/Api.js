@@ -249,21 +249,21 @@ export const productApi = {
 
 export const onlineOrderApi = {
   getAll() {
-    return axios.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=`)
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=`)
   },
   get(orderId) {
-    return axios.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=${orderId}`)
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=${orderId}`)
   },
   getAllBySite(siteId) {
-    return axios.get(`${REST_ENDPOINT}sam/onlineOrder/${siteId}?orderId=`)
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder/${siteId}?orderId=`)
   }
 }
 
 export const orderApi = {
   getAll() {
-    return axios.get(`${REST_ENDPOINT}store/customerOrder?orderId=`)
+    return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder?orderId=`)
   },
   get(orderId) {
-    return axios.get(`${REST_ENDPOINT}store/customerOrder/view/${orderId}`)
+    return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder/view/${orderId}`)
   },
 }

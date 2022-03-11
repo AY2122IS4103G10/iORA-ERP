@@ -55,7 +55,7 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
         Algorithm algorithm = Algorithm.HMAC256("iora-ERP".getBytes());
         String accessToken = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 20 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 15 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("accessRights",
                         user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
@@ -68,6 +68,8 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
         tokens.put("refreshToken", refreshToken);
+        tokens.put("username", user.getUsername());
+        tokens.put("responsibility", user.getAuthorities().toString());
         response.setContentType("application/json");
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }

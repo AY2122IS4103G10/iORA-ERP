@@ -73,6 +73,7 @@ public class AuthenticationController {
                 Map<String, String> tokens = new HashMap<>();
                 tokens.put("accessToken", accessToken);
                 tokens.put("refreshToken", refreshToken);
+                tokens.put("username", employee.getUsername());
                 response.setContentType("application/json");
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
             } catch (Exception e) {
@@ -82,6 +83,30 @@ public class AuthenticationController {
                 error.put("errorMessage", e.getMessage());
                 response.setContentType("application/json");
                 new ObjectMapper().writeValue(response.getOutputStream(), error);
+            }
+        } else {
+            throw new RuntimeException("Refresh token is missing");
+        }
+    }
+
+    @GetMapping(path = "/postLogin")
+    public ResponseEntity<Object> postLogin(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String accessToken = authHeader.substring("Bearer ".length());
+                Algorithm algorithm = Algorithm.HMAC256("iora-ERP".getBytes());
+                JWTVerifier verifier = JWT.require(algorithm).build();
+                DecodedJWT decodedJWT = verifier.verify(accessToken);
+                String username = decodedJWT.getSubject();
+                Employee employee = employeeService.getEmployeeByUsername(username);
+                Employee out = new Employee(employee.getName(), employee.getEmail(), employee.getSalary(),
+                        employee.getUsername(), "", employee.getAvailStatus(), employee.getPayType(),
+                        employee.getJobTitle(), employee.getDepartment(), employee.getCompany());
+                return ResponseEntity.ok(out);
+            } catch (Exception ex) {
+                return ResponseEntity.badRequest().body(ex.getMessage());
             }
         } else {
             throw new RuntimeException("Refresh token is missing");

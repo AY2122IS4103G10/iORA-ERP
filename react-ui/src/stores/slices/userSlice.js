@@ -49,17 +49,41 @@ export const login = createAsyncThunk("auth/login", async (credentials) => {
   }
 });
 
-// export const loginJwt = createAsyncThunk(
-//   "auth/loginJwt",
-//   async (credentials) => {
-//     try {
-//       const response = await authApi.loginJwt(credentials);
-//       return response.data;
-//     } catch (error) {
-//       return Promise.reject(error.response.data);
-//     }
-//   }
-// );
+export const loginJwt = createAsyncThunk(
+  "auth/loginJwt",
+  async (credentials) => {
+    try {
+      const response = await authApi.loginJwt(credentials);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
+export const postLoginJwt = createAsyncThunk(
+  "auth/postLoginJwt",
+  async (accessToken) => {
+    try {
+      const response = await authApi.postLoginJwt(accessToken);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
+export const refreshTokenJwt = createAsyncThunk(
+  "auth/refreshTokenJwt",
+  async (refreshToken) => {
+    try {
+      const response = await authApi.refreshTokenJwt(refreshToken);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.message);
+    }
+  }
+);
 
 // export const updateCurrSite = createAction("updateCurrSite");
 
@@ -69,6 +93,8 @@ const userSlice = createSlice({
   reducers: {
     logout(state) {
       localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       state.loggedIn = false;
       state.user = { ...guest };
     },
@@ -104,20 +130,20 @@ const userSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.error = "Login failed";
     });
-    // builder.addCase(loginJwt.fulfilled, (state, action) => {
-    //   state = {
-    //     ...state,
-    //     user: { ...action.payload },
-    //     status: "succeeded",
-    //     loggedIn: true,
-    //   };
-    // });
-    // builder.addCase(loginJwt.rejected, (state, action) => {
-    //   state.error = "Login failed";
-    // });
-    // builder.addCase(updateCurrSite, (state, action) => {
-    //   state.currSite = action.payload;
-    // });
+    builder.addCase(loginJwt.fulfilled, (state, action) => {
+      state = {
+        ...state,
+        user: { ...action.payload },
+        status: "succeeded",
+        loggedIn: true,
+      };
+    });
+    builder.addCase(loginJwt.rejected, (state, action) => {
+      state.error = "Login failed";
+    });
+    builder.addCase(updateCurrSite, (state, action) => {
+      state.currSite = action.payload;
+    });
   },
 });
 

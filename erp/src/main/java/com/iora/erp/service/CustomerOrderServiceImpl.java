@@ -553,7 +553,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
      */
 
     @Override
-    public OnlineOrder scanProduct(OnlineOrder onlineOrder, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException {
+    public OnlineOrder scanProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException {
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
         Product product = productService.getProduct(rfidsku);
         
         List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
@@ -590,5 +591,35 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
+    }
+
+    @Override
+    public OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public OnlineOrder deliveryOnlineOrder(Long orderId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public OnlineOrder completeOnlineOrder(Long orderId) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

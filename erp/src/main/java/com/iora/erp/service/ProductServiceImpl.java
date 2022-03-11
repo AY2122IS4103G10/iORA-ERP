@@ -567,13 +567,8 @@ public class ProductServiceImpl implements ProductService {
             throws ProductException, ModelException, JSONException,
             ProductFieldException {
         JSONObject jo = new JSONObject();
-        ProductItem pi = em.find(ProductItem.class, rfidsku);
         Product p = getProduct(rfidsku);
-        if (pi == null && p == null) {
-            return jo;
-        } else if (p == null) {
-            p = pi.getProduct();
-        }
+
         Model m = getModelByProduct(p);
         jo.put("name", m.getName());
         jo.put("listPrice", m.getListPrice());

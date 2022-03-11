@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.iora.erp.model.customerOrder.CustomerOrder;
-import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.site.Site;
@@ -142,7 +141,8 @@ public class WarehouseController {
                 return ResponseEntity.ok(procurementService.scanProductAtWarehouse(orderId, barcode, 1));
             } else {
                 return ResponseEntity
-                        .ok(procurementService.scanProductAtWarehouse(orderId, barcode.substring(0, barcode.indexOf("/")),
+                        .ok(procurementService.scanProductAtWarehouse(orderId,
+                                barcode.substring(0, barcode.indexOf("/")),
                                 Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
             }
         } catch (Exception ex) {
@@ -168,11 +168,18 @@ public class WarehouseController {
         }
     }
 
-    @PatchMapping(path = "/scan/{rfidsku}/{qty}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> scanProduct(@RequestBody OnlineOrder onlineOrder, @PathVariable String rfidsku,
+    @PatchMapping(path = "/scan/{orderId}/{barcode}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> scanProduct(@PathVariable Long orderId, @PathVariable String barcode,
             @PathVariable int qty) {
         try {
-            return ResponseEntity.ok(customerOrderService.scanProduct(onlineOrder, rfidsku, qty));
+            if (barcode.contains("/")) {
+                return ResponseEntity.ok(customerOrderService.scanProduct(orderId, barcode, 1));
+            } else {
+                return ResponseEntity
+                        .ok(customerOrderService.scanProduct(orderId, barcode.substring(0, barcode.indexOf("/")),
+                                Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
+            }
+
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

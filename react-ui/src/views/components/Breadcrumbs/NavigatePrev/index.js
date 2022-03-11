@@ -4,7 +4,7 @@ import { ChevronLeftIcon } from "@heroicons/react/solid";
 export const NavigatePrev = ({ page, path }) => {
   return (
     <nav
-      className="flex items-start px-4 py-3 sm:px-6 lg:px-8"
+      className="flex items-start px-2 py-3 sm:px-4 lg:px-6"
       aria-label="Breadcrumb"
     >
       <Link

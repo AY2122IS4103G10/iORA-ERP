@@ -1,5 +1,7 @@
 package com.iora.erp.security;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,19 +34,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         AuthFilter authFilter = new AuthFilter(authenticationManagerBean());
         authFilter.setFilterProcessesUrl("/auth/login");
-        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
+        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT", "OPTIONS", "PATCH", "DELETE"));
+        http.cors().configurationSource(request -> corsConfiguration);
         http.csrf().disable();
+        http.headers().frameOptions().sameOrigin();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        
+
         http.authorizeRequests().anyRequest().permitAll();
-        
+
         // http.authorizeRequests().antMatchers("/auth/login/**","/auth/refreshToken/**").permitAll();
         // http.authorizeRequests().antMatchers("/admin/**").hasAnyAuthority("SYSADMIN_BASIC");;
         // http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(authFilter);
         http.addFilterBefore(new AuthAccessFilter(), UsernamePasswordAuthenticationFilter.class);
     }
-    
+
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {

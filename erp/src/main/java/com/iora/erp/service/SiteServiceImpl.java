@@ -201,14 +201,14 @@ public class SiteServiceImpl implements SiteService {
             return lineItem;
         } catch (NoResultException ex) {
             Product product = em.find(Product.class, SKUCode);
-            StockLevelLI lineItem = new StockLevelLI(product, stockLevel, 0L, 0L);
+            StockLevelLI lineItem = new StockLevelLI(product, stockLevel, 0, 0);
             em.persist(lineItem);
             return lineItem;
         }
     }
 
     @Override
-    public StockLevel addProducts(Long siteId, String SKUCode, Long qty) throws NoStockLevelException {
+    public StockLevel addProducts(Long siteId, String SKUCode, int qty) throws NoStockLevelException {
         try {
             StockLevelLI lineItem = getStockLevelLI(siteId, SKUCode);
             lineItem.setQty(lineItem.getQty() + qty);
@@ -220,7 +220,7 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public StockLevel removeProducts(Long siteId, String SKUCode, Long qty)
+    public StockLevel removeProducts(Long siteId, String SKUCode, int qty)
             throws NoStockLevelException, IllegalTransferException {
         try {
             StockLevelLI lineItem = getStockLevelLI(siteId, SKUCode);
@@ -237,7 +237,7 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId, Long toSiteId, String SKUCode, Long qty)
+    public Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId, Long toSiteId, String SKUCode, int qty)
             throws NoStockLevelException, IllegalTransferException {
         StockLevel sl1 = removeProducts(fromSiteId, SKUCode, qty);
         StockLevel sl2 = addProducts(toSiteId, SKUCode, qty);
@@ -245,8 +245,7 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public StockLevel addProductsWithRfid(Long siteId, List<String> rfidskus)
-            throws NoStockLevelException {
+    public StockLevel addProductsWithRfid(Long siteId, List<String> rfidskus) throws NoStockLevelException {
         Map<String, Long> counter = rfidskus.stream().parallel().map(new Function<String, Product>() {
             public Product apply(String rfidsku) {
                 Product product = em.find(Product.class, rfidsku);
@@ -260,10 +259,11 @@ public class SiteServiceImpl implements SiteService {
                     return productItem.getProduct();
                 }
             }
-        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(), Collectors.counting()));
+        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(),
+                Collectors.counting()));
 
         for (Map.Entry<String, Long> entry : counter.entrySet()) {
-            addProducts(siteId, entry.getKey(), entry.getValue());
+            addProducts(siteId, entry.getKey(), entry.getValue().intValue());
         }
         return em.find(Site.class, siteId).getStockLevel();
     }
@@ -284,16 +284,18 @@ public class SiteServiceImpl implements SiteService {
                     return productItem.getProduct();
                 }
             }
-        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(), Collectors.counting()));
+        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(),
+                Collectors.counting()));
 
         for (Map.Entry<String, Long> entry : counter.entrySet()) {
-            removeProducts(siteId, entry.getKey(), entry.getValue());
+            removeProducts(siteId, entry.getKey(), entry.getValue().intValue());
         }
         return em.find(Site.class, siteId).getStockLevel();
     }
 
     @Override
-    public Pair<StockLevel, StockLevel> moveProductsWithRfid(Long fromSiteId, Long toSiteId,
+    public Pair<StockLevel, StockLevel> moveProductsWithRfid(Long fromSiteId,
+            Long toSiteId,
             List<String> rfidskus)
             throws NoStockLevelException, IllegalTransferException {
         Map<String, Long> counter = rfidskus.stream().parallel().map(new Function<String, Product>() {
@@ -309,12 +311,14 @@ public class SiteServiceImpl implements SiteService {
                     return productItem.getProduct();
                 }
             }
-        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(), Collectors.counting()));
+        }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(),
+                Collectors.counting()));
 
         for (Map.Entry<String, Long> entry : counter.entrySet()) {
-            moveProducts(fromSiteId, toSiteId, entry.getKey(), entry.getValue());
+            moveProducts(fromSiteId, toSiteId, entry.getKey(), entry.getValue().intValue());
         }
-        return Pair.of(em.find(Site.class, fromSiteId).getStockLevel(), em.find(Site.class, toSiteId).getStockLevel());
+        return Pair.of(em.find(Site.class, fromSiteId).getStockLevel(),
+                em.find(Site.class, toSiteId).getStockLevel());
     }
 
 }

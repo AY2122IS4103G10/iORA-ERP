@@ -77,9 +77,9 @@ public class WarehouseController {
             try {
                 Product p = productService.getProduct(entry.getKey());
                 if (entry.getValue() < 0) {
-                    siteService.removeProducts(entry.getValue(), p.getSku(), entry.getValue());
+                    siteService.removeProducts(entry.getValue(), p.getSku(), entry.getValue().intValue());
                 } else {
-                    siteService.addProducts(entry.getValue(), p.getSku(), entry.getValue());
+                    siteService.addProducts(entry.getValue(), p.getSku(), entry.getValue().intValue());
                 }
             } catch (Exception ex) {
                 errors.add(ex.getMessage());
@@ -112,8 +112,12 @@ public class WarehouseController {
     }
 
     @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
-    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
-        return procurementService.getProcurementOrder(orderId);
+    public ResponseEntity<Object> getProcurementOrderByOrderId(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(procurementService.getProcurementOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
     @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
@@ -122,17 +126,40 @@ public class WarehouseController {
         return procurementService.getProcurementOrdersOfSite(site);
     }
 
-    @PutMapping(path = "/procurementOrder/verify/{siteId}")
-    public ResponseEntity<Object> verifyProcurementOrder(@RequestBody ProcurementOrder procurementOrder,
-            @PathVariable Long siteId) {
+    @PutMapping(path = "/procurementOrder/receive/{orderId}/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> receiveProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            return ResponseEntity.ok(procurementService.verifyProcurementOrder(procurementOrder, siteId));
+            return ResponseEntity.ok(procurementService.receiveProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PostMapping(path = "/customerOrder", consumes = "application/json", produces = "application/json")
+    @PatchMapping(path = "/procurementOrder/scan/{orderId}/{barcode}", produces = "application/json")
+    public ResponseEntity<Object> scanProductsAtWarehouse(@PathVariable Long orderId, @PathVariable String barcode) {
+        try {
+            if (barcode.contains("/")) {
+                return ResponseEntity.ok(procurementService.scanProductAtWarehouse(orderId, barcode, 1));
+            } else {
+                return ResponseEntity
+                        .ok(procurementService.scanProductAtWarehouse(orderId, barcode.substring(0, barcode.indexOf("/")),
+                                Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
+            }
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/procurementOrder/complete/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> verifyProcurementOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(procurementService.completeProcurementOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder", produces = "application/json")
     public ResponseEntity<Object> createCustomerOrder(@RequestBody CustomerOrder customerOrder) {
         try {
             return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder));

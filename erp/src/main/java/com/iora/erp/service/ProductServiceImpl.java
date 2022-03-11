@@ -1,13 +1,8 @@
 package com.iora.erp.service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
@@ -16,42 +11,27 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import com.iora.erp.enumeration.Country;
-import com.iora.erp.enumeration.PaymentType;
-import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.ModelException;
-import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.ProductFieldException;
 import com.iora.erp.exception.ProductItemException;
-import com.iora.erp.model.customerOrder.CustomerOrder;
-import com.iora.erp.model.customerOrder.CustomerOrderLI;
-import com.iora.erp.model.customerOrder.OnlineOrder;
-import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
-import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.utils.StringGenerator;
 
 import org.hibernate.NonUniqueResultException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@SuppressWarnings("unchecked")
 @Service("productServiceImpl")
 @Transactional
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    private SiteService siteService;
-    @Autowired
-    private CustomerOrderService customerOrderService;
     @PersistenceContext
     private EntityManager em;
 
@@ -422,14 +402,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProduct(String sku) throws ProductException {
-        Product product = em.find(Product.class, sku);
+    public Product getProduct(String rfidsku) throws ProductException {
+        Product product = em.find(Product.class, rfidsku);
+        ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
-        if (product == null) {
-            throw new ProductException("Product with the SKU " + sku + " cannot be found.");
-        } else {
-            return product;
+        if (product == null && productItem == null) {
+            throw new ProductException("Product cannot be found.");
+        } else if (product == null) {
+            product = productItem.getProduct();
         }
+
+        return product;
+    }
+
+    @Override
+    public List<Product> getProducts(List<String> rfidskus) throws ProductException {
+        List<Product> products = new ArrayList<>();
+
+        for (String rfidsku : rfidskus) {
+            products.add(getProduct(rfidsku));
+        }
+
+        return products;
     }
 
     @Override
@@ -587,133 +581,5 @@ public class ProductServiceImpl implements ProductService {
         jo.put("colour", getProductFieldValue(p, "COLOUR"));
         jo.put("size", getProductFieldValue(p, "SIZE"));
         return jo;
-    }
-
-    @Override
-    public void loadProducts(List<Object> productsJSON)
-            throws ProductException, ProductFieldException, ProductItemException, CustomerException,
-            NoStockLevelException {
-
-        for (Object j : productsJSON) {
-            LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
-            List<Object> json = hashMap.values().stream().collect(Collectors.toList());
-            // Decoding JSON Object
-            String name = (String) json.get(0);
-            String modelCode = (String) json.get(1);
-            String description = (String) json.get(2);
-            List<String> colours = (ArrayList<String>) json.get(3);
-            List<String> sizes = (ArrayList<String>) json.get(4);
-            String company = (String) json.get(5);
-            List<String> tags = (ArrayList<String>) json.get(6);
-            List<String> categories = (ArrayList<String>) json.get(7);
-
-            LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
-            List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
-            double listPrice = Double.parseDouble((String) priceList.get(0));
-
-            LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
-            List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
-                    .collect(Collectors.toList());
-            double discountPrice = discountedPriceList.isEmpty() ? listPrice
-                    : Double.parseDouble((String) discountedPriceList.get(0));
-
-            Model model = new Model(modelCode, name, description, listPrice, discountPrice,
-                    categories.contains("SALE FROM $10"), true);
-            List<ProductField> productFields = new ArrayList<>();
-
-            for (String c : colours) {
-                ProductField colour = createProductField("colour", c);
-                model.addProductField(colour);
-                productFields.add(colour);
-            }
-
-            for (String s : sizes) {
-                ProductField size = createProductField("size", s);
-                model.addProductField(size);
-                productFields.add(size);
-            }
-
-            ProductField com = createProductField("company", company);
-            model.addProductField(com);
-            productFields.add(com);
-
-            for (String t : tags) {
-                ProductField tag = createProductField("tag", t);
-                model.addProductField(tag);
-                productFields.add(tag);
-            }
-
-            for (String cat : categories) {
-                if (cat.contains("S$")) {
-                    ProductField category = getPromoField("category", cat);
-                    model.addProductField(category);
-                    productFields.add(category);
-                }
-            }
-            em.persist(model);
-            createProduct(modelCode, productFields);
-        }
-
-        List<Product> products = searchProductsBySKU(null);
-        for (Product p : products) {
-            Random r = new Random();
-            int stockLevel = r.nextInt(7) + 3;
-
-            for (int i = 0; i < stockLevel; i++) {
-                String rfid = StringGenerator.generateRFID(p.getSku());
-                createProductItem(rfid, p.getSku());
-            }
-            siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), Long.valueOf(stockLevel));
-        }
-
-        // Customer Order
-        CustomerOrderLI coli1 = new CustomerOrderLI();
-        coli1.setProduct(getProduct("BPD0010528A-1"));
-        coli1.setQty(2);
-        coli1.setSubTotal(98.0);
-        customerOrderService.createCustomerOrderLI(coli1);
-
-        CustomerOrderLI coli2 = new CustomerOrderLI();
-        coli2.setProduct(getProduct("BPS0009808X-1"));
-        coli2.setQty(1);
-        coli2.setSubTotal(29.0);
-        customerOrderService.createCustomerOrderLI(coli2);
-
-        CustomerOrderLI coli3 = new CustomerOrderLI();
-        coli3.setProduct(getProduct("BSK0009530X-1"));
-        coli3.setQty(1);
-        coli3.setSubTotal(29.0);
-        customerOrderService.createCustomerOrderLI(coli3);
-
-        CustomerOrderLI coli4 = new CustomerOrderLI();
-        coli4.setProduct(getProduct("BPD0010304X-1"));
-        coli4.setQty(1);
-        coli4.setSubTotal(49.0);
-        customerOrderService.createCustomerOrderLI(coli4);
-
-        Payment payment1 = new Payment(127, "241563", PaymentType.VISA);
-        customerOrderService.createPayment(payment1);
-
-        Payment payment2 = new Payment(78, "546130", PaymentType.MASTERCARD);
-        customerOrderService.createPayment(payment2);
-
-        CustomerOrder co1 = new CustomerOrder();
-        co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        co1.addLineItem(coli1);
-        co1.addLineItem(coli2);
-        co1.addPayment(payment1);
-        co1.setPaid(true);
-        co1.setSite(siteService.getSite(4L));
-        em.persist(co1);
-
-        OnlineOrder oo1 = new OnlineOrder(false, Country.Singapore);
-        oo1.setCustomerId(2L);
-        oo1.setPickupSite((StoreSite) siteService.getSite(4L));
-        oo1.addLineItem(coli3);
-        oo1.addLineItem(coli4);
-        oo1.setPaid(true);
-        oo1.addPayment(payment2);
-        oo1.setSite(siteService.getSite(3L));
-        em.persist(oo1);
     }
 }

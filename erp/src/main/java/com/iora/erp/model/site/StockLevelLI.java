@@ -24,15 +24,15 @@ public class StockLevelLI {
     private StockLevel stockLevel;
 
     @Column(nullable = false)
-    private Long qty = 0L;
+    private int qty = 0;
 
     @Column(nullable = false)
-    private Long reserveQty;
+    private int reserveQty;
 
     public StockLevelLI() {
     }
 
-    public StockLevelLI(Product product, StockLevel stockLevel, Long qty, Long reserveQty) {
+    public StockLevelLI(Product product, StockLevel stockLevel, int qty, int reserveQty) {
         this.product = product;
         this.stockLevel = stockLevel;
         this.qty = qty;
@@ -67,19 +67,19 @@ public class StockLevelLI {
         this.stockLevel = stockLevel;
     }
 
-    public Long getQty() {
+    public int getQty() {
         return this.qty;
     }
 
-    public void setQty(Long qty) {
+    public void setQty(int qty) {
         this.qty = qty;
     }
 
-    public Long getReserveQty() {
+    public int getReserveQty() {
         return this.reserveQty;
     }
 
-    public void setReserveQty(Long reserveQty) {
+    public void setReserveQty(int reserveQty) {
         this.reserveQty = reserveQty;
     }
 

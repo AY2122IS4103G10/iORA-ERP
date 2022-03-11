@@ -18,11 +18,20 @@ public class StockTransferOrderLI {
 
     @ManyToOne(optional = false)
     private Product product;
-    private Integer requestedQty;
-    private Integer sentQty;
-    private Integer actualQty;
+    private int requestedQty;
+    private int sentQty;
+    private int actualQty;
 
     public StockTransferOrderLI() {
+        this.requestedQty = 0;
+        this.sentQty = 0;
+        this.actualQty = 0;
+    }
+
+    public StockTransferOrderLI(Product product, int requestedQty) {
+        this();
+        this.product = product;
+        this.requestedQty = requestedQty;
     }
 
     public Long getId() {

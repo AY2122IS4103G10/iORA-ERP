@@ -1,10 +1,8 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -14,17 +12,16 @@ import com.iora.erp.exception.IllegalPOModificationException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProcurementOrderException;
-import com.iora.erp.exception.ProductItemException;
+import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.model.procurementOrder.POStatus;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.procurementOrder.ProcurementOrderLI;
-import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.Product;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.WarehouseSite;
-import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,8 +39,14 @@ public class ProcurementServiceImpl implements ProcurementService {
     private EntityManager em;
 
     @Override
-    public ProcurementOrder getProcurementOrder(Long id) {
-        return em.find(ProcurementOrder.class, id);
+    public ProcurementOrder getProcurementOrder(Long id) throws ProcurementOrderException {
+        ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
+
+        if (procurementOrder == null) {
+            throw new ProcurementOrderException("Procurement Order cannot be found");
+        } else {
+            return procurementOrder;
+        }
     }
 
     @Override
@@ -108,12 +111,10 @@ public class ProcurementServiceImpl implements ProcurementService {
     public ProcurementOrder rejectProcurementOrder(Long id, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
 
-        ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
         ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
 
-        if (procurementOrder == null) {
-            throw new ProcurementOrderException("Procurement Order not found");
-        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
             throw new IllegalPOModificationException(
                     "Procurement Order is not pending and cannot be rejected.");
         } else if (actionBy == null) {
@@ -130,12 +131,10 @@ public class ProcurementServiceImpl implements ProcurementService {
     public ProcurementOrder deleteProcurementOrder(Long id, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
 
-        ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
         HeadquartersSite actionBy = em.find(HeadquartersSite.class, siteId);
 
-        if (procurementOrder == null) {
-            throw new ProcurementOrderException("Procurement Order not found");
-        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
             throw new IllegalPOModificationException(
                     "Procurement Order is not pending and cannot be deleted.");
         } else if (actionBy == null) {
@@ -149,15 +148,13 @@ public class ProcurementServiceImpl implements ProcurementService {
     }
 
     @Override
-    public ProcurementOrder confirmProcurementOrder(Long id, Long siteId)
+    public ProcurementOrder acceptProcurementOrder(Long id, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
 
-        ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
         ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
 
-        if (procurementOrder == null) {
-            throw new ProcurementOrderException("Procurement Order not found");
-        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
             throw new IllegalPOModificationException("Procurement Order is not pending.");
         } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to confirm Procurement Order.");
@@ -170,131 +167,200 @@ public class ProcurementServiceImpl implements ProcurementService {
     }
 
     @Override
-    public ProcurementOrder fulfilProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
+    public ProcurementOrder manufactureProcurementOrder(Long id)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException,
             IllegalTransferException {
 
-        ProcurementOrder oldOrder = em.find(ProcurementOrder.class, procurementOrder.getId());
-        ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (oldOrder == null) {
-            throw new ProcurementOrderException("Procurement Order not found");
-        } else if (oldOrder.getLastStatus() != ProcurementOrderStatus.ACCEPTED) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.ACCEPTED) {
             throw new IllegalPOModificationException("Procurement Order is not confirmed.");
-        } else if (actionBy == null || actionBy.getId() != siteId) {
-            throw new SiteConfirmationException("Site is not authorised to fulfil Procurement Order.");
         }
 
-        List<ProductItem> allProductItems = new ArrayList<>();
+        procurementOrder.addStatus(
+                new POStatus(procurementOrder.getManufacturing(), new Date(), ProcurementOrderStatus.MANUFACTURED));
 
-        for (ProcurementOrderLI poli : procurementOrder.getLineItems()) {
-            for (int i = 0; i < poli.getRequestedQty(); i++) {
-                try {
-                    ProductItem pi = productService.createProductItem(StringGenerator.generateRFID(poli.getProduct().getSku()), poli.getProduct().getSku());
-                    allProductItems.add(pi);
-                    poli.addFulfilledProductItems(pi);
-                } catch (ProductItemException e) {
-                    System.err.println(e.getMessage());
+        return em.merge(procurementOrder);
+        /*
+         * Generate Newly manufactured items, deprecated
+         * List<ProductItem> allProductItems = new ArrayList<>();
+         * 
+         * for (ProcurementOrderLI poli : procurementOrder.getLineItems()) {
+         * for (int i = 0; i < poli.getRequestedQty(); i++) {
+         * try {
+         * ProductItem pi =
+         * productService.createProductItem(StringGenerator.generateRFID(poli.getProduct
+         * ().getSku()), poli.getProduct().getSku());
+         * allProductItems.add(pi);
+         * poli.addFulfilledProductItems(pi);
+         * } catch (ProductItemException e) {
+         * System.err.println(e.getMessage());
+         * }
+         * }
+         * 
+         * try {
+         * siteService.addProducts(actionBy.getId(), poli.getProduct().getSku(),
+         * Long.valueOf(poli.getRequestedQty()));
+         * } catch (NoStockLevelException e) {
+         * System.err.println(e.getMessage());
+         * }
+         * }
+         * 
+         * List<ProductItem> productItems =
+         * procurementOrder.getLineItems().stream().map(x ->
+         * x.getFulfilledProductItems())
+         * .flatMap(Collection::stream).collect(Collectors.toList());
+         * for (int i = 0; i < productItems.size(); i++) {
+         * try {
+         * productService.createProductItem(productItems.get(i).getRfid(),
+         * productItems.get(i).getProductSKU());
+         * } catch (ProductItemException e) {
+         * System.err.println(e.getMessage());
+         * }
+         * }
+         */
+
+    }
+
+    @Override
+    public ProcurementOrder pickPackProcurementOrder(Long id) throws ProcurementOrderException {
+        ProcurementOrder po = getProcurementOrder(id);
+
+        if (po.getLastStatus() == ProcurementOrderStatus.MANUFACTURED) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.PICKING));
+        } else if (po.getLastStatus() == ProcurementOrderStatus.PICKING) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.PICKED));
+        } else if (po.getLastStatus() == ProcurementOrderStatus.PICKED) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.PACKING));
+        } else if (po.getLastStatus() == ProcurementOrderStatus.PACKING) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.PACKED));
+        } else if (po.getLastStatus() == ProcurementOrderStatus.PACKED) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.READY_FOR_SHIPPING));
+        } else {
+            throw new ProcurementOrderException("Order is not due to pick or pack.");
+        }
+
+        return em.merge(po);
+    }
+
+    @Override
+    public ProcurementOrder scanProductAtFactory(Long id, String rfidsku, int qty)
+            throws ProductException, ProcurementOrderException {
+
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
+
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PICKING) {
+            throw new ProcurementOrderException("Order does not need picking.");
+        }
+
+        Product product = productService.getProduct(rfidsku);
+
+        List<ProcurementOrderLI> lineItems = procurementOrder.getLineItems();
+
+        for (ProcurementOrderLI poli : lineItems) {
+            if (poli.getProduct().equals(product)) {
+                if (poli.getFulfilledQty() + qty > poli.getRequestedQty()) {
+                    throw new ProcurementOrderException("There will be too many quantity of this product.");
+                } else {
+                    poli.setFulfilledQty(poli.getFulfilledQty() + qty);
+                    boolean picked = true;
+                    for (ProcurementOrderLI poli2 : lineItems) {
+                        if (poli2.getFulfilledQty() < poli2.getRequestedQty()) {
+                            picked = false;
+                        }
+                    }
+                    if (picked) {
+                        procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                                ProcurementOrderStatus.PICKED));
+                    }
+                    return em.merge(procurementOrder);
                 }
             }
-
-            try {
-                siteService.addProducts(actionBy.getId(), poli.getProduct().getSku(), Long.valueOf(poli.getRequestedQty()));
-            } catch (NoStockLevelException e) {
-                System.err.println(e.getMessage());
-            }
         }
-
-        // List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
-        //         .flatMap(Collection::stream).collect(Collectors.toList());
-        // for (int i = 0; i < productItems.size(); i++) {
-        //     try {
-        //         productService.createProductItem(productItems.get(i).getRfid(), productItems.get(i).getProductSKU());
-        //     } catch (ProductItemException e) {
-        //         System.err.println(e.getMessage());
-        //     }
-        // }
-        procurementOrder.setHeadquarters(oldOrder.getHeadquarters());
-        procurementOrder.setManufacturing(oldOrder.getManufacturing());
-        procurementOrder.setWarehouse(oldOrder.getWarehouse());
-        procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.READY));
-
-        return em.merge(procurementOrder);
+        throw new ProcurementOrderException("The product scanned is not required in the order that you are picking");
     }
 
     @Override
-    public ProcurementOrder shipProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
-            throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException,
-            IllegalTransferException {
+    public ProcurementOrder shipProcurementOrder(Long id)
+            throws IllegalPOModificationException, ProcurementOrderException {
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        ProcurementOrder oldOrder = em.find(ProcurementOrder.class, procurementOrder.getId());
-        ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
-
-        if (oldOrder == null) {
-            throw new ProcurementOrderException("Procurement Order not found");
-        } else if (oldOrder.getLastStatus() != ProcurementOrderStatus.READY) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.READY_FOR_SHIPPING) {
             throw new IllegalPOModificationException("Procurement Order is not ready.");
-        } else if (actionBy == null || actionBy.getId() != siteId) {
-            throw new SiteConfirmationException("Site is not authorised to ship Procurement Order.");
         }
 
-        List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
-                .flatMap(Collection::stream).collect(Collectors.toList());
-        // siteService.removeManyFromStockLevel(productItems);
-        procurementOrder.setHeadquarters(oldOrder.getHeadquarters());
-        procurementOrder.setManufacturing(oldOrder.getManufacturing());
-        procurementOrder.setWarehouse(oldOrder.getWarehouse());
-        procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.SHIPPED));
-
+        procurementOrder
+                .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(), ProcurementOrderStatus.SHIPPING));
         return em.merge(procurementOrder);
     }
 
     @Override
-    public ProcurementOrder verifyProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
-            throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException,
-            IllegalTransferException {
-
-        ProcurementOrder oldOrder = em.find(ProcurementOrder.class, procurementOrder.getId());
+    public ProcurementOrder receiveProcurementOrder(Long id, Long siteId)
+            throws IllegalPOModificationException, ProcurementOrderException {
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
         WarehouseSite actionBy = em.find(WarehouseSite.class, siteId);
 
-        if (oldOrder == null) {
-            throw new ProcurementOrderException("Procurement Order not found");
-        } else if (oldOrder.getLastStatus() != ProcurementOrderStatus.SHIPPED) {
-            throw new IllegalPOModificationException("Procurement Order is not shipped.");
-        } else if (actionBy == null || actionBy.getId() != siteId) {
-            throw new SiteConfirmationException("Site is not authorised to verify Procurement Order.");
+        if (actionBy == null) {
+            throw new ProcurementOrderException("You are not supposed to be receiving this order.");
+        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING) {
+            throw new IllegalPOModificationException("Procurement Order is not supposed to be received.");
         }
 
-        List<ProductItem> productItems = procurementOrder.getLineItems().stream().map(x -> x.getFulfilledProductItems())
-                .flatMap(Collection::stream).collect(Collectors.toList());
-        // siteService.addManyToStockLevel(actionBy.getStockLevel(), productItems);
-        procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.VERIFIED));
-
+        procurementOrder.setWarehouse(actionBy);
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.SHIPPING));
         return em.merge(procurementOrder);
     }
 
     @Override
-    public ProcurementOrder completeProcurementOrder(Long id, Long siteId)
-            throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
+    public ProcurementOrder scanProductAtWarehouse(Long id, String rfidsku, int qty)
+            throws ProductException, ProcurementOrderException {
 
-        ProcurementOrder procurementOrder = em.find(ProcurementOrder.class, id);
-        HeadquartersSite actionBy = em.find(HeadquartersSite.class, siteId);
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (procurementOrder == null) {
-            throw new ProcurementOrderException("Procurement Order not found");
-        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.VERIFIED) {
-            throw new IllegalPOModificationException("Procurement Order is not verified.");
-        } else if (actionBy == null) {
-            throw new SiteConfirmationException("Site is not authorised to complete Procurement Order.");
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPED) {
+            throw new ProcurementOrderException("Order does not need scanning.");
         }
 
-        procurementOrder.setStatusHistory(procurementOrder.getStatusHistory());
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.COMPLETED));
+        Product product = productService.getProduct(rfidsku);
+
+        List<ProcurementOrderLI> lineItems = procurementOrder.getLineItems();
+
+        for (ProcurementOrderLI poli : lineItems) {
+            if (poli.getProduct().equals(product)) {
+                poli.setActualQty(poli.getActualQty() + qty);
+
+                boolean picked = true;
+                for (ProcurementOrderLI poli2 : lineItems) {
+                    if (poli2.getActualQty() != poli2.getFulfilledQty()) {
+                        picked = false;
+                    }
+                }
+                if (picked) {
+                    procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                            ProcurementOrderStatus.COMPLETED));
+                }
+
+                try {
+                    siteService.addProducts(procurementOrder.getWarehouse().getId(), poli.getProduct().getSku(), qty);
+                } catch (NoStockLevelException e) {
+                    e.printStackTrace();
+                }
+                return em.merge(procurementOrder);
+
+            }
+        }
+        throw new ProcurementOrderException("The product scanned is not relevant to the Procurement Order");
+    }
+
+    @Override
+    public ProcurementOrder completeProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException {
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
+
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPED) {
+            throw new IllegalPOModificationException("Procurement Order is not received.");
+        } 
+        procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(), ProcurementOrderStatus.COMPLETED));
 
         return em.merge(procurementOrder);
     }
-
 }

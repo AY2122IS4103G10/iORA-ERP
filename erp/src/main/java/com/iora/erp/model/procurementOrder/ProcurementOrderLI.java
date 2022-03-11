@@ -1,21 +1,14 @@
 package com.iora.erp.model.procurementOrder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import com.iora.erp.model.product.Product;
-import com.iora.erp.model.product.ProductItem;
 
 @Entity
 public class ProcurementOrderLI {
@@ -26,37 +19,23 @@ public class ProcurementOrderLI {
     @ManyToOne
     private Product product;
 
-    @Column
     private int requestedQty;
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    private List<ProductItem> fulfilledProductItems;
-    @Transient
     private int fulfilledQty;
-    @OneToMany
-    private List<ProductItem> actualProductItems;
-    @Transient
     private int actualQty;
 
     public ProcurementOrderLI() {
-        fulfilledProductItems = new ArrayList<>();
-        actualProductItems = new ArrayList<>();
-    }
-
-    public ProcurementOrderLI(Long id) {
-        this.id = id;
-        fulfilledProductItems = new ArrayList<>();
-        actualProductItems = new ArrayList<>();
+        this.requestedQty = 0;
+        this.fulfilledQty = 0;
+        this.actualQty = 0;
     }
 
 
-    public ProcurementOrderLI(Long id, Product product, int requestedQty, List<ProductItem> fulfilledProductItems, List<ProductItem> actualProductItems) {
-        this.id = id;
+    public ProcurementOrderLI(Product product, int requestedQty) {
+        this();
         this.product = product;
         this.requestedQty = requestedQty;
-        this.fulfilledProductItems = new ArrayList<>(fulfilledProductItems);
-        this.actualProductItems = new ArrayList<>(actualProductItems);
     }
-    
+
 
     public Long getId() {
         return this.id;
@@ -82,34 +61,22 @@ public class ProcurementOrderLI {
         this.requestedQty = requestedQty;
     }
 
-    public List<ProductItem> getFulfilledProductItems() {
-        return this.fulfilledProductItems;
-    }
-
-    public void setFulfilledProductItems(List<ProductItem> fulfilledProductItems) {
-        this.fulfilledProductItems = fulfilledProductItems;
-    }
-
-    public void addFulfilledProductItems(ProductItem fulfilledProductItem) {
-        this.fulfilledProductItems.add(fulfilledProductItem);
-    }
-
     public int getFulfilledQty() {
-        return this.fulfilledProductItems.size();
+        return this.fulfilledQty;
     }
 
-    public List<ProductItem> getActualProductItems() {
-        return this.actualProductItems;
-    }
-
-    public void setActualProductItems(List<ProductItem> actualProductItems) {
-        this.actualProductItems = actualProductItems;
+    public void setFulfilledQty(int fulfilledQty) {
+        this.fulfilledQty = fulfilledQty;
     }
 
     public int getActualQty() {
-        return this.actualProductItems.size();
+        return this.actualQty;
     }
 
+    public void setActualQty(int actualQty) {
+        this.actualQty = actualQty;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (o == this)

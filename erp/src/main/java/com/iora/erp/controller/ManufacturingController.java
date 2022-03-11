@@ -10,9 +10,9 @@ import com.iora.erp.service.SiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,8 +37,12 @@ public class ManufacturingController {
     }
 
     @GetMapping(path = "/procurementOrder/{orderId}", produces = "application/json")
-    public ProcurementOrder getProcurementOrderByOrderId(@PathVariable Long orderId) {
-        return procurementService.getProcurementOrder(orderId);
+    public ResponseEntity<Object> getProcurementOrderByOrderId(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(procurementService.getProcurementOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
     @GetMapping(path = "/procurementOrder/site/{siteId}", produces = "application/json")
@@ -50,14 +54,14 @@ public class ManufacturingController {
     @PutMapping(path = "/procurementOrder/accept/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> acceptProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
-            return ResponseEntity.ok(procurementService.confirmProcurementOrder(orderId, siteId));
+            return ResponseEntity.ok(procurementService.acceptProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @PutMapping(path = "/procurementOrder/cancel/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> cancelProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+    public ResponseEntity<Object> rejectProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
             return ResponseEntity.ok(procurementService.rejectProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
@@ -65,20 +69,43 @@ public class ManufacturingController {
         }
     }
 
-    @PutMapping(path = "/procurementOrder/fulfil/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> fulfilProcurementOrder(@RequestBody ProcurementOrder order,
-            @PathVariable Long siteId) {
+    @PutMapping(path = "/procurementOrder/manu/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> manufactureProcurementOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity.ok(procurementService.fulfilProcurementOrder(order, siteId));
+            return ResponseEntity.ok(procurementService.manufactureProcurementOrder(orderId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PutMapping(path = "/procurementOrder/ship/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> shipProcurementOrder(@RequestBody ProcurementOrder order, @PathVariable Long siteId) {
+    @PutMapping(path = "/procurementOrder/pickpack/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> pickPackProcurementOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity.ok(procurementService.shipProcurementOrder(order, siteId));
+            return ResponseEntity.ok(procurementService.pickPackProcurementOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PatchMapping(path = "/procurementOrder/scan/{orderId}/{barcode}", produces = "application/json")
+    public ResponseEntity<Object> scanProductAtFactory(@PathVariable Long orderId, @PathVariable String barcode) {
+        try {
+            if (barcode.contains("/")) {
+                return ResponseEntity.ok(procurementService.scanProductAtFactory(orderId, barcode, 1));
+            } else {
+                return ResponseEntity
+                        .ok(procurementService.scanProductAtFactory(orderId, barcode.substring(0, barcode.indexOf("/")),
+                                Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
+            }
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/procurementOrder/ship/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> shipProcurementOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(procurementService.shipProcurementOrder(orderId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

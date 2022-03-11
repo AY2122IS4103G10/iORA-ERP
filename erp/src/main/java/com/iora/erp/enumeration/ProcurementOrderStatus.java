@@ -2,10 +2,15 @@ package com.iora.erp.enumeration;
 
 public enum ProcurementOrderStatus implements StatusEnum {
     PENDING("Pending confirmation from factory."),
-    ACCEPTED("Procurement Order accepted by factory."),
-    READY("Procurement Order satisfied by factory."),
-    SHIPPED("Stock has been shipped to warehouse"),
-    VERIFIED("Warehouse has verified the Procurement Order"),
+    ACCEPTED("Order has been accepted by factory."),
+    MANUFACTURED("Factory has completed the manufacturing process."),
+    PICKING("Items are being picked by the factory."),
+    PICKED("Items are picked and is ready for packing by the factory."),
+    PACKING("Items are being packed by the factory."),
+    PACKED("Items are packed and is being processed for shipping"),
+    READY_FOR_SHIPPING("Order is processed and ready for shipping."),
+    SHIPPING("Order is on its way to its destination."),
+    SHIPPED("Order has been shipped to warehouse"),
     COMPLETED("Procurement Order has been fulfilled"),
     CANCELLED("Procurement Order cancelled.");
 

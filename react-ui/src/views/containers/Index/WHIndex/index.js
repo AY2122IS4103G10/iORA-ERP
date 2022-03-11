@@ -11,6 +11,7 @@ import {
   HomeIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
+  ShoppingBagIcon,
   TruckIcon,
 } from "@heroicons/react/outline";
 import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
@@ -35,7 +36,7 @@ const navigation = [
   {
     name: "Online Orders",
     href: "/wh/online-orders/search",
-    icon: DocumentTextIcon,
+    icon: ShoppingBagIcon,
     current: false,
   },
   {

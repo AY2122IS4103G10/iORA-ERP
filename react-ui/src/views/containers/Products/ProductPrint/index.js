@@ -36,18 +36,6 @@ const ProductList = ({
                     </p>
                   </button>
                 </div>
-                {/* <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-                    onClick={() => {
-                      onProductSelectedChanged(product);
-                      openModal();
-                    }}
-                  >
-                    <span>View Sticker</span>
-                  </button>
-                </div> */}
 
                 <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
                   <div>
@@ -58,7 +46,7 @@ const ProductList = ({
                           name="qty"
                           id="qty"
                           min="1"
-                          className="focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                          className="focus:ring-cyan-500 focus:border-cyan-500 block rounded-none rounded-l-md sm:text-sm border-gray-300"
                           placeholder="Quantity"
                           value={printQty}
                           onChange={onPrintQtyChanged}
@@ -87,7 +75,7 @@ const ProductList = ({
   );
 };
 
-const ProductSticker = ({ key, product }) => {
+const ProductSticker = ({ product }) => {
   const { sku } = product;
   return (
     // <div ref={ref}>

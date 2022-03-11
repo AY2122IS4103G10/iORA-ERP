@@ -10,6 +10,7 @@ public enum StockTransferStatus implements StatusEnum {
     PACKED("Items are packed and is being processed for delivering"),
     READY_FOR_DELIVERY("Order is ready and will be out for delivery on the next available slot."),
     DELIVERING("Order is out for delivery."),
+    DELIVERED("Order has been deliverd and is due for verifying"),
     COMPLETED("Stock Transfer Order has been fulfilled"),
     CANCELLED("Stock Transfer Order has been cancelled");
 

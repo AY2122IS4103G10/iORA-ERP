@@ -1,7 +1,6 @@
 package com.iora.erp.service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,12 +9,9 @@ import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.StockTransferStatus;
 import com.iora.erp.exception.NoStockLevelException;
-import com.iora.erp.exception.ProcurementOrderException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.exception.StockTransferException;
-import com.iora.erp.model.procurementOrder.POStatus;
-import com.iora.erp.model.procurementOrder.ProcurementOrderLI;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.Site;
@@ -251,11 +247,27 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
+    public StockTransferOrder receiveStockTransferOrder(Long id, Long siteId) throws StockTransferException {
+        StockTransferOrder stOrder = getStockTransferOrder(id);
+        Site actionBy = em.find(Site.class, siteId);
+
+        if (actionBy == null || !actionBy.equals(stOrder.getToSite())) {
+            throw new StockTransferException("Site is not supposed to receive this order.");
+        } else if (stOrder.getLastStatus() != StockTransferStatus.DELIVERING) {
+            throw new StockTransferException("Stock Transfer Order cannot be received.");
+        }
+
+        stOrder.addStatusHistory(
+                new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.DELIVERED));
+        return em.merge(stOrder);
+    }
+
+    @Override
     public StockTransferOrder scanProductAtToSite(Long id, String rfidsku, int qty)
             throws StockTransferException, ProductException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
 
-        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERING) {
+        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERED) {
             throw new StockTransferException("Order cannot be verified yet.");
         }
 
@@ -273,7 +285,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                 }
                 if (picked) {
                     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), LocalDateTime.now(),
-                            StockTransferStatus.PICKED));
+                            StockTransferStatus.COMPLETED));
                 }
                 try {
                     siteService.addProducts(stOrder.getToSite().getId(), product.getSku(), qty);
@@ -292,7 +304,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         StockTransferOrder stOrder = getStockTransferOrder(orderId);
 
-        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERING) {
+        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERED) {
             throw new StockTransferException("Stock Transfer Order is not due to be confirmed.");
         }
 

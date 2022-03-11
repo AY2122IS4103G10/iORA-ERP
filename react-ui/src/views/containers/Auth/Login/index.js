@@ -2,12 +2,11 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-
 import {
-  login,
   loginJwt,
-  postLoginJwt,
+  postLoginJwt
 } from "../../../../stores/slices/userSlice";
+
 
 export function Login() {
   const dispatch = useDispatch();
@@ -18,28 +17,6 @@ export function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // dispatch(login({ username: username, password: password }))
-    //   .unwrap()
-    //   .then((data) => {
-    //     data.password = password;
-    //     localStorage.setItem("user", JSON.stringify(data));
-    //     setUsername("");
-    //     setPassword("");
-    //     addToast("Login Successful", {
-    //       appearance: "success",
-    //       autoDismiss: true,
-    //     });
-    //     return data.id;
-    //   })
-    //   .then((id) => {
-    //     id !== -1 && navigate("/home");
-    //   })
-    //   .catch((err) => {
-    //     addToast(`Error: ${err.message}`, {
-    //       appearance: "error",
-    //       autoDismiss: true,
-    //     });
-    //   });
     try {
       const response = dispatch(
         loginJwt({ username: username, password: password })

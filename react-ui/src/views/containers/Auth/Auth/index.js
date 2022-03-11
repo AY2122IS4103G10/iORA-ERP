@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { login, refreshTokenJwt } from "../../../../stores/slices/userSlice";
+import { refreshTokenJwt } from "../../../../stores/slices/userSlice";
 
 export function Auth() {
   const dispatch = useDispatch();
@@ -16,7 +16,6 @@ export function Auth() {
       dispatch(refreshTokenJwt(refreshToken))
         .unwrap()
         .then((data) => {
-          console.log("token refreshed");
           localStorage.setItem("accessToken", data.accessToken);
           location.pathname === "/" &&
             data?.username !== null &&

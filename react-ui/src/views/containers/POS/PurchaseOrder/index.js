@@ -5,16 +5,10 @@ import {
   DeviceMobileIcon,
   XIcon,
 } from "@heroicons/react/outline";
-import { MinusSmIcon, PlusSmIcon, XCircleIcon } from "@heroicons/react/solid";
+import { MinusSmIcon, PlusSmIcon } from "@heroicons/react/solid";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
-import { api, posApi, productApi } from "../../../../environments/Api";
-import { addProductToLineItems } from "../../../../stores/slices/posSlice";
-import {
-  getProductDetails,
-  getProductItem,
-} from "../../../../stores/slices/productSlice";
+import { api, posApi } from "../../../../environments/Api";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
 const paymentTypes = [
@@ -260,9 +254,7 @@ const OrderList = ({
                           </p>
                           <p className="mt-1 flex font-medium text-sm text-gray-900">
                             -$
-                            {(
-                              Number.parseFloat(-lineItem.subTotal)
-                            ).toFixed(2)}
+                            {Number.parseFloat(-lineItem.subTotal).toFixed(2)}
                           </p>
                         </h4>
                         <h4 className="text-lg w-1/12">
@@ -350,12 +342,21 @@ export const PosPurchaseOrder = () => {
   };
 
   const addProduct = async (rfid) => {
-    const response = await posApi.addProductToLineItems(rfid, lineItems);
-    setLineItems(response.data);
-    const detail = await api.get("store/productDetails", rfid);
-    setProductDetails(productDetails.set(rfid, detail.data));
-    setAmount(response.data.map((x) => x.subTotal).reduce((x, y) => x + y));
-    setRfid("");
+    try {
+      const response = await posApi.addProductToLineItems(rfid, lineItems);
+      console.log(response);
+      setLineItems(response.data);
+      const detail = await api.get("store/productDetails", rfid);
+      setProductDetails(productDetails.set(rfid, detail.data));
+      setAmount(response.data.map((x) => x.subTotal).reduce((x, y) => x + y));
+      setRfid("");
+    } catch (err) {
+      addToast(`Error: ${err.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+      setRfid("");
+    }
   };
 
   const removeProduct = async (rfid) => {

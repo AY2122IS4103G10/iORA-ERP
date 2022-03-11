@@ -77,6 +77,7 @@ import { ManageOrders } from "./views/containers/Orders/ManageOrders/index.js";
 import { OrderList } from "./views/containers/Orders/OrderList/index.js";
 import { OrderSearch } from "./views/containers/Orders/OrderSearch/index.js";
 import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper/index.js";
+import { CustomerOrderDetails } from "./views/containers/Orders/CustomerOrderDetails/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -189,7 +190,7 @@ function App() {
                 path=":orderId"
                 element={<CustomerOrderWrapper subsys="sm" />}
               >
-                <Route index element={<OrderDetails subsys="sm" />} />
+                <Route index element={<CustomerOrderDetails subsys="sm" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />

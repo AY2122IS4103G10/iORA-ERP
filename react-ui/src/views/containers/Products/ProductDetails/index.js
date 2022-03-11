@@ -6,14 +6,17 @@ import {
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import {
   fetchProducts,
   selectProductByCode,
+  updateExistingProduct,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 
-const fieldSection = ({ fieldName, fields }) => {
+const FieldSection = ({ fieldName, fields }) => {
   return Boolean(fields.length) ? (
     <div>
       <h2 className="text-sm font-medium text-gray-500">{fieldName}</h2>
@@ -64,6 +67,7 @@ export const SKUTable = ({ data }) => {
   );
   return <SimpleTable columns={columns} data={data} />;
 };
+
 const ProductDetailsBody = ({
   prodCode,
   name,
@@ -76,6 +80,7 @@ const ProductDetailsBody = ({
   categories,
   available,
   products,
+  onToggleEnableClicked,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
@@ -90,6 +95,12 @@ const ProductDetailsBody = ({
                 <p className="mt-2 text-sm text-gray-500">{prodCode}</p>
               </div>
               <div className="mt-4 flex space-x-3 md:mt-0">
+                <ToggleLeftLabel
+                  enabled={available}
+                  onEnabledChanged={onToggleEnableClicked}
+                  label={!available ? "Enable" : "Disable"}
+                  toggleColor="red"
+                />
                 <Link to={`/sm/products/edit/${prodCode}`}>
                   <button
                     type="button"
@@ -136,19 +147,10 @@ const ProductDetailsBody = ({
                 </div>
               </div>
               <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
-                {fieldSection({
-                  fieldName: "Colors",
-                  fields: colors,
-                })}
-                {fieldSection({
-                  fieldName: "Sizes",
-                  fields: sizes,
-                })}
-                {fieldSection({ fieldName: "Categories", fields: categories })}
-                {fieldSection({
-                  fieldName: "Tags",
-                  fields: tags,
-                })}
+                <FieldSection fieldName="Colors" fields={colors} />
+                <FieldSection fieldName="Sizes" fields={sizes} />
+                <FieldSection fieldName="Categories" fields={categories} />
+                <FieldSection fieldName="Tags" fields={tags} />
               </div>
             </aside>
             <div className="py-3 xl:pt-6 xl:pb-0">
@@ -208,19 +210,10 @@ const ProductDetailsBody = ({
             </div>
           </div>
           <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
-            {fieldSection({
-              fieldName: "Colors",
-              fields: colors,
-            })}
-            {fieldSection({
-              fieldName: "Sizes",
-              fields: sizes,
-            })}
-            {fieldSection({ fieldName: "Categories", fields: categories })}
-            {fieldSection({
-              fieldName: "Tags",
-              fields: tags,
-            })}
+            <FieldSection fieldName="Colors" fields={colors} />
+            <FieldSection fieldName="Sizes" fields={sizes} />
+            <FieldSection fieldName="Categories" fields={categories} />
+            <FieldSection fieldName="Tags" fields={tags} />
           </div>
         </aside>
       </div>
@@ -230,6 +223,7 @@ const ProductDetailsBody = ({
 
 export const ProductDetails = () => {
   const { prodCode } = useParams();
+  const { addToast } = useToasts();
   const product = useSelector((state) => selectProductByCode(state, prodCode));
   const dispatch = useDispatch();
   const prodStatus = useSelector((state) => state.products.status);
@@ -237,6 +231,31 @@ export const ProductDetails = () => {
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
+
+  const onToggleEnableClicked = () => {
+    dispatch(
+      updateExistingProduct({
+        ...product,
+        available: !product.available,
+      })
+    )
+      .unwrap()
+      .then(() => {
+        addToast(
+          `Successfully ${!product.available ? "enabled" : "disabled"} product`,
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
+        );
+      })
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
+  };
 
   return (
     Boolean(product) && (
@@ -279,6 +298,7 @@ export const ProductDetails = () => {
             )}
           available={product.available}
           products={product.products}
+          onToggleEnableClicked={onToggleEnableClicked}
         />
       </>
     )

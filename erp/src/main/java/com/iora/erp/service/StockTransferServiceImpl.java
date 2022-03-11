@@ -62,6 +62,14 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
+    public List<StockTransferOrder> getStockTransferOrdersForDelivery() {
+        TypedQuery<StockTransferOrder> q = em.createQuery(
+                "SELECT sto FROM StockTransferOrder sto WHERE LAST(sto.statusHistory).status = :status", StockTransferOrder.class);
+                q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY);
+        return q.getResultList();
+    }
+
+    @Override
     public StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
             throws SiteConfirmationException {
         Site actionBy = em.find(Site.class, siteId);

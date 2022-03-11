@@ -228,24 +228,6 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransfer/receive/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> receiveStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
-        try {
-            return ResponseEntity.ok(stockTransferService.receiveStockTransferOrder(orderId, siteId));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PutMapping(path = "/stockTransfer/deliver/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> deliverStockTransferOrder(@PathVariable Long orderId) {
-        try {
-            return ResponseEntity.ok(stockTransferService.deliverStockTransferOrder(orderId));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
     @PatchMapping(path = "/stockTransfer/scanTo/{orderId}/{barcode}", produces = "application/json")
     public ResponseEntity<Object> scanProductAtToSite(@PathVariable Long orderId, @PathVariable String barcode) {
         try {

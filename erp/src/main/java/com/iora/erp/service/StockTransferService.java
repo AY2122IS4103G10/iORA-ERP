@@ -12,6 +12,9 @@ public interface StockTransferService {
     public abstract StockTransferOrder getStockTransferOrder(Long id) throws StockTransferException;
     public abstract List<StockTransferOrder> getStockTransferOrders();
     public abstract List<StockTransferOrder> getStockTransferOrderOfSite(Site site);
+    public abstract List<StockTransferOrder> getStockTransferOrdersForDelivery();
+
+
     public abstract StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException;
     public abstract StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
     public abstract StockTransferOrder cancelStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException;

@@ -1,4 +1,3 @@
-import { Switch } from "@headlessui/react";
 import { CurrencyDollarIcon } from "@heroicons/react/outline";
 import {
   PencilIcon,
@@ -13,9 +12,9 @@ import {
   selectProductByCode,
   updateExistingProduct,
 } from "../../../../stores/slices/productSlice";
-import { classNames } from "../../../../utilities/Util";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 
 const FieldSection = ({ fieldName, fields }) => {
   return Boolean(fields.length) ? (
@@ -96,36 +95,12 @@ const ProductDetailsBody = ({
                 <p className="mt-2 text-sm text-gray-500">{prodCode}</p>
               </div>
               <div className="mt-4 flex space-x-3 md:mt-0">
-                <Switch.Group
-                  as="div"
-                  className="flex items-center justify-between"
-                >
-                  <span className="flex-grow flex flex-col">
-                    <Switch.Label
-                      as="span"
-                      className="mr-4 text-sm font-medium text-gray-900"
-                      passive
-                    >
-                      {!available ? "Enable" : "Disable"}
-                    </Switch.Label>
-                  </span>
-                  <Switch
-                    checked={available}
-                    onChange={onToggleEnableClicked}
-                    className={classNames(
-                      available ? "bg-cyan-600" : "bg-gray-200",
-                      "relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                    )}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={classNames(
-                        available ? "translate-x-5" : "translate-x-0",
-                        "pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"
-                      )}
-                    />
-                  </Switch>
-                </Switch.Group>
+                <ToggleLeftLabel
+                  enabled={available}
+                  onEnabledChanged={onToggleEnableClicked}
+                  label={!available ? "Enable" : "Disable"}
+                  toggleColor="red"
+                />
                 <Link to={`/sm/products/edit/${prodCode}`}>
                   <button
                     type="button"

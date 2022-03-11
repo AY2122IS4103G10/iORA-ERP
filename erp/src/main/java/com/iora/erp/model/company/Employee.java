@@ -72,7 +72,7 @@ public class Employee implements Serializable {
         this.notifications = new ArrayList<>();
     }
 
-    public Employee(String name, String email, Double salary, String username,String password, Boolean availStatus,
+    public Employee(String name, String email, Double salary, String username, String password, Boolean availStatus,
             PayType payType, JobTitle jobTitle, Department department, Company company) {
         this.name = name;
         this.email = email;

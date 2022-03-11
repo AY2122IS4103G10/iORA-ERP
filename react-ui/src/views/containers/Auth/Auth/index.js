@@ -1,33 +1,39 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import {
-  login,
-} from "../../../../stores/slices/userSlice";
+import { useToasts } from "react-toast-notifications";
+import { login, refreshTokenJwt } from "../../../../stores/slices/userSlice";
 
 export function Auth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useToasts();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userState = useSelector(state => state.user.status)
+  const refreshToken = localStorage.getItem("refreshToken");
 
   useEffect(() => {
-    if (user && user.username !== "" && user.password !== "" && userState === "idle") {
-      dispatch(login({ username: user.username, password: user.password }))
+    if (refreshToken != null) {
+      dispatch(refreshTokenJwt(refreshToken))
         .unwrap()
         .then((data) => {
-          location.pathname === "/" && data.id !== -1 && navigate("/home");
+          console.log("token refreshed");
+          localStorage.setItem("accessToken", data.accessToken);
+          location.pathname === "/" &&
+            data?.username !== null &&
+            navigate("/home");
         })
         .catch((err) => {
-          console.error(err);
-          localStorage.removeItem("user");
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          });
+          localStorage.removeItem("refreshToken");
           location.pathname !== "/" && navigate("/");
         });
     } else {
       location.pathname !== "/" && navigate("/");
     }
-  }, [location, dispatch, navigate, user, userState]);
+  }, [location, dispatch, navigate, refreshToken, addToast]);
 
   return <Outlet />;
 }

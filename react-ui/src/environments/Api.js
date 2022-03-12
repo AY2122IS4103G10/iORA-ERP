@@ -83,9 +83,14 @@ export const procurementApi = {
       `${REST_ENDPOINT}manufacturing/procurementOrder/manu/${orderId}`
     );
   },
+  pickPack(orderId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/pickpack/${orderId}`
+    );
+  },
   scanItem(orderId, barcode) {
     return axiosPrivate.patch(
-      `${REST_ENDPOINT}manufacturing/procurementOrder/scan/${orderId}/${barcode}`
+      `${REST_ENDPOINT}manufacturing/procurementOrder/scan/${orderId}?barcode=${barcode}`
     );
   },
   fulfillOrder(siteId, order) {
@@ -147,6 +152,16 @@ export const stockTransferApi = {
   rejectOrder(orderId, siteId) {
     return axiosPrivate.put(
       `${REST_ENDPOINT}store/stockTransfer/reject/${orderId}/${siteId}`
+    );
+  },
+  pickPack(orderId, siteId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}store/stockTransfer/pickPack/${orderId}/${siteId}`
+    );
+  },
+  scanItem(orderId, barcode) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}store/stockTransfer/scanFrom/${orderId}?barcode=${barcode}`
     );
   },
   readyOrder(order, siteId) {
@@ -285,7 +300,7 @@ export const onlineOrderApi = {
   },
   getAllBySite(siteId) {
     return axiosPrivate.get(
-      `${REST_ENDPOINT}sam/onlineOrder/${siteId}?orderId=`
+      `${REST_ENDPOINT}online/searchOrder/${siteId}?orderId=`
     );
   },
 };

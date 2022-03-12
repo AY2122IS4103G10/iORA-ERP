@@ -157,18 +157,43 @@ const ProcurementDetailsBody = ({
                   Created by
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {headquarters.name}
+                  <address className="not-italic">
+                    <span className="block">{headquarters.name}</span>
+                    <span className="block">{headquarters.address.road}</span>
+                    <span className="block">
+                      {headquarters.address.city},{" "}
+                      {headquarters.address.postalCode}
+                    </span>
+                    <span className="block">{headquarters.phoneNumber}</span>
+                  </address>
                 </dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">From</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {manufacturing ? manufacturing.name : "-"}
+                  <address className="not-italic">
+                    <span className="block">{manufacturing.name}</span>
+                    <span className="block">{manufacturing.address.road}</span>
+                    <span className="block">
+                      {manufacturing.address.city},{" "}
+                      {manufacturing.address.postalCode}
+                    </span>
+                    <span className="block">{manufacturing.phoneNumber}</span>
+                  </address>
                 </dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">To</dt>
-                <dd className="mt-1 text-sm text-gray-900">{warehouse.name}</dd>
+                <dd className="mt-1 text-sm text-gray-900">
+                  <address className="not-italic">
+                    <span className="block">{warehouse.name}</span>
+                    <span className="block">{warehouse.address.road}</span>
+                    <span className="block">
+                      {warehouse.address.city}, {warehouse.address.postalCode}
+                    </span>
+                    <span className="block">{warehouse.phoneNumber}</span>
+                  </address>
+                </dd>
               </div>
             </dl>
           </div>

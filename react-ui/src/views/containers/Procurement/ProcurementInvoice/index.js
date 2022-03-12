@@ -1,59 +1,17 @@
 import { forwardRef } from "react";
 import QRCode from "qrcode.react";
-import { useMemo } from "react";
 import Barcode from "react-barcode";
 import moment from "moment";
-import { BasicTable } from "../../../components/Tables/BasicTable";
-
-const ItemsSummary = ({ data, status }) => {
-  const columns = useMemo(() => {
-    return [
-      {
-        Header: "SKU",
-        accessor: (row) => row.product.sku,
-      },
-      {
-        Header: "Color",
-        accessor: (row) =>
-          row.product.productFields.find(
-            (field) => field.fieldName === "COLOUR"
-          ).fieldValue,
-      },
-      {
-        Header: "Size",
-        accessor: (row) =>
-          row.product.productFields.find((field) => field.fieldName === "SIZE")
-            .fieldValue,
-      },
-      {
-        Header: "Quantity",
-        accessor: "requestedQty",
-      },
-    ];
-  }, []);
-  return (
-    <div className="py-8 border-b border-gray-200">
-      <div className="md:flex md:items-center md:justify-between">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Summary</h3>
-      </div>
-      {Boolean(data.length) && (
-        <div className="mt-4">
-          <BasicTable columns={columns} data={data} />
-        </div>
-      )}
-    </div>
-  );
-};
 
 export const ProcurementInvoiceBody = ({
   orderId,
   orderStatus,
   company,
-  headquarters,
-  manufacturing,
-  warehouse,
-  data,
+  createdBy,
+  fromSite,
+  toSite,
   qrValue,
+  children,
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
@@ -114,8 +72,8 @@ export const ProcurementInvoiceBody = ({
                 <dt className="text-gray-900">For enquiries, call</dt>
                 <dd className="text-gray-700 mt-2">
                   <address className="not-italic">
-                    <span className="block">{headquarters.name}</span>
-                    <span className="block">{headquarters.phoneNumber}</span>
+                    <span className="block">{createdBy.name}</span>
+                    <span className="block">{createdBy.phoneNumber}</span>
                   </address>
                 </dd>
               </dl>
@@ -133,13 +91,13 @@ export const ProcurementInvoiceBody = ({
               <dt className="font-medium text-gray-900">Shipping From</dt>
               <dd className="mt-2 text-gray-700">
                 <address className="not-italic">
-                  <span className="block">{manufacturing.name}</span>
-                  <span className="block">{manufacturing.address.road}</span>
+                  <span className="block">{fromSite.name}</span>
+                  <span className="block">{fromSite.address.road}</span>
                   <span className="block">
-                    {manufacturing.address.city},{" "}
-                    {manufacturing.address.postalCode}
+                    {fromSite.address.city},{" "}
+                    {fromSite.address.postalCode}
                   </span>
-                  <span className="block">{manufacturing.phoneNumber}</span>
+                  <span className="block">{fromSite.phoneNumber}</span>
                 </address>
               </dd>
             </div>
@@ -147,19 +105,19 @@ export const ProcurementInvoiceBody = ({
               <dt className="font-medium text-gray-900">Shipping To</dt>
               <dd className="mt-2 text-gray-700">
                 <address className="not-italic">
-                  <span className="block">{warehouse.name}</span>
-                  <span className="block">{warehouse.address.road}</span>
+                  <span className="block">{toSite.name}</span>
+                  <span className="block">{toSite.address.road}</span>
                   <span className="block">
-                    {warehouse.address.city}, {warehouse.address.postalCode}
+                    {toSite.address.city}, {toSite.address.postalCode}
                   </span>
-                  <span className="block">{warehouse.phoneNumber}</span>
+                  <span className="block">{toSite.phoneNumber}</span>
                 </address>
               </dd>
             </div>
           </dl>
         </div>
         <h3 className="sr-only">Items</h3>
-        <ItemsSummary data={data} status={orderStatus.status} />
+        {children}
         <QRCode
           id="qr-gen"
           value={qrValue}
@@ -178,27 +136,30 @@ export const ProcurementInvoice = forwardRef(
       orderId,
       orderStatus,
       company,
-      headquarters,
-      manufacturing,
-      warehouse,
+      createdBy,
+      fromSite,
+      toSite,
       data,
       qrValue,
+      children,
     },
     ref
   ) => {
     return (
-      [company, headquarters, manufacturing, warehouse].every(Boolean) && (
+      [company, createdBy, fromSite, toSite].every(Boolean) && (
         <div ref={ref}>
           <ProcurementInvoiceBody
             orderId={orderId}
             orderStatus={orderStatus}
             company={company}
-            headquarters={headquarters}
-            manufacturing={manufacturing}
-            warehouse={warehouse}
+            createdBy={createdBy}
+            fromSite={fromSite}
+            toSite={toSite}
             data={data}
             qrValue={qrValue}
-          />
+          >
+            {children}
+            </ProcurementInvoiceBody>
         </div>
       )
     );

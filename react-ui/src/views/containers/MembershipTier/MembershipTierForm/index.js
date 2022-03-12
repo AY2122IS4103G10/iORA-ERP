@@ -305,17 +305,8 @@ export const MembershipTierForm = () => {
   const onBirthdayMultiplierChanged = (e) =>
     setBirthdayMultiplier(e.target.value);
 
-  // const canAdd = [
-  //   name,
-  //   minSpend,
-  //   multiplier,
-  //   birthdayName,
-  //   birthdayMultiplier,
-  //   birthdayQuota,
-  // ].every(Boolean);
   const onAddMembershipTierClicked = (evt) => {
     evt.preventDefault();
-    // if (canAdd) {
     if (!isEditing) {
       dispatch(
         addNewMembershipTier({
@@ -377,7 +368,6 @@ export const MembershipTierForm = () => {
           });
         });
     }
-    // }
   };
 
   const onCancelClicked = () =>

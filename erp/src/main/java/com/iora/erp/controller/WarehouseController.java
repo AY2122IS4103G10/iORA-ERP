@@ -134,10 +134,10 @@ public class WarehouseController {
         }
     }
 
-    @PatchMapping(path = "/procurementOrder/scan/{orderId}/{barcode}", produces = "application/json")
-    public ResponseEntity<Object> scanProductsAtWarehouse(@PathVariable Long orderId, @PathVariable String barcode) {
+    @PatchMapping(path = "/procurementOrder/scan/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> scanProductsAtWarehouse(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
-            if (barcode.contains("/")) {
+            if (!barcode.contains("/")) {
                 return ResponseEntity.ok(procurementService.scanProductAtWarehouse(orderId, barcode, 1));
             } else {
                 return ResponseEntity
@@ -168,11 +168,10 @@ public class WarehouseController {
         }
     }
 
-    @PatchMapping(path = "/scan/{orderId}/{barcode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> scanProduct(@PathVariable Long orderId, @PathVariable String barcode,
-            @PathVariable int qty) {
+    @PatchMapping(path = "/scan/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> scanProduct(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
-            if (barcode.contains("/")) {
+            if (!barcode.contains("/")) {
                 return ResponseEntity.ok(customerOrderService.scanProduct(orderId, barcode, 1));
             } else {
                 return ResponseEntity

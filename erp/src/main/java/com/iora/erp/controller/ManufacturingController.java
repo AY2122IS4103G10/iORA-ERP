@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -87,10 +88,10 @@ public class ManufacturingController {
         }
     }
 
-    @PatchMapping(path = "/procurementOrder/scan/{orderId}/{barcode}", produces = "application/json")
-    public ResponseEntity<Object> scanProductAtFactory(@PathVariable Long orderId, @PathVariable String barcode) {
+    @PatchMapping(path = "/procurementOrder/scan/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> scanProductAtFactory(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
-            if (barcode.contains("/")) {
+            if (!barcode.contains("/")) {
                 return ResponseEntity.ok(procurementService.scanProductAtFactory(orderId, barcode, 1));
             } else {
                 return ResponseEntity

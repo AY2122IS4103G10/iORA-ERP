@@ -213,10 +213,10 @@ public class StoreController {
         }
     }
 
-    @PatchMapping(path = "/stockTransfer/scanFrom/{orderId}/{barcode}", produces = "application/json")
-    public ResponseEntity<Object> scanProductAtFromSite(@PathVariable Long orderId, @PathVariable String barcode) {
+    @PatchMapping(path = "/stockTransfer/scanFrom/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> scanProductAtFromSite(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
-            if (barcode.contains("/")) {
+            if (!barcode.contains("/")) {
                 return ResponseEntity.ok(stockTransferService.scanProductAtFromSite(orderId, barcode, 1));
             } else {
                 return ResponseEntity.ok(
@@ -228,10 +228,10 @@ public class StoreController {
         }
     }
 
-    @PatchMapping(path = "/stockTransfer/scanTo/{orderId}/{barcode}", produces = "application/json")
-    public ResponseEntity<Object> scanProductAtToSite(@PathVariable Long orderId, @PathVariable String barcode) {
+    @PatchMapping(path = "/stockTransfer/scanTo/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> scanProductAtToSite(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
-            if (barcode.contains("/")) {
+            if (!barcode.contains("/")) {
                 return ResponseEntity.ok(stockTransferService.scanProductAtFromSite(orderId, barcode, 1));
             } else {
                 return ResponseEntity.ok(

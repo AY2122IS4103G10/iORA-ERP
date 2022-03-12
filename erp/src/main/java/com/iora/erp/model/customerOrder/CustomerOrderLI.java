@@ -20,6 +20,9 @@ public class CustomerOrderLI {
     @Column(nullable = false)
     private int qty;
 
+    // Used only for onlineOrder
+    private int packedQty;
+
     @ManyToOne(optional = false)
     private Product product;
 
@@ -27,14 +30,17 @@ public class CustomerOrderLI {
     private double subTotal;
 
     public CustomerOrderLI() {
+        this.packedQty = 0;
     }
 
     public CustomerOrderLI(int qty, Product product) {
+        this();
         this.qty = qty;
         this.product = product;
     }
 
     public CustomerOrderLI(int qty, Product product, double subTotal) {
+        this();
         this.qty = qty;
         this.product = product;
         this.subTotal = subTotal;
@@ -54,6 +60,14 @@ public class CustomerOrderLI {
 
     public void setQty(int qty) {
         this.qty = qty;
+    }
+
+    public int getPackedQty() {
+        return this.packedQty;
+    }
+
+    public void setPackedQty(int packedQty) {
+        this.packedQty = packedQty;
     }
 
     public Product getProduct() {

@@ -27,6 +27,7 @@ public class CustomerOrder {
     @Column(nullable = false, scale = 2)
     private Double totalAmount;
 
+    // This site will be supplying the inventory for the order
     @JsonBackReference(value="site-CustomerOrder")
     @ManyToOne
     private Site site;

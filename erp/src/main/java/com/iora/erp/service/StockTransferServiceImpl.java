@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -8,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.StockTransferStatus;
+import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
@@ -63,10 +65,18 @@ public class StockTransferServiceImpl implements StockTransferService {
 
     @Override
     public List<StockTransferOrder> getStockTransferOrdersForDelivery() {
-        TypedQuery<StockTransferOrder> q = em.createQuery(
-                "SELECT sto FROM StockTransferOrder sto WHERE LAST(sto.statusHistory).status = :status", StockTransferOrder.class);
-                q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY);
-        return q.getResultList();
+        /* TypedQuery<StockTransferOrder> q = em.createQuery(
+                "SELECT DISTINCT(sto) FROM StockTransferOrder sto RIGHT JOIN .statusHistory st WHERE st.status = 'READY_FOR_DELIVERY' OR st.status = 'DELIVERING' ORDER BY st.timeStamp DESC", StockTransferOrder.class);
+                q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY); */
+
+        List<StockTransferOrder> deliveryOrders = new ArrayList<>();
+        
+        for (StockTransferOrder sto : getStockTransferOrders()) {
+            if (sto.getLastStatus() == StockTransferStatus.READY_FOR_DELIVERY || sto.getLastStatus() == StockTransferStatus.DELIVERING) {
+                deliveryOrders.add(sto);
+            }
+        }
+        return deliveryOrders;
     }
 
     @Override
@@ -218,10 +228,16 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         for (StockTransferOrderLI stoli : lineItems) {
             if (stoli.getProduct().equals(product)) {
-                if (stoli.getSentQty() + qty > stoli.getSentQty()) {
+                if (stoli.getSentQty() + qty > stoli.getRequestedQty()) {
                     throw new StockTransferException("There will be too many quantity of this product.");
                 } else {
                     stoli.setSentQty(stoli.getSentQty() + qty);
+                    try {
+                        siteService.removeProducts(stOrder.getFromSite().getId(), product.getSku(), qty);
+                    } catch (NoStockLevelException | IllegalTransferException e) {
+                        e.printStackTrace();
+                    }
+
                     boolean picked = true;
                     for (StockTransferOrderLI stoli2 : lineItems) {
                         if (stoli2.getSentQty() < stoli2.getRequestedQty()) {

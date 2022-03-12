@@ -187,19 +187,19 @@ export const posApi = {
     return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder/${siteId}?orderId=`);
   },
   addProductToLineItems(rfidsku, lineItems) {
-    return axiosPrivate.post(
+    return axiosPublic.post(
       `${REST_ENDPOINT}store/customerOrder/add/${rfidsku}`,
       lineItems
     );
   },
   removeProductFromLineItems(rfidsku, lineItems) {
-    return axiosPrivate.post(
+    return axiosPublic.post(
       `${REST_ENDPOINT}store/customerOrder/remove/${rfidsku}`,
       lineItems
     );
   },
   calculatePromotions(lineItems) {
-    return axiosPrivate.post(
+    return axiosPublic.post(
       `${REST_ENDPOINT}store/customerOrder/calculate`,
       lineItems
     );

@@ -28,17 +28,17 @@ const columns = [
   }
 ];
 
-const convertData = (data, sites) =>
-  Object.entries(data).map((pair) => {
-    return {
-      id: pair[0],
-      siteCode: sites.find((site) => parseInt(site.id) === parseInt(pair[0]))
-        .siteCode,
-      siteName: sites.find((site) => parseInt(site.id) === parseInt(pair[0]))
-        .name,
-      qty: pair[1],
-    };
-  });
+// const convertData = (data, sites) =>
+//   Object.entries(data).map((pair) => {
+//     return {
+//       id: pair[0],
+//       siteCode: sites.find((site) => parseInt(site.id) === parseInt(pair[0]))
+//         .siteCode,
+//       siteName: sites.find((site) => parseInt(site.id) === parseInt(pair[0]))
+//         .name,
+//       qty: pair[1],
+//     };
+//   });
 
 export const AProductStock = (subsys) => {
   const { id } = useParams();
@@ -117,7 +117,7 @@ export const AProductStock = (subsys) => {
             {/* Stock Levels By Products*/}
             <section aria-labelledby="stocks-level">
               <div className="m-1">
-                {stocklevel === undefined ? (
+                {stocklevel === undefined || stocklevel === null ? (
                   <p>loading</p>
                 ) : (
                   <SimpleTable

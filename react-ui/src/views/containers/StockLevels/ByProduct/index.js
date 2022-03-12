@@ -22,7 +22,6 @@ const columns = [
 export const ProductTable = (subsys) => {
   const dispatch = useDispatch();
   const data = useSelector(selectAllProducts);
-  const prodStatus = useSelector((state) => state.products.status);
 
   const products = data.flatMap((model) =>
     model.products.map((product) => ({

@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -63,10 +64,18 @@ public class StockTransferServiceImpl implements StockTransferService {
 
     @Override
     public List<StockTransferOrder> getStockTransferOrdersForDelivery() {
-        TypedQuery<StockTransferOrder> q = em.createQuery(
-                "SELECT sto FROM StockTransferOrder sto WHERE LAST(sto.statusHistory).status = :status", StockTransferOrder.class);
-                q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY);
-        return q.getResultList();
+        /* TypedQuery<StockTransferOrder> q = em.createQuery(
+                "SELECT DISTINCT(sto) FROM StockTransferOrder sto RIGHT JOIN .statusHistory st WHERE st.status = 'READY_FOR_DELIVERY' OR st.status = 'DELIVERING' ORDER BY st.timeStamp DESC", StockTransferOrder.class);
+                q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY); */
+
+        List<StockTransferOrder> deliveryOrders = new ArrayList<>();
+        
+        for (StockTransferOrder sto : getStockTransferOrders()) {
+            if (sto.getLastStatus() == StockTransferStatus.READY_FOR_DELIVERY || sto.getLastStatus() == StockTransferStatus.DELIVERING) {
+                deliveryOrders.add(sto);
+            }
+        }
+        return deliveryOrders;
     }
 
     @Override

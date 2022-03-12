@@ -18,6 +18,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
+import com.iora.erp.enumeration.OnlineOrderStatus;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
@@ -29,6 +30,7 @@ import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
+import com.iora.erp.model.customerOrder.OOStatus;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.PromotionLI;
@@ -38,6 +40,9 @@ import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
+import com.iora.erp.model.site.Site;
+import com.iora.erp.model.site.StoreSite;
+import com.iora.erp.model.site.WarehouseSite;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +55,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     private CustomerService customerService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SiteService siteService;
     @PersistenceContext
     private EntityManager em;
 
@@ -553,73 +560,136 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
      */
 
     @Override
-    public OnlineOrder scanProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException {
+    public OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
+        Site actionBy = em.find(Site.class, siteId);
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
-        Product product = productService.getProduct(rfidsku);
-        
-        List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
-        List<CustomerOrderLI> packedLineItems = onlineOrder.getPackedLineItems();
 
-        for (CustomerOrderLI coli : packedLineItems) {
+        if (actionBy == null || !(actionBy instanceof WarehouseSite) || !(actionBy instanceof StoreSite)) {
+            throw new CustomerOrderException("Site is not authorised to cancel the order.");
+        } else if (actionBy instanceof WarehouseSite) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.CANCELLED));
+        } else {
+            onlineOrder.setSite(siteService.getSite(3L));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.CANCELLED));
+        }
+        
+        return em.merge(onlineOrder);
+    }
+
+    @Override
+    public OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
+        Site actionBy = em.find(Site.class, siteId);
+
+        if (actionBy == null || !actionBy.equals(onlineOrder.getSite())) {
+            throw new CustomerOrderException("Site is unauthorised to pick/pack this order.");
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PENDING) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.PICKING));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PICKING) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.PICKED));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PICKED) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.PACKING));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PACKING) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.PACKED));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PACKED) {
+            if (onlineOrder.getSite().equals(onlineOrder.getPickupSite())) {
+                onlineOrder.addStatusHistory(
+                        new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.READY_FOR_COLLECTION));
+            } else {
+                onlineOrder.addStatusHistory(
+                        new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.READY_FOR_DELIVERY));
+            }
+        }
+
+        return em.merge(onlineOrder);
+    }
+
+    @Override
+    public OnlineOrder scanProduct(Long orderId, String rfidsku, int qty)
+            throws CustomerOrderException, ProductException {
+
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
+
+        if (onlineOrder.getLastStatus() != OnlineOrderStatus.PICKING) {
+            throw new CustomerOrderException("Order does not need picking.");
+        }
+
+        Product product = productService.getProduct(rfidsku);
+        List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
+
+        for (CustomerOrderLI coli : lineItems) {
             if (coli.getProduct().equals(product)) {
-                int requiredQty = lineItems.stream()
-                        .filter(x -> x.getProduct().equals(coli.getProduct()))
-                        .findAny()
-                        .get()
-                        .getQty();
-                if (coli.getQty() + qty > requiredQty) {
+                if (coli.getPackedQty() + qty > coli.getQty()) {
                     throw new CustomerOrderException("There will be too many quantity of this product.");
                 } else {
-                    coli.setQty(coli.getQty() + qty);
-                    onlineOrder.setPackedLineItems(packedLineItems);
-                    // siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(),
-                    // Long.valueOf(qty));
+                    coli.setPackedQty(coli.getPackedQty() + qty);
+                    try {
+                        siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(), qty);
+                    } catch (NoStockLevelException | IllegalTransferException e) {
+                        e.printStackTrace();
+                    }
+
+                    boolean picked = true;
+                    for (CustomerOrderLI coli2 : lineItems) {
+                        if (coli2.getPackedQty() < coli2.getQty()) {
+                            picked = false;
+                        }
+                    }
+                    if (picked) {
+                        onlineOrder.addStatusHistory(
+                                new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.PICKED));
+                    }
                     return em.merge(onlineOrder);
                 }
             }
         }
-
-        for (CustomerOrderLI coli : lineItems) {
-            if (coli.getProduct().equals(product)) {
-                CustomerOrderLI lineItem = new CustomerOrderLI(qty, product);
-                createCustomerOrderLI(lineItem);
-                onlineOrder.addPackedLineItems(lineItem);
-                // siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(),
-                // Long.valueOf(qty));
-                return em.merge(onlineOrder);
-            }
-        }
-
         throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
     }
 
     @Override
-    public OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) {
-        // TODO Auto-generated method stub
-        return null;
+    public OnlineOrder deliverOnlineOrder(Long orderId) throws CustomerOrderException {
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
+
+        if (onlineOrder.getLastStatus() == OnlineOrderStatus.READY_FOR_DELIVERY) {
+            onlineOrder.addStatusHistory(
+                    new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.DELIVERING));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.DELIVERING) {
+            onlineOrder.addStatusHistory(
+                    new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.DELIVERED));
+        } else {
+            throw new CustomerOrderException("Order is not up for delivery.");
+        }
+
+        return em.merge(onlineOrder);
+    }
+
+    // Only for self-pickup order
+    @Override
+    public OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
+        Site actionBy = em.find(Site.class, siteId);
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
+
+        if (actionBy == null || !actionBy.equals(onlineOrder.getPickupSite())) {
+            throw new CustomerOrderException("Site is not supposed to be receiving this order.");
+        } else if (onlineOrder.getLastStatus() != OnlineOrderStatus.DELIVERING) {
+            throw new CustomerOrderException("Order is not ready for delivery.");
+        }
+
+        onlineOrder.addStatusHistory(
+                new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.READY_FOR_COLLECTION));
+        return em.merge(onlineOrder);
     }
 
     @Override
-    public OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    public OnlineOrder collectOnlineOrder(Long orderId) throws CustomerOrderException {
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 
-    @Override
-    public OnlineOrder deliveryOnlineOrder(Long orderId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        if (onlineOrder.getLastStatus() != OnlineOrderStatus.READY_FOR_COLLECTION) {
+            throw new CustomerOrderException("Order is not ready for collection.");
+        }
 
-    @Override
-    public OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public OnlineOrder completeOnlineOrder(Long orderId) {
-        // TODO Auto-generated method stub
-        return null;
+        onlineOrder.addStatusHistory(
+                new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.COLLECTED));
+        return em.merge(onlineOrder);
     }
 }

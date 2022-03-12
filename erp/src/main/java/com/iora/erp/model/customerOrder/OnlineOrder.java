@@ -10,8 +10,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.enumeration.OnlineOrderStatus;
+import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 
 @Entity
@@ -22,10 +24,7 @@ public class OnlineOrder extends CustomerOrder {
 
     private boolean delivery;
 
-    @ElementCollection
-    private List<CustomerOrderLI> packedLineItems;
-
-    @JsonBackReference(value="pickupSite-onlineOrder")
+    @JsonBackReference(value = "pickupSite-onlineOrder")
     @ManyToOne
     private StoreSite pickupSite;
 
@@ -34,10 +33,13 @@ public class OnlineOrder extends CustomerOrder {
 
     private String deliveryAddress;
 
+    @ElementCollection
+    private List<OOStatus> statusHistory;
+
     public OnlineOrder() {
         super();
         this.status = OnlineOrderStatus.PENDING;
-        this.packedLineItems = new ArrayList<>();
+        this.statusHistory = new ArrayList<>();
     }
 
     public OnlineOrder(boolean delivery, Country country) {
@@ -60,18 +62,6 @@ public class OnlineOrder extends CustomerOrder {
 
     public boolean getDelivery() {
         return this.delivery;
-    }
-    
-    public List<CustomerOrderLI> getPackedLineItems() {
-        return this.packedLineItems;
-    }
-
-    public void setPackedLineItems(List<CustomerOrderLI> packedLineItems) {
-        this.packedLineItems = packedLineItems;
-    }
-
-    public void addPackedLineItems(CustomerOrderLI packedLineItem) {
-        this.packedLineItems.add(packedLineItem);
     }
 
     public void setDelivery(boolean delivery) {
@@ -100,5 +90,35 @@ public class OnlineOrder extends CustomerOrder {
 
     public void setDeliveryAddress(String deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
+    }
+
+    public List<OOStatus> getStatusHistory() {
+        return this.statusHistory;
+    }
+
+    public void setStatusHistory(List<OOStatus> statusHistory) {
+        this.statusHistory = statusHistory;
+    }
+
+    public void addStatusHistory(OOStatus statusHistory) {
+        this.statusHistory.add(statusHistory);
+    }
+
+    @JsonIgnore
+    public OnlineOrderStatus getLastStatus() {
+        try {
+            return this.statusHistory.get(this.statusHistory.size() - 1).getStatus();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    @JsonIgnore
+    public Site getLastActor() {
+        try {
+            return this.statusHistory.get(this.statusHistory.size() - 1).getActionBy();
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

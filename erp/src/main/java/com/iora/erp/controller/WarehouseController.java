@@ -167,20 +167,4 @@ public class WarehouseController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
-    @PatchMapping(path = "/scan/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> scanProduct(@PathVariable Long orderId, @RequestParam String barcode) {
-        try {
-            if (!barcode.contains("/")) {
-                return ResponseEntity.ok(customerOrderService.scanProduct(orderId, barcode, 1));
-            } else {
-                return ResponseEntity
-                        .ok(customerOrderService.scanProduct(orderId, barcode.substring(0, barcode.indexOf("/")),
-                                Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
-            }
-
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
 }

@@ -4,7 +4,7 @@ import { api, stockLevelApi } from "../../environments/Api";
 
 const initialState = {
   currSiteStock: {},
-  prodStockLevel: {},
+  prodStockLevel: null,
   status: "idle",
   error: null
 };

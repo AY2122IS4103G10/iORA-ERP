@@ -132,6 +132,12 @@ public class StoreController {
         }
     }
 
+    /*
+     * ---------------------------------------------------------
+     * Stock Transfer Order
+     * ---------------------------------------------------------
+     */
+
     @GetMapping(path = "/stockTransfer/all", produces = "application/json")
     public List<StockTransferOrder> getStockTransferOrders() {
         return stockTransferService.getStockTransferOrders();
@@ -223,6 +229,24 @@ public class StoreController {
                         stockTransferService.scanProductAtFromSite(orderId, barcode.substring(0, barcode.indexOf("/")),
                                 Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
             }
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/deliver/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverStockTransferOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(stockTransferService.deliverStockTransferOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/receive/{orderId}/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> receiveStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+        try {
+            return ResponseEntity.ok(stockTransferService.receiveStockTransferOrder(orderId, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

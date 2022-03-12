@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.StockTransferStatus;
+import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
@@ -227,10 +228,16 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         for (StockTransferOrderLI stoli : lineItems) {
             if (stoli.getProduct().equals(product)) {
-                if (stoli.getSentQty() + qty > stoli.getSentQty()) {
+                if (stoli.getSentQty() + qty > stoli.getRequestedQty()) {
                     throw new StockTransferException("There will be too many quantity of this product.");
                 } else {
                     stoli.setSentQty(stoli.getSentQty() + qty);
+                    try {
+                        siteService.removeProducts(stOrder.getFromSite().getId(), product.getSku(), qty);
+                    } catch (NoStockLevelException | IllegalTransferException e) {
+                        e.printStackTrace();
+                    }
+
                     boolean picked = true;
                     for (StockTransferOrderLI stoli2 : lineItems) {
                         if (stoli2.getSentQty() < stoli2.getRequestedQty()) {

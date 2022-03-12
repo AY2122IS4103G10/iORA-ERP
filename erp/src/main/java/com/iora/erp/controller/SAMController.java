@@ -44,8 +44,6 @@ public class SAMController {
     private SiteService siteService;
     @Autowired
     private ProcurementService procurementService;
-    // @Autowired
-    // private StockTransferService stockTransferService;
 
     /*
      * ---------------------------------------------------------

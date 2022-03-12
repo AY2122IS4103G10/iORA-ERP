@@ -20,13 +20,15 @@ public class ProcurementOrderLI {
     private Product product;
 
     private int requestedQty;
-    private int fulfilledQty;
-    private int actualQty;
+    private int pickedQty;
+    private int packedQty;
+    private int receivedQty;
 
     public ProcurementOrderLI() {
         this.requestedQty = 0;
-        this.fulfilledQty = 0;
-        this.actualQty = 0;
+        this.pickedQty = 0;
+        this.packedQty = 0;
+        this.receivedQty = 0;
     }
 
 
@@ -61,20 +63,28 @@ public class ProcurementOrderLI {
         this.requestedQty = requestedQty;
     }
 
-    public int getFulfilledQty() {
-        return this.fulfilledQty;
+    public int getPickedQty() {
+        return this.pickedQty;
     }
 
-    public void setFulfilledQty(int fulfilledQty) {
-        this.fulfilledQty = fulfilledQty;
+    public void setPickedQty(int pickedQty) {
+        this.pickedQty = pickedQty;
     }
 
-    public int getActualQty() {
-        return this.actualQty;
+    public int getPackedQty() {
+        return this.packedQty;
     }
 
-    public void setActualQty(int actualQty) {
-        this.actualQty = actualQty;
+    public void setPackedQty(int packedQty) {
+        this.packedQty = packedQty;
+    }
+
+    public int getReceivedQty() {
+        return this.receivedQty;
+    }
+
+    public void setReceivedQty(int receivedQty) {
+        this.receivedQty = receivedQty;
     }
     
     @Override
@@ -99,5 +109,4 @@ public class ProcurementOrderLI {
                 " id='" + getId() + "'" +
                 "}";
     }
-
 }

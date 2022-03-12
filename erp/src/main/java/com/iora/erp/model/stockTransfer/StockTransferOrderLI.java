@@ -19,13 +19,15 @@ public class StockTransferOrderLI {
     @ManyToOne(optional = false)
     private Product product;
     private int requestedQty;
-    private int sentQty;
-    private int actualQty;
+    private int pickedQty;
+    private int packedQty;
+    private int receivedQty;
 
     public StockTransferOrderLI() {
         this.requestedQty = 0;
-        this.sentQty = 0;
-        this.actualQty = 0;
+        this.pickedQty = 0;
+        this.packedQty = 0;
+        this.receivedQty = 0;
     }
 
     public StockTransferOrderLI(Product product, int requestedQty) {
@@ -58,20 +60,28 @@ public class StockTransferOrderLI {
         this.requestedQty = requestedQty;
     }
 
-    public Integer getSentQty() {
-        return this.sentQty;
+    public Integer getPickedQty() {
+        return this.pickedQty;
     }
 
-    public void setSentQty(Integer sentQty) {
-        this.sentQty = sentQty;
+    public void setPickedQty(Integer pickedQty) {
+        this.pickedQty = pickedQty;
     }
 
-    public Integer getActualQty() {
-        return this.actualQty;
+    public int getPackedQty() {
+        return this.packedQty;
     }
 
-    public void setActualQty(Integer actualQty) {
-        this.actualQty = actualQty;
+    public void setPackedQty(int packedQty) {
+        this.packedQty = packedQty;
+    }
+
+    public Integer getReceivedQty() {
+        return this.receivedQty;
+    }
+
+    public void setReceivedQty(Integer receivedQty) {
+        this.receivedQty = receivedQty;
     }
 
     @Override

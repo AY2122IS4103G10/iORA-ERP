@@ -65,14 +65,18 @@ public class StockTransferServiceImpl implements StockTransferService {
 
     @Override
     public List<StockTransferOrder> getStockTransferOrdersForDelivery() {
-        /* TypedQuery<StockTransferOrder> q = em.createQuery(
-                "SELECT DISTINCT(sto) FROM StockTransferOrder sto RIGHT JOIN .statusHistory st WHERE st.status = 'READY_FOR_DELIVERY' OR st.status = 'DELIVERING' ORDER BY st.timeStamp DESC", StockTransferOrder.class);
-                q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY); */
+        /*
+         * TypedQuery<StockTransferOrder> q = em.createQuery(
+         * "SELECT DISTINCT(sto) FROM StockTransferOrder sto RIGHT JOIN .statusHistory st WHERE st.status = 'READY_FOR_DELIVERY' OR st.status = 'DELIVERING' ORDER BY st.timeStamp DESC"
+         * , StockTransferOrder.class);
+         * q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY);
+         */
 
         List<StockTransferOrder> deliveryOrders = new ArrayList<>();
-        
+
         for (StockTransferOrder sto : getStockTransferOrders()) {
-            if (sto.getLastStatus() == StockTransferStatus.READY_FOR_DELIVERY || sto.getLastStatus() == StockTransferStatus.DELIVERING) {
+            if (sto.getLastStatus() == StockTransferStatus.READY_FOR_DELIVERY
+                    || sto.getLastStatus() == StockTransferStatus.DELIVERING) {
                 deliveryOrders.add(sto);
             }
         }
@@ -219,28 +223,17 @@ public class StockTransferServiceImpl implements StockTransferService {
             throws StockTransferException, ProductException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
 
-        if (stOrder.getLastStatus() != StockTransferStatus.PICKING) {
-            throw new StockTransferException("Order does not need picking.");
-        }
-
         Product product = productService.getProduct(rfidsku);
         List<StockTransferOrderLI> lineItems = stOrder.getLineItems();
 
-        for (StockTransferOrderLI stoli : lineItems) {
-            if (stoli.getProduct().equals(product)) {
-                if (stoli.getSentQty() + qty > stoli.getRequestedQty()) {
-                    throw new StockTransferException("There will be too many quantity of this product.");
-                } else {
-                    stoli.setSentQty(stoli.getSentQty() + qty);
-                    try {
-                        siteService.removeProducts(stOrder.getFromSite().getId(), product.getSku(), qty);
-                    } catch (NoStockLevelException | IllegalTransferException e) {
-                        e.printStackTrace();
-                    }
+        if (stOrder.getLastStatus() == StockTransferStatus.PICKING) {
+            for (StockTransferOrderLI stoli : lineItems) {
+                if (stoli.getProduct().equals(product)) {
+                    stoli.setPickedQty(stoli.getPickedQty() + qty);
 
                     boolean picked = true;
                     for (StockTransferOrderLI stoli2 : lineItems) {
-                        if (stoli2.getSentQty() < stoli2.getRequestedQty()) {
+                        if (stoli2.getPickedQty() < stoli2.getRequestedQty()) {
                             picked = false;
                         }
                     }
@@ -248,11 +241,43 @@ public class StockTransferServiceImpl implements StockTransferService {
                         stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), LocalDateTime.now(),
                                 StockTransferStatus.PICKED));
                     }
+
                     return em.merge(stOrder);
+
                 }
             }
+            throw new StockTransferException("The product scanned is not required in the order that you are picking");
+        } else if (stOrder.getLastStatus() == StockTransferStatus.PACKING) {
+            for (StockTransferOrderLI stoli : lineItems) {
+                if (stoli.getProduct().equals(product)) {
+                    if (stoli.getPackedQty() + qty > stoli.getPickedQty()) {
+                        throw new StockTransferException("You are packing items that are not meant for this order.");
+                    } else {
+                        stoli.setPackedQty(stoli.getPackedQty() + qty);
+                        try {
+                            siteService.removeProducts(stOrder.getFromSite().getId(), product.getSku(), qty);
+                        } catch (NoStockLevelException | IllegalTransferException e) {
+                            e.printStackTrace();
+                        }
+
+                        boolean packed = true;
+                        for (StockTransferOrderLI stoli2 : lineItems) {
+                            if (stoli2.getPackedQty() < stoli2.getPickedQty()) {
+                                packed = false;
+                            }
+                        }
+                        if (packed) {
+                            stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), LocalDateTime.now(),
+                                    StockTransferStatus.PACKED));
+                        }
+                        return em.merge(stOrder);
+                    }
+                }
+            }
+            throw new StockTransferException("The product scanned is not required in the order that you are packing");
+        } else {
+            throw new StockTransferException("The order is not due for picking / packing.");
         }
-        throw new StockTransferException("The product scanned is not required in the order that you are picking");
     }
 
     @Override
@@ -300,10 +325,10 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         for (StockTransferOrderLI stoli : lineItems) {
             if (stoli.getProduct().equals(product)) {
-                stoli.setActualQty(stoli.getActualQty() + qty);
+                stoli.setReceivedQty(stoli.getReceivedQty() + qty);
                 boolean picked = true;
                 for (StockTransferOrderLI stoli2 : lineItems) {
-                    if (stoli2.getActualQty() < stoli2.getSentQty()) {
+                    if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
                         picked = false;
                     }
                 }

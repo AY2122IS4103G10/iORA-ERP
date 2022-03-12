@@ -572,7 +572,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             onlineOrder.setSite(siteService.getSite(3L));
             onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.CANCELLED));
         }
-        
+
         return em.merge(onlineOrder);
     }
 
@@ -610,28 +610,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 
-        if (onlineOrder.getLastStatus() != OnlineOrderStatus.PICKING) {
-            throw new CustomerOrderException("Order does not need picking.");
-        }
-
         Product product = productService.getProduct(rfidsku);
         List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
 
-        for (CustomerOrderLI coli : lineItems) {
-            if (coli.getProduct().equals(product)) {
-                if (coli.getPackedQty() + qty > coli.getQty()) {
-                    throw new CustomerOrderException("There will be too many quantity of this product.");
-                } else {
-                    coli.setPackedQty(coli.getPackedQty() + qty);
-                    try {
-                        siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(), qty);
-                    } catch (NoStockLevelException | IllegalTransferException e) {
-                        e.printStackTrace();
-                    }
-
+        if (onlineOrder.getLastStatus() == OnlineOrderStatus.PICKING) {
+            for (CustomerOrderLI coli : lineItems) {
+                if (coli.getProduct().equals(product)) {
+                    coli.setPickedQty(coli.getPickedQty() + qty);
                     boolean picked = true;
                     for (CustomerOrderLI coli2 : lineItems) {
-                        if (coli2.getPackedQty() < coli2.getQty()) {
+                        if (coli2.getPickedQty() < coli2.getQty()) {
                             picked = false;
                         }
                     }
@@ -642,8 +630,39 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     return em.merge(onlineOrder);
                 }
             }
+            throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
+
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PACKING) {
+            for (CustomerOrderLI coli : lineItems) {
+                if (coli.getProduct().equals(product)) {
+                    if (coli.getPackedQty() + qty > coli.getPickedQty()) {
+                        throw new CustomerOrderException("You are packing items that are not meant for this order.");
+                    } else {
+                        coli.setPackedQty(coli.getPackedQty() + qty);
+                        try {
+                            siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(), qty);
+                        } catch (NoStockLevelException | IllegalTransferException e) {
+                            e.printStackTrace();
+                        }
+
+                        boolean packed = true;
+                        for (CustomerOrderLI coli2 : lineItems) {
+                            if (coli2.getPackedQty() < coli2.getPickedQty()) {
+                                packed = false;
+                            }
+                        }
+                        if (packed) {
+                            onlineOrder.addStatusHistory(
+                                    new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.PACKED));
+                        }
+                        return em.merge(onlineOrder);
+                    }
+                }
+            }
+            throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
+        } else {
+            throw new CustomerOrderException("The order is not due for picking / packing.");
         }
-        throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
     }
 
     @Override

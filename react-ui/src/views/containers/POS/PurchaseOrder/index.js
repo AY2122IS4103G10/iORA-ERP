@@ -112,8 +112,6 @@ const OrderList = ({
   Modify,
   clear,
   openModal,
-  closeModal,
-  qty,
 }) => (
   <main>
     <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4">
@@ -173,7 +171,7 @@ const OrderList = ({
                             {productDetails.get(lineItem.product.sku)?.colour}
                             &nbsp; -- &nbsp;
                             {productDetails.get(lineItem.product.sku)?.size !==
-                            null
+                              null
                               ? productDetails.get(lineItem.product.sku)?.size
                               : null}{" "}
                             &nbsp;
@@ -322,8 +320,6 @@ const OrderList = ({
 
 export const PosPurchaseOrder = () => {
   const [modalState, setModalState] = useState(false);
-  const openModal = () => setModalState(true);
-  const closeModal = () => setModalState(false);
   const [rfid, setRfid] = useState("");
   const [lineItems, setLineItems] = useState([]);
   const [promotions, setPromotions] = useState([]);
@@ -331,6 +327,8 @@ export const PosPurchaseOrder = () => {
   const [amount, setAmount] = useState(0);
   const { addToast } = useToasts();
 
+  const openModal = () => setModalState(true);
+  const closeModal = () => setModalState(false);
   const onRfidChanged = (e) => {
     if (
       e.target.value.length - rfid.length > 10 &&
@@ -344,10 +342,11 @@ export const PosPurchaseOrder = () => {
   const addProduct = async (rfid) => {
     try {
       const response = await posApi.addProductToLineItems(rfid, lineItems);
-      console.log(response);
       setLineItems(response.data);
-      const detail = await api.get("store/productDetails", rfid);
-      setProductDetails(productDetails.set(rfid, detail.data));
+      if (!productDetails.has(rfid)) {
+        const detail = await api.get("store/productDetails", rfid);
+        setProductDetails(productDetails.set(rfid, detail.data));
+      }
       setAmount(response.data.map((x) => x.subTotal).reduce((x, y) => x + y));
       setRfid("");
     } catch (err) {
@@ -379,7 +378,6 @@ export const PosPurchaseOrder = () => {
           .reduce((x, y) => x + y, 0)
       );
     }
-
     calculate();
   }, [setPromotions, lineItems]);
 
@@ -435,7 +433,6 @@ export const PosPurchaseOrder = () => {
         Modify={Modify}
         clear={clear}
         openModal={openModal}
-        closeModal={closeModal}
       />
       <PaymentModal open={modalState} closeModal={closeModal} />
     </>

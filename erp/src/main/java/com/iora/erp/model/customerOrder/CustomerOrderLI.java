@@ -21,6 +21,7 @@ public class CustomerOrderLI {
     private int qty;
 
     // Used only for onlineOrder
+    private int pickedQty;
     private int packedQty;
 
     @ManyToOne(optional = false)
@@ -30,6 +31,7 @@ public class CustomerOrderLI {
     private double subTotal;
 
     public CustomerOrderLI() {
+        this.pickedQty = 0;
         this.packedQty = 0;
     }
 
@@ -60,6 +62,14 @@ public class CustomerOrderLI {
 
     public void setQty(int qty) {
         this.qty = qty;
+    }
+
+    public int getPickedQty() {
+        return this.pickedQty;
+    }
+
+    public void setPickedQty(int pickedQty) {
+        this.pickedQty = pickedQty;
     }
 
     public int getPackedQty() {

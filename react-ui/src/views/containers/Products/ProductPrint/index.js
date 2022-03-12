@@ -124,7 +124,13 @@ const StickerModal = ({ open, closeModal, product }) => {
 export const ProductPrint = () => {
   const { addToast } = useToasts();
   const componentRef = useRef();
-  const handlePrint = useReactToPrint({ content: () => componentRef.current });
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    onBeforeGetContent: (product) => {
+      onProductSelectedChanged(product);
+      return Promise.resolve();
+    },
+  });
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
@@ -136,7 +142,6 @@ export const ProductPrint = () => {
     evt.preventDefault();
     if (canSearch) {
       const skus = search.split(",").map((sku) => sku.trim());
-      console.log(skus)
       productApi.searchProductsBySku(skus).then((response) => {
         const products = response.data;
         if (response.data !== "") {

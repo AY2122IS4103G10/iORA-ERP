@@ -388,7 +388,7 @@ export const MembershipTierForm = () => {
 
   useEffect(() => {
     Boolean(tierName) &&
-      api.get("sam/membershipTier/", `?name=${tierName}`).then((response) => {
+      api.get("sam/membershipTier", `?name=${tierName}`).then((response) => {
         const { name, currency, multiplier, minSpend, birthday } =
           response.data;
         setIsEditing(true);

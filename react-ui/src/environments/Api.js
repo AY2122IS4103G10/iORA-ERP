@@ -78,6 +78,16 @@ export const procurementApi = {
       `${REST_ENDPOINT}manufacturing/procurementOrder/cancel/${orderId}/${siteId}`
     );
   },
+  manufactureOrder(orderId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/manu/${orderId}`
+    );
+  },
+  scanItem(orderId, barcode) {
+    return axiosPrivate.patch(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/scan/${orderId}/${barcode}`
+    );
+  },
   fulfillOrder(siteId, order) {
     return axiosPrivate.put(
       `${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`,
@@ -260,7 +270,7 @@ export const productApi = {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/product?sku=${sku}`);
   },
   searchProductsBySku(skus) {
-    return axiosPrivate.get(`${REST_ENDPOINT}sam/products`, skus);
+    return axiosPrivate.post(`${REST_ENDPOINT}sam/products`, skus);
   },
 };
 

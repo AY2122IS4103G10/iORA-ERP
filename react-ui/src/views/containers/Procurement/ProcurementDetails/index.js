@@ -55,40 +55,40 @@ const ItemsSummary = ({
         Header: "Fulfilled",
         accessor: "fulfilledQty",
         disableSortBy: true,
-        Cell: (row) =>
-          status === "PENDING" ||
-          status === "CANCELLED" ||
-          status === "ACCEPTED"
-            ? "-"
-            : row.row.original.fulfilledProductItems.length,
+        // Cell: (row) =>
+        //   status === "PENDING" ||
+        //   status === "CANCELLED" ||
+        //   status === "ACCEPTED"
+        //     ? "-"
+        //     : row.row.original.fulfilledProductItems.length,
       },
-      {
-        Header: "Shipped",
-        accessor: "",
-        Cell: (row) => {
-          return status === "SHIPPED" ||
-            status === "VERIFIED" ||
-            status === "COMPLETED"
-            ? row.row.original.fulfilledProductItems.length
-            : "-";
-        },
-      },
-      {
-        Header: "Received",
-        accessor: "actualQty",
-        Cell: (row) => {
-          return status === "SHIPPED" && pathname.includes("wh") ? (
-            <EditableCell
-              value={0}
-              row={row.row}
-              column={row.column}
-              updateMyData={updateMyData}
-            />
-          ) : (
-            "-"
-          );
-        },
-      },
+      // {
+      //   Header: "Shipped",
+      //   accessor: "",
+      //   Cell: (row) => {
+      //     return status === "SHIPPED" ||
+      //       status === "VERIFIED" ||
+      //       status === "COMPLETED"
+      //       ? row.row.original.fulfilledProductItems.length
+      //       : "-";
+      //   },
+      // },
+      // {
+      //   Header: "Received",
+      //   accessor: "actualQty",
+      //   Cell: (row) => {
+      //     return status === "SHIPPED" && pathname.includes("wh") ? (
+      //       <EditableCell
+      //         value={0}
+      //         row={row.row}
+      //         column={row.column}
+      //         updateMyData={updateMyData}
+      //       />
+      //     ) : (
+      //       "-"
+      //     );
+      //   },
+      // },
     ];
   }, [setData, status, pathname]);
   return (
@@ -199,7 +199,6 @@ export const ProcurementDetails = () => {
     lineItems,
     setLineItems,
   } = useOutletContext();
-  // const { procurementId } = useParams();
   const { pathname } = useLocation();
 
   return (

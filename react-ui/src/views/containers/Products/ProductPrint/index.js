@@ -36,18 +36,6 @@ const ProductList = ({
                     </p>
                   </button>
                 </div>
-                {/* <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-                    onClick={() => {
-                      onProductSelectedChanged(product);
-                      openModal();
-                    }}
-                  >
-                    <span>View Sticker</span>
-                  </button>
-                </div> */}
 
                 <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
                   <div>
@@ -87,17 +75,15 @@ const ProductList = ({
   );
 };
 
-const ProductSticker = ({ key, product }) => {
+const ProductSticker = ({ product }) => {
   const { sku } = product;
   return (
-    // <div ref={ref}>
     <div className="max-w-3xl mx-auto px-4 py-6 sm:px-6 sm:py-24 lg:px-8">
       <div className="space-y-2 sm:px-0 sm:flex sm:items-baseline sm:justify-between sm:space-y-0">
         <h1 className="tracking-tight text-base">{sku}</h1>
       </div>
       <Barcode value={sku} width={1} height={100} margin={0} />
     </div>
-    // </div>
   );
 };
 
@@ -134,10 +120,17 @@ const StickerModal = ({ open, closeModal, product }) => {
     </SimpleModal>
   );
 };
+
 export const ProductPrint = () => {
   const { addToast } = useToasts();
   const componentRef = useRef();
-  const handlePrint = useReactToPrint({ content: () => componentRef.current });
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    onBeforeGetContent: (product) => {
+      onProductSelectedChanged(product);
+      return Promise.resolve();
+    },
+  });
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
@@ -147,11 +140,11 @@ export const ProductPrint = () => {
   const canSearch = Boolean(search);
   const onSearchClicked = (evt) => {
     evt.preventDefault();
-    if (canSearch)
-      productApi.searchProductsBySku(search).then((response) => {
+    if (canSearch) {
+      const skus = search.split(",").map((sku) => sku.trim());
+      productApi.searchProductsBySku(skus).then((response) => {
         const products = response.data;
         if (response.data !== "") {
-          console.log(products);
           setProducts(products);
         } else
           addToast(`Error: Product(s) not found.`, {
@@ -159,12 +152,8 @@ export const ProductPrint = () => {
             autoDismiss: true,
           });
       });
+    }
   };
-
-  // const onPrintClicked = (evt) => {
-  //   evt.preventDefault()
-
-  // }
 
   const onSearchChanged = (e) => setSearch(e.target.value);
   const onProductSelectedChanged = (e) => setProductSelected(e);
@@ -180,32 +169,30 @@ export const ProductPrint = () => {
           <div className="bg-white shadow sm:rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Print Product Sticker
+                Print Product Label(s)
               </h3>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
                 <p>Scan barcode or enter product SKU.</p>
               </div>
-              <form
-                className="mt-5 sm:flex sm:items-center"
-                onSubmit={onSearchClicked}
-              >
-                <div className="w-full sm:max-w-xs">
-                  <label htmlFor="sku" className="sr-only">
-                    Product SKU
-                  </label>
-                  <input
-                    type="text"
-                    name="sku"
-                    id="sku"
-                    className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                    placeholder="Search products..."
-                    value={search}
-                    onChange={onSearchChanged}
-                  />
+              <form onSubmit={onSearchClicked}>
+                <div className="mt-5 sm:flex sm:items-center">
+                  <div className="w-full sm:max-w-md">
+                    <label htmlFor="sku" className="sr-only">
+                      Product SKU
+                    </label>
+                    <textarea
+                      rows={4}
+                      name="skus"
+                      id="skus"
+                      className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      value={search}
+                      onChange={onSearchChanged}
+                    />
+                  </div>
                 </div>
                 <button
                   type="submit"
-                  className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-3 sm:w-auto sm:text-sm"
                 >
                   Search
                 </button>

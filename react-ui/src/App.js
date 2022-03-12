@@ -78,6 +78,10 @@ import { OrderList } from "./views/containers/Orders/OrderList/index.js";
 import { OrderSearch } from "./views/containers/Orders/OrderSearch/index.js";
 import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper/index.js";
 import { CustomerOrderDetails } from "./views/containers/Orders/CustomerOrderDetails/index.js";
+import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTransferWrapper/index.js";
+import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack/index.js";
+import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList/index.js";
+import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -127,12 +131,30 @@ function App() {
             </Route>
             {/* Stock Transfer Orders */}
             <Route path="stocktransfer" element={<Outlet />}>
-              <Route index element={<ManageStockTransfer subsys="sm" />} />
+              <Route
+                index
+                element={
+                  <ManageStockTransfer subsys="sm">
+                    <StockTransferList subsys="sm" />
+                  </ManageStockTransfer>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageStockTransfer subsys="sm">
+                    <StockTransferSearch subsys="sm" />
+                  </ManageStockTransfer>
+                }
+              />
               <Route
                 path="create"
                 element={<StockTransferForm subsys="sm" />}
               />
-              <Route path=":id" element={<ViewStockTransfer subsys="sm" />} />
+              <Route path=":id" element={<StockTransferWrapper subsys="sm" />}>
+                <Route index element={<ViewStockTransfer subsys="sm" />} />
+                <Route path="pick-pack" element={<StockTransferPickPack />} />
+              </Route>
               <Route
                 path="edit/:id"
                 element={<StockTransferForm subsys="sm" />}
@@ -204,6 +226,8 @@ function App() {
               <Route path="create" element={<VoucherForm />} />
               <Route path="edit/:voucherId" element={<VoucherForm />} />
             </Route>
+
+            {/* Customers */}
             <Route path="customers" element={<Outlet />}>
               <Route index element={<ManageCustomer />} />
               <Route path=":customerId" element={<CustomerDetails />} />
@@ -239,14 +263,32 @@ function App() {
                 element={<AProductStock subsys="str" />}
               />
             </Route>
-
+{/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
-              <Route index element={<ManageStockTransfer subsys="str" />} />
+            <Route
+                index
+                element={
+                  <ManageStockTransfer subsys="str">
+                    <StockTransferList subsys="str" />
+                  </ManageStockTransfer>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageStockTransfer subsys="str">
+                    <StockTransferSearch subsys="str" />
+                  </ManageStockTransfer>
+                }
+              />
               <Route
                 path="create"
                 element={<StockTransferForm subsys="str" />}
               />
-              <Route path=":id" element={<ViewStockTransfer subsys="str" />} />
+              <Route path=":id" element={<StockTransferWrapper subsys="str" />}>
+                <Route index element={<ViewStockTransfer subsys="str" />} />
+                <Route path="pick-pack" element={<StockTransferPickPack />} />
+              </Route>
               <Route
                 path="edit/:id"
                 element={<StockTransferForm subsys="str" />}
@@ -368,6 +410,7 @@ function App() {
                 }
               />
             </Route>
+            {/* Stock Levels */}
             <Route path="stocklevels">
               <Route path="my/:id" element={<StockLevelForm subsys="wh" />} />
               <Route path="my" element={<MyStoreStock subsys="wh" />} />
@@ -406,6 +449,7 @@ function App() {
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
               </Route>
             </Route>
+
             {/* Online Orders */}
             <Route path="online-orders" element={<Outlet />}>
               <Route
@@ -433,14 +477,32 @@ function App() {
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
               </Route> */}
             </Route>
-
+            {/* Stock Transfer Orders */}
             <Route path="stocktransfer" element={<Outlet />}>
-              <Route index element={<ManageStockTransfer subsys="wh" />} />
+              <Route
+                index
+                element={
+                  <ManageStockTransfer subsys="wh">
+                    <StockTransferList subsys="wh" />
+                  </ManageStockTransfer>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageStockTransfer subsys="wh">
+                    <StockTransferSearch subsys="wh" />
+                  </ManageStockTransfer>
+                }
+              />
               <Route
                 path="create"
                 element={<StockTransferForm subsys="wh" />}
               />
-              <Route path=":id" element={<ViewStockTransfer subsys="wh" />} />
+              <Route path=":id" element={<StockTransferWrapper subsys="wh" />}>
+                <Route index element={<ViewStockTransfer subsys="wh" />} />
+                <Route path="pick-pack" element={<StockTransferPickPack />} />
+              </Route>
               <Route
                 path="edit/:id"
                 element={<StockTransferForm subsys="wh" />}

@@ -64,6 +64,18 @@ export const cancelProcurement = createAsyncThunk(
   }
 );
 
+export const scanItem = createAsyncThunk(
+  "procurements/scanItem",
+  async ({ orderId, barcode }) => {
+    try {
+      const response = await procurementApi.scanItem(orderId, barcode);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.message);
+    }
+  }
+);
+
 const procurementSlice = createSlice({
   name: "procurements",
   initialState,
@@ -111,27 +123,21 @@ const procurementSlice = createSlice({
       );
     });
     builder.addCase(acceptProcurement.fulfilled, (state, action) => {
-      const {
-        id,
-        statusHistory,
-      } = action.payload;
+      const { id, statusHistory } = action.payload;
       const existingProcurement = state.procurements.find(
         (procurement) => procurement.id === id
       );
       if (existingProcurement) {
-        existingProcurement.statusHistory = statusHistory
+        existingProcurement.statusHistory = statusHistory;
       }
     });
     builder.addCase(cancelProcurement.fulfilled, (state, action) => {
-      const {
-        id,
-        statusHistory,
-      } = action.payload;
+      const { id, statusHistory } = action.payload;
       const existingProcurement = state.procurements.find(
         (procurement) => procurement.id === id
       );
       if (existingProcurement) {
-        existingProcurement.statusHistory = statusHistory
+        existingProcurement.statusHistory = statusHistory;
       }
     });
   },

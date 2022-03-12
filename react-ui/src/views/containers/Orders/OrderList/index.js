@@ -3,7 +3,7 @@ import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { orderApi } from "../../../../environments/Api";
+import { onlineOrderApi, orderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import {
@@ -25,7 +25,7 @@ const OrderTable = ({ data, handleOnClick }) => {
       {
         Header: "Total Amount",
         accessor: "totalAmount",
-        Cell: (row) => `${row.value.toFixed(2)}`
+        Cell: (row) => `${row.value.toFixed(2)}`,
       },
       {
         Header: "Status",
@@ -52,10 +52,15 @@ export const OrderList = ({ subsys }) => {
   const currSiteId = parseInt(useSelector(selectUserSite));
 
   useEffect(() => {
-    orderApi.getAll().then((response) => {
-      setData(response.data);
-    });
+    subsys === "sm"
+      ? orderApi.getAll().then((response) => {
+          setData(response.data);
+        })
+      : onlineOrderApi.getAllBySite(currSiteId).then((response) => {
+          setData(response.data);
+        });
   }, [subsys, currSiteId]);
+  console.log(data)
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);

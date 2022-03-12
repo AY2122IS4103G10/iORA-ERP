@@ -39,7 +39,7 @@ const navigation = [
   },
   {
     name: "Stock Transfer",
-    href: "/sm/stocktransfer",
+    href: "/sm/stocktransfer/search",
     icon: ArchiveIcon,
     current: false,
   },

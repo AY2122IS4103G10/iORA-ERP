@@ -93,7 +93,7 @@ public class OnlineCustomerController {
 
     @GetMapping(path = "/searchOrder/{siteId}", produces = "application/json")
     public List<OnlineOrder> searchOnlineOrders(@PathVariable Long siteId, @RequestParam String orderId) {
-        return customerOrderService.searchOnlineOrders(siteId, Long.valueOf(orderId));
+        return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
     @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")

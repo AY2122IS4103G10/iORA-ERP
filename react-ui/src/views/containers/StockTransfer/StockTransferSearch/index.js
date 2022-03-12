@@ -11,7 +11,7 @@ export const StockTransferSearch = () => {
   const onSearchClicked = (evt) => {
     evt.preventDefault();
     api
-      .get("sam/procurementOrder", search.trim())
+      .get("store/stockTransfer", search.trim())
       .then((response) =>
         navigate(pathname.replace("search", response.data.id))
       );
@@ -22,7 +22,7 @@ export const StockTransferSearch = () => {
         <div className="bg-white shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Search Procurement Order
+              Search Stock Transfer Order
             </h3>
             <div className="mt-2 max-w-xl text-sm text-gray-500">
               <p>Scan barcode or enter order number.</p>

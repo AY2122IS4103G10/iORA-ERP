@@ -305,79 +305,68 @@ export const MembershipTierForm = () => {
   const onBirthdayMultiplierChanged = (e) =>
     setBirthdayMultiplier(e.target.value);
 
-  const canAdd = [
-    name,
-    minSpend,
-    multiplier,
-    birthdayName,
-    birthdayMultiplier,
-    birthdayQuota,
-  ].every(Boolean);
-
   const onAddMembershipTierClicked = (evt) => {
     evt.preventDefault();
-    if (canAdd) {
-      if (!isEditing) {
-        dispatch(
-          addNewMembershipTier({
-            name,
-            multiplier,
-            currency: currencySelected,
-            minSpend,
-            birthday: {
-              name: birthdayName,
-              currency: birthdayCurrencySelected,
-              birthdaySpend,
-              quota: birthdayQuota,
-              multiplier: birthdayMultiplier,
-            },
-          })
-        )
-          .unwrap()
-          .then(() => {
-            addToast("Successfully added membership tier", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            navigate("/sm/customers/tiers");
-          })
-          .catch((err) => {
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            });
+    if (!isEditing) {
+      dispatch(
+        addNewMembershipTier({
+          name,
+          multiplier,
+          currency: currencySelected,
+          minSpend,
+          birthday: {
+            name: birthdayName,
+            currency: birthdayCurrencySelected,
+            birthdaySpend,
+            quota: birthdayQuota,
+            multiplier: birthdayMultiplier,
+          },
+        })
+      )
+        .unwrap()
+        .then(() => {
+          addToast("Successfully added membership tier", {
+            appearance: "success",
+            autoDismiss: true,
           });
-      } else {
-        dispatch(
-          updateExistingMembershipTier({
-            name,
-            multiplier,
-            currency: currencySelected,
-            minSpend,
-            birthday: {
-              name: birthdayName,
-              currency: birthdayCurrencySelected,
-              birthdaySpend,
-              quota: birthdayQuota,
-              multiplier: birthdayMultiplier,
-            },
-          })
-        )
-          .unwrap()
-          .then(() => {
-            addToast("Successfully updated membership tier", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            navigate(`/sm/customers/tiers/${tierName}`);
-          })
-          .catch((err) => {
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            });
+          navigate("/sm/customers/tiers");
+        })
+        .catch((err) => {
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
           });
-      }
+        });
+    } else {
+      dispatch(
+        updateExistingMembershipTier({
+          name,
+          multiplier,
+          currency: currencySelected,
+          minSpend,
+          birthday: {
+            name: birthdayName,
+            currency: birthdayCurrencySelected,
+            birthdaySpend,
+            quota: birthdayQuota,
+            multiplier: birthdayMultiplier,
+          },
+        })
+      )
+        .unwrap()
+        .then(() => {
+          addToast("Successfully updated membership tier", {
+            appearance: "success",
+            autoDismiss: true,
+          });
+          navigate(`/sm/customers/tiers/${tierName}`);
+        })
+        .catch((err) => {
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          });
+        });
     }
   };
 
@@ -388,9 +377,10 @@ export const MembershipTierForm = () => {
 
   useEffect(() => {
     Boolean(tierName) &&
-      api.get("sam/membershipTier/", `?name=${tierName}`).then((response) => {
+      api.get("sam/membershipTier", `?name=${tierName}`).then((response) => {
         const { name, currency, multiplier, minSpend, birthday } =
           response.data;
+        console.log(response.data);
         setIsEditing(true);
         setName(name);
         setMultiplier(multiplier);

@@ -1,4 +1,10 @@
-import { PencilIcon, PrinterIcon, TrashIcon, XIcon } from "@heroicons/react/outline";
+import {
+  PencilIcon,
+  PrinterIcon,
+  TrashIcon,
+  XIcon,
+} from "@heroicons/react/outline";
+import { useMemo } from "react";
 import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -14,6 +20,7 @@ import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import Confirmation from "../../../components/Modals/Confirmation";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { BasicTable } from "../../../components/Tables/BasicTable";
 import { Tabs } from "../../../components/Tabs";
 import { ProcurementInvoice } from "../ProcurementInvoice";
 
@@ -35,9 +42,9 @@ const Header = ({
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev
-            page="Procurement Orders"
-            path={`/${subsys}/procurements`}
-          />
+        page="Procurement Orders"
+        path={`/${subsys}/procurements`}
+      />
       <div className="relative pb-5 border-b border-gray-200 sm:pb-0">
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${procurementId}`}</h1>
@@ -91,7 +98,7 @@ const Header = ({
                     <span>Delete</span>
                   </button>
                 </div>
-              ) : (
+              ) : subsys === "mf" ? (
                 <div>
                   <button
                     type="button"
@@ -119,6 +126,8 @@ const Header = ({
                     <span>Cancel order</span>
                   </button>
                 </div>
+              ) : (
+                <div></div>
               )
             ) : status === "ACCEPTED" && subsys === "mf" ? (
               <div></div>
@@ -169,13 +178,14 @@ export const InvoiceModal = ({
   data,
   qrValue,
   company,
-  headquarters,
-  manufacturing,
-  warehouse,
+  createdBy,
+  fromSite,
+  toSite,
   handlePrint,
+  children,
 }) => {
   return (
-    [company, headquarters, manufacturing, warehouse].every(Boolean) && (
+    [company, createdBy, fromSite, toSite].every(Boolean) && (
       <SimpleModal open={open} closeModal={closeModal}>
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
           <div className="sm:block absolute top-0 right-0 pt-4 pr-4">
@@ -203,15 +213,56 @@ export const InvoiceModal = ({
             orderId={orderId}
             orderStatus={orderStatus}
             company={company}
-            headquarters={headquarters}
-            manufacturing={manufacturing}
-            warehouse={warehouse}
-            data={data}
+            createdBy={createdBy}
+            fromSite={fromSite}
+            toSite={toSite}
             qrValue={qrValue}
-          />
+          >
+            {children}
+          </ProcurementInvoice>
         </div>
       </SimpleModal>
     )
+  );
+};
+
+const InvoiceSummary = ({ data }) => {
+  const columns = useMemo(() => {
+    return [
+      {
+        Header: "SKU",
+        accessor: (row) => row.product.sku,
+      },
+      {
+        Header: "Color",
+        accessor: (row) =>
+          row.product.productFields.find(
+            (field) => field.fieldName === "COLOUR"
+          ).fieldValue,
+      },
+      {
+        Header: "Size",
+        accessor: (row) =>
+          row.product.productFields.find((field) => field.fieldName === "SIZE")
+            .fieldValue,
+      },
+      {
+        Header: "Quantity",
+        accessor: "requestedQty",
+      },
+    ];
+  }, []);
+  return (
+    <div className="py-8 border-b border-gray-200">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">Summary</h3>
+      </div>
+      {Boolean(data.length) && (
+        <div className="mt-4">
+          <BasicTable columns={columns} data={data} />
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -264,7 +315,9 @@ export const ProcurementWrapper = ({ subsys }) => {
         status: statusHistory[statusHistory.length - 1].status,
         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
       });
-      setQrValue(`/${subsys}/procurements/${procurementId}/pick-pack`);
+      setQrValue(
+        `http://localhost:3000/${subsys}/procurements/${procurementId}/pick-pack`
+      );
     });
   }, [subsys, procurementId]);
 
@@ -303,10 +356,13 @@ export const ProcurementWrapper = ({ subsys }) => {
         });
       })
       .then(() => {
-        addToast("Successfully accepted procurement order", {
-          appearance: "success",
-          autoDismiss: true,
-        });
+        addToast(
+          "Successfully accepted procurement order. Please print the order invoice.",
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
+        );
         closeConfirmModal();
         openInvoice();
       })
@@ -413,7 +469,11 @@ export const ProcurementWrapper = ({ subsys }) => {
       href: `/${subsys}/procurements/${procurementId}`,
       current: true,
     },
-    { name: "Pick / Pack", href: `/${subsys}/procurements/${procurementId}/pick-pack`, current: false },
+    {
+      name: "Pick / Pack",
+      href: `/${subsys}/procurements/${procurementId}/pick-pack`,
+      current: false,
+    },
     { name: "Delivery", href: "#", current: false },
   ];
 
@@ -442,6 +502,7 @@ export const ProcurementWrapper = ({ subsys }) => {
               subsys,
               procurementId,
               status,
+              setStatus,
               manufacturing,
               headquarters,
               warehouse,
@@ -462,12 +523,14 @@ export const ProcurementWrapper = ({ subsys }) => {
             orderId={procurementId}
             orderStatus={status}
             company={headquarters.company}
-            headquarters={headquarters}
-            manufacturing={manufacturing}
-            warehouse={warehouse}
+            createdBy={headquarters}
+            fromSite={manufacturing}
+            toSite={warehouse}
             data={lineItems}
             qrValue={qrValue}
-          />
+          >
+            <InvoiceSummary data={lineItems} status={status.status} />
+          </ProcurementInvoice>
         </div>
         <InvoiceModal
           open={open}
@@ -475,13 +538,15 @@ export const ProcurementWrapper = ({ subsys }) => {
           orderId={procurementId}
           orderStatus={status}
           company={headquarters.company}
-          headquarters={headquarters}
-          manufacturing={manufacturing}
-          warehouse={warehouse}
+          createdBy={headquarters}
+          fromSite={manufacturing}
+          toSite={warehouse}
           data={lineItems}
           qrValue={qrValue}
           handlePrint={handlePrint}
-        />
+        >
+          <InvoiceSummary data={lineItems} status={status} />
+        </InvoiceModal>
         {Boolean(action) && (
           <Confirmation
             title={`${action.name} "Order #${procurementId}"`}

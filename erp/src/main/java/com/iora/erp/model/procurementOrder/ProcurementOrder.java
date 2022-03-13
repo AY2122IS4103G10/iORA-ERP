@@ -41,11 +41,7 @@ public class ProcurementOrder {
     private Site warehouse;
 
     public ProcurementOrder() {
-        this.statusHistory = new ArrayList<>();
-    }
-
-    public ProcurementOrder(Long id) {
-        this.id = id;
+        this.lineItems = new ArrayList<>();
         this.statusHistory = new ArrayList<>();
     }
 
@@ -103,6 +99,10 @@ public class ProcurementOrder {
 
     public void setLineItems(List<ProcurementOrderLI> lineItems) {
         this.lineItems = lineItems;
+    }
+
+    public void addLineItem(ProcurementOrderLI lineItem) {
+        this.lineItems.add(lineItem);
     }
 
     public String getNotes() {

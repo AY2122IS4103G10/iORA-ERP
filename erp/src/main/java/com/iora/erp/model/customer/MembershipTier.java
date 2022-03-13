@@ -13,8 +13,6 @@ public class MembershipTier {
     private String name;
     @Column(nullable = false)
     private double multiplier;
-    @ManyToOne
-    private Currency currency;
     @Column(nullable = false)
     private double minSpend;
     @ManyToOne
@@ -23,10 +21,9 @@ public class MembershipTier {
     public MembershipTier() {
     }
 
-    public MembershipTier(String name, double multiplier, Currency currency, double minSpend, BirthdayPoints birthday) {
+    public MembershipTier(String name, double multiplier, double minSpend, BirthdayPoints birthday) {
         this.name = name;
         this.multiplier = multiplier;
-        this.currency = currency;
         this.minSpend = minSpend;
         this.birthday = birthday;
     }
@@ -45,14 +42,6 @@ public class MembershipTier {
 
     public void setMultiplier(double multiplier) {
         this.multiplier = multiplier;
-    }
-
-    public Currency getCurrency() {
-        return this.currency;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
     }
 
     public double getMinSpend() {

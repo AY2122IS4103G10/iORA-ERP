@@ -1,15 +1,12 @@
 package com.iora.erp.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
-import com.iora.erp.model.product.Product;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
@@ -95,40 +92,13 @@ public class StoreController {
         return siteService.getStockLevelByProduct(sku);
     }
 
-    @PostMapping(path = "/editStock/{siteId}", consumes = "application/json")
-    public ResponseEntity<Object> editStock(@RequestBody List<Map<String, Long>> toUpdate, @PathVariable Long siteId) {
-        List<String> errors = new ArrayList<>();
-
-        for (Map.Entry<String, Long> entry : toUpdate.get(0).entrySet()) {
-            try {
-                Product p = productService.getProduct(entry.getKey());
-                if (entry.getValue() < 0) {
-                    siteService.removeProducts(entry.getValue(), p.getSku(), entry.getValue().intValue());
-                } else {
-                    siteService.addProducts(entry.getValue(), p.getSku(), entry.getValue().intValue());
-                }
-            } catch (Exception ex) {
-                errors.add(ex.getMessage());
-            }
-        }
-
-        for (Map.Entry<String, Long> entry : toUpdate.get(1).entrySet()) {
-            try {
-                if (entry.getValue().equals(0L)) {
-                    siteService.removeProductsWithRfid(entry.getValue(), List.of(entry.getKey()));
-                } else {
-                    siteService.addProductsWithRfid(entry.getValue(), List.of(entry.getKey()));
-                }
-            } catch (Exception ex) {
-                errors.add(ex.getMessage());
-            }
-        }
-
-        if (errors.isEmpty()) {
-            return ResponseEntity.ok(viewStock(siteId));
-        } else {
-            System.err.println(errors);
-            return ResponseEntity.badRequest().body(String.join("\n", errors));
+    @PostMapping(path = "/editStock/{siteId}/{sku}/{qty}", produces = "application/json")
+    public ResponseEntity<Object> editStockLevel(@PathVariable Long siteId, @PathVariable String sku,
+            @PathVariable int qty) {
+        try {
+            return ResponseEntity.ok(siteService.editStockLevel(siteId, sku, qty));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 

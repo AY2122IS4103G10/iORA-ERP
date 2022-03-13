@@ -11,8 +11,6 @@ import com.iora.erp.model.Currency;
 public class BirthdayPoints {
     @Id
     private String name;
-    @OneToOne
-    private Currency currency;
     @Column(nullable = false)
     private double birthdaySpend;
     @Column(nullable = false)
@@ -23,9 +21,8 @@ public class BirthdayPoints {
     public BirthdayPoints() {
     }
 
-    public BirthdayPoints(String name, Currency currency, double birthdaySpend, int quota, double multiplier) {
+    public BirthdayPoints(String name, double birthdaySpend, int quota, double multiplier) {
         this.name = name;
-        this.currency = currency;
         this.birthdaySpend = birthdaySpend;
         this.quota = quota;
         this.multiplier = multiplier;
@@ -45,14 +42,6 @@ public class BirthdayPoints {
 
     public void setQuota(int quota) {
         this.quota = quota;
-    }
-
-    public Currency getCurrency() {
-        return this.currency;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
     }
 
     public double getBirthdaySpend() {

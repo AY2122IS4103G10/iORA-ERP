@@ -11,6 +11,7 @@ import {
 } from "../../../../stores/slices/userSlice";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const convertData = (data) =>
   data.products.map((product) => ({
@@ -99,10 +100,10 @@ export const MyStoreStock = (subsys) => {
                     {isObjectEmpty(siteStock) ? (
                       <p>loading</p>
                     ) : (
-                      <SelectableTable
+                      <SimpleTable
                         columns={columns}
                         data={convertData(siteStock)}
-                        path={path}
+                        // path={path}
                       />
                     )}
                   </div>

@@ -2,8 +2,6 @@ package com.iora.erp.service;
 
 import java.util.List;
 
-import com.iora.erp.exception.IllegalTransferException;
-import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.exception.StockTransferException;

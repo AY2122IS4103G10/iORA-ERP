@@ -35,24 +35,20 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer createCustomerAccount(Customer customer) throws RegistrationException {
-        Customer newC = customer;
 
         try {
+            if (getCustomerByPhone(customer.getContactNumber()) != null ) {
+                throw new RegistrationException("Phone number " + customer.getContactNumber() + " has already been used");
+            }
             getCustomerByEmail(customer.getEmail());
             throw new RegistrationException("Account with " + customer.getEmail() + " has already been created");
-
         } catch (CustomerException ex) {
-            newC.setMembershipTier(findMembershipTierById("BASIC"));
-            newC.setMembershipPoints(0);
-            newC.setStoreCredit(0.00);
-            newC.setAvailStatus(true);
-            newC.setSalt(StringGenerator.saltGeneration());
-            newC.sethashPass(StringGenerator.generateProtectedPassword(newC.getSalt(), customer.gethashPass()));
-            em.persist(newC);
+            customer.setSalt(StringGenerator.saltGeneration());
+            customer.sethashPass(StringGenerator.generateProtectedPassword(customer.getSalt(), customer.gethashPass()));
+            em.persist(customer);
 
-            return newC;
+            return customer;
         }
-
     }
 
     @Override
@@ -172,12 +168,10 @@ public class CustomerServiceImpl implements CustomerService {
                 Customer.class);
         q.setParameter("phone", phone);
 
-        Customer c = q.getSingleResult();
-
-        if (c == null) {
-            throw new CustomerException("Customer information cannot be retrieved");
-        } else {
-            return c;
+        try {
+            return (Customer) q.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new CustomerException("Customer phone number " + phone + " does not exist.");
         }
     }
 

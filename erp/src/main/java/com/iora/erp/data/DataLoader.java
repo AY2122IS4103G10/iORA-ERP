@@ -32,6 +32,7 @@ import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
+import com.iora.erp.model.procurementOrder.ProcurementOrderLI;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
@@ -41,9 +42,11 @@ import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
+import com.iora.erp.model.stockTransfer.StockTransferOrderLI;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.utils.StringGenerator;
@@ -64,6 +67,8 @@ public class DataLoader implements CommandLineRunner {
 	private AdminService adminService;
 	@Autowired
 	private ProductService productService;
+	@Autowired
+	private ProcurementService procurementService;
 	@Autowired
 	private CustomerOrderService customerOrderService;
 	@Autowired
@@ -197,8 +202,6 @@ public class DataLoader implements CommandLineRunner {
 		sora.setAddress(a1);
 		em.persist(sora);
 
-		
-		
 		// Employee
 		Employee e1 = new Employee("Darth Vader", "darthV", "password");
 		e1.setEmail("darth.vader@gmail.com");
@@ -207,8 +210,6 @@ public class DataLoader implements CommandLineRunner {
 		e1.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e1.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e1.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e1.setSalt(StringGenerator.saltGeneration());
-		// e1.setPassword(StringGenerator.generateProtectedPassword(e1.getSalt(), "password"));
 		e1.setPassword(passwordEncoder.encode("password"));
 		em.persist(e1);
 
@@ -219,8 +220,6 @@ public class DataLoader implements CommandLineRunner {
 		e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(2)));
 		e2.setDepartment(adminService.getDepartmentById(Long.valueOf(2)));
 		e2.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e2.setSalt(StringGenerator.saltGeneration());
-		// e2.setPassword(StringGenerator.generateProtectedPassword(e2.getSalt(), "password"));
 		e2.setPassword(passwordEncoder.encode("password"));
 		em.persist(e2);
 
@@ -231,8 +230,6 @@ public class DataLoader implements CommandLineRunner {
 		e3.setJobTitle(adminService.getJobTitleById(Long.valueOf(3)));
 		e3.setDepartment(adminService.getDepartmentById(Long.valueOf(4)));
 		e3.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e3.setSalt(StringGenerator.saltGeneration());
-		// e3.setPassword(StringGenerator.generateProtectedPassword(e3.getSalt(), "password"));
 		e3.setPassword(passwordEncoder.encode("password"));
 		em.persist(e3);
 
@@ -243,8 +240,6 @@ public class DataLoader implements CommandLineRunner {
 		e4.setJobTitle(adminService.getJobTitleById(Long.valueOf(4)));
 		e4.setDepartment(adminService.getDepartmentById(Long.valueOf(5)));
 		e4.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e4.setSalt(StringGenerator.saltGeneration());
-		// e4.setPassword(StringGenerator.generateProtectedPassword(e4.getSalt(), "password"));
 		e4.setPassword(passwordEncoder.encode("password"));
 		em.persist(e4);
 
@@ -255,8 +250,6 @@ public class DataLoader implements CommandLineRunner {
 		e5.setJobTitle(adminService.getJobTitleById(Long.valueOf(5)));
 		e5.setDepartment(adminService.getDepartmentById(Long.valueOf(6)));
 		e5.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e5.setSalt(StringGenerator.saltGeneration());
-		// e5.setPassword(StringGenerator.generateProtectedPassword(e5.getSalt(), "password"));
 		e5.setPassword(passwordEncoder.encode("password"));
 		em.persist(e5);
 
@@ -267,8 +260,6 @@ public class DataLoader implements CommandLineRunner {
 		e6.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e6.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e6.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e6.setSalt(StringGenerator.saltGeneration());
-		// e6.setPassword(StringGenerator.generateProtectedPassword(e6.getSalt(), "password"));
 		e6.setPassword(passwordEncoder.encode("password"));
 		em.persist(e6);
 
@@ -279,8 +270,6 @@ public class DataLoader implements CommandLineRunner {
 		e7.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e7.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e7.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e7.setSalt(StringGenerator.saltGeneration());
-		// e7.setPassword(StringGenerator.generateProtectedPassword(e7.getSalt(), "password"));
 		e7.setPassword(passwordEncoder.encode("password"));
 		em.persist(e7);
 
@@ -291,8 +280,6 @@ public class DataLoader implements CommandLineRunner {
 		e8.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e8.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e8.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e8.setSalt(StringGenerator.saltGeneration());
-		// e8.setPassword(StringGenerator.generateProtectedPassword(e8.getSalt(), "password"));
 		e8.setPassword(passwordEncoder.encode("password"));
 		em.persist(e8);
 
@@ -303,8 +290,6 @@ public class DataLoader implements CommandLineRunner {
 		e9.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e9.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e9.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e9.setSalt(StringGenerator.saltGeneration());
-		// e9.setPassword(StringGenerator.generateProtectedPassword(e9.getSalt(), "password"));
 		e9.setPassword(passwordEncoder.encode("password"));
 		em.persist(e9);
 
@@ -315,8 +300,6 @@ public class DataLoader implements CommandLineRunner {
 		e10.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e10.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e10.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e10.setSalt(StringGenerator.saltGeneration());
-		// e10.setPassword(StringGenerator.generateProtectedPassword(e10.getSalt(), "password"));
 		e10.setPassword(passwordEncoder.encode("password"));
 		em.persist(e10);
 
@@ -327,8 +310,6 @@ public class DataLoader implements CommandLineRunner {
 		e11.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
 		e11.setDepartment(adminService.getDepartmentById(Long.valueOf(1)));
 		e11.setCompany(adminService.getCompanyById(Long.valueOf(1)));
-		// e11.setSalt(StringGenerator.saltGeneration());
-		// e11.setPassword(StringGenerator.generateProtectedPassword(e11.getSalt(), "password"));
 		e11.setPassword(passwordEncoder.encode("password"));
 		em.persist(e11);
 
@@ -434,19 +415,21 @@ public class DataLoader implements CommandLineRunner {
 				"345678", "+86 123 456 7890", iora);
 		em.persist(m1);
 
-		// Adding birthday points and membership tiers
-		Currency rm = new Currency("RM", "Malaysian Ringgit", Country.Malaysia);
-		Currency sgd = new Currency("SGD", "Singapore Dollar", Country.Singapore);
-		em.persist(rm);
-		em.persist(sgd);
+		/*
+		 * Currency rm = new Currency("RM", "Malaysian Ringgit", Country.Malaysia);
+		 * Currency sgd = new Currency("SGD", "Singapore Dollar", Country.Singapore);
+		 * em.persist(rm);
+		 * em.persist(sgd);
+		 */
 
-		BirthdayPoints bday = new BirthdayPoints("STANDARD", sgd, 200, 1, 2.00);
+		// Adding birthday points and membership tiers
+		BirthdayPoints bday = new BirthdayPoints("STANDARD", 200, 1, 2.00);
 		em.persist(bday);
 
-		MembershipTier basic = new MembershipTier("BASIC", 0.00, sgd, 0, bday);
-		MembershipTier silver = new MembershipTier("SILVER", 0.03, sgd, 200, bday);
-		MembershipTier gold = new MembershipTier("GOLD", 0.05, sgd, 1000, bday);
-		MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, sgd, 2500, bday);
+		MembershipTier basic = new MembershipTier("BASIC", 0.00, 0, bday);
+		MembershipTier silver = new MembershipTier("SILVER", 0.03, 200, bday);
+		MembershipTier gold = new MembershipTier("GOLD", 0.05, 1000, bday);
+		MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, 2500, bday);
 		em.persist(basic);
 		em.persist(silver);
 		em.persist(gold);
@@ -508,137 +491,167 @@ public class DataLoader implements CommandLineRunner {
 		// Generate 10 $5 vouchers
 		customerService.generateVouchers(5, 10, "2022-02-16");
 
-		// emailService.sendSimpleMessage("pengyu_33@msn.com", "testing testing", "this is sent by Spring Boot Framework :D");
-
-		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5), false, false, true);
-		PromotionField pf2 = new PromotionField("category", "2 FOR S$ 49", 2, List.of(0.00, 0.00), List.of(24.5, 24.5), false, false, true);
+		// Adding Promotions
+		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5),
+				false, false, true);
+		PromotionField pf2 = new PromotionField("category", "2 FOR S$ 49", 2, List.of(0.00, 0.00), List.of(24.5, 24.5),
+				false, false, true);
 		em.persist(pf1);
 		em.persist(pf2);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void loadProducts(List<Object> productsJSON) throws Exception {
-        for (Object j : productsJSON) {
-            LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
-            List<Object> json = hashMap.values().stream().collect(Collectors.toList());
-            // Decoding JSON Object
-            String name = (String) json.get(0);
-            String modelCode = (String) json.get(1);
-            String description = (String) json.get(2);
-            List<String> colours = (ArrayList<String>) json.get(3);
-            List<String> sizes = (ArrayList<String>) json.get(4);
-            String company = (String) json.get(5);
-            List<String> tags = (ArrayList<String>) json.get(6);
-            List<String> categories = (ArrayList<String>) json.get(7);
+		for (Object j : productsJSON) {
+			LinkedHashMap<Object, Object> hashMap = (LinkedHashMap<Object, Object>) j;
+			List<Object> json = hashMap.values().stream().collect(Collectors.toList());
+			// Decoding JSON Object
+			String name = (String) json.get(0);
+			String modelCode = (String) json.get(1);
+			String description = (String) json.get(2);
+			List<String> colours = (ArrayList<String>) json.get(3);
+			List<String> sizes = (ArrayList<String>) json.get(4);
+			String company = (String) json.get(5);
+			List<String> tags = (ArrayList<String>) json.get(6);
+			List<String> categories = (ArrayList<String>) json.get(7);
 
-            LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
-            List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
-            double listPrice = Double.parseDouble((String) priceList.get(0));
+			LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
+			List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
+			double listPrice = Double.parseDouble((String) priceList.get(0));
 
-            LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
-            List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
-                    .collect(Collectors.toList());
-            double discountPrice = discountedPriceList.isEmpty() ? listPrice
-                    : Double.parseDouble((String) discountedPriceList.get(0));
+			LinkedHashMap<Object, Object> discountedPriceMap = (LinkedHashMap<Object, Object>) json.get(9);
+			List<Object> discountedPriceList = (ArrayList<Object>) discountedPriceMap.values().stream()
+					.collect(Collectors.toList());
+			double discountPrice = discountedPriceList.isEmpty() ? listPrice
+					: Double.parseDouble((String) discountedPriceList.get(0));
 
-            Model model = new Model(modelCode, name, description, listPrice, discountPrice,
-                    categories.contains("SALE FROM $10"), true);
-            List<ProductField> productFields = new ArrayList<>();
+			Model model = new Model(modelCode, name, description, listPrice, discountPrice,
+					categories.contains("SALE FROM $10"), true);
+			List<ProductField> productFields = new ArrayList<>();
 
-            for (String c : colours) {
-                ProductField colour = productService.createProductField("colour", c);
-                model.addProductField(colour);
-                productFields.add(colour);
-            }
+			for (String c : colours) {
+				ProductField colour = productService.createProductField("colour", c);
+				model.addProductField(colour);
+				productFields.add(colour);
+			}
 
-            for (String s : sizes) {
-                ProductField size = productService.createProductField("size", s);
-                model.addProductField(size);
-                productFields.add(size);
-            }
+			for (String s : sizes) {
+				ProductField size = productService.createProductField("size", s);
+				model.addProductField(size);
+				productFields.add(size);
+			}
 
-            ProductField com = productService.createProductField("company", company);
-            model.addProductField(com);
-            productFields.add(com);
+			ProductField com = productService.createProductField("company", company);
+			model.addProductField(com);
+			productFields.add(com);
 
-            for (String t : tags) {
-                ProductField tag = productService.createProductField("tag", t);
-                model.addProductField(tag);
-                productFields.add(tag);
-            }
+			for (String t : tags) {
+				ProductField tag = productService.createProductField("tag", t);
+				model.addProductField(tag);
+				productFields.add(tag);
+			}
 
-            for (String cat : categories) {
-                if (cat.contains("S$")) {
-                    ProductField category = productService.getPromoField("category", cat);
-                    model.addProductField(category);
-                    productFields.add(category);
-                }
-            }
-            em.persist(model);
-            productService.createProduct(modelCode, productFields);
-        }
+			for (String cat : categories) {
+				if (cat.contains("S$")) {
+					ProductField category = productService.getPromoField("category", cat);
+					model.addProductField(category);
+					productFields.add(category);
+				}
+			}
+			em.persist(model);
+			productService.createProduct(modelCode, productFields);
+		}
 
-        List<Product> products = productService.searchProductsBySKU(null);
-        for (Product p : products) {
-            Random r = new Random();
-            int stockLevel = r.nextInt(7) + 3;
+		List<Product> products = productService.searchProductsBySKU(null);
+		for (Product p : products) {
+			Random r = new Random();
+			int stockLevel = r.nextInt(7) + 3;
 
-            for (int i = 0; i < stockLevel; i++) {
-                String rfid = StringGenerator.generateRFID(p.getSku());
-                productService.createProductItem(rfid, p.getSku());
-            }
-            siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), stockLevel);
-        }
+			for (int i = 0; i < stockLevel; i++) {
+				String rfid = StringGenerator.generateRFID(p.getSku());
+				productService.createProductItem(rfid, p.getSku());
+			}
+			siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), stockLevel);
+		}
 
-        // Customer Order
-        CustomerOrderLI coli1 = new CustomerOrderLI();
-        coli1.setProduct(productService.getProduct("BPD0010528A-1"));
-        coli1.setQty(2);
-        coli1.setSubTotal(98.0);
-        customerOrderService.createCustomerOrderLI(coli1);
+		// ProcurementOrder LineItems
+		em.persist(new ProcurementOrderLI(productService.getProduct("BDQ0010497X-1"), 50));
+		em.persist(new ProcurementOrderLI(productService.getProduct("BDQ0010497X-2"), 30));
+		em.persist(new ProcurementOrderLI(productService.getProduct("BDQ0010497X-3"), 45));
+		em.persist(new ProcurementOrderLI(productService.getProduct("AB0009644H-1"), 75));
+		em.persist(new ProcurementOrderLI(productService.getProduct("AB0009644H-2"), 70));
 
-        CustomerOrderLI coli2 = new CustomerOrderLI();
-        coli2.setProduct(productService.getProduct("BPS0009808X-1"));
-        coli2.setQty(1);
-        coli2.setSubTotal(29.0);
-        customerOrderService.createCustomerOrderLI(coli2);
+		// StockTransferOrder LineItems
+		em.persist(new StockTransferOrderLI(productService.getProduct("AT0009862Z-1"), 5));
+		em.persist(new StockTransferOrderLI(productService.getProduct("AT0009862Z-2"), 7));
+		em.persist(new StockTransferOrderLI(productService.getProduct("AT0010054D-1"), 12));
+		em.persist(new StockTransferOrderLI(productService.getProduct("AT0010054D-2"), 15));
+		em.persist(new StockTransferOrderLI(productService.getProduct("AT0010054D-3"), 4));
 
-        CustomerOrderLI coli3 = new CustomerOrderLI();
-        coli3.setProduct(productService.getProduct("BSK0009530X-1"));
-        coli3.setQty(1);
-        coli3.setSubTotal(29.0);
-        customerOrderService.createCustomerOrderLI(coli3);
+		// Customer Order
+		CustomerOrderLI coli1 = new CustomerOrderLI();
+		coli1.setProduct(productService.getProduct("BPL0009803M-1"));
+		coli1.setQty(1);
+		coli1.setSubTotal(39.0);
 
-        CustomerOrderLI coli4 = new CustomerOrderLI();
-        coli4.setProduct(productService.getProduct("BPD0010304X-1"));
-        coli4.setQty(1);
-        coli4.setSubTotal(49.0);
-        customerOrderService.createCustomerOrderLI(coli4);
+		CustomerOrderLI coli2 = new CustomerOrderLI();
+		coli2.setProduct(productService.getProduct("BDQ0010043X-1"));
+		coli2.setQty(2);
+		coli2.setSubTotal(78.0);
 
-        Payment payment1 = new Payment(127, "241563", PaymentType.VISA);
-        customerOrderService.createPayment(payment1);
+		CustomerOrderLI coli3 = new CustomerOrderLI();
+		coli3.setProduct(productService.getProduct("APL0009197A-1"));
+		coli3.setQty(2);
+		coli3.setSubTotal(38.0);
 
-        Payment payment2 = new Payment(78, "546130", PaymentType.MASTERCARD);
-        customerOrderService.createPayment(payment2);
+		CustomerOrderLI coli4 = new CustomerOrderLI();
+		coli4.setProduct(productService.getProduct("BPD0010528A-1"));
+		coli4.setQty(2);
+		coli4.setSubTotal(98.0);
+		customerOrderService.createCustomerOrderLI(coli4);
 
-        CustomerOrder co1 = new CustomerOrder();
-        co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        co1.addLineItem(coli1);
-        co1.addLineItem(coli2);
-        co1.addPayment(payment1);
-        co1.setPaid(true);
-        co1.setSite(siteService.getSite(4L));
-        em.persist(co1);
+		CustomerOrderLI coli5 = new CustomerOrderLI();
+		coli5.setProduct(productService.getProduct("BPS0009808X-1"));
+		coli5.setQty(1);
+		coli5.setSubTotal(29.0);
+		customerOrderService.createCustomerOrderLI(coli5);
 
-        OnlineOrder oo1 = new OnlineOrder(false, Country.Singapore);
-        oo1.setCustomerId(2L);
-        oo1.setPickupSite((StoreSite) siteService.getSite(4L));
-        oo1.addLineItem(coli3);
-        oo1.addLineItem(coli4);
-        oo1.setPaid(true);
-        oo1.addPayment(payment2);
-        oo1.setSite(siteService.getSite(3L));
-        em.persist(oo1);
-    }
+		CustomerOrderLI coli6 = new CustomerOrderLI();
+		coli6.setProduct(productService.getProduct("BSK0009530X-1"));
+		coli6.setQty(1);
+		coli6.setSubTotal(29.0);
+		customerOrderService.createCustomerOrderLI(coli6);
+
+		CustomerOrderLI coli7 = new CustomerOrderLI();
+		coli7.setProduct(productService.getProduct("BPD0010304X-1"));
+		coli7.setQty(1);
+		coli7.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli7);
+
+		Payment payment1 = new Payment(127, "241563", PaymentType.VISA);
+		customerOrderService.createPayment(payment1);
+
+		Payment payment2 = new Payment(78, "546130", PaymentType.MASTERCARD);
+		customerOrderService.createPayment(payment2);
+
+		CustomerOrder co1 = new CustomerOrder();
+		co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+		co1.addLineItem(coli4);
+		co1.addLineItem(coli5);
+		co1.addPayment(payment1);
+		co1.setPaid(true);
+		co1.setSite(siteService.getSite(4L));
+		customerOrderService.createCustomerOrder(co1);
+
+		OnlineOrder oo1 = new OnlineOrder(false, Country.Singapore);
+		oo1.setCustomerId(2L);
+		oo1.setPickupSite((StoreSite) siteService.getSite(4L));
+		oo1.addLineItem(coli6);
+		oo1.addLineItem(coli7);
+		oo1.setPaid(true);
+		oo1.addPayment(payment2);
+		oo1.setSite(siteService.getSite(3L));
+		customerOrderService.createCustomerOrder(oo1);
+	}
 
 }

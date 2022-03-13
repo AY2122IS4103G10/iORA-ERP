@@ -172,7 +172,7 @@ export const ProductPrint = () => {
                 Print Product Label(s)
               </h3>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
-                <p>Scan barcode or enter product SKU.</p>
+                <p>Scan barcodes or enter product SKUs separated by a comma ",".</p>
               </div>
               <form onSubmit={onSearchClicked}>
                 <div className="mt-5 sm:flex sm:items-center">
@@ -188,6 +188,7 @@ export const ProductPrint = () => {
                       value={search}
                       onChange={onSearchChanged}
                     />
+                    
                   </div>
                 </div>
                 <button

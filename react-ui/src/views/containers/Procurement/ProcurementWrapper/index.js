@@ -8,7 +8,7 @@ import { useMemo } from "react";
 import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
 import { api, procurementApi } from "../../../../environments/Api";
 import { deleteExistingProcurement } from "../../../../stores/slices/procurementSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import Confirmation from "../../../components/Modals/Confirmation";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
@@ -34,7 +35,6 @@ const Header = ({
   onAcceptClicked,
   onCancelOrderClicked,
   onShippedClicked,
-  onFulfilClicked,
   openInvoice,
   setAction,
   openConfirm,
@@ -209,17 +209,7 @@ export const InvoiceModal = ({
               <XIcon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-          <ProcurementInvoice
-            orderId={orderId}
-            orderStatus={orderStatus}
-            company={company}
-            createdBy={createdBy}
-            fromSite={fromSite}
-            toSite={toSite}
-            qrValue={qrValue}
-          >
-            {children}
-          </ProcurementInvoice>
+          {children}
         </div>
       </SimpleModal>
     )
@@ -280,9 +270,11 @@ export const ProcurementWrapper = ({ subsys }) => {
   const [status, setStatus] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [qrValue, setQrValue] = useState("");
+  const [qrDelivery, setQrDelivery] = useState("");
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const currSiteId = useSelector(selectUserSite)
 
   useEffect(() => {
     api.get("sam/procurementOrder", procurementId).then((response) => {
@@ -318,6 +310,9 @@ export const ProcurementWrapper = ({ subsys }) => {
       setQrValue(
         `http://localhost:3000/${subsys}/procurements/${procurementId}/pick-pack`
       );
+      setQrDelivery(
+        `http://localhost:3000/${subsys}/procurements/${procurementId}/delivery`
+      );
     });
   }, [subsys, procurementId]);
 
@@ -325,7 +320,7 @@ export const ProcurementWrapper = ({ subsys }) => {
     dispatch(
       deleteExistingProcurement({
         orderId: procurementId,
-        siteId: headquarters.id,
+        siteId: currSiteId,
       })
     )
       .unwrap()
@@ -347,7 +342,7 @@ export const ProcurementWrapper = ({ subsys }) => {
 
   const onAcceptClicked = () => {
     procurementApi
-      .acceptOrder(procurementId, manufacturing.id)
+      .acceptOrder(procurementId, currSiteId)
       .then((response) => {
         const { statusHistory } = response.data;
         setStatus({
@@ -376,7 +371,7 @@ export const ProcurementWrapper = ({ subsys }) => {
 
   const onCancelOrderClicked = () => {
     procurementApi
-      .cancelOrder(procurementId, manufacturing.id)
+      .cancelOrder(procurementId, currSiteId)
       .then((response) => {
         const { statusHistory } = response.data;
         setStatus({
@@ -386,35 +381,6 @@ export const ProcurementWrapper = ({ subsys }) => {
       })
       .then(() => {
         addToast("Successfully cancelled procurement order", {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        closeConfirmModal();
-      })
-      .catch((err) =>
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        })
-      );
-  };
-
-  const onFulfilClicked = () => {
-    procurementApi
-      .fulfillOrder(manufacturing.id, {
-        id: procurementId,
-        lineItems,
-      })
-      .then((response) => {
-        const { lineItems, statusHistory } = response.data;
-        setLineItems(lineItems);
-        setStatus({
-          status: statusHistory[statusHistory.length - 1].status,
-          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-        });
-      })
-      .then(() => {
-        addToast("Successfully fulfilled procurement order", {
           appearance: "success",
           autoDismiss: true,
         });
@@ -474,7 +440,11 @@ export const ProcurementWrapper = ({ subsys }) => {
       href: `/${subsys}/procurements/${procurementId}/pick-pack`,
       current: false,
     },
-    { name: "Delivery", href: "#", current: false },
+    {
+      name: "Delivery",
+      href: `/${subsys}/procurements/${procurementId}/delivery`,
+      current: false,
+    },
   ];
 
   return (
@@ -491,7 +461,6 @@ export const ProcurementWrapper = ({ subsys }) => {
             onAcceptClicked={onAcceptClicked}
             onCancelOrderClicked={onCancelOrderClicked}
             onShippedClicked={onShippedClicked}
-            onFulfilClicked={onFulfilClicked}
             handlePrint={handlePrint}
             openInvoice={openInvoice}
             setAction={setAction}
@@ -508,6 +477,9 @@ export const ProcurementWrapper = ({ subsys }) => {
               warehouse,
               lineItems,
               setLineItems,
+              componentRef,
+              handlePrint,
+              addToast,
             }}
           />
         </div>
@@ -520,6 +492,9 @@ export const ProcurementWrapper = ({ subsys }) => {
         <div className="hidden">
           <ProcurementInvoice
             ref={componentRef}
+            title={`${
+              status.status === "READY_FOR_SHIPPING" ? "Delivery" : ""
+            } Invoice`}
             orderId={procurementId}
             orderStatus={status}
             company={headquarters.company}
@@ -535,17 +510,28 @@ export const ProcurementWrapper = ({ subsys }) => {
         <InvoiceModal
           open={open}
           closeModal={closeInvoice}
-          orderId={procurementId}
-          orderStatus={status}
           company={headquarters.company}
           createdBy={headquarters}
           fromSite={manufacturing}
           toSite={warehouse}
-          data={lineItems}
-          qrValue={qrValue}
           handlePrint={handlePrint}
         >
-          <InvoiceSummary data={lineItems} status={status} />
+          <ProcurementInvoice
+            title={`${
+              status.status === "READY_FOR_SHIPPING" ? "Delivery" : ""
+            } Invoice`}
+            orderId={procurementId}
+            orderStatus={status}
+            company={headquarters.company}
+            createdBy={headquarters}
+            fromSite={manufacturing}
+            toSite={warehouse}
+            qrValue={
+              status.status !== "READY_FOR_SHIPPING" ? qrValue : qrDelivery
+            }
+          >
+            <InvoiceSummary data={lineItems} status={status} />
+          </ProcurementInvoice>
         </InvoiceModal>
         {Boolean(action) && (
           <Confirmation

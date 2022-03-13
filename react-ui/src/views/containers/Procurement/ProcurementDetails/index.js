@@ -1,7 +1,6 @@
 import { useLocation } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
-  EditableCell,
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 import { useOutletContext } from "react-router-dom";
@@ -13,22 +12,7 @@ const ItemsSummary = ({
   pathname,
   onVerifyReceivedClicked,
 }) => {
-  const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
-    const updateMyData = (rowIndex, columnId, value) => {
-      setSkipPageReset(true);
-      setData((old) =>
-        old.map((row, index) => {
-          if (index === rowIndex) {
-            return {
-              ...old[rowIndex],
-              [columnId]: value,
-            };
-          }
-          return row;
-        })
-      );
-    };
     return [
       {
         Header: "SKU",
@@ -55,12 +39,6 @@ const ItemsSummary = ({
         Header: "Fulfilled",
         accessor: "fulfilledQty",
         disableSortBy: true,
-        // Cell: (row) =>
-        //   status === "PENDING" ||
-        //   status === "CANCELLED" ||
-        //   status === "ACCEPTED"
-        //     ? "-"
-        //     : row.row.original.fulfilledProductItems.length,
       },
       // {
       //   Header: "Shipped",
@@ -90,7 +68,7 @@ const ItemsSummary = ({
       //   },
       // },
     ];
-  }, [setData, status, pathname]);
+  }, []);
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -114,7 +92,6 @@ const ItemsSummary = ({
           <SimpleTable
             columns={columns}
             data={data}
-            skipPageReset={skipPageReset}
           />
         </div>
       )}
@@ -225,7 +202,7 @@ export const ProcurementDetails = () => {
     setLineItems,
   } = useOutletContext();
   const { pathname } = useLocation();
-
+console.log(lineItems)
   return (
     [procurementId, headquarters, manufacturing, warehouse].every(Boolean) && (
       <ProcurementDetailsBody

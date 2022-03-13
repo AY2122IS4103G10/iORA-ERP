@@ -4,6 +4,7 @@ import Barcode from "react-barcode";
 import moment from "moment";
 
 export const ProcurementInvoiceBody = ({
+  title,
   orderId,
   orderStatus,
   company,
@@ -17,7 +18,7 @@ export const ProcurementInvoiceBody = ({
     <div className="max-w-3xl mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <div>
         <div className="space-y-2 sm:px-0 sm:flex sm:items-baseline sm:justify-between sm:space-y-0">
-          <h1 className="font-extrabold tracking-tight text-5xl">Invoice</h1>
+          <h1 className="font-extrabold tracking-tight text-5xl">{title}</h1>
         </div>
 
         <h4 className="sr-only">Order Information</h4>
@@ -94,8 +95,7 @@ export const ProcurementInvoiceBody = ({
                   <span className="block">{fromSite.name}</span>
                   <span className="block">{fromSite.address.road}</span>
                   <span className="block">
-                    {fromSite.address.city},{" "}
-                    {fromSite.address.postalCode}
+                    {fromSite.address.city}, {fromSite.address.postalCode}
                   </span>
                   <span className="block">{fromSite.phoneNumber}</span>
                 </address>
@@ -133,6 +133,7 @@ export const ProcurementInvoiceBody = ({
 export const ProcurementInvoice = forwardRef(
   (
     {
+      title,
       orderId,
       orderStatus,
       company,
@@ -149,6 +150,7 @@ export const ProcurementInvoice = forwardRef(
       [company, createdBy, fromSite, toSite].every(Boolean) && (
         <div ref={ref}>
           <ProcurementInvoiceBody
+            title={title}
             orderId={orderId}
             orderStatus={orderStatus}
             company={company}
@@ -159,7 +161,7 @@ export const ProcurementInvoice = forwardRef(
             qrValue={qrValue}
           >
             {children}
-            </ProcurementInvoiceBody>
+          </ProcurementInvoiceBody>
         </div>
       )
     );

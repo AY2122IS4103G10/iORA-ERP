@@ -82,6 +82,7 @@ import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTran
 import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack/index.js";
 import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList/index.js";
 import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch/index.js";
+import { ProcurementDelivery } from "./views/containers/Procurement/ProcurementDelivery/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -104,6 +105,7 @@ function App() {
               </PrivateRoute>
             }
           >
+            {/* Products */}
             <Route path="products" element={<Outlet />}>
               <Route
                 index
@@ -118,6 +120,7 @@ function App() {
               <Route path="edit/:prodId" element={<ProductForm />} />
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
+            {/* Stock Levels */}
             <Route path="stocklevels">
               <Route path="my/:id" element={<StockLevelForm subsys="sm" />} />
               <Route path="my" element={<MyStoreStock subsys="sm" />} />
@@ -185,6 +188,7 @@ function App() {
               >
                 <Route index element={<ProcurementDetails subsys="sm" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
@@ -263,9 +267,9 @@ function App() {
                 element={<AProductStock subsys="str" />}
               />
             </Route>
-{/* Stock Transfer */}
+            {/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
-            <Route
+              <Route
                 index
                 element={
                   <ManageStockTransfer subsys="str">
@@ -385,6 +389,7 @@ function App() {
               >
                 <Route index element={<ProcurementDetails subsys="mf" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<VoucherForm />} />
@@ -445,8 +450,9 @@ function App() {
                 path=":procurementId"
                 element={<ProcurementWrapper subsys="wh" />}
               >
-                <Route index element={<ProcurementDetails subsys="wh" />} />
+                <Route index element={<ProcurementDetails />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
             </Route>
 

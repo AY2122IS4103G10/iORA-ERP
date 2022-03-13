@@ -95,6 +95,10 @@ public class StockTransferOrder {
         this.lineItems = lineItems;
     }
 
+    public void addLineItem(StockTransferOrderLI lineItem) {
+        this.lineItems.add(lineItem);
+    }
+
     public Site getFromSite() {
         return this.fromSite;
     }

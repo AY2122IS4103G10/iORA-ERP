@@ -32,6 +32,7 @@ import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
+import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.procurementOrder.ProcurementOrderLI;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
@@ -42,6 +43,7 @@ import com.iora.erp.model.site.ManufacturingSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
+import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.model.stockTransfer.StockTransferOrderLI;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerOrderService;
@@ -49,6 +51,7 @@ import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
+import com.iora.erp.service.StockTransferService;
 import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,8 @@ public class DataLoader implements CommandLineRunner {
 	private ProductService productService;
 	@Autowired
 	private ProcurementService procurementService;
+	@Autowired
+	private StockTransferService stockTransferService;
 	@Autowired
 	private CustomerOrderService customerOrderService;
 	@Autowired
@@ -574,22 +579,62 @@ public class DataLoader implements CommandLineRunner {
 			siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), stockLevel);
 		}
 
-		// ProcurementOrder LineItems
-		em.persist(new ProcurementOrderLI(productService.getProduct("BDQ0010497X-1"), 50));
-		em.persist(new ProcurementOrderLI(productService.getProduct("BDQ0010497X-2"), 30));
-		em.persist(new ProcurementOrderLI(productService.getProduct("BDQ0010497X-3"), 45));
-		em.persist(new ProcurementOrderLI(productService.getProduct("AB0009644H-1"), 75));
-		em.persist(new ProcurementOrderLI(productService.getProduct("AB0009644H-2"), 70));
+		// ProcurementOrders
+		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("BDQ0010497X-1"), 50);
+		em.persist(poli1);
+		ProcurementOrderLI poli2 = new ProcurementOrderLI(productService.getProduct("BDQ0010497X-2"), 30);
+		em.persist(poli2);
+		ProcurementOrderLI poli3 = new ProcurementOrderLI(productService.getProduct("BDQ0010497X-3"), 45);
+		em.persist(poli3);
+		ProcurementOrderLI poli4 = new ProcurementOrderLI(productService.getProduct("AB0009644H-1"), 75);
+		em.persist(poli4);
+		ProcurementOrderLI poli5 = new ProcurementOrderLI(productService.getProduct("AB0009644H-2"), 70);
+		em.persist(poli5);
 
-		// StockTransferOrder LineItems
-		em.persist(new StockTransferOrderLI(productService.getProduct("AT0009862Z-1"), 5));
-		em.persist(new StockTransferOrderLI(productService.getProduct("AT0009862Z-2"), 7));
-		em.persist(new StockTransferOrderLI(productService.getProduct("AT0010054D-1"), 12));
-		em.persist(new StockTransferOrderLI(productService.getProduct("AT0010054D-2"), 15));
-		em.persist(new StockTransferOrderLI(productService.getProduct("AT0010054D-3"), 4));
+		ProcurementOrder po1 = new ProcurementOrder();
+		po1.setHeadquarters(siteService.getSite(1L));
+		po1.setManufacturing(siteService.getSite(22L));
+		po1.setWarehouse(siteService.getSite(2L));
+		po1.setNotes("Please pack into boxes of 5.");
+		po1.addLineItem(poli1);
+		po1.addLineItem(poli2);
+		po1.addLineItem(poli3);
+		procurementService.createProcurementOrder(po1, 1L);
+
+		ProcurementOrder po2 = new ProcurementOrder();
+		po2.setHeadquarters(siteService.getSite(1L));
+		po2.setManufacturing(siteService.getSite(22L));
+		po2.setWarehouse(siteService.getSite(2L));
+		po2.setNotes("No requirements in packing.");
+		po2.addLineItem(poli4);
+		po2.addLineItem(poli5);
+		procurementService.createProcurementOrder(po2, 1L);
+
+		// StockTransferOrders
+		StockTransferOrderLI stoli1 = new StockTransferOrderLI(productService.getProduct("AT0009862Z-1"), 5);
+		em.persist(stoli1);
+		StockTransferOrderLI stoli2 = new StockTransferOrderLI(productService.getProduct("AT0009862Z-2"), 7);
+		em.persist(stoli2);
+		StockTransferOrderLI stoli3 = new StockTransferOrderLI(productService.getProduct("AT0010054D-1"), 12);
+		em.persist(stoli3);
+		StockTransferOrderLI stoli4 = new StockTransferOrderLI(productService.getProduct("AT0010054D-2"), 15);
+		em.persist(stoli4);
+		StockTransferOrderLI stoli5 = new StockTransferOrderLI(productService.getProduct("AT0010054D-3"), 4);
+		em.persist(stoli5);
+
+		StockTransferOrder sto1 = new StockTransferOrder(siteService.getSite(10L), siteService.getSite(15L));
+		sto1.addLineItem(stoli1);
+		sto1.addLineItem(stoli2);
+		stockTransferService.createStockTransferOrder(sto1, 10L);
+
+		StockTransferOrder sto2 = new StockTransferOrder(siteService.getSite(5L), siteService.getSite(8L));
+		sto2.addLineItem(stoli3);
+		sto2.addLineItem(stoli4);
+		sto2.addLineItem(stoli5);
+		stockTransferService.createStockTransferOrder(sto2, 1L);
 
 		// Customer Order
-		CustomerOrderLI coli1 = new CustomerOrderLI();
+		/* CustomerOrderLI coli1 = new CustomerOrderLI();
 		coli1.setProduct(productService.getProduct("BPL0009803M-1"));
 		coli1.setQty(1);
 		coli1.setSubTotal(39.0);
@@ -602,7 +647,7 @@ public class DataLoader implements CommandLineRunner {
 		CustomerOrderLI coli3 = new CustomerOrderLI();
 		coli3.setProduct(productService.getProduct("APL0009197A-1"));
 		coli3.setQty(2);
-		coli3.setSubTotal(38.0);
+		coli3.setSubTotal(38.0); */
 
 		CustomerOrderLI coli4 = new CustomerOrderLI();
 		coli4.setProduct(productService.getProduct("BPD0010528A-1"));

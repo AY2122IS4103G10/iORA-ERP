@@ -9,8 +9,6 @@ import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.model.site.StoreSite;
 
-import org.springframework.data.util.Pair;
-
 public interface SiteService {
     public abstract Site createSite(Site site, String siteType);
     public abstract Site getSite(Long id);
@@ -34,10 +32,13 @@ public interface SiteService {
 
     public abstract StockLevel addProducts(Long siteId, String SKUCode, int qty) throws NoStockLevelException;
     public abstract StockLevel removeProducts(Long siteId, String SKUCode, int qty) throws NoStockLevelException, IllegalTransferException;
-    public abstract Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId, Long toSiteId, String SKUCode, int qty) throws NoStockLevelException, IllegalTransferException;
+    public abstract String editStockLevel(Long siteId, String SKUCode, int qty) throws NoStockLevelException, IllegalTransferException;
 
-    public abstract StockLevel addProductsWithRfid(Long siteId, List<String> rfidskus) throws NoStockLevelException;
+
+    //public abstract Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId, Long toSiteId, String SKUCode, int qty) throws NoStockLevelException, IllegalTransferException;
+
+    /* public abstract StockLevel addProductsWithRfid(Long siteId, List<String> rfidskus) throws NoStockLevelException;
     public abstract StockLevel removeProductsWithRfid(Long siteId, List<String> rfidskus) throws NoStockLevelException, IllegalTransferException;
     public abstract Pair<StockLevel, StockLevel> moveProductsWithRfid(Long fromSiteId, Long toSiteId, List<String> rfidskus) throws NoStockLevelException, IllegalTransferException;
-
+ */
 }

@@ -27,7 +27,7 @@ public class StockLevelLI {
     private int qty = 0;
 
     @Column(nullable = false)
-    private int reserveQty;
+    private int reserveQty = 0;
 
     public StockLevelLI() {
     }

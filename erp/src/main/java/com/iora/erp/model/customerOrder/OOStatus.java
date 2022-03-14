@@ -3,23 +3,16 @@ package com.iora.erp.model.customerOrder;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import com.iora.erp.enumeration.OnlineOrderStatus;
 import com.iora.erp.model.site.Site;
 
-@Entity
+@Embeddable
 public class OOStatus {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
     @ManyToOne
     private Site actionBy;
 

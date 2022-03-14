@@ -31,6 +31,7 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
         this.authenticationManager = authenticationManager;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {

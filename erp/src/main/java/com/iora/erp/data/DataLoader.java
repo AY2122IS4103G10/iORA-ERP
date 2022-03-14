@@ -18,7 +18,6 @@ import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.enumeration.PayType;
 import com.iora.erp.enumeration.PaymentType;
-import com.iora.erp.model.Currency;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;

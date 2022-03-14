@@ -14,9 +14,11 @@ import javax.persistence.TypedQuery;
 
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
+import com.iora.erp.exception.SupportTicketException;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.utils.StringGenerator;
 
@@ -298,5 +300,39 @@ public class CustomerServiceImpl implements CustomerService {
         if (membershipTier != null) {
             em.remove(membershipTier);
         }
+    }
+
+    @Override
+    public SupportTicket getSupportTicket(Long id) throws SupportTicketException {
+        SupportTicket st = em.find(SupportTicket.class, id);
+        if (st == null) {
+            throw new SupportTicketException("Support ticket cannot be found.");
+        }
+        return st;
+    }
+
+    @Override
+    public List<SupportTicket> searchSupportTicket(Long id) {
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.id = :id", SupportTicket.class);
+        q.setParameter("id", id);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<SupportTicket> searchSupportTicketBySubject(String subject) {
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.subject LIKE :subject", SupportTicket.class);
+        q.setParameter("subject", "%" + subject + "%");
+        return q.getResultList();
+    }
+
+    @Override
+    public SupportTicket createSupportTicket(SupportTicket supportTicket) {
+        em.persist(supportTicket);
+        return supportTicket;
+    }
+
+    @Override
+    public SupportTicket updateSupportTicket(SupportTicket supportTicket) {
+        return em.merge(supportTicket);
     }
 }

@@ -567,10 +567,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (actionBy == null || !(actionBy instanceof WarehouseSite) || !(actionBy instanceof StoreSite)) {
             throw new CustomerOrderException("Site is not authorised to cancel the order.");
         } else if (actionBy instanceof WarehouseSite) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.CANCELLED));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.CANCELLED));
         } else {
             onlineOrder.setSite(siteService.getSite(3L));
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.CANCELLED));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.CANCELLED));
         }
 
         return em.merge(onlineOrder);
@@ -584,20 +584,20 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (actionBy == null || !actionBy.equals(onlineOrder.getSite())) {
             throw new CustomerOrderException("Site is unauthorised to pick/pack this order.");
         } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PENDING) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.PICKING));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.PICKING));
         } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PICKING) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.PICKED));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.PICKED));
         } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PICKED) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.PACKING));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.PACKING));
         } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PACKING) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.PACKED));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.PACKED));
         } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PACKED) {
             if (onlineOrder.getSite().equals(onlineOrder.getPickupSite())) {
                 onlineOrder.addStatusHistory(
-                        new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.READY_FOR_COLLECTION));
+                        new OOStatus(actionBy, new Date(), OnlineOrderStatus.READY_FOR_COLLECTION));
             } else {
                 onlineOrder.addStatusHistory(
-                        new OOStatus(actionBy, LocalDateTime.now(), OnlineOrderStatus.READY_FOR_DELIVERY));
+                        new OOStatus(actionBy, new Date(), OnlineOrderStatus.READY_FOR_DELIVERY));
             }
         }
 
@@ -625,7 +625,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     }
                     if (picked) {
                         onlineOrder.addStatusHistory(
-                                new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.PICKED));
+                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.PICKED));
                     }
                     return em.merge(onlineOrder);
                 }
@@ -653,7 +653,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         }
                         if (packed) {
                             onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.PACKED));
+                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.PACKED));
                         }
                         return em.merge(onlineOrder);
                     }
@@ -671,10 +671,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         if (onlineOrder.getLastStatus() == OnlineOrderStatus.READY_FOR_DELIVERY) {
             onlineOrder.addStatusHistory(
-                    new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.DELIVERING));
+                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.DELIVERING));
         } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.DELIVERING) {
             onlineOrder.addStatusHistory(
-                    new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.DELIVERED));
+                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.DELIVERED));
         } else {
             throw new CustomerOrderException("Order is not up for delivery.");
         }
@@ -695,7 +695,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         onlineOrder.addStatusHistory(
-                new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.READY_FOR_COLLECTION));
+                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.READY_FOR_COLLECTION));
         return em.merge(onlineOrder);
     }
 
@@ -708,7 +708,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         onlineOrder.addStatusHistory(
-                new OOStatus(onlineOrder.getSite(), LocalDateTime.now(), OnlineOrderStatus.COLLECTED));
+                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.COLLECTED));
         return em.merge(onlineOrder);
     }
 }

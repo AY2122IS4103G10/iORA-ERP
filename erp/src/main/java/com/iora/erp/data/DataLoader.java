@@ -1,9 +1,8 @@
 package com.iora.erp.data;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -679,7 +678,7 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createPayment(payment2);
 
 		CustomerOrder co1 = new CustomerOrder();
-		co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+		co1.setDateTime(new Date());
 		co1.addLineItem(coli4);
 		co1.addLineItem(coli5);
 		co1.addPayment(payment1);

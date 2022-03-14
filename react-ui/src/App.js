@@ -82,6 +82,7 @@ import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTran
 import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack/index.js";
 import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList/index.js";
 import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch/index.js";
+import OrderSuccess from "./views/containers/SelfService/OrderSuccess/index.js";
 
 function App() {
   const { pathname } = useLocation();

@@ -96,7 +96,7 @@ export const SelectableTable = ({columns, data, path}) => {
   } = useTable({columns, data}, useFilters, useGlobalFilter, useSortBy, usePagination);
   const navigate = useNavigate();
   const handleRowClick = (row) => {
-    if (row.original.id === undefined) {
+    if (row.original.id === undefined || path.includes('stocklevels/my')) {
       navigate(`${path}/${row.original.sku}`);
     } else {
       navigate(`${path}/${row.original.id}`);

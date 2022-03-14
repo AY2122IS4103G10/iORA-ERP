@@ -125,10 +125,9 @@ export const vendorApi = {
 };
 
 export const stockLevelApi = {
-  editStock(toUpdate, siteId) {
+  editStock(sku,qty, siteId) {
     return axiosPrivate.post(
-      `${REST_ENDPOINT}warehouse/editStock/${siteId}`,
-      toUpdate
+      `${REST_ENDPOINT}warehouse/editStock/${siteId}/${sku}/${qty}`,
     );
   },
 };
@@ -233,7 +232,7 @@ export const posApi = {
       `${REST_ENDPOINT}store/customerOrder/calculate`,
       lineItems
     );
-  },
+  }
 };
 
 export const employeeApi = {
@@ -303,6 +302,9 @@ export const onlineOrderApi = {
     return axiosPrivate.get(
       `${REST_ENDPOINT}online/searchOrder/${siteId}?orderId=`
     );
+  },
+  getPaymentIntent(lineItems) {
+    return axiosPublic.post(`${REST_ENDPOINT}online/pay`, lineItems);
   },
 };
 

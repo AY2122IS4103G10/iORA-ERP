@@ -84,6 +84,7 @@ import { StockTransferSearch } from "./views/containers/StockTransfer/StockTrans
 import { ProcurementDelivery } from "./views/containers/Procurement/ProcurementDelivery/index.js";
 import { VouchersList } from "./views/containers/Vouchers/VouchersList/index.js";
 import { MembershipTierList } from "./views/containers/MembershipTier/MembershipTierList/index.js";
+import OrderSuccess from "./views/containers/SelfService/OrderSuccess/index.js";
 
 function App() {
   const { pathname } = useLocation();

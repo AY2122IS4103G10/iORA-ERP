@@ -384,10 +384,10 @@ public class SAMController {
         }
     }
 
-    @PutMapping(path = "/voucher/issue/{voucherCode}", produces = "application/json")
-    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode) {
+    @PutMapping(path = "/voucher/issue/{voucherCode}/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode, @PathVariable Long customerId) {
         try {
-            return ResponseEntity.ok(customerService.issueVoucher(voucherCode));
+            return ResponseEntity.ok(customerService.issueVoucher(voucherCode, customerId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

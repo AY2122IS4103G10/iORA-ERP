@@ -34,7 +34,6 @@ const Header = ({
   openModal,
   onAcceptClicked,
   onCancelOrderClicked,
-  onShippedClicked,
   openInvoice,
   setAction,
   openConfirm,
@@ -131,15 +130,6 @@ const Header = ({
               )
             ) : status === "ACCEPTED" && subsys === "mf" ? (
               <div></div>
-            ) : status === "READY" && subsys === "mf" ? (
-              <button
-                type="button"
-                className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-                onClick={onShippedClicked}
-                disabled
-              >
-                <span>Ship order</span>
-              </button>
             ) : (
               <div></div>
             )}
@@ -268,13 +258,14 @@ export const ProcurementWrapper = ({ subsys }) => {
   const [warehouse, setWarehouse] = useState(null);
   const [lineItems, setLineItems] = useState([]);
   const [status, setStatus] = useState("");
+  const [statusHistory, setStatusHistory] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [qrDelivery, setQrDelivery] = useState("");
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const currSiteId = useSelector(selectUserSite)
+  const currSiteId = useSelector(selectUserSite);
 
   useEffect(() => {
     api.get("sam/procurementOrder", procurementId).then((response) => {
@@ -307,6 +298,7 @@ export const ProcurementWrapper = ({ subsys }) => {
         status: statusHistory[statusHistory.length - 1].status,
         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
       });
+      setStatusHistory(statusHistory);
       setQrValue(
         `http://localhost:3000/${subsys}/procurements/${procurementId}/pick-pack`
       );
@@ -349,6 +341,7 @@ export const ProcurementWrapper = ({ subsys }) => {
           status: statusHistory[statusHistory.length - 1].status,
           timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
         });
+        setStatusHistory(statusHistory);
       })
       .then(() => {
         addToast(
@@ -378,6 +371,7 @@ export const ProcurementWrapper = ({ subsys }) => {
           status: statusHistory[statusHistory.length - 1].status,
           timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
         });
+        setStatusHistory(statusHistory);
       })
       .then(() => {
         addToast("Successfully cancelled procurement order", {
@@ -393,33 +387,7 @@ export const ProcurementWrapper = ({ subsys }) => {
         })
       );
   };
-
-  const onShippedClicked = () => {
-    procurementApi
-      .shipOrder(manufacturing.id, {
-        id: procurementId,
-        lineItems,
-      })
-      .then((response) => {
-        const { lineItems, statusHistory } = response.data;
-        // setHeadquarters(headquarters);
-        // setManufacturing(manufacturing);
-        // setWarehouse(warehouse);
-        setLineItems(lineItems);
-        // lineItems.map((item) => ({
-        //   ...item,
-        //   actualQuantity: fulfilledProductItems.length,
-        // }))
-        setStatus({
-          status: statusHistory[statusHistory.length - 1].status,
-          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-        });
-      })
-      .catch((error) =>
-        console.error("Failed to ship procurement: ", error.message)
-      );
-  };
-
+  
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 
@@ -460,7 +428,6 @@ export const ProcurementWrapper = ({ subsys }) => {
             openModal={openModal}
             onAcceptClicked={onAcceptClicked}
             onCancelOrderClicked={onCancelOrderClicked}
-            onShippedClicked={onShippedClicked}
             handlePrint={handlePrint}
             openInvoice={openInvoice}
             setAction={setAction}
@@ -472,6 +439,8 @@ export const ProcurementWrapper = ({ subsys }) => {
               procurementId,
               status,
               setStatus,
+              statusHistory,
+              setStatusHistory,
               manufacturing,
               headquarters,
               warehouse,

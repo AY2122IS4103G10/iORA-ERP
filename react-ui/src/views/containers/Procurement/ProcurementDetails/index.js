@@ -1,9 +1,16 @@
 import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
-import {
-  SimpleTable,
-} from "../../../components/Tables/SimpleTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useOutletContext } from "react-router-dom";
+import { CheckIcon, ThumbUpIcon, UserIcon } from "@heroicons/react/outline";
+import { classNames } from "../../../../utilities/Util";
+import moment from "moment";
+
+const eventTypes = {
+  created: { icon: UserIcon, bgColorClass: "bg-gray-400" },
+  action: { icon: ThumbUpIcon, bgColorClass: "bg-blue-500" },
+  completed: { icon: CheckIcon, bgColorClass: "bg-green-500" },
+};
 
 const ItemsSummary = ({
   data,
@@ -89,10 +96,7 @@ const ItemsSummary = ({
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable
-            columns={columns}
-            data={data}
-          />
+          <SimpleTable columns={columns} data={data} />
         </div>
       )}
     </div>
@@ -101,6 +105,7 @@ const ItemsSummary = ({
 
 const ProcurementDetailsBody = ({
   pathname,
+  history,
   status,
   lineItems,
   manufacturing,
@@ -110,7 +115,7 @@ const ProcurementDetailsBody = ({
   onFulfilClicked,
   onVerifyReceivedClicked,
 }) => (
-  <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+  <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
       {/* Site Information*/}
       <section aria-labelledby="order-information-title">
@@ -187,6 +192,62 @@ const ProcurementDetailsBody = ({
         />
       </section>
     </div>
+    <section
+      aria-labelledby="timeline-title"
+      className="lg:col-start-3 lg:col-span-1"
+    >
+      <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
+        <h2 id="timeline-title" className="text-lg font-medium text-gray-900">
+          Activity
+        </h2>
+
+        {/* Activity Feed */}
+        <div className="mt-6 flow-root">
+          <ul className="-mb-8">
+            {history.map((item, itemIdx) => (
+              <li key={item.id}>
+                <div className="relative pb-8">
+                  {itemIdx !== history.length - 1 ? (
+                    <span
+                      className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  <div className="relative flex space-x-3">
+                    <div>
+                      <span
+                        className={classNames(
+                          item.type.bgColorClass,
+                          "h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
+                        )}
+                      >
+                        <item.type.icon
+                          className="w-5 h-5 text-white"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          {item.content}{" "}
+                          <span className="font-medium text-gray-900">
+                            {item.target}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                       {item.date}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
   </div>
 );
 
@@ -195,6 +256,7 @@ export const ProcurementDetails = () => {
     procurementId,
     subsys,
     status,
+    statusHistory,
     headquarters,
     manufacturing,
     warehouse,
@@ -202,19 +264,51 @@ export const ProcurementDetails = () => {
     setLineItems,
   } = useOutletContext();
   const { pathname } = useLocation();
-console.log(lineItems)
+  console.log(lineItems);
+  console.log(statusHistory)
+  const history = statusHistory.map(
+    ({ status, actionBy, timeStamp }, index) => {
+      return {
+        id: index,
+        type:
+          status === "PENDING"
+            ? eventTypes.created
+            : ["MANUFACTURING", "PICKING", "PACKING", "SHIPPING"].some(
+                (s) => s === status
+              )
+            ? eventTypes.action
+            : eventTypes.completed,
+        content:
+          status === "PENDING"
+            ? "Created by"
+            : status === "READY_FOR_SHIPPING"
+            ? "Ready for shipping by"
+            : `${status.charAt(0) + status.slice(1)} by`,
+        target: actionBy.name,
+        date: moment.unix(timeStamp / 1000).format("DD/MM, H:mm"),
+      };
+    }
+  );
   return (
-    [procurementId, headquarters, manufacturing, warehouse].every(Boolean) && (
+    [
+      procurementId,
+      headquarters,
+      manufacturing,
+      warehouse,
+      history.length,
+    ].every(Boolean) && (
       <ProcurementDetailsBody
         subsys={subsys}
         procurementId={procurementId}
         status={status.status}
+        statusHistory={statusHistory}
         manufacturing={manufacturing}
         headquarters={headquarters}
         warehouse={warehouse}
         lineItems={lineItems}
         setLineItems={setLineItems}
         pathname={pathname}
+        history={history}
         // onFulfilClicked={onFulfilClicked}
       />
     )

@@ -213,8 +213,15 @@ export const ConfirmSection = ({
 
 export const ProcurementPickPack = () => {
   const { addToast } = useToasts();
-  const { procurementId, subsys, status, setStatus, lineItems, setLineItems } =
-    useOutletContext();
+  const {
+    procurementId,
+    subsys,
+    status,
+    setStatus,
+    setStatusHistory,
+    lineItems,
+    setLineItems,
+  } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -238,6 +245,7 @@ export const ProcurementPickPack = () => {
               status: statusHistory[statusHistory.length - 1].status,
               timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
             });
+            setStatusHistory(statusHistory);
           })
           .then(() => {
             addToast(`Order #${procurementId} has completed manufacturing.`, {
@@ -274,11 +282,14 @@ export const ProcurementPickPack = () => {
           status: statusHistory[statusHistory.length - 1].status,
           timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
         });
+        setStatusHistory(statusHistory);
       })
       .then(() => {
         addToast(
           `Order #${procurementId}  ${
-            status.status === "PICKED"
+            status.status === "MANUFACTURED"
+              ? "has begun picking"
+              : status.status === "PICKED"
               ? "has completed picking"
               : "is ready for shipping"
           }.`,
@@ -308,6 +319,7 @@ export const ProcurementPickPack = () => {
           status: statusHistory[statusHistory.length - 1].status,
           timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
         });
+        setStatusHistory(statusHistory);
       })
       .then(() => {
         addToast(`Successfully picked ${barcode}.`, {

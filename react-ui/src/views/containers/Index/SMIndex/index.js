@@ -33,7 +33,7 @@ const navigation = [
   },
   {
     name: "Orders",
-    href: "/sm/orders",
+    href: "/sm/orders/search",
     icon: ArchiveIcon,
     current: false,
   },

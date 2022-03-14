@@ -188,7 +188,6 @@ export const ProductPrint = () => {
                       value={search}
                       onChange={onSearchChanged}
                     />
-                    
                   </div>
                 </div>
                 <button

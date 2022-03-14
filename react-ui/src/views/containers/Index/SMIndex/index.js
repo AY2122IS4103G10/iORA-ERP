@@ -50,15 +50,15 @@ const navigation = [
     current: false,
   },
   {
-    name: "Vouchers",
-    href: "/sm/vouchers",
-    icon: TicketIcon,
-    current: false,
-  },
-  {
     name: "Customers",
     href: "/sm/customers",
     icon: UserGroupIcon,
+    current: false,
+  },
+  {
+    name: "Rewards & Loyalty",
+    href: "/sm/rewards-loyalty/tiers",
+    icon: TicketIcon,
     current: false,
   },
   {

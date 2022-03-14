@@ -2,15 +2,12 @@ import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useOutletContext } from "react-router-dom";
-import { CheckIcon, ThumbUpIcon, UserIcon } from "@heroicons/react/outline";
 import { classNames } from "../../../../utilities/Util";
 import moment from "moment";
-
-const eventTypes = {
-  created: { icon: UserIcon, bgColorClass: "bg-gray-400" },
-  action: { icon: ThumbUpIcon, bgColorClass: "bg-blue-500" },
-  completed: { icon: CheckIcon, bgColorClass: "bg-green-500" },
-};
+import { sitesApi } from "../../../../environments/Api";
+import { useEffect } from "react";
+import { useState } from "react";
+import { eventTypes } from "../../../../constants/eventTypes";
 
 const ItemsSummary = ({
   data,
@@ -39,12 +36,12 @@ const ItemsSummary = ({
             .fieldValue,
       },
       {
-        Header: "Requested",
+        Header: "Req",
         accessor: "requestedQty",
       },
       {
-        Header: "Fulfilled",
-        accessor: "fulfilledQty",
+        Header: "Ful",
+        accessor: "packedQty",
         disableSortBy: true,
       },
       // {
@@ -103,6 +100,67 @@ const ItemsSummary = ({
   );
 };
 
+export const ActivitySection = ({ history }) => {
+  return (
+    <section
+      aria-labelledby="timeline-title"
+      className="lg:col-start-3 lg:col-span-1"
+    >
+      <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6 max-h-full overflow-auto">
+        <h2 id="timeline-title" className="text-lg font-medium text-gray-900">
+          Activity
+        </h2>
+
+        {/* Activity Feed */}
+        <div className="mt-6 flow-root">
+          <ul className="-mb-8">
+            {history.map((item, itemIdx) => (
+              <li key={item.id}>
+                <div className="relative pb-8">
+                  {itemIdx !== history.length - 1 ? (
+                    <span
+                      className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  <div className="relative flex space-x-3">
+                    <div>
+                      <span
+                        className={classNames(
+                          item.type.bgColorClass,
+                          "h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
+                        )}
+                      >
+                        <item.type.icon
+                          className="w-5 h-5 text-white"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          {item.content}{" "}
+                          <span className="font-medium text-gray-900">
+                            {item.target}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        {item.date}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const ProcurementDetailsBody = ({
   pathname,
   history,
@@ -111,6 +169,7 @@ const ProcurementDetailsBody = ({
   manufacturing,
   headquarters,
   warehouse,
+  notes,
   setLineItems,
   onFulfilClicked,
   onVerifyReceivedClicked,
@@ -177,6 +236,12 @@ const ProcurementDetailsBody = ({
                   </address>
                 </dd>
               </div>
+              {notes && (
+                <div className="sm:col-span-2">
+                  <dt className="text-sm font-medium text-gray-500">Remarks</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{notes}</dd>
+                </div>
+              )}
             </dl>
           </div>
         </div>
@@ -192,62 +257,7 @@ const ProcurementDetailsBody = ({
         />
       </section>
     </div>
-    <section
-      aria-labelledby="timeline-title"
-      className="lg:col-start-3 lg:col-span-1"
-    >
-      <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-        <h2 id="timeline-title" className="text-lg font-medium text-gray-900">
-          Activity
-        </h2>
-
-        {/* Activity Feed */}
-        <div className="mt-6 flow-root">
-          <ul className="-mb-8">
-            {history.map((item, itemIdx) => (
-              <li key={item.id}>
-                <div className="relative pb-8">
-                  {itemIdx !== history.length - 1 ? (
-                    <span
-                      className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                  <div className="relative flex space-x-3">
-                    <div>
-                      <span
-                        className={classNames(
-                          item.type.bgColorClass,
-                          "h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
-                        )}
-                      >
-                        <item.type.icon
-                          className="w-5 h-5 text-white"
-                          aria-hidden="true"
-                        />
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p className="text-sm text-gray-500">
-                          {item.content}{" "}
-                          <span className="font-medium text-gray-900">
-                            {item.target}
-                          </span>
-                        </p>
-                      </div>
-                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                       {item.date}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
+    {history && <ActivitySection history={history} />}
   </div>
 );
 
@@ -260,35 +270,52 @@ export const ProcurementDetails = () => {
     headquarters,
     manufacturing,
     warehouse,
+    notes,
     lineItems,
     setLineItems,
   } = useOutletContext();
   const { pathname } = useLocation();
-  console.log(lineItems);
-  console.log(statusHistory)
-  const history = statusHistory.map(
-    ({ status, actionBy, timeStamp }, index) => {
-      return {
-        id: index,
-        type:
-          status === "PENDING"
-            ? eventTypes.created
-            : ["MANUFACTURING", "PICKING", "PACKING", "SHIPPING"].some(
-                (s) => s === status
-              )
-            ? eventTypes.action
-            : eventTypes.completed,
-        content:
-          status === "PENDING"
-            ? "Created by"
-            : status === "READY_FOR_SHIPPING"
-            ? "Ready for shipping by"
-            : `${status.charAt(0) + status.slice(1)} by`,
-        target: actionBy.name,
-        date: moment.unix(timeStamp / 1000).format("DD/MM, H:mm"),
-      };
-    }
-  );
+  const [history, setHistory] = useState([]);
+
+  const fetchActionBy = async (actionBy) => {
+    const { data } = await sitesApi.getSiteSAM(
+      Boolean(actionBy.id) ? actionBy.id : actionBy
+    );
+    return data;
+  };
+
+  useEffect(() => {
+    const fetchAllActionBy = async () => {
+      return Promise.all(
+        statusHistory.map(({ actionBy }) => fetchActionBy(actionBy))
+      );
+    };
+    fetchAllActionBy().then((data) => {
+      setHistory(
+        statusHistory.map(({ status, timeStamp }, index) => ({
+          id: index,
+          type:
+            status === "PENDING"
+              ? index === 0
+                ? eventTypes.created
+                : eventTypes.action
+              : ["PICKING", "PACKING", "SHIPPING"].some((s) => s === status)
+              ? eventTypes.action
+              : status === "CANCELLED"
+              ? eventTypes.cancelled
+              : eventTypes.completed,
+          content:
+            status === "PENDING"
+              ? `${index === 0 ? "Created" : "Updated"} by`
+              : status === "READY_FOR_SHIPPING"
+              ? "Ready for shipping by"
+              : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
+          target: data[index].name,
+          date: moment.unix(timeStamp / 1000).format("DD/MM, H:mm"),
+        }))
+      );
+    });
+  }, [statusHistory]);
   return (
     [
       procurementId,
@@ -305,6 +332,7 @@ export const ProcurementDetails = () => {
         manufacturing={manufacturing}
         headquarters={headquarters}
         warehouse={warehouse}
+        notes={notes}
         lineItems={lineItems}
         setLineItems={setLineItems}
         pathname={pathname}

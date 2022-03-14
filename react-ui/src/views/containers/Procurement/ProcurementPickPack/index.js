@@ -221,6 +221,7 @@ export const ProcurementPickPack = () => {
     setStatusHistory,
     lineItems,
     setLineItems,
+    openInvoice,
   } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -298,8 +299,10 @@ export const ProcurementPickPack = () => {
             autoDismiss: true,
           }
         );
-        status.status === "PACKED" &&
+        if (status.status === "PACKED") {
+          openInvoice();
           navigate(`/${subsys}/procurements/${procurementId}/delivery`);
+        }
       });
   };
 

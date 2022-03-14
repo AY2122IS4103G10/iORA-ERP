@@ -163,10 +163,6 @@ const Header = ({
 export const InvoiceModal = ({
   open,
   closeModal,
-  orderId,
-  orderStatus,
-  data,
-  qrValue,
   company,
   createdBy,
   fromSite,
@@ -256,6 +252,7 @@ export const ProcurementWrapper = ({ subsys }) => {
   const [headquarters, setHeadquarters] = useState(null);
   const [manufacturing, setManufacturing] = useState(null);
   const [warehouse, setWarehouse] = useState(null);
+  const [notes, setNotes] = useState("")
   const [lineItems, setLineItems] = useState([]);
   const [status, setStatus] = useState("");
   const [statusHistory, setStatusHistory] = useState([]);
@@ -274,6 +271,7 @@ export const ProcurementWrapper = ({ subsys }) => {
         manufacturing,
         warehouse,
         lineItems,
+        notes,
         statusHistory,
       } = response.data;
       api
@@ -294,6 +292,7 @@ export const ProcurementWrapper = ({ subsys }) => {
           },
         }))
       );
+      setNotes(notes)
       setStatus({
         status: statusHistory[statusHistory.length - 1].status,
         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
@@ -444,11 +443,14 @@ export const ProcurementWrapper = ({ subsys }) => {
               manufacturing,
               headquarters,
               warehouse,
+              notes,
               lineItems,
               setLineItems,
               componentRef,
               handlePrint,
               addToast,
+              openInvoice,
+              currSiteId,
             }}
           />
         </div>

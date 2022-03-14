@@ -10,65 +10,100 @@ export const ProcurementDelivery = () => {
     subsys,
     status,
     setStatus,
-    headquarters,
-    manufacturing,
-    warehouse,
+    setStatusHistory,
     lineItems,
     setLineItems,
-    componentRef,
-    handlePrint,
     addToast,
+    currSiteId,
   } = useOutletContext();
 
-  const onConfirmClicked = () => {
-    status.status === "READY_FOR_SHIPPING" &&
-      procurementApi
-        .shipOrder(procurementId)
-        .then((response) => {
-          const { lineItems, statusHistory } = response.data;
-          setLineItems(
-            lineItems.map((item) => ({
-              ...item,
-              product: {
-                sku: item.product.sku,
-                productFields: item.product.productFields,
-              },
-            }))
-          );
-          setStatus({
-            status: statusHistory[statusHistory.length - 1].status,
-            timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-          });
-        })
-        .then(() => {
-          addToast(`Order #${procurementId} has been shipped.`, {
-            appearance: "success",
-            autoDismiss: true,
-          });
-        });
+  const onConfirmClicked = async () => {
+    const { data } = await (status.status === "READY_FOR_SHIPPING"
+      ? procurementApi.shipOrder(procurementId)
+      : procurementApi.receiveOrder(procurementId, currSiteId));
+      console.log(data)
+    const { lineItems, statusHistory } = data;
+    setLineItems(
+      lineItems.map((item) => ({
+        ...item,
+        product: {
+          sku: item.product.sku,
+          productFields: item.product.productFields,
+        },
+      }))
+    );
+    setStatus({
+      status: statusHistory[statusHistory.length - 1].status,
+      timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+    });
+    setStatusHistory(statusHistory);
+    addToast(`Order #${procurementId} has been shipped.`, {
+      appearance: "success",
+      autoDismiss: true,
+    });
+
+    // status.status === "READY_FOR_SHIPPING" &&
+    //   procurementApi
+    //     .shipOrder(procurementId)
+    //     .then((response) => {
+    //       const { lineItems, statusHistory } = response.data;
+    //       setLineItems(
+    //         lineItems.map((item) => ({
+    //           ...item,
+    //           product: {
+    //             sku: item.product.sku,
+    //             productFields: item.product.productFields,
+    //           },
+    //         }))
+    //       );
+    //       setStatus({
+    //         status: statusHistory[statusHistory.length - 1].status,
+    //         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+    //       });
+    //     })
+    //     .then(() => {
+    //       addToast(`Order #${procurementId} has been shipped.`, {
+    //         appearance: "success",
+    //         autoDismiss: true,
+    //       });
+    //     });
   };
 
   return (
-    ["READY_FOR_SHIPPING", "SHIPPING", "SHIPPED", "COMPLETED"].some(
-      (s) => s === status.status
-    ) ? (
-      <div className="flex justify-center">
+    <div className="flex justify-center">
+      {status.status === "READY_FOR_SHIPPING" && subsys === "mf" ? (
         <ConfirmSection
           subsys={subsys}
           procurementId={procurementId}
-          title={`Confirm items ${
-            status.status === "READY_FOR_SHIPPING" ? "shipped" : "received"
-          }`}
-          body={`Confirm that all the items in this order have been ${
-            status.status === "READY_FOR_SHIPPING" ? "shipped" : "received"
-          }? This action cannot be undone.`}
+          title={"Confirm items shipped"}
+          body={
+            "Confirm that all the items in this order have been shipped? This action cannot be undone."
+          }
           onConfirmClicked={onConfirmClicked}
         />
-      </div>
-    ) : <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
-    <span className="mt-2 block text-base font-medium text-gray-900">
-      No items to deliver.
-    </span>
-  </div>
+      ) : status.status === "SHIPPING" && subsys === "wh" ? (
+        <ConfirmSection
+          subsys={subsys}
+          procurementId={procurementId}
+          title={"Confirm items received"}
+          body={
+            "Confirm that all the items in this order have been? This action cannot be undone."
+          }
+          onConfirmClicked={onConfirmClicked}
+        />
+      ) : (
+        <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+          <span className="mt-2 block text-base font-medium text-gray-900">
+            No items to{" "}
+            {["SHIPPING", "SHIPPED", "COMPLETED"].some(
+              (s) => s === status.status
+            )
+              ? "receive"
+              : "deliver"}
+            .
+          </span>
+        </div>
+      )}
+    </div>
   );
 };

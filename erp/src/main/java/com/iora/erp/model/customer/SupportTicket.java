@@ -43,12 +43,12 @@ public class SupportTicket {
     private List<SupportTicketMsg> messages;
 
     public SupportTicket() {
-        messages = new ArrayList<>();
+        this.status = Status.PENDING;
+        this.messages = new ArrayList<>();
     }
 
-    public SupportTicket(Status status, Category category, String subject) {
+    public SupportTicket(Category category, String subject) {
         this();
-        this.status = status;
         this.category = category;
         this.subject = subject;
     }

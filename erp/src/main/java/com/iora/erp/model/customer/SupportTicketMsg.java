@@ -19,19 +19,14 @@ public class SupportTicketMsg {
 
     @Column(nullable = false)
     private String message;
-    private String image;
 
     public SupportTicketMsg() {
         this.timeStamp = LocalDateTime.now();
     }
 
     public SupportTicketMsg(String message) {
+        this();
         this.message = message;
-    }
-
-    public SupportTicketMsg(String message, String image) {
-        this.message = message;
-        this.image = image;
     }
 
     public Long getId() {
@@ -56,13 +51,5 @@ public class SupportTicketMsg {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getImage() {
-        return this.image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 }

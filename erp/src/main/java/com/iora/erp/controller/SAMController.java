@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -541,6 +542,24 @@ public class SAMController {
     public ResponseEntity<Object> updateSupportTicket(@RequestBody SupportTicket supportTicket) {
         try {
             return ResponseEntity.ok(customerService.updateSupportTicket(supportTicket));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PatchMapping(path = "/ticket/reply/{id}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> replySupportTicket(@PathVariable Long id, @RequestBody String message) {
+        try {
+            return ResponseEntity.ok(customerService.replySupportTicket(id, message));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    } 
+
+    @DeleteMapping(path = "/ticket/{id}",  produces = "application/json")
+    public ResponseEntity<Object> replySupportTicket(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.deleteSupportTicket(id));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

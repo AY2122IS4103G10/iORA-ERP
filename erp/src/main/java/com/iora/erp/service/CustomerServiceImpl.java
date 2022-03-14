@@ -19,6 +19,7 @@ import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
+import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.utils.StringGenerator;
 
@@ -332,7 +333,27 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public SupportTicket updateSupportTicket(SupportTicket supportTicket) {
+    public SupportTicket updateSupportTicket(SupportTicket supportTicket) throws SupportTicketException {
+        getSupportTicket(supportTicket.getId());
         return em.merge(supportTicket);
+    }
+
+    @Override
+    public SupportTicket replySupportTicket(Long id, String message) throws SupportTicketException {
+        SupportTicket st = getSupportTicket(id);
+        st.addMessage(createSTMsg(new SupportTicketMsg(message)));
+        return em.merge(st);
+    }
+
+    @Override
+    public Long deleteSupportTicket(Long id) throws SupportTicketException {
+        em.remove(getSupportTicket(id));
+        return id;
+    }
+
+    @Override
+    public SupportTicketMsg createSTMsg(SupportTicketMsg supportTicketMsg) {
+        em.persist(supportTicketMsg);
+        return supportTicketMsg;
     }
 }

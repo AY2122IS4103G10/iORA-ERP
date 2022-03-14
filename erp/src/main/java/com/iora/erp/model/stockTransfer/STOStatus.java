@@ -1,12 +1,14 @@
 package com.iora.erp.model.stockTransfer;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.iora.erp.enumeration.StockTransferStatus;
 import com.iora.erp.model.site.Site;
@@ -16,8 +18,8 @@ public class STOStatus {
     @ManyToOne
     private Site actionBy;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime timeStamp;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeStamp;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -26,7 +28,7 @@ public class STOStatus {
     public STOStatus() {
     }
 
-    public STOStatus(Site actionBy, LocalDateTime timeStamp, StockTransferStatus status) {
+    public STOStatus(Site actionBy, Date timeStamp, StockTransferStatus status) {
         this.actionBy = actionBy;
         this.timeStamp = timeStamp;
         this.status = status;
@@ -40,11 +42,11 @@ public class STOStatus {
         this.actionBy = actionBy;
     }
 
-    public LocalDateTime getTimeStamp() {
+    public Date getTimeStamp() {
         return this.timeStamp;
     }
 
-    public void setTimeStamp(LocalDateTime timeStamp) {
+    public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
     }
 

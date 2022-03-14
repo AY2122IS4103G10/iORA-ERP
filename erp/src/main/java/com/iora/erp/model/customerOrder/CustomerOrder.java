@@ -1,7 +1,7 @@
 package com.iora.erp.model.customerOrder;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -12,6 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iora.erp.model.site.Site;
@@ -22,8 +24,8 @@ public class CustomerOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime dateTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateTime;
 
     @Column(nullable = false, scale = 2)
     private Double totalAmount;
@@ -50,7 +52,7 @@ public class CustomerOrder {
     private Long customerId;
 
     public CustomerOrder() {
-        dateTime = LocalDateTime.now();
+        dateTime = new Date();
         this.lineItems = new ArrayList<>();
         this.payments = new ArrayList<>();
         this.refundedLIs = new ArrayList<>();
@@ -66,11 +68,11 @@ public class CustomerOrder {
         this.id = id;
     }
 
-    public LocalDateTime getDateTime() {
+    public Date getDateTime() {
         return this.dateTime;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
+    public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
     }
 

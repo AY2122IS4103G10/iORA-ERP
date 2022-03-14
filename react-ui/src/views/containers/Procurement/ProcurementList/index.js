@@ -39,7 +39,7 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
         accessor: (row) => row.warehouse,
       },
       {
-        Header: "Updated",
+        Header: "Last Updated",
         accessor: (row) =>
           moment
             .unix(

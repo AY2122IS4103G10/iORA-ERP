@@ -56,17 +56,7 @@ const membershipTierSlice = createSlice({
       state.membershipTiers.sort((x, y) => x.multiplier - y.multiplier);
     });
     builder.addCase(updateExistingMembershipTier.fulfilled, (state, action) => {
-      const { name, multiplier, threshold } = action.payload;
-      console.log(action.payload);
-      const existingMembershipTier = state.membershipTiers.find(
-        (tier) => tier.name === name
-      );
-      if (existingMembershipTier) {
-        existingMembershipTier.multiplier = multiplier;
-        existingMembershipTier.threshold = threshold;
-      }
-      state.membershipTiers.sort((x) => x.multiplier);
-      // state.status = "idle";
+      state.status = "idle";
     });
   },
 });

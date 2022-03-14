@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo} from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,39 +11,18 @@ import {
 } from "../../../../stores/slices/userSlice";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
-const convertData = (data) =>
-  data.products.map((product) => ({
-    sku: product.sku,
-    qty: product.qty,
-    reserve: product.reserveQty,
-  }));
-
-function isObjectEmpty(obj) {
-  return Object.keys(obj).length === 0;
-}
-
-const columns = [
-  {
-    Header: "SKU Code",
-    accessor: "sku",
-  },
-  {
-    Header: "Qty",
-    accessor: "qty",
-  },
-  {
-    Header: "Reserved Qty",
-    accessor: "reserve",
-  },
-];
+// const convertData = (data) =>
+//   data.products.map((product) => ({
+//     sku: product.sku,
+//     qty: product.qty,
+//     reserve: product.reserveQty,
+//   }));
 
 export const MyStoreStock = (subsys) => {
   const id = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
   const siteStock = useSelector(selectCurrSiteStock);
-
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getASiteStock(id));
@@ -82,6 +61,55 @@ export const MyStoreStock = (subsys) => {
 
   const path = `/${subsys.subsys}/stocklevels/my`;
 
+  const columns = useMemo(()=> [
+    {
+      Header: "SKU Code",
+      accessor: "sku",
+    },
+    {
+      Header: "Colour",
+      Cell: (row) => {
+        return (
+          row.row.original.product.productFields.find((field) => field.fieldName === 'COLOUR').fieldValue
+        );
+      }
+    },
+    {
+      Header: "Size",
+      Cell: (row) => {
+        return (
+          row.row.original.product.productFields.find((field) => field.fieldName === 'SIZE').fieldValue
+        );
+      }
+    },
+
+    {
+      Header: "Qty",
+      accessor: "qty",
+    },
+    {
+      Header: "Reserved",
+      accessor: "reserveQty",
+    },
+    // {
+    //   Header: "",
+    //   accessor: "accessor",
+    //   disableSortBy: true,
+    //   Cell: (e) => {
+    //     return (
+    //       <div>
+    //         <button
+    //           type="button"
+    //           className="px-3 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+    //         >
+    //           Edit Qty
+    //         </button>
+    //       </div>
+    //     );
+    //   }
+    // }
+  ], []);
+
   return (
     <>
       <SectionHeading
@@ -97,13 +125,13 @@ export const MyStoreStock = (subsys) => {
                 {/* Stock Levels*/}
                 <section aria-labelledby="stocks-level">
                   <div className="ml-2 mr-2">
-                    {isObjectEmpty(siteStock) ? (
+                    {siteStock === null ? (
                       <p>loading</p>
                     ) : (
-                      <SimpleTable
+                      <SelectableTable
                         columns={columns}
-                        data={convertData(siteStock)}
-                        // path={path}
+                        data={siteStock?.products}
+                        path={path}
                       />
                     )}
                   </div>

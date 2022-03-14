@@ -49,7 +49,9 @@ export const sitesApi = {
   getAll() {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSites/all`);
   },
-
+  getSiteSAM(id) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSite/${id}`);
+  },
   getASite(id) {
     return axiosPrivate.get(`${REST_ENDPOINT}admin/viewSite/${id}`);
   },
@@ -93,16 +95,15 @@ export const procurementApi = {
       `${REST_ENDPOINT}manufacturing/procurementOrder/scan/${orderId}?barcode=${barcode}`
     );
   },
-  fulfillOrder(siteId, order) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`,
-      order
-    );
-  },
   shipOrder(siteId, order) {
     return axiosPrivate.put(
       `${REST_ENDPOINT}manufacturing/procurementOrder/ship/${siteId}`,
       order
+    );
+  },
+  receiveOrder(orderId, siteId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}warehouse/procurementOrder/receive/${orderId}/${siteId}`
     );
   },
 };
@@ -124,10 +125,9 @@ export const vendorApi = {
 };
 
 export const stockLevelApi = {
-  editStock(toUpdate, siteId) {
+  editStock(sku,qty, siteId) {
     return axiosPrivate.post(
-      `${REST_ENDPOINT}warehouse/editStock/${siteId}`,
-      toUpdate
+      `${REST_ENDPOINT}warehouse/editStock/${siteId}/${sku}/${qty}`,
     );
   },
 };

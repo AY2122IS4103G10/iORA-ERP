@@ -10,49 +10,50 @@ import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
 import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
 import { CustomerForm } from "./views/containers/Customer/CustomerForm";
 import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
-import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails/index.js";
+import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails";
 import { DepartmentForm } from "./views/containers/Department/DepartmentForm";
 import { ManageDepartment } from "./views/containers/Department/ManageDepartment";
 import { EmployeeForm } from "./views/containers/Employee/CreateEmployeeForm";
-import { EmployeeDetails } from "./views/containers/Employee/EmployeeDetails/index.js";
+import { EmployeeDetails } from "./views/containers/Employee/EmployeeDetails";
 import { ManageEmployee } from "./views/containers/Employee/ManageEmployee";
 import { AdminIndex } from "./views/containers/Index/AdminIndex";
 import { HomeIndex } from "./views/containers/Index/HomeIndex";
-import { LGIndex } from "./views/containers/Index/LGIndex/index.js";
+import { LGIndex } from "./views/containers/Index/LGIndex";
 import { MFIndex } from "./views/containers/Index/MFIndex";
 import { SMIndex } from "./views/containers/Index/SMIndex";
 import { StoreIndex } from "./views/containers/Index/StrIndex";
 import { WHIndex } from "./views/containers/Index/WHIndex";
-import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/index.js";
+import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails";
 import { JobTitleForm } from "./views/containers/JobTitle/JobTitleForm";
 import { ManageJobTitle } from "./views/containers/JobTitle/ManageJobTitle";
-import { ManageMembershipTier } from "./views/containers/MembershipTier/ManageMembershipTier/index.js";
-import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails/index.js";
-import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm/index.js";
-import { ManageOnlineOrders } from "./views/containers/OnlineOrder/ManageOnlineOrders/index.js";
-import { OnlineOrderList } from "./views/containers/OnlineOrder/OnlineOrderList/index.js";
-import { OnlineOrderSearch } from "./views/containers/OnlineOrder/OnlineOrderSearch/index.js";
-import { CustomerOrderDetails } from "./views/containers/Orders/CustomerOrderDetails/index.js";
-import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper/index.js";
-import { ManageOrders } from "./views/containers/Orders/ManageOrders/index.js";
-import { OrderList } from "./views/containers/Orders/OrderList/index.js";
-import { OrderSearch } from "./views/containers/Orders/OrderSearch/index.js";
+import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails";
+import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm";
+import { MembershipTierList } from "./views/containers/MembershipTier/MembershipTierList";
+import { ManageOnlineOrders } from "./views/containers/OnlineOrder/ManageOnlineOrders";
+import { OnlineOrderList } from "./views/containers/OnlineOrder/OnlineOrderList";
+import { OnlineOrderSearch } from "./views/containers/OnlineOrder/OnlineOrderSearch";
+import { CustomerOrderDetails } from "./views/containers/Orders/CustomerOrderDetails";
+import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper";
+import { ManageOrders } from "./views/containers/Orders/ManageOrders";
+import { OrderList } from "./views/containers/Orders/OrderList";
+import { OrderSearch } from "./views/containers/Orders/OrderSearch";
 import { ManagePOS } from "./views/containers/POS/ManagePOS";
-import { OrderDetails } from "./views/containers/POS/OrderDetails/index.js";
-import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory/index.js";
-import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder/index.js";
+import { OrderDetails } from "./views/containers/POS/OrderDetails";
+import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory";
+import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder";
 import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
+import { ProcurementDelivery } from "./views/containers/Procurement/ProcurementDelivery";
 import { ProcurementDetails } from "./views/containers/Procurement/ProcurementDetails";
 import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
-import { ProcurementList } from "./views/containers/Procurement/ProcurementList/index.js";
-import { ProcurementPickPack } from "./views/containers/Procurement/ProcurementPickPack/index.js";
-import { ProcurementSearch } from "./views/containers/Procurement/ProcurementSearch/index.js";
-import { ProcurementWrapper } from "./views/containers/Procurement/ProcurementWrapper/index.js";
+import { ProcurementList } from "./views/containers/Procurement/ProcurementList";
+import { ProcurementPickPack } from "./views/containers/Procurement/ProcurementPickPack";
+import { ProcurementSearch } from "./views/containers/Procurement/ProcurementSearch";
+import { ProcurementWrapper } from "./views/containers/Procurement/ProcurementWrapper";
 import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ProductForm } from "./views/containers/Products/ProductForm";
-import { ProductPrint } from "./views/containers/Products/ProductPrint/index.js";
-import { ProductsList } from "./views/containers/Products/ProductsList/index.js";
+import { ProductPrint } from "./views/containers/Products/ProductPrint";
+import { ProductsList } from "./views/containers/Products/ProductsList";
 // import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
@@ -61,26 +62,27 @@ import { Order } from "./views/containers/SelfService/Order";
 import { ManageSites } from "./views/containers/Sites/ManageSites";
 import { SiteDetails } from "./views/containers/Sites/SiteDetails";
 import { SiteForm } from "./views/containers/Sites/SiteForm";
-import { AProductStock } from "./views/containers/StockLevels/AProductStock/index.js";
-import { AsiteStock } from "./views/containers/StockLevels/ASiteStock/index.js";
-import { ProductStocks } from "./views/containers/StockLevels/ByProduct/index.js";
-import { SiteStocks } from "./views/containers/StockLevels/BySite/index.js";
-import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel/index.js";
+import { AProductStock } from "./views/containers/StockLevels/AProductStock";
+import { AsiteStock } from "./views/containers/StockLevels/ASiteStock";
+import { ProductStocks } from "./views/containers/StockLevels/ByProduct";
+import { SiteStocks } from "./views/containers/StockLevels/BySite";
+import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel";
 import { StockLevelForm } from "./views/containers/StockLevels/ProdStockLevelForm";
-import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList/index.js";
+import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
 import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
-import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList/index.js";
-import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack/index.js";
-import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch/index.js";
-import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTransferWrapper/index.js";
+import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList";
+import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack";
+import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch";
+import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTransferWrapper";
 import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTransfer";
 import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
 import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
-import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
-import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
+import { ManageRewardsLoyalty } from "./views/containers/Vouchers/ManageVouchers";
+import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
+import { VouchersList } from "./views/containers/Vouchers/VouchersList";
 
 function App() {
   const { pathname } = useLocation();
@@ -103,6 +105,7 @@ function App() {
               </PrivateRoute>
             }
           >
+            {/* Products */}
             <Route path="products" element={<Outlet />}>
               <Route
                 index
@@ -117,6 +120,7 @@ function App() {
               <Route path="edit/:prodId" element={<ProductForm />} />
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
+            {/* Stock Levels */}
             <Route path="stocklevels">
               <Route path="my/:id" element={<StockLevelForm subsys="sm" />} />
               <Route path="my" element={<MyStoreStock subsys="sm" />} />
@@ -184,6 +188,7 @@ function App() {
               >
                 <Route index element={<ProcurementDetails subsys="sm" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
@@ -218,12 +223,41 @@ function App() {
               <Route path="edit/:orderId" element={<ProcurementForm />} />
             </Route>
 
-            {/* Vouchers */}
-            <Route path="vouchers" element={<Outlet />}>
-              <Route index element={<ManageVouchers />} />
-              <Route path=":voucherCode" element={<VoucherDetails />} />
-              <Route path="create" element={<VoucherForm />} />
-              <Route path="edit/:voucherId" element={<VoucherForm />} />
+            {/* Rewards & Loyalty */}
+            <Route path="rewards-loyalty" element={<Outlet />}>
+              <Route path="vouchers" element={<Outlet />}>
+                <Route
+                  index
+                  element={
+                    <ManageRewardsLoyalty title="Vouchers">
+                      <VouchersList />
+                    </ManageRewardsLoyalty>
+                  }
+                />
+                <Route path=":voucherCode" element={<Outlet />}>
+                  <Route index element={<VoucherDetails />} />
+                  <Route path="edit" element={<VoucherForm />} />
+                </Route>
+                <Route path="create" element={<VoucherForm />} />
+              </Route>
+              <Route path="tiers" element={<Outlet />}>
+                <Route
+                  index
+                  element={
+                    <ManageRewardsLoyalty
+                      title="Membership Tiers"
+                      buttonText="tier"
+                    >
+                      <MembershipTierList />
+                    </ManageRewardsLoyalty>
+                  }
+                />
+                <Route path=":name" element={<Outlet />}>
+                  <Route index element={<MembershipTierDetails />} />
+                  <Route path="edit" element={<MembershipTierForm />} />
+                </Route>
+                <Route path="create" element={<MembershipTierForm />} />
+              </Route>
             </Route>
 
             {/* Customers */}
@@ -232,12 +266,12 @@ function App() {
               <Route path=":customerId" element={<CustomerDetails />} />
               <Route path="create" element={<CustomerForm />} />
               <Route path="edit/:customerId" element={<CustomerForm />} />
-              <Route path="tiers" element={<Outlet />}>
+              {/* <Route path="tiers" element={<Outlet />}>
                 <Route index element={<ManageMembershipTier />} />
                 <Route path=":name" element={<MembershipTierDetails />} />
                 <Route path="create" element={<MembershipTierForm />} />
                 <Route path="edit/:name" element={<MembershipTierForm />} />
-              </Route>
+              </Route> */}
             </Route>
           </Route>
 
@@ -262,7 +296,6 @@ function App() {
                 element={<AProductStock subsys="str" />}
               />
             </Route>
-
             {/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
               <Route
@@ -385,6 +418,7 @@ function App() {
               >
                 <Route index element={<ProcurementDetails subsys="mf" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<VoucherForm />} />
@@ -445,8 +479,9 @@ function App() {
                 path=":procurementId"
                 element={<ProcurementWrapper subsys="wh" />}
               >
-                <Route index element={<ProcurementDetails subsys="wh" />} />
+                <Route index element={<ProcurementDetails />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
             </Route>
 

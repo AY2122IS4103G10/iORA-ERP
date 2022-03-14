@@ -6,22 +6,21 @@ import {
 } from "@stripe/react-stripe-js";
 import { useLocation } from "react-router-dom";
 
-export default function CheckoutForm() {
+export default function CheckoutForm({
+  setIsLoading,
+  clientSecret,
+  closeModal,
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const location = useLocation();
 
   const [message, setMessage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!stripe) {
       return;
     }
-
-    const clientSecret = new URLSearchParams(window.location.search).get(
-      "payment_intent_client_secret"
-    );
 
     if (!clientSecret) {
       return;
@@ -43,7 +42,7 @@ export default function CheckoutForm() {
           break;
       }
     });
-  }, [stripe]);
+  }, [stripe, clientSecret]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,19 +54,15 @@ export default function CheckoutForm() {
     }
 
     setIsLoading(true);
+    console.log(location);
 
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${location.pathname}/success`,
+        return_url: `http://localhost:3000/ss/order`,
       },
     });
 
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Otherwise, your customer will be redirected to
-    // your `return_url`. For some payment methods like iDEAL, your customer will
-    // be redirected to an intermediate site first to authorize the payment, then
-    // redirected to the `return_url`.
     if (error.type === "card_error" || error.type === "validation_error") {
       setMessage(error.message);
     } else {
@@ -80,13 +75,23 @@ export default function CheckoutForm() {
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
       <PaymentElement id="payment-element" />
-      <button disabled={isLoading || !stripe || !elements} id="submit">
-        <span id="button-text">
-          {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
-        </span>
-      </button>
       {/* Show any error or success messages */}
       {message && <div id="payment-message">{message}</div>}
+      <div className="sm:mt-6 sm:flex sm:flex-row">
+        <button
+          type="button"
+          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+          onClick={closeModal}
+        >
+          Cancel Checkout
+        </button>
+        <button
+          type="submit"
+          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+        >
+          Checkout
+        </button>
+      </div>
     </form>
   );
 }

@@ -4,8 +4,11 @@ import java.util.List;
 
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
+import com.iora.erp.exception.SupportTicketException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.customer.SupportTicket;
+import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customer.Voucher;
 
 public interface CustomerService {
@@ -35,6 +38,15 @@ public interface CustomerService {
     public abstract List<MembershipTier> listOfMembershipTier();
     public abstract MembershipTier findMembershipTierById(String name);
     public abstract MembershipTier createMembershipTier(MembershipTier membershipTier);
-
     public abstract void deleteMembershipTier(String name);
+
+    public abstract SupportTicket getSupportTicket(Long id) throws SupportTicketException;
+    public abstract List<SupportTicket> searchSupportTicket(Long id);
+    public abstract List<SupportTicket> searchSupportTicketBySubject(String subject);
+    public abstract SupportTicket createSupportTicket(SupportTicket supportTicket);
+    public abstract SupportTicket updateSupportTicket(SupportTicket supportTicket) throws SupportTicketException;
+    public abstract SupportTicket replySupportTicket(Long id, String message) throws SupportTicketException;
+    public abstract Long deleteSupportTicket(Long id) throws SupportTicketException;
+
+    public abstract SupportTicketMsg createSTMsg(SupportTicketMsg supportTicketMsg);
 }

@@ -3,9 +3,6 @@ package com.iora.erp.model.customer;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-
-import com.iora.erp.model.Currency;
 
 @Entity
 public class BirthdayPoints {

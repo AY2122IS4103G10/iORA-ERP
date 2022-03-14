@@ -3,9 +3,11 @@ package com.iora.erp.controller;
 import java.util.List;
 
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -81,6 +83,19 @@ public class OnlineCustomerController {
      * Online Order
      * ---------------------------------------------------------
      */
+
+    @Autowired
+    StripeService stripeService;
+
+    @PostMapping(path = "/pay", consumes = "application/json",  produces = "application/json")
+    public ResponseEntity<Object> completePayment(@RequestBody List<CustomerOrderLI> lineItems) {
+        try {
+            return ResponseEntity.ok(stripeService.chargeCreditCard(lineItems));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
     @GetMapping(path = "/order/{orderId}", produces = "application/json")
     public ResponseEntity<Object> getOnlineOrder(@PathVariable Long orderId) {

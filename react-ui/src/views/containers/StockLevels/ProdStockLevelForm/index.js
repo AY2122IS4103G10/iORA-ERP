@@ -11,9 +11,9 @@ import {
   updateCurrSite,
 } from "../../../../stores/slices/userSlice";
 import {
-  getASiteStock,
-  selectCurrSiteStock,
+  selectSiteProductStock,
   editStock,
+  getASiteStock,
 } from "../../../../stores/slices/stocklevelSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
@@ -253,17 +253,53 @@ export const Slideover = ({
   );
 };
 
+export const QuantityTable = ({productStock}) => {
+  return (
+    <div className="mt-4 flex flex-col">
+      <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+            <table className="min-w-full divide-y divide-gray-300">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="py-3.5 text-center text-sm font-semibold text-gray-900">
+                    Quantity
+                  </th>
+                  <th scope="col" className="py-3.5 text-center text-sm font-semibold text-gray-900">
+                    Reserved Quantity
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="text-center divide-y divide-gray-200 bg-white">
+                <tr>
+                  <td className="whitespace-nowrap px-3 py-4 text-base text-black">{productStock.qty}</td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-black">{productStock.reserveQty}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const EditQtyModal = ({open, closeModal, handleEditQty}) => {
+  // return (
+
+  // );
+}
+
 export const StockLevelForm = (subsys) => {
   const { id } = useParams(); //sku code
   const siteId = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
-  const siteStock = useSelector(selectCurrSiteStock);
+  const productStock = useSelector((state) => selectSiteProductStock(state, id));
   const [open, setOpen] = useState(false);
   const [rfid, setRfid] = useState("");
   const [selected, setSelected] = useState(actions[0]);
   const [reload, setReload] = useState(0);
   const { addToast } = useToasts();
-
   //get product information
   const modelCode = id.substring(0, id.indexOf("-"));
   const model = useSelector(selectModel);
@@ -363,24 +399,24 @@ export const StockLevelForm = (subsys) => {
                           Price
                         </dt>
                         <dd className="mt-1 text-sm text-gray-900">
-                          {model === null ? "" : model.price}
+                          {model === null ? "" : model.listPrice}
                         </dd>
                       </div>
                       {model != null && model.products != null
                         ? model?.products
-                            ?.filter((prod) => prod.sku === id.trim())[0]
-                            ?.productFields.map((field) => {
-                              return (
-                                <div key={field.id} className="sm:col-span-1">
-                                  <dt className="text-sm font-medium text-gray-500">
-                                    {field.fieldName}
-                                  </dt>
-                                  <dd className="mt-1 text-sm text-gray-900">
-                                    {field.fieldValue}
-                                  </dd>
-                                </div>
-                              );
-                            })
+                          ?.filter((prod) => prod.sku === id.trim())[0]
+                          ?.productFields.map((field) => {
+                            return (
+                              <div key={field.id} className="sm:col-span-1">
+                                <dt className="text-sm font-medium text-gray-500">
+                                  {field.fieldName}
+                                </dt>
+                                <dd className="mt-1 text-sm text-gray-900">
+                                  {field.fieldValue}
+                                </dd>
+                              </div>
+                            );
+                          })
                         : ""}
 
                       <div className="sm:col-span-1">
@@ -416,20 +452,19 @@ export const StockLevelForm = (subsys) => {
                 </div>
               </section>
 
-              {/* RFID tags */}
               <section aria-labelledby="stocks-level">
                 <div className="grid grid-cols-2">
                   <div className="col-span-1">
-                    <h2 className="ml-2 mb-4 text-lg leading-6 font-bold text-gray-900">
-                      Product Items
+                    <h2 className="ml-2 mt-2 text-lg leading-6 font-bold text-gray-900">
+                      Stock Level
                     </h2>
                   </div>
                   <div className="col-span-1 flex justify-end">
                     <button
                       type="button"
-                      className="inline-flex items-center mr-3 px-3 py-2 border border-transparent text-sm leading-4 
-                  font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 
-                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                      className="inline-flex items-center mr-3 px-3 py-3 border border-transparent text-sm leading-4 
+                                font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 
+                                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                       onClick={() => openModal()}
                     >
                       Edit Stock
@@ -437,20 +472,13 @@ export const StockLevelForm = (subsys) => {
                   </div>
                 </div>
 
-                <div className="m-1">
-                  {Boolean(siteStock) && (
-                    <SimpleTable
-                      columns={columns}
-                      data={getProductItem(siteStock, id)}
-                    />
-                  )}
-                </div>
+                <QuantityTable productStock={productStock}/>
               </section>
             </div>
           </div>
 
           {/* Edit Stock Slideover */}
-          <Slideover
+          {/* <Slideover
             open={open}
             closeModal={closeModal}
             handleEditStock={handleEditStock}
@@ -458,7 +486,7 @@ export const StockLevelForm = (subsys) => {
             setRfid={setRfid}
             selected={selected}
             setSelected={setSelected}
-          />
+          /> */}
         </main>
       </div>
     )

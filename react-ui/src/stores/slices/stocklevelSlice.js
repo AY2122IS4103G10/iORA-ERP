@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api, stockLevelApi } from "../../environments/Api";
 
 const initialState = {
-  currSiteStock: {},
+  currSiteStock: null,
   prodStockLevel: null,
   status: "idle",
   error: null
@@ -74,5 +74,13 @@ const stocklevelSlice = createSlice({
 export default stocklevelSlice.reducer;
 
 export const selectCurrSiteStock = (state) => state.stocklevel.currSiteStock;
+
+export const selectSiteProductStock = (state, sku) => {
+  if (state.stocklevel.currSiteStock === null) {
+    return null;
+  } else {
+    return state.stocklevel.currSiteStock.products.find((prod) => prod.sku === sku);
+  }
+}
 
 export const selectProductStock = (state) => state.stocklevel.prodStockLevel;

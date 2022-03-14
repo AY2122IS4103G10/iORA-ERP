@@ -1,12 +1,14 @@
 package com.iora.erp.model.customer;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 public class SupportTicketMsg {
@@ -14,14 +16,14 @@ public class SupportTicketMsg {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime timeStamp;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeStamp;
 
     @Column(nullable = false)
     private String message;
 
     public SupportTicketMsg() {
-        this.timeStamp = LocalDateTime.now();
+        this.timeStamp = new Date();
     }
 
     public SupportTicketMsg(String message) {
@@ -37,11 +39,11 @@ public class SupportTicketMsg {
         this.id = id;
     }
 
-    public LocalDateTime getTimeStamp() {
+    public Date getTimeStamp() {
         return this.timeStamp;
     }
 
-    public void setTimeStamp(LocalDateTime timeStamp) {
+    public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
     }
 

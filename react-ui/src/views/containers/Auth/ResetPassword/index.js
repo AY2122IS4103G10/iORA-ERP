@@ -1,34 +1,42 @@
 import {useState, useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {useToasts} from "react-toast-notifications";
+import {CheckCircleIcon, XIcon} from "@heroicons/react/solid";
+
+const AlertSuccessful = () => {
+  return (
+    <div className="rounded-md bg-green-50 p-4">
+      <div className="flex">
+        <div className="flex-shrink-0">
+          <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
+        </div>
+        <div className="ml-3">
+          <p className="text-sm font-medium text-green-800">An email as been sent to</p>
+        </div>
+        <div className="ml-auto pl-3">
+          <div className="-mx-1.5 -my-1.5">
+            <button
+              type="button"
+              className="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600">
+              <span className="sr-only">Dismiss</span>
+              <XIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export function ResetPassword() {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
-  const {addToast} = useToasts();
+  const [status, setStatus] = useState(false);
 
-  /* const handleLogin = async (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    /*try {
-      const response = dispatch(loginJwt({username: username, password: password}));
-      const data = await response.unwrap();
-      //const user = await postLogin.unwrap();
-      //ocalStorage.setItem("user", JSON.stringify(user));
-      setEmail("");
-      /*addToast("Login Successful", {
-        appearance: "success",
-        autoDismiss: true,
-      });
-      if (user.id !== -1) {
-        navigate("/home");
-      } 
-    } catch (err) {
-      addToast(`Error: ${err.message}`, {
-        appearance: "error",
-        autoDismiss: true,
-      });
-    }
-  };*/
+    setStatus = true;
+    console.log("s");
+  };
 
   return (
     <>
@@ -40,8 +48,15 @@ export function ResetPassword() {
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white border py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <div className="bg-cyan border py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <form className="space-y-6">
+              <div>
+                <h1 className="font-bold text-black-600 text-center text-2xl">Account Recovery</h1>
+                <h3 className="font-normal mt-2 pb-10 text-gray-600 text-center text-base">
+                  Reset password through email account.
+                </h3>
+                {status === true ? <AlertSuccessful /> : ""}
+              </div>
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                   Email
@@ -61,20 +76,19 @@ export function ResetPassword() {
               <div>
                 <button
                   type="submit"
+                  onClick={handleReset}
                   className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
                   Reset Password
                 </button>
               </div>
-
               <div className="flex items-center justify-between">
                 <div className="text-sm">
                   <a href="/" className="font-medium text-cyan-600 hover:text-cyan-500">
-                    Return to login
+                    {"< Return to login"}
                   </a>
                 </div>
               </div>
             </form>
-
             <div className="mt-6"></div>
           </div>
         </div>

@@ -40,10 +40,11 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
     private EmailService emailService;
     @Autowired
     private AdminService adminService;
+
     @Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Override
     public Employee createEmployee(Employee employee) throws EmployeeException {
@@ -53,7 +54,8 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
 
                 String tempPassword = StringGenerator.generateRandom(48, 122, 8);
                 // employee.setSalt(StringGenerator.saltGeneration());
-                // employee.setPassword(StringGenerator.generateProtectedPassword(employee.getSalt(), tempPassword));
+                // employee.setPassword(StringGenerator.generateProtectedPassword(employee.getSalt(),
+                // tempPassword));
                 employee.setPassword(passwordEncoder().encode(tempPassword));
                 em.persist(employee);
                 emailService.sendTemporaryPassword(employee, tempPassword);
@@ -91,7 +93,8 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
                         old.setEmail(employee.getEmail());
 
                         if (employee.getPassword() != null && employee.getPassword() != "") {
-                            // old.setPassword(StringGenerator.generateProtectedPassword(salt, employee.getPassword()));
+                            // old.setPassword(StringGenerator.generateProtectedPassword(salt,
+                            // employee.getPassword()));
                             old.setPassword(passwordEncoder().encode(employee.getPassword()));
                         }
                         old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
@@ -207,6 +210,19 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
     }
 
     @Override
+    public Employee getEmployeeByEmail(String email) throws EmployeeException {
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.email = :email");
+        q.setParameter("email", email);
+
+        try {
+            return (Employee) q.getSingleResult();
+
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new EmployeeException("Employee email" + email + " does not exist.");
+        }
+    }
+
+    @Override
     public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
         return getEmployeeById(id).getJobTitle().getResponsibility();
     }
@@ -250,10 +266,22 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
     }
 
     @Override
-    public void resetPassword(Long id) throws EmployeeException {
+    public void resetPasswordUser(String email) throws EmployeeException {
+        Employee e = getEmployeeByEmail(email);
+        String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+        // e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(),
+        // tempPassword));
+        e.setPassword(passwordEncoder().encode(tempPassword));
+
+        emailService.sendTemporaryPassword(e, tempPassword);
+    }
+
+    @Override
+    public void resetPasswordAdmin(Long id) throws EmployeeException {
         Employee e = getEmployeeById(id);
         String tempPassword = StringGenerator.generateRandom(48, 122, 8);
-        // e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(), tempPassword));
+        // e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(),
+        // tempPassword));
         e.setPassword(passwordEncoder().encode(tempPassword));
 
         emailService.sendTemporaryPassword(e, tempPassword);

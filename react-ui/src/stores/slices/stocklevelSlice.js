@@ -20,7 +20,7 @@ export const getASiteStock = createAsyncThunk(
 export const editStock = createAsyncThunk(
   "stocklevels/editStock",
   async (data) => {
-    const response = await stockLevelApi.editStock(data.toUpdate, data.siteId);
+    const response = await stockLevelApi.editStock(data.sku, data.qty, data.siteId);
     return response.data;
   }
 );

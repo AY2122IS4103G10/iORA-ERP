@@ -15,13 +15,14 @@ import {
   editStock,
   getASiteStock,
 } from "../../../../stores/slices/stocklevelSlice";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
   fetchModel,
   selectModel,
 } from "../../../../stores/slices/productSlice";
 import { useToasts } from "react-toast-notifications";
 import { classNames } from "../../../../utilities/Util";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 
 export const getProductItem = (data, sku) => {
   return data.products.filter(
@@ -50,6 +51,10 @@ const actions = [
     id: 2,
     name: "Remove",
   },
+  {
+    id: 3,
+    name: "Set"
+  }
 ];
 
 export const Slideover = ({
@@ -253,7 +258,7 @@ export const Slideover = ({
   );
 };
 
-export const QuantityTable = ({productStock}) => {
+export const QuantityTable = ({ qty, reserveQty }) => {
   return (
     <div className="mt-4 flex flex-col">
       <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -272,8 +277,8 @@ export const QuantityTable = ({productStock}) => {
               </thead>
               <tbody className="text-center divide-y divide-gray-200 bg-white">
                 <tr>
-                  <td className="whitespace-nowrap px-3 py-4 text-base text-black">{productStock.qty}</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-black">{productStock.reserveQty}</td>
+                  <td className="whitespace-nowrap px-3 py-4 text-base text-black">{qty ?? 0}</td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-black">{reserveQty ?? 0}</td>
                 </tr>
               </tbody>
             </table>
@@ -284,70 +289,166 @@ export const QuantityTable = ({productStock}) => {
   );
 }
 
-export const EditQtyModal = ({open, closeModal, handleEditQty}) => {
-  // return (
-
-  // );
+export const EditQtyModal = ({ open, closeModal, selected, setSelected, inputQty, setInputQty, handleEditQty }) => {
+  return (
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white h-70 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+        <div>
+          <div className="m-4 mt-2">
+            <Dialog.Title
+              as="h3"
+              className="text-center text-lg leading-6 font-medium text-gray-900"
+            >
+              Edit Stock Quantity
+            </Dialog.Title>
+          </div>
+          <div className="pt-2 pb-3">
+            <SimpleSelectMenu
+              options={actions}
+              selected={selected}
+              setSelected={setSelected}
+            />
+          </div>
+          <input
+            type="number"
+            name="qty"
+            id="qty"
+            autoFocus
+            className="flex-grow shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+            placeholder="Quantity"
+            value={inputQty}
+            onChange={(e) => {
+              if (e.target.value >= 0) {
+                setInputQty(e.target.value);
+              }
+            }}
+            onKeyPress={(e) => e.key === "Enter" && handleEditQty()}
+          />
+        </div>
+        <div className="pt-4">
+          <div className="flex-shrink-0 pt-5">
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                onClick={handleEditQty}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SimpleModal>
+  );
 }
 
 export const StockLevelForm = (subsys) => {
+  const dispatch = useDispatch();
+
   const { id } = useParams(); //sku code
   const siteId = useSelector(selectUserSite); //get current store/site user is in
-  const dispatch = useDispatch();
   const productStock = useSelector((state) => selectSiteProductStock(state, id));
-  const [open, setOpen] = useState(false);
-  const [rfid, setRfid] = useState("");
-  const [selected, setSelected] = useState(actions[0]);
-  const [reload, setReload] = useState(0);
-  const { addToast } = useToasts();
   //get product information
   const modelCode = id.substring(0, id.indexOf("-"));
   const model = useSelector(selectModel);
+
+  const [open, setOpen] = useState(false);
+  // const [rfid, setRfid] = useState("");
+  const [inputQty, setInputQty] = useState(0);
+  const [selected, setSelected] = useState(actions[0]);
+  const [reload, setReload] = useState(0);
+  const { addToast } = useToasts();
 
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getASiteStock(siteId));
     dispatch(fetchModel(modelCode));
-    // }
   }, [dispatch, reload, modelCode, siteId]);
 
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
 
-  const handleEditStock = (e) => {
-    e.preventDefault();
-    let toUpdate = {};
-    const rfidArr = rfid.trim().split(" ");
-
-    // add
+  const handleEditQty = (e) => {
+    // e.preventDefault();
+    console.log("clicked")
+    let qty = productStock?.qty ?? 0;
     if (selected.id === 1) {
-      Object.entries(rfidArr).forEach(([key, value]) => {
-        toUpdate[value] = siteId;
-      });
-
-      // remove
+      qty = qty + parseInt(inputQty);
     } else if (selected.id === 2) {
-      Object.entries(rfidArr).forEach(([key, value]) => {
-        toUpdate[value] = 0;
-      });
+      qty = qty - parseInt(inputQty);
+    } else if (selected.id === 3) {
+      qty = inputQty;
     }
-
-    dispatch(editStock({ toUpdate: toUpdate, siteId: siteId }))
-      .unwrap()
-      .then((response) => {
-        addToast("Successfully updated stock levels", {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        setReload(reload + 1);
-      })
-      .catch((err) => {
-        addToast(`Edit Stock Failed - Could be Invalid RFID tag`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
+    console.log(qty);
+    if (qty < 0) {
+      addToast(`Quantity cannot be negative`, {
+        appearance: "error",
+        autoDismiss: true,
       });
-  };
+    } else {
+      dispatch(editStock({ sku: id, qty: qty, siteId: siteId }))
+        .unwrap()
+        .then((response) => {
+          addToast("Successfully updated stock levels", {
+            appearance: "success",
+            autoDismiss: true,
+          });
+          setInputQty(0);
+          setSelected(actions[0]);
+          closeModal();
+          setReload(reload + 1);
+        })
+        .catch((err) => {
+          addToast(`Edit Stock Failed - Could be Invalid RFID tag`, {
+            appearance: "error",
+            autoDismiss: true,
+          });
+        });
+    }
+  }
+
+  // const handleEditStock = (e) => {
+  //   e.preventDefault();
+  //   let toUpdate = {};
+  //   const rfidArr = rfid.trim().split(" ");
+
+  //   // add
+  //   if (selected.id === 1) {
+  //     Object.entries(rfidArr).forEach(([key, value]) => {
+  //       toUpdate[value] = siteId;
+  //     });
+
+  //     // remove
+  //   } else if (selected.id === 2) {
+  //     Object.entries(rfidArr).forEach(([key, value]) => {
+  //       toUpdate[value] = 0;
+  //     });
+  //   }
+
+  //   dispatch(editStock({ toUpdate: toUpdate, siteId: siteId }))
+  //     .unwrap()
+  //     .then((response) => {
+  //       addToast("Successfully updated stock levels", {
+  //         appearance: "success",
+  //         autoDismiss: true,
+  //       });
+  //       setReload(reload + 1);
+  //     })
+  //     .catch((err) => {
+  //       addToast(`Edit Stock Failed - Could be Invalid RFID tag`, {
+  //         appearance: "error",
+  //         autoDismiss: true,
+  //       });
+  //     });
+  // };
 
   return (
     Boolean(model) && (
@@ -471,12 +572,24 @@ export const StockLevelForm = (subsys) => {
                     </button>
                   </div>
                 </div>
+                <QuantityTable
+                  qty={productStock?.qty}
+                  reserveQty={productStock?.reserveQty}
 
-                <QuantityTable productStock={productStock}/>
+                />
               </section>
             </div>
           </div>
 
+          <EditQtyModal
+            open={open}
+            closeModal={closeModal}
+            selected={selected}
+            setSelected={setSelected}
+            inputQty={inputQty}
+            setInputQty={setInputQty}
+            handleEditQty={handleEditQty}
+          />
           {/* Edit Stock Slideover */}
           {/* <Slideover
             open={open}

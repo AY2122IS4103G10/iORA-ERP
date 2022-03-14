@@ -124,10 +124,9 @@ export const vendorApi = {
 };
 
 export const stockLevelApi = {
-  editStock(toUpdate, siteId) {
+  editStock(sku,qty, siteId) {
     return axiosPrivate.post(
-      `${REST_ENDPOINT}warehouse/editStock/${siteId}`,
-      toUpdate
+      `${REST_ENDPOINT}warehouse/editStock/${siteId}/${sku}/${qty}`,
     );
   },
 };

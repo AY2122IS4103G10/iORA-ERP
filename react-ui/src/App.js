@@ -16,7 +16,7 @@ import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel/in
 import { Login } from "./views/containers/Auth/Login";
 import { Home } from "./views/containers/Auth/Home";
 import { HomeIndex } from "./views/containers/Index/HomeIndex";
-import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
+import { ManageRewardsLoyalty } from "./views/containers/Vouchers/ManageVouchers";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
 import { StoreIndex } from "./views/containers/Index/StrIndex";
@@ -56,7 +56,6 @@ import { Order } from "./views/containers/SelfService/Order";
 import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
 import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
 import { CustomerForm } from "./views/containers/Customer/CustomerForm";
-import { ManageMembershipTier } from "./views/containers/MembershipTier/ManageMembershipTier/index.js";
 import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails/index.js";
 import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm/index.js";
 import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory/index.js";
@@ -82,6 +81,9 @@ import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTran
 import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack/index.js";
 import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList/index.js";
 import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch/index.js";
+import { ProcurementDelivery } from "./views/containers/Procurement/ProcurementDelivery/index.js";
+import { VouchersList } from "./views/containers/Vouchers/VouchersList/index.js";
+import { MembershipTierList } from "./views/containers/MembershipTier/MembershipTierList/index.js";
 import OrderSuccess from "./views/containers/SelfService/OrderSuccess/index.js";
 
 function App() {
@@ -105,6 +107,7 @@ function App() {
               </PrivateRoute>
             }
           >
+            {/* Products */}
             <Route path="products" element={<Outlet />}>
               <Route
                 index
@@ -119,6 +122,7 @@ function App() {
               <Route path="edit/:prodId" element={<ProductForm />} />
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
+            {/* Stock Levels */}
             <Route path="stocklevels">
               <Route path="my/:id" element={<StockLevelForm subsys="sm" />} />
               <Route path="my" element={<MyStoreStock subsys="sm" />} />
@@ -186,6 +190,7 @@ function App() {
               >
                 <Route index element={<ProcurementDetails subsys="sm" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
@@ -220,12 +225,41 @@ function App() {
               <Route path="edit/:orderId" element={<ProcurementForm />} />
             </Route>
 
-            {/* Vouchers */}
-            <Route path="vouchers" element={<Outlet />}>
-              <Route index element={<ManageVouchers />} />
-              <Route path=":voucherCode" element={<VoucherDetails />} />
-              <Route path="create" element={<VoucherForm />} />
-              <Route path="edit/:voucherId" element={<VoucherForm />} />
+            {/* Rewards & Loyalty */}
+            <Route path="rewards-loyalty" element={<Outlet />}>
+              <Route path="vouchers" element={<Outlet />}>
+                <Route
+                  index
+                  element={
+                    <ManageRewardsLoyalty title="Vouchers">
+                      <VouchersList />
+                    </ManageRewardsLoyalty>
+                  }
+                />
+                <Route path=":voucherCode" element={<Outlet />}>
+                  <Route index element={<VoucherDetails />} />
+                  <Route path="edit" element={<VoucherForm />} />
+                </Route>
+                <Route path="create" element={<VoucherForm />} />
+              </Route>
+              <Route path="tiers" element={<Outlet />}>
+                <Route
+                  index
+                  element={
+                    <ManageRewardsLoyalty
+                      title="Membership Tiers"
+                      buttonText="tier"
+                    >
+                      <MembershipTierList />
+                    </ManageRewardsLoyalty>
+                  }
+                />
+                <Route path=":name" element={<Outlet />}>
+                  <Route index element={<MembershipTierDetails />} />
+                  <Route path="edit" element={<MembershipTierForm />} />
+                </Route>
+                <Route path="create" element={<MembershipTierForm />} />
+              </Route>
             </Route>
 
             {/* Customers */}
@@ -234,12 +268,12 @@ function App() {
               <Route path=":customerId" element={<CustomerDetails />} />
               <Route path="create" element={<CustomerForm />} />
               <Route path="edit/:customerId" element={<CustomerForm />} />
-              <Route path="tiers" element={<Outlet />}>
+              {/* <Route path="tiers" element={<Outlet />}>
                 <Route index element={<ManageMembershipTier />} />
                 <Route path=":name" element={<MembershipTierDetails />} />
                 <Route path="create" element={<MembershipTierForm />} />
                 <Route path="edit/:name" element={<MembershipTierForm />} />
-              </Route>
+              </Route> */}
             </Route>
           </Route>
 
@@ -264,9 +298,9 @@ function App() {
                 element={<AProductStock subsys="str" />}
               />
             </Route>
-{/* Stock Transfer */}
+            {/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
-            <Route
+              <Route
                 index
                 element={
                   <ManageStockTransfer subsys="str">
@@ -386,6 +420,7 @@ function App() {
               >
                 <Route index element={<ProcurementDetails subsys="mf" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<VoucherForm />} />
@@ -446,8 +481,9 @@ function App() {
                 path=":procurementId"
                 element={<ProcurementWrapper subsys="wh" />}
               >
-                <Route index element={<ProcurementDetails subsys="wh" />} />
+                <Route index element={<ProcurementDetails />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
             </Route>
 

@@ -94,28 +94,7 @@ const procurementSlice = createSlice({
       state.procurements.push(action.payload);
     });
     builder.addCase(updateExistingProcurement.fulfilled, (state, action) => {
-      const {
-        id,
-        name,
-        description,
-        price,
-        onlineOnly,
-        available,
-        procurements,
-        productFields,
-      } = action.payload;
-      const existingProcurement = state.procurements.find(
-        (procurement) => procurement.id === id
-      );
-      if (existingProcurement) {
-        existingProcurement.name = name;
-        existingProcurement.description = description;
-        existingProcurement.price = price;
-        existingProcurement.onlineOnly = onlineOnly;
-        existingProcurement.available = available;
-        existingProcurement.procurements = procurements;
-        existingProcurement.productFields = productFields;
-      }
+      state.status = "idle"
     });
     builder.addCase(deleteExistingProcurement.fulfilled, (state, action) => {
       state.procurements = state.procurements.filter(

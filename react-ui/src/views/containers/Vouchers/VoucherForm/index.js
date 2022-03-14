@@ -154,7 +154,7 @@ export const VoucherForm = () => {
           appearance: "success",
           autoDismiss: true,
         });
-        navigate("/sm/vouchers");
+        navigate("/sm/rewards-loyalty/vouchers");
       })
       .catch((err) =>
         addToast(`Error: ${err.message}`, {
@@ -164,7 +164,7 @@ export const VoucherForm = () => {
       );
   };
 
-  const onCancelClicked = () => navigate("/sm/vouchers");
+  const onCancelClicked = () => navigate(-1);
 
   return (
     <VoucherFormBody

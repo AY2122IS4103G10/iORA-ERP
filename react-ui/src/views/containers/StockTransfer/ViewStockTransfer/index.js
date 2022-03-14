@@ -1,13 +1,24 @@
 import { PrinterIcon } from "@heroicons/react/solid";
+import moment from "moment";
+import { useState } from "react";
+import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
+import { eventTypes } from "../../../../constants/eventTypes";
+import { sitesApi } from "../../../../environments/Api";
+import { classNames } from "../../../../utilities/Util";
 import { LineItems } from "../StockTransferWrapper";
 
-export const StockTransferBody = ({ order, lineItems, userSiteId }) => {
+export const StockTransferBody = ({
+  order,
+  lineItems,
+  userSiteId,
+  history,
+}) => {
   let status = order.statusHistory[order.statusHistory.length - 1].status;
   let orderMadeBy = order.statusHistory[0].actionBy.name;
 
   return (
-    <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+    <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
         <section aria-labelledby="stocktransfer-view">
           <div className="bg-white shadow sm:rounded-lg">
@@ -91,18 +102,123 @@ export const StockTransferBody = ({ order, lineItems, userSiteId }) => {
           )}
         </section>
       </div>
+      {history && (
+        <section
+          aria-labelledby="timeline-title"
+          className="lg:col-start-3 lg:col-span-1"
+        >
+          <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
+            <h2
+              id="timeline-title"
+              className="text-lg font-medium text-gray-900"
+            >
+              Activity
+            </h2>
+
+            {/* Activity Feed */}
+            <div className="mt-6 flow-root">
+              <ul className="-mb-8">
+                {history.map((item, itemIdx) => (
+                  <li key={item.id}>
+                    <div className="relative pb-8">
+                      {itemIdx !== history.length - 1 ? (
+                        <span
+                          className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                          aria-hidden="true"
+                        />
+                      ) : null}
+                      <div className="relative flex space-x-3">
+                        <div>
+                          <span
+                            className={classNames(
+                              item.type.bgColorClass,
+                              "h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
+                            )}
+                          >
+                            <item.type.icon
+                              className="w-5 h-5 text-white"
+                              aria-hidden="true"
+                            />
+                          </span>
+                        </div>
+                        <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                          <div>
+                            <p className="text-sm text-gray-500">
+                              {item.content}{" "}
+                              <span className="font-medium text-gray-900">
+                                {item.target}
+                              </span>
+                            </p>
+                          </div>
+                          <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                            {item.date}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 };
 
 export const ViewStockTransfer = () => {
   const { order, lineItems, userSiteId } = useOutletContext();
+  const [history, setHistory] = useState([]);
 
+  const fetchActionBy = async (actionBy) => {
+    const { data } = await sitesApi.getSiteSAM(
+      Boolean(actionBy.id) ? actionBy.id : actionBy
+    );
+    return data;
+  };
+
+  useEffect(() => {
+    const fetchAllActionBy = async () => {
+      return Promise.all(
+        order.statusHistory.map(({ actionBy }) => fetchActionBy(actionBy))
+      );
+    };
+    fetchAllActionBy().then((data) => {
+      setHistory(
+        order.statusHistory.map(({ status, timeStamp }, index) => {
+          return {
+            id: index,
+            type:
+              status === "PENDINGALL" || status === "PENDINGONE"
+                ? index === 0
+                  ? eventTypes.created
+                  : eventTypes.action
+                : ["PICKING", "PACKING", "SHIPPING"].some((s) => s === status)
+                ? eventTypes.action
+                : status === "CANCELLED"
+                ? eventTypes.cancelled
+                : eventTypes.completed,
+            content:
+              status === "PENDINGALL" || status === "PENDINGONE"
+                ? `${index === 0 ? "Created" : "Updated"} by`
+                : status === "READY_FOR_SHIPPING"
+                ? "Ready for shipping by"
+                : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
+            target: data[index].name,
+            date: moment(timeStamp).format("DD/MM, H:mm"),
+          };
+        })
+      );
+    });
+  }, [order]);
+  // console.log(history)
   return (
     <StockTransferBody
       order={order}
       lineItems={lineItems}
       userSiteId={userSiteId}
+      history={history}
     />
   );
 };

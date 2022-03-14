@@ -232,7 +232,7 @@ export const posApi = {
       `${REST_ENDPOINT}store/customerOrder/calculate`,
       lineItems
     );
-  }
+  },
 };
 
 export const employeeApi = {
@@ -315,6 +315,11 @@ export const orderApi = {
   get(orderId) {
     return axiosPrivate.get(
       `${REST_ENDPOINT}store/customerOrder/view/${orderId}`
+    );
+  },
+  createOrder(order) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}store/customerOrder/create`, order
     );
   },
 };

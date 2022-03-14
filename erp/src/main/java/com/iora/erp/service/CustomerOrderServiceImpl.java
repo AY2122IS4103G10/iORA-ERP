@@ -148,6 +148,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
+        customerOrder.setDateTime(LocalDateTime.now());
         em.persist(customerOrder);
         return customerOrder;
     }

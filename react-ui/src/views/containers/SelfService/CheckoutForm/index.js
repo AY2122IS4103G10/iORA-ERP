@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
 import {
   PaymentElement,
-  useStripe,
   useElements,
+  useStripe,
 } from "@stripe/react-stripe-js";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { orderApi } from "../../../../environments/Api";
 
 export default function CheckoutForm({
   setIsLoading,
   clientSecret,
   closeModal,
+  order,
 }) {
   const stripe = useStripe();
   const elements = useElements();
-  const location = useLocation();
 
   const [message, setMessage] = useState(null);
 
@@ -46,20 +46,26 @@ export default function CheckoutForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
 
     setIsLoading(true);
-    console.log(location);
+    const { data } = await orderApi.createOrder({
+      ...order,
+      payments: [
+        {
+          amount: order?.totalAmount,
+          paymentType: "MASTERCARD",
+          ccTransactionId: clientSecret,
+        },
+      ],
+    });
 
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `http://localhost:3000/ss/order`,
+        return_url: `http://localhost:3000/ss/order/${data?.id}`,
       },
     });
 

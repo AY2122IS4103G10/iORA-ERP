@@ -1,88 +1,86 @@
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { PrivateRoute } from "./routes/PrivateRoute.js";
-import { SMIndex } from "./views/containers/Index/SMIndex";
-import { AdminIndex } from "./views/containers/Index/AdminIndex";
-import { MFIndex } from "./views/containers/Index/MFIndex";
-import { WHIndex } from "./views/containers/Index/WHIndex";
-import { ManageProducts } from "./views/containers/Products/ManageProducts";
-import { ProductForm } from "./views/containers/Products/ProductForm";
-import { ProductDetails } from "./views/containers/Products/ProductDetails";
-import { SiteStocks } from "./views/containers/StockLevels/BySite/index.js";
-import { ProductStocks } from "./views/containers/StockLevels/ByProduct/index.js";
-import { AsiteStock } from "./views/containers/StockLevels/ASiteStock/index.js";
-import { AProductStock } from "./views/containers/StockLevels/AProductStock/index.js";
-import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList/index.js";
-import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel/index.js";
-import { Login } from "./views/containers/Auth/Login";
+import { Auth } from "./views/containers/Auth/Auth";
+import Error from "./views/containers/Auth/Error";
 import { Home } from "./views/containers/Auth/Home";
-import { HomeIndex } from "./views/containers/Index/HomeIndex";
-import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
-import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
-import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
-import { StoreIndex } from "./views/containers/Index/StrIndex";
-// import { SMRoute } from "./routes/SMRoute";
-import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
-// import { ADRoute } from "./routes/ADRoute";
-import { ManageSites } from "./views/containers/Sites/ManageSites";
-import { SiteForm } from "./views/containers/Sites/SiteForm";
-import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
-import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
-import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
-import { CompanyForm } from "./views/containers/Companies/CompanyForm";
-import { SiteDetails } from "./views/containers/Sites/SiteDetails";
-import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
-import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
+import { Login } from "./views/containers/Auth/Login";
 import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
-import { ProcurementDetails } from "./views/containers/Procurement/ProcurementDetails";
-import { ManageEmployee } from "./views/containers/Employee/ManageEmployee";
+import { CompanyForm } from "./views/containers/Companies/CompanyForm";
+import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
+import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
+import { CustomerForm } from "./views/containers/Customer/CustomerForm";
+import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
+import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails/index.js";
+import { DepartmentForm } from "./views/containers/Department/DepartmentForm";
+import { ManageDepartment } from "./views/containers/Department/ManageDepartment";
 import { EmployeeForm } from "./views/containers/Employee/CreateEmployeeForm";
 import { EmployeeDetails } from "./views/containers/Employee/EmployeeDetails/index.js";
-import { ManageDepartment } from "./views/containers/Department/ManageDepartment";
-import { DepartmentForm } from "./views/containers/Department/DepartmentForm";
-import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails/index.js";
-import { ManageJobTitle } from "./views/containers/JobTitle/ManageJobTitle";
-import { JobTitleForm } from "./views/containers/JobTitle/JobTitleForm";
+import { ManageEmployee } from "./views/containers/Employee/ManageEmployee";
+import { AdminIndex } from "./views/containers/Index/AdminIndex";
+import { HomeIndex } from "./views/containers/Index/HomeIndex";
+import { LGIndex } from "./views/containers/Index/LGIndex/index.js";
+import { MFIndex } from "./views/containers/Index/MFIndex";
+import { SMIndex } from "./views/containers/Index/SMIndex";
+import { StoreIndex } from "./views/containers/Index/StrIndex";
+import { WHIndex } from "./views/containers/Index/WHIndex";
 import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails/index.js";
-import Error from "./views/containers/Auth/Error";
-import { Auth } from "./views/containers/Auth/Auth";
+import { JobTitleForm } from "./views/containers/JobTitle/JobTitleForm";
+import { ManageJobTitle } from "./views/containers/JobTitle/ManageJobTitle";
+import { ManageMembershipTier } from "./views/containers/MembershipTier/ManageMembershipTier/index.js";
+import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails/index.js";
+import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm/index.js";
+import { ManageOnlineOrders } from "./views/containers/OnlineOrder/ManageOnlineOrders/index.js";
+import { OnlineOrderList } from "./views/containers/OnlineOrder/OnlineOrderList/index.js";
+import { OnlineOrderSearch } from "./views/containers/OnlineOrder/OnlineOrderSearch/index.js";
+import { CustomerOrderDetails } from "./views/containers/Orders/CustomerOrderDetails/index.js";
+import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper/index.js";
+import { ManageOrders } from "./views/containers/Orders/ManageOrders/index.js";
+import { OrderList } from "./views/containers/Orders/OrderList/index.js";
+import { OrderSearch } from "./views/containers/Orders/OrderSearch/index.js";
 import { ManagePOS } from "./views/containers/POS/ManagePOS";
+import { OrderDetails } from "./views/containers/POS/OrderDetails/index.js";
+import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory/index.js";
+import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder/index.js";
+import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
+import { ProcurementDetails } from "./views/containers/Procurement/ProcurementDetails";
+import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
+import { ProcurementList } from "./views/containers/Procurement/ProcurementList/index.js";
+import { ProcurementPickPack } from "./views/containers/Procurement/ProcurementPickPack/index.js";
+import { ProcurementSearch } from "./views/containers/Procurement/ProcurementSearch/index.js";
+import { ProcurementWrapper } from "./views/containers/Procurement/ProcurementWrapper/index.js";
+import { ManageProducts } from "./views/containers/Products/ManageProducts";
+import { ProductDetails } from "./views/containers/Products/ProductDetails";
+import { ProductForm } from "./views/containers/Products/ProductForm";
+import { ProductPrint } from "./views/containers/Products/ProductPrint/index.js";
+import { ProductsList } from "./views/containers/Products/ProductsList/index.js";
+// import { SMRoute } from "./routes/SMRoute";
+import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
+import { FrontPage } from "./views/containers/SelfService/FrontPage";
+import { Order } from "./views/containers/SelfService/Order";
+// import { ADRoute } from "./routes/ADRoute";
+import { ManageSites } from "./views/containers/Sites/ManageSites";
+import { SiteDetails } from "./views/containers/Sites/SiteDetails";
+import { SiteForm } from "./views/containers/Sites/SiteForm";
+import { AProductStock } from "./views/containers/StockLevels/AProductStock/index.js";
+import { AsiteStock } from "./views/containers/StockLevels/ASiteStock/index.js";
+import { ProductStocks } from "./views/containers/StockLevels/ByProduct/index.js";
+import { SiteStocks } from "./views/containers/StockLevels/BySite/index.js";
+import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel/index.js";
 import { StockLevelForm } from "./views/containers/StockLevels/ProdStockLevelForm";
+import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList/index.js";
+import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
+import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
+import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList/index.js";
+import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack/index.js";
+import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch/index.js";
+import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTransferWrapper/index.js";
 import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTransfer";
 import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
 import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
-import { FrontPage } from "./views/containers/SelfService/FrontPage";
-import { Order } from "./views/containers/SelfService/Order";
-import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
-import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
-import { CustomerForm } from "./views/containers/Customer/CustomerForm";
-import { ManageMembershipTier } from "./views/containers/MembershipTier/ManageMembershipTier/index.js";
-import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails/index.js";
-import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm/index.js";
-import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory/index.js";
-import { OrderDetails } from "./views/containers/POS/OrderDetails/index.js";
-import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder/index.js";
-import { ProcurementList } from "./views/containers/Procurement/ProcurementList/index.js";
-import { useLocation } from "react-router-dom";
-import { ProcurementSearch } from "./views/containers/Procurement/ProcurementSearch/index.js";
-import { LGIndex } from "./views/containers/Index/LGIndex/index.js";
-import { ProductsList } from "./views/containers/Products/ProductsList/index.js";
-import { ProductPrint } from "./views/containers/Products/ProductPrint/index.js";
-import { ProcurementWrapper } from "./views/containers/Procurement/ProcurementWrapper/index.js";
-import { ProcurementPickPack } from "./views/containers/Procurement/ProcurementPickPack/index.js";
-import { ManageOnlineOrders } from "./views/containers/OnlineOrder/ManageOnlineOrders/index.js";
-import { OnlineOrderList } from "./views/containers/OnlineOrder/OnlineOrderList/index.js";
-import { OnlineOrderSearch } from "./views/containers/OnlineOrder/OnlineOrderSearch/index.js";
-import { ManageOrders } from "./views/containers/Orders/ManageOrders/index.js";
-import { OrderList } from "./views/containers/Orders/OrderList/index.js";
-import { OrderSearch } from "./views/containers/Orders/OrderSearch/index.js";
-import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper/index.js";
-import { CustomerOrderDetails } from "./views/containers/Orders/CustomerOrderDetails/index.js";
-import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTransferWrapper/index.js";
-import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack/index.js";
-import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList/index.js";
-import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch/index.js";
-import OrderSuccess from "./views/containers/SelfService/OrderSuccess/index.js";
+import { ManageVouchers } from "./views/containers/Vouchers/ManageVouchers";
+import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails/index.js";
+import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 
 function App() {
   const { pathname } = useLocation();
@@ -264,9 +262,10 @@ function App() {
                 element={<AProductStock subsys="str" />}
               />
             </Route>
-{/* Stock Transfer */}
+
+            {/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
-            <Route
+              <Route
                 index
                 element={
                   <ManageStockTransfer subsys="str">
@@ -531,6 +530,7 @@ function App() {
         <Route path="ss" element={<Outlet />}>
           <Route index element={<FrontPage />} />
           <Route path="order" element={<Order />} />
+          <Route path="order/:id" element={<Order />} />
         </Route>
 
         <Route path="*" element={<Error />} />

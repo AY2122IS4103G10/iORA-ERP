@@ -4,6 +4,7 @@ import { MinusSmIcon, PlusSmIcon, XCircleIcon } from '@heroicons/react/solid';
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, posApi } from "../../../../environments/Api";
+import ManageCheckout from "../ManageCheckout";
 
 const OrderList = ({
   lineItems,
@@ -16,6 +17,7 @@ const OrderList = ({
   Modify,
   clear,
   openModal,
+  openCheckoutModal,
   error,
 }) => (
   <main>
@@ -191,6 +193,7 @@ const OrderList = ({
             <button
               type="button"
               className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+              onClick={openCheckoutModal}
             >
               {localStorage.getItem("customer") === null ?
                 <>Checkout as Guest</> :
@@ -322,11 +325,21 @@ export function Order() {
   const [amount, setAmount] = useState(0);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
+  const [openCheckout, setOpenCheckout] = useState(false);
+  const [checkoutItems, setCheckoutItems] = useState([]);
 
   const navigate = useNavigate();
 
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
+  const openCheckoutModal = () => {
+    setOpenCheckout(true)
+    setCheckoutItems(lineItems.concat(promotions));
+  };
+  const closeCheckoutModal = () => {
+    setOpenCheckout(false);
+    setCheckoutItems([]);
+  }
   const onRfidChanged = (e) => {
     if (
       e.target.value.length - rfid.length > 10 &&
@@ -428,6 +441,12 @@ export function Order() {
         open={open}
         closeModal={closeModal}
         onCancel={onCancel}
+      />
+      <ManageCheckout
+        open={openCheckout}
+        closeModal={closeCheckoutModal}
+        onCancel={closeCheckoutModal}
+        checkoutItems={checkoutItems}
       />
       <OrderList
         rfid={rfid}

@@ -233,6 +233,9 @@ export const posApi = {
       lineItems
     );
   },
+  getPaymentIntent(lineItems) {
+    return axiosPublic.post(`${REST_ENDPOINT}online/pay`, lineItems);
+  },
 };
 
 export const employeeApi = {

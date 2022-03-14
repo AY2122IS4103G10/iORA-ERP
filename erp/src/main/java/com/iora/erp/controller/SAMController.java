@@ -7,6 +7,7 @@ import java.util.Map;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Model;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -497,6 +499,67 @@ public class SAMController {
     public ResponseEntity<Object> deleteProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
             return ResponseEntity.ok(procurementService.deleteProcurementOrder(orderId, siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * B.2 Inventory Management
+     * ---------------------------------------------------------
+     */
+
+    @GetMapping(path = "/ticket/{id}", produces = "application/json")
+    public ResponseEntity<Object> getSupportTicket(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.getSupportTicket(id));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/ticket/search", produces = "application/json")
+    public List<SupportTicket> searchSupportTicket(@RequestParam String id) {
+            return customerService.searchSupportTicket(Long.valueOf(id));
+    }
+
+    @GetMapping(path = "/ticket/searchSubject", produces = "application/json")
+    public List<SupportTicket> searchSupportTicketBySubject(@RequestParam String subject) {
+            return customerService.searchSupportTicketBySubject(subject);
+    }
+
+    @PostMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createSupportTicket(@RequestBody SupportTicket supportTicket) {
+        try {
+            return ResponseEntity.ok(customerService.createSupportTicket(supportTicket));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> updateSupportTicket(@RequestBody SupportTicket supportTicket) {
+        try {
+            return ResponseEntity.ok(customerService.updateSupportTicket(supportTicket));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PatchMapping(path = "/ticket/reply/{id}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> replySupportTicket(@PathVariable Long id, @RequestBody String message) {
+        try {
+            return ResponseEntity.ok(customerService.replySupportTicket(id, message));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    } 
+
+    @DeleteMapping(path = "/ticket/{id}",  produces = "application/json")
+    public ResponseEntity<Object> replySupportTicket(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.deleteSupportTicket(id));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

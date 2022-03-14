@@ -3,14 +3,12 @@ package com.iora.erp.controller;
 import java.util.List;
 
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
-import com.iora.erp.model.customerOrder.PaymentRequest;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.StripeService;
-import com.stripe.model.Charge;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -90,11 +87,12 @@ public class OnlineCustomerController {
     @Autowired
     StripeService stripeService;
 
-    @PostMapping(path = "/charge", produces = "application/json")
-    public ResponseEntity<Object> completePayment(@RequestBody PaymentRequest request) {
+    @PostMapping(path = "/pay", consumes = "application/json",  produces = "application/json")
+    public ResponseEntity<Object> completePayment(@RequestBody List<CustomerOrderLI> lineItems) {
         try {
-            return ResponseEntity.ok(stripeService.chargeCreditCard(request));
+            return ResponseEntity.ok(stripeService.chargeCreditCard(lineItems));
         } catch (Exception ex) {
+            ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

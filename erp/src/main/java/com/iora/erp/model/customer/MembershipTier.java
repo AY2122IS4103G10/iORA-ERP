@@ -5,8 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import com.iora.erp.model.Currency;
-
 @Entity
 public class MembershipTier {
     @Id

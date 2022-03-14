@@ -18,7 +18,6 @@ import com.iora.erp.enumeration.AccessRights;
 import com.iora.erp.enumeration.Country;
 import com.iora.erp.enumeration.PayType;
 import com.iora.erp.enumeration.PaymentType;
-import com.iora.erp.model.Currency;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
@@ -634,7 +633,7 @@ public class DataLoader implements CommandLineRunner {
 		stockTransferService.createStockTransferOrder(sto2, 1L);
 
 		// Customer Order
-		/* CustomerOrderLI coli1 = new CustomerOrderLI();
+		CustomerOrderLI coli1 = new CustomerOrderLI();
 		coli1.setProduct(productService.getProduct("BPL0009803M-1"));
 		coli1.setQty(1);
 		coli1.setSubTotal(39.0);
@@ -647,7 +646,7 @@ public class DataLoader implements CommandLineRunner {
 		CustomerOrderLI coli3 = new CustomerOrderLI();
 		coli3.setProduct(productService.getProduct("APL0009197A-1"));
 		coli3.setQty(2);
-		coli3.setSubTotal(38.0); */
+		coli3.setSubTotal(38.0);
 
 		CustomerOrderLI coli4 = new CustomerOrderLI();
 		coli4.setProduct(productService.getProduct("BPD0010528A-1"));

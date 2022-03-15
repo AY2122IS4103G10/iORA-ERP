@@ -12,7 +12,7 @@ export const Listings = () => {
     console.log(line);
 
     useEffect(() => {
-        dispatch(fetchListings({line: line, tag: tag}));
+        dispatch(fetchListings({ line: line, tag: tag }));
     }, [dispatch, line, tag]);
 
     return (
@@ -25,30 +25,32 @@ export const Listings = () => {
                     </p>
                 </div>
                 {/* Product grid */}
-                <section aria-labelledby="products-heading" className="mt-8">
-                    <h2 id="products-heading" className="sr-only">
-                        Products
-                    </h2>
+                {listings === null ? <p>loading</p> :
+                    <section aria-labelledby="products-heading" className="mt-8">
+                        <h2 id="products-heading" className="sr-only">
+                            Products
+                        </h2>
 
-                    <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-                        {listings.map((model) => (
-                            <Link key={model.modelCode} to={`products/${model.modelCode}`} className="group">
-                                <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
-                                    <img
-                                        src="https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-02.jpg"
-                                        alt="image"
-                                        className="w-full h-full object-center object-cover group-hover:opacity-75"
-                                    />
-                                </div>
-                                <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
-                                    <h3>{model.name}</h3>
-                                    <p>${model.listPrice}</p>
-                                </div>
-                                <p className="mt-1 text-sm italic text-gray-500">{model.description}</p>
-                            </Link>
-                        ))}
-                    </div>
-                </section>
+                        <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                            {listings.map((model) => (
+                                <Link key={model.modelCode} to={`/products/${model.modelCode}`} className="group">
+                                    <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
+                                        <img
+                                            src="https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-02.jpg"
+                                            alt="image"
+                                            className="w-full h-full object-center object-cover group-hover:opacity-75"
+                                        />
+                                    </div>
+                                    <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
+                                        <h3>{model.name}</h3>
+                                        <p>${model.listPrice}</p>
+                                    </div>
+                                    <p className="mt-1 text-sm italic text-gray-500">{model.description}</p>
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
+                }
             </div>
         </main>
     )

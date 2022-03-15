@@ -31,9 +31,14 @@ export const authApi = {
 };
 
 export const listingApi = {
-  getListing(line, tag) {
+  getListingByLineAndTag(line, tag) {
     return axios.get(
       `${REST_ENDPOINT}sam/model/tag/${line}/${tag}`
+    );
+  },
+  getListingByLine(line) {
+    return axios.get(
+      `${REST_ENDPOINT}sam/model/tag/${line}`
     );
   }
 }

@@ -31,7 +31,7 @@ const VoucherDetailsBody = ({
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
-      <NavigatePrev page="Vouchers" path="/sm/vouchers" />
+      <NavigatePrev page="Vouchers" path="/sm/rewards-loyalty/vouchers" />
       <div className="px-4 sm:px-6 lg:px-8">
         <div>
           <div className="md:flex md:items-center md:justify-between md:space-x-4 xl:border-b xl:pb-6">

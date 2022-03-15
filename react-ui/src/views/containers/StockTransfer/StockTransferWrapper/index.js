@@ -307,50 +307,44 @@ export const LineItems = ({
             .fieldValue,
       },
       {
-        Header: "Requested",
+        Header: "Req",
         accessor: "requestedQty",
       },
       {
         Header: "Sent",
-        accessor: "sentQty",
+        accessor: "packedQty",
         disableSortBy: true,
-        Cell: (row) => {
+        Cell: (e) => {
           return status === "CONFIRMED" &&
             userSiteId === fromSiteId &&
             editable ? (
             <EditableCell
-              value={row.row.original.sentQty}
-              row={row.row}
-              column={row.column}
+              value={e.value}
+              row={e.row}
+              column={e.column}
               updateMyData={updateMyData}
             />
           ) : (
-            `${
-              row.row.original.sentQty === null ? "-" : row.row.original.sentQty
-            }`
+            `${e.value === null ? "-" : e.value}`
           );
         },
       },
       {
         Header: "Received",
-        accessor: "actualQty",
+        accessor: "receivedQty",
         disableSortBy: true,
-        Cell: (row) => {
+        Cell: (e) => {
           return (status === "READY" || status === "DELIVERING") &&
             userSiteId === toSiteId &&
             editable ? (
             <EditableCell
-              value={row.row.original.actualQty}
-              row={row.row}
-              column={row.column}
+              value={e.value}
+              row={e.row}
+              column={e.column}
               updateMyData={updateMyData}
             />
           ) : (
-            `${
-              row.row.original.actualQty === null
-                ? "-"
-                : row.row.original.actualQty
-            }`
+            `${e.value === null ? "-" : e.value}`
           );
         },
       },
@@ -430,7 +424,7 @@ export const StockTransferWrapper = ({ subsys }) => {
   const [openVerifyItems, setOpenVerifyItems] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [openInvoice, setOpenInvoice] = useState(false);
-
+  console.log(lineItems);
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getStockTransfer(id));
@@ -620,7 +614,6 @@ export const StockTransferWrapper = ({ subsys }) => {
     { name: "Delivery", href: "#", current: false },
   ];
 
-  
   return Object.keys(order).length !== 0 && Boolean(lineItems) ? (
     <>
       <div className="py-8 xl:py-10">
@@ -671,30 +664,46 @@ export const StockTransferWrapper = ({ subsys }) => {
         <ProcurementInvoice
           ref={componentRef}
           orderId={order.id}
-          orderStatus={order.statusHistory[order.statusHistory.length - 1].status}
+          orderStatus={
+            order.statusHistory[order.statusHistory.length - 1].status
+          }
           company={order.statusHistory[0].actionBy.company}
           createdBy={order.statusHistory[0].actionBy}
           fromSite={order.fromSite}
           toSite={order.toSite}
           qrValue={qrValue}
         >
-          <InvoiceSummary data={lineItems} status={order.statusHistory[order.statusHistory.length - 1].status} />
+          <InvoiceSummary
+            data={lineItems}
+            status={order.statusHistory[order.statusHistory.length - 1].status}
+          />
         </ProcurementInvoice>
       </div>
       <InvoiceModal
         open={openInvoice}
         closeModal={closeInvoiceModal}
-        orderId={order.id}
-        orderStatus={order.statusHistory[order.statusHistory.length - 1].status}
         company={order.statusHistory[0].actionBy.company}
         createdBy={order.statusHistory[0].actionBy}
         fromSite={order.fromSite}
         toSite={order.toSite}
-        data={lineItems}
-        qrValue={qrValue}
         handlePrint={handlePrint}
       >
-        <InvoiceSummary data={lineItems} status={order.statusHistory[order.statusHistory.length - 1].status} />
+        <ProcurementInvoice
+          orderId={order.id}
+          orderStatus={
+            order.statusHistory[order.statusHistory.length - 1].status
+          }
+          company={order.statusHistory[0].actionBy.company}
+          createdBy={order.statusHistory[0].actionBy}
+          fromSite={order.fromSite}
+          toSite={order.toSite}
+          qrValue={qrValue}
+        >
+          <InvoiceSummary
+            data={lineItems}
+            status={order.statusHistory[order.statusHistory.length - 1].status}
+          />
+        </ProcurementInvoice>
       </InvoiceModal>
     </>
   ) : (

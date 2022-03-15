@@ -49,7 +49,9 @@ export const sitesApi = {
   getAll() {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSites/all`);
   },
-
+  getSiteSAM(id) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSite/${id}`);
+  },
   getASite(id) {
     return axiosPrivate.get(`${REST_ENDPOINT}admin/viewSite/${id}`);
   },
@@ -93,16 +95,15 @@ export const procurementApi = {
       `${REST_ENDPOINT}manufacturing/procurementOrder/scan/${orderId}?barcode=${barcode}`
     );
   },
-  fulfillOrder(siteId, order) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`,
-      order
-    );
-  },
   shipOrder(siteId, order) {
     return axiosPrivate.put(
       `${REST_ENDPOINT}manufacturing/procurementOrder/ship/${siteId}`,
       order
+    );
+  },
+  receiveOrder(orderId, siteId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}warehouse/procurementOrder/receive/${orderId}/${siteId}`
     );
   },
 };
@@ -231,7 +232,7 @@ export const posApi = {
       `${REST_ENDPOINT}store/customerOrder/calculate`,
       lineItems
     );
-  }
+  },
 };
 
 export const employeeApi = {
@@ -314,6 +315,11 @@ export const orderApi = {
   get(orderId) {
     return axiosPrivate.get(
       `${REST_ENDPOINT}store/customerOrder/view/${orderId}`
+    );
+  },
+  createOrder(order) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}store/customerOrder/create`, order
     );
   },
 };

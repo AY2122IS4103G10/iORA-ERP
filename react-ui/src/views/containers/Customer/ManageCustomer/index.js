@@ -5,12 +5,7 @@ import { classNames } from "../../../../utilities/Util";
 
 const tabs = [
   { name: "View Customers", href: "/sm/customers", index: 0 },
-  {
-    name: "View Membership Tiers",
-    href: "/sm/customers/tiers",
-    index: 1,
-  },
-  { name: "Support Center", href: "/sm/customers/support", index: 2 },
+  { name: "Support Center", href: "/sm/customers/support", index: 1 },
 ];
 
 export const Header = ({type, path}) => {

@@ -23,11 +23,11 @@ export const MembershipTierTable = ({ data, handleOnClick }) => {
         Header: "Min. Spend",
         accessor: "minSpend",
       },
-      {
-        Header: "Currency",
-        accessor: "currency",
-        Cell: (e) => `${e.value.name} (${e.value.code})`,
-      },
+      // {
+      //   Header: "Currency",
+      //   accessor: "currency",
+      //   Cell: (e) => `${e.value.name} (${e.value.code})`,
+      // },
     ],
     []
   );
@@ -53,8 +53,8 @@ export const MembershipTierList = () => {
   useEffect(() => {
     membershipTierStatus === "idle" && dispatch(fetchMembershipTiers());
   }, [membershipTierStatus, dispatch]);
-  
-  const handleOnClick = (row) => navigate(`/sm/customers/tiers/${row.original.name}`);
+  console.log(data)
+  const handleOnClick = (row) => navigate(`/sm/rewards-loyalty/tiers/${row.original.name}`);
 
   return <MembershipTierTable data={data} handleOnClick={handleOnClick} />;
 };

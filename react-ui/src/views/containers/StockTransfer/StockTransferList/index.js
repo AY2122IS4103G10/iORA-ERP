@@ -14,6 +14,7 @@ import {
   SelectColumnFilter,
 } from "../../../components/Tables/SelectableTable";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
+import moment from "moment";
 
 const cols = [
   {
@@ -34,26 +35,16 @@ const cols = [
   },
   {
     Header: "Status",
-    accessor: (row) => row?.statusHistory?.slice(-1)[0].status,
+    accessor: (row) => row.statusHistory[row.statusHistory.length - 1].status,
     Filter: SelectColumnFilter,
     filter: "includes",
   },
   {
     Header: "Last Updated",
-    accessor: (row) => {
-      let timeStamp = row?.statusHistory?.slice(-1)[0].timeStamp;
-      var datetime =
-        (timeStamp[3] < 10 ? "0" + timeStamp[3] : timeStamp[3]) +
-        ":" +
-        (timeStamp[4] < 10 ? "0" + timeStamp[4] : timeStamp[4]) +
-        " " +
-        timeStamp[2] +
-        "/" +
-        timeStamp[1] +
-        "/" +
-        timeStamp[0];
-      return datetime;
-    },
+    accessor: (row) =>
+      moment
+        .unix(row.statusHistory[row.statusHistory.length - 1].timeStamp / 1000)
+        .format("DD/MM/YY, HH:mm:ss"),
   },
 ];
 

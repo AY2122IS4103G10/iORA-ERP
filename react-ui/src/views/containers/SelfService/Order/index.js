@@ -365,6 +365,7 @@ export function Order() {
   const [openCheckout, setOpenCheckout] = useState(false);
   const [checkoutItems, setCheckoutItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [order, setOrder] = useState({});
 
   const navigate = useNavigate();
   const renderSummary =
@@ -373,10 +374,25 @@ export function Order() {
 
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
+
   const openCheckoutModal = () => {
     setOpenCheckout(true);
-    setCheckoutItems(lineItems.concat(promotions));
+    const concat = lineItems.concat(promotions);
+    setCheckoutItems(concat);
+    setOrder({
+      totalAmount: 0.0,
+      lineItems: concat,
+      payments: [],
+      paid: false,
+      refundedLIs: [],
+      exchangedLIs: [],
+      customerId:
+        localStorage.getItem("customer") === null
+          ? JSON.parse(localStorage.getItem("customer"))?.id
+          : null,
+    });
   };
+
   const closeCheckoutModal = () => {
     setOpenCheckout(false);
     setCheckoutItems([]);
@@ -487,11 +503,12 @@ export function Order() {
       )}
       <ManageCheckout
         open={openCheckout}
-        openModal
+        openModal={openCheckoutModal}
         closeModal={closeCheckoutModal}
         onCancel={closeCheckoutModal}
-        checkoutItems={checkoutItems}
         setIsLoading={setIsLoading}
+        checkoutItems={checkoutItems}
+        order={order}
       />
       {!renderSummary && (
         <OrderList

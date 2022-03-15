@@ -109,8 +109,8 @@ export const ProductsList = () => {
 
   if (prodStatus === "loading") {
     content = (
-      <div className="items-center">
-        <TailSpin color="#00BFFF" height={50} width={50} />
+      <div className="flex min-h-screen items-center justify-center">
+        <TailSpin color="#00BFFF" height={20} width={20} />
       </div>
     );
   } else if (prodStatus === "succeeded") {

@@ -377,8 +377,6 @@ export const StockLevelForm = (subsys) => {
   const closeModal = () => setOpen(false);
 
   const handleEditQty = (e) => {
-    // e.preventDefault();
-    console.log("clicked")
     let qty = productStock?.qty ?? 0;
     if (selected.id === 1) {
       qty = qty + parseInt(inputQty);
@@ -387,7 +385,6 @@ export const StockLevelForm = (subsys) => {
     } else if (selected.id === 3) {
       qty = inputQty;
     }
-    console.log(qty);
     if (qty < 0) {
       addToast(`Quantity cannot be negative`, {
         appearance: "error",

@@ -29,3 +29,8 @@ export const authApi = {
     return axios.post(`${REST_ENDPOINT}online/register`, user);
   },
 };
+
+export const listingApi = {
+  getListing(line, tag) {
+  }
+}

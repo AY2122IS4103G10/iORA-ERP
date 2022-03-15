@@ -1,15 +1,15 @@
 import { useParams } from "react-router-dom";
 
 export const Listings = () => {
-    const { category } = useParams();
+    const { tag } = useParams();
     const { line } = useParams();
-    console.log(category);
+    console.log(tag);
     console.log(line);
     return (
         <main>
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                 <div className="py-8 text-center">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">{line.toUpperCase() + ' ' + (category === undefined ? '' : category?.toUpperCase())}</h1>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">{line.toUpperCase() + ' ' + (tag === undefined ? '' : tag?.toUpperCase())}</h1>
                     <p className="mt-4 max-w-3xl mx-auto text-base text-gray-500">
                         Thoughtfully designed outfits for the workspace, home, and travel.
                     </p>

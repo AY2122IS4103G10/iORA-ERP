@@ -8,7 +8,6 @@ import {
   getAllSites,
   selectAllSites,
 } from "../../../../stores/slices/siteSlice";
-import { getASiteStock } from "../../../../stores/slices/stocklevelSlice";
 import {
   createStockTransfer,
   editStockTransfer,
@@ -26,7 +25,6 @@ import {
 } from "../../../components/Tables/ClickableRowTable";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useToasts } from "react-toast-notifications";
-import { useCallback } from "react";
 
 const cols = [
   {
@@ -371,7 +369,7 @@ const LineItemsTable = ({ data, setLineItems }) => {
       },
       {
         Header: "Name",
-        accessor: "product.name",
+        accessor: "name",
       },
       {
         Header: "Color",
@@ -413,6 +411,15 @@ const LineItemsTable = ({ data, setLineItems }) => {
   );
 };
 
+export const fetchModelBySku = async (sku) => {
+  const { data } = await productApi.getModelBySku(sku);
+  return data;
+};
+
+export const fetchAllModelsBySkus = async (items) => {
+  return Promise.all(items.map((item) => fetchModelBySku(item.product.sku)));
+};
+
 export const StockTransferForm = (subsys) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -430,17 +437,8 @@ export const StockTransferForm = (subsys) => {
   const { addToast } = useToasts();
 
   //get stock level and product information
-
   const [prodTableData, setProdTableData] = useState([]);
 
-  const fetchModelBySku = async (sku) => {
-    const { data } = await productApi.getModelBySku(sku);
-    return data;
-  };
-
-  const fetchAllModelsBySkus = useCallback(async (items) => {
-    return Promise.all(items.map((item) => fetchModelBySku(item.product.sku)));
-  }, []);
   
   const fetchStockLevel = async (id) => {
     const { data } = await api.get(`store/viewStock/sites`, id);
@@ -450,9 +448,6 @@ export const StockTransferForm = (subsys) => {
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getAllSites());
-    if (!isObjectEmpty(from)) {
-      dispatch(getASiteStock(from.id));
-    }
   }, [dispatch, from]);
 
   //editing
@@ -512,12 +507,12 @@ export const StockTransferForm = (subsys) => {
           })
         );
     }
-  }, [id, addToast, fetchAllModelsBySkus, currSite]);
-
+  }, [id, addToast, currSite]);
   //selecting sites
   const sites = useSelector(selectAllSites);
   const openSitesModal = () => setOpenSites(true);
   const closeSitesModal = () => setOpenSites(false);
+  
   //open items modal
   const openItemsModal = () => {
     if (isObjectEmpty(from)) {
@@ -548,7 +543,6 @@ export const StockTransferForm = (subsys) => {
   };
 
   //Handle Create Order product
-  console.log(lineItems)
   const handleSubmit = (e) => {
     e.preventDefault();
     const stockTransferLI = lineItems.map((item) => ({

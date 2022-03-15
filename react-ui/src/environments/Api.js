@@ -161,11 +161,11 @@ export const stockTransferApi = {
   },
   pickPack(orderId, siteId) {
     return axiosPrivate.put(
-      `${REST_ENDPOINT}store/stockTransfer/pickPack/${orderId}/${siteId}`
+      `${REST_ENDPOINT}store/stockTransfer/pickpack/${orderId}/${siteId}`
     );
   },
   scanItem(orderId, barcode) {
-    return axiosPrivate.put(
+    return axiosPrivate.patch(
       `${REST_ENDPOINT}store/stockTransfer/scanFrom/${orderId}?barcode=${barcode}`
     );
   },

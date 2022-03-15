@@ -8,19 +8,27 @@ import { sitesApi } from "../../../../environments/Api";
 import { useEffect } from "react";
 import { useState } from "react";
 import { eventTypes } from "../../../../constants/eventTypes";
+import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 
 const ItemsSummary = ({
   data,
   status,
-  setData,
   pathname,
   onVerifyReceivedClicked,
 }) => {
   const columns = useMemo(() => {
     return [
       {
+        Header: "Prod Code",
+        accessor: "product.modelCode",
+      },
+      {
         Header: "SKU",
-        accessor: (row) => row.product.sku,
+        accessor: "product.sku",
+      },
+      {
+        Header: "Name",
+        accessor: "product.name",
       },
       {
         Header: "Color",
@@ -170,7 +178,6 @@ const ProcurementDetailsBody = ({
   headquarters,
   warehouse,
   notes,
-  setLineItems,
   onFulfilClicked,
   onVerifyReceivedClicked,
 }) => (
@@ -246,21 +253,33 @@ const ProcurementDetailsBody = ({
           </div>
         </div>
       </section>
+    </div>
+    {history && <ActivitySection history={history} />}
+    <div className="lg:col-start-1 lg:col-span-3">
       <section aria-labelledby="order-summary">
         <ItemsSummary
           data={lineItems}
           status={status}
-          setData={setLineItems}
           pathname={pathname}
           onFulfilClicked={onFulfilClicked}
           onVerifyReceivedClicked={onVerifyReceivedClicked}
         />
       </section>
     </div>
-    {history && <ActivitySection history={history} />}
   </div>
 );
 
+export const fetchActionBy = async (actionBy) => {
+  const { data } = await sitesApi.getSiteSAM(
+    Boolean(actionBy.id) ? actionBy.id : actionBy
+  );
+  return data;
+};
+export const fetchAllActionBy = async (statusHistory) => {
+  return Promise.all(
+    statusHistory.map(({ actionBy }) => fetchActionBy(actionBy))
+  );
+};
 export const ProcurementDetails = () => {
   const {
     procurementId,
@@ -276,21 +295,10 @@ export const ProcurementDetails = () => {
   } = useOutletContext();
   const { pathname } = useLocation();
   const [history, setHistory] = useState([]);
-
-  const fetchActionBy = async (actionBy) => {
-    const { data } = await sitesApi.getSiteSAM(
-      Boolean(actionBy.id) ? actionBy.id : actionBy
-    );
-    return data;
-  };
+  const [lItems, setLItems] = useState([]);
 
   useEffect(() => {
-    const fetchAllActionBy = async () => {
-      return Promise.all(
-        statusHistory.map(({ actionBy }) => fetchActionBy(actionBy))
-      );
-    };
-    fetchAllActionBy().then((data) => {
+    fetchAllActionBy(statusHistory).then((data) => {
       setHistory(
         statusHistory.map(({ status, timeStamp }, index) => ({
           id: index,
@@ -298,7 +306,7 @@ export const ProcurementDetails = () => {
             status === "PENDING"
               ? index === 0
                 ? eventTypes.created
-                : eventTypes.action
+                : eventTypes.completed
               : ["PICKING", "PACKING", "SHIPPING"].some((s) => s === status)
               ? eventTypes.action
               : status === "CANCELLED"
@@ -316,6 +324,21 @@ export const ProcurementDetails = () => {
       );
     });
   }, [statusHistory]);
+  useEffect(() => {
+    fetchAllModelsBySkus(lineItems).then((data) => {
+      setLItems(
+        lineItems.map((item, index) => ({
+          ...item,
+          product: {
+            ...item.product,
+            modelCode: data[index].modelCode,
+            name: data[index].name,
+          },
+        }))
+      );
+    });
+  }, [lineItems]);
+
   return (
     [
       procurementId,
@@ -333,11 +356,10 @@ export const ProcurementDetails = () => {
         headquarters={headquarters}
         warehouse={warehouse}
         notes={notes}
-        lineItems={lineItems}
+        lineItems={lItems}
         setLineItems={setLineItems}
         pathname={pathname}
         history={history}
-        // onFulfilClicked={onFulfilClicked}
       />
     )
   );

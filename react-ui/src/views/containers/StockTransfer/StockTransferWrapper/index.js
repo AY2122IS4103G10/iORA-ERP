@@ -143,7 +143,7 @@ export const StockTransferHeader = ({
               <Link to={`/sm/stocktransfer/edit/${order.id}`}>
                 <button
                   type="button"
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none"
+                  className="ml-3 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none"
                 >
                   <span>Edit order</span>
                   <PencilIcon
@@ -159,7 +159,7 @@ export const StockTransferHeader = ({
             {userSiteId === orderMadeBy && status === "PENDING" ? (
               <button
                 type="button"
-                className="inline-flex items-center px-3 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                className="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
                 onClick={openDeleteModal}
               >
                 <span>Cancel order</span>
@@ -169,8 +169,7 @@ export const StockTransferHeader = ({
             )}
 
             {/* Accept order if status is pending */}
-            {userSiteId === order.fromSite.id &&
-            (status === "PENDINGALL" || status === "PENDINGONE") ? (
+            {userSiteId === order.fromSite.id && status === "PENDING" ? (
               <>
                 <button
                   type="button"
@@ -291,7 +290,11 @@ export const LineItems = ({
     return [
       {
         Header: "SKU",
-        accessor: (row) => row.product.sku,
+        accessor: "product.sku",
+      },
+      {
+        Header: "Name",
+        accessor: "product.name",
       },
       {
         Header: "Color",
@@ -424,7 +427,6 @@ export const StockTransferWrapper = ({ subsys }) => {
   const [openVerifyItems, setOpenVerifyItems] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [openInvoice, setOpenInvoice] = useState(false);
-  console.log(lineItems);
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getStockTransfer(id));
@@ -631,7 +633,7 @@ export const StockTransferWrapper = ({ subsys }) => {
           openInvoiceModal={openInvoiceModal}
         />
         <Outlet
-          context={{ subsys, order, lineItems, setLineItems, userSiteId }}
+          context={{ subsys, order, lineItems, setLineItems, userSiteId, openInvoice }}
         />
       </div>
       <Confirmation

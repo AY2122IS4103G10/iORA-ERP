@@ -8,14 +8,13 @@ import { useMemo } from "react";
 import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
 import { api, procurementApi } from "../../../../environments/Api";
-import { deleteExistingProcurement } from "../../../../stores/slices/procurementSlice";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import Confirmation from "../../../components/Modals/Confirmation";
@@ -246,13 +245,12 @@ export const ProcurementWrapper = ({ subsys }) => {
   const { addToast } = useToasts();
   const componentRef = useRef();
   const handlePrint = useReactToPrint({ content: () => componentRef.current });
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { procurementId } = useParams();
   const [headquarters, setHeadquarters] = useState(null);
   const [manufacturing, setManufacturing] = useState(null);
   const [warehouse, setWarehouse] = useState(null);
-  const [notes, setNotes] = useState("")
+  const [notes, setNotes] = useState("");
   const [lineItems, setLineItems] = useState([]);
   const [status, setStatus] = useState("");
   const [statusHistory, setStatusHistory] = useState([]);
@@ -292,7 +290,7 @@ export const ProcurementWrapper = ({ subsys }) => {
           },
         }))
       );
-      setNotes(notes)
+      setNotes(notes);
       setStatus({
         status: statusHistory[statusHistory.length - 1].status,
         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
@@ -307,86 +305,156 @@ export const ProcurementWrapper = ({ subsys }) => {
     });
   }, [subsys, procurementId]);
 
-  const onDeleteProcurementClicked = () => {
-    dispatch(
-      deleteExistingProcurement({
-        orderId: procurementId,
-        siteId: currSiteId,
-      })
-    )
-      .unwrap()
-      .then(() => {
-        addToast("Successfully deleted procurement order", {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        closeModal();
-        navigate("/sm/procurements");
-      })
-      .catch((err) =>
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        })
+  const onDeleteProcurementClicked = async () => {
+    try {
+      const { data } = await procurementApi.deleteOrder(
+        procurementId,
+        currSiteId
       );
+      const { statusHistory } = data;
+      setStatus({
+        status: statusHistory[statusHistory.length - 1].status,
+        timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+      });
+      setStatusHistory(statusHistory);
+      addToast("Successfully deleted procurement order", {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      closeModal();
+    } catch (err) {
+      addToast(`Error: ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+    // dispatch(
+    //   deleteExistingProcurement({
+    //     orderId: procurementId,
+    //     siteId: currSiteId,
+    //   })
+    // )
+    //   .unwrap()
+    //   .then(() => {
+    //     addToast("Successfully deleted procurement order", {
+    //       appearance: "success",
+    //       autoDismiss: true,
+    //     });
+    //     closeModal();
+    //     navigate("/sm/procurements");
+    //   })
+    //   .catch((err) =>
+    //     addToast(`Error: ${err.message}`, {
+    //       appearance: "error",
+    //       autoDismiss: true,
+    //     })
+    //   );
   };
 
-  const onAcceptClicked = () => {
-    procurementApi
-      .acceptOrder(procurementId, currSiteId)
-      .then((response) => {
-        const { statusHistory } = response.data;
-        setStatus({
-          status: statusHistory[statusHistory.length - 1].status,
-          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-        });
-        setStatusHistory(statusHistory);
-      })
-      .then(() => {
-        addToast(
-          "Successfully accepted procurement order. Please print the order invoice.",
-          {
-            appearance: "success",
-            autoDismiss: true,
-          }
-        );
-        closeConfirmModal();
-        openInvoice();
-      })
-      .catch((err) =>
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        })
+  const onAcceptClicked = async () => {
+    try {
+      const { data } = await procurementApi.acceptOrder(
+        procurementId,
+        currSiteId
       );
-  };
-
-  const onCancelOrderClicked = () => {
-    procurementApi
-      .cancelOrder(procurementId, currSiteId)
-      .then((response) => {
-        const { statusHistory } = response.data;
-        setStatus({
-          status: statusHistory[statusHistory.length - 1].status,
-          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-        });
-        setStatusHistory(statusHistory);
-      })
-      .then(() => {
-        addToast("Successfully cancelled procurement order", {
+      const { statusHistory } = data;
+      setStatus({
+        status: statusHistory[statusHistory.length - 1].status,
+        timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+      });
+      setStatusHistory(statusHistory);
+      addToast(
+        "Successfully accepted procurement order. Please print the order invoice.",
+        {
           appearance: "success",
           autoDismiss: true,
-        });
-        closeConfirmModal();
-      })
-      .catch((err) =>
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        })
+        }
       );
+      closeConfirmModal();
+      openInvoice();
+    } catch (err) {
+      addToast(`Error: ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+    // procurementApi
+    //   .acceptOrder(procurementId, currSiteId)
+    //   .then((response) => {
+    //     const { statusHistory } = response.data;
+    //     setStatus({
+    //       status: statusHistory[statusHistory.length - 1].status,
+    //       timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+    //     });
+    //     setStatusHistory(statusHistory);
+    //   })
+    //   .then(() => {
+    //     addToast(
+    //       "Successfully accepted procurement order. Please print the order invoice.",
+    //       {
+    //         appearance: "success",
+    //         autoDismiss: true,
+    //       }
+    //     );
+    //     closeConfirmModal();
+    //     openInvoice();
+    //   })
+    //   .catch((err) =>
+    //     addToast(`Error: ${err.message}`, {
+    //       appearance: "error",
+    //       autoDismiss: true,
+    //     })
+    //   );
   };
-  
+
+  const onCancelOrderClicked = async () => {
+    try {
+      const { data } = await procurementApi.cancelOrder(
+        procurementId,
+        currSiteId
+      );
+      const { statusHistory } = data;
+      setStatus({
+        status: statusHistory[statusHistory.length - 1].status,
+        timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+      });
+      setStatusHistory(statusHistory);
+      addToast("Successfully cancelled procurement order", {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      closeConfirmModal();
+    } catch (err) {
+      addToast(`Error: ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+    // procurementApi
+    //   .cancelOrder(procurementId, currSiteId)
+    //   .then((response) => {
+    //     const { statusHistory } = response.data;
+    //     setStatus({
+    //       status: statusHistory[statusHistory.length - 1].status,
+    //       timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+    //     });
+    //     setStatusHistory(statusHistory);
+    //   })
+    //   .then(() => {
+    //     addToast("Successfully cancelled procurement order", {
+    //       appearance: "success",
+    //       autoDismiss: true,
+    //     });
+    //     closeConfirmModal();
+    //   })
+    //   .catch((err) =>
+    //     addToast(`Error: ${err.message}`, {
+    //       appearance: "error",
+    //       autoDismiss: true,
+    //     })
+    //   );
+  };
+
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 

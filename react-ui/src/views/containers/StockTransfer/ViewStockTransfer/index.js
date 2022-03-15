@@ -5,7 +5,8 @@ import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { eventTypes } from "../../../../constants/eventTypes";
 import { sitesApi } from "../../../../environments/Api";
-import { classNames } from "../../../../utilities/Util";
+import { ActivitySection } from "../../Procurement/ProcurementDetails";
+import { fetchAllModelsBySkus } from "../StockTransferForm";
 import { LineItems } from "../StockTransferWrapper";
 
 export const StockTransferBody = ({
@@ -86,83 +87,25 @@ export const StockTransferBody = ({
               </dl>
             </div>
           </div>
-          {lineItems !== undefined &&
-          lineItems !== undefined &&
-          Object.keys(lineItems).length !== 0 ? (
-            <LineItems
-              lineItems={lineItems}
-              status={status}
-              userSiteId={userSiteId}
-              fromSiteId={order.fromSite.id}
-              toSiteId={order.toSite.id}
-              editable={false}
-            />
-          ) : (
-            <p>loading</p>
-          )}
         </section>
       </div>
-      {history && (
-        <section
-          aria-labelledby="timeline-title"
-          className="lg:col-start-3 lg:col-span-1"
-        >
-          <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-            <h2
-              id="timeline-title"
-              className="text-lg font-medium text-gray-900"
-            >
-              Activity
-            </h2>
-
-            {/* Activity Feed */}
-            <div className="mt-6 flow-root">
-              <ul className="-mb-8">
-                {history.map((item, itemIdx) => (
-                  <li key={item.id}>
-                    <div className="relative pb-8">
-                      {itemIdx !== history.length - 1 ? (
-                        <span
-                          className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-                          aria-hidden="true"
-                        />
-                      ) : null}
-                      <div className="relative flex space-x-3">
-                        <div>
-                          <span
-                            className={classNames(
-                              item.type.bgColorClass,
-                              "h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
-                            )}
-                          >
-                            <item.type.icon
-                              className="w-5 h-5 text-white"
-                              aria-hidden="true"
-                            />
-                          </span>
-                        </div>
-                        <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                          <div>
-                            <p className="text-sm text-gray-500">
-                              {item.content}{" "}
-                              <span className="font-medium text-gray-900">
-                                {item.target}
-                              </span>
-                            </p>
-                          </div>
-                          <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                            {item.date}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-      )}
+      {history && <ActivitySection history={history} />}
+      <div className="lg:col-start-1 lg:col-span-3">
+        {lineItems !== undefined &&
+        lineItems !== undefined &&
+        Object.keys(lineItems).length !== 0 ? (
+          <LineItems
+            lineItems={lineItems}
+            status={status}
+            userSiteId={userSiteId}
+            fromSiteId={order.fromSite.id}
+            toSiteId={order.toSite.id}
+            editable={false}
+          />
+        ) : (
+          <p>loading</p>
+        )}
+      </div>
     </div>
   );
 };
@@ -170,6 +113,7 @@ export const StockTransferBody = ({
 export const ViewStockTransfer = () => {
   const { order, lineItems, userSiteId } = useOutletContext();
   const [history, setHistory] = useState([]);
+  const [lItems, setLItems] = useState([]);
 
   const fetchActionBy = async (actionBy) => {
     const { data } = await sitesApi.getSiteSAM(
@@ -190,7 +134,7 @@ export const ViewStockTransfer = () => {
           return {
             id: index,
             type:
-              status === "PENDINGALL" || status === "PENDINGONE"
+              status === "PENDING"
                 ? index === 0
                   ? eventTypes.created
                   : eventTypes.action
@@ -200,7 +144,7 @@ export const ViewStockTransfer = () => {
                 ? eventTypes.cancelled
                 : eventTypes.completed,
             content:
-              status === "PENDINGALL" || status === "PENDINGONE"
+              status === "PENDING"
                 ? `${index === 0 ? "Created" : "Updated"} by`
                 : status === "READY_FOR_SHIPPING"
                 ? "Ready for shipping by"
@@ -212,11 +156,25 @@ export const ViewStockTransfer = () => {
       );
     });
   }, [order]);
+  useEffect(() => {
+    fetchAllModelsBySkus(lineItems).then((data) => {
+      setLItems(
+        lineItems.map((item, index) => ({
+          ...item,
+          product: {
+            ...item.product,
+            modelCode: data[index].modelCode,
+            name: data[index].name,
+          },
+        }))
+      );
+    });
+  }, [lineItems]);
   // console.log(history)
   return (
     <StockTransferBody
       order={order}
-      lineItems={lineItems}
+      lineItems={lItems}
       userSiteId={userSiteId}
       history={history}
     />

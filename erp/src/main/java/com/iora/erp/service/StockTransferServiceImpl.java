@@ -145,8 +145,7 @@ public class StockTransferServiceImpl implements StockTransferService {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
-        if (actionBy == null || !actionBy.equals(stOrder.getFromSite()) || !actionBy.equals(stOrder.getToSite())
-                || !(actionBy instanceof HeadquartersSite)) {
+        if (actionBy == null || !actionBy.equals(stOrder.getFromSite())) {
             throw new SiteConfirmationException("Site is not allowed to reject the order.");
         } else if (stOrder.getLastStatus() != StockTransferStatus.PENDING) {
             throw new StockTransferException(

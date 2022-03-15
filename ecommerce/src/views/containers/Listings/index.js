@@ -1,10 +1,20 @@
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchListings, selectListings } from "../../../stores/slices/listingSlice";
 
 export const Listings = () => {
     const { tag } = useParams();
     const { line } = useParams();
+    const dispatch = useDispatch();
+    const listings = useSelector(selectListings);
     console.log(tag);
     console.log(line);
+
+    useEffect(() => {
+        dispatch(fetchListings({line: line, tag: tag}));
+    }, [dispatch, line, tag]);
+
     return (
         <main>
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -20,24 +30,24 @@ export const Listings = () => {
                         Products
                     </h2>
 
-                    {/* <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8">
-                        {products1.map((product) => (
-                            <Link key={product.id} href={product.href} className="group">
+                    <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                        {listings.map((model) => (
+                            <Link key={model.modelCode} to={`products/${model.modelCode}`} className="group">
                                 <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
                                     <img
-                                        src={product.imageSrc}
-                                        alt={product.imageAlt}
+                                        src="https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-02.jpg"
+                                        alt="image"
                                         className="w-full h-full object-center object-cover group-hover:opacity-75"
                                     />
                                 </div>
                                 <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
-                                    <h3>{product.name}</h3>
-                                    <p>{product.price}</p>
+                                    <h3>{model.name}</h3>
+                                    <p>${model.listPrice}</p>
                                 </div>
-                                <p className="mt-1 text-sm italic text-gray-500">{product.description}</p>
+                                <p className="mt-1 text-sm italic text-gray-500">{model.description}</p>
                             </Link>
                         ))}
-                    </div> */}
+                    </div>
                 </section>
             </div>
         </main>

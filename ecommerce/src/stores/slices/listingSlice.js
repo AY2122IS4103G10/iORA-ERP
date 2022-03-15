@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { listingApi } from "../../environments/Api";
 
 const initialState = {
-    models: [], 
+    models: null, 
     currModel: null,
     currProduct: null,
     status: "idle",
@@ -36,3 +36,5 @@ const listingSlice = createSlice({
 });
 
 export default listingSlice.reducer;
+
+export const selectListings = (state) => state.listing.models;

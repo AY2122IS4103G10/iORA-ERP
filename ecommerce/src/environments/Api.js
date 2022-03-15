@@ -32,5 +32,8 @@ export const authApi = {
 
 export const listingApi = {
   getListing(line, tag) {
+    return axios.get(
+      `${REST_ENDPOINT}sam/model/tag/${line}/${tag}`
+    );
   }
 }

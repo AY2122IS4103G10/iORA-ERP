@@ -7,6 +7,8 @@ import { ECIndex } from "./views/containers/Index/ECIndex";
 import { SettingsIndex } from "./views/containers/Index/SettingsIndex";
 import { Account } from "./views/containers/Auth/Settings/Account";
 import { Auth } from "./views/containers/Auth/Auth";
+import { HomeIndex } from "./views/containers/Index/HomeIndex";
+import { Listings } from "./views/containers/Listings";
 
 function App() {
   return (
@@ -23,7 +25,12 @@ function App() {
             </Auth>
           }
         >
-          <Route index element={<Cart />} />
+          <Route index element={<HomeIndex/>} />
+          <Route path="products/:line">
+            <Route path=":category" element={<Listings/>}/>
+            <Route path="" element={<Listings/>}/>
+          </Route>
+          <Route path="cart" element={<Cart/>}/>
           <Route path="settings" element={<SettingsIndex />}>
             <Route path="profile" element={<Profile />} />
             <Route path="account" element={<Account />} />

@@ -424,7 +424,6 @@ export const StockTransferWrapper = ({ subsys }) => {
   const [openVerifyItems, setOpenVerifyItems] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [openInvoice, setOpenInvoice] = useState(false);
-  console.log(lineItems);
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getStockTransfer(id));

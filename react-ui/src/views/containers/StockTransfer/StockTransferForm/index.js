@@ -3,19 +3,12 @@ import { ExclamationCircleIcon, XIcon } from "@heroicons/react/outline";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { api } from "../../../../environments/Api";
-import {
-  fetchProducts,
-  selectAllProducts,
-} from "../../../../stores/slices/productSlice";
+import { api, productApi } from "../../../../environments/Api";
 import {
   getAllSites,
   selectAllSites,
 } from "../../../../stores/slices/siteSlice";
-import {
-  getASiteStock,
-  selectCurrSiteStock,
-} from "../../../../stores/slices/stocklevelSlice";
+import { getASiteStock } from "../../../../stores/slices/stocklevelSlice";
 import {
   createStockTransfer,
   editStockTransfer,
@@ -33,6 +26,7 @@ import {
 } from "../../../components/Tables/ClickableRowTable";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useToasts } from "react-toast-notifications";
+import { useCallback } from "react";
 
 const cols = [
   {
@@ -65,6 +59,11 @@ export const SelectSiteModal = ({
   to,
   setFrom,
   setTo,
+  setLineItems,
+  setSelectedRows,
+  setProdTableData,
+  fetchStockLevel,
+  fetchAllModelsBySkus,
 }) => {
   const columns = useMemo(() => cols, []);
   const fromRef = useRef(null);
@@ -88,6 +87,20 @@ export const SelectSiteModal = ({
         setError(true);
       } else {
         setFrom(row);
+        fetchStockLevel(row.id).then(({ data: stocklevel }) => {
+          fetchAllModelsBySkus(stocklevel.products).then((data) => {
+            setProdTableData({
+              ...stocklevel,
+              products: stocklevel.products.map((product, index) => ({
+                ...product,
+                modelCode: data[index].modelCode,
+                name: data[index].name,
+              })),
+            });
+          });
+        });
+        setLineItems([])
+        setSelectedRows([])
       }
 
       if (isObjectEmpty(to)) {
@@ -231,13 +244,6 @@ export const SelectSiteModal = ({
   );
 };
 
-const convertData = (data) =>
-  data.products.map((product) => ({
-    sku: product.sku,
-    qty: product.qty,
-    reserve: product.reserveQty,
-  }));
-
 const ItemsList = ({
   cols,
   data,
@@ -339,18 +345,6 @@ const AddItemsModal = ({
   );
 };
 
-function prepareStockLevel(stocklevel, allModels) {
-  for (let i = 0; i < stocklevel.length; i++) {
-    let model = allModels?.find(
-      (model) => model.modelCode === stocklevel[i].sku.slice(0, -2)
-    );
-    stocklevel[i].name = model?.name;
-    stocklevel[i].product = model?.products.find(
-      (prod) => prod.sku === stocklevel[i].sku
-    );
-  }
-  return stocklevel;
-}
 
 const LineItemsTable = ({ data, setLineItems }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
@@ -377,7 +371,7 @@ const LineItemsTable = ({ data, setLineItems }) => {
       },
       {
         Header: "Name",
-        accessor: "name",
+        accessor: "product.name",
       },
       {
         Header: "Color",
@@ -436,11 +430,22 @@ export const StockTransferForm = (subsys) => {
   const { addToast } = useToasts();
 
   //get stock level and product information
-  const stocklevel = useSelector(selectCurrSiteStock);
-  const allModels = useSelector(selectAllProducts);
-  const prodTableData = isObjectEmpty(stocklevel)
-    ? []
-    : prepareStockLevel(convertData(stocklevel), allModels);
+
+  const [prodTableData, setProdTableData] = useState([]);
+
+  const fetchModelBySku = async (sku) => {
+    const { data } = await productApi.getModelBySku(sku);
+    return data;
+  };
+
+  const fetchAllModelsBySkus = useCallback(async (items) => {
+    return Promise.all(items.map((item) => fetchModelBySku(item.product.sku)));
+  }, []);
+  
+  const fetchStockLevel = async (id) => {
+    const { data } = await api.get(`store/viewStock/sites`, id);
+    return { data };
+  };
 
   useEffect(() => {
     dispatch(updateCurrSite());
@@ -448,55 +453,71 @@ export const StockTransferForm = (subsys) => {
     if (!isObjectEmpty(from)) {
       dispatch(getASiteStock(from.id));
     }
-    dispatch(fetchProducts());
   }, [dispatch, from]);
 
   //editing
-  function mapLineItemsToSelectedRows(data) {
-    let selectedRows = {};
-    for (let i = 0; i < data.length; i++) {
-      let item = data[i];
-      let product = prodTableData.find((data) => data.sku === item.product.sku);
-      item.name = product.name;
-      item.qty = product.qty;
-
-      //update selectedRows
-      let index = prodTableData.findIndex(
-        (data) => data.sku === item.product.sku
-      );
-      selectedRows[index] = true;
-    }
-    setSelectedRows(selectedRows);
-    return data;
-  }
 
   useEffect(() => {
+    const fetchStockTransfer = async (id) => {
+      const { data } = await api.get("store/stockTransfer", id);
+      return { data };
+    };
+
     if (id !== undefined) {
       setIsEditing(true);
-      api
-        .get("store/stockTransfer", id)
-        .then((response) => {
-          const { lineItems, fromSite, toSite } = response.data;
-          // console.log(lineItems);
-          setOriginalOrder(response.data);
-          setLineItems(mapLineItemsToSelectedRows(lineItems));
+      fetchStockTransfer(id)
+        .then(({ data: stockTransfer }) => {
+          const { lineItems, fromSite, toSite } = stockTransfer;
+          fetchStockLevel(fromSite.id).then(({ data: stocklevel }) => {
+            fetchAllModelsBySkus(stocklevel.products).then((data) => {
+              setProdTableData({
+                ...stocklevel,
+                products: stocklevel.products.map((product, index) => ({
+                  ...product,
+                  modelCode: data[index].modelCode,
+                  name: data[index].name,
+                })),
+              });
+            });
+            fetchAllModelsBySkus(lineItems).then((data) => {
+              setLineItems(
+                lineItems.map((item, index) => {
+                  const prod = stocklevel.products.find(
+                    (product) => product.sku === item.product.sku
+                  );
+                  return {
+                    ...item,
+                    product: {
+                      ...item.product,
+                      modelCode: data[index].modelCode,
+                      name: data[index].name,
+                    },
+                    qty: prod ? prod.qty : 0,
+                  };
+                })
+              );
+            });
+          });
+          setOriginalOrder(stockTransfer);
           setFrom(fromSite);
           setTo(toSite);
+          let selectedRows = {};
+          lineItems.forEach((_, index) => (selectedRows[index] = true));
+          setSelectedRows(selectedRows);
         })
-        .catch((error) => {
+        .catch((error) =>
           addToast(`${error.message}`, {
             appearance: "error",
             autoDismiss: true,
-          });
-        });
+          })
+        );
     }
-  }, [id]);
+  }, [id, addToast, fetchAllModelsBySkus, currSite]);
 
   //selecting sites
   const sites = useSelector(selectAllSites);
   const openSitesModal = () => setOpenSites(true);
   const closeSitesModal = () => setOpenSites(false);
-
   //open items modal
   const openItemsModal = () => {
     if (isObjectEmpty(from)) {
@@ -516,7 +537,7 @@ export const StockTransferForm = (subsys) => {
       parseInt(key)
     );
     const lineItems = [];
-    selectedRowKeys.map((key) => lineItems.push(prodTableData[key]));
+    selectedRowKeys.map((key) => lineItems.push(prodTableData.products[key]));
     setLineItems(
       lineItems.map((item) => ({
         ...item,
@@ -526,14 +547,8 @@ export const StockTransferForm = (subsys) => {
     closeItemsModal();
   };
 
-  // const validateForm = () => {
-  //     if (isObjectEmpty(from) || isObjectEmpty(to)) {
-  //         return false;
-  //     }
-  //     //check negative quantity
-  // }
-
   //Handle Create Order product
+  console.log(lineItems)
   const handleSubmit = (e) => {
     e.preventDefault();
     const stockTransferLI = lineItems.map((item) => ({
@@ -576,6 +591,7 @@ export const StockTransferForm = (subsys) => {
     originalOrder.lineItems = stockTransferLI;
     originalOrder.fromSite = from;
     originalOrder.toSite = to;
+    console.log(originalOrder)
     dispatch(editStockTransfer({ order: originalOrder, siteId: currSite }))
       .unwrap()
       .then(() => {
@@ -593,7 +609,7 @@ export const StockTransferForm = (subsys) => {
       });
   };
 
-  //cancel
+  // cancel
   const onCancelClicked = () => {
     if (isEditing) {
       navigate(`/${subsys.subsys}/stocktransfer/${id}`);
@@ -601,7 +617,6 @@ export const StockTransferForm = (subsys) => {
       navigate(`/${subsys.subsys}/stocktransfer`);
     }
   };
-
   return (
     Boolean(originalOrder) && (
       <>
@@ -743,10 +758,15 @@ export const StockTransferForm = (subsys) => {
           setFrom={setFrom}
           setTo={setTo}
           data={sites}
+          setLineItems={setLineItems}
+          setSelectedRows={setSelectedRows}
+          setProdTableData={setProdTableData}
+          fetchStockLevel={fetchStockLevel}
+          fetchAllModelsBySkus={fetchAllModelsBySkus}
         />
 
         <AddItemsModal
-          data={prodTableData}
+          data={prodTableData.products}
           setData={setLineItems}
           open={openItems}
           closeModal={closeItemsModal}

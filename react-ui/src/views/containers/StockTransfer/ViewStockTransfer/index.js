@@ -190,7 +190,7 @@ export const ViewStockTransfer = () => {
           return {
             id: index,
             type:
-              status === "PENDINGALL" || status === "PENDINGONE"
+              status === "PENDING"
                 ? index === 0
                   ? eventTypes.created
                   : eventTypes.action
@@ -200,7 +200,7 @@ export const ViewStockTransfer = () => {
                 ? eventTypes.cancelled
                 : eventTypes.completed,
             content:
-              status === "PENDINGALL" || status === "PENDINGONE"
+              status === "PENDING"
                 ? `${index === 0 ? "Created" : "Updated"} by`
                 : status === "READY_FOR_SHIPPING"
                 ? "Ready for shipping by"

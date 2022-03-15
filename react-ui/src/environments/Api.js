@@ -70,6 +70,11 @@ export const companyApi = {
 };
 
 export const procurementApi = {
+  deleteOrder(orderId, siteId) {
+    return axiosPrivate.delete(
+      `${REST_ENDPOINT}sam/procurementOrder/delete/${orderId}/${siteId}`
+    );
+  },
   acceptOrder(orderId, siteId) {
     return axiosPrivate.put(
       `${REST_ENDPOINT}manufacturing/procurementOrder/accept/${orderId}/${siteId}`
@@ -125,9 +130,9 @@ export const vendorApi = {
 };
 
 export const stockLevelApi = {
-  editStock(sku,qty, siteId) {
+  editStock(sku, qty, siteId) {
     return axiosPrivate.post(
-      `${REST_ENDPOINT}warehouse/editStock/${siteId}/${sku}/${qty}`,
+      `${REST_ENDPOINT}warehouse/editStock/${siteId}/${sku}/${qty}`
     );
   },
 };
@@ -287,6 +292,9 @@ export const productApi = {
   searchProductsBySku(skus) {
     return axiosPrivate.post(`${REST_ENDPOINT}sam/products`, skus);
   },
+  getModelBySku(sku) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/model/name/${sku}`);
+  },
 };
 
 export const onlineOrderApi = {
@@ -319,7 +327,8 @@ export const orderApi = {
   },
   createOrder(order) {
     return axiosPublic.post(
-      `${REST_ENDPOINT}store/customerOrder/create`, order
+      `${REST_ENDPOINT}store/customerOrder/create`,
+      order
     );
   },
 };

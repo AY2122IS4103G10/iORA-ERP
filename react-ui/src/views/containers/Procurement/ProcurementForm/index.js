@@ -492,32 +492,34 @@ export const ProcurementForm = () => {
   const onRemarksChanged = (e) => setRemarks(e.target.value);
 
   useEffect(() => {
+    const fetchSite = async (site) => {
+      const { data } = await api.get("sam/viewSite", site);
+      return data;
+    };
+    const fetchProcurement = async () => {
+      const { data } = await api.get("sam/procurementOrder", orderId);
+      const { lineItems, headquarters, manufacturing, warehouse, notes } = data;
+      setIsEditing(true);
+      setLineItems(lineItems);
+      setRemarks(notes);
+      fetchSite(headquarters).then((data) => data && setHqSelected(data));
+      fetchSite(manufacturing).then(
+        (data) => data && setManufacturingSelected(data)
+      );
+      fetchSite(warehouse).then((data) => data && setWarehouseSelected(data));
+      let selectedRows = {};
+      lineItems.forEach((_, index) => (selectedRows[index] = true));
+      setSelectedRows(selectedRows);
+    };
+
     Boolean(orderId) &&
-      api.get("sam/procurementOrder", orderId).then((response) => {
-        const { lineItems, headquarters, manufacturing, warehouse, notes } =
-          response.data;
-        setIsEditing(true);
-        setLineItems(lineItems);
-        api
-          .get("sam/viewSite", headquarters)
-          .then((response) => response.data && setHqSelected(response.data));
-        api
-          .get("sam/viewSite", manufacturing)
-          .then(
-            (response) =>
-              response.data && setManufacturingSelected(response.data)
-          );
-        api
-          .get("sam/viewSite", warehouse)
-          .then(
-            (response) => response.data && setWarehouseSelected(response.data)
-          );
-        setRemarks(notes);
-        let selectedRows = {};
-        lineItems.forEach((item, index) => (selectedRows[index] = true));
-        setSelectedRows(selectedRows);
-      });
-  }, [orderId]);
+      fetchProcurement().catch((error) =>
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
+  }, [orderId, addToast]);
 
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);

@@ -199,7 +199,7 @@ public class SAMController {
     @GetMapping(path = "/model/name/{sku}", produces = "application/json")
     public ResponseEntity<Object> getModelsNameBySKU(@PathVariable String sku) {
         try {
-            return ResponseEntity.ok(productService.getModelByProduct(productService.getProduct(sku)).getName());
+            return ResponseEntity.ok(productService.getModelByProduct(productService.getProduct(sku)));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

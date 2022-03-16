@@ -287,7 +287,7 @@ export const ProcurementPickPack = () => {
           ? "has begun picking"
           : status.status === "PICKED"
           ? "has completed picking"
-          : "is ready for shipping"
+          : "is ready for shipping. Please print the delivery invoice."
       }.`,
       {
         appearance: "success",
@@ -298,44 +298,6 @@ export const ProcurementPickPack = () => {
       openInvoice();
       navigate(`/${subsys}/procurements/${procurementId}/delivery`);
     }
-    // procurementApi
-    //   .pickPack(procurementId)
-    //   .then((response) => {
-    //     const { lineItems, statusHistory } = response.data;
-    //     setLineItems(
-    //       lineItems.map((item) => ({
-    //         ...item,
-    //         product: {
-    //           sku: item.product.sku,
-    //           productFields: item.product.productFields,
-    //         },
-    //       }))
-    //     );
-    //     setStatus({
-    //       status: statusHistory[statusHistory.length - 1].status,
-    //       timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-    //     });
-    //     setStatusHistory(statusHistory);
-    //   })
-    //   .then(() => {
-    //     addToast(
-    //       `Order #${procurementId}  ${
-    //         status.status === "MANUFACTURED"
-    //           ? "has begun picking"
-    //           : status.status === "PICKED"
-    //           ? "has completed picking"
-    //           : "is ready for shipping"
-    //       }.`,
-    //       {
-    //         appearance: "success",
-    //         autoDismiss: true,
-    //       }
-    //     );
-    //     if (status.status === "PACKED") {
-    //       openInvoice();
-    //       navigate(`/${subsys}/procurements/${procurementId}/delivery`);
-    //     }
-    //   });
   };
 
   const handleScan = (barcode) => {
@@ -376,10 +338,9 @@ export const ProcurementPickPack = () => {
       e.target.value.length - search.length > 10 &&
       e.target.value.includes("-")
     ) {
-      if (status.status === "MANUFACTURED") {
-        handlePickPack();
-      }
-      handleScan(e.target.value);
+      if (status.status === "MANUFACTURED")
+        handlePickPack().then(() => handleScan(e.target.value));
+      else handleScan(e.target.value);
     }
     setSearch(e.target.value);
   };

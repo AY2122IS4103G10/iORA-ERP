@@ -16,6 +16,7 @@ import {
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import moment from "moment";
 import { TailSpin } from "react-loader-spinner";
+import { CheckCircleIcon } from "@heroicons/react/outline";
 
 const cols = [
   {
@@ -71,12 +72,17 @@ export const StockTransferList = ({ subsys }) => {
           </div>
         ) : Boolean(sto.length) ? (
           <SelectableTable columns={columns} data={sto} path={path} />
+        ) : pathname.includes("sm") ? (
+          <Link to="/sm/stockTransfer/create">
+            <DashedBorderES item="stock transfer" />
+          </Link>
         ) : (
-          pathname.includes("sm") && (
-            <Link to="/sm/stockTransfer/create">
-              <DashedBorderES item="stock transfer" />
-            </Link>
-          )
+          <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <span className="mt-2 block text-sm font-medium text-gray-900">
+              No orders requiring attention.
+            </span>
+          </div>
         )}
       </div>
     </div>

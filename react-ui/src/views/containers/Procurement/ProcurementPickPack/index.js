@@ -125,6 +125,7 @@ export const PickPackList = ({ data, setData }) => {
 
 export const ScanItemsSection = ({
   search,
+  searchHelper,
   onSearchChanged,
   onScanClicked,
 }) => {
@@ -135,10 +136,7 @@ export const ScanItemsSection = ({
           Scan Items
         </h3>
         <div className="mt-2 max-w-xl text-sm text-gray-700">
-          <p>
-            Scan barcode or enter product SKU. Scan once to "pick", a second
-            time to "pack".
-          </p>
+          <p>{searchHelper}</p>
         </div>
         <form className="mt-5 sm:flex sm:items-center" onSubmit={onScanClicked}>
           <div className="w-full sm:max-w-xs">
@@ -349,43 +347,39 @@ export const ProcurementPickPack = () => {
   // }
 
   return (
-    <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+    <div className="space-y-6 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-12 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-        <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
-          <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-            {[
-              "ACCEPTED",
-              "MANUFACTURED",
-              "PICKING",
-              "PICKED",
-              "PACKING",
-              "PACKED",
-            ].some((s) => s === status.status) ? (
-              ["ACCEPTED", "PICKED", "PACKED"].some(
-                (s) => s === status.status
-              ) ? (
-                subsys === "mf" ? (
-                  <section
-                    aria-labelledby="confirm-manufactured"
-                    className="flex justify-center"
-                  >
-                    <ConfirmSection
-                      subsys={subsys}
-                      procurementId={procurementId}
-                      title={`Confirm items ${
-                        status.status === "ACCEPTED"
-                          ? "manufactured"
-                          : status.status === "PICKED"
-                          ? "picked"
-                          : "packed"
-                      }`}
-                      body={`Confirm that all the items in this order have been ${
-                        status.status === "ACCEPTED"
-                          ? "manufactured"
-                          : status.status === "PICKED"
-                          ? "picked"
-                          : "packed"
-                      }?
+        {[
+          "ACCEPTED",
+          "MANUFACTURED",
+          "PICKING",
+          "PICKED",
+          "PACKING",
+          "PACKED",
+        ].some((s) => s === status.status) ? (
+          ["ACCEPTED", "PICKED", "PACKED"].some((s) => s === status.status) ? (
+            subsys === "mf" ? (
+              <section
+                aria-labelledby="confirm-manufactured"
+                className="flex justify-center"
+              >
+                <ConfirmSection
+                  subsys={subsys}
+                  procurementId={procurementId}
+                  title={`Confirm items ${
+                    status.status === "ACCEPTED"
+                      ? "manufactured"
+                      : status.status === "PICKED"
+                      ? "picked"
+                      : "packed"
+                  }`}
+                  body={`Confirm that all the items in this order have been ${
+                    status.status === "ACCEPTED"
+                      ? "manufactured"
+                      : status.status === "PICKED"
+                      ? "picked"
+                      : "packed"
+                  }?
                   This action cannot be undone, and this order will advance to the
                   ${
                     status.status === "ACCEPTED"
@@ -394,48 +388,48 @@ export const ProcurementPickPack = () => {
                       ? "packing"
                       : "delivery"
                   } stage.`}
-                      onConfirmClicked={onConfirmClicked}
-                    />
-                  </section>
-                ) : (
-                  <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
-                    <span className="mt-2 block text-base font-medium text-gray-900">
-                      {status.status === "ACCEPTED"
-                        ? "Items are being manufactured."
-                        : status.status === "PICKED"
-                        ? "Items have been picked"
-                        : "Items are ready to be delivered."}
-                    </span>
-                  </div>
-                )
-              ) : (
-                subsys === "mf" && (
-                  <section aria-labelledby="scan-items">
-                    <ScanItemsSection
-                      search={search}
-                      onSearchChanged={onSearchChanged}
-                      onScanClicked={onScanClicked}
-                    />
-                  </section>
-                )
-              )
+                  onConfirmClicked={onConfirmClicked}
+                />
+              </section>
             ) : (
               <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
                 <span className="mt-2 block text-base font-medium text-gray-900">
-                  No items to pick / pack.
+                  {status.status === "ACCEPTED"
+                    ? "Items are being manufactured."
+                    : status.status === "PICKED"
+                    ? "Items have been picked"
+                    : "Items are ready to be delivered."}
                 </span>
               </div>
-            )}
-            {["MANUFACTURED", "PICKING", "PICKED", "PACKING", "PACKED"].some(
-              (s) => s === status.status
-            ) &&
-              ["sm", "mf", "wh"].some((s) => s === subsys) && (
-                <section aria-labelledby="order-summary">
-                  <PickPackList data={lineItems} setData={setLineItems} />
-                </section>
-              )}
+            )
+          ) : (
+            subsys === "mf" && (
+              <section aria-labelledby="scan-items">
+                <ScanItemsSection
+                  search={search}
+                  searchHelper={`Scan barcode or enter product SKU. Scan once to "pick", a second
+                  time to "pack".`}
+                  onSearchChanged={onSearchChanged}
+                  onScanClicked={onScanClicked}
+                />
+              </section>
+            )
+          )
+        ) : (
+          <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+            <span className="mt-2 block text-base font-medium text-gray-900">
+              No items to pick / pack.
+            </span>
           </div>
-        </div>
+        )}
+        {["MANUFACTURED", "PICKING", "PICKED", "PACKING", "PACKED"].some(
+          (s) => s === status.status
+        ) &&
+          ["sm", "mf", "wh"].some((s) => s === subsys) && (
+            <section aria-labelledby="order-summary">
+              <PickPackList data={lineItems} setData={setLineItems} />
+            </section>
+          )}
       </div>
     </div>
   );

@@ -632,6 +632,15 @@ public class SAMController {
         }
     }
 
+    @GetMapping(path = "/customer/email/{email}", produces = "application/json")
+    public ResponseEntity<Object> getCustomerByEmail(@PathVariable String email) {
+        try {
+            return ResponseEntity.ok(customerService.getCustomerByEmail(email));
+        } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/customer/view/{id}", produces = "application/json")
     public ResponseEntity<Object> getCustomerById(@PathVariable Long id) {
         try {

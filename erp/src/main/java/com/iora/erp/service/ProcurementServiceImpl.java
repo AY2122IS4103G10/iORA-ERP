@@ -334,7 +334,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
         if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING
-                || procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
+                && procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
             throw new ProcurementOrderException("Order does not need scanning.");
         }
 

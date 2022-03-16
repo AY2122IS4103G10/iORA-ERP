@@ -128,6 +128,8 @@ const IssueVoucherModal = ({
   input,
   onInputChanged,
   onIssueClicked,
+  inputTypeSelected,
+  onInputTypeSelectedChanged,
   loading,
 }) => {
   return (
@@ -155,15 +157,36 @@ const IssueVoucherModal = ({
                 <label htmlFor="order-no" className="sr-only">
                   Customer Contact / Email
                 </label>
-                <input
-                  type="text"
-                  name="search"
-                  id="search"
-                  className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                  placeholder="Enter email address or contact number."
-                  value={input}
-                  onChange={onInputChanged}
-                />
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <input
+                    type={inputTypeSelected === "email" ? "email" : "number"}
+                    name="search"
+                    id="search"
+                    className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    placeholder={`Enter ${
+                      inputTypeSelected === "email"
+                        ? "email address"
+                        : "contact number"
+                    }.`}
+                    value={input}
+                    onChange={onInputChanged}
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center">
+                    <label htmlFor="type" className="sr-only">
+                      Type
+                    </label>
+                    <select
+                      id="type"
+                      name="type"
+                      className="focus:ring-cyan-500 focus:border-cyan-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
+                      value={inputTypeSelected}
+                      onChange={onInputTypeSelectedChanged}
+                    >
+                      <option value="email">Email</option>
+                      <option value="phone">Phone</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <button
                 type="submit"
@@ -188,6 +211,7 @@ export const VoucherDetails = () => {
     selectVoucherByCode(state, voucherCode)
   );
   const [input, setInput] = useState("");
+  const [inputTypeSelected, setInputTypeSelected] = useState("email");
   const [openDelete, setOpenDelete] = useState(false);
   const [openIssue, setOpenIssue] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -196,6 +220,8 @@ export const VoucherDetails = () => {
     voucherStatus === "idle" && dispatch(fetchVouchers());
   }, [voucherStatus, dispatch]);
   const onInputChanged = (e) => setInput(e.target.value);
+  const onInputTypeSelectedChanged = (e) =>
+    setInputTypeSelected(e.target.value);
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
   const openIssueModal = () => setOpenIssue(true);
@@ -205,35 +231,40 @@ export const VoucherDetails = () => {
     evt.preventDefault();
     if (!voucher.issued) {
       const fetchCustomer = async () => {
-        try {
-          const { data } = await api.get("sam/customer/search", input);
-          return data;
-        } catch (err) {
-          addToast(`Error: ${err.message}`, {
+        const { data } = await api.get(
+          `sam/customer/${inputTypeSelected}`,
+          input
+        );
+        return data;
+      };
+      fetchCustomer()
+        .then((data) => {
+          setLoading(true);
+          dispatch(issueVoucher({ code: voucherCode, id: data.id }))
+            .unwrap()
+            .then(() => {
+              addToast("Successfully issued voucher", {
+                appearance: "success",
+                autoDismiss: true,
+              });
+              closeIssueModal();
+            })
+            .catch((err) => {
+              addToast(`Error: ${err.message}`, {
+                appearance: "error",
+                autoDismiss: true,
+              });
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        })
+        .catch(() =>
+          addToast(`Error: Customer not found. Please try again`, {
             appearance: "error",
             autoDismiss: true,
-          });
-        }
-      };
-      fetchCustomer().then((data) => {
-        setLoading(true);
-        dispatch(issueVoucher({ code: voucherCode, id: data[0].id }))
-          .unwrap()
-          .then(() => {
-            addToast("Successfully issued voucher", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            closeIssueModal();
-            setLoading(false);
           })
-          .catch((err) =>
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            })
-          );
-      });
+        );
     }
   };
   const onRedeemClicked = () => {
@@ -295,6 +326,8 @@ export const VoucherDetails = () => {
         <IssueVoucherModal
           input={input}
           onInputChanged={onInputChanged}
+          inputTypeSelected={inputTypeSelected}
+          onInputTypeSelectedChanged={onInputTypeSelectedChanged}
           onIssueClicked={onIssueClicked}
           open={openIssue}
           closeModal={closeIssueModal}

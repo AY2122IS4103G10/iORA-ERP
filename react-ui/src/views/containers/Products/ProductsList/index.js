@@ -109,7 +109,7 @@ export const ProductsList = () => {
 
   if (prodStatus === "loading") {
     content = (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex mt-5 items-center justify-center">
         <TailSpin color="#00BFFF" height={20} width={20} />
       </div>
     );

@@ -366,6 +366,7 @@ export function Order() {
   const [checkoutItems, setCheckoutItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [order, setOrder] = useState({});
+  const siteId = localStorage?.getItem("siteId");
 
   const navigate = useNavigate();
   const renderSummary =
@@ -386,6 +387,9 @@ export function Order() {
       paid: false,
       refundedLIs: [],
       exchangedLIs: [],
+      site: {
+        id: siteId,
+      },
       customerId:
         localStorage.getItem("customer") === null
           ? JSON.parse(localStorage.getItem("customer"))?.id
@@ -509,6 +513,7 @@ export function Order() {
         setIsLoading={setIsLoading}
         checkoutItems={checkoutItems}
         order={order}
+        amount={amount}
       />
       {!renderSummary && (
         <OrderList

@@ -18,6 +18,7 @@ export default function ManageCheckout({
   closeModal,
   checkoutItems,
   order,
+  amount,
   setIsLoading,
 }) {
   const { search } = useLocation();
@@ -118,6 +119,7 @@ export default function ManageCheckout({
                             clientSecret={clientSecret}
                             closeModal={closeModal}
                             order={order}
+                            amount={amount}
                           />
                         </div>
                       </div>

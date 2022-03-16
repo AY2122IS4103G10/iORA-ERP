@@ -15,6 +15,7 @@ import {
 } from "../../../components/Tables/SelectableTable";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import moment from "moment";
+import { TailSpin } from "react-loader-spinner";
 
 const cols = [
   {
@@ -53,6 +54,7 @@ export const StockTransferList = ({ subsys }) => {
   const sto = useSelector(selectAllOrders);
   const { pathname } = useLocation();
   let currSiteId = useSelector(selectUserSite);
+  const stOrderStatus = useSelector((state) => state.stocktransfer.status);
 
   const columns = useMemo(() => cols, []);
   const path = `/${subsys}/stocktransfer`;
@@ -63,7 +65,11 @@ export const StockTransferList = ({ subsys }) => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        {Boolean(sto.length) ? (
+        {stOrderStatus === "loading" ? (
+          <div className="flex mt-5 items-center justify-center">
+            <TailSpin color="#00BFFF" height={20} width={20} />
+          </div>
+        ) : Boolean(sto.length) ? (
           <SelectableTable columns={columns} data={sto} path={path} />
         ) : (
           pathname.includes("sm") && (

@@ -106,7 +106,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
 
-        if (actionBy == null || actionBy.equals(stockTransferOrder.getLastActor())) {
+        if (actionBy == null || !actionBy.equals(stockTransferOrder.getLastActor())) {
             throw new SiteConfirmationException(
                     "Site is not the creator of this order and is not permitted to update it.");
         } else if (stockTransferOrder.getLastStatus() != StockTransferStatus.PENDING) {

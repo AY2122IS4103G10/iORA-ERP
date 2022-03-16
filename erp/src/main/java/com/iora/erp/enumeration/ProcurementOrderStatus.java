@@ -9,8 +9,8 @@ public enum ProcurementOrderStatus implements StatusEnum {
     PACKING("Items are being packed by the factory."),
     PACKED("Items are packed and is being processed for shipping"),
     READY_FOR_SHIPPING("Order is processed and ready for shipping."),
-    SHIPPING("Order is on its way to its destination."),
-    SHIPPED("Order has been shipped to warehouse"),
+    SHIPPING("Order is on its way to its destination in one single delivery."),
+    SHIPPING_MULTIPLE("Order is on its way to its destination in multiple deliveries."),
     COMPLETED("Procurement Order has been fulfilled"),
     CANCELLED("Procurement Order cancelled.");
 

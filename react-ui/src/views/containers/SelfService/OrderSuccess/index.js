@@ -58,7 +58,6 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
       .get(id)
       .then(({ data }) => {
         setOrder(data);
-        console.log(data);
       })
       .catch((err) => {
         addToast(`Error: ${err?.response?.data?.message}`, {

@@ -8,7 +8,10 @@ import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Refund;
+import com.stripe.param.PaymentIntentCancelParams;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.RefundCreateParams;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -46,5 +49,24 @@ public class StripeServiceImpl implements StripeService {
         }
 
         return Long.valueOf((long) (amount * 100));
+    }
+
+    @Override
+    public PaymentIntent cancelPayment(String clientSecret) throws StripeException {
+        PaymentIntent resource = PaymentIntent.retrieve(clientSecret);
+        PaymentIntentCancelParams params = PaymentIntentCancelParams.builder().build();
+
+        return resource.cancel(params);
+    }
+
+    @Override
+    public Refund refundPayment(String clientSecret, double amount) throws StripeException {
+        RefundCreateParams params = RefundCreateParams
+                .builder()
+                .setPaymentIntent("clientSecret")
+                .setAmount(Long.valueOf((long) (amount * 100)))
+                .build();
+
+        return Refund.create(params);
     }
 }

@@ -111,4 +111,13 @@ public class ManufacturingController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
+    @PutMapping(path = "/procurementOrder/shipMultiple/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> shipMultipleProcurementOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(procurementService.shipMultipleProcurementOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }

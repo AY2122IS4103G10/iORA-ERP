@@ -313,19 +313,17 @@ public class ProcurementServiceImpl implements ProcurementService {
     }
 
     @Override
-    public ProcurementOrder receiveProcurementOrder(Long id, Long siteId)
+    public ProcurementOrder shipMultipleProcurementOrder(Long id)
             throws IllegalPOModificationException, ProcurementOrderException {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
-        WarehouseSite actionBy = em.find(WarehouseSite.class, siteId);
 
-        if (actionBy == null) {
-            throw new ProcurementOrderException("You are not supposed to be receiving this order.");
-        } else if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING) {
-            throw new IllegalPOModificationException("Procurement Order is not supposed to be received.");
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.READY_FOR_SHIPPING) {
+            throw new IllegalPOModificationException("Procurement Order is not ready.");
         }
 
-        procurementOrder.setWarehouse(actionBy);
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.SHIPPING));
+        procurementOrder
+                .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                        ProcurementOrderStatus.SHIPPING_MULTIPLE));
         return em.merge(procurementOrder);
     }
 
@@ -335,7 +333,8 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPED) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING
+                || procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
             throw new ProcurementOrderException("Order does not need scanning.");
         }
 
@@ -375,7 +374,8 @@ public class ProcurementServiceImpl implements ProcurementService {
             throws IllegalPOModificationException, ProcurementOrderException {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPED) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING
+                || procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
             throw new IllegalPOModificationException("Procurement Order is not received.");
         }
         procurementOrder

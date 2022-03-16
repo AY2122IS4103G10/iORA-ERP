@@ -92,15 +92,6 @@ public class WarehouseController {
         return procurementService.getProcurementOrdersOfSite(site);
     }
 
-    @PutMapping(path = "/procurementOrder/receive/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> receiveProcurementOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
-        try {
-            return ResponseEntity.ok(procurementService.receiveProcurementOrder(orderId, siteId));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
     @PatchMapping(path = "/procurementOrder/scan/{orderId}", produces = "application/json")
     public ResponseEntity<Object> scanProductsAtWarehouse(@PathVariable Long orderId, @RequestParam String barcode) {
         try {

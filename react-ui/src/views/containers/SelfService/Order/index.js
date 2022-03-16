@@ -509,6 +509,7 @@ export function Order() {
         setIsLoading={setIsLoading}
         checkoutItems={checkoutItems}
         order={order}
+        amount={amount}
       />
       {!renderSummary && (
         <OrderList

@@ -11,6 +11,7 @@ export default function CheckoutForm({
   clientSecret,
   closeModal,
   order,
+  amount,
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -53,9 +54,10 @@ export default function CheckoutForm({
     setIsLoading(true);
     const { data } = await orderApi.createOrder({
       ...order,
+      paid: true,
       payments: [
         {
-          amount: order?.totalAmount,
+          amount: amount,
           paymentType: "MASTERCARD",
           ccTransactionId: clientSecret,
         },

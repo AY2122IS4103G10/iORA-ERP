@@ -1,98 +1,8 @@
-import { Dialog } from "@headlessui/react";
-import {
-  CashIcon,
-  CreditCardIcon,
-  DeviceMobileIcon,
-  XIcon
-} from "@heroicons/react/outline";
 import { MinusSmIcon, PlusSmIcon } from "@heroicons/react/solid";
 import { useEffect, useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { api, posApi } from "../../../../environments/Api";
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import PosCheckoutForm from "../PosCheckoutForm";
-
-const paymentTypes = [
-  {
-    name: "CASH",
-    icon: CashIcon,
-  },
-  {
-    name: "MASTERCARD",
-    icon: CreditCardIcon,
-  },
-  {
-    name: "VISA",
-    icon: CreditCardIcon,
-  },
-  {
-    name: "NETS",
-    icon: CreditCardIcon,
-  },
-  {
-    name: "PAYLAH",
-    icon: DeviceMobileIcon,
-  },
-  {
-    name: "GRABPAY",
-    icon: DeviceMobileIcon,
-  },
-  {
-    name: "FAVE",
-    icon: DeviceMobileIcon,
-  },
-];
-
-export const PaymentModal = ({ open, closeModal, onStripe }) => {
-  return (
-    <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
-        <div>
-          <div className="flex justify-between">
-            <Dialog.Title
-              as="h3"
-              className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
-            >
-              Payment Option
-            </Dialog.Title>
-            <button
-              type="button"
-              className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
-              onClick={closeModal}
-            >
-              <XIcon className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="rounded-lg bg-white overflow-hidden divide-y divide-gray-200 sm:divide-y-0 sm:grid sm:grid-cols-3 sm:gap-0">
-            {paymentTypes.map((type, index) => (
-              <div
-                key={index}
-                className="m-2 border shadow rounded-lg align-middle sm:rounded-md relative bg-white p-8 
-                focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500"
-              >
-                <div className="m-0 flex justify-center">
-                  <button>
-                    {/* Extend touch target to entire panel */}
-                    <span className="absolute inset-0" aria-hidden="true" />
-
-                    <div className="flex justify-center align-middle ">
-                      <span>{type.name}</span>
-                      <type.icon
-                        className="ml-2 inline-flex h-6 w-6 text-cyan-500 row-span-1"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </SimpleModal>
-  );
-};
+import { CheckoutForm } from "../CheckoutForm";
 
 const OrderList = ({
   lineItems,
@@ -289,6 +199,7 @@ const OrderList = ({
         <div className="mt-10 flex flex-row-reverse space-x-4 space-x-reverse">
           <button
             type="button"
+            disabled={amount === 0}
             onClick={openModal}
             className="w-2/12 mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
           >
@@ -318,9 +229,25 @@ export const PosPurchaseOrder = () => {
   const [promotions, setPromotions] = useState([]);
   const [productDetails, setProductDetails] = useState(new Map());
   const [amount, setAmount] = useState(0);
+  const [order, setOrder] = useState({});
   const { addToast } = useToasts();
 
-  const openModal = () => setModalState(true);
+  const openModal = () => {
+    setModalState(true);
+    const concat = lineItems.concat(promotions);
+    setOrder({
+      totalAmount: 0.0,
+      lineItems: concat,
+      payments: [],
+      paid: false,
+      refundedLIs: [],
+      exchangedLIs: [],
+      customerId:
+        localStorage.getItem("customer") === null
+          ? JSON.parse(localStorage.getItem("customer"))?.id
+          : null,
+    });
+  };
   const closeModal = () => setModalState(false);
   const onRfidChanged = (e) => {
     if (
@@ -427,16 +354,11 @@ export const PosPurchaseOrder = () => {
         clear={clear}
         openModal={openModal}
       />
-      <PaymentModal open={modalState} closeModal={closeModal} /> 
-      <PosCheckoutForm
-        deliveryMethods={{}}
-        deliveryMethod={null}
-        setDeliveryMethod={null}
-        paymentMethods={{}}
-        shippingDetails={{}}
-        contact={false}
+      <CheckoutForm
+        open={modalState}
+        closeModal={closeModal}
         amount={amount}
-        onPay={{}}
+        order={order}
       />
     </>
   );

@@ -3,7 +3,7 @@ import {
   CashIcon,
   CreditCardIcon,
   DeviceMobileIcon,
-  XIcon,
+  XIcon
 } from "@heroicons/react/outline";
 import { ExclamationIcon } from "@heroicons/react/solid";
 import { useState } from "react";
@@ -51,7 +51,7 @@ const paymentTypes = [
   },
 ];
 
-export const CheckoutForm = ({ open, closeModal, amount, order }) => {
+export const CheckoutForm = ({ open, closeModal, amount, order, clear }) => {
   const [mode, setMode] = useState(0);
   const [customerId, setCustomerId] = useState(null);
   const { addToast } = useToasts();
@@ -74,7 +74,8 @@ export const CheckoutForm = ({ open, closeModal, amount, order }) => {
         appearance: "success",
         autoDismiss: true,
       });
-      console.log(response.data.customerId);
+      closeModal();
+      clear();
     } catch (err) {
       addToast(`Error: Order was not created`, {
         appearance: "error",

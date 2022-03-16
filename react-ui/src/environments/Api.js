@@ -100,15 +100,19 @@ export const procurementApi = {
       `${REST_ENDPOINT}manufacturing/procurementOrder/scan/${orderId}?barcode=${barcode}`
     );
   },
-  shipOrder(siteId, order) {
+  shipOrder(orderId) {
     return axiosPrivate.put(
-      `${REST_ENDPOINT}manufacturing/procurementOrder/ship/${siteId}`,
-      order
+      `${REST_ENDPOINT}manufacturing/procurementOrder/ship/${orderId}`
     );
   },
-  receiveOrder(orderId, siteId) {
+  shipMultiple(orderId) {
     return axiosPrivate.put(
-      `${REST_ENDPOINT}warehouse/procurementOrder/receive/${orderId}/${siteId}`
+      `${REST_ENDPOINT}manufacturing/procurementOrder/shipMultiple/${orderId}`
+    );
+  },
+  scanReceive(orderId, barcode) {
+    return axiosPrivate.patch(
+      `${REST_ENDPOINT}warehouse/procurementOrder/scan/${orderId}?barcode=${barcode}`
     );
   },
 };

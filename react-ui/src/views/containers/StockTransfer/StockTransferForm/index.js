@@ -406,7 +406,13 @@ const LineItemsTable = ({ data, setLineItems }) => {
   }, [setLineItems]);
 
   return (
-    <SimpleTable columns={columns} data={data} skipPageReset={skipPageReset} />
+    <div className="mt-4">
+      <SimpleTable
+        columns={columns}
+        data={data}
+        skipPageReset={skipPageReset}
+      />
+    </div>
   );
 };
 
@@ -582,7 +588,6 @@ export const StockTransferForm = (subsys) => {
     originalOrder.lineItems = stockTransferLI;
     originalOrder.fromSite = from;
     originalOrder.toSite = to;
-    console.log(originalOrder);
     dispatch(
       editStockTransfer({
         order: originalOrder,
@@ -706,38 +711,40 @@ export const StockTransferForm = (subsys) => {
                           </button>
                         </div>
                       </div>
-                      <div className="m-2">
+                      {Boolean(lineItems.length) && (
                         <LineItemsTable
                           data={lineItems}
                           setLineItems={setLineItems}
                         />
-                      </div>
-                      <div className="flex justify-end">
+                      )}
+                    </div>
+                  </div>
+                  <div className="pt-5">
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                        onClick={onCancelClicked}
+                      >
+                        Cancel
+                      </button>
+                      {!isEditing ? (
                         <button
-                          type="button"
-                          className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                          onClick={onCancelClicked}
+                          type="submit"
+                          className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          onClick={handleSubmit}
                         >
-                          Cancel
+                          Create
                         </button>
-                        {!isEditing ? (
-                          <button
-                            type="submit"
-                            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                            onClick={handleSubmit}
-                          >
-                            Create
-                          </button>
-                        ) : (
-                          <button
-                            type="submit"
-                            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                            onClick={handleSaveEdit}
-                          >
-                            Save Edit
-                          </button>
-                        )}
-                      </div>
+                      ) : (
+                        <button
+                          type="submit"
+                          className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          onClick={handleSaveEdit}
+                        >
+                          Save Edit
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

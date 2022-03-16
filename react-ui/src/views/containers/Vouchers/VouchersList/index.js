@@ -1,5 +1,6 @@
 import moment from "moment";
 import { useEffect, useMemo } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -26,7 +27,11 @@ export const VouchersTable = ({ data, handleOnClick }) => {
       {
         Header: "Expiry Date",
         accessor: "expiry",
-        Cell: (e) => moment(e.value).add(1, "days").subtract(1, "months").format("DD/MM/yy"),
+        Cell: (e) =>
+          moment(e.value)
+            .add(1, "days")
+            .subtract(1, "months")
+            .format("DD/MM/yy"),
       },
       {
         Header: "Issued",
@@ -73,5 +78,11 @@ export const VouchersList = () => {
     voucherStatus === "idle" && dispatch(fetchVouchers());
   }, [voucherStatus, dispatch]);
 
-  return <VouchersTable data={data} handleOnClick={handleOnClick} />;
+  return voucherStatus === "loading" ? (
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BFFF" height={20} width={20} />
+    </div>
+  ) : (
+    <VouchersTable data={data} handleOnClick={handleOnClick} />
+  );
 };

@@ -1,5 +1,3 @@
-import { CheckIcon } from "@heroicons/react/outline";
-import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { procurementApi } from "../../../../environments/Api";
 import { ConfirmSection } from "../ProcurementPickPack";
@@ -11,7 +9,9 @@ export const ProcurementDelivery = () => {
     status,
     setStatus,
     setStatusHistory,
-    lineItems,
+    manufacturing,
+    warehouse,
+    // lineItems,
     setLineItems,
     addToast,
     currSiteId,
@@ -21,7 +21,6 @@ export const ProcurementDelivery = () => {
     const { data } = await (status.status === "READY_FOR_SHIPPING"
       ? procurementApi.shipOrder(procurementId)
       : procurementApi.receiveOrder(procurementId, currSiteId));
-      console.log(data)
     const { lineItems, statusHistory } = data;
     setLineItems(
       lineItems.map((item) => ({
@@ -41,37 +40,11 @@ export const ProcurementDelivery = () => {
       appearance: "success",
       autoDismiss: true,
     });
-
-    // status.status === "READY_FOR_SHIPPING" &&
-    //   procurementApi
-    //     .shipOrder(procurementId)
-    //     .then((response) => {
-    //       const { lineItems, statusHistory } = response.data;
-    //       setLineItems(
-    //         lineItems.map((item) => ({
-    //           ...item,
-    //           product: {
-    //             sku: item.product.sku,
-    //             productFields: item.product.productFields,
-    //           },
-    //         }))
-    //       );
-    //       setStatus({
-    //         status: statusHistory[statusHistory.length - 1].status,
-    //         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-    //       });
-    //     })
-    //     .then(() => {
-    //       addToast(`Order #${procurementId} has been shipped.`, {
-    //         appearance: "success",
-    //         autoDismiss: true,
-    //       });
-    //     });
   };
 
   return (
     <div className="flex justify-center">
-      {status.status === "READY_FOR_SHIPPING" && subsys === "mf" ? (
+      {status.status === "READY_FOR_SHIPPING" && manufacturing.id === currSiteId ? (
         <ConfirmSection
           subsys={subsys}
           procurementId={procurementId}
@@ -81,7 +54,7 @@ export const ProcurementDelivery = () => {
           }
           onConfirmClicked={onConfirmClicked}
         />
-      ) : status.status === "SHIPPING" && subsys === "wh" ? (
+      ) : status.status === "SHIPPING" && warehouse.id === currSiteId ? (
         <ConfirmSection
           subsys={subsys}
           procurementId={procurementId}

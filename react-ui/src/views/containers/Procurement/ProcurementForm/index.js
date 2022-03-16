@@ -403,6 +403,7 @@ export const ProcurementForm = () => {
   }, [warehouse]);
 
   const [selectedRows, setSelectedRows] = useState([]);
+  
   const onAddItemsClicked = (evt) => {
     evt.preventDefault();
     const selectedRowKeys = Object.keys(selectedRows).map((key) =>

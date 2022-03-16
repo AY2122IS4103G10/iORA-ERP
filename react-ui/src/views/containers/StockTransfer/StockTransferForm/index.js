@@ -97,8 +97,8 @@ export const SelectSiteModal = ({
             });
           });
         });
-        setLineItems([])
-        setSelectedRows([])
+        setLineItems([]);
+        setSelectedRows([]);
       }
 
       if (isObjectEmpty(to)) {
@@ -343,7 +343,6 @@ const AddItemsModal = ({
   );
 };
 
-
 const LineItemsTable = ({ data, setLineItems }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
 
@@ -439,7 +438,6 @@ export const StockTransferForm = (subsys) => {
   //get stock level and product information
   const [prodTableData, setProdTableData] = useState([]);
 
-  
   const fetchStockLevel = async (id) => {
     const { data } = await api.get(`store/viewStock/sites`, id);
     return { data };
@@ -512,7 +510,7 @@ export const StockTransferForm = (subsys) => {
   const sites = useSelector(selectAllSites);
   const openSitesModal = () => setOpenSites(true);
   const closeSitesModal = () => setOpenSites(false);
-  
+
   //open items modal
   const openItemsModal = () => {
     if (isObjectEmpty(from)) {
@@ -574,7 +572,6 @@ export const StockTransferForm = (subsys) => {
         });
       });
   };
-
   //save edit
   const handleSaveEdit = (e) => {
     e.preventDefault();
@@ -585,8 +582,13 @@ export const StockTransferForm = (subsys) => {
     originalOrder.lineItems = stockTransferLI;
     originalOrder.fromSite = from;
     originalOrder.toSite = to;
-    console.log(originalOrder)
-    dispatch(editStockTransfer({ order: originalOrder, siteId: currSite }))
+    console.log(originalOrder);
+    dispatch(
+      editStockTransfer({
+        order: originalOrder,
+        siteId: currSite,
+      })
+    )
       .unwrap()
       .then(() => {
         addToast("Successfully edited stock transfer order", {

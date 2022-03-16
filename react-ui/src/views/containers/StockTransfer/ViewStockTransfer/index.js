@@ -1,4 +1,3 @@
-import { PrinterIcon } from "@heroicons/react/solid";
 import moment from "moment";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -30,13 +29,6 @@ export const StockTransferBody = ({
               >
                 Order Information
               </h2>
-              <button
-                className=" text-sm flex justify-end"
-                onClick={() => window.print()}
-              >
-                Print
-                <PrinterIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
             </div>
 
             <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
@@ -156,6 +148,7 @@ export const ViewStockTransfer = () => {
       );
     });
   }, [order]);
+
   useEffect(() => {
     fetchAllModelsBySkus(lineItems).then((data) => {
       setLItems(

@@ -8,14 +8,8 @@ import { sitesApi } from "../../../../environments/Api";
 import { useEffect } from "react";
 import { useState } from "react";
 import { eventTypes } from "../../../../constants/eventTypes";
-import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 
-const ItemsSummary = ({
-  data,
-  status,
-  pathname,
-  onVerifyReceivedClicked,
-}) => {
+const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
   const columns = useMemo(() => {
     return [
       {
@@ -295,7 +289,6 @@ export const ProcurementDetails = () => {
   } = useOutletContext();
   const { pathname } = useLocation();
   const [history, setHistory] = useState([]);
-  const [lItems, setLItems] = useState([]);
 
   useEffect(() => {
     fetchAllActionBy(statusHistory).then((data) => {
@@ -324,20 +317,6 @@ export const ProcurementDetails = () => {
       );
     });
   }, [statusHistory]);
-  useEffect(() => {
-    fetchAllModelsBySkus(lineItems).then((data) => {
-      setLItems(
-        lineItems.map((item, index) => ({
-          ...item,
-          product: {
-            ...item.product,
-            modelCode: data[index].modelCode,
-            name: data[index].name,
-          },
-        }))
-      );
-    });
-  }, [lineItems]);
 
   return (
     [
@@ -356,7 +335,7 @@ export const ProcurementDetails = () => {
         headquarters={headquarters}
         warehouse={warehouse}
         notes={notes}
-        lineItems={lItems}
+        lineItems={lineItems}
         setLineItems={setLineItems}
         pathname={pathname}
         history={history}

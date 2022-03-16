@@ -13,6 +13,7 @@ export const ProcurementInvoiceBody = ({
   toSite,
   qrValue,
   children,
+  qrHelper,
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
@@ -37,6 +38,20 @@ export const ProcurementInvoiceBody = ({
                 </span>
                 <span className="block">{company.telephone}</span>
               </address>
+            </dd>
+            <dd className="mt-2 text-gray-700">
+              <div className="my-10">
+                <QRCode
+                  id={orderId}
+                  value={qrValue}
+                  size={150}
+                  level={"H"}
+                  includeMargin={false}
+                />
+                <p className="mt-2 text-gray-700">
+                  {qrHelper && qrHelper}
+                </p>
+              </div>
             </dd>
           </div>
           <div>
@@ -118,13 +133,6 @@ export const ProcurementInvoiceBody = ({
         </div>
         <h3 className="sr-only">Items</h3>
         {children}
-        <QRCode
-          id="qr-gen"
-          value={qrValue}
-          size={290}
-          level={"H"}
-          includeMargin={true}
-        />
       </div>
     </div>
   );
@@ -142,6 +150,7 @@ export const ProcurementInvoice = forwardRef(
       toSite,
       data,
       qrValue,
+      qrHelper,
       children,
     },
     ref
@@ -159,6 +168,7 @@ export const ProcurementInvoice = forwardRef(
             toSite={toSite}
             data={data}
             qrValue={qrValue}
+            qrHelper={qrHelper}
           >
             {children}
           </ProcurementInvoiceBody>

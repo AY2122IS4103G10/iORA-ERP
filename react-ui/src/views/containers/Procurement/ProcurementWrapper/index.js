@@ -8,6 +8,7 @@ import { useMemo } from "react";
 import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -22,6 +23,7 @@ import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { BasicTable } from "../../../components/Tables/BasicTable";
 import { Tabs } from "../../../components/Tabs";
+import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 import { ProcurementInvoice } from "../ProcurementInvoice";
 
 const Header = ({
@@ -57,7 +59,7 @@ const Header = ({
             <button
               type="button"
               className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              // onClick={handlePrint}
+              onClick={() => window.print()}
             >
               <PrinterIcon
                 className="-ml-1 mr-2 h-5 w-5 text-gray-400"
@@ -201,12 +203,16 @@ export const InvoiceModal = ({
   );
 };
 
-const InvoiceSummary = ({ data }) => {
+const InvoiceSummary = ({ data, status }) => {
   const columns = useMemo(() => {
     return [
       {
         Header: "SKU",
-        accessor: (row) => row.product.sku,
+        accessor: "product.sku",
+      },
+      {
+        Header: "Name",
+        accessor: "product.name",
       },
       {
         Header: "Color",
@@ -222,13 +228,14 @@ const InvoiceSummary = ({ data }) => {
             .fieldValue,
       },
       {
-        Header: "Quantity",
-        accessor: "requestedQty",
+        Header: `${status === "READY_FOR_SHIPPING" ? "Ful" : "Req"}`,
+        accessor: `${status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"}`,
       },
+
     ];
-  }, []);
+  }, [status]);
   return (
-    <div className="py-8 border-b border-gray-200">
+    <div className="py-8 border-gray-200">
       <div className="md:flex md:items-center md:justify-between">
         <h3 className="text-lg leading-6 font-medium text-gray-900">Summary</h3>
       </div>
@@ -261,49 +268,63 @@ export const ProcurementWrapper = ({ subsys }) => {
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
   const currSiteId = useSelector(selectUserSite);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    api.get("sam/procurementOrder", procurementId).then((response) => {
-      const {
-        headquarters,
-        manufacturing,
-        warehouse,
-        lineItems,
-        notes,
-        statusHistory,
-      } = response.data;
-      api
-        .get("sam/viewSite", headquarters)
-        .then((response) => setHeadquarters(response.data));
-      api
-        .get("sam/viewSite", manufacturing)
-        .then((response) => setManufacturing(response.data));
-      api
-        .get("sam/viewSite", warehouse)
-        .then((response) => setWarehouse(response.data));
-      setLineItems(
-        lineItems.map((item) => ({
-          ...item,
-          product: {
-            sku: item.product.sku,
-            productFields: item.product.productFields,
-          },
-        }))
-      );
-      setNotes(notes);
-      setStatus({
-        status: statusHistory[statusHistory.length - 1].status,
-        timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-      });
-      setStatusHistory(statusHistory);
-      setQrValue(
-        `http://localhost:3000/${subsys}/procurements/${procurementId}/pick-pack`
-      );
-      setQrDelivery(
-        `http://localhost:3000/${subsys}/procurements/${procurementId}/delivery`
-      );
-    });
-  }, [subsys, procurementId]);
+    const fetchSite = async (site) => {
+      const { data } = await api.get("sam/viewSite", site);
+      return data;
+    };
+    const fetchProcurementOrder = async () => {
+      setLoading(true);
+      try {
+        const { data } = await api.get("sam/procurementOrder", procurementId);
+        const {
+          headquarters,
+          manufacturing,
+          warehouse,
+          lineItems,
+          notes,
+          statusHistory,
+        } = data;
+        fetchSite(headquarters).then((data) => setHeadquarters(data));
+        fetchSite(manufacturing).then((data) => setManufacturing(data));
+        fetchSite(warehouse).then((data) => setWarehouse(data));
+        fetchAllModelsBySkus(lineItems).then((data) => {
+          setLineItems(
+            lineItems.map((item, index) => ({
+              ...item,
+              product: {
+                ...item.product,
+                modelCode: data[index].modelCode,
+                name: data[index].name,
+              },
+            }))
+          );
+        });
+        setNotes(notes);
+        setStatus({
+          status: statusHistory[statusHistory.length - 1].status,
+          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+        });
+        setStatusHistory(statusHistory);
+        setQrValue(
+          `http://localhost:3000/${subsys}/procurements/${procurementId}/pick-pack`
+        );
+        setQrDelivery(
+          `http://localhost:3000/${subsys}/procurements/${procurementId}/delivery`
+        );
+      } catch (err) {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProcurementOrder();
+  }, [subsys, procurementId, addToast]);
 
   const onDeleteProcurementClicked = async () => {
     try {
@@ -328,27 +349,6 @@ export const ProcurementWrapper = ({ subsys }) => {
         autoDismiss: true,
       });
     }
-    // dispatch(
-    //   deleteExistingProcurement({
-    //     orderId: procurementId,
-    //     siteId: currSiteId,
-    //   })
-    // )
-    //   .unwrap()
-    //   .then(() => {
-    //     addToast("Successfully deleted procurement order", {
-    //       appearance: "success",
-    //       autoDismiss: true,
-    //     });
-    //     closeModal();
-    //     navigate("/sm/procurements");
-    //   })
-    //   .catch((err) =>
-    //     addToast(`Error: ${err.message}`, {
-    //       appearance: "error",
-    //       autoDismiss: true,
-    //     })
-    //   );
   };
 
   const onAcceptClicked = async () => {
@@ -378,33 +378,6 @@ export const ProcurementWrapper = ({ subsys }) => {
         autoDismiss: true,
       });
     }
-    // procurementApi
-    //   .acceptOrder(procurementId, currSiteId)
-    //   .then((response) => {
-    //     const { statusHistory } = response.data;
-    //     setStatus({
-    //       status: statusHistory[statusHistory.length - 1].status,
-    //       timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-    //     });
-    //     setStatusHistory(statusHistory);
-    //   })
-    //   .then(() => {
-    //     addToast(
-    //       "Successfully accepted procurement order. Please print the order invoice.",
-    //       {
-    //         appearance: "success",
-    //         autoDismiss: true,
-    //       }
-    //     );
-    //     closeConfirmModal();
-    //     openInvoice();
-    //   })
-    //   .catch((err) =>
-    //     addToast(`Error: ${err.message}`, {
-    //       appearance: "error",
-    //       autoDismiss: true,
-    //     })
-    //   );
   };
 
   const onCancelOrderClicked = async () => {
@@ -430,29 +403,6 @@ export const ProcurementWrapper = ({ subsys }) => {
         autoDismiss: true,
       });
     }
-    // procurementApi
-    //   .cancelOrder(procurementId, currSiteId)
-    //   .then((response) => {
-    //     const { statusHistory } = response.data;
-    //     setStatus({
-    //       status: statusHistory[statusHistory.length - 1].status,
-    //       timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-    //     });
-    //     setStatusHistory(statusHistory);
-    //   })
-    //   .then(() => {
-    //     addToast("Successfully cancelled procurement order", {
-    //       appearance: "success",
-    //       autoDismiss: true,
-    //     });
-    //     closeConfirmModal();
-    //   })
-    //   .catch((err) =>
-    //     addToast(`Error: ${err.message}`, {
-    //       appearance: "error",
-    //       autoDismiss: true,
-    //     })
-    //   );
   };
 
   const openModal = () => setOpenDelete(true);
@@ -481,8 +431,11 @@ export const ProcurementWrapper = ({ subsys }) => {
       current: false,
     },
   ];
-
-  return (
+  return loading ? (
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BFFF" height={20} width={20} />
+    </div>
+  ) : (
     [procurementId, headquarters, manufacturing, warehouse].every(Boolean) && (
       <>
         <div className="py-8 xl:py-10">
@@ -519,6 +472,8 @@ export const ProcurementWrapper = ({ subsys }) => {
               addToast,
               openInvoice,
               currSiteId,
+              loading,
+              setLoading,
             }}
           />
         </div>
@@ -542,6 +497,11 @@ export const ProcurementWrapper = ({ subsys }) => {
             toSite={warehouse}
             data={lineItems}
             qrValue={qrValue}
+            qrHelper={
+              status.status !== "READY_FOR_SHIPPING"
+                ? "Scan to start picking."
+                : "Scan to start delivery."
+            }
           >
             <InvoiceSummary data={lineItems} status={status.status} />
           </ProcurementInvoice>
@@ -568,8 +528,13 @@ export const ProcurementWrapper = ({ subsys }) => {
             qrValue={
               status.status !== "READY_FOR_SHIPPING" ? qrValue : qrDelivery
             }
+            qrHelper={
+              status.status !== "READY_FOR_SHIPPING"
+                ? "Scan to start picking."
+                : "Scan to start delivery."
+            }
           >
-            <InvoiceSummary data={lineItems} status={status} />
+            <InvoiceSummary data={lineItems} status={status.status} />
           </ProcurementInvoice>
         </InvoiceModal>
         {Boolean(action) && (

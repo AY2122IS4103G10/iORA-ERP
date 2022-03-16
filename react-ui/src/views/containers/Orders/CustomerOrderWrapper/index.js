@@ -1,4 +1,9 @@
-import { PencilIcon, PrinterIcon, TrashIcon, XIcon } from "@heroicons/react/outline";
+import {
+  PencilIcon,
+  PrinterIcon,
+  TrashIcon,
+  XIcon,
+} from "@heroicons/react/outline";
 import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -33,10 +38,7 @@ const Header = ({
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
-      <NavigatePrev
-        page="Orders"
-        path={`/${subsys}/orders`}
-      />
+      <NavigatePrev page="Orders" path={`/${subsys}/orders`} />
       <div className="relative pb-5 border-b border-gray-200 sm:pb-0">
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${orderId}`}</h1>
@@ -224,6 +226,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [order, setOrder] = useState(null);
   const [lineItems, setLineItems] = useState([]);
   const [status, setStatus] = useState("");
+  const [statusHistory, setStatusHistory] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [open, setOpen] = useState(false);
@@ -231,11 +234,9 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [openConfirm, setOpenConfirm] = useState(false);
 
   useEffect(() => {
-    orderApi.get(orderId).then((response) => {
-      const {
-        lineItems,
-        
-      } = response.data;
+    const fetchOrder = async () => {
+      const { data } = await orderApi.get(orderId);
+      const { lineItems, statusHistory } = data;
       setLineItems(
         lineItems.map((item) => ({
           ...item,
@@ -245,9 +246,13 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           },
         }))
       );
-      setOrder(response.data)
+      console.log(data)
+      setStatus(statusHistory[statusHistory.length - 1]);
+      setStatusHistory(statusHistory);
+      setOrder(data);
       setQrValue(`/${subsys}/orders/${orderId}/pick-pack`);
-    });
+    };
+    fetchOrder();
   }, [subsys, orderId]);
 
   // const onDeleteProcurementClicked = () => {
@@ -265,32 +270,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   //       });
   //       closeModal();
   //       navigate("/sm/procurements");
-  //     })
-  //     .catch((err) =>
-  //       addToast(`Error: ${err.message}`, {
-  //         appearance: "error",
-  //         autoDismiss: true,
-  //       })
-  //     );
-  // };
-
-  // const onAcceptClicked = () => {
-  //   procurementApi
-  //     .acceptOrder(orderId, manufacturing.id)
-  //     .then((response) => {
-  //       const { statusHistory } = response.data;
-  //       setStatus({
-  //         status: statusHistory[statusHistory.length - 1].status,
-  //         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-  //       });
-  //     })
-  //     .then(() => {
-  //       addToast("Successfully accepted procurement order", {
-  //         appearance: "success",
-  //         autoDismiss: true,
-  //       });
-  //       closeConfirmModal();
-  //       openInvoice();
   //     })
   //     .catch((err) =>
   //       addToast(`Error: ${err.message}`, {
@@ -395,7 +374,11 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       href: `/${subsys}/orders/${orderId}`,
       current: true,
     },
-    { name: "Pick / Pack", href: `/${subsys}/orders/${orderId}/pick-pack`, current: false },
+    {
+      name: "Pick / Pack",
+      href: `/${subsys}/orders/${orderId}/pick-pack`,
+      current: false,
+    },
     { name: "Delivery", href: "#", current: false },
   ];
 
@@ -427,6 +410,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
               status,
               lineItems,
               setLineItems,
+              statusHistory,
             }}
           />
         </div>

@@ -199,7 +199,7 @@ public class SAMController {
     @GetMapping(path = "/model/name/{sku}", produces = "application/json")
     public ResponseEntity<Object> getModelsNameBySKU(@PathVariable String sku) {
         try {
-            return ResponseEntity.ok(productService.getModelByProduct(productService.getProduct(sku)).getName());
+            return ResponseEntity.ok(productService.getModelByProduct(productService.getProduct(sku)));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -384,10 +384,10 @@ public class SAMController {
         }
     }
 
-    @PutMapping(path = "/voucher/issue/{voucherCode}", produces = "application/json")
-    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode) {
+    @PutMapping(path = "/voucher/issue/{voucherCode}/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode, @PathVariable Long customerId) {
         try {
-            return ResponseEntity.ok(customerService.issueVoucher(voucherCode));
+            return ResponseEntity.ok(customerService.issueVoucher(voucherCode, customerId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -521,12 +521,12 @@ public class SAMController {
 
     @GetMapping(path = "/ticket/search", produces = "application/json")
     public List<SupportTicket> searchSupportTicket(@RequestParam String id) {
-            return customerService.searchSupportTicket(Long.valueOf(id));
+        return customerService.searchSupportTicket(Long.valueOf(id));
     }
 
     @GetMapping(path = "/ticket/searchSubject", produces = "application/json")
     public List<SupportTicket> searchSupportTicketBySubject(@RequestParam String subject) {
-            return customerService.searchSupportTicketBySubject(subject);
+        return customerService.searchSupportTicketBySubject(subject);
     }
 
     @PostMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
@@ -554,9 +554,9 @@ public class SAMController {
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
-    } 
+    }
 
-    @DeleteMapping(path = "/ticket/{id}",  produces = "application/json")
+    @DeleteMapping(path = "/ticket/{id}", produces = "application/json")
     public ResponseEntity<Object> replySupportTicket(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(customerService.deleteSupportTicket(id));
@@ -621,6 +621,15 @@ public class SAMController {
     @GetMapping(path = "/customer/search/{query}", produces = "application/json")
     public List<Customer> searchCustomers(@PathVariable String query) {
         return customerService.getCustomerByFields(query);
+    }
+
+    @GetMapping(path = "/customer/phone/{phone}", produces = "application/json")
+    public ResponseEntity<Object> getCustomerByPhone(@PathVariable String phone) {
+        try {
+            return ResponseEntity.ok(customerService.getCustomerByPhone(phone));
+        } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
     @GetMapping(path = "/customer/view/{id}", produces = "application/json")

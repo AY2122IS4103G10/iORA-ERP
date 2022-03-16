@@ -29,9 +29,9 @@ export const addNewVouchers = createAsyncThunk(
 
 export const issueVoucher = createAsyncThunk(
   "vouchers/issueVoucher",
-  async (voucherCode) => {
+  async ({ code: voucherCode, id: customerId }) => {
     try {
-      const response = await voucherApi.issue(voucherCode);
+      const response = await voucherApi.issue(voucherCode, customerId);
       return response.data;
     } catch (error) {
       return Promise.reject(error.response.data);

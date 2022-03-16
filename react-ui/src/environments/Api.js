@@ -31,8 +31,8 @@ export const api = {
 };
 
 export const voucherApi = {
-  issue(id) {
-    return axiosPrivate.put(`${REST_ENDPOINT}sam/voucher/issue/${id}`);
+  issue(code, id) {
+    return axiosPrivate.put(`${REST_ENDPOINT}sam/voucher/issue/${code}/${id}`);
   },
   redeem(id) {
     return axiosPrivate.put(`${REST_ENDPOINT}sam/voucher/redeem/${id}`);
@@ -46,7 +46,9 @@ export const sitesApi = {
   getAll() {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSites/all`);
   },
-
+  getSiteSAM(id) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSite/${id}`);
+  },
   getASite(id) {
     return axiosPrivate.get(`${REST_ENDPOINT}admin/viewSite/${id}`);
   },
@@ -65,6 +67,9 @@ export const companyApi = {
 };
 
 export const procurementApi = {
+  deleteOrder(orderId, siteId) {
+    return axiosPrivate.delete(`${REST_ENDPOINT}sam/procurementOrder/delete/${orderId}/${siteId}`);
+  },
   acceptOrder(orderId, siteId) {
     return axiosPrivate.put(
       `${REST_ENDPOINT}manufacturing/procurementOrder/accept/${orderId}/${siteId}`
@@ -86,14 +91,13 @@ export const procurementApi = {
       `${REST_ENDPOINT}manufacturing/procurementOrder/scan/${orderId}?barcode=${barcode}`
     );
   },
-  fulfillOrder(siteId, order) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}manufacturing/procurementOrder/fulfil/${siteId}`,
-      order
-    );
-  },
   shipOrder(siteId, order) {
     return axiosPrivate.put(`${REST_ENDPOINT}manufacturing/procurementOrder/ship/${siteId}`, order);
+  },
+  receiveOrder(orderId, siteId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}warehouse/procurementOrder/receive/${orderId}/${siteId}`
+    );
   },
 };
 
@@ -110,8 +114,8 @@ export const vendorApi = {
 };
 
 export const stockLevelApi = {
-  editStock(toUpdate, siteId) {
-    return axiosPrivate.post(`${REST_ENDPOINT}warehouse/editStock/${siteId}`, toUpdate);
+  editStock(sku, qty, siteId) {
+    return axiosPrivate.post(`${REST_ENDPOINT}warehouse/editStock/${siteId}/${sku}/${qty}`);
   },
 };
 
@@ -129,10 +133,10 @@ export const stockTransferApi = {
     return axiosPrivate.put(`${REST_ENDPOINT}store/stockTransfer/reject/${orderId}/${siteId}`);
   },
   pickPack(orderId, siteId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}store/stockTransfer/pickPack/${orderId}/${siteId}`);
+    return axiosPrivate.put(`${REST_ENDPOINT}store/stockTransfer/pickpack/${orderId}/${siteId}`);
   },
   scanItem(orderId, barcode) {
-    return axiosPrivate.put(
+    return axiosPrivate.patch(
       `${REST_ENDPOINT}store/stockTransfer/scanFrom/${orderId}?barcode=${barcode}`
     );
   },
@@ -230,6 +234,9 @@ export const productApi = {
   searchProductsBySku(skus) {
     return axiosPrivate.post(`${REST_ENDPOINT}sam/products`, skus);
   },
+  getModelBySku(sku) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/model/name/${sku}`);
+  },
 };
 
 export const onlineOrderApi = {
@@ -242,6 +249,9 @@ export const onlineOrderApi = {
   getAllBySite(siteId) {
     return axiosPrivate.get(`${REST_ENDPOINT}online/searchOrder/${siteId}?orderId=`);
   },
+  getPaymentIntent(lineItems) {
+    return axiosPublic.post(`${REST_ENDPOINT}online/pay`, lineItems);
+  },
 };
 
 export const orderApi = {
@@ -250,5 +260,8 @@ export const orderApi = {
   },
   get(orderId) {
     return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder/view/${orderId}`);
+  },
+  createOrder(order) {
+    return axiosPublic.post(`${REST_ENDPOINT}store/customerOrder/create`, order);
   },
 };

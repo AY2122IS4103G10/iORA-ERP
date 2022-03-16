@@ -12,8 +12,10 @@ import {
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 
-export const PickPackList = ({ subsys, data, status, setData }) => {
+export const PickPackList = ({ data, setData }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [skipPageReset, setSkipPageReset] = useState(false);
+
   const columns = useMemo(() => {
     const updateMyData = (rowIndex, columnId, value) => {
       setSkipPageReset(true);
@@ -48,52 +50,59 @@ export const PickPackList = ({ subsys, data, status, setData }) => {
             .fieldValue,
       },
       {
-        Header: "Requested",
+        Header: "Req",
         accessor: "requestedQty",
       },
       {
         Header: "Picked",
-        accessor: "fulfilledQty",
+        accessor: "pickedQty",
+        Cell: (e) => {
+          return isEditing ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+            />
+          ) : (
+            e.value
+          );
+        },
+      },
+      {
+        Header: "Packed",
+        accessor: "packedQty",
       },
       {
         Header: "Status",
         accessor: "",
         Cell: (row) => {
           const lineItem = row.row.original;
-          return lineItem.fulfilledQty !== lineItem.requestedQty
+          return lineItem.pickedQty !== lineItem.requestedQty
             ? "PICKING"
-            : "PICKED";
+            : lineItem.pickedQty === lineItem.requestedQty &&
+              lineItem.packedQty === 0
+            ? "PICKED"
+            : lineItem.packedQty !== lineItem.requestedQty
+            ? "PACKING"
+            : "PACKED";
         },
       },
       // {
-      //   Header: "Shipped",
-      //   accessor: "",
-      //   Cell: (row) => {
-      //     return status === "SHIPPED" ||
-      //       status === "VERIFIED" ||
-      //       status === "COMPLETED"
-      //       ? row.row.original.fulfilledProductItems.length
-      //       : "-";
-      //   },
-      // },
-      // {
-      //   Header: "Received",
-      //   accessor: "actualQty",
-      //   Cell: (row) => {
-      //     return status === "SHIPPED" && subsys === "wh" ? (
-      //       <EditableCell
-      //         value={0}
-      //         row={row.row}
-      //         column={row.column}
-      //         updateMyData={updateMyData}
-      //       />
-      //     ) : (
-      //       "-"
-      //     );
-      //   },
+      //   Header: "",
+      //   accessor: "options",
+      //   Cell: () => (
+      //     <button
+      //       className="text-indigo-600 hover:text-indigo-900"
+      //       onClick={() => setIsEditing(!isEditing)}
+      //     >
+      //       Edit
+      //     </button>
+      //   ),
       // },
     ];
-  }, [setData, status, subsys]);
+  }, [isEditing, setData]);
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -159,10 +168,12 @@ export const ScanItemsSection = ({
   );
 };
 
-const ConfirmManufacturedSection = ({
+export const ConfirmSection = ({
   subsys,
   procurementId,
-  onConfirmManufacturedClicked,
+  title,
+  body,
+  onConfirmClicked,
 }) => {
   const navigate = useNavigate();
   return (
@@ -173,14 +184,10 @@ const ConfirmManufacturedSection = ({
         </div>
         <div className="mt-3 text-center sm:mt-5">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
-            Confirm items manufactured
+            {title}
           </h3>
           <div className="mt-2">
-            <p className="text-sm text-gray-500">
-              Confirm that all the items in this order have been manufactured?
-              This action cannot be undone, and this order will advance to the
-              picking and packing stage.
-            </p>
+            <p className="text-sm text-gray-500">{body}</p>
           </div>
         </div>
       </div>
@@ -188,7 +195,7 @@ const ConfirmManufacturedSection = ({
         <button
           type="button"
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:col-start-2 sm:text-sm"
-          onClick={onConfirmManufacturedClicked}
+          onClick={onConfirmClicked}
         >
           Confirm
         </button>
@@ -206,83 +213,117 @@ const ConfirmManufacturedSection = ({
 
 export const ProcurementPickPack = () => {
   const { addToast } = useToasts();
-  const { procurementId, subsys, status, setStatus, lineItems, setLineItems } =
-    useOutletContext();
+  const {
+    procurementId,
+    subsys,
+    status,
+    setStatus,
+    setStatusHistory,
+    lineItems,
+    setLineItems,
+    openInvoice,
+  } = useOutletContext();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
-  const onConfirmManufacturedClicked = () => {
-    procurementApi
-      .manufactureOrder(procurementId)
-      .then((response) => {
-        const { lineItems, statusHistory } = response.data;
-        setLineItems(
-          lineItems.map((item) => ({
-            ...item,
-            product: {
-              sku: item.product.sku,
-              productFields: item.product.productFields,
-            },
-          }))
-        );
-        setStatus({
-          status: statusHistory[statusHistory.length - 1].status,
-          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-        });
-      })
-      .then(() => {
-        addToast(`Order #${procurementId} has completed manufacturing.`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-      });
+  const onConfirmClicked = () => {
+    status.status === "ACCEPTED"
+      ? procurementApi
+          .manufactureOrder(procurementId)
+          .then((response) => {
+            const { lineItems, statusHistory } = response.data;
+            setLineItems(
+              lineItems.map((item) => ({
+                ...item,
+                product: {
+                  sku: item.product.sku,
+                  productFields: item.product.productFields,
+                },
+              }))
+            );
+            setStatus({
+              status: statusHistory[statusHistory.length - 1].status,
+              timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+            });
+            setStatusHistory(statusHistory);
+          })
+          .then(() => {
+            addToast(`Order #${procurementId} has completed manufacturing.`, {
+              appearance: "success",
+              autoDismiss: true,
+            });
+          })
+      : handlePickPack();
   };
 
   const onScanClicked = (evt) => {
     evt.preventDefault();
-    if (status.status === "MANUFACTURED") {
-      procurementApi
-        .pickPack(procurementId)
-        .then((response) => {
-          const { statusHistory } = response.data;
-          setStatus({
-            status: statusHistory[statusHistory.length - 1].status,
-            timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-          });
-        })
-        .catch((error) => {
-          addToast(`Error: ${error.response.data.message}`, {
-            appearance: "error",
-            autoDismiss: true,
-          });
-        })
-        .then(() => handleScan());
-    } else {
-      handleScan();
+    if (status.status === "MANUFACTURED")
+      handlePickPack().then(() => handleScan(search));
+    else handleScan(search);
+  };
+
+  const handlePickPack = async () => {
+    const { data } = await procurementApi.pickPack(procurementId);
+    const { lineItems, statusHistory } = data;
+    setLineItems(
+      lineItems.map((item) => ({
+        ...item,
+        product: {
+          sku: item.product.sku,
+          productFields: item.product.productFields,
+        },
+      }))
+    );
+    setStatus({
+      status: statusHistory[statusHistory.length - 1].status,
+      timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+    });
+    setStatusHistory(statusHistory);
+    addToast(
+      `Order #${procurementId}  ${
+        status.status === "MANUFACTURED"
+          ? "has begun picking"
+          : status.status === "PICKED"
+          ? "has completed picking"
+          : "is ready for shipping. Please print the delivery invoice."
+      }.`,
+      {
+        appearance: "success",
+        autoDismiss: true,
+      }
+    );
+    if (status.status === "PACKED") {
+      openInvoice();
+      navigate(`/${subsys}/procurements/${procurementId}/delivery`);
     }
   };
 
-  const handleScan = () => {
-    dispatch(scanItem({ orderId: procurementId, barcode: search }))
+  const handleScan = (barcode) => {
+    dispatch(scanItem({ orderId: procurementId, barcode }))
       .unwrap()
       .then((data) => {
         const { lineItems: lIs, statusHistory } = data;
         setLineItems(
           lineItems.map((item, index) => ({
             ...item,
-            fulfilledQty: lIs[index].fulfilledQty,
+            pickedQty: lIs[index].pickedQty,
+            packedQty: lIs[index].packedQty,
           }))
         );
         setStatus({
           status: statusHistory[statusHistory.length - 1].status,
           timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
         });
+        setStatusHistory(statusHistory);
       })
       .then(() => {
-        addToast(`Successfully picked ${search}.`, {
+        addToast(`Successfully picked ${barcode}.`, {
           appearance: "success",
           autoDismiss: true,
         });
+        setSearch("");
       })
       .catch((error) => {
         addToast(`Error: ${error.message}`, {
@@ -292,26 +333,83 @@ export const ProcurementPickPack = () => {
       });
   };
 
-  const onSearchChanged = (e) => setSearch(e.target.value);
+  const onSearchChanged = (e) => {
+    if (
+      e.target.value.length - search.length > 10 &&
+      e.target.value.includes("-")
+    ) {
+      if (status.status === "MANUFACTURED")
+        handlePickPack().then(() => handleScan(e.target.value));
+      else handleScan(e.target.value);
+    }
+    setSearch(e.target.value);
+  };
+
+  // const onSaveQtyClicked = () => {
+  // }
 
   return (
     <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
         <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
           <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-            {status.status === "ACCEPTED" && subsys === "mf" ? (
-              <section aria-labelledby="confirm-manufactured">
-                <ConfirmManufacturedSection
-                  subsys={subsys}
-                  procurementId={procurementId}
-                  onConfirmManufacturedClicked={onConfirmManufacturedClicked}
-                />
-              </section>
-            ) : ["MANUFACTURED", "PICKING", "PICKED", "PACKING", "PACKED"].some(
+            {[
+              "ACCEPTED",
+              "MANUFACTURED",
+              "PICKING",
+              "PICKED",
+              "PACKING",
+              "PACKED",
+            ].some((s) => s === status.status) ? (
+              ["ACCEPTED", "PICKED", "PACKED"].some(
                 (s) => s === status.status
               ) ? (
-              <>
-                {["mf", "wh"].some((s) => s === subsys) && (
+                subsys === "mf" ? (
+                  <section
+                    aria-labelledby="confirm-manufactured"
+                    className="flex justify-center"
+                  >
+                    <ConfirmSection
+                      subsys={subsys}
+                      procurementId={procurementId}
+                      title={`Confirm items ${
+                        status.status === "ACCEPTED"
+                          ? "manufactured"
+                          : status.status === "PICKED"
+                          ? "picked"
+                          : "packed"
+                      }`}
+                      body={`Confirm that all the items in this order have been ${
+                        status.status === "ACCEPTED"
+                          ? "manufactured"
+                          : status.status === "PICKED"
+                          ? "picked"
+                          : "packed"
+                      }?
+                  This action cannot be undone, and this order will advance to the
+                  ${
+                    status.status === "ACCEPTED"
+                      ? "picking"
+                      : status.status === "PICKED"
+                      ? "packing"
+                      : "delivery"
+                  } stage.`}
+                      onConfirmClicked={onConfirmClicked}
+                    />
+                  </section>
+                ) : (
+                  <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                    <span className="mt-2 block text-base font-medium text-gray-900">
+                      {status.status === "ACCEPTED"
+                        ? "Items are being manufactured."
+                        : status.status === "PICKED"
+                        ? "Items have been picked"
+                        : "Items are ready to be delivered."}
+                    </span>
+                  </div>
+                )
+              ) : (
+                subsys === "mf" && (
                   <section aria-labelledby="scan-items">
                     <ScanItemsSection
                       search={search}
@@ -319,16 +417,8 @@ export const ProcurementPickPack = () => {
                       onScanClicked={onScanClicked}
                     />
                   </section>
-                )}
-                <section aria-labelledby="order-summary">
-                  <PickPackList
-                    subsys={subsys}
-                    data={lineItems}
-                    status={status.status}
-                    setData={setLineItems}
-                  />
-                </section>
-              </>
+                )
+              )
             ) : (
               <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
                 <span className="mt-2 block text-base font-medium text-gray-900">
@@ -336,6 +426,14 @@ export const ProcurementPickPack = () => {
                 </span>
               </div>
             )}
+            {["MANUFACTURED", "PICKING", "PICKED", "PACKING", "PACKED"].some(
+              (s) => s === status.status
+            ) &&
+              ["sm", "mf", "wh"].some((s) => s === subsys) && (
+                <section aria-labelledby="order-summary">
+                  <PickPackList data={lineItems} setData={setLineItems} />
+                </section>
+              )}
           </div>
         </div>
       </div>

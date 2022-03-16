@@ -1,7 +1,7 @@
 package com.iora.erp.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -90,12 +90,15 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
+        } else if (actionBy.equals(stockTransferOrder.getFromSite())) {
+            stockTransferOrder
+                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.ACCEPTED));
         } else {
             stockTransferOrder
-                    .addStatusHistory(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDINGALL));
-            em.persist(stockTransferOrder);
-            return stockTransferOrder;
+                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.PENDING));
         }
+        em.persist(stockTransferOrder);
+        return stockTransferOrder;
     }
 
     @Override
@@ -103,15 +106,15 @@ public class StockTransferServiceImpl implements StockTransferService {
             throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
 
-        if (actionBy == null || actionBy.equals(stockTransferOrder.getLastActor())) {
+        if (actionBy == null || !actionBy.equals(stockTransferOrder.getLastActor())) {
             throw new SiteConfirmationException(
                     "Site is not the creator of this order and is not permitted to update it.");
-        } else if (stockTransferOrder.getLastStatus() != StockTransferStatus.PENDINGALL) {
+        } else if (stockTransferOrder.getLastStatus() != StockTransferStatus.PENDING) {
             throw new StockTransferException(
-                    "Stock Transfer Order has been received by the other party and cannot be amended.");
+                    "Stock Transfer Order has been accepted and cannot be amended.");
         } else {
             stockTransferOrder
-                    .addStatusHistory(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDINGALL));
+                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.PENDING));
             return em.merge(stockTransferOrder);
         }
     }
@@ -124,16 +127,15 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
-        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDINGALL
-                || stOrder.getLastStatus() != StockTransferStatus.PENDINGONE) {
+        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDING) {
             throw new StockTransferException(
-                    "Stock Transfer Order has been responded to by all other parties and cannot be deleted.");
+                    "Stock Transfer Order has been accepted and cannot be deleted.");
         } else if (!actionBy.equals(stOrder.getLastActor())) {
             throw new SiteConfirmationException(
                     "Site is not the creator of this order and is not permitted to update it.");
         }
 
-        stOrder.addStatusHistory(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
+        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.CANCELLED));
         return em.merge(stOrder);
     }
 
@@ -143,16 +145,14 @@ public class StockTransferServiceImpl implements StockTransferService {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
-        if (actionBy == null || !actionBy.equals(stOrder.getFromSite()) || !actionBy.equals(stOrder.getToSite())
-                || !(actionBy instanceof HeadquartersSite)) {
+        if (actionBy == null || !actionBy.equals(stOrder.getFromSite())) {
             throw new SiteConfirmationException("Site is not allowed to reject the order.");
-        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDINGALL
-                || stOrder.getLastStatus() != StockTransferStatus.PENDINGONE) {
+        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDING) {
             throw new StockTransferException(
-                    "Stock Transfer Order cannot be rejected.");
+                    "Stock Transfer Order has already been accepted.");
         }
 
-        stOrder.addStatusHistory(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.CANCELLED));
+        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.CANCELLED));
         return em.merge(stOrder);
     }
 
@@ -162,28 +162,12 @@ public class StockTransferServiceImpl implements StockTransferService {
         StockTransferOrder stOrder = getStockTransferOrder(id);
         Site actionBy = em.find(Site.class, siteId);
 
-        if (actionBy == null || !actionBy.equals(stOrder.getFromSite()) || !actionBy.equals(stOrder.getToSite())
-                || !(actionBy instanceof HeadquartersSite)) {
+        if (actionBy == null || !actionBy.equals(stOrder.getFromSite())) {
             throw new SiteConfirmationException("Site is not allowed to confirm the order.");
-        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDINGALL
-                || stOrder.getLastStatus() != StockTransferStatus.PENDINGONE) {
+        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDING) {
             throw new StockTransferException("Stock Transfer Order is not pending for approval.");
-        } else if (stOrder.getLastStatus() == StockTransferStatus.PENDINGALL) {
-            if (actionBy instanceof HeadquartersSite) {
-                stOrder.setHqAccepted(true);
-            } else {
-                stOrder.setOpAccepeted(true);
-            }
-            stOrder.addStatusHistory(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.PENDINGONE));
-        } else {
-            if (actionBy instanceof HeadquartersSite) {
-                stOrder.setHqAccepted(true);
-            } else {
-                stOrder.setOpAccepeted(true);
-            }
-            stOrder.addStatusHistory(new STOStatus(actionBy, LocalDateTime.now(), StockTransferStatus.ACCEPTED));
         }
-
+        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.ACCEPTED));
         return em.merge(stOrder);
     }
 
@@ -198,19 +182,19 @@ public class StockTransferServiceImpl implements StockTransferService {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else if (stOrder.getLastStatus() == StockTransferStatus.ACCEPTED) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.PICKING));
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.PICKING));
         } else if (stOrder.getLastStatus() == StockTransferStatus.PICKING) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.PICKED));
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.PICKED));
         } else if (stOrder.getLastStatus() == StockTransferStatus.PICKED) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.PACKING));
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.PACKING));
         } else if (stOrder.getLastStatus() == StockTransferStatus.PACKING) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.PACKED));
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.PACKED));
         } else if (stOrder.getLastStatus() == StockTransferStatus.PACKED) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.READY_FOR_DELIVERY));
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.READY_FOR_DELIVERY));
         } else {
             throw new StockTransferException("Order is not due to pick or pack.");
         }
@@ -238,7 +222,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                         }
                     }
                     if (picked) {
-                        stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), LocalDateTime.now(),
+                        stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
                                 StockTransferStatus.PICKED));
                     }
 
@@ -267,7 +251,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                             }
                         }
                         if (packed) {
-                            stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), LocalDateTime.now(),
+                            stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
                                     StockTransferStatus.PACKED));
                         }
                         return em.merge(stOrder);
@@ -291,7 +275,7 @@ public class StockTransferServiceImpl implements StockTransferService {
         }
 
         stOrder.addStatusHistory(
-                new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.DELIVERING));
+                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.DELIVERING));
         return em.merge(stOrder);
     }
 
@@ -307,7 +291,7 @@ public class StockTransferServiceImpl implements StockTransferService {
         }
 
         stOrder.addStatusHistory(
-                new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.DELIVERED));
+                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.DELIVERED));
         return em.merge(stOrder);
     }
 
@@ -333,7 +317,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                     }
                 }
                 if (picked) {
-                    stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), LocalDateTime.now(),
+                    stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
                             StockTransferStatus.COMPLETED));
                 }
                 try {
@@ -358,7 +342,7 @@ public class StockTransferServiceImpl implements StockTransferService {
         }
 
         stOrder.addStatusHistory(
-                new STOStatus(stOrder.getLastActor(), LocalDateTime.now(), StockTransferStatus.COMPLETED));
+                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.COMPLETED));
         return em.merge(stOrder);
     }
 }

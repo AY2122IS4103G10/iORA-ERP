@@ -132,7 +132,7 @@ const CustomerDetailsBody = ({
                   Membership Tier
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {membershipTier.name}
+                  {membershipTier ? membershipTier.name : "N/A"}
                 </dd>
               </div>
               <div className="sm:col-span-1">
@@ -140,14 +140,14 @@ const CustomerDetailsBody = ({
                   Membership Points
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {membershipPoints}
+                  {membershipPoints ? membershipPoints : "-"}
                 </dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
                   Store Credit
                 </dt>
-                <dd className="mt-1 text-sm text-gray-900">{storeCredit}</dd>
+                <dd className="mt-1 text-sm text-gray-900">{storeCredit ? storeCredit : "-"}</dd>
               </div>
             </dl>
           </div>

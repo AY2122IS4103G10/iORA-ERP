@@ -1,105 +1,15 @@
 import { Dialog } from "@headlessui/react";
+import { XIcon } from "@heroicons/react/outline";
 import {
-  CashIcon,
-  CreditCardIcon,
-  DeviceMobileIcon,
-  XIcon,
-} from "@heroicons/react/outline";
-import { MinusSmIcon, PlusSmIcon } from "@heroicons/react/solid";
+  ExclamationIcon,
+  MinusSmIcon,
+  PlusSmIcon,
+} from "@heroicons/react/solid";
 import { useEffect, useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { api, posApi } from "../../../../environments/Api";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
-
-const paymentTypes = [
-  {
-    name: "CASH",
-    icon: CashIcon,
-  },
-  {
-    name: "MASTERCARD",
-    icon: CreditCardIcon,
-  },
-  {
-    name: "VISA",
-    icon: CreditCardIcon,
-  },
-  {
-    name: "NETS",
-    icon: CreditCardIcon,
-  },
-  {
-    name: "PAYLAH",
-    icon: DeviceMobileIcon,
-  },
-  {
-    name: "GRABPAY",
-    icon: DeviceMobileIcon,
-  },
-  {
-    name: "FAVE",
-    icon: DeviceMobileIcon,
-  },
-];
-
-export const PaymentModal = ({ open, closeModal }) => {
-  return (
-    <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
-        <div>
-          <div className="flex justify-between">
-            <Dialog.Title
-              as="h3"
-              className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
-            >
-              Payment Option
-            </Dialog.Title>
-            <button
-              type="button"
-              className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
-              onClick={closeModal}
-            >
-              <XIcon className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="rounded-lg bg-white overflow-hidden divide-y divide-gray-200 sm:divide-y-0 sm:grid sm:grid-cols-3 sm:gap-0">
-            {paymentTypes.map((type, index) => (
-              <div
-                key={index}
-                className="m-2 border shadow rounded-lg align-middle sm:rounded-md relative bg-white p-8 
-                focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500"
-              >
-                <div className="m-0 flex justify-center">
-                  <button>
-                    {/* Extend touch target to entire panel */}
-                    <span className="absolute inset-0" aria-hidden="true" />
-
-                    <div className="flex justify-center align-middle ">
-                      <span>{type.name}</span>
-                      <type.icon
-                        className="ml-2 inline-flex h-6 w-6 text-cyan-500 row-span-1"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  </button>
-                </div>
-                {/* <span
-                  className="pointer-events-none absolute top-6 right-6 text-gray-300 group-hover:text-gray-400"
-                  aria-hidden="true"
-                >
-                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
-                  </svg>
-                </span> */}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </SimpleModal>
-  );
-};
+import { CheckoutForm } from "../CheckoutForm";
 
 const OrderList = ({
   lineItems,
@@ -112,6 +22,7 @@ const OrderList = ({
   Modify,
   clear,
   openModal,
+  openSureModal,
 }) => (
   <main>
     <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4">
@@ -171,7 +82,7 @@ const OrderList = ({
                             {productDetails.get(lineItem.product.sku)?.colour}
                             &nbsp; -- &nbsp;
                             {productDetails.get(lineItem.product.sku)?.size !==
-                              null
+                            null
                               ? productDetails.get(lineItem.product.sku)?.size
                               : null}{" "}
                             &nbsp;
@@ -296,6 +207,7 @@ const OrderList = ({
         <div className="mt-10 flex flex-row-reverse space-x-4 space-x-reverse">
           <button
             type="button"
+            disabled={amount === 0}
             onClick={openModal}
             className="w-2/12 mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
           >
@@ -303,14 +215,10 @@ const OrderList = ({
           </button>
           <button
             type="button"
-            className="w-2/12 mt-3 bg-zinc-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
-            onClick={() => {
-              if (window.confirm("Are you sure to clear ALL items?")) {
-                clear();
-              }
-            }}
+            className="w-2/12 mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-0 px-4 text-base font-medium text-white hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-500"
+            onClick={openSureModal}
           >
-            Clear All Items
+            Clear All
           </button>
         </div>
       </section>
@@ -320,15 +228,38 @@ const OrderList = ({
 
 export const PosPurchaseOrder = () => {
   const [modalState, setModalState] = useState(false);
+  const [sureModalState, setSureModalState] = useState(false);
   const [rfid, setRfid] = useState("");
   const [lineItems, setLineItems] = useState([]);
   const [promotions, setPromotions] = useState([]);
   const [productDetails, setProductDetails] = useState(new Map());
   const [amount, setAmount] = useState(0);
+  const [order, setOrder] = useState({});
+  const siteId = localStorage?.getItem("siteId");
   const { addToast } = useToasts();
 
-  const openModal = () => setModalState(true);
+  const openModal = () => {
+    setModalState(true);
+    const concat = lineItems.concat(promotions);
+    setOrder({
+      totalAmount: 0.0,
+      lineItems: concat,
+      payments: [],
+      paid: false,
+      refundedLIs: [],
+      exchangedLIs: [],
+      site: {
+        id: siteId,
+      },
+      customerId:
+        localStorage.getItem("customer") === null
+          ? JSON.parse(localStorage.getItem("customer"))?.id
+          : null,
+    });
+  };
   const closeModal = () => setModalState(false);
+  const openSureModal = () => setSureModalState(true);
+  const closeSureModal = () => setSureModalState(false);
   const onRfidChanged = (e) => {
     if (
       e.target.value.length - rfid.length > 10 &&
@@ -433,8 +364,61 @@ export const PosPurchaseOrder = () => {
         Modify={Modify}
         clear={clear}
         openModal={openModal}
+        openSureModal={openSureModal}
       />
-      <PaymentModal open={modalState} closeModal={closeModal} />
+      <CheckoutForm
+        open={modalState}
+        closeModal={closeModal}
+        clear={clear}
+        amount={amount}
+        order={order}
+      />
+      <SimpleModal open={sureModalState} closeModal={closeSureModal}>
+        <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:p-6">
+          <div className="flex justify-between">
+            <div className="my-6 flex-shrink-0">
+              <ExclamationIcon
+                className="h-12 w-12 text-yellow-400"
+                aria-hidden="true"
+              />
+            </div>
+            <Dialog.Title
+              as="h3"
+              className="my-6 text-center text-lg leading-6 font-medium text-gray-900"
+            >
+              <h3 className="text-md font-medium text-black-800">
+                Are you sure you want to clear all items?
+              </h3>
+            </Dialog.Title>
+            <button
+              type="button"
+              className="relative h-full inline-flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-full text-gray-700"
+              onClick={closeSureModal}
+            >
+              <XIcon className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="flex justify-center gap-4">
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={closeSureModal}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              onClick={() => {
+                clear();
+                closeSureModal();
+              }}
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </SimpleModal>
     </>
   );
 };

@@ -1,8 +1,10 @@
 import { CheckCircleIcon } from "@heroicons/react/outline";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { api } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
@@ -39,7 +41,7 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
         accessor: (row) => row.warehouse,
       },
       {
-        Header: "Updated",
+        Header: "Last Updated",
         accessor: (row) =>
           moment
             .unix(
@@ -56,21 +58,33 @@ export const ProcurementTable = ({ data, handleOnClick }) => {
 };
 
 export const ProcurementList = ({ subsys }) => {
+  const { addToast } = useToasts();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const currSiteId = parseInt(useSelector(selectUserSite));
 
   useEffect(() => {
-    api
-      .getAll(
-        subsys === "sm"
-          ? "sam/procurementOrder/all"
-          : `manufacturing/procurementOrder/site/${currSiteId}`
-      )
-      .then((response) => {
-        setData(response.data);
-      });
-  }, [subsys, currSiteId]);
+    const fetchAllProcurement = async () => {
+      setLoading(true);
+      try {
+        const { data } = await api.getAll(
+          subsys === "sm"
+            ? "sam/procurementOrder/all"
+            : `manufacturing/procurementOrder/site/${currSiteId}`
+        );
+        setData(data);
+      } catch (err) {
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllProcurement();
+  }, [subsys, currSiteId, addToast]);
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/procurements/${row.original.id}`);
@@ -78,7 +92,11 @@ export const ProcurementList = ({ subsys }) => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        {Boolean(data.length) ? (
+        {loading ? (
+          <div className="flex mt-5 items-center justify-center">
+            <TailSpin color="#00BFFF" height={20} width={20} />
+          </div>
+        ) : Boolean(data.length) ? (
           <ProcurementTable data={data} handleOnClick={handleOnClick} />
         ) : subsys === "sm" ? (
           <Link to="/sm/procurements/create">

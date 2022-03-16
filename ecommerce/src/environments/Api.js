@@ -29,3 +29,16 @@ export const authApi = {
     return axios.post(`${REST_ENDPOINT}online/register`, user);
   },
 };
+
+export const listingApi = {
+  getListingByLineAndTag(line, tag) {
+    return axios.get(
+      `${REST_ENDPOINT}sam/model/tag/${line}/${tag}`
+    );
+  },
+  getListingByLine(line) {
+    return axios.get(
+      `${REST_ENDPOINT}sam/model/tag/${line}`
+    );
+  }
+}

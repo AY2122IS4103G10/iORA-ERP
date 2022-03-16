@@ -5,9 +5,11 @@ import {
 } from "@heroicons/react/solid";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+import { api } from "../../../../environments/Api";
 import {
   deleteExistingVoucher,
   fetchVouchers,
@@ -18,6 +20,7 @@ import {
 import { classNames } from "../../../../utilities/Util";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
 const VoucherDetailsBody = ({
   voucherCode,
@@ -26,12 +29,12 @@ const VoucherDetailsBody = ({
   expiry,
   redeemed,
   openModal,
-  onIssueClicked,
+  openIssueModal,
   onRedeemClicked,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
-      <NavigatePrev page="Vouchers" path="/sm/vouchers" />
+      <NavigatePrev page="Vouchers" path="/sm/rewards-loyalty/vouchers" />
       <div className="px-4 sm:px-6 lg:px-8">
         <div>
           <div className="md:flex md:items-center md:justify-between md:space-x-4 xl:border-b xl:pb-6">
@@ -48,7 +51,7 @@ const VoucherDetailsBody = ({
                   !issued ? "bg-white hover:bg-gray-50" : "bg-gray-200",
                   "inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                 )}
-                onClick={onIssueClicked}
+                onClick={openIssueModal}
                 disabled={issued}
               >
                 <span>Issue</span>
@@ -56,7 +59,9 @@ const VoucherDetailsBody = ({
               <button
                 type="button"
                 className={classNames(
-                  !redeemed && issued ? "bg-white hover:bg-gray-50" : "bg-gray-200",
+                  !redeemed && issued
+                    ? "bg-white hover:bg-gray-50"
+                    : "bg-gray-200",
                   "inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                 )}
                 onClick={onRedeemClicked}
@@ -117,39 +122,119 @@ const VoucherDetailsBody = ({
   </div>
 );
 
+const IssueVoucherModal = ({
+  open,
+  closeModal,
+  input,
+  onInputChanged,
+  onIssueClicked,
+  loading,
+}) => {
+  return (
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        {loading ? (
+          <div className="flex items-center justify-center">
+            <TailSpin color="#00BFFF" height={20} width={20} />
+          </div>
+        ) : (
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-lg leading-6 font-medium text-gray-900">
+              Issue Voucher
+            </h3>
+            <div className="mt-2 max-w-xl text-sm text-gray-500">
+              <p>
+                Enter customer email address or contact number to issue voucher.
+              </p>
+            </div>
+            <form
+              className="mt-5 sm:flex sm:items-center"
+              onSubmit={onIssueClicked}
+            >
+              <div className="w-full sm:max-w-xs">
+                <label htmlFor="order-no" className="sr-only">
+                  Customer Contact / Email
+                </label>
+                <input
+                  type="text"
+                  name="search"
+                  id="search"
+                  className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Enter email address or contact number."
+                  value={input}
+                  onChange={onInputChanged}
+                />
+              </div>
+              <button
+                type="submit"
+                className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              >
+                Issue
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    </SimpleModal>
+  );
+};
+
 export const VoucherDetails = () => {
   const { addToast } = useToasts();
   const { voucherCode } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const voucher = useSelector((state) =>
     selectVoucherByCode(state, voucherCode)
   );
+  const [input, setInput] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [openIssue, setOpenIssue] = useState(false);
+  const [loading, setLoading] = useState(false);
   const voucherStatus = useSelector((state) => state.vouchers.status);
   useEffect(() => {
     voucherStatus === "idle" && dispatch(fetchVouchers());
   }, [voucherStatus, dispatch]);
-
+  const onInputChanged = (e) => setInput(e.target.value);
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
+  const openIssueModal = () => setOpenIssue(true);
+  const closeIssueModal = () => setOpenIssue(false);
 
-  const onIssueClicked = () => {
-    if (!voucher.issued)
-      dispatch(issueVoucher(voucherCode))
-        .unwrap()
-        .then(() =>
-          addToast("Successfully issued voucher", {
-            appearance: "success",
-            autoDismiss: true,
-          })
-        )
-        .catch((err) =>
+  const onIssueClicked = (evt) => {
+    evt.preventDefault();
+    if (!voucher.issued) {
+      const fetchCustomer = async () => {
+        try {
+          const { data } = await api.get("sam/customer/search", input);
+          return data;
+        } catch (err) {
           addToast(`Error: ${err.message}`, {
             appearance: "error",
             autoDismiss: true,
+          });
+        }
+      };
+      fetchCustomer().then((data) => {
+        setLoading(true);
+        dispatch(issueVoucher({ code: voucherCode, id: data[0].id }))
+          .unwrap()
+          .then(() => {
+            addToast("Successfully issued voucher", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            closeIssueModal();
+            setLoading(false);
           })
-        );
+          .catch((err) =>
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            })
+          );
+      });
+    }
   };
   const onRedeemClicked = () => {
     if (!voucher.redeemed)
@@ -199,12 +284,21 @@ export const VoucherDetails = () => {
           openModal={openModal}
           onIssueClicked={onIssueClicked}
           onRedeemClicked={onRedeemClicked}
+          openIssueModal={openIssueModal}
         />
         <ConfirmDelete
           item={`$${voucher.amount} voucher?`}
           open={openDelete}
           closeModal={closeModal}
           onConfirm={onDeleteVoucherClicked}
+        />
+        <IssueVoucherModal
+          input={input}
+          onInputChanged={onInputChanged}
+          onIssueClicked={onIssueClicked}
+          open={openIssue}
+          closeModal={closeIssueModal}
+          loading={loading}
         />
       </>
     )

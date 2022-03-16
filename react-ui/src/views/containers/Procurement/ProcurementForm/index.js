@@ -206,6 +206,8 @@ const ProcurementFormBody = ({
   items,
   setItems,
   openProducts,
+  remarks,
+  onRemarksChanged,
   onSaveOrderClicked,
   onCancelClicked,
   canAdd,
@@ -296,6 +298,22 @@ const ProcurementFormBody = ({
                 />
               )}
             </div>
+            <div className="pt-8">
+              <div className="md:flex md:items-center md:justify-between">
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Remarks
+                </h3>
+              </div>
+              <textarea
+                rows={4}
+                name="skus"
+                id="skus"
+                className="mt-4 shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                placeholder="Leave remarks for manufacturer. Eg. Pack items into boxes of 5."
+                value={remarks}
+                onChange={onRemarksChanged}
+              />
+            </div>
           </div>
 
           <div className="pt-5">
@@ -311,7 +329,8 @@ const ProcurementFormBody = ({
                 type="submit"
                 className={classNames(
                   canAdd ? "bg-cyan-600 hover:bg-cyan-700" : "bg-cyan-800",
-                  "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500")}
+                  "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                )}
                 disabled={!canAdd}
               >
                 {!isEditing ? "Create" : "Save"} order
@@ -334,6 +353,7 @@ export const ProcurementForm = () => {
   const [hqSelected, setHqSelected] = useState(null);
   const [manufacturingSelected, setManufacturingSelected] = useState(null);
   const [warehouseSelected, setWarehouseSelected] = useState(null);
+  const [remarks, setRemarks] = useState("");
   const [openProducts, setOpenProducts] = useState(false);
 
   const skus = useSelector(selectAllProducts).flatMap((model) =>
@@ -383,6 +403,7 @@ export const ProcurementForm = () => {
   }, [warehouse]);
 
   const [selectedRows, setSelectedRows] = useState([]);
+  
   const onAddItemsClicked = (evt) => {
     evt.preventDefault();
     const selectedRowKeys = Object.keys(selectedRows).map((key) =>
@@ -399,10 +420,13 @@ export const ProcurementForm = () => {
     );
     closeModal();
   };
-  
-  const canAdd = [hqSelected, manufacturingSelected, warehouseSelected, lineItems.length].every(
-    Boolean
-  );
+
+  const canAdd = [
+    hqSelected,
+    manufacturingSelected,
+    warehouseSelected,
+    lineItems.length,
+  ].every(Boolean);
 
   const onSaveOrderClicked = (evt) => {
     evt.preventDefault();
@@ -420,6 +444,7 @@ export const ProcurementForm = () => {
             headquarters: { id: hqSelected.id },
             manufacturing: { id: manufacturingSelected.id },
             warehouse: { id: warehouseSelected.id },
+            notes: remarks,
           })
           .then(() => {
             addToast("Successfully created procurement order", {
@@ -445,6 +470,7 @@ export const ProcurementForm = () => {
             headquarters: { id: hqSelected.id },
             manufacturing: { id: manufacturingSelected.id },
             warehouse: { id: warehouseSelected.id },
+            notes: remarks,
           })
           .then(() => {
             addToast("Successfully updated procurement order", {
@@ -464,38 +490,41 @@ export const ProcurementForm = () => {
   const onCancelClicked = () =>
     navigate(!isEditing ? "/sm/procurements" : `/sm/procurements/${orderId}`);
 
+  const onRemarksChanged = (e) => setRemarks(e.target.value);
+
   useEffect(() => {
+    const fetchSite = async (site) => {
+      const { data } = await api.get("sam/viewSite", site);
+      return data;
+    };
+    const fetchProcurement = async () => {
+      const { data } = await api.get("sam/procurementOrder", orderId);
+      const { lineItems, headquarters, manufacturing, warehouse, notes } = data;
+      setIsEditing(true);
+      setLineItems(lineItems);
+      setRemarks(notes);
+      fetchSite(headquarters).then((data) => data && setHqSelected(data));
+      fetchSite(manufacturing).then(
+        (data) => data && setManufacturingSelected(data)
+      );
+      fetchSite(warehouse).then((data) => data && setWarehouseSelected(data));
+      let selectedRows = {};
+      lineItems.forEach((_, index) => (selectedRows[index] = true));
+      setSelectedRows(selectedRows);
+    };
+
     Boolean(orderId) &&
-      api.get("sam/procurementOrder", orderId).then((response) => {
-        const { lineItems, headquarters, manufacturing, warehouse } =
-          response.data;
-        setIsEditing(true);
-        setLineItems(lineItems);
-        api
-          .get("sam/viewSite", headquarters)
-          .then((response) => response.data && setHqSelected(response.data));
-        api
-          .get("sam/viewSite", manufacturing)
-          .then(
-            (response) =>
-              response.data && setManufacturingSelected(response.data)
-          );
-        api
-          .get("sam/viewSite", warehouse)
-          .then(
-            (response) => response.data && setWarehouseSelected(response.data)
-          );
-        let selectedRows = {};
-        lineItems.forEach((item, index) => (selectedRows[index] = true));
-        setSelectedRows(selectedRows);
-      });
-  }, [orderId]);
+      fetchProcurement().catch((error) =>
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
+  }, [orderId, addToast]);
 
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);
-  // const openInvoiceModal = () => setOpenInvoice(true)
-  // const closeInvoiceModal = () => setOpenInvoice(false)
-  
+
   return (
     <>
       <ProcurementFormBody
@@ -512,6 +541,8 @@ export const ProcurementForm = () => {
         items={lineItems}
         setItems={setLineItems}
         openProducts={openModal}
+        remarks={remarks}
+        onRemarksChanged={onRemarksChanged}
         onSaveOrderClicked={onSaveOrderClicked}
         onCancelClicked={onCancelClicked}
         canAdd={canAdd}

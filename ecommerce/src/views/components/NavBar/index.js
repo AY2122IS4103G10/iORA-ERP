@@ -257,7 +257,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
           </Transition.Child>
         </Dialog>
       </Transition.Root>
-      <nav aria-label="Top" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav aria-label="Top" className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-gray-200">
           <div className="h-16 flex items-center">
             <button
@@ -274,7 +274,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
               <Link to="/">
                 <span className="sr-only">iORA</span>
                 <img
-                  className="mx-auto h-8 w-auto"
+                  className="mx-auto h-14 w-auto"
                   src="android-chrome-512x512.png"
                   alt="iORA"
                 />
@@ -367,12 +367,12 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                                               key={item.name}
                                               className="flex"
                                             >
-                                              <a
-                                                href={item.href}
+                                              <Link
+                                                to={item.href}
                                                 className="hover:text-gray-800"
                                               >
                                                 {item.name}
-                                              </a>
+                                              </Link>
                                             </li>
                                           ))}
                                         </ul>
@@ -447,7 +447,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
 
               {/* Cart */}
               <div className="ml-4 flow-root lg:ml-6">
-                <a href="#" className="group -m-2 p-2 flex items-center">
+                <Link to="cart" className="group -m-2 p-2 flex items-center">
                   <ShoppingBagIcon
                     className="flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"
                     aria-hidden="true"
@@ -456,7 +456,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                     0
                   </span>
                   <span className="sr-only">items in cart, view bag</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

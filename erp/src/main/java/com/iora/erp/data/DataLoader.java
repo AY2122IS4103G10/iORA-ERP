@@ -1,9 +1,8 @@
 package com.iora.erp.data;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -633,7 +632,7 @@ public class DataLoader implements CommandLineRunner {
 		stockTransferService.createStockTransferOrder(sto2, 1L);
 
 		// Customer Order
-		/* CustomerOrderLI coli1 = new CustomerOrderLI();
+		CustomerOrderLI coli1 = new CustomerOrderLI();
 		coli1.setProduct(productService.getProduct("BPL0009803M-1"));
 		coli1.setQty(1);
 		coli1.setSubTotal(39.0);
@@ -646,7 +645,7 @@ public class DataLoader implements CommandLineRunner {
 		CustomerOrderLI coli3 = new CustomerOrderLI();
 		coli3.setProduct(productService.getProduct("APL0009197A-1"));
 		coli3.setQty(2);
-		coli3.setSubTotal(38.0); */
+		coli3.setSubTotal(38.0);
 
 		CustomerOrderLI coli4 = new CustomerOrderLI();
 		coli4.setProduct(productService.getProduct("BPD0010528A-1"));
@@ -679,7 +678,7 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createPayment(payment2);
 
 		CustomerOrder co1 = new CustomerOrder();
-		co1.setDateTime(LocalDateTime.parse("2022-02-10 13:34", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+		co1.setDateTime(new Date());
 		co1.addLineItem(coli4);
 		co1.addLineItem(coli5);
 		co1.addPayment(payment1);

@@ -3,8 +3,8 @@ package com.iora.erp.controller;
 import java.util.List;
 
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
-import com.iora.erp.model.customerOrder.PaymentRequest;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.StripeService;
@@ -87,11 +87,12 @@ public class OnlineCustomerController {
     @Autowired
     StripeService stripeService;
 
-    @PostMapping(path = "/charge", produces = "application/json")
-    public ResponseEntity<Object> completePayment(@RequestBody PaymentRequest request) {
+    @PostMapping(path = "/pay", consumes = "application/json",  produces = "application/json")
+    public ResponseEntity<Object> completePayment(@RequestBody List<CustomerOrderLI> lineItems) {
         try {
-            return ResponseEntity.ok(stripeService.chargeCreditCard(request));
+            return ResponseEntity.ok(stripeService.chargeCreditCard(lineItems));
         } catch (Exception ex) {
+            ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

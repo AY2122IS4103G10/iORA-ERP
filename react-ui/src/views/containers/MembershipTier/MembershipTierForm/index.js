@@ -10,17 +10,17 @@ import {
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 
-const currencies = [
-  { id: 1, code: "SGD", name: "Singapore Dollar", country: "Singapore" },
-  { id: 2, code: "RM", name: "Malaysian Ringgit", country: "Malaysia" },
-  { id: 3, code: "RMB", name: "Chinese Yuan", country: "China" },
-  {
-    id: 4,
-    code: "USD",
-    name: "United States Dollar",
-    country: "United States",
-  },
-];
+// const currencies = [
+//   { id: 1, code: "SGD", name: "Singapore Dollar", country: "Singapore" },
+//   { id: 2, code: "RM", name: "Malaysian Ringgit", country: "Malaysia" },
+//   { id: 3, code: "RMB", name: "Chinese Yuan", country: "China" },
+//   {
+//     id: 4,
+//     code: "USD",
+//     name: "United States Dollar",
+//     country: "United States",
+//   },
+// ];
 
 const MembershipTierFormBody = ({
   isEditing,
@@ -113,7 +113,7 @@ const MembershipTierFormBody = ({
                           onChange={onMinSpendChanged}
                           required
                         />
-                        <div className="absolute inset-y-0 right-0 flex items-center">
+                        {/* <div className="absolute inset-y-0 right-0 flex items-center">
                           <label htmlFor="currency" className="sr-only">
                             Currency
                           </label>
@@ -130,7 +130,7 @@ const MembershipTierFormBody = ({
                               </option>
                             ))}
                           </select>
-                        </div>
+                        </div> */}
                       </div>
                     </SimpleInputGroup>
                     <SimpleInputGroup
@@ -177,7 +177,7 @@ const MembershipTierFormBody = ({
                               onChange={onBirthdaySpendChanged}
                               required
                             />
-                            <div className="absolute inset-y-0 right-0 flex items-center">
+                            {/* <div className="absolute inset-y-0 right-0 flex items-center">
                               <label
                                 htmlFor="birthday-currency"
                                 className="sr-only"
@@ -197,7 +197,7 @@ const MembershipTierFormBody = ({
                                   </option>
                                 ))}
                               </select>
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </div>
@@ -282,7 +282,7 @@ export const MembershipTierForm = () => {
   const [name, setName] = useState(tierName);
   const [multiplier, setMultiplier] = useState("");
   const [minSpend, setMinSpend] = useState("");
-  const [currencySelected, setCurrencySelected] = useState(currencies[0]);
+  // const [currencySelected, setCurrencySelected] = useState(currencies[0]);
   const [birthdayName, setBirthdayName] = useState("");
   const [birthdaySpend, setBirthdaySpend] = useState("");
   const [birthdayCurrencySelected, setBirthdayCurrencySelected] = useState("");
@@ -296,7 +296,7 @@ export const MembershipTierForm = () => {
   const onNameChanged = (e) => setName(e.target.value);
   const onMultiplierChanged = (e) => setMultiplier(e.target.value);
   const onMinSpendChanged = (e) => setMinSpend(e.target.value);
-  const onCurrencyChanged = (e) => setCurrencySelected(e.target.value);
+  // const onCurrencyChanged = (e) => setCurrencySelected(e.target.value);
   const onBirthdayNameChanged = (e) => setBirthdayName(e.target.value);
   const onBirthdaySpendChanged = (e) => setBirthdaySpend(e.target.value);
   const onBirthdayCurrencyChanged = (e) =>
@@ -312,7 +312,7 @@ export const MembershipTierForm = () => {
         addNewMembershipTier({
           name,
           multiplier,
-          currency: currencySelected,
+          // currency: currencySelected,
           minSpend,
           birthday: {
             name: birthdayName,
@@ -329,7 +329,7 @@ export const MembershipTierForm = () => {
             appearance: "success",
             autoDismiss: true,
           });
-          navigate("/sm/customers/tiers");
+          navigate("/sm/rewards-loyalty/tiers");
         })
         .catch((err) => {
           addToast(`Error: ${err.message}`, {
@@ -342,7 +342,7 @@ export const MembershipTierForm = () => {
         updateExistingMembershipTier({
           name,
           multiplier,
-          currency: currencySelected,
+          // currency: currencySelected,
           minSpend,
           birthday: {
             name: birthdayName,
@@ -359,7 +359,7 @@ export const MembershipTierForm = () => {
             appearance: "success",
             autoDismiss: true,
           });
-          navigate(`/sm/customers/tiers/${tierName}`);
+          navigate(`/sm/rewards-loyalty/tiers/${tierName}`);
         })
         .catch((err) => {
           addToast(`Error: ${err.message}`, {
@@ -370,21 +370,17 @@ export const MembershipTierForm = () => {
     }
   };
 
-  const onCancelClicked = () =>
-    navigate(
-      !isEditing ? "/sm/customers/tiers" : `/sm/customers/tiers/${tierName}`
-    );
+  const onCancelClicked = () => navigate(-1);
 
   useEffect(() => {
     Boolean(tierName) &&
       api.get("sam/membershipTier", `?name=${tierName}`).then((response) => {
-        const { name, currency, multiplier, minSpend, birthday } =
-          response.data;
+        const { name, multiplier, minSpend, birthday } = response.data;
         console.log(response.data);
         setIsEditing(true);
         setName(name);
         setMultiplier(multiplier);
-        setCurrencySelected(currency);
+        // setCurrencySelected(currency);
         setMinSpend(minSpend);
         setBirthdayName(birthday.name);
         setBirthdayCurrencySelected(birthday.currency);
@@ -403,8 +399,8 @@ export const MembershipTierForm = () => {
       onNameChanged={onNameChanged}
       minSpend={minSpend}
       onMinSpendChanged={onMinSpendChanged}
-      currencySelected={currencySelected}
-      onCurrencyChanged={onCurrencyChanged}
+      // currencySelected={currencySelected}
+      // onCurrencyChanged={onCurrencyChanged}
       birthdayName={birthdayName}
       onBirthdayNameChanged={onBirthdayNameChanged}
       birthdaySpend={birthdaySpend}

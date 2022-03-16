@@ -28,7 +28,7 @@ public class Payment {
     @Column(nullable = false)
     private PaymentType paymentType;
 
-    @Column(nullable = false, unique = true)
+    @Column
     private String ccTransactionId;
 
     public Payment() {

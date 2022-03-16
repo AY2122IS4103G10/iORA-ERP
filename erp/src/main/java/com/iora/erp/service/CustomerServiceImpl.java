@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -40,8 +41,9 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer createCustomerAccount(Customer customer) throws RegistrationException {
 
         try {
-            if (getCustomerByPhone(customer.getContactNumber()) != null ) {
-                throw new RegistrationException("Phone number " + customer.getContactNumber() + " has already been used");
+            if (getCustomerByPhone(customer.getContactNumber()) != null) {
+                throw new RegistrationException(
+                        "Phone number " + customer.getContactNumber() + " has already been used");
             }
             getCustomerByEmail(customer.getEmail());
             throw new RegistrationException("Account with " + customer.getEmail() + " has already been created");
@@ -263,9 +265,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Voucher issueVoucher(String voucherCode) throws CustomerException {
+    public Voucher issueVoucher(String voucherCode, Long customerId) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
+        Customer customer = getCustomerById(customerId);
+
+        emailService.sendSimpleMessage(customer.getEmail(), "iORA S$" + voucher.getAmount() + " Voucher",
+                "Dear customer, Your S$" + voucher.getAmount() + " voucher code is " + voucher.getVoucherCode()
+                        + ". Please redeem it any of our physical or online stores before the expiry date "
+                        + voucher.getExpiry().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         voucher.setIssued(true);
+
         return voucher;
     }
 
@@ -314,14 +323,16 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<SupportTicket> searchSupportTicket(Long id) {
-        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.id = :id", SupportTicket.class);
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.id = :id",
+                SupportTicket.class);
         q.setParameter("id", id);
         return q.getResultList();
     }
 
     @Override
     public List<SupportTicket> searchSupportTicketBySubject(String subject) {
-        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.subject LIKE :subject", SupportTicket.class);
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.subject LIKE :subject",
+                SupportTicket.class);
         q.setParameter("subject", "%" + subject + "%");
         return q.getResultList();
     }

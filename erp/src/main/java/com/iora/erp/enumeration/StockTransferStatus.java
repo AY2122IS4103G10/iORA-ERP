@@ -1,9 +1,8 @@
 package com.iora.erp.enumeration;
 
 public enum StockTransferStatus implements StatusEnum {
-    PENDINGALL("Pending approval from 2 other sites."),
-    PENDINGONE("Pending approval from 1 other site."),
-    ACCEPTED("All sites have approved the order and is now ready for picking."),
+    PENDING("Pending approval from origin site."),
+    ACCEPTED("Order has been approved and will be picked soon."),
     PICKING("Items are being picked."),
     PICKED("Items are picked and is ready for packing."),
     PACKING("Items are being packed."),

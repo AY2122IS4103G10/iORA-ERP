@@ -334,6 +334,15 @@ public class StoreController {
         }
     }
 
+    @PostMapping(path = "/customerOrder/create", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createOnlineOrder(@RequestBody CustomerOrder customerOrder) {
+        try {
+            return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/productDetails/{rfid}", produces = "application/json")
     public ResponseEntity<Object> getProductDetails(@PathVariable String rfid) {
         try {

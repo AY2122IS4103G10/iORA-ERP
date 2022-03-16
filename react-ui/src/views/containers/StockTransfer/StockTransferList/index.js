@@ -14,6 +14,8 @@ import {
   SelectColumnFilter,
 } from "../../../components/Tables/SelectableTable";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
+import moment from "moment";
+import { TailSpin } from "react-loader-spinner";
 
 const cols = [
   {
@@ -34,26 +36,16 @@ const cols = [
   },
   {
     Header: "Status",
-    accessor: (row) => row?.statusHistory?.slice(-1)[0].status,
+    accessor: (row) => row.statusHistory[row.statusHistory.length - 1].status,
     Filter: SelectColumnFilter,
     filter: "includes",
   },
   {
     Header: "Last Updated",
-    accessor: (row) => {
-      let timeStamp = row?.statusHistory?.slice(-1)[0].timeStamp;
-      var datetime =
-        (timeStamp[3] < 10 ? "0" + timeStamp[3] : timeStamp[3]) +
-        ":" +
-        (timeStamp[4] < 10 ? "0" + timeStamp[4] : timeStamp[4]) +
-        " " +
-        timeStamp[2] +
-        "/" +
-        timeStamp[1] +
-        "/" +
-        timeStamp[0];
-      return datetime;
-    },
+    accessor: (row) =>
+      moment
+        .unix(row.statusHistory[row.statusHistory.length - 1].timeStamp / 1000)
+        .format("DD/MM/YY, HH:mm:ss"),
   },
 ];
 
@@ -62,6 +54,7 @@ export const StockTransferList = ({ subsys }) => {
   const sto = useSelector(selectAllOrders);
   const { pathname } = useLocation();
   let currSiteId = useSelector(selectUserSite);
+  const stOrderStatus = useSelector((state) => state.stocktransfer.status);
 
   const columns = useMemo(() => cols, []);
   const path = `/${subsys}/stocktransfer`;
@@ -72,7 +65,11 @@ export const StockTransferList = ({ subsys }) => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        {Boolean(sto.length) ? (
+        {stOrderStatus === "loading" ? (
+          <div className="flex mt-5 items-center justify-center">
+            <TailSpin color="#00BFFF" height={20} width={20} />
+          </div>
+        ) : Boolean(sto.length) ? (
           <SelectableTable columns={columns} data={sto} path={path} />
         ) : (
           pathname.includes("sm") && (

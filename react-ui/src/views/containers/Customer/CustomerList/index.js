@@ -38,7 +38,7 @@ export const CustomerTable = ({ data, handleOnClick }) => {
       },
       {
         Header: "Member Tier",
-        accessor: (row) => row.membershipTier.name,
+        accessor: "membershipTier.name",
         Filter: SelectColumnFilter,
         filter: "includes",
       },
@@ -86,7 +86,7 @@ export const CustomerList = () => {
   useEffect(() => {
     customerStatus === "idle" && dispatch(fetchCustomers());
   }, [customerStatus, dispatch]);
-
+  console.log(data)
   const handleOnClick = (row) => navigate(`/sm/customers/${row.original.id}`);
 
   return <CustomerTable data={data} handleOnClick={handleOnClick} />;

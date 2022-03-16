@@ -1,9 +1,10 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
-import { MinusSmIcon, PlusSmIcon, XCircleIcon } from '@heroicons/react/solid';
+import { MinusSmIcon, PlusSmIcon, XCircleIcon } from "@heroicons/react/solid";
 import { Fragment, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { api, posApi } from "../../../../environments/Api";
+import ManageCheckout from "../ManageCheckout";
 
 const OrderList = ({
   lineItems,
@@ -14,8 +15,9 @@ const OrderList = ({
   onRfidChanged,
   addRfidClicked,
   Modify,
-  clear,
   openModal,
+  openCheckoutModal,
+  isLoading,
   error,
 }) => (
   <main>
@@ -34,10 +36,26 @@ const OrderList = ({
             <li key="header" className="flex py-2">
               <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                 <div className="flex justify-between items-center">
-                  <div className="text-lg w-6/12"><h3><strong>Item name</strong></h3></div>
-                  <div className="text-lg w-2/12"><h3><strong>Price</strong></h3></div>
-                  <div className="text-lg w-2/12"><h3><strong>Quantity</strong></h3></div>
-                  <div className="text-lg w-2/12"><h3><strong>Subtotal</strong></h3></div>
+                  <div className="text-lg w-6/12">
+                    <h3>
+                      <strong>Item name</strong>
+                    </h3>
+                  </div>
+                  <div className="text-lg w-2/12">
+                    <h3>
+                      <strong>Price</strong>
+                    </h3>
+                  </div>
+                  <div className="text-lg w-2/12">
+                    <h3>
+                      <strong>Quantity</strong>
+                    </h3>
+                  </div>
+                  <div className="text-lg w-2/12">
+                    <h3>
+                      <strong>Subtotal</strong>
+                    </h3>
+                  </div>
                 </div>
               </div>
             </li>
@@ -46,11 +64,14 @@ const OrderList = ({
                 <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                   <div className="flex justify-between items-center">
                     <div className="text-lg w-6/12">
-                      <h4><strong className="font-medium text-gray-700 hover:text-gray-800">
-                        {productDetails.get(lineItem.product.sku)?.name}
-                      </strong></h4>
+                      <h4>
+                        <strong className="font-medium text-gray-700 hover:text-gray-800">
+                          {productDetails.get(lineItem.product.sku)?.name}
+                        </strong>
+                      </h4>
                       <p className="mt-1 text-sm text-gray-500">
-                        Colour: {productDetails.get(lineItem.product.sku)?.colour}
+                        Colour:{" "}
+                        {productDetails.get(lineItem.product.sku)?.colour}
                       </p>
                       <p className="mt-1 text-sm text-gray-500">
                         Size: {productDetails.get(lineItem.product.sku)?.size}
@@ -60,10 +81,8 @@ const OrderList = ({
                       <p className="line-through text-gray-500">
                         {productDetails[lineItem.product.sku]?.listPrice &&
                           `${Number.parseFloat(
-                            productDetails.get(lineItem.product.sku)
-                              ?.listPrice
-                          ).toFixed(2)}`
-                        }
+                            productDetails.get(lineItem.product.sku)?.listPrice
+                          ).toFixed(2)}`}
                       </p>
                       <p>
                         $
@@ -74,17 +93,13 @@ const OrderList = ({
                       </p>
                     </div>
                     <div className="text-lg w-1/12">
-                      <p>
-                        {lineItem.qty}
-                      </p>
+                      <p>{lineItem.qty}</p>
                     </div>
                     <div className="w-1/12">
                       <Modify product={lineItem.product} />
                     </div>
                     <div className="text-lg w-2/12">
-                      <p>
-                        ${Number.parseFloat(lineItem.subTotal).toFixed(2)}
-                      </p>
+                      <p>${Number.parseFloat(lineItem.subTotal).toFixed(2)}</p>
                     </div>
                   </div>
                 </div>
@@ -96,7 +111,11 @@ const OrderList = ({
               <li key="header" className="flex py-2">
                 <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                   <div className="flex justify-between items-center">
-                    <div className="text-lg"><h3><strong>Promotions</strong></h3></div>
+                    <div className="text-lg">
+                      <h3>
+                        <strong>Promotions</strong>
+                      </h3>
+                    </div>
                   </div>
                 </div>
               </li>
@@ -105,12 +124,16 @@ const OrderList = ({
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                     <div className="flex justify-between items-center">
                       <div className="text-lg w-6/12">
-                        <h4><strong className="font-medium text-gray-700 hover:text-gray-800">
-                          {lineItem.promotion.fieldValue}
-                        </strong></h4>
+                        <h4>
+                          <strong className="font-medium text-gray-700 hover:text-gray-800">
+                            {lineItem.promotion.fieldValue}
+                          </strong>
+                        </h4>
                       </div>
                       <div className="text-lg w-2/12">
-                        <p>-${Number.parseFloat(-lineItem.subTotal).toFixed(2)}</p>
+                        <p>
+                          -${Number.parseFloat(-lineItem.subTotal).toFixed(2)}
+                        </p>
                       </div>
                       <div className="text-lg w-2/12">
                         <p>{lineItem.qty}</p>
@@ -135,74 +158,93 @@ const OrderList = ({
           <div>
             <dl className="space-y-4">
               <div className="flex items-center justify-between">
-                <dt className="text-2xl font-bold text-gray-900">Total Amount</dt>
-                <dd className="ml-4 text-2xl font-bold font-medium text-gray-900">${amount}</dd>
+                <dt className="text-2xl font-bold text-gray-900">
+                  Total Amount
+                </dt>
+                <dd className="ml-4 text-2xl font-bold font-medium text-gray-900">
+                  ${amount}
+                </dd>
               </div>
             </dl>
-            <p className="mt-1 text-sm text-gray-500">Please proceed to our friendly staff for assistance if there is an issue with your order.</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Please proceed to our friendly staff for assistance if there is an
+              issue with your order.
+            </p>
           </div>
         </section>
-        <form className="mt-10">
-          <div>
-            <label htmlFor="rfid" className="block mt-5 text-sm font-medium text-gray-700">
-              SKU Code or RFID
-            </label>
-            <div className="mt-1">
-              <input
-                type="text"
-                name="rfid"
-                id="rfid"
-                autoComplete="rfid"
-                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                placeholder="AA0009876-1 or 10-0001234-0XXXXX-0000XXXXX"
-                value={rfid}
-                onChange={onRfidChanged}
-                required
-                aria-describedby="rfid"
-              />
-              {error &&
-                <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-red-800">
-                        Product not found.
-                      </p>
-                    </div>
+        <div>
+          <label
+            htmlFor="rfid"
+            className="block mt-5 text-sm font-medium text-gray-700"
+          >
+            SKU Code or RFID
+          </label>
+          <div className="mt-1">
+            <input
+              type="text"
+              name="rfid"
+              id="rfid"
+              autoComplete="rfid"
+              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              placeholder="AA0009876-1 or 10-0001234-0XXXXX-0000XXXXX"
+              value={rfid}
+              onChange={onRfidChanged}
+              required
+              aria-describedby="rfid"
+            />
+            {error && (
+              <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <XCircleIcon
+                      className="h-5 w-5 text-red-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-800">Product not found.</p>
                   </div>
                 </div>
-              }
-              <button
-                type="submit"
-                className="inline-flex justify-end mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                onClick={addRfidClicked}
-              >
-                Add product
-              </button>
-            </div>
+              </div>
+            )}
+            <button
+              type="submit"
+              className="inline-flex justify-end mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={addRfidClicked}
+            >
+              Add product
+            </button>
           </div>
-        </form>
+        </div>
         {/* Order summary */}
         <section aria-labelledby="summary-heading" className="mt-10">
-
           <div className="mt-10">
             <button
               type="button"
               className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+              onClick={openCheckoutModal}
+              disabled={lineItems.length === 0}
             >
-              {localStorage.getItem("customer") === null ?
-                <>Checkout as Guest</> :
-                <>Checkout as {JSON.parse(localStorage.customer).firstName} {JSON.parse(localStorage.customer).lastName}</>}
+              {localStorage.getItem("customer") === null ? (
+                <>Checkout as Guest</>
+              ) : (
+                <>
+                  Checkout as {JSON.parse(localStorage.customer).firstName}{" "}
+                  {JSON.parse(localStorage.customer).lastName}
+                </>
+              )}
             </button>
-            <button
-              type="button"
-              className="w-full mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
-              onClick={() => openModal()}
-            >
-              Cancel
-            </button>
+            {isLoading ? (
+              <div className="spinner" id="spinner" />
+            ) : (
+              <button
+                type="button"
+                className="w-full mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                onClick={() => openModal()}
+              >
+                Cancel
+              </button>
+            )}
           </div>
         </section>
       </form>
@@ -215,10 +257,8 @@ const OrderList = ({
                     </a>
                 </p>
             </div> */}
-
-
     </div>
-  </main >
+  </main>
 );
 
 function ConfirmCancel({ open, closeModal, onCancel }) {
@@ -322,11 +362,45 @@ export function Order() {
   const [amount, setAmount] = useState(0);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
+  const [openCheckout, setOpenCheckout] = useState(false);
+  const [checkoutItems, setCheckoutItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [order, setOrder] = useState({});
+  const siteId = localStorage?.getItem("siteId");
 
   const navigate = useNavigate();
+  const renderSummary =
+    new URLSearchParams(useLocation()?.search).get("redirect_status") ===
+    "succeeded";
 
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
+
+  const openCheckoutModal = () => {
+    setOpenCheckout(true);
+    const concat = lineItems.concat(promotions);
+    setCheckoutItems(concat);
+    setOrder({
+      totalAmount: 0.0,
+      lineItems: concat,
+      payments: [],
+      paid: false,
+      refundedLIs: [],
+      exchangedLIs: [],
+      site: {
+        id: siteId,
+      },
+      customerId:
+        localStorage.getItem("customer") === null
+          ? JSON.parse(localStorage.getItem("customer"))?.id
+          : null,
+    });
+  };
+
+  const closeCheckoutModal = () => {
+    setOpenCheckout(false);
+    setCheckoutItems([]);
+  };
   const onRfidChanged = (e) => {
     if (
       e.target.value.length - rfid.length > 10 &&
@@ -368,7 +442,7 @@ export function Order() {
     localStorage.removeItem("customer");
     clear();
     navigate("/ss");
-  }
+  };
 
   useEffect(() => {
     async function calculate() {
@@ -424,24 +498,39 @@ export function Order() {
 
   return (
     <>
-      <ConfirmCancel
-        open={open}
-        closeModal={closeModal}
-        onCancel={onCancel}
-      />
-      <OrderList
-        rfid={rfid}
-        lineItems={lineItems}
-        productDetails={productDetails}
-        promotions={promotions}
+      {!renderSummary && (
+        <ConfirmCancel
+          open={open}
+          closeModal={closeModal}
+          onCancel={onCancel}
+        />
+      )}
+      <ManageCheckout
+        open={openCheckout}
+        openModal={openCheckoutModal}
+        closeModal={closeCheckoutModal}
+        onCancel={closeCheckoutModal}
+        setIsLoading={setIsLoading}
+        checkoutItems={checkoutItems}
+        order={order}
         amount={amount}
-        onRfidChanged={onRfidChanged}
-        addRfidClicked={addRfidClicked}
-        Modify={Modify}
-        clear={clear}
-        openModal={openModal}
-        error={error}
       />
+      {!renderSummary && (
+        <OrderList
+          rfid={rfid}
+          lineItems={lineItems}
+          productDetails={productDetails}
+          promotions={promotions}
+          amount={amount}
+          onRfidChanged={onRfidChanged}
+          addRfidClicked={addRfidClicked}
+          Modify={Modify}
+          openModal={openModal}
+          openCheckoutModal={openCheckoutModal}
+          isLoading={isLoading}
+          error={error}
+        />
+      )}
     </>
-  )
+  );
 }

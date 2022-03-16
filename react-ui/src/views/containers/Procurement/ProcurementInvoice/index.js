@@ -4,6 +4,7 @@ import Barcode from "react-barcode";
 import moment from "moment";
 
 export const ProcurementInvoiceBody = ({
+  title,
   orderId,
   orderStatus,
   company,
@@ -12,12 +13,13 @@ export const ProcurementInvoiceBody = ({
   toSite,
   qrValue,
   children,
+  qrHelper,
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <div>
         <div className="space-y-2 sm:px-0 sm:flex sm:items-baseline sm:justify-between sm:space-y-0">
-          <h1 className="font-extrabold tracking-tight text-5xl">Invoice</h1>
+          <h1 className="font-extrabold tracking-tight text-5xl">{title}</h1>
         </div>
 
         <h4 className="sr-only">Order Information</h4>
@@ -36,6 +38,20 @@ export const ProcurementInvoiceBody = ({
                 </span>
                 <span className="block">{company.telephone}</span>
               </address>
+            </dd>
+            <dd className="mt-2 text-gray-700">
+              <div className="my-10">
+                <QRCode
+                  id={orderId}
+                  value={qrValue}
+                  size={150}
+                  level={"H"}
+                  includeMargin={false}
+                />
+                <p className="mt-2 text-gray-700">
+                  {qrHelper && qrHelper}
+                </p>
+              </div>
             </dd>
           </div>
           <div>
@@ -94,8 +110,7 @@ export const ProcurementInvoiceBody = ({
                   <span className="block">{fromSite.name}</span>
                   <span className="block">{fromSite.address.road}</span>
                   <span className="block">
-                    {fromSite.address.city},{" "}
-                    {fromSite.address.postalCode}
+                    {fromSite.address.city}, {fromSite.address.postalCode}
                   </span>
                   <span className="block">{fromSite.phoneNumber}</span>
                 </address>
@@ -118,13 +133,6 @@ export const ProcurementInvoiceBody = ({
         </div>
         <h3 className="sr-only">Items</h3>
         {children}
-        <QRCode
-          id="qr-gen"
-          value={qrValue}
-          size={290}
-          level={"H"}
-          includeMargin={true}
-        />
       </div>
     </div>
   );
@@ -133,6 +141,7 @@ export const ProcurementInvoiceBody = ({
 export const ProcurementInvoice = forwardRef(
   (
     {
+      title,
       orderId,
       orderStatus,
       company,
@@ -141,6 +150,7 @@ export const ProcurementInvoice = forwardRef(
       toSite,
       data,
       qrValue,
+      qrHelper,
       children,
     },
     ref
@@ -149,6 +159,7 @@ export const ProcurementInvoice = forwardRef(
       [company, createdBy, fromSite, toSite].every(Boolean) && (
         <div ref={ref}>
           <ProcurementInvoiceBody
+            title={title}
             orderId={orderId}
             orderStatus={orderStatus}
             company={company}
@@ -157,9 +168,10 @@ export const ProcurementInvoice = forwardRef(
             toSite={toSite}
             data={data}
             qrValue={qrValue}
+            qrHelper={qrHelper}
           >
             {children}
-            </ProcurementInvoiceBody>
+          </ProcurementInvoiceBody>
         </div>
       )
     );

@@ -2,6 +2,13 @@ import { useMemo } from "react";
 import moment from "moment";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useOutletContext } from "react-router-dom";
+import {
+  ActivitySection,
+  fetchAllActionBy,
+} from "../../Procurement/ProcurementDetails";
+import { useEffect } from "react";
+import { useState } from "react";
+import { eventTypes } from "../../../../constants/eventTypes";
 
 const ItemTable = ({ data }) => {
   const columns = useMemo(
@@ -35,9 +42,9 @@ const ItemTable = ({ data }) => {
   );
 };
 
-const OrderDetailsBody = ({ order }) => {
+const OrderDetailsBody = ({ history, order }) => {
   return (
-    <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+    <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
         {/* Site Information list*/}
         <section aria-labelledby="applicant-information-title">
@@ -62,7 +69,7 @@ const OrderDetailsBody = ({ order }) => {
                     Date Created
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {moment(order.dateTime).format("DD/MM/YYYY")}
+                    {moment(order.dateTime).format("DD/MM/YYYY, hh:mm:ss")}
                   </dd>
                 </div>
 
@@ -112,19 +119,57 @@ const OrderDetailsBody = ({ order }) => {
             </div>
           </div>
         </section>
-        {Boolean(order.lineItems.length) && (
+      </div>
+      {history && <ActivitySection history={history} />}
+      {Boolean(order.lineItems.length) && (
+        <div className="lg:col-start-1 lg:col-span-3">
           <section aria-labelledby="departments">
             <ItemTable data={order.lineItems} />
           </section>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export const CustomerOrderDetails = () => {
-  const { subsys, orderId, order, status, lineItems, setLineItems } =
-    useOutletContext();
-
-  return Boolean(order) && <OrderDetailsBody order={order} />;
+  const {
+    subsys,
+    orderId,
+    order,
+    status,
+    lineItems,
+    setLineItems,
+    statusHistory,
+  } = useOutletContext();
+  const [history, setHistory] = useState([]);
+  console.log(statusHistory)
+  useEffect(() => {
+    fetchAllActionBy(statusHistory).then((data) => {
+      setHistory(
+        statusHistory.map(({ status, timeStamp }, index) => ({
+          id: index,
+          type:
+            status === "PENDING"
+              ? index === 0
+                ? eventTypes.created
+                : eventTypes.completed
+              : ["PICKING", "PACKING", "SHIPPING"].some((s) => s === status)
+              ? eventTypes.action
+              : status === "CANCELLED"
+              ? eventTypes.cancelled
+              : eventTypes.completed,
+          content:
+            status === "PENDING"
+              ? `${index === 0 ? "Created" : "Updated"} by`
+              : status === "READY_FOR_SHIPPING"
+              ? "Ready for shipping by"
+              : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
+          target: data[index].name,
+          date: moment.unix(timeStamp / 1000).format("DD/MM, H:mm"),
+        }))
+      );
+    });
+  }, [statusHistory]);
+  return Boolean(order) && <OrderDetailsBody order={order} history={history} />;
 };

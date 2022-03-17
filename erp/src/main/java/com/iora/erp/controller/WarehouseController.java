@@ -116,13 +116,4 @@ public class WarehouseController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
-    @PostMapping(path = "/customerOrder", produces = "application/json")
-    public ResponseEntity<Object> createCustomerOrder(@RequestBody CustomerOrder customerOrder) {
-        try {
-            return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
 }

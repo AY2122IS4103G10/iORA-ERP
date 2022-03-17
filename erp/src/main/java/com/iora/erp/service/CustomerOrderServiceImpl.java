@@ -43,6 +43,8 @@ import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,6 +59,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     private ProductService productService;
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private StripeService stripeService;
     @PersistenceContext
     private EntityManager em;
 
@@ -147,9 +151,14 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
+    public CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException {
+        if (clientSecret != null) {
+            stripeService.capturePayment(clientSecret);
+        }
+        
         em.persist(customerOrder);
         return customerOrder;
+        //return finaliseCustomerOrder(customerOrder); to fix this method
     }
 
     @Override
@@ -163,18 +172,15 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder, List<Payment> payments)
-            throws CustomerOrderException, InsufficientPaymentException {
-        CustomerOrder old = getCustomerOrder(customerOrder.getId());
-        if (payments.stream().mapToDouble(x -> x.getAmount()).sum() < old.getTotalAmount()) {
+    public CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder) throws InsufficientPaymentException, CustomerException {
+        List<Payment> payments = customerOrder.getPayments();
+        if (payments.stream().mapToDouble(x -> x.getAmount()).sum() < customerOrder.getTotalAmount()) {
             throw new InsufficientPaymentException("Insufficient Payment");
         }
-        old.setPaid(true);
-        old.setPayments(payments);
-        try {
-            updateMembershipPoints(old);
-        } catch (CustomerException e) {
-            old.setCustomerId(null);
+        customerOrder.setPaid(true);
+
+        if (customerOrder.getCustomerId() != null) {
+            updateMembershipPoints(customerOrder);
         }
         return em.merge(customerOrder);
     }
@@ -508,7 +514,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
         Double spending = em
-                .createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
+                .createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date",
                         Payment.class)
                 .setParameter("id", customer.getId())
                 .setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP)

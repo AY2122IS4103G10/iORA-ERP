@@ -10,6 +10,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
 import com.stripe.param.PaymentIntentCancelParams;
+import com.stripe.param.PaymentIntentCaptureParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.RefundCreateParams;
 
@@ -29,7 +30,7 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
-    public String chargeCreditCard(List<CustomerOrderLI> lineItems) throws StripeException {
+    public String createPaymentIntent(List<CustomerOrderLI> lineItems) throws StripeException {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(calculateOrderAmount(lineItems))
                 .setCurrency("sgd")
@@ -39,6 +40,13 @@ public class StripeServiceImpl implements StripeService {
         PaymentIntent paymentIntent = PaymentIntent.create(params);
 
         return paymentIntent.getClientSecret();
+    }
+
+    public PaymentIntent capturePayment(String clientSecret) throws StripeException {
+        PaymentIntent resource = PaymentIntent.retrieve(clientSecret);
+        PaymentIntentCaptureParams params = PaymentIntentCaptureParams.builder().build();
+
+        return resource.capture(params);
     }
 
     private Long calculateOrderAmount(List<CustomerOrderLI> lineItems) {

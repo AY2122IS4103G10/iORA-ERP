@@ -7,21 +7,6 @@ import { useToasts } from "react-toast-notifications";
 import Barcode from "react-barcode";
 import { HomeIcon, PrinterIcon } from "@heroicons/react/solid";
 
-const products = [
-  {
-    id: 1,
-    name: "Cold Brew Bottle",
-    description:
-      "This glass bottle comes with a mesh insert for steeping tea or cold-brewing coffee. Pour from any angle and remove the top for easy cleaning.",
-    href: "#",
-    quantity: 1,
-    price: "$32.00",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/confirmation-page-05-product-01.jpg",
-    imageAlt: "Glass bottle with black plastic pour top and mesh insert.",
-  },
-];
-
 export default function OrderSuccess({ paymentIntent, clientSecret }) {
   const stripe = useStripe();
   const navigate = useNavigate();

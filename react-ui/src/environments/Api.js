@@ -223,32 +223,6 @@ export const authApi = {
   },
 };
 
-export const posApi = {
-  getOrders(siteId) {
-    return axiosPrivate.get(
-      `${REST_ENDPOINT}store/customerOrder/${siteId}?orderId=`
-    );
-  },
-  addProductToLineItems(rfidsku, lineItems) {
-    return axiosPublic.post(
-      `${REST_ENDPOINT}store/customerOrder/add/${rfidsku}`,
-      lineItems
-    );
-  },
-  removeProductFromLineItems(rfidsku, lineItems) {
-    return axiosPublic.post(
-      `${REST_ENDPOINT}store/customerOrder/remove/${rfidsku}`,
-      lineItems
-    );
-  },
-  calculatePromotions(lineItems) {
-    return axiosPublic.post(
-      `${REST_ENDPOINT}store/customerOrder/calculate`,
-      lineItems
-    );
-  },
-};
-
 export const employeeApi = {
   getEmployee(employeeId) {
     return axiosPrivate.get(
@@ -340,4 +314,35 @@ export const orderApi = {
       order
     );
   },
+};
+
+export const posApi = {
+  getOrders(siteId) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/customerOrder/${siteId}?orderId=`
+    );
+  },
+  addProductToLineItems(rfidsku, lineItems) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}store/customerOrder/add/${rfidsku}`,
+      lineItems
+    );
+  },
+  removeProductFromLineItems(rfidsku, lineItems) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}store/customerOrder/remove/${rfidsku}`,
+      lineItems
+    );
+  },
+  calculatePromotions(lineItems) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}store/customerOrder/calculate`,
+      lineItems
+    );
+  },
+  connectToken() {
+    return axiosPrivate.post(
+      `${REST_ENDPOINT}store/customerOrder/connectionToken`
+    )
+  }
 };

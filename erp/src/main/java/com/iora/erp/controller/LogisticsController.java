@@ -48,13 +48,4 @@ public class LogisticsController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
-    @PutMapping(path = "/delivered/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> receiveStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
-        try {
-            return ResponseEntity.ok(stockTransferService.receiveStockTransferOrder(orderId, siteId));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
 }

@@ -17,6 +17,7 @@ import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
+import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,8 @@ public class StoreController {
     private ProductService productService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private StripeService stripeService;
 
     /*
      * ---------------------------------------------------------
@@ -213,10 +216,10 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransfer/receive/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> receiveStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+    @PutMapping(path = "/stockTransfer/deliverMultiple/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverMultipleStockTransferOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity.ok(stockTransferService.receiveStockTransferOrder(orderId, siteId));
+            return ResponseEntity.ok(stockTransferService.deliverMultipleStockTransferOrder(orderId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -334,10 +337,20 @@ public class StoreController {
         }
     }
 
-    @PostMapping(path = "/customerOrder/create", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createOnlineOrder(@RequestBody CustomerOrder customerOrder) {
+    @PostMapping(path = "/customerOrder/connectionToken", produces = "application/json")
+    public ResponseEntity<Object> createConnectionToken() {
         try {
-            return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder));
+            return ResponseEntity.ok(stripeService.createConnnectionToken());
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/create", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createOnlineOrder(@RequestBody CustomerOrder customerOrder,
+            @RequestParam String clientSecret) {
+        try {
+            return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder, clientSecret));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

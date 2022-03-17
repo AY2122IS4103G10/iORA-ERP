@@ -2,6 +2,7 @@ package com.iora.erp.service;
 
 import java.util.List;
 
+import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
@@ -13,6 +14,7 @@ import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.RefundLI;
+import com.stripe.exception.StripeException;
 
 public interface CustomerOrderService {
     public abstract CustomerOrder getCustomerOrder(Long id) throws CustomerOrderException;
@@ -20,9 +22,9 @@ public interface CustomerOrderService {
     public abstract List<CustomerOrder> searchStoreOrders(Long siteId, Long orderId);
     public abstract List<OnlineOrder> searchOnlineOrders(Long siteId, Long orderId);
 
-    public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder);
+    public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;
     public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
-    public abstract CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder, List<Payment> payments) throws CustomerOrderException, InsufficientPaymentException;
+    public abstract CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException, InsufficientPaymentException, CustomerException;
     
     public abstract CustomerOrderLI getCustomerOrderLI(Long id) throws CustomerOrderException;
     public abstract List<CustomerOrderLI> getCustomerOrderLIs(CustomerOrder customerOrder);

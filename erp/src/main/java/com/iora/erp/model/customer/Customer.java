@@ -46,26 +46,26 @@ public class Customer implements Serializable {
     private String salt;
 
     public Customer() {
-        membershipPoints = 0;
-        storeCredit = 0.0;
+        this.membershipPoints = 0;
+        this.storeCredit = 0.0;
+        this.availStatus = true;
     }
 
     public Customer(String firstName, String lastName, String email, LocalDate dob, String contactNumber,
             MembershipTier membershipTier, String hashPass, String salt) {
+        this();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.dob = dob;
         this.contactNumber = contactNumber;
-        this.membershipPoints = 0;
         this.membershipTier = membershipTier;
-        this.storeCredit = 0.0;
         this.salt = salt;
         this.hashPass = hashPass;
-        this.availStatus = true;
     }
 
     public Customer(String firstName, String lastName) {
+        this();
         this.firstName = firstName;
         this.lastName = lastName;
     }
@@ -85,7 +85,6 @@ public class Customer implements Serializable {
     public void sethashPass(String password) {
         this.hashPass = password;
     }
-
 
     public Long getId() {
         return id;

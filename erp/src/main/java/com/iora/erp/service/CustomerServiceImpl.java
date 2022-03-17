@@ -39,22 +39,24 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer createCustomerAccount(Customer customer) throws RegistrationException {
+        try {
+            getCustomerByPhone(customer.getContactNumber());
+            throw new RegistrationException("Phone number already exists.");
+        } catch (CustomerException e) {
+            // Do nothing
+        }
 
         try {
-            if (getCustomerByPhone(customer.getContactNumber()) != null) {
-                throw new RegistrationException(
-                        "Phone number " + customer.getContactNumber() + " has already been used");
-            }
             getCustomerByEmail(customer.getEmail());
-            throw new RegistrationException("Account with " + customer.getEmail() + " has already been created");
-        } catch (CustomerException ex) {
+            throw new RegistrationException("Email already exists.");
+        } catch (CustomerException e) {
             customer.setSalt(StringGenerator.saltGeneration());
             customer.sethashPass(StringGenerator.generateProtectedPassword(customer.getSalt(), customer.gethashPass()));
             em.persist(customer);
 
             return customer;
         }
-    }
+     }
 
     @Override
     public Customer updateCustomerAccount(Customer customer) throws CustomerException {

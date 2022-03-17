@@ -1,6 +1,8 @@
 package com.iora.erp.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -9,10 +11,12 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
+import com.stripe.model.terminal.ConnectionToken;
 import com.stripe.param.PaymentIntentCancelParams;
 import com.stripe.param.PaymentIntentCaptureParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.RefundCreateParams;
+import com.stripe.param.terminal.ConnectionTokenCreateParams;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,17 @@ public class StripeServiceImpl implements StripeService {
         PaymentIntent paymentIntent = PaymentIntent.create(params);
 
         return paymentIntent.getClientSecret();
+    }
+
+    @Override
+    public Map<String, String> createConnnectionToken() throws StripeException {
+        ConnectionTokenCreateParams params = ConnectionTokenCreateParams.builder().build();
+        ConnectionToken connectionToken = ConnectionToken.create(params);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("secret", connectionToken.getSecret());
+
+        return map;
     }
 
     public PaymentIntent capturePayment(String clientSecret) throws StripeException {

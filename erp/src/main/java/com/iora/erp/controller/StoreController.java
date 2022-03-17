@@ -17,6 +17,7 @@ import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
+import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,8 @@ public class StoreController {
     private ProductService productService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private StripeService stripeService;
 
     /*
      * ---------------------------------------------------------
@@ -330,6 +333,15 @@ public class StoreController {
             return ResponseEntity.ok(customerOrderService.calculatePromotions(newLineItems));
         } catch (Exception ex) {
             ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/connectionToken", produces = "application/json")
+    public ResponseEntity<Object> createConnectionToken() {
+        try {
+            return ResponseEntity.ok(stripeService.createConnnectionToken());
+        } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

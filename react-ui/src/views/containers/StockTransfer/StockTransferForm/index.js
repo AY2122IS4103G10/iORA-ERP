@@ -660,16 +660,16 @@ export const StockTransferForm = ({ subsys }) => {
                       {isEditing ? "Edit" : "Create"} Stock Transfer Order
                     </h3>
                     <div className="grid grid-cols-2">
-                      {subsys === "sm" ? (
-                        <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                          <div>
-                            <label
-                              htmlFor="from"
-                              className="block text-sm font-bold text-gray-900 sm:mt-px sm:pt-2"
-                            >
-                              From Site
-                            </label>
+                      <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                        <div>
+                          <label
+                            htmlFor="from"
+                            className="block text-sm font-bold text-gray-900 sm:mt-px sm:pt-2"
+                          >
+                            From Site
+                          </label>
 
+                          {subsys === "sm" ? (
                             <div className="mt-3 flex rounded-md shadow-sm">
                               <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
                                 <input
@@ -690,22 +690,11 @@ export const StockTransferForm = ({ subsys }) => {
                                 </button>
                               </div>
                             </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                          <div>
-                            <label
-                              htmlFor="from"
-                              className="block text-sm font-bold text-gray-900 sm:mt-px sm:pt-2"
-                            >
-                              From Site
-                            </label>
-
+                          ) : (
                             <h3 className="mt-3 flex">{from.name}</h3>
-                          </div>
+                          )}
                         </div>
-                      )}
+                      </div>
 
                       <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
                         <div>

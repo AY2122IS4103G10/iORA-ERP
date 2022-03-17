@@ -243,6 +243,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                         throw new StockTransferException("You are packing items that are not meant for this order.");
                     } else {
                         try {
+                            stoli.setPackedQty(stoli.getPackedQty() + qty);
                             siteService.removeProducts(stOrder.getFromSite().getId(), product.getSku(), qty);
                         } catch (NoStockLevelException | IllegalTransferException e) {
                             e.printStackTrace();

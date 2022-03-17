@@ -70,6 +70,7 @@ import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel";
 import { StockLevelForm } from "./views/containers/StockLevels/ProdStockLevelForm";
 import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
+import { StockTransferDelivery } from "./views/containers/StockTransfer/StockTransferDelivery/index.js";
 import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
 import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList";
 import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack";
@@ -157,6 +158,7 @@ function App() {
               <Route path=":id" element={<StockTransferWrapper subsys="sm" />}>
                 <Route index element={<ViewStockTransfer subsys="sm" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
+                <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
               <Route
                 path="edit/:id"
@@ -266,12 +268,6 @@ function App() {
               <Route path=":customerId" element={<CustomerDetails />} />
               <Route path="create" element={<CustomerForm />} />
               <Route path="edit/:customerId" element={<CustomerForm />} />
-              {/* <Route path="tiers" element={<Outlet />}>
-                <Route index element={<ManageMembershipTier />} />
-                <Route path=":name" element={<MembershipTierDetails />} />
-                <Route path="create" element={<MembershipTierForm />} />
-                <Route path="edit/:name" element={<MembershipTierForm />} />
-              </Route> */}
             </Route>
           </Route>
 
@@ -321,6 +317,7 @@ function App() {
               <Route path=":id" element={<StockTransferWrapper subsys="str" />}>
                 <Route index element={<ViewStockTransfer subsys="str" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
+                <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
               <Route
                 path="edit/:id"
@@ -537,6 +534,7 @@ function App() {
               <Route path=":id" element={<StockTransferWrapper subsys="wh" />}>
                 <Route index element={<ViewStockTransfer subsys="wh" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
+                <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
               <Route
                 path="edit/:id"

@@ -173,6 +173,11 @@ export const stockTransferApi = {
       `${REST_ENDPOINT}store/stockTransfer/scanFrom/${orderId}?barcode=${barcode}`
     );
   },
+  scanReceive(orderId, barcode) {
+    return axiosPrivate.patch(
+      `${REST_ENDPOINT}store/stockTransfer/scanTo/${orderId}?barcode=${barcode}`
+    );
+  },
   readyOrder(order, siteId) {
     return axiosPrivate.put(
       `${REST_ENDPOINT}store/stockTransfer/ready/${siteId}`,

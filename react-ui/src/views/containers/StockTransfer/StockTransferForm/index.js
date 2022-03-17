@@ -25,6 +25,7 @@ import {
 } from "../../../components/Tables/ClickableRowTable";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useToasts } from "react-toast-notifications";
+import { fetchSite } from "../../Procurement/ProcurementWrapper";
 
 const cols = [
   {
@@ -394,10 +395,11 @@ const LineItemsTable = ({ data, setLineItems }) => {
         Cell: (row) => {
           return (
             <EditableCell
-              value={row.row.original.requestedQty}
+              value={row.value}
               row={row.row}
               column={row.column}
               updateMyData={updateMyData}
+              max={row.row.original.qty}
             />
           );
         },
@@ -425,9 +427,10 @@ export const fetchAllModelsBySkus = async (items) => {
   return Promise.all(items.map((item) => fetchModelBySku(item.product.sku)));
 };
 
-export const StockTransferForm = (subsys) => {
+export const StockTransferForm = ({ subsys }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useToasts();
   const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [from, setFrom] = useState({});
@@ -439,7 +442,6 @@ export const StockTransferForm = (subsys) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [originalOrder, setOriginalOrder] = useState({});
   const currSite = useSelector(selectUserSite);
-  const { addToast } = useToasts();
 
   //get stock level and product information
   const [prodTableData, setProdTableData] = useState([]);
@@ -453,6 +455,33 @@ export const StockTransferForm = (subsys) => {
     dispatch(updateCurrSite());
     dispatch(getAllSites());
   }, [dispatch, from]);
+
+  useEffect(() => {
+    currSite &&
+      subsys !== "sm" &&
+      fetchSite(currSite)
+        .then((data) => {
+          setFrom(data);
+          fetchStockLevel(data.id).then(({ data: stocklevel }) => {
+            fetchAllModelsBySkus(stocklevel.products).then((data) => {
+              setProdTableData({
+                ...stocklevel,
+                products: stocklevel.products.map((product, index) => ({
+                  ...product,
+                  modelCode: data[index].modelCode,
+                  name: data[index].name,
+                })),
+              });
+            });
+          });
+        })
+        .catch((error) =>
+          addToast(`Error: ${error.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          })
+        );
+  }, [currSite, addToast, subsys]);
 
   //editing
 
@@ -569,7 +598,7 @@ export const StockTransferForm = (subsys) => {
           autoDismiss: true,
         });
         console.log(response);
-        navigate(`/${subsys.subsys}/stocktransfer/${response.id}`);
+        navigate(`/${subsys}/stocktransfer/${response.id}`);
       })
       .catch((error) => {
         addToast(`${error.message}`, {
@@ -600,7 +629,7 @@ export const StockTransferForm = (subsys) => {
           appearance: "success",
           autoDismiss: true,
         });
-        navigate(`/${subsys.subsys}/stocktransfer/${id}`);
+        navigate(`/${subsys}/stocktransfer/${id}`);
       })
       .catch((error) => {
         addToast(`Edit stock transfer failed. ${error.message}`, {
@@ -613,9 +642,9 @@ export const StockTransferForm = (subsys) => {
   // cancel
   const onCancelClicked = () => {
     if (isEditing) {
-      navigate(`/${subsys.subsys}/stocktransfer/${id}`);
+      navigate(`/${subsys}/stocktransfer/${id}`);
     } else {
-      navigate(`/${subsys.subsys}/stocktransfer`);
+      navigate(`/${subsys}/stocktransfer`);
     }
   };
   return (
@@ -631,37 +660,52 @@ export const StockTransferForm = (subsys) => {
                       {isEditing ? "Edit" : "Create"} Stock Transfer Order
                     </h3>
                     <div className="grid grid-cols-2">
-                      <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                        <div>
-                          <label
-                            htmlFor="from"
-                            className="block text-sm font-bold text-gray-900 sm:mt-px sm:pt-2"
-                          >
-                            From Site
-                          </label>
+                      {subsys === "sm" ? (
+                        <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                          <div>
+                            <label
+                              htmlFor="from"
+                              className="block text-sm font-bold text-gray-900 sm:mt-px sm:pt-2"
+                            >
+                              From Site
+                            </label>
 
-                          <div className="mt-3 flex rounded-md shadow-sm">
-                            <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
-                              <input
-                                name="from"
-                                id="from"
-                                type="text"
-                                value={isObjectEmpty(from) ? "" : from.name}
-                                className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
-                                placeholder="Select"
-                                readOnly
-                              ></input>
-                              <button
-                                type="button"
-                                className="-ml-px relative h-full inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
-                                onClick={openSitesModal}
-                              >
-                                Select
-                              </button>
+                            <div className="mt-3 flex rounded-md shadow-sm">
+                              <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
+                                <input
+                                  name="from"
+                                  id="from"
+                                  type="text"
+                                  value={isObjectEmpty(from) ? "" : from.name}
+                                  className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                                  placeholder="Select"
+                                  readOnly
+                                ></input>
+                                <button
+                                  type="button"
+                                  className="-ml-px relative h-full inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
+                                  onClick={openSitesModal}
+                                >
+                                  Select
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                          <div>
+                            <label
+                              htmlFor="from"
+                              className="block text-sm font-bold text-gray-900 sm:mt-px sm:pt-2"
+                            >
+                              From Site
+                            </label>
+
+                            <h3 className="mt-3 flex">{from.name}</h3>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
                         <div>

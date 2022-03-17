@@ -103,7 +103,7 @@ export const StockTransferBody = ({
 };
 
 export const ViewStockTransfer = () => {
-  const { order, lineItems, userSiteId } = useOutletContext();
+  const { order, userSiteId } = useOutletContext();
   const [history, setHistory] = useState([]);
   const [lItems, setLItems] = useState([]);
 
@@ -150,9 +150,9 @@ export const ViewStockTransfer = () => {
   }, [order]);
 
   useEffect(() => {
-    fetchAllModelsBySkus(lineItems).then((data) => {
+    fetchAllModelsBySkus(order.lineItems).then((data) => {
       setLItems(
-        lineItems.map((item, index) => ({
+        order.lineItems.map((item, index) => ({
           ...item,
           product: {
             ...item.product,
@@ -162,7 +162,7 @@ export const ViewStockTransfer = () => {
         }))
       );
     });
-  }, [lineItems]);
+  }, [order]);
   // console.log(history)
   return (
     <StockTransferBody

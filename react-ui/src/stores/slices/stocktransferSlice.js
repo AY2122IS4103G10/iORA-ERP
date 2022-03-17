@@ -101,6 +101,14 @@ export const scanItemStockTransfer = createAsyncThunk(
   }
 );
 
+export const scanReceiveStockTransfer = createAsyncThunk(
+  "stocktransfer/scanReceive",
+  async ({ orderId, barcode }) => {
+    const response = await stockTransferApi.scanReceive(orderId, barcode);
+    return response.data;
+  }
+)
+
 export const readyStockTransfer = createAsyncThunk(
   "stocktransfer/ready",
   async (data) => {
@@ -208,6 +216,7 @@ const stocktransferSlice = createSlice({
       if (state.currOrder) {
         state.currOrder.statusHistory = statusHistory;
       }
+      state.status = "succeeded";
     });
     builder.addCase(pickPackStockTransfer.rejected, (state, action) => {
       state.status = "failed";
@@ -221,8 +230,23 @@ const stocktransferSlice = createSlice({
         state.currOrder.statusHistory = statusHistory;
         state.currOrder.lineItems = lineItems;
       }
+      state.status = "succeeded";
     });
     builder.addCase(scanItemStockTransfer.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(scanReceiveStockTransfer.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(scanReceiveStockTransfer.fulfilled, (state, action) => {
+      const { statusHistory, lineItems } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+        state.currOrder.lineItems = lineItems;
+      }
+      state.status = "succeeded";
+    });
+    builder.addCase(scanReceiveStockTransfer.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(readyStockTransfer.pending, (state, action) => {

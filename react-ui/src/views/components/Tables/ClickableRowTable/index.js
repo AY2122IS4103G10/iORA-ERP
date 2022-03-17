@@ -163,6 +163,7 @@ export const EditableCell = ({
   row: { index },
   column: { id },
   updateMyData,
+  max = "",
 }) => {
   const [value, setValue] = useState(initialValue);
 
@@ -186,6 +187,7 @@ export const EditableCell = ({
       onChange={onChange}
       onBlur={onBlur}
       min="1"
+      max={max}
     />
   );
 };

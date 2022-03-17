@@ -372,6 +372,7 @@ export const PosPurchaseOrder = () => {
         clear={clear}
         amount={amount}
         order={order}
+        checkoutItems={order?.lineItems}
       />
       <SimpleModal open={sureModalState} closeModal={closeSureModal}>
         <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:p-6">

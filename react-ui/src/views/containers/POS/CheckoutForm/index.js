@@ -56,7 +56,14 @@ const paymentTypes = [
   },
 ];
 
-export const CheckoutForm = ({ open, closeModal, amount, order, clear }) => {
+export const CheckoutForm = ({
+  open,
+  closeModal,
+  amount,
+  order,
+  clear,
+  checkoutItems,
+}) => {
   const [mode, setMode] = useState(0);
   const [customerId, setCustomerId] = useState(null);
   const [customerName, setCustomerName] = useState("");
@@ -226,7 +233,7 @@ export const CheckoutForm = ({ open, closeModal, amount, order, clear }) => {
           />
         )}
         {mode >= 2 && mode <= 4 && (
-          <Card onDisconnect={() => setMode(0)} addToast={addToast} />
+          <Card addToast={addToast} checkoutItems={checkoutItems} />
         )}
         {mode !== 0 && (
           <div className="mt-3 flex flex-row-reverse space-x-4 space-x-reverse justify-center">
@@ -414,8 +421,10 @@ const Cash = ({ amount, handleSubmit, addToast }) => {
   );
 };
 
-const Card = ({ onDisconnect, addToast }) => {
+const Card = ({ addToast, checkoutItems }) => {
   const [terminal, setTerminal] = useState(null);
+  const [connected, setConnected] = useState(false);
+  const [clientSecret, setClientSecret] = useState(null);
 
   useEffect(() => {
     loadStripeTerminal().then((StripeTerminal) => {
@@ -429,12 +438,25 @@ const Card = ({ onDisconnect, addToast }) => {
             appearance: "error",
             autoDismiss: true,
           });
-          onDisconnect();
+          setConnected(false);
         },
       });
       setTerminal(initTerminal);
     });
-  }, [addToast, onDisconnect]);
+  }, [addToast]);
+
+  useEffect(() => {
+    checkoutItems.length > 0 &&
+      posApi
+        .getPaymentIntent(checkoutItems)
+        .then((response) => setClientSecret(response.data))
+        .catch((err) => {
+          addToast(`Error: ${err.response.data.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          });
+        });
+  }, [checkoutItems, addToast]);
 
   const setSimulated = async () => {
     const config = { simulated: true };
@@ -463,6 +485,35 @@ const Card = ({ onDisconnect, addToast }) => {
         appearance: "success",
         autoDismiss: true,
       });
+      setConnected(true);
+    }
+  };
+
+  const simulatedCheckout = async () => {
+    if (terminal && clientSecret) {
+      terminal.setSimulatorConfiguration({
+        testCardNumber: "4242424242424242",
+      });
+      const { error } = await terminal.collectPaymentMethod(clientSecret);
+      if (error) {
+        addToast(`Error: ${error}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      } else {
+        addToast(
+          `Client secret is ${clientSecret}. I'm gona go sleep for now`,
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
+        );
+      }
+    } else {
+      addToast(`Error: either reader or client secret is not connected.`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
     }
   };
 
@@ -470,14 +521,31 @@ const Card = ({ onDisconnect, addToast }) => {
     <div className="rounded-lg bg-white overflow-hidden divide-y divide-gray-200 sm:divide-y-0 flex justify-center">
       <div className="grow max-w-md sm:grid sm:grid-cols-1 pl-3">
         <h3>Card payment thing here</h3>
-        <button
-          type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          onClick={setSimulated}
-        >
-          <DeviceTabletIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-          Connect to Simulated Reader
-        </button>
+        {connected ? (
+          <button
+            type="button"
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={simulatedCheckout}
+          >
+            <DeviceTabletIcon
+              className="-ml-1 mr-2 h-5 w-5"
+              aria-hidden="true"
+            />
+            Checkout
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={setSimulated}
+          >
+            <DeviceTabletIcon
+              className="-ml-1 mr-2 h-5 w-5"
+              aria-hidden="true"
+            />
+            Connect to Simulated Reader
+          </button>
+        )}
       </div>
     </div>
   );

@@ -339,5 +339,8 @@ export const posApi = {
     return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/connectionToken`
     )
-  }
+  },
+  getPaymentIntent(lineItems) {
+    return axiosPrivate.post(`${REST_ENDPOINT}online/pay`, lineItems);
+  },
 };

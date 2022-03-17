@@ -381,8 +381,8 @@ public class ProcurementServiceImpl implements ProcurementService {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
         if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING
-                || procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
-            throw new IllegalPOModificationException("Procurement Order is not received.");
+            && procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
+            throw new IllegalPOModificationException("Procurement Order has not been received.");
         }
         procurementOrder
                 .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(), ProcurementOrderStatus.COMPLETED));

@@ -269,8 +269,7 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public StockTransferOrder deliverStockTransferOrder(Long id)
-            throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder deliverStockTransferOrder(Long id) throws StockTransferException {
 
         StockTransferOrder stOrder = getStockTransferOrder(id);
 
@@ -284,18 +283,16 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public StockTransferOrder receiveStockTransferOrder(Long id, Long siteId) throws StockTransferException {
-        StockTransferOrder stOrder = getStockTransferOrder(id);
-        Site actionBy = em.find(Site.class, siteId);
+    public StockTransferOrder deliverMultipleStockTransferOrder(Long id) throws StockTransferException {
 
-        if (actionBy == null || !actionBy.equals(stOrder.getToSite())) {
-            throw new StockTransferException("Site is not supposed to receive this order.");
-        } else if (stOrder.getLastStatus() != StockTransferStatus.DELIVERING) {
-            throw new StockTransferException("Stock Transfer Order cannot be received.");
+        StockTransferOrder stOrder = getStockTransferOrder(id);
+
+        if (stOrder.getLastStatus() != StockTransferStatus.READY_FOR_DELIVERY) {
+            throw new StockTransferException("Stock Transfer Order is ready for delivery.");
         }
 
         stOrder.addStatusHistory(
-                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.DELIVERED));
+                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.DELIVERING_MULTIPLE));
         return em.merge(stOrder);
     }
 
@@ -304,7 +301,8 @@ public class StockTransferServiceImpl implements StockTransferService {
             throws StockTransferException, ProductException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
 
-        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERED) {
+        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERING_MULTIPLE
+                && stOrder.getLastStatus() != StockTransferStatus.DELIVERING) {
             throw new StockTransferException("Order cannot be verified yet.");
         }
 
@@ -341,7 +339,8 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         StockTransferOrder stOrder = getStockTransferOrder(orderId);
 
-        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERED) {
+        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERING
+                && stOrder.getLastStatus() != StockTransferStatus.DELIVERING_MULTIPLE) {
             throw new StockTransferException("Stock Transfer Order is not due to be confirmed.");
         }
 

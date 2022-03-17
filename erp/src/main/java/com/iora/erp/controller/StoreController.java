@@ -216,10 +216,10 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransfer/receive/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> receiveStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+    @PutMapping(path = "/stockTransfer/deliverMultiple/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverMultipleStockTransferOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity.ok(stockTransferService.receiveStockTransferOrder(orderId, siteId));
+            return ResponseEntity.ok(stockTransferService.deliverMultipleStockTransferOrder(orderId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -347,7 +347,8 @@ public class StoreController {
     }
 
     @PostMapping(path = "/customerOrder/create", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createOnlineOrder(@RequestBody CustomerOrder customerOrder, @RequestParam String clientSecret) {
+    public ResponseEntity<Object> createOnlineOrder(@RequestBody CustomerOrder customerOrder,
+            @RequestParam String clientSecret) {
         try {
             return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder, clientSecret));
         } catch (Exception ex) {

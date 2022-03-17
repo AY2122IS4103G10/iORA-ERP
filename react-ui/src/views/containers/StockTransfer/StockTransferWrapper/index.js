@@ -122,13 +122,15 @@ export const StockTransferHeader = ({
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Stock Transfer Order #${id}`}</h1>
           <div className="mt-3 flex md:mt-0 md:absolute md:top-3 md:right-0">
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={openInvoiceModal}
-            >
-              <span>View Invoice</span>
-            </button>
+            {status !== "PENDING" && (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                onClick={openInvoiceModal}
+              >
+                <span>View Invoice</span>
+              </button>
+            )}
             <button
               type="button"
               className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -141,7 +143,7 @@ export const StockTransferHeader = ({
               <span>Print</span>
             </button>
             {status === "PENDING" && userSiteId === orderMadeBy ? (
-              <Link to={`/sm/stocktransfer/edit/${order.id}`}>
+              <Link to={`/${subsys}/stocktransfer/edit/${order.id}`}>
                 <button
                   type="button"
                   className="ml-3 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none"
@@ -396,7 +398,9 @@ const InvoiceSummary = ({ data, status }) => {
       },
       {
         Header: `${status === "READY_FOR_SHIPPING" ? "Ful" : "Req"}`,
-        accessor: `${status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"}`,
+        accessor: `${
+          status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"
+        }`,
       },
     ];
   }, [status]);
@@ -428,7 +432,6 @@ export const StockTransferWrapper = ({ subsys }) => {
   const [openInvoice, setOpenInvoice] = useState(false);
   let userSiteId = useSelector(selectUserSite);
   var order = useSelector(selectStockTransferOrder);
-  // const orderStatus = order?.statusHistory[order?.statusHistory.length - 1].status
   const stOrderStatus = useSelector((state) => state.stocktransfer.status);
 
   useEffect(() => {
@@ -485,6 +488,7 @@ export const StockTransferWrapper = ({ subsys }) => {
           autoDismiss: true,
         });
         closeDeleteModal();
+        openInvoiceModal();
         dispatch(getStockTransfer(id));
       })
       .catch((error) => {
@@ -617,7 +621,7 @@ export const StockTransferWrapper = ({ subsys }) => {
       href: `/${subsys}/stocktransfer/${id}/pick-pack`,
       current: false,
     },
-    { name: "Delivery", href: "#", current: false },
+    { name: "Delivery", href:  `/${subsys}/stocktransfer/${id}/delivery`, current: false },
   ];
 
   return stOrderStatus === "loading" ? (
@@ -648,8 +652,9 @@ export const StockTransferWrapper = ({ subsys }) => {
               lineItems,
               setLineItems,
               userSiteId,
-              openInvoice,
+              openInvoiceModal,
               stOrderStatus,
+              addToast,
             }}
           />
         </div>
@@ -689,16 +694,15 @@ export const StockTransferWrapper = ({ subsys }) => {
             } Invoice`}
             ref={componentRef}
             orderId={order.id}
-            orderStatus={
-              order.statusHistory[order.statusHistory.length - 1].status
-            }
+            orderStatus={order.statusHistory[order.statusHistory.length - 1]}
             company={order.statusHistory[0].actionBy.company}
             createdBy={order.statusHistory[0].actionBy}
             fromSite={order.fromSite}
             toSite={order.toSite}
             qrValue={qrValue}
             qrHelper={
-              order.statusHistory[order.statusHistory.length - 1].status !== "READY_FOR_SHIPPING"
+              order.statusHistory[order.statusHistory.length - 1].status !==
+              "READY_FOR_SHIPPING"
                 ? "Scan to start picking."
                 : "Scan to start delivery."
             }
@@ -728,16 +732,15 @@ export const StockTransferWrapper = ({ subsys }) => {
                 : ""
             } Invoice`}
             orderId={order.id}
-            orderStatus={
-              order.statusHistory[order.statusHistory.length - 1].status
-            }
+            orderStatus={order.statusHistory[order.statusHistory.length - 1]}
             company={order.statusHistory[0].actionBy.company}
             createdBy={order.statusHistory[0].actionBy}
             fromSite={order.fromSite}
             toSite={order.toSite}
             qrValue={qrValue}
             qrHelper={
-              order.statusHistory[order.statusHistory.length - 1].status !== "READY_FOR_SHIPPING"
+              order.statusHistory[order.statusHistory.length - 1].status !==
+              "READY_FOR_SHIPPING"
                 ? "Scan to start picking."
                 : "Scan to start delivery."
             }

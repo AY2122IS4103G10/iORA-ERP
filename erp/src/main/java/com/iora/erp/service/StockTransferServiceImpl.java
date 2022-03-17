@@ -15,7 +15,6 @@ import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.product.Product;
-import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.stockTransfer.STOStatus;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
@@ -213,6 +212,12 @@ public class StockTransferServiceImpl implements StockTransferService {
         if (stOrder.getLastStatus() == StockTransferStatus.PICKING) {
             for (StockTransferOrderLI stoli : lineItems) {
                 if (stoli.getProduct().equals(product)) {
+                    if (stoli.getPickedQty() + qty > stoli.getRequestedQty()) {
+                        throw new StockTransferException(
+                                "The quantity of this product has exceeded the requested quantity by "
+                                        + (stoli.getPickedQty() + qty - stoli.getRequestedQty())
+                                        + " and cannot be picked.");
+                    }
                     stoli.setPickedQty(stoli.getPickedQty() + qty);
 
                     boolean picked = true;
@@ -237,7 +242,6 @@ public class StockTransferServiceImpl implements StockTransferService {
                     if (stoli.getPackedQty() + qty > stoli.getPickedQty()) {
                         throw new StockTransferException("You are packing items that are not meant for this order.");
                     } else {
-                        stoli.setPackedQty(stoli.getPackedQty() + qty);
                         try {
                             siteService.removeProducts(stOrder.getFromSite().getId(), product.getSku(), qty);
                         } catch (NoStockLevelException | IllegalTransferException e) {

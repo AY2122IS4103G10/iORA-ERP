@@ -181,6 +181,7 @@ public class ProcurementServiceImpl implements ProcurementService {
                 new POStatus(procurementOrder.getManufacturing(), new Date(), ProcurementOrderStatus.MANUFACTURED));
 
         return em.merge(procurementOrder);
+
         /*
          * Generate Newly manufactured items, deprecated
          * List<ProductItem> allProductItems = new ArrayList<>();
@@ -219,7 +220,6 @@ public class ProcurementServiceImpl implements ProcurementService {
          * }
          * }
          */
-
     }
 
     @Override
@@ -254,6 +254,12 @@ public class ProcurementServiceImpl implements ProcurementService {
         if (procurementOrder.getLastStatus() == ProcurementOrderStatus.PICKING) {
             for (ProcurementOrderLI poli : lineItems) {
                 if (poli.getProduct().equals(product)) {
+                    if (poli.getPickedQty() + qty > poli.getRequestedQty()) {
+                        throw new ProcurementOrderException(
+                                "The quantity of this product has exceeded the requested quantity by "
+                                        + (poli.getPickedQty() + qty - poli.getRequestedQty())
+                                        + " and cannot be picked.");
+                    }
                     poli.setPickedQty(poli.getPickedQty() + qty);
                     boolean picked = true;
                     for (ProcurementOrderLI poli2 : lineItems) {

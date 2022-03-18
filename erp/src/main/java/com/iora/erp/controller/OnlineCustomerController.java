@@ -84,19 +84,6 @@ public class OnlineCustomerController {
      * ---------------------------------------------------------
      */
 
-    @Autowired
-    StripeService stripeService;
-
-    @PostMapping(path = "/pay", consumes = "application/json",  produces = "application/json")
-    public ResponseEntity<Object> completePayment(@RequestBody List<CustomerOrderLI> lineItems) {
-        try {
-            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
     @GetMapping(path = "/order/{orderId}", produces = "application/json")
     public ResponseEntity<Object> getOnlineOrder(@PathVariable Long orderId) {
         try {
@@ -111,15 +98,31 @@ public class OnlineCustomerController {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
-    @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createOnlineOrder(@RequestBody OnlineOrder onlineOrder, @RequestParam String clientSecret) {
+    @Autowired
+    StripeService stripeService;
+
+    @PostMapping(path = "/pay", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems) {
         try {
-            return ResponseEntity.ok(customerOrderService.createCustomerOrder(onlineOrder, clientSecret));
+            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createOnlineOrder(@RequestBody OnlineOrder onlineOrder,
+            @RequestParam String clientSecret) {
+        try {
+            return ResponseEntity.ok(
+                    customerOrderService.createCustomerOrder(onlineOrder, (clientSecret == "") ? null : clientSecret));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
+    // Haven't get into making it work
     @PutMapping(path = "/cancel/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> cancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
@@ -157,6 +160,15 @@ public class OnlineCustomerController {
     public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity.ok(customerOrderService.deliverOnlineOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/deliverMultiple/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverMuiltipleOnlineOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(customerOrderService.deliverMultipleOnlineOrder(orderId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

@@ -150,14 +150,15 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException {
+    public CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret)
+            throws StripeException, InsufficientPaymentException, CustomerException {
         if (clientSecret != null) {
             stripeService.capturePayment(clientSecret);
         }
-        
+
         em.persist(customerOrder);
         return customerOrder;
-        //return finaliseCustomerOrder(customerOrder); to fix this method
+        // return finaliseCustomerOrder(customerOrder); to fix this method
     }
 
     @Override
@@ -171,7 +172,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder) throws InsufficientPaymentException, CustomerException {
+    public CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder)
+            throws InsufficientPaymentException, CustomerException {
         List<Payment> payments = customerOrder.getPayments();
         if (payments.stream().mapToDouble(x -> x.getAmount()).sum() < customerOrder.getTotalAmount()) {
             throw new InsufficientPaymentException("Insufficient Payment");
@@ -687,6 +689,23 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         return em.merge(onlineOrder);
     }
 
+    @Override
+    public OnlineOrder deliverMultipleOnlineOrder(Long orderId) throws CustomerOrderException {
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
+
+        if (onlineOrder.getLastStatus() == OnlineOrderStatus.READY_FOR_DELIVERY) {
+            onlineOrder.addStatusHistory(
+                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.DELIVERING_MULTIPLE));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.DELIVERING_MULTIPLE) {
+            onlineOrder.addStatusHistory(
+                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.DELIVERED));
+        } else {
+            throw new CustomerOrderException("Order is not up for delivery.");
+        }
+
+        return em.merge(onlineOrder);
+    }
+
     // Only for self-pickup order
     @Override
     public OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
@@ -695,7 +714,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         if (actionBy == null || !actionBy.equals(onlineOrder.getPickupSite())) {
             throw new CustomerOrderException("Site is not supposed to be receiving this order.");
-        } else if (onlineOrder.getLastStatus() != OnlineOrderStatus.DELIVERING) {
+        } else if (onlineOrder.getLastStatus() != OnlineOrderStatus.DELIVERING
+                && onlineOrder.getLastStatus() != OnlineOrderStatus.DELIVERING_MULTIPLE) {
             throw new CustomerOrderException("Order is not ready for delivery.");
         }
 

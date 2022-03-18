@@ -357,7 +357,7 @@ public class StoreController {
     }
 
     @PostMapping(path = "/customerOrder/pay", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> completePayment(@RequestBody List<CustomerOrderLI> lineItems) {
+    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems) {
         try {
             return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems));
         } catch (Exception ex) {

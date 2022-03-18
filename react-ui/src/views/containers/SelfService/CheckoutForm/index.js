@@ -17,6 +17,7 @@ export default function CheckoutForm({
   const elements = useElements();
 
   const [message, setMessage] = useState(null);
+  const [paymentIntentId, setPaymentIntentId] = useState("");
 
   useEffect(() => {
     if (!stripe) {
@@ -31,12 +32,13 @@ export default function CheckoutForm({
       switch (paymentIntent.status) {
         case "succeeded":
           setMessage("Payment succeeded!");
+          setPaymentIntentId(paymentIntent.id);
           break;
         case "processing":
           setMessage("Your payment is processing.");
           break;
         case "requires_payment_method":
-          setMessage("Your payment was not successful, please try again.");
+          setMessage("");
           break;
         default:
           setMessage("Something went wrong.");
@@ -47,7 +49,7 @@ export default function CheckoutForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!stripe || !elements) {
+    if (!stripe || !elements || !paymentIntentId) {
       return;
     }
 
@@ -62,7 +64,7 @@ export default function CheckoutForm({
           ccTransactionId: clientSecret,
         },
       ],
-    });
+    }, paymentIntentId);
 
     const { error } = await stripe.confirmPayment({
       elements,

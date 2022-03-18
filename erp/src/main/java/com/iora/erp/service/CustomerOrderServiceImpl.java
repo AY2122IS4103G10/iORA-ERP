@@ -152,7 +152,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret)
             throws StripeException, InsufficientPaymentException, CustomerException {
-        if (clientSecret != null) {
+        if (clientSecret != null && clientSecret != "") {
             stripeService.capturePayment(clientSecret);
         }
 

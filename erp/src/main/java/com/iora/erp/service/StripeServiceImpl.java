@@ -16,6 +16,7 @@ import com.stripe.param.PaymentIntentCancelParams;
 import com.stripe.param.PaymentIntentCaptureParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.RefundCreateParams;
+import com.stripe.param.PaymentIntentCreateParams.CaptureMethod;
 import com.stripe.param.terminal.ConnectionTokenCreateParams;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +39,9 @@ public class StripeServiceImpl implements StripeService {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(calculateOrderAmount(lineItems))
                 .setCurrency("sgd")
+                .addPaymentMethodType("card_present")
+                .addPaymentMethodType("card")
+                .setCaptureMethod(CaptureMethod.MANUAL)
                 .build();
 
         // Create a PaymentIntent with the order amount and currency

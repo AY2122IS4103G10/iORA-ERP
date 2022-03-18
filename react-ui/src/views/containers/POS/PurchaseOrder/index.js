@@ -250,11 +250,7 @@ export const PosPurchaseOrder = () => {
       exchangedLIs: [],
       site: {
         id: siteId,
-      },
-      customerId:
-        localStorage.getItem("customer") === null
-          ? JSON.parse(localStorage.getItem("customer"))?.id
-          : null,
+      }
     });
   };
   const closeModal = () => setModalState(false);

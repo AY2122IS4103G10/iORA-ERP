@@ -75,12 +75,12 @@ export const CheckoutForm = ({
   const closeModalComplex = () => {
     closeModal();
     setShowChoice(false);
+    setMode(0);
     setPhone("");
     setCustomerName("");
-    setCustomerId(null);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (paymentIntentId) => {
     try {
       const response = await orderApi.createOrder({
         ...order,
@@ -93,7 +93,7 @@ export const CheckoutForm = ({
             ccTransactionId: null,
           },
         ],
-      });
+      }, paymentIntentId);
       addToast(`Success: Order with ID ${response.data.id} created`, {
         appearance: "success",
         autoDismiss: true,
@@ -228,12 +228,16 @@ export const CheckoutForm = ({
         {mode === 1 && (
           <Cash
             amount={amount}
-            handleSubmit={handleSubmit}
+            handleSubmit={() => handleSubmit("")}
             addToast={addToast}
           />
         )}
         {mode >= 2 && mode <= 4 && (
-          <Card addToast={addToast} checkoutItems={checkoutItems} />
+          <Card
+            addToast={addToast}
+            checkoutItems={checkoutItems}
+            handleSubmit={handleSubmit}
+          />
         )}
         {mode !== 0 && (
           <div className="mt-3 flex flex-row-reverse space-x-4 space-x-reverse justify-center">
@@ -421,7 +425,7 @@ const Cash = ({ amount, handleSubmit, addToast }) => {
   );
 };
 
-const Card = ({ addToast, checkoutItems }) => {
+const Card = ({ addToast, checkoutItems, handleSubmit }) => {
   const [terminal, setTerminal] = useState(null);
   const [connected, setConnected] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
@@ -490,27 +494,37 @@ const Card = ({ addToast, checkoutItems }) => {
   };
 
   const simulatedCheckout = async () => {
-    if (terminal && clientSecret) {
+    try {
+      if (!terminal || !clientSecret) {
+        throw new Error("Either reader or client secret is not connected.");
+      }
       terminal.setSimulatorConfiguration({
         testCardNumber: "4242424242424242",
+        paymentMethodType: "card",
       });
-      const { error } = await terminal.collectPaymentMethod(clientSecret);
-      if (error) {
-        addToast(`Error: ${error}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      } else {
-        addToast(
-          `Client secret is ${clientSecret}. I'm gona go sleep for now`,
-          {
-            appearance: "success",
-            autoDismiss: true,
-          }
-        );
+
+      const result = await terminal.collectPaymentMethod(clientSecret);
+      if (result.error) {
+        throw new Error(result.error.message);
       }
-    } else {
-      addToast(`Error: either reader or client secret is not connected.`, {
+
+      addToast(`Success: Payment method retrieved`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      const result2 = await terminal.processPayment(result?.paymentIntent);
+      if (result2.error) {
+        throw new Error(result2.error.message);
+      }
+
+      addToast(`Success: Payment processed`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      handleSubmit(result2.paymentIntent.id);
+    } catch (err) {
+      console.log(err);
+      addToast(`Error: ${err}`, {
         appearance: "error",
         autoDismiss: true,
       });
@@ -520,7 +534,6 @@ const Card = ({ addToast, checkoutItems }) => {
   return (
     <div className="rounded-lg bg-white overflow-hidden divide-y divide-gray-200 sm:divide-y-0 flex justify-center">
       <div className="grow max-w-md sm:grid sm:grid-cols-1 pl-3">
-        <h3>Card payment thing here</h3>
         {connected ? (
           <button
             type="button"

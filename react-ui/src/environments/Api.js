@@ -308,9 +308,9 @@ export const orderApi = {
       `${REST_ENDPOINT}store/customerOrder/view/${orderId}`
     );
   },
-  createOrder(order) {
+  createOrder(order, paymentIntentId) {
     return axiosPublic.post(
-      `${REST_ENDPOINT}store/customerOrder/create`,
+      `${REST_ENDPOINT}store/customerOrder/create?clientSecret=${paymentIntentId}`,
       order
     );
   },

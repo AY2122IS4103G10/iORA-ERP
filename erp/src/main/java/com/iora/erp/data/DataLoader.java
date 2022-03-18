@@ -701,7 +701,7 @@ public class DataLoader implements CommandLineRunner {
 		oo1.setPaid(true);
 		oo1.addPayment(payment2);
 		oo1.setSite(siteService.getSite(3L));
-		customerOrderService.createCustomerOrder(oo1, null);
+		customerOrderService.createOnlineOrder(oo1, null);
 	}
 
 }

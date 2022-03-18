@@ -567,6 +567,20 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
      */
 
     @Override
+    public OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret)
+            throws StripeException, InsufficientPaymentException, CustomerException {
+        if (clientSecret != null && clientSecret != "") {
+            stripeService.capturePayment(clientSecret);
+        }
+
+        onlineOrder.setSite(siteService.getSite(3L));
+        onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatus.PENDING));
+        em.persist(onlineOrder);
+        return onlineOrder;
+        // return finaliseCustomerOrder(onlineOrder); to fix this method
+    }
+
+    @Override
     public OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
         Site actionBy = em.find(Site.class, siteId);
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);

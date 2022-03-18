@@ -116,7 +116,7 @@ public class OnlineCustomerController {
             @RequestParam String clientSecret) {
         try {
             return ResponseEntity.ok(
-                    customerOrderService.createCustomerOrder(onlineOrder, (clientSecret == "") ? null : clientSecret));
+                    customerOrderService.createOnlineOrder(onlineOrder, (clientSecret == "") ? null : clientSecret));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

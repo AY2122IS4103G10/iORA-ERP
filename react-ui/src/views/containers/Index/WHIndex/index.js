@@ -35,7 +35,7 @@ const navigation = [
   },
   {
     name: "Online Orders",
-    href: "/wh/online-orders/search",
+    href: "/wh/orders/search",
     icon: ShoppingBagIcon,
     current: false,
   },

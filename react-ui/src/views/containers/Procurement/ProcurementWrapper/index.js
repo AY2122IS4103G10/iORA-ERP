@@ -277,8 +277,8 @@ export const ProcurementWrapper = ({ subsys }) => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const currSiteId = useSelector(selectUserSite);
   const [loading, setLoading] = useState(false);
+  const currSiteId = useSelector(selectUserSite);
 
   useEffect(() => {
     const fetchProcurementOrder = async () => {

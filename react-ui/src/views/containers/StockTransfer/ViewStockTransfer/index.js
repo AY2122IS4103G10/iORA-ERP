@@ -84,19 +84,17 @@ export const StockTransferBody = ({
       {history && <ActivitySection history={history} />}
       <div className="lg:col-start-1 lg:col-span-3">
         {lineItems !== undefined &&
-        lineItems !== undefined &&
-        Object.keys(lineItems).length !== 0 ? (
-          <LineItems
-            lineItems={lineItems}
-            status={status}
-            userSiteId={userSiteId}
-            fromSiteId={order.fromSite.id}
-            toSiteId={order.toSite.id}
-            editable={false}
-          />
-        ) : (
-          <p>loading</p>
-        )}
+          lineItems !== undefined &&
+          Object.keys(lineItems).length !== 0 && (
+            <LineItems
+              lineItems={lineItems}
+              status={status}
+              userSiteId={userSiteId}
+              fromSiteId={order.fromSite.id}
+              toSiteId={order.toSite.id}
+              editable={false}
+            />
+          )}
       </div>
     </div>
   );
@@ -138,8 +136,8 @@ export const ViewStockTransfer = () => {
             content:
               status === "PENDING"
                 ? `${index === 0 ? "Created" : "Updated"} by`
-                : status === "READY_FOR_SHIPPING"
-                ? "Ready for shipping by"
+                : status === "READY_FOR_DELIVERY"
+                ? "Ready for delivery by"
                 : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
             target: data[index].name,
             date: moment(timeStamp).format("DD/MM, H:mm"),

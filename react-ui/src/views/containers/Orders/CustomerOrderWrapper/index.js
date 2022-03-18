@@ -7,7 +7,7 @@ import {
 import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -15,14 +15,17 @@ import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
 import { api, orderApi, procurementApi } from "../../../../environments/Api";
 import { deleteExistingProcurement } from "../../../../stores/slices/procurementSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import Confirmation from "../../../components/Modals/Confirmation";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { Tabs } from "../../../components/Tabs";
+import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 
 const Header = ({
   subsys,
+  disableTabs,
   tabs,
   navigate,
   orderId,
@@ -153,9 +156,11 @@ const Header = ({
               ))}
             </select>
           </div>
-          <div className="hidden sm:block">
-            <Tabs tabs={tabs} />
-          </div>
+          {!disableTabs && (
+            <div className="hidden sm:block">
+              <Tabs tabs={tabs} />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -232,22 +237,25 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const currSiteId = useSelector(selectUserSite);
 
   useEffect(() => {
     const fetchOrder = async () => {
       const { data } = await orderApi.get(orderId);
-      const { lineItems, statusHistory } = data;
-      setLineItems(
-        lineItems.map((item) => ({
-          ...item,
-          product: {
-            sku: item.product.sku,
-            productFields: item.product.productFields,
-          },
-        }))
-      );
-      console.log(data)
-      setStatus(statusHistory[statusHistory.length - 1]);
+      const { lineItems, status, statusHistory } = data;
+      fetchAllModelsBySkus(lineItems).then((data) => {
+        setLineItems(
+          lineItems.map((item, index) => ({
+            ...item,
+            product: {
+              ...item.product,
+              modelCode: data[index].modelCode,
+              name: data[index].name,
+            },
+          }))
+        );
+      });
+      setStatus(status);
       setStatusHistory(statusHistory);
       setOrder(data);
       setQrValue(`/${subsys}/orders/${orderId}/pick-pack`);
@@ -389,14 +397,11 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           <Header
             subsys={subsys}
             navigate={navigate}
+            disableTabs={order.delivery === null}
             tabs={tabs}
             orderId={orderId}
             status={order.status}
             openModal={openModal}
-            // onAcceptClicked={onAcceptClicked}
-            // onCancelOrderClicked={onCancelOrderClicked}
-            // onShippedClicked={onShippedClicked}
-            // onFulfilClicked={onFulfilClicked}
             handlePrint={handlePrint}
             openInvoice={openInvoice}
             setAction={setAction}
@@ -411,6 +416,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
               lineItems,
               setLineItems,
               statusHistory,
+              currSiteId,
             }}
           />
         </div>

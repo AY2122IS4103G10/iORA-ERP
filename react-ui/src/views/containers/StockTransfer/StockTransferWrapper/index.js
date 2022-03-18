@@ -10,7 +10,7 @@ import {
   cancelStockTransfer,
   rejectStockTransfer,
   confirmStockTransfer,
-  readyStockTransfer,
+  // readyStockTransfer,
   completeStockTransfer,
   deliverStockTransfer,
 } from "../../../../stores/slices/stocktransferSlice";
@@ -34,6 +34,14 @@ import { useReactToPrint } from "react-to-print";
 import { ProcurementInvoice } from "../../Procurement/ProcurementInvoice";
 import { BasicTable } from "../../../components/Tables/BasicTable";
 import { TailSpin } from "react-loader-spinner";
+
+const deliveryStatuses = [
+  "READY_FOR_DELIVERY",
+  "DELIVERING",
+  "DELIVERING_MULTIPLE",
+  "DELIVERED",
+  "COMPLETED",
+];
 
 export const VerifyItemsModal = ({
   open,
@@ -194,45 +202,6 @@ export const StockTransferHeader = ({
                   <span>Reject</span>
                 </button>
               </>
-            ) : (
-              ""
-            )}
-
-            {userSiteId === order.fromSite.id && status === "CONFIRMED" ? (
-              <button
-                type="button"
-                className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                onClick={openVerifyItemsModal}
-              >
-                {/* Enter qty sent */}
-                <span>Ready for Delivery</span>
-              </button>
-            ) : (
-              ""
-            )}
-
-            {userSiteId === order.fromSite.id && status === "READY" ? (
-              <button
-                type="button"
-                className="inline-flex items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                onClick={handleDeliveringOrder}
-              >
-                {/* Enter qty sent */}
-                <span>Delivering</span>
-              </button>
-            ) : (
-              ""
-            )}
-
-            {userSiteId === order.toSite.id && status === "DELIVERING" ? (
-              <button
-                type="button"
-                className="inline-flex items-center px-4 py-2.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none"
-                onClick={openVerifyItemsModal}
-              >
-                {/* Enter actual qty received */}
-                <span>Complete Order</span>
-              </button>
             ) : (
               ""
             )}
@@ -429,6 +398,7 @@ export const StockTransferWrapper = ({ subsys }) => {
   const [openReject, setOpenReject] = useState(false);
   const [openVerifyItems, setOpenVerifyItems] = useState(false);
   const [qrValue, setQrValue] = useState("");
+  const [qrDelivery, setQrDelivery] = useState("");
   const [openInvoice, setOpenInvoice] = useState(false);
   let userSiteId = useSelector(selectUserSite);
   var order = useSelector(selectStockTransferOrder);
@@ -443,6 +413,9 @@ export const StockTransferWrapper = ({ subsys }) => {
     setLineItems(order.lineItems);
     setQrValue(
       `http://localhost:3000/${subsys}/stocktransfer/${order.id}/pick-pack`
+    );
+    setQrDelivery(
+      `http://localhost:3000/${subsys}/stocktransfer/${order.id}/delivery`
     );
   }, [subsys, order]);
 
@@ -499,31 +472,31 @@ export const StockTransferWrapper = ({ subsys }) => {
       });
   };
 
-  const handleReadyOrder = (e) => {
-    e.preventDefault();
-    let temp = { ...order };
-    temp.lineItems = lineItems;
-    order = temp;
-    dispatch(readyStockTransfer({ order: order, siteId: userSiteId }))
-      .unwrap()
-      .then(() => {
-        addToast(`Stock Transfer Order Ready for Delivery`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        // navigate(`/${subsys.subsys}/stocktransfer/${id}`)
-        // setReload(reload + 1);
-        dispatch(getStockTransfer(id));
-      })
-      .catch((err) => {
-        addToast(`${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      });
+  // const handleReadyOrder = (e) => {
+  //   e.preventDefault();
+  //   let temp = { ...order };
+  //   temp.lineItems = lineItems;
+  //   order = temp;
+  //   dispatch(readyStockTransfer({ order: order, siteId: userSiteId }))
+  //     .unwrap()
+  //     .then(() => {
+  //       addToast(`Stock Transfer Order Ready for Delivery`, {
+  //         appearance: "success",
+  //         autoDismiss: true,
+  //       });
+  //       // navigate(`/${subsys.subsys}/stocktransfer/${id}`)
+  //       // setReload(reload + 1);
+  //       dispatch(getStockTransfer(id));
+  //     })
+  //     .catch((err) => {
+  //       addToast(`${err.message}`, {
+  //         appearance: "error",
+  //         autoDismiss: true,
+  //       });
+  //     });
 
-    closeVerifyItemsModal();
-  };
+  //   closeVerifyItemsModal();
+  // };
 
   const handleDeliveringOrder = (e) => {
     e.preventDefault();
@@ -621,7 +594,11 @@ export const StockTransferWrapper = ({ subsys }) => {
       href: `/${subsys}/stocktransfer/${id}/pick-pack`,
       current: false,
     },
-    { name: "Delivery", href:  `/${subsys}/stocktransfer/${id}/delivery`, current: false },
+    {
+      name: "Delivery",
+      href: `/${subsys}/stocktransfer/${id}/delivery`,
+      current: false,
+    },
   ];
 
   return stOrderStatus === "loading" ? (
@@ -629,7 +606,7 @@ export const StockTransferWrapper = ({ subsys }) => {
       <TailSpin color="#00BFFF" height={20} width={20} />
     </div>
   ) : (
-    Object.keys(order).length !== 0 && Boolean(lineItems) && (
+    Boolean(order) && Object.keys(order).length !== 0 && Boolean(lineItems) && (
       <>
         <div className="py-8 xl:py-10">
           <StockTransferHeader
@@ -679,7 +656,7 @@ export const StockTransferWrapper = ({ subsys }) => {
           toSiteId={order.toSite.id}
           open={openVerifyItems}
           closeModal={closeVerifyItemsModal}
-          handleReadyOrder={handleReadyOrder}
+          // handleReadyOrder={handleReadyOrder}
           handleCompleteOrder={handleCompleteOrder}
           lineItems={lineItems}
           setLineItems={setLineItems}
@@ -687,8 +664,11 @@ export const StockTransferWrapper = ({ subsys }) => {
         <div className="hidden">
           <ProcurementInvoice
             title={`${
-              order.statusHistory[order.statusHistory.length - 1].status ===
-              "READY_FOR_SHIPPING"
+              deliveryStatuses.some(
+                (s) =>
+                  s ===
+                  order.statusHistory[order.statusHistory.length - 1].status
+              )
                 ? "Delivery"
                 : ""
             } Invoice`}
@@ -699,12 +679,23 @@ export const StockTransferWrapper = ({ subsys }) => {
             createdBy={order.statusHistory[0].actionBy}
             fromSite={order.fromSite}
             toSite={order.toSite}
-            qrValue={qrValue}
+            qrValue={
+              deliveryStatuses.some(
+                (s) =>
+                  s ===
+                  order.statusHistory[order.statusHistory.length - 1].status
+              )
+                ? qrDelivery
+                : qrValue
+            }
             qrHelper={
-              order.statusHistory[order.statusHistory.length - 1].status !==
-              "READY_FOR_SHIPPING"
-                ? "Scan to start picking."
-                : "Scan to start delivery."
+              deliveryStatuses.some(
+                (s) =>
+                  s ===
+                  order.statusHistory[order.statusHistory.length - 1].status
+              )
+                ? "Scan to start delivery."
+                : "Scan to start picking."
             }
           >
             <InvoiceSummary
@@ -726,8 +717,11 @@ export const StockTransferWrapper = ({ subsys }) => {
         >
           <ProcurementInvoice
             title={`${
-              order.statusHistory[order.statusHistory.length - 1].status ===
-              "READY_FOR_SHIPPING"
+              deliveryStatuses.some(
+                (s) =>
+                  s ===
+                  order.statusHistory[order.statusHistory.length - 1].status
+              )
                 ? "Delivery"
                 : ""
             } Invoice`}
@@ -737,12 +731,23 @@ export const StockTransferWrapper = ({ subsys }) => {
             createdBy={order.statusHistory[0].actionBy}
             fromSite={order.fromSite}
             toSite={order.toSite}
-            qrValue={qrValue}
+            qrValue={
+              deliveryStatuses.some(
+                (s) =>
+                  s ===
+                  order.statusHistory[order.statusHistory.length - 1].status
+              )
+                ? qrDelivery
+                : qrValue
+            }
             qrHelper={
-              order.statusHistory[order.statusHistory.length - 1].status !==
-              "READY_FOR_SHIPPING"
-                ? "Scan to start picking."
-                : "Scan to start delivery."
+              deliveryStatuses.some(
+                (s) =>
+                  s ===
+                  order.statusHistory[order.statusHistory.length - 1].status
+              )
+                ? "Scan to start delivery."
+                : "Scan to start picking."
             }
           >
             <InvoiceSummary

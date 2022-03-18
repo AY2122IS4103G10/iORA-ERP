@@ -184,10 +184,14 @@ export const stockTransferApi = {
       order
     );
   },
-  deliverOrder(order, siteId) {
+  deliverOrder(orderId) {
     return axiosPrivate.put(
-      `${REST_ENDPOINT}store/stockTransfer/deliver/${siteId}`,
-      order
+      `${REST_ENDPOINT}store/stockTransfer/deliver/${orderId}`
+    );
+  },
+  deliverMultiple(orderId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}store/stockTransfer/deliverMultiple/${orderId}`
     );
   },
   completeOrder(order, siteId) {
@@ -282,7 +286,7 @@ export const productApi = {
 
 export const onlineOrderApi = {
   getAll() {
-    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=`);
+    return axiosPrivate.get(`${REST_ENDPOINT}store/onlineOrder?orderId=`);
   },
   get(orderId) {
     return axiosPrivate.get(
@@ -296,6 +300,36 @@ export const onlineOrderApi = {
   },
   getPaymentIntent(lineItems) {
     return axiosPublic.post(`${REST_ENDPOINT}online/pay`, lineItems);
+  },
+  pickPack(orderId, siteId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/pickpack/${orderId}/${siteId}`
+    );
+  },
+  scanItem(orderId, barcode) {
+    return axiosPrivate.patch(
+      `${REST_ENDPOINT}online/scan/${orderId}?barcode=${barcode}`
+    );
+  },
+  deliverOrder(orderId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/deliver/${orderId}`
+    );
+  },
+  deliverMultiple(orderId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/deliverMultiple/${orderId}`
+    );
+  },
+  receive(orderId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/receive/${orderId}`
+    );
+  },
+  collect(orderId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/collect/${orderId}`
+    );
   },
 };
 
@@ -343,7 +377,7 @@ export const posApi = {
   connectToken() {
     return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/connectionToken`
-    )
+    );
   },
   getPaymentIntent(lineItems) {
     return axiosPrivate.post(`${REST_ENDPOINT}online/pay`, lineItems);

@@ -276,9 +276,6 @@ export const ProcurementPickPack = () => {
     setSearch(e.target.value);
   };
 
-  // const onSaveQtyClicked = () => {
-  // }
-
   return (
     <div className="space-y-6 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-12 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">

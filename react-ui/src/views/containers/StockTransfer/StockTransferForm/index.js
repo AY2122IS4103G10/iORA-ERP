@@ -51,6 +51,7 @@ function isObjectEmpty(obj) {
 }
 
 export const SelectSiteModal = ({
+  subsys,
   open,
   closeModal,
   data,
@@ -149,31 +150,35 @@ export const SelectSiteModal = ({
                   From Site
                 </label>
 
-                <div className="mt-3 flex rounded-md shadow-sm">
-                  <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
-                    <input
-                      name="from"
-                      id="from"
-                      ref={fromRef}
-                      type="text"
-                      value={isObjectEmpty(from) ? "" : from.name}
-                      className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
-                      placeholder="Select From Site"
-                      readOnly
-                      autoFocus
-                    ></input>
-                    <button
-                      type="button"
-                      className="-ml-px relative h-full inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100"
-                      onClick={() => {
-                        setFrom({});
-                        handleFocus(fromRef);
-                      }}
-                    >
-                      <XIcon className="h-5 w-5" />
-                    </button>
+                {subsys === "sm" ? (
+                  <div className="mt-3 flex rounded-md shadow-sm">
+                    <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
+                      <input
+                        name="from"
+                        id="from"
+                        ref={fromRef}
+                        type="text"
+                        value={isObjectEmpty(from) ? "" : from.name}
+                        className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                        placeholder="Select From Site"
+                        readOnly
+                        autoFocus
+                      ></input>
+                      <button
+                        type="button"
+                        className="-ml-px relative h-full inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100"
+                        onClick={() => {
+                          setFrom({});
+                          handleFocus(fromRef);
+                        }}
+                      >
+                        <XIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <h3 className="mt-3 flex">{from.name}</h3>
+                )}
 
                 {error ? (
                   <div className="flex mt-2">
@@ -787,6 +792,7 @@ export const StockTransferForm = ({ subsys }) => {
         </div>
 
         <SelectSiteModal
+          subsys={subsys}
           open={openSites}
           closeModal={closeSitesModal}
           from={from}

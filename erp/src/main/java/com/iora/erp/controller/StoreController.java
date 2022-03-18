@@ -229,10 +229,10 @@ public class StoreController {
     public ResponseEntity<Object> scanProductAtToSite(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
             if (!barcode.contains("/")) {
-                return ResponseEntity.ok(stockTransferService.scanProductAtFromSite(orderId, barcode, 1));
+                return ResponseEntity.ok(stockTransferService.scanProductAtToSite(orderId, barcode, 1));
             } else {
                 return ResponseEntity.ok(
-                        stockTransferService.scanProductAtFromSite(orderId, barcode.substring(0, barcode.indexOf("/")),
+                        stockTransferService.scanProductAtToSite(orderId, barcode.substring(0, barcode.indexOf("/")),
                                 Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
             }
         } catch (Exception ex) {

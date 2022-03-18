@@ -20,32 +20,22 @@ const OnlineOrderTable = ({ data, handleOnClick }) => {
       },
       {
         Header: "Status",
-        accessor: (row) =>
-          row.statusHistory[row.statusHistory.length - 1].status,
+        accessor: "status",
         Filter: SelectColumnFilter,
         filter: "includes",
       },
       {
-        Header: "HQ",
-        accessor: (row) => row.headquarters,
+        Header: "Customer No.",
+        accessor: "customerId",
       },
       {
-        Header: "Manufacturing",
-        accessor: (row) =>
-          Boolean(row.manufacturing) ? row.manufacturing : "-",
-      },
-      {
-        Header: "Warehouse",
-        accessor: (row) => row.warehouse,
+        Header: "Total Amount",
+        accessor: "totalAmount",
       },
       {
         Header: "Updated",
-        accessor: (row) =>
-          moment
-            .unix(
-              row.statusHistory[row.statusHistory.length - 1].timeStamp / 1000
-            )
-            .format("DD/MM/YY, HH:mm:ss"),
+        accessor: "dateTime",
+        Cell: (e) => moment.unix(e.value / 1000).format("DD/MM/YY, HH:mm:ss"),
       },
     ],
     []
@@ -61,13 +51,17 @@ export const OnlineOrderList = ({ subsys }) => {
   const currSiteId = parseInt(useSelector(selectUserSite));
 
   useEffect(() => {
-    onlineOrderApi.getAllBySite(currSiteId).then((response) => {
-      setData(response.data);
-    });
-  }, [subsys, currSiteId]);
+    const fetchOnlineOrdersOfSite = async () => {
+      // const { data } = await onlineOrderApi.getAllBySite(currSiteId);
+      const { data } = await onlineOrderApi.getAll();
+      console.log(data);
+      setData(data);
+    };
+    fetchOnlineOrdersOfSite();
+  }, [currSiteId]);
 
   const handleOnClick = (row) =>
-    navigate(`/${subsys}/procurements/${row.original.id}`);
+    navigate(`/${subsys}/orders/${row.original.id}`);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

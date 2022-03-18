@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
-import { useToasts } from "react-toast-notifications";
 import {
   pickPackStockTransfer,
   scanItemStockTransfer,
@@ -14,8 +13,14 @@ import {
 } from "../../Procurement/ProcurementPickPack";
 
 export const StockTransferPickPack = () => {
-  const { subsys, lineItems, setLineItems, userSiteId, openInvoiceModal, addToast } =
-    useOutletContext();
+  const {
+    subsys,
+    lineItems,
+    setLineItems,
+    userSiteId,
+    openInvoiceModal,
+    addToast,
+  } = useOutletContext();
   var { order } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -30,8 +35,10 @@ export const StockTransferPickPack = () => {
     else handleScan(search);
   };
 
-  const handlePickPack = () => {
-    dispatch(pickPackStockTransfer({ orderId: order.id, siteId: userSiteId }))
+  const handlePickPack = async () => {
+    await dispatch(
+      pickPackStockTransfer({ orderId: order.id, siteId: userSiteId })
+    )
       .unwrap()
       .then(() => {
         addToast(
@@ -60,8 +67,8 @@ export const StockTransferPickPack = () => {
       });
   };
 
-  const handleScan = (barcode) => {
-    dispatch(scanItemStockTransfer({ orderId: order.id, barcode }))
+  const handleScan = async (barcode) => {
+    await dispatch(scanItemStockTransfer({ orderId: order.id, barcode }))
       .unwrap()
       .then(() => {
         addToast(
@@ -88,9 +95,8 @@ export const StockTransferPickPack = () => {
       e.target.value.includes("-")
     ) {
       if (status === "ACCEPTED") {
-        handlePickPack();
-      }
-      handleScan(e.target.value);
+        handlePickPack().then(() => handleScan(e.target.value));
+      } else handleScan(e.target.value);
     }
     setSearch(e.target.value);
   };
@@ -133,7 +139,8 @@ export const StockTransferPickPack = () => {
                   </div>
                 )
               ) : (
-                order.fromSite.id === userSiteId && (
+                order.fromSite.id === userSiteId &&
+                subsys !== "lg" && (
                   <section aria-labelledby="scan-items">
                     <ScanItemsSection
                       search={search}

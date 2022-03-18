@@ -107,23 +107,28 @@ export const scanReceiveStockTransfer = createAsyncThunk(
     const response = await stockTransferApi.scanReceive(orderId, barcode);
     return response.data;
   }
-)
-
-export const readyStockTransfer = createAsyncThunk(
-  "stocktransfer/ready",
-  async (data) => {
-    const response = await stockTransferApi.readyOrder(data.order, data.siteId);
-    return response.data;
-  }
 );
+
+// export const readyStockTransfer = createAsyncThunk(
+//   "stocktransfer/ready",
+//   async (data) => {
+//     const response = await stockTransferApi.readyOrder(data.order, data.siteId);
+//     return response.data;
+//   }
+// );
 
 export const deliverStockTransfer = createAsyncThunk(
   "stocktransfer/deliver",
   async (data) => {
-    const response = await stockTransferApi.deliverOrder(
-      data.order,
-      data.siteId
-    );
+    const response = await stockTransferApi.deliverOrder(data);
+    return response.data;
+  }
+);
+
+export const deliverMultipleStockTransfer = createAsyncThunk(
+  "stocktransfer/deliverMultiple",
+  async (data) => {
+    const response = await stockTransferApi.deliverMultiple(data);
     return response.data;
   }
 );
@@ -249,22 +254,39 @@ const stocktransferSlice = createSlice({
     builder.addCase(scanReceiveStockTransfer.rejected, (state, action) => {
       state.status = "failed";
     });
-    builder.addCase(readyStockTransfer.pending, (state, action) => {
-      state.status = "loading";
-    });
-    builder.addCase(readyStockTransfer.fulfilled, (state, action) => {
-      state.status = "succeeded";
-    });
-    builder.addCase(readyStockTransfer.rejected, (state, action) => {
-      state.status = "failed";
-    });
+    // builder.addCase(readyStockTransfer.pending, (state, action) => {
+    //   state.status = "loading";
+    // });
+    // builder.addCase(readyStockTransfer.fulfilled, (state, action) => {
+    //   state.status = "succeeded";
+    // });
+    // builder.addCase(readyStockTransfer.rejected, (state, action) => {
+    //   state.status = "failed";
+    // });
     builder.addCase(deliverStockTransfer.pending, (state, action) => {
       state.status = "loading";
     });
     builder.addCase(deliverStockTransfer.fulfilled, (state, action) => {
+      const { statusHistory } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+      }
       state.status = "succeeded";
     });
     builder.addCase(deliverStockTransfer.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(deliverMultipleStockTransfer.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(deliverMultipleStockTransfer.fulfilled, (state, action) => {
+      const { statusHistory } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+      }
+      state.status = "succeeded";
+    });
+    builder.addCase(deliverMultipleStockTransfer.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(completeStockTransfer.pending, (state, action) => {

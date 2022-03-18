@@ -22,6 +22,23 @@ const ItemTable = ({ data }) => {
         accessor: "product.sku",
       },
       {
+        Header: "Name",
+        accessor: "product.name",
+      },
+      {
+        Header: "Color",
+        accessor: (row) =>
+          row.product.productFields.find(
+            (field) => field.fieldName === "COLOUR"
+          ).fieldValue,
+      },
+      {
+        Header: "Size",
+        accessor: (row) =>
+          row.product.productFields.find((field) => field.fieldName === "SIZE")
+            .fieldValue,
+      },
+      {
         Header: "Qty",
         accessor: "qty",
       },
@@ -42,7 +59,7 @@ const ItemTable = ({ data }) => {
   );
 };
 
-const OrderDetailsBody = ({ history, order }) => {
+const OrderDetailsBody = ({ history, order, lineItems }) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -124,7 +141,7 @@ const OrderDetailsBody = ({ history, order }) => {
       {Boolean(order.lineItems.length) && (
         <div className="lg:col-start-1 lg:col-span-3">
           <section aria-labelledby="departments">
-            <ItemTable data={order.lineItems} />
+            <ItemTable data={lineItems} />
           </section>
         </div>
       )}
@@ -143,7 +160,6 @@ export const CustomerOrderDetails = () => {
     statusHistory,
   } = useOutletContext();
   const [history, setHistory] = useState([]);
-  console.log(statusHistory)
   useEffect(() => {
     fetchAllActionBy(statusHistory).then((data) => {
       setHistory(
@@ -171,5 +187,5 @@ export const CustomerOrderDetails = () => {
       );
     });
   }, [statusHistory]);
-  return Boolean(order) && <OrderDetailsBody order={order} history={history} />;
+  return Boolean(order) && <OrderDetailsBody order={order} lineItems={lineItems} history={history} />;
 };

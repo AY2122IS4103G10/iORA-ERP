@@ -347,11 +347,21 @@ public class StoreController {
     }
 
     @PostMapping(path = "/customerOrder/create", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createOnlineOrder(@RequestBody CustomerOrder customerOrder,
+    public ResponseEntity<Object> createCustomerOrder(@RequestBody CustomerOrder customerOrder,
             @RequestParam String clientSecret) {
         try {
             return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder, clientSecret));
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/pay", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> completePayment(@RequestBody List<CustomerOrderLI> lineItems) {
+        try {
+            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems));
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

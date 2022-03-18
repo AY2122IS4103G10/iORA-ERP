@@ -80,10 +80,10 @@ export const ProcurementInvoiceBody = ({
                 <dd className="text-indigo-600 mt-2">{orderStatus.status}</dd>
               </dl>
 
-              <dl className="mt-4 text-sm font-medium">
+              {/* <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">Tracking number</dt>
                 <dd className="text-indigo-600 mt-2">51547878755545848512</dd>
-              </dl>
+              </dl> */}
               <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">For enquiries, call</dt>
                 <dd className="text-gray-700 mt-2">

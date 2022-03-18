@@ -7,30 +7,10 @@ import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { procurementApi } from "../../../../environments/Api";
 import { scanItem } from "../../../../stores/slices/procurementSlice";
-import {
-  EditableCell,
-  SimpleTable,
-} from "../../../components/Tables/SimpleTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
-export const PickPackList = ({ data, setData }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [skipPageReset, setSkipPageReset] = useState(false);
-
+export const PickPackList = ({ data }) => {
   const columns = useMemo(() => {
-    const updateMyData = (rowIndex, columnId, value) => {
-      setSkipPageReset(true);
-      setData((old) =>
-        old.map((row, index) => {
-          if (index === rowIndex) {
-            return {
-              ...old[rowIndex],
-              [columnId]: value,
-            };
-          }
-          return row;
-        })
-      );
-    };
     return [
       {
         Header: "SKU",
@@ -56,19 +36,6 @@ export const PickPackList = ({ data, setData }) => {
       {
         Header: "Picked",
         accessor: "pickedQty",
-        Cell: (e) => {
-          return isEditing ? (
-            <EditableCell
-              value={e.value}
-              row={e.row}
-              column={e.column}
-              updateMyData={updateMyData}
-              min="0"
-            />
-          ) : (
-            e.value
-          );
-        },
       },
       {
         Header: "Packed",
@@ -89,20 +56,8 @@ export const PickPackList = ({ data, setData }) => {
             : "PACKED";
         },
       },
-      // {
-      //   Header: "",
-      //   accessor: "options",
-      //   Cell: () => (
-      //     <button
-      //       className="text-indigo-600 hover:text-indigo-900"
-      //       onClick={() => setIsEditing(!isEditing)}
-      //     >
-      //       Edit
-      //     </button>
-      //   ),
-      // },
     ];
-  }, [isEditing, setData]);
+  }, []);
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -112,11 +67,7 @@ export const PickPackList = ({ data, setData }) => {
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable
-            columns={columns}
-            data={data}
-            skipPageReset={skipPageReset}
-          />
+          <SimpleTable columns={columns} data={data} />
         </div>
       )}
     </div>
@@ -167,11 +118,10 @@ export const ScanItemsSection = ({
 };
 
 export const ConfirmSection = ({
-  subsys,
-  procurementId,
   title,
   body,
   onConfirmClicked,
+  cancelPath,
 }) => {
   const navigate = useNavigate();
   return (
@@ -200,7 +150,7 @@ export const ConfirmSection = ({
         <button
           type="button"
           className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-          onClick={() => navigate(`/${subsys}/procurements/${procurementId}`)}
+          onClick={() => navigate(cancelPath)}
         >
           Cancel
         </button>
@@ -226,33 +176,24 @@ export const ProcurementPickPack = () => {
   const [search, setSearch] = useState("");
 
   const onConfirmClicked = () => {
-    status.status === "ACCEPTED"
-      ? procurementApi
-          .manufactureOrder(procurementId)
-          .then((response) => {
-            const { lineItems, statusHistory } = response.data;
-            setLineItems(
-              lineItems.map((item) => ({
-                ...item,
-                product: {
-                  sku: item.product.sku,
-                  productFields: item.product.productFields,
-                },
-              }))
-            );
-            setStatus({
-              status: statusHistory[statusHistory.length - 1].status,
-              timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-            });
-            setStatusHistory(statusHistory);
-          })
-          .then(() => {
-            addToast(`Order #${procurementId} has completed manufacturing.`, {
-              appearance: "success",
-              autoDismiss: true,
-            });
-          })
-      : handlePickPack();
+    const manufactureOrder = async () => {
+      try {
+        const { data } = await procurementApi.manufactureOrder(procurementId);
+        const { statusHistory } = data;
+        setStatus(statusHistory[statusHistory.length - 1]);
+        setStatusHistory(statusHistory);
+        addToast(`Order #${procurementId} has completed manufacturing.`, {
+          appearance: "success",
+          autoDismiss: true,
+        });
+      } catch (error) {
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      }
+    };
+    status.status === "ACCEPTED" ? manufactureOrder() : handlePickPack();
   };
 
   const onScanClicked = (evt) => {
@@ -264,27 +205,15 @@ export const ProcurementPickPack = () => {
 
   const handlePickPack = async () => {
     const { data } = await procurementApi.pickPack(procurementId);
-    const { lineItems, statusHistory } = data;
-    setLineItems(
-      lineItems.map((item) => ({
-        ...item,
-        product: {
-          sku: item.product.sku,
-          productFields: item.product.productFields,
-        },
-      }))
-    );
-    setStatus({
-      status: statusHistory[statusHistory.length - 1].status,
-      timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-    });
+    const { statusHistory } = data;
+    setStatus(statusHistory[statusHistory.length - 1]);
     setStatusHistory(statusHistory);
     addToast(
       `Order #${procurementId}  ${
         status.status === "MANUFACTURED"
           ? "has begun picking"
           : status.status === "PICKED"
-          ? "has completed picking"
+          ? "has begun packing"
           : "is ready for shipping. Please print the delivery invoice."
       }.`,
       {
@@ -310,17 +239,21 @@ export const ProcurementPickPack = () => {
             packedQty: lIs[index].packedQty,
           }))
         );
-        setStatus({
-          status: statusHistory[statusHistory.length - 1].status,
-          timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-        });
+        setStatus(statusHistory[statusHistory.length - 1]);
         setStatusHistory(statusHistory);
       })
       .then(() => {
-        addToast(`Successfully picked ${barcode}.`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
+        addToast(
+          `Successfully  ${
+            status.status === "PICKING" || status.status === "ACCEPTED"
+              ? "picked"
+              : "packed"
+          } ${barcode}.`,
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
+        );
         setSearch("");
       })
       .catch((error) => {
@@ -389,6 +322,7 @@ export const ProcurementPickPack = () => {
                       : "delivery"
                   } stage.`}
                   onConfirmClicked={onConfirmClicked}
+                  cancelPath={`/${subsys}/procurements/${procurementId}`}
                 />
               </section>
             ) : (
@@ -427,7 +361,7 @@ export const ProcurementPickPack = () => {
         ) &&
           ["sm", "mf", "wh"].some((s) => s === subsys) && (
             <section aria-labelledby="order-summary">
-              <PickPackList data={lineItems} setData={setLineItems} />
+              <PickPackList data={lineItems} />
             </section>
           )}
       </div>

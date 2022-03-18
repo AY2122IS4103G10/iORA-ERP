@@ -3,8 +3,10 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { stockTransferApi } from "../../../../environments/Api";
-import { scanItemStockTransfer } from "../../../../stores/slices/stocktransferSlice";
+import {
+  pickPackStockTransfer,
+  scanItemStockTransfer,
+} from "../../../../stores/slices/stocktransferSlice";
 import {
   ConfirmSection,
   PickPackList,
@@ -12,9 +14,9 @@ import {
 } from "../../Procurement/ProcurementPickPack";
 
 export const StockTransferPickPack = () => {
-  const { addToast } = useToasts();
-  const { subsys, order, lineItems, setLineItems, userSiteId, openInvoice } =
+  const { subsys, lineItems, setLineItems, userSiteId, openInvoiceModal, addToast } =
     useOutletContext();
+  var { order } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -28,47 +30,49 @@ export const StockTransferPickPack = () => {
     else handleScan(search);
   };
 
-  const handlePickPack = async () => {
-    const { data } = await stockTransferApi.pickPack(order.id, userSiteId);
-    const { lineItems } = data;
-    setLineItems(
-      lineItems.map((item) => ({
-        ...item,
-        product: {
-          sku: item.product.sku,
-          productFields: item.product.productFields,
-        },
-      }))
-    );
-    addToast(
-      `Order #${order.id}  ${
-        status === "PICKED" ? "has completed picking" : "is ready for shipping"
-      }.`,
-      {
-        appearance: "success",
-        autoDismiss: true,
-      }
-    );
-    if (status === "PACKED") {
-      openInvoice();
-      navigate(`/${subsys}/stocktransfer/${order.id}/delivery`);
-    }
+  const handlePickPack = () => {
+    dispatch(pickPackStockTransfer({ orderId: order.id, siteId: userSiteId }))
+      .unwrap()
+      .then(() => {
+        addToast(
+          `Order #${order.id}  ${
+            status === "ACCEPTED"
+              ? "has begun picking"
+              : status === "PICKED"
+              ? "has begun packing"
+              : "is ready for shipping"
+          }.`,
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
+        );
+        if (status === "PACKED") {
+          openInvoiceModal();
+          navigate(`/${subsys}/stocktransfer/${order.id}/delivery`);
+        }
+      })
+      .catch((error) => {
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
   };
+
   const handleScan = (barcode) => {
     dispatch(scanItemStockTransfer({ orderId: order.id, barcode }))
       .unwrap()
-      .then((data) => {
-        const { lineItems: lIs } = data;
-        setLineItems(
-          lineItems.map((item, index) => ({
-            ...item,
-            fulfilledQty: lIs[index].fulfilledQty,
-          }))
+      .then(() => {
+        addToast(
+          `Successfully ${
+            status === "PICKING" ? "picked" : "packed"
+          } ${barcode}.`,
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
         );
-        addToast(`Successfully picked ${search}.`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
       })
       .catch((error) => {
         addToast(`Error: ${error.message}`, {
@@ -83,14 +87,13 @@ export const StockTransferPickPack = () => {
       e.target.value.length - search.length > 10 &&
       e.target.value.includes("-")
     ) {
-      if (status.status === "ACCEPTED") {
+      if (status === "ACCEPTED") {
         handlePickPack();
       }
       handleScan(e.target.value);
     }
     setSearch(e.target.value);
   };
-
   return (
     <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -117,6 +120,7 @@ export const StockTransferPickPack = () => {
                   This action cannot be undone, and this order will advance to the
                   ${order.status === "PICKED" ? "packing" : "delivery"} stage.`}
                       onConfirmClicked={onConfirmClicked}
+                      cancelPath={`/${subsys}/stocktransfer/${order.id}`}
                     />
                   </section>
                 ) : (

@@ -145,7 +145,8 @@ export const StockTransferDelivery = () => {
           (s) => s === status
         ) ? (
           status === "READY_FOR_DELIVERY" &&
-          order.fromSite.id === userSiteId ? (
+          order.fromSite.id === userSiteId &&
+          subsys === "lg" ? (
             <div className="flex justify-center">
               <NumDeliveriesSection
                 subsys={subsys}
@@ -157,7 +158,8 @@ export const StockTransferDelivery = () => {
               />
             </div>
           ) : (
-            order.toSite.id === userSiteId && subsys !== "lg" && (
+            order.toSite.id === userSiteId &&
+            subsys !== "lg" && (
               <section aria-labelledby="scan-items">
                 <ScanItemsSection
                   search={search}

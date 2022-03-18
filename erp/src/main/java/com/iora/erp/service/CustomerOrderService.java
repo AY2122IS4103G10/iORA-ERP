@@ -50,6 +50,7 @@ public interface CustomerOrderService {
     public abstract RefundLI createRefundLI(RefundLI refundLI);
     public abstract RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
 
+    public abstract OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;
     public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
     public abstract OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
     public abstract OnlineOrder scanProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException;

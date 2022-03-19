@@ -12,6 +12,7 @@ import companyReducer from "./slices/companySlice";
 import customerReducer from "./slices/customerSlice";
 import employeeReducer from "./slices/employeeSlice";
 import jobTitleReducer from "./slices/jobTitleSlice";
+import notificationsReducer from "./slices/notificationsSlice";
 import departmentReducer from "./slices/departmentSlice";
 import vendorReducer from "./slices/vendorSlice";
 import posReducer from "./slices/posSlice";
@@ -25,6 +26,7 @@ export default configureStore({
     employee: employeeReducer,
     jobTitle: jobTitleReducer,
     membershipTiers: membershipTierReducer,
+    notifications: notificationsReducer,
     products: productReducer,
     prodFields: prodFieldReducer,
     procurements: procurementReducer,

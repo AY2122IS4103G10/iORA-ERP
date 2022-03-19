@@ -29,10 +29,10 @@ public class StockTransferOrder {
     @OneToMany(cascade = CascadeType.ALL)
     private List<StockTransferOrderLI> lineItems;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Site fromSite;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Site toSite;
 
     private boolean hqAccepted;

@@ -15,7 +15,7 @@ public interface ProcurementService {
     public abstract List<ProcurementOrder> getProcurementOrders();
     public abstract List<ProcurementOrder> getProcurementOrdersOfSite(Site site);
     public abstract ProcurementOrder createProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException;
-    public abstract ProcurementOrder updateProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder updateProcurementOrderDetails(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
     public abstract ProcurementOrder deleteProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
     public abstract ProcurementOrder rejectProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
     public abstract ProcurementOrder acceptProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;

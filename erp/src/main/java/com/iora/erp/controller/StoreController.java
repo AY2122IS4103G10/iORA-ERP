@@ -147,7 +147,7 @@ public class StoreController {
             @PathVariable Long siteId) {
         try {
             return ResponseEntity
-                    .ok(stockTransferService.updateStockTransferOrder(stockTransferOrder, siteId));
+                    .ok(stockTransferService.updateOrderDetails(stockTransferOrder, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

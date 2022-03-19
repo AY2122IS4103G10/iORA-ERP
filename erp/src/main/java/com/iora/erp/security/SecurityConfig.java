@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        AuthFilter authFilter = new AuthFilter(authenticationManagerBean());
+        EmployeeAuthenticationFilter authFilter = new EmployeeAuthenticationFilter(authenticationManagerBean());
         authFilter.setFilterProcessesUrl("/auth/login");
         CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT", "OPTIONS", "PATCH", "DELETE"));
@@ -47,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // http.authorizeRequests().antMatchers("/admin/**").hasAnyAuthority("SYSADMIN_BASIC");;
         // http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(authFilter);
-        http.addFilterBefore(new AuthAccessFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new EmployeeAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

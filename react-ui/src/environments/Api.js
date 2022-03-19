@@ -8,7 +8,7 @@ let axiosPrivate = axios.create();
 
 if (localStorage.getItem("accessToken")) {
   axiosPrivate.defaults.headers.common["Authorization"] =
-    localStorage.getItem("accessToken");
+    "Bearer " + localStorage.getItem("accessToken");
 }
 
 export const axiosPublic = axios.create();

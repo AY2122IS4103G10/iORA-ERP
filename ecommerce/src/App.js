@@ -9,6 +9,7 @@ import { Account } from "./views/containers/Auth/Settings/Account";
 import { Auth } from "./views/containers/Auth/Auth";
 import { HomeIndex } from "./views/containers/Index/HomeIndex";
 import { Listings } from "./views/containers/Listings";
+import ViewModel from "./views/containers/ViewModel";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           }
         >
           <Route index element={<HomeIndex/>} />
+          <Route path="products/view/:modelCode" element={<ViewModel/>} />
           <Route path="products/:line">
             <Route path=":tag" element={<Listings/>}/>
             <Route path="" element={<Listings/>}/>

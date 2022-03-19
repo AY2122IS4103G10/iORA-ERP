@@ -19,6 +19,7 @@ import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.ProductService;
 import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,8 @@ public class OnlineCustomerController {
     private CustomerService customerService;
     @Autowired
     private CustomerOrderService customerOrderService;
+    @Autowired
+    private ProductService productService;
 
     /*
      * ---------------------------------------------------------
@@ -247,6 +250,28 @@ public class OnlineCustomerController {
     public ResponseEntity<Object> collectOnlineOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity.ok(customerOrderService.collectOnlineOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    // Get models by fashion line (iORA) and tag (top)
+    // Return empty list if no results
+    @GetMapping(path = "/model/tag/{company}/{tag}", produces = "application/json")
+    public ResponseEntity<Object> getModelsByCompanyAndTag(@PathVariable String company, @PathVariable String tag) {
+        try {
+            return ResponseEntity.ok(productService.getModelsByCompanyAndTag(company, tag));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    // Get models by tag (top)
+    // Return empty list if no results
+    @GetMapping(path = "/model/tag/{tag}", produces = "application/json")
+    public ResponseEntity<Object> getModelsByTag(@PathVariable String tag) {
+        try {
+            return ResponseEntity.ok(productService.getModelsByTag(tag));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

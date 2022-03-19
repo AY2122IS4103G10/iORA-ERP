@@ -1,14 +1,15 @@
-import { Fragment } from "react";
-import { useDispatch } from "react-redux";
-import {
-  MenuAlt1Icon,
-  BellIcon,
-  ChevronDownIcon,
-} from "@heroicons/react/outline";
 import { Menu, Transition } from "@headlessui/react";
-import { classNames } from "../../../utilities/Util";
-import { logout } from "../../../stores/slices/userSlice";
+import {
+  BellIcon,
+  ChevronDownIcon, MenuAlt1Icon
+} from "@heroicons/react/outline";
+import { Fragment, useState } from "react";
+import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
+import { logout } from "../../../stores/slices/userSlice";
+import { classNames } from "../../../utilities/Util";
+import { Notifications } from "../../components/Notifications";
+
 
 export const NavBar = ({ setSidebarOpen, badge }) => {
   const dispatch = useDispatch();
@@ -19,6 +20,13 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
     dispatch(logout());
     navigate("/");
   };
+
+  const [open, setOpen] = useState(false);
+  const [siteId, setSiteId] = useState(0);
+  const notiClicked = () => {
+    setOpen(true);
+    setSiteId(new Number(JSON.parse(localStorage.getItem("siteId"))))
+  }
 
   return (
     <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
@@ -35,6 +43,7 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
         <div className="ml-4 flex items-center md:ml-6">
           <button
             type="button"
+            onClick={() => notiClicked()}
             className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
           >
             <span className="sr-only">View notifications</span>
@@ -114,6 +123,7 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
           </Menu>
         </div>
       </div>
+      <Notifications open={open} setOpen={setOpen} siteId={siteId} />
     </div>
   );
 };

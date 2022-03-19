@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
@@ -34,6 +35,7 @@ public interface SiteService {
     public abstract StockLevel removeProducts(Long siteId, String SKUCode, int qty) throws NoStockLevelException, IllegalTransferException;
     public abstract String editStockLevel(Long siteId, String SKUCode, int qty) throws NoStockLevelException, IllegalTransferException;
 
+    public abstract List<Notification> getNotifications(Long siteId);
 
     //public abstract Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId, Long toSiteId, String SKUCode, int qty) throws NoStockLevelException, IllegalTransferException;
 

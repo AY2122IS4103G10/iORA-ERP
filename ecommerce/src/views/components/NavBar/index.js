@@ -1,4 +1,5 @@
 import { Fragment, useState } from "react";
+import { selectCartQty } from "../../../stores/slices/cartSlice";
 import {
   MenuIcon,
   SearchIcon,
@@ -9,6 +10,7 @@ import {
 import { Transition, Popover, Dialog, Tab, Menu } from "@headlessui/react";
 import { classNames } from "../../../../../ecommerce/src/utilities/Util";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const ProfileDropdown = ({ handleLogout }) => {
   return (
@@ -77,6 +79,9 @@ const ProfileDropdown = ({ handleLogout }) => {
 
 export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
   const [open, setOpen] = useState(false);
+  const cartCount = useSelector(selectCartQty);
+
+
   return (
     <>
       {/* Mobile menu */}
@@ -453,7 +458,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                     aria-hidden="true"
                   />
                   <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                    0
+                    {cartCount}
                   </span>
                   <span className="sr-only">items in cart, view bag</span>
                 </Link>

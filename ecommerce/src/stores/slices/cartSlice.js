@@ -67,3 +67,11 @@ export const { addCartItemQty, minusCartItemQty, addToCart, removeItemFromCart }
 export default cartSlice.reducer;
 
 export const selectCart = (state) => state.cart.cart;
+
+export const selectCartQty = (state) => {
+    let count = 0;
+    const cart = state.cart.cart;
+    cart.forEach((item) => count = count + item.qty);
+    
+    return count;
+};

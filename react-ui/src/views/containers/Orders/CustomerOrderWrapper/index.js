@@ -7,6 +7,7 @@ import {
 import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -225,7 +226,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const { addToast } = useToasts();
   const { orderId } = useParams();
   const componentRef = useRef();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const handlePrint = useReactToPrint({ content: () => componentRef.current });
   const [order, setOrder] = useState(null);
@@ -237,31 +237,41 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [loading, setLoading] = useState(false)
   const currSiteId = useSelector(selectUserSite);
 
   useEffect(() => {
     const fetchOrder = async () => {
-      const { data } = await orderApi.get(orderId);
-      const { lineItems, status, statusHistory } = data;
-      fetchAllModelsBySkus(lineItems).then((data) => {
-        setLineItems(
-          lineItems.map((item, index) => ({
-            ...item,
-            product: {
-              ...item.product,
-              modelCode: data[index].modelCode,
-              name: data[index].name,
-            },
-          }))
-        );
-      });
-      setStatus(status);
-      setStatusHistory(statusHistory);
-      setOrder(data);
-      setQrValue(`/${subsys}/orders/${orderId}/pick-pack`);
+      setLoading(true)
+      try {
+        const { data } = await orderApi.get(orderId);
+        const { lineItems, statusHistory } = data;
+        fetchAllModelsBySkus(lineItems).then((data) => {
+          setLineItems(
+            lineItems.map((item, index) => ({
+              ...item,
+              product: {
+                ...item.product,
+                modelCode: data[index].modelCode,
+                name: data[index].name,
+              },
+            }))
+          );
+        });
+        setStatus(statusHistory[statusHistory.length - 1].status);
+        setStatusHistory(statusHistory);
+        setOrder(data);
+        setQrValue(`/${subsys}/orders/${orderId}/pick-pack`);
+        setLoading(false)
+      } catch (error) {
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      }
     };
     fetchOrder();
-  }, [subsys, orderId]);
+  }, [subsys, orderId, addToast]);
 
   // const onDeleteProcurementClicked = () => {
   //   dispatch(
@@ -390,7 +400,11 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     { name: "Delivery", href: "#", current: false },
   ];
 
-  return (
+  return loading ? (
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BFFF" height={20} width={20} />
+    </div>
+  ) : (
     Boolean(order) && (
       <>
         <div className="py-8 xl:py-10">
@@ -400,7 +414,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             disableTabs={order.delivery === null}
             tabs={tabs}
             orderId={orderId}
-            status={order.status}
+            status={status}
             openModal={openModal}
             handlePrint={handlePrint}
             openInvoice={openInvoice}
@@ -413,19 +427,17 @@ export const CustomerOrderWrapper = ({ subsys }) => {
               orderId,
               order,
               status,
+              setStatus,
               lineItems,
               setLineItems,
               statusHistory,
+              setStatusHistory,
               currSiteId,
             }}
           />
         </div>
-        {/* <ConfirmDelete
-          item={`Order #${orderId}`}
-          open={openDelete}
-          closeModal={closeModal}
-          onConfirm={onDeleteProcurementClicked}
-        />
+        {
+        /*
         <div className="hidden">
           <ProcurementInvoice
             ref={componentRef}

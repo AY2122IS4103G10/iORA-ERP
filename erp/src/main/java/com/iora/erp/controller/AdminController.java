@@ -12,6 +12,7 @@ import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.AdminService;
@@ -462,4 +463,11 @@ public class AdminController {
         }
     }
 
+    @GetMapping(path = "/noti/{siteId}", produces = "application/json")
+    public List<Notification> getNotifications(@PathVariable String siteId) {
+        if (siteId.equals("0") || siteId.equals("null")) {
+            return new ArrayList<>();
+        }
+        return siteService.getNotifications(Long.valueOf(siteId));
+    }
 }

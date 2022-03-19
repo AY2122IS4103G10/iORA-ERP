@@ -429,10 +429,10 @@ public class DataLoader implements CommandLineRunner {
 		BirthdayPoints bday = new BirthdayPoints("STANDARD", 200, 1, 2.00);
 		em.persist(bday);
 
-		MembershipTier basic = new MembershipTier("BASIC", 0.00, 0, bday);
-		MembershipTier silver = new MembershipTier("SILVER", 0.03, 200, bday);
-		MembershipTier gold = new MembershipTier("GOLD", 0.05, 1000, bday);
-		MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, 2500, bday);
+		MembershipTier basic = new MembershipTier("BASIC", 1.00, 0, bday);
+		MembershipTier silver = new MembershipTier("SILVER", 1.03, 200, bday);
+		MembershipTier gold = new MembershipTier("GOLD", 1.05, 1000, bday);
+		MembershipTier diamond = new MembershipTier("DIAMOND", 1.07, 2500, bday);
 		em.persist(basic);
 		em.persist(silver);
 		em.persist(gold);
@@ -443,7 +443,7 @@ public class DataLoader implements CommandLineRunner {
 		c1.setContactNumber("83940775");
 		c1.setDob(LocalDate.of(2000, 1, 1));
 		c1.setEmail("hongpeiisrandom@gmail.com");
-		c1.sethashPass("password");
+		c1.setPassword("password");
 		c1.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		customerService.createCustomerAccount(c1);
 
@@ -451,7 +451,7 @@ public class DataLoader implements CommandLineRunner {
 		c2.setContactNumber("92711363");
 		c2.setDob(LocalDate.of(2000, 1, 1));
 		c2.setEmail("pengyu_33@msn.com");
-		c2.sethashPass("password");
+		c2.setPassword("password");
 		c2.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		customerService.createCustomerAccount(c2);
 
@@ -459,15 +459,15 @@ public class DataLoader implements CommandLineRunner {
 		c3.setContactNumber("93834898");
 		c3.setDob(LocalDate.of(2000, 1, 1));
 		c3.setEmail("tan.adelinejy@gmail.com");
-		c3.sethashPass("password");
+		c3.setPassword("password");
 		c3.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		customerService.createCustomerAccount(c3);
 
 		Customer c4 = new Customer("Louis", "Misson");
 		c4.setContactNumber("98550432");
 		c4.setDob(LocalDate.of(2000, 1, 1));
-		c4.setEmail("louismisson8@gmail.com");
-		c4.sethashPass("password");
+		c4.setEmail(passwordEncoder.encode("louismisson8@gmail.com"));
+		c4.setPassword("password");
 		c4.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		customerService.createCustomerAccount(c4);
 
@@ -475,7 +475,7 @@ public class DataLoader implements CommandLineRunner {
 		c5.setContactNumber("90556630");
 		c5.setDob(LocalDate.of(2000, 1, 1));
 		c5.setEmail("remuskwan23@gmail.com");
-		c5.sethashPass("password");
+		c5.setPassword("password");
 		c5.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		customerService.createCustomerAccount(c5);
 
@@ -483,7 +483,7 @@ public class DataLoader implements CommandLineRunner {
 		c6.setContactNumber("86065278");
 		c6.setDob(LocalDate.of(2000, 1, 1));
 		c6.setEmail("ruth.cjn@gmail.com");
-		c6.sethashPass("password");
+		c6.setPassword("password");
 		c6.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		customerService.createCustomerAccount(c6);
 
@@ -491,7 +491,7 @@ public class DataLoader implements CommandLineRunner {
 		c7.setContactNumber("91234567");
 		c7.setDob(LocalDate.of(2000, 1, 1));
 		c7.setEmail("stevenlim@gmail.com");
-		c7.sethashPass("password");
+		c7.setPassword("password");
 		c7.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		customerService.createCustomerAccount(c7);
 
@@ -691,6 +691,7 @@ public class DataLoader implements CommandLineRunner {
 		co1.addPayment(payment1);
 		co1.setPaid(true);
 		co1.setSite(siteService.getSite(4L));
+		co1.setCustomerId(2L);
 		customerOrderService.createCustomerOrder(co1, null);
 
 		OnlineOrder oo1 = new OnlineOrder(false, Country.Singapore);

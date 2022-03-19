@@ -8,6 +8,7 @@ import javax.persistence.PersistenceContext;
 
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.ManufacturingSite;
@@ -247,6 +248,16 @@ public class SiteServiceImpl implements SiteService {
         } else {
             return "Stock level is accurate and no changes are made.";
         }
+    }
+
+    @Override
+    public List<Notification> getNotifications(Long siteId) {
+        Site site = em.find(Site.class, siteId);
+
+        if (site != null) {
+            return site.getNotifications();
+        }
+        return null;
     }
 
     /*

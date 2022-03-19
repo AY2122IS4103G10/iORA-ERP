@@ -14,6 +14,7 @@ import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProcurementOrderException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.procurementOrder.POStatus;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.procurementOrder.ProcurementOrderLI;
@@ -69,6 +70,20 @@ public class ProcurementServiceImpl implements ProcurementService {
         return new ArrayList<>();
     }
 
+    private ProcurementOrder updateProcurementOrder(ProcurementOrder procurementOrder) {
+        Notification noti = new Notification("Procurement Order #" + procurementOrder.getId(),
+                "Status has been updated to " + procurementOrder.getLastStatus().name() + ": "
+                        + procurementOrder.getLastStatus().getDescription());
+
+        Site site1 = procurementOrder.getHeadquarters();
+        site1.addNotification(noti);
+        Site site2 = procurementOrder.getManufacturing();
+        site2.addNotification(noti);
+        Site site3 = procurementOrder.getWarehouse();
+        site3.addNotification(noti);
+        return em.merge(procurementOrder);
+    }
+
     @Override
     public ProcurementOrder createProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
             throws SiteConfirmationException {
@@ -78,14 +93,14 @@ public class ProcurementServiceImpl implements ProcurementService {
             procurementOrder.setHeadquarters(actionBy);
 
             em.persist(procurementOrder);
-            return procurementOrder;
+            return updateProcurementOrder(procurementOrder);
         } else {
             throw new SiteConfirmationException("Site is not authorised to create Procurement Order.");
         }
     }
 
     @Override
-    public ProcurementOrder updateProcurementOrder(ProcurementOrder procurementOrder, Long siteId)
+    public ProcurementOrder updateProcurementOrderDetails(ProcurementOrder procurementOrder, Long siteId)
             throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException {
 
         ProcurementOrder oldOrder = em.find(ProcurementOrder.class, procurementOrder.getId());
@@ -104,7 +119,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.PENDING));
         procurementOrder.setHeadquarters(actionBy);
 
-        return em.merge(procurementOrder);
+        return updateProcurementOrder(procurementOrder);
     }
 
     @Override
@@ -124,7 +139,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CANCELLED));
         procurementOrder.setManufacturing(actionBy);
 
-        return em.merge(procurementOrder);
+        return updateProcurementOrder(procurementOrder);
     }
 
     @Override
@@ -144,7 +159,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CANCELLED));
         procurementOrder.setHeadquarters(actionBy);
 
-        return em.merge(procurementOrder);
+        return updateProcurementOrder(procurementOrder);
     }
 
     @Override
@@ -163,7 +178,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         procurementOrder.setManufacturing(actionBy);
         procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.ACCEPTED));
 
-        return em.merge(procurementOrder);
+        return updateProcurementOrder(procurementOrder);
     }
 
     @Override
@@ -180,7 +195,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         procurementOrder.addStatus(
                 new POStatus(procurementOrder.getManufacturing(), new Date(), ProcurementOrderStatus.MANUFACTURED));
 
-        return em.merge(procurementOrder);
+        return updateProcurementOrder(procurementOrder);
 
         /*
          * Generate Newly manufactured items, deprecated
@@ -240,7 +255,7 @@ public class ProcurementServiceImpl implements ProcurementService {
             throw new ProcurementOrderException("Order is not due to pick or pack.");
         }
 
-        return em.merge(po);
+        return updateProcurementOrder(po);
     }
 
     @Override
@@ -315,7 +330,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         procurementOrder
                 .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(), ProcurementOrderStatus.SHIPPING));
-        return em.merge(procurementOrder);
+        return updateProcurementOrder(procurementOrder);
     }
 
     @Override
@@ -330,7 +345,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         procurementOrder
                 .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
                         ProcurementOrderStatus.SHIPPING_MULTIPLE));
-        return em.merge(procurementOrder);
+        return updateProcurementOrder(procurementOrder);
     }
 
     @Override
@@ -381,12 +396,12 @@ public class ProcurementServiceImpl implements ProcurementService {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
         if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING
-            && procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
+                && procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
             throw new IllegalPOModificationException("Procurement Order has not been received.");
         }
         procurementOrder
                 .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(), ProcurementOrderStatus.COMPLETED));
 
-        return em.merge(procurementOrder);
+        return updateProcurementOrder(procurementOrder);
     }
 }

@@ -78,3 +78,12 @@ export const listingApi = {
     );
   },
 }
+
+export const checkoutApi = {
+  calculatePromotions(lineItems) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}online/customerOrder/calculate`,
+      lineItems
+    );
+  },
+}

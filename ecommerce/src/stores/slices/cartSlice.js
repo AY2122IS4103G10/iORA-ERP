@@ -48,17 +48,21 @@ const cartSlice = createSlice({
                 if (item.product.sku === product.sku) {
                     return {
                         ...item,
-                        qty: item.qty >= 1 ? item.qty - 1 : 0
+                        qty: item.qty > 1 ? item.qty - 1 : 1
                     }
                 } else {
                     return {...item};
                 }
             })
+        },
+        removeItemFromCart(state, action) {
+            const product = action.payload;
+            state.cart = state.cart.filter((item) => item.product.sku !== product.sku);
         }
     },
 })
 
-export const { addCartItemQty, minusCartItemQty, addToCart } = cartSlice.actions;
+export const { addCartItemQty, minusCartItemQty, addToCart, removeItemFromCart } = cartSlice.actions;
 
 export default cartSlice.reducer;
 

@@ -295,4 +295,14 @@ public class OnlineCustomerController {
     public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
+
+    @PostMapping(path = "/customerOrder/calculate", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> calculatePromotions(@RequestBody List<CustomerOrderLI> lineItems) {
+        try {
+            return ResponseEntity.ok(customerOrderService.calculatePromotions(lineItems));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }

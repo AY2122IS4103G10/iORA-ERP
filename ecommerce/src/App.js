@@ -9,6 +9,7 @@ import { Account } from "./views/containers/Auth/Settings/Account";
 import { Auth } from "./views/containers/Auth/Auth";
 import { HomeIndex } from "./views/containers/Index/HomeIndex";
 import { Listings } from "./views/containers/Listings";
+import { Checkout } from "./views/containers/Checkout/CheckoutForm";
 import ViewModel from "./views/containers/ViewModel";
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
             <Route path="" element={<Listings/>}/>
           </Route>
           <Route path="cart" element={<Cart/>}/>
+          <Route path="cart/checkout" element={<Checkout/>}/>
           <Route path="settings" element={<SettingsIndex />}>
             <Route path="profile" element={<Profile />} />
             <Route path="account" element={<Account />} />

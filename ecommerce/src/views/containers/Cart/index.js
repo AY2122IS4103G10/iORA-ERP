@@ -6,52 +6,25 @@ import {
   QuestionMarkCircleIcon,
   XIcon as XIconSolid,
 } from "@heroicons/react/solid";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { addCartItemQty, minusCartItemQty, selectCart } from "../../../stores/slices/cartSlice";
+import { Link, useNavigate } from "react-router-dom";
+import { checkoutApi } from "../../../environments/Api";
+import { addCartItemQty, minusCartItemQty, removeItemFromCart, selectCart } from "../../../stores/slices/cartSlice";
+import { classNames } from "../../../utilities/Util";
 
-const products = [
-  {
-    id: 1,
-    name: "Basic Tee",
-    href: "#",
-    price: "$32.00",
-    color: "Sienna",
-    inStock: true,
-    size: "Large",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-01.jpg",
-    imageAlt: "Front of men's Basic Tee in sienna.",
-  },
-  {
-    id: 2,
-    name: "Basic Tee",
-    href: "#",
-    price: "$32.00",
-    color: "Black",
-    inStock: false,
-    leadTime: "3–4 weeks",
-    size: "Large",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-02.jpg",
-    imageAlt: "Front of men's Basic Tee in black.",
-  },
-  {
-    id: 3,
-    name: "Nomad Tumbler",
-    href: "#",
-    price: "$35.00",
-    color: "White",
-    inStock: true,
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-03.jpg",
-    imageAlt: "Insulated bottle with white base and black snap lid.",
-  },
-];
+const deliveryOptions = [
+  { id: 1, name: "Standard Shipping", description: "Shipping: $2.50" },
+  { id: 2, name: "Collect In-Stores", description: "Pick up in a physical store of your choice" }
+]
 
 
 export const Cart = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); 
+  const [amount, setAmount] = useState(0);
+  const [promotions, setPromotions] = useState([]);
+  const [delivery, setDelivery] = useState(0);
   const cart = useSelector(selectCart);
 
   const onAddQtyClicked = (e, product) => {
@@ -63,6 +36,38 @@ export const Cart = () => {
     e.preventDefault();
     dispatch(minusCartItemQty(product))
   }
+
+  const onRemoveItemClicked = (e, product) => {
+    e.preventDefault();
+    dispatch(removeItemFromCart(product))
+  }
+
+  const onCheckoutClicked = (e) => {
+      e.preventDefault();
+      if (cart.length > 0) {
+        navigate("checkout");
+      }
+  }
+
+
+  useEffect(() => {
+    async function calculate() {
+      let lineItems = cart.map((item) => {
+        const { model, ...lineItem } = item;
+        console.log(lineItem);
+        return lineItem;
+      });
+      console.log(lineItems);
+      const response = await checkoutApi.calculatePromotions(lineItems);
+      setPromotions(response.data[1]);
+      setAmount(
+        response.data
+          .map((y) => y.map((x) => x.subTotal).reduce((x, y) => x + y, 0))
+          .reduce((x, y) => x + y, 0)
+      );
+    }
+    calculate();
+  }, [cart]);
 
   return (
     <div className="max-w-2xl mx-auto pt-16 pb-24 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -107,7 +112,7 @@ export const Cart = () => {
                         </p>
                       </div>
                       <p className="mt-1 text-sm font-medium text-gray-900">
-                        {item.product.listPrice}
+                        ${item.model.listPrice}
                       </p>
                     </div>
 
@@ -118,7 +123,7 @@ export const Cart = () => {
                       >
                         Quantity, {item.product.name}
                       </label>
-                      
+
                       <span className="relative z-0 inline-flex shadow-sm rounded-md">
                         <button
                           type="button"
@@ -134,7 +139,7 @@ export const Cart = () => {
                           className="text-center block w-full sm:text-sm border border-gray-300"
                           placeholder="0"
                           value={item.qty}
-                          disabled 
+                          disabled
                         />
                         <button
                           type="button"
@@ -149,6 +154,7 @@ export const Cart = () => {
                         <button
                           type="button"
                           className="-m-2 p-2 inline-flex text-gray-400 hover:text-gray-500"
+                          onClick={(e) => onRemoveItemClicked(e, item.product)}
                         >
                           <span className="sr-only">Remove</span>
                           <XIconSolid className="h-5 w-5" aria-hidden="true" />
@@ -157,24 +163,8 @@ export const Cart = () => {
                     </div>
                   </div>
 
-                  <p className="mt-4 flex text-sm text-gray-700 space-x-2">
-                    {/* {product.inStock ? (
-                      <CheckIcon
-                        className="flex-shrink-0 h-5 w-5 text-green-500"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <ClockIcon
-                        className="flex-shrink-0 h-5 w-5 text-gray-300"
-                        aria-hidden="true"
-                      />
-                    )} */}
-
-                    {/* <span>
-                      {product.inStock
-                        ? "In stock"
-                        : `Ships in ${product.leadTime}`}
-                    </span> */}
+                  <p className="mt-4 flex flex-row-reverse font-bold text-sm text-gray-700 space-x-2">
+                    Subtotal: ${parseInt(item.model.listPrice) * item.qty}
                   </p>
                 </div>
               </li>
@@ -202,54 +192,51 @@ export const Cart = () => {
             <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
               <dt className="flex items-center text-sm text-gray-600">
                 <span>Shipping estimate</span>
-                <a
-                  href="#"
-                  className="ml-2 flex-shrink-0 text-gray-400 hover:text-gray-500"
-                >
-                  <span className="sr-only">
-                    Learn more about how shipping is calculated
-                  </span>
-                  <QuestionMarkCircleIcon
-                    className="h-5 w-5"
-                    aria-hidden="true"
-                  />
-                </a>
               </dt>
-              <dd className="text-sm font-medium text-gray-900">$5.00</dd>
+              <dd className="text-sm font-medium text-gray-900">$2.50</dd>
             </div>
-            <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
-              <dt className="flex text-sm text-gray-600">
-                <span>Tax estimate</span>
-                <a
-                  href="#"
-                  className="ml-2 flex-shrink-0 text-gray-400 hover:text-gray-500"
-                >
-                  <span className="sr-only">
-                    Learn more about how tax is calculated
-                  </span>
-                  <QuestionMarkCircleIcon
-                    className="h-5 w-5"
-                    aria-hidden="true"
-                  />
-                </a>
-              </dt>
-              <dd className="text-sm font-medium text-gray-900">$8.32</dd>
-            </div>
+
+            <fieldset>
+              {deliveryOptions.map((option) => (
+                <div key={option.id} className="relative flex items-start mb-1">
+                  <div className="flex items-center h-5">
+                    <input
+                      id={option.id}
+                      value={option.id}
+                      name="shipping-type"
+                      type="radio"
+                      className="focus:ring-gray-600 h-4 w-4 text-gray-700 border-gray-300"
+                      onChange={(e) => setDelivery(option.id)}
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label htmlFor={option.id} className="font-medium text-gray-700">
+                      {option.name}
+                    </label>
+                    <p id={`${option.id}-description`} className="text-gray-500">
+                      {option.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </fieldset>
+
             <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
               <dt className="text-base font-medium text-gray-900">
                 Order total
               </dt>
-              <dd className="text-base font-medium text-gray-900">$112.32</dd>
+              <dd className="text-base font-medium text-gray-900">${delivery === 1 ? amount + 2.50 : amount}</dd>
             </div>
           </dl>
 
           <div className="mt-6">
-            <button
-              type="submit"
-              className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
-            >
-              Checkout
-            </button>
+              <button
+                type="submit"
+                className="w-full bg-gray-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                onClick={onCheckoutClicked}
+              >
+                Checkout
+              </button>
           </div>
         </section>
       </form>

@@ -62,8 +62,8 @@ const product = {
     ],
 }
 const policies = [
-    { name: 'International delivery', icon: GlobeIcon, description: 'Get your order in 2 years' },
-    { name: 'Loyalty rewards', icon: CurrencyDollarIcon, description: "Don't look at other tees" },
+    { name: 'Doorstep delivery', icon: GlobeIcon, description: 'Enjoy Free Shipping with $25 purchase within Singapore.' },
+    { name: '30 Days Exchange', icon: CurrencyDollarIcon, description: "Exchange at any of our retail stores in Singapore within 30 days from date of order placement. Exchange not applicable for items purchased during a sale or a campaign. Items purchased on regular price, 2 for $29 and 2 for $49 will be eligible for exchange."},
 ]
 
 function classNames(...classes) {
@@ -118,12 +118,12 @@ export const SizePicker = ({ model, selectedSize, setSelectedSize }) => {
 
     return (
         <div className="mt-8">
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
                 <h2 className="text-sm font-medium text-gray-900">Size</h2>
                 <a href="#" className="text-sm font-medium text-black hover:text-gray-500">
                     See sizing chart
                 </a>
-            </div>
+            </div> */}
 
             <RadioGroup value={selectedSize} onChange={setSelectedSize} className="mt-2">
                 <RadioGroup.Label className="sr-only">Choose a size</RadioGroup.Label>
@@ -172,7 +172,9 @@ export const StockAvailability = ({model, selectedColor, selectedSize}) => {
 
 
     return (
-        <p>loading</p>
+        <div className="text-center mt-4">
+            <p>displaying stocks...</p>
+        </div>
     );
 
 }
@@ -212,7 +214,7 @@ export default function ViewModel() {
         e.preventDefault();
         if (selectedColor !== 0 && selectedSize !== 0) {
             const product = findProduct(model, selectedColor, selectedSize);
-            dispatch(addToCart(product))
+            dispatch(addToCart({model: model, product: product}))
         }
 
     }

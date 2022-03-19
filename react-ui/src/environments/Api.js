@@ -11,7 +11,7 @@ if (localStorage.getItem("accessToken")) {
     "Bearer " + localStorage.getItem("accessToken");
 }
 
-export const axiosPublic = axios.create();
+let axiosPublic = axios.create();
 
 export const api = {
   getAll(path) {

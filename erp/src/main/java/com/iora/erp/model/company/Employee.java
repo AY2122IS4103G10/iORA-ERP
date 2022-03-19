@@ -30,8 +30,6 @@ public class Employee implements Serializable {
     private Double salary;
     @Column(nullable = false, unique = true)
     private String username;
-    @Column
-    private String salt;
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
@@ -53,22 +51,6 @@ public class Employee implements Serializable {
         this.username = username;
         this.password = password;
         this.availStatus = true;
-        this.notifications = new ArrayList<>();
-    }
-
-    public Employee(String name, String email, Double salary, String username, String salt, String password,
-            Boolean availStatus, PayType payType, JobTitle jobTitle, Department department, Company company) {
-        this.name = name;
-        this.email = email;
-        this.salary = salary;
-        this.username = username;
-        this.salt = salt;
-        this.password = password;
-        this.availStatus = availStatus;
-        this.payType = payType;
-        this.jobTitle = jobTitle;
-        this.department = department;
-        this.company = company;
         this.notifications = new ArrayList<>();
     }
 
@@ -128,14 +110,6 @@ public class Employee implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
     }
 
     public Employee(String name, Double salary) {
@@ -202,13 +176,6 @@ public class Employee implements Serializable {
 
     public void setNotifications(List<Notification> notifications) {
         this.notifications = notifications;
-    }
-
-    public boolean authentication(String password2) {
-        if(password2.equals(this.password)) {
-            return true;
-        }
-        return false;
     }
 
 }

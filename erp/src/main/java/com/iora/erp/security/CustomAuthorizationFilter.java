@@ -24,12 +24,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-public class EmployeeAuthorizationFilter extends OncePerRequestFilter {
+public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        System.err.println(request.getServletPath() + " " + toAuthenticate(request));
         if (toAuthenticate(request)) {
             setLoginTokenFilter(request, response, filterChain);
         } else {

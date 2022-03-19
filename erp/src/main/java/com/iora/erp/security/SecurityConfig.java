@@ -32,8 +32,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        EmployeeAuthenticationFilter authFilter = new EmployeeAuthenticationFilter(authenticationManagerBean());
-        authFilter.setFilterProcessesUrl("/auth/login");
+        CustomAuthenticationFilter authFilterEmployee = new CustomAuthenticationFilter(authenticationManagerBean());
+        authFilterEmployee.setFilterProcessesUrl("/auth/login");
+        CustomAuthenticationFilter authFilterCustomer = new CustomAuthenticationFilter(authenticationManagerBean());
+        authFilterCustomer.setFilterProcessesUrl("/online/login");
         CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT", "OPTIONS", "PATCH", "DELETE"));
         http.cors().configurationSource(request -> corsConfiguration);
@@ -46,8 +48,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // http.authorizeRequests().antMatchers("/auth/login/**","/auth/refreshToken/**").permitAll();
         // http.authorizeRequests().antMatchers("/admin/**").hasAnyAuthority("SYSADMIN_BASIC");;
         // http.authorizeRequests().anyRequest().authenticated();
-        http.addFilter(authFilter);
-        http.addFilterBefore(new EmployeeAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilter(authFilterCustomer);
+        http.addFilter(authFilterEmployee);
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

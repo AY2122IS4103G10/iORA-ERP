@@ -1,43 +1,69 @@
 import axios from "axios";
 import { REST_ENDPOINT } from "../constants/restEndpoint.js";
 
+let axiosPrivate = axios.create();
+
+if (localStorage.getItem("accessToken")) {
+  axiosPrivate.defaults.headers.common["Authorization"] =
+    "Bearer " + localStorage.getItem("accessToken");
+}
+
+let axiosPublic = axios.create();
+
 export const api = {
   getAll(path) {
-    return axios.get(`${REST_ENDPOINT}${path}`);
+    return axiosPrivate.get(`${REST_ENDPOINT}${path}`);
   },
   get(path, id) {
-    return axios.get(`${REST_ENDPOINT}${path}/${id}`);
+    return axiosPrivate.get(`${REST_ENDPOINT}${path}/${id}`);
   },
   create(path, item) {
-    return axios.post(`${REST_ENDPOINT}${path}`, item);
+    return axiosPrivate.post(`${REST_ENDPOINT}${path}`, item);
   },
   update(path, item) {
-    return axios.put(`${REST_ENDPOINT}${path}`, item);
+    return axiosPrivate.put(`${REST_ENDPOINT}${path}`, item);
   },
   delete(path, id) {
-    return axios.delete(`${REST_ENDPOINT}${path}/${id}`);
+    return axiosPrivate.delete(`${REST_ENDPOINT}${path}/${id}`);
   },
 };
 
 export const authApi = {
   login(email, password) {
-    return axios.get(
-      `${REST_ENDPOINT}online/login?email=${email}&password=${password}`
+    return axiosPublic.get(
+      `${REST_ENDPOINT}online/loginOld?email=${email}&password=${password}`
     );
   },
+  loginJwt(credentials) {
+    return axiosPublic.post(`${REST_ENDPOINT}online/login`, credentials);
+  },
+  postLoginJwt(accessToken) {
+    return axiosPublic.get(`${REST_ENDPOINT}online/postLogin`, {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    });
+  },
+  refreshTokenJwt(refreshToken) {
+    return axiosPublic.get(`${REST_ENDPOINT}online/refreshToken`, {
+      headers: {
+        Authorization: "Bearer " + refreshToken,
+      },
+    });
+  },
   register(user) {
-    return axios.post(`${REST_ENDPOINT}online/register`, user);
+    return axiosPublic.post(`${REST_ENDPOINT}online/register`, user);
   },
 };
 
 export const listingApi = {
   getListingByLineAndTag(line, tag) {
-    return axios.get(
+    return axiosPublic.get(
       `${REST_ENDPOINT}sam/model/tag/${line}/${tag}`
     );
   },
   getListingByLine(line) {
-    return axios.get(
+    return axiosPublic.get(
       `${REST_ENDPOINT}sam/model/tag/${line}`
     );
   }

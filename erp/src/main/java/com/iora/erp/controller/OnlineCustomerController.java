@@ -1,15 +1,28 @@
 package com.iora.erp.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iora.erp.exception.AuthenticationException;
+import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
+import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,13 +50,60 @@ public class OnlineCustomerController {
      * ---------------------------------------------------------
      */
 
-    @GetMapping(path = "/login", produces = "application/json")
+    @GetMapping(path = "/loginOld", produces = "application/json")
     public ResponseEntity<Object> customerLogin(@RequestParam String email, @RequestParam String password) {
         try {
             return ResponseEntity.ok(customerService.loginAuthentication(email, password));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/refreshToken")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        try {
+            DecodedJWT decodedJWT = JWTUtil.decodeHeader(authHeader);
+            String username = decodedJWT.getSubject();
+            Customer customer = customerService.getCustomerByEmail(username);
+            String issuer = request.getRequestURL().toString();
+            List<String> authorities = List.of("CUSTOMER");
+            String accessToken = JWTUtil.generateAccessToken(username, issuer, authorities);
+            String refreshToken = authHeader.substring("Bearer ".length());
+            Map<String, String> tokens = new HashMap<>();
+            tokens.put("accessToken", accessToken);
+            tokens.put("refreshToken", refreshToken);
+            tokens.put("username", customer.getEmail());
+            response.setContentType("application/json");
+            new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Refresh token is missing");
+        } catch (CustomerException | JWTVerificationException e) {
+            response.setHeader("error", e.getMessage());
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            Map<String, String> error = new HashMap<>();
+            error.put("errorMessage", e.getMessage());
+            response.setContentType("application/json");
+            new ObjectMapper().writeValue(response.getOutputStream(), error);
+        }
+    }
+
+    @GetMapping(path = "/postLogin")
+    public ResponseEntity<Object> postLogin(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        try {
+            DecodedJWT decodedJWT = JWTUtil.decodeHeader(authHeader);
+            String username = decodedJWT.getSubject();
+            Customer customer = customerService.getCustomerByEmail(username);
+            Customer out = new Customer(customer.getFirstName(), customer.getLastName(), customer.getEmail(),
+                    customer.getDob(), customer.getContactNumber(), customer.getMembershipTier(), "");
+            return ResponseEntity.ok(out);
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Refresh token is missing");
+        } catch (CustomerException | JWTVerificationException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

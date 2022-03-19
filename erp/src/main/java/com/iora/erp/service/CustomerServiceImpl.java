@@ -25,6 +25,7 @@ import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,8 @@ public class CustomerServiceImpl implements CustomerService {
     private EmailService emailService;
     @PersistenceContext
     private EntityManager em;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
     @Override
     public Customer createCustomerAccount(Customer customer) throws RegistrationException {
@@ -50,8 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
             getCustomerByEmail(customer.getEmail());
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
-            customer.setSalt(StringGenerator.saltGeneration());
-            customer.sethashPass(StringGenerator.generateProtectedPassword(customer.getSalt(), customer.gethashPass()));
+            customer.setPassword(passwordEncoder.encode(customer.getPassword()));
             em.persist(customer);
 
             return customer;
@@ -185,10 +187,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer loginAuthentication(String email, String password) throws CustomerException {
         try {
-
             Customer c = getCustomerByEmail(email);
 
-            if (c.authentication(StringGenerator.generateProtectedPassword(c.getSalt(), password))) {
+            if (passwordEncoder.matches(password, c.getPassword())) {
                 return c;
             } else {
                 throw new CustomerException("Authentication Fail");
@@ -202,7 +203,7 @@ public class CustomerServiceImpl implements CustomerService {
     public void resetPassword(Long id) throws CustomerException {
         Customer c = getCustomerById(id);
         String tempPassword = StringGenerator.generateRandom(48, 122, 8);
-        c.sethashPass(StringGenerator.generateProtectedPassword(c.getSalt(), tempPassword));
+        c.setPassword(passwordEncoder.encode(tempPassword));
 
         emailService.sendCustomerPassword(c, tempPassword);
     }

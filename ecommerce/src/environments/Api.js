@@ -59,12 +59,12 @@ export const authApi = {
 export const listingApi = {
   getListingByLineAndTag(line, tag) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}sam/model/tag/${line}/${tag}`
+      `${REST_ENDPOINT}online/model/tag/${line}/${tag}`
     );
   },
   getListingByLine(line) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}sam/model/tag/${line}`
+      `${REST_ENDPOINT}online/model/tag/${line}`
     );
   }
 }

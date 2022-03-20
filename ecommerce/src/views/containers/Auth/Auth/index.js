@@ -27,10 +27,10 @@ export function Auth({ children }) {
             autoDismiss: true,
           });
           localStorage.removeItem("refreshToken");
-          location.pathname !== "/login" && navigate("/login");
+          location.pathname.startsWith("/settings") && navigate("/login");
         });
     } else {
-      location.pathname !== "/login" && navigate("/login");
+      location.pathname.startsWith("/settings") && navigate("/login");
     }
   }, [location, dispatch, navigate, refreshToken, addToast]);
 

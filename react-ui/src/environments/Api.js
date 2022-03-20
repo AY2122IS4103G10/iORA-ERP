@@ -299,7 +299,7 @@ export const onlineOrderApi = {
     );
   },
   getPaymentIntent(lineItems) {
-    return axiosPublic.post(`${REST_ENDPOINT}online/pay`, lineItems);
+    return axiosPrivate.post(`${REST_ENDPOINT}online/pay`, lineItems);
   },
   pickPack(orderId, siteId) {
     return axiosPrivate.put(
@@ -343,7 +343,7 @@ export const orderApi = {
     );
   },
   createOrder(order, paymentIntentId) {
-    return axiosPublic.post(
+    return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/create?clientSecret=${paymentIntentId}`,
       order
     );
@@ -357,19 +357,19 @@ export const posApi = {
     );
   },
   addProductToLineItems(rfidsku, lineItems) {
-    return axiosPublic.post(
+    return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/add/${rfidsku}`,
       lineItems
     );
   },
   removeProductFromLineItems(rfidsku, lineItems) {
-    return axiosPublic.post(
+    return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/remove/${rfidsku}`,
       lineItems
     );
   },
   calculatePromotions(lineItems) {
-    return axiosPublic.post(
+    return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/calculate`,
       lineItems
     );

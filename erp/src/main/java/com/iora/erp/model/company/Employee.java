@@ -1,8 +1,6 @@
 package com.iora.erp.model.company;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.iora.erp.enumeration.PayType;
@@ -43,15 +40,12 @@ public class Employee implements Serializable {
     private Department department;
     @OneToOne(fetch = FetchType.EAGER)
     private Company company;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy="employee")
-    private List<Notification> notifications;
 
     public Employee(String name, String username, String password) {
         this.name = name;
         this.username = username;
         this.password = password;
         this.availStatus = true;
-        this.notifications = new ArrayList<>();
     }
 
     public Employee(String name, String email, Double salary, String username, String password, Boolean availStatus,
@@ -66,7 +60,6 @@ public class Employee implements Serializable {
         this.jobTitle = jobTitle;
         this.department = department;
         this.company = company;
-        this.notifications = new ArrayList<>();
     }
 
     public Employee() {
@@ -170,12 +163,11 @@ public class Employee implements Serializable {
         this.company = company;
     }
 
-    public List<Notification> getNotifications() {
-        return this.notifications;
-    }
-
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
+    public boolean authentication(String password2) {
+        if (password2.equals(this.password)) {
+            return true;
+        }
+        return false;
     }
 
 }

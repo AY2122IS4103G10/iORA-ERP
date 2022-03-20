@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,6 +26,7 @@ import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -157,8 +159,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         em.persist(customerOrder);
-        return customerOrder;
-        // return finaliseCustomerOrder(customerOrder); to fix this method
+        return finaliseCustomerOrder(customerOrder);
     }
 
     @Override
@@ -514,15 +515,17 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
-        Double spending = em
-                .createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date",
-                        Payment.class)
-                .setParameter("id", customer.getId())
-                .setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP)
-                .getResultList()
+        TypedQuery<CustomerOrder> q = em.createQuery(
+                "SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date", CustomerOrder.class);
+        q.setParameter("id", customer.getId());
+        q.setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP);
+
+        double spending = q.getResultList()
                 .stream()
-                .mapToDouble(x -> x.getAmount())
-                .sum();
+                .map(x -> x.getPayments())
+                .map(x -> x.stream().mapToDouble(y -> y.getAmount()).sum())
+                .collect(Collectors.summingDouble(Double::doubleValue));
+
         List<MembershipTier> tiers = em
                 .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
                 .getResultList();
@@ -555,8 +558,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             }
         }
         Integer membershipPoints = customer.getMembershipPoints();
-        membershipPoints = Integer.sum(membershipPoints,
-                (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier()));
+        membershipPoints = membershipPoints
+                + (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier());
         customer.setMembershipPoints(membershipPoints);
     }
 
@@ -565,6 +568,21 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
      * Online Order Statuses Methods
      * ---------------------------------------------------------
      */
+
+    private OnlineOrder updateOnlineOrder(OnlineOrder onlineOrder) {
+        Notification noti = new Notification("Online Order #" + onlineOrder.getId(),
+                "Status has been updated to " + onlineOrder.getLastStatus().name() + ": "
+                        + onlineOrder.getLastStatus().getDescription());
+
+        Site site1 = onlineOrder.getSite();
+        site1.addNotification(noti);
+        if (!onlineOrder.getDelivery() && !onlineOrder.getSite().equals(onlineOrder.getPickupSite())) {
+            Site site2 = onlineOrder.getPickupSite();
+            site2.addNotification(noti);
+        }
+
+        return em.merge(onlineOrder);
+    }
 
     @Override
     public OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret)
@@ -576,8 +594,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         onlineOrder.setSite(siteService.getSite(3L));
         onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatus.PENDING));
         em.persist(onlineOrder);
-        return onlineOrder;
-        // return finaliseCustomerOrder(onlineOrder); to fix this method
+        finaliseCustomerOrder(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 
     @Override
@@ -594,7 +612,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.CANCELLED));
         }
 
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 
     @Override
@@ -622,7 +640,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             }
         }
 
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 
     @Override
@@ -700,7 +718,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             throw new CustomerOrderException("Order is not up for delivery.");
         }
 
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 
     @Override
@@ -717,7 +735,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             throw new CustomerOrderException("Order is not up for delivery.");
         }
 
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 
     // Only for self-pickup order
@@ -735,7 +753,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         onlineOrder.addStatusHistory(
                 new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.READY_FOR_COLLECTION));
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 
     @Override
@@ -748,6 +766,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         onlineOrder.addStatusHistory(
                 new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.COLLECTED));
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 }

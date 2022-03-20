@@ -1,8 +1,10 @@
 import { CheckCircleIcon } from "@heroicons/react/outline";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { onlineOrderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
@@ -20,7 +22,8 @@ const OnlineOrderTable = ({ data, handleOnClick }) => {
       },
       {
         Header: "Status",
-        accessor: "status",
+        accessor: (row) =>
+          row.statusHistory[row.statusHistory.length - 1].status,
         Filter: SelectColumnFilter,
         filter: "includes",
       },
@@ -46,24 +49,37 @@ const OnlineOrderTable = ({ data, handleOnClick }) => {
 };
 
 export const OnlineOrderList = ({ subsys }) => {
+  const { addToast } = useToasts();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const currSiteId = parseInt(useSelector(selectUserSite));
 
   useEffect(() => {
     const fetchOnlineOrdersOfSite = async () => {
-      // const { data } = await onlineOrderApi.getAllBySite(currSiteId);
-      const { data } = await onlineOrderApi.getAll();
-      console.log(data);
-      setData(data);
+      setLoading(true);
+      try {
+        const { data } = await onlineOrderApi.getAllBySite(currSiteId);
+        setData(data);
+        setLoading(false);
+      } catch (error) {
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      }
     };
     fetchOnlineOrdersOfSite();
-  }, [currSiteId]);
+  }, [currSiteId, addToast]);
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);
 
-  return (
+  return loading ? (
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BFFF" height={20} width={20} />
+    </div>
+  ) : (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
         {Boolean(data.length) ? (

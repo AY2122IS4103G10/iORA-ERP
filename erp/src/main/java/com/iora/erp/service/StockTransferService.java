@@ -2,6 +2,8 @@ package com.iora.erp.service;
 
 import java.util.List;
 
+import javax.naming.directory.InvalidAttributesException;
+
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.exception.StockTransferException;
@@ -14,8 +16,8 @@ public interface StockTransferService {
     public abstract List<StockTransferOrder> getStockTransferOrderOfSite(Site site);
     public abstract List<StockTransferOrder> getStockTransferOrdersForDelivery();
 
-    public abstract StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException;
-    public abstract StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
+    public abstract StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, InvalidAttributesException;
+    public abstract StockTransferOrder updateOrderDetails(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;
     public abstract StockTransferOrder cancelStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException;
     public abstract StockTransferOrder rejectStockTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException;
     public abstract StockTransferOrder confirmStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException;

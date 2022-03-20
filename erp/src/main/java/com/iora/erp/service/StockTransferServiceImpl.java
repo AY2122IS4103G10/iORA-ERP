@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.directory.InvalidAttributesException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -14,6 +15,7 @@ import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.exception.StockTransferException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.stockTransfer.STOStatus;
@@ -75,16 +77,36 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         for (StockTransferOrder sto : getStockTransferOrders()) {
             if (sto.getLastStatus() == StockTransferStatus.READY_FOR_DELIVERY
-                    || sto.getLastStatus() == StockTransferStatus.DELIVERING) {
+                    || sto.getLastStatus() == StockTransferStatus.DELIVERING
+                    || sto.getLastStatus() == StockTransferStatus.DELIVERING_MULTIPLE) {
                 deliveryOrders.add(sto);
             }
         }
         return deliveryOrders;
     }
 
+    private StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder) {
+        Notification noti = new Notification("Stock Transfer Order #" + stockTransferOrder.getId(),
+                "Status has been updated to " + stockTransferOrder.getLastStatus().name() + ": "
+                        + stockTransferOrder.getLastStatus().getDescription());
+
+        // If HQ is creator, need to include HQ in the loop too
+        Site firstActor = stockTransferOrder.getStatusHistory().get(0).getActionBy();
+        if (!firstActor.equals(stockTransferOrder.getFromSite())
+                && !firstActor.equals(stockTransferOrder.getToSite())) {
+            firstActor.addNotification(noti);
+        }
+
+        Site site1 = stockTransferOrder.getFromSite();
+        site1.addNotification(noti);
+        Site site2 = stockTransferOrder.getToSite();
+        site2.addNotification(noti);
+        return em.merge(stockTransferOrder);
+    }
+
     @Override
     public StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
-            throws SiteConfirmationException {
+            throws SiteConfirmationException, InvalidAttributesException {
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null) {
@@ -96,12 +118,13 @@ public class StockTransferServiceImpl implements StockTransferService {
             stockTransferOrder
                     .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.PENDING));
         }
+
         em.persist(stockTransferOrder);
-        return stockTransferOrder;
+        return updateStockTransferOrder(stockTransferOrder);
     }
 
     @Override
-    public StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
+    public StockTransferOrder updateOrderDetails(StockTransferOrder stockTransferOrder, Long siteId)
             throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
 
@@ -114,7 +137,7 @@ public class StockTransferServiceImpl implements StockTransferService {
         } else {
             stockTransferOrder
                     .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.PENDING));
-            return em.merge(stockTransferOrder);
+            return updateStockTransferOrder(stockTransferOrder);
         }
     }
 
@@ -135,7 +158,7 @@ public class StockTransferServiceImpl implements StockTransferService {
         }
 
         stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.CANCELLED));
-        return em.merge(stOrder);
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -152,7 +175,7 @@ public class StockTransferServiceImpl implements StockTransferService {
         }
 
         stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.CANCELLED));
-        return em.merge(stOrder);
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -167,7 +190,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             throw new StockTransferException("Stock Transfer Order is not pending for approval.");
         }
         stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.ACCEPTED));
-        return em.merge(stOrder);
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -198,7 +221,7 @@ public class StockTransferServiceImpl implements StockTransferService {
             throw new StockTransferException("Order is not due to pick or pack.");
         }
 
-        return em.merge(stOrder);
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -280,7 +303,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         stOrder.addStatusHistory(
                 new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.DELIVERING));
-        return em.merge(stOrder);
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -294,7 +317,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         stOrder.addStatusHistory(
                 new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.DELIVERING_MULTIPLE));
-        return em.merge(stOrder);
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -347,6 +370,6 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         stOrder.addStatusHistory(
                 new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.COMPLETED));
-        return em.merge(stOrder);
+        return updateStockTransferOrder(stOrder);
     }
 }

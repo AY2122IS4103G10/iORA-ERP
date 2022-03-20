@@ -59,7 +59,7 @@ const ItemTable = ({ data }) => {
   );
 };
 
-const OrderDetailsBody = ({ history, order, lineItems }) => {
+const OrderDetailsBody = ({ history, order, lineItems, status }) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -78,7 +78,7 @@ const OrderDetailsBody = ({ history, order, lineItems }) => {
               <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Status</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{order.status}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">{status}</dd>
                 </div>
 
                 <div className="sm:col-span-1">
@@ -187,5 +187,5 @@ export const CustomerOrderDetails = () => {
       );
     });
   }, [statusHistory]);
-  return Boolean(order) && <OrderDetailsBody order={order} lineItems={lineItems} history={history} />;
+  return Boolean(order) && <OrderDetailsBody order={order} status={status} lineItems={lineItems} history={history} />;
 };

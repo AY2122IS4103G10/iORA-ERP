@@ -489,7 +489,7 @@ public class SAMController {
         try {
 
             return ResponseEntity
-                    .ok(procurementService.updateProcurementOrder(procurementOrder, siteId));
+                    .ok(procurementService.updateProcurementOrderDetails(procurementOrder, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

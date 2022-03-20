@@ -63,7 +63,7 @@ const product = {
 }
 const policies = [
     { name: 'Doorstep delivery', icon: GlobeIcon, description: 'Enjoy Free Shipping with $25 purchase within Singapore.' },
-    { name: '30 Days Exchange', icon: CurrencyDollarIcon, description: "Exchange at any of our retail stores in Singapore within 30 days from date of order placement. Exchange not applicable for items purchased during a sale or a campaign. Items purchased on regular price, 2 for $29 and 2 for $49 will be eligible for exchange."},
+    { name: '30 Days Exchange', icon: CurrencyDollarIcon, description: "Exchange at any of our retail stores in Singapore within 30 days from date of order placement. Exchange not applicable for items purchased during a sale or a campaign. Items purchased on regular price, 2 for $29 and 2 for $49 will be eligible for exchange." },
 ]
 
 function classNames(...classes) {
@@ -153,27 +153,14 @@ export const SizePicker = ({ model, selectedSize, setSelectedSize }) => {
     );
 }
 
-export const StockAvailability = ({model, selectedColor, selectedSize}) => {
-    const dispatch = useDispatch();
-    const qty = useSelector(selectProductStock);
-    //find the sku code according to color and size from the model
-    const product = findProduct(model, selectedColor, selectedSize);
-    console.log(product);
-
-    //fetch the stock availability
-    useEffect(() => {
-        if (product !== undefined) {
-            dispatch(fetchProductStock(product.sku));
-        }
-    }, [])
-    
-    console.log(qty);
-
-
+export const StockAvailability = ({ productStock }) => {
 
     return (
-        <div className="text-center mt-4">
-            <p>displaying stocks...</p>
+        <div className="text-center mt-6">
+            {productStock !== null && productStock.qty !== 0 ?
+                <p>In Stock: {productStock.qty}</p>
+                : <p>Out of Stock</p>
+            }
         </div>
     );
 
@@ -183,8 +170,8 @@ const findProduct = (model, selectedColor, selectedSize) => {
     return (
         model.products.find((prod) => {
             if (prod.productFields.some((field) => field.fieldName === "COLOUR" && field.id === selectedColor)
-            &&
-            prod.productFields.some((field) => field.fieldName === "SIZE" && field.id === selectedSize)
+                &&
+                prod.productFields.some((field) => field.fieldName === "SIZE" && field.id === selectedSize)
             ) {
                 return true;
             } else {
@@ -198,23 +185,33 @@ export default function ViewModel() {
     const dispatch = useDispatch();
     const { modelCode } = useParams();
     const model = useSelector(selectModel);
-    console.log(model);
-
     const [selectedColor, setSelectedColor] = useState(0)
     const [selectedSize, setSelectedSize] = useState(0)
 
-    console.log(selectedColor);
-    console.log(selectedSize);
+    const productStock = useSelector(selectProductStock);
 
     useEffect(() => {
         dispatch(fetchModel(modelCode));
     }, [dispatch])
 
+    //fetch the stock availability
+    useEffect(() => {
+        console.log(model);
+        if (model !== null || model !== undefined) {
+            const product = findProduct(model, selectedColor, selectedSize);
+            if (product !== undefined) {
+                dispatch(fetchProductStock(product?.sku));
+            }
+        }
+    }, [selectedColor, selectedSize])
+    console.log("QTY", productStock);
+
+
     const onAddCartClicked = (e) => {
         e.preventDefault();
         if (selectedColor !== 0 && selectedSize !== 0) {
             const product = findProduct(model, selectedColor, selectedSize);
-            dispatch(addToCart({model: model, product: product}))
+            dispatch(addToCart({ model: model, product: product }))
         }
 
     }
@@ -290,13 +287,10 @@ export default function ViewModel() {
                                     selectedSize={selectedSize}
                                     setSelectedSize={setSelectedSize}
                                 />
-
-                                <StockAvailability 
-                                    model={model}
-                                    selectedColor={selectedColor}
-                                    selectedSize={selectedSize}
-                                />
-
+                                {model !== null && selectedColor !== 0 && selectedSize !== 0 ?    
+                                    <StockAvailability productStock={productStock} />
+                                    : null
+                                }
                                 <button
                                     type="submit"
                                     className="mt-8 w-full bg-gray-800 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"

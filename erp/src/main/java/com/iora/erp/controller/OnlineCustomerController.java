@@ -320,9 +320,13 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
-        return siteService.getStockLevelByProduct(sku);
+    @GetMapping(path = "/viewStock/{skuCode}", produces = "application/json")
+    public StockLevelLI viewStock(@PathVariable String skuCode) {
+        try {
+            return siteService.getStockLevelLI(3L, skuCode);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @PostMapping(path = "/customerOrder/calculate", consumes = "application/json", produces = "application/json")

@@ -27,9 +27,10 @@ export function Notifications({
     }
 
     useEffect(() => {
-        const timer = setInterval(getNotifications, 2000);
-        return () => clearInterval(timer);
-    });
+        getNotifications();
+        //const timer = setInterval(getNotifications, 2000);
+        //return () => clearInterval(timer);
+    }, [notifications]);
 
     return (
         <Transition.Root show={open} as={Fragment}>

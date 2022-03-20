@@ -137,7 +137,7 @@ const OrderList = ({
                 Promotions
               </p>
             )}
-            <ul className="border-t border-b border-gray-200">
+            <ul className="border-b border-gray-200">
               {promotions.map((lineItem, index) => (
                 <li key={index} className="flex py-6">
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">

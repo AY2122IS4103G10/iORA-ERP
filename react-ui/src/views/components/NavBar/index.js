@@ -1,6 +1,6 @@
 import { Menu, Transition } from "@headlessui/react";
 import {
-  BellIcon,
+  BellIcon, ExclamationIcon,
   ChevronDownIcon, MenuAlt1Icon
 } from "@heroicons/react/outline";
 import { Fragment, useState } from "react";
@@ -22,10 +22,11 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
   };
 
   const [open, setOpen] = useState(false);
-  const [siteId, setSiteId] = useState(0);
+  const [newNoti, setNewNoti] = useState(false);
+
   const notiClicked = () => {
+    setNewNoti(false);
     setOpen(true);
-    setSiteId(new Number(JSON.parse(localStorage.getItem("siteId"))))
   }
 
   return (
@@ -47,9 +48,13 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
             className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
           >
             <span className="sr-only">View notifications</span>
-            <BellIcon className="h-6 w-6" aria-hidden="true" />
-          </button>
 
+            <BellIcon className="h-6 w-6" aria-hidden="true" />
+            {newNoti && <ExclamationIcon
+              className="h-6 w-6 w-5 text-red-500"
+              aria-hidden="true"
+            />}
+          </button>
           {/* Profile dropdown */}
           <Menu as="div" className="ml-3 relative">
             <div>
@@ -123,7 +128,7 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
           </Menu>
         </div>
       </div>
-      <Notifications open={open} setOpen={setOpen} siteId={siteId} />
+      <Notifications open={open} setOpen={setOpen} setNewNoti={setNewNoti} />
     </div>
   );
 };

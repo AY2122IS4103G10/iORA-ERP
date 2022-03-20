@@ -51,6 +51,8 @@ public class CustomerOrder {
 
     private Long customerId;
 
+    private String voucherCode;
+
     public CustomerOrder() {
         dateTime = new Date();
         this.lineItems = new ArrayList<>();

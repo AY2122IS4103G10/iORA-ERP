@@ -75,12 +75,9 @@ public class ProcurementServiceImpl implements ProcurementService {
                 "Status has been updated to " + procurementOrder.getLastStatus().name() + ": "
                         + procurementOrder.getLastStatus().getDescription());
 
-        Site site1 = procurementOrder.getHeadquarters();
-        site1.addNotification(noti);
-        Site site2 = procurementOrder.getManufacturing();
-        site2.addNotification(noti);
-        Site site3 = procurementOrder.getWarehouse();
-        site3.addNotification(noti);
+        procurementOrder.getHeadquarters().addNotification(noti);
+        procurementOrder.getManufacturing().addNotification(noti);
+        procurementOrder.getWarehouse().addNotification(noti);
         return em.merge(procurementOrder);
     }
 
@@ -93,7 +90,16 @@ public class ProcurementServiceImpl implements ProcurementService {
             procurementOrder.setHeadquarters(actionBy);
 
             em.persist(procurementOrder);
-            return updateProcurementOrder(procurementOrder);
+
+            Notification noti = new Notification("NEW Procurement Order #" + procurementOrder.getId(),
+                    "Status is " + procurementOrder.getLastStatus().name() + ": "
+                            + procurementOrder.getLastStatus().getDescription());
+
+            procurementOrder.getHeadquarters().addNotification(noti);
+            procurementOrder.getManufacturing().addNotification(noti);
+            procurementOrder.getWarehouse().addNotification(noti);
+
+            return procurementOrder;
         } else {
             throw new SiteConfirmationException("Site is not authorised to create Procurement Order.");
         }

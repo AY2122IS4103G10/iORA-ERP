@@ -276,4 +276,33 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
+    // Get models by category (2 FOR S$49 / IORA NEW ARRIVALS)
+    // Return empty list if no results
+    @GetMapping(path = "/model/category/{category}", produces = "application/json")
+    public ResponseEntity<Object> getModelsByCategory(@PathVariable String category) {
+        try {
+            return ResponseEntity.ok(productService.getModelsByCategory(category));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/model/skuCode/{sku}", produces = "application/json")
+    public ResponseEntity<Object> getModelsNameBySKU(@PathVariable String sku) {
+        try {
+            return ResponseEntity.ok(productService.getModelByProduct(productService.getProduct(sku)));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/model/modelCode/{modelCode}", produces = "application/json")
+    public ResponseEntity<Object> getModelsNameByModelCode(@PathVariable String modelCode) {
+        try {
+            return ResponseEntity.ok(productService.getModel(modelCode));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }

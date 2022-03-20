@@ -66,5 +66,24 @@ export const listingApi = {
     return axiosPublic.get(
       `${REST_ENDPOINT}online/model/tag/${line}`
     );
-  }
+  },
+  getModel(modelCode) {
+    return axiosPublic.get(
+      `${REST_ENDPOINT}online/model/${modelCode}`
+    );
+  },
+  getProductStock(sku) {
+    return axiosPublic.get(
+      `${REST_ENDPOINT}online/viewStock/product/${sku}`
+    );
+  },
+}
+
+export const checkoutApi = {
+  calculatePromotions(lineItems) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}online/customerOrder/calculate`,
+      lineItems
+    );
+  },
 }

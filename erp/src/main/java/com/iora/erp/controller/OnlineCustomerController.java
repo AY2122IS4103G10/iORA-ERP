@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.model.site.StockLevelLI;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,6 +23,7 @@ import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.StripeService;
+import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -46,6 +49,8 @@ public class OnlineCustomerController {
     private CustomerOrderService customerOrderService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SiteService siteService;
 
     /*
      * ---------------------------------------------------------
@@ -287,6 +292,15 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+    
+    @GetMapping(path = "/model/{modelCode}", produces = "application/json")
+    public ResponseEntity<Object> getModel(@PathVariable String modelCode) {
+        try {
+            return ResponseEntity.ok(productService.getModel(modelCode));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
     @GetMapping(path = "/model/skuCode/{sku}", produces = "application/json")
     public ResponseEntity<Object> getModelsNameBySKU(@PathVariable String sku) {
@@ -302,6 +316,21 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(productService.getModel(modelCode));
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
+    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
+        return siteService.getStockLevelByProduct(sku);
+    }
+
+    @PostMapping(path = "/customerOrder/calculate", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> calculatePromotions(@RequestBody List<CustomerOrderLI> lineItems) {
+        try {
+            return ResponseEntity.ok(customerOrderService.calculatePromotions(lineItems));
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

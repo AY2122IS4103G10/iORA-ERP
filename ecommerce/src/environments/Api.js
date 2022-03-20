@@ -74,7 +74,7 @@ export const listingApi = {
   },
   getProductStock(sku) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/viewStock/${sku}`
+      `${REST_ENDPOINT}online/viewStock/product/${sku}`
     );
   },
 }

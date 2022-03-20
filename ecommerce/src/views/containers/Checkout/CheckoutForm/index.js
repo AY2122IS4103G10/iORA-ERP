@@ -14,9 +14,13 @@
   }
   ```
 */
-import { Fragment } from 'react'
+import { useEffect, useState, Fragment } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
 import { Popover, Transition } from '@headlessui/react'
 import { ChevronUpIcon } from '@heroicons/react/solid'
+
+import { selectCart } from "../../../../stores/slices/cartSlice";
 
 const products = [
   {
@@ -33,19 +37,31 @@ const products = [
   // More products...
 ]
 
+function calculateSubTotal(cart) {
+  let amount = 0;
+  cart.map((item) => {
+    amount = amount + item.model.listPrice * item.qty;
+  })
+  return amount;
+}
+
 export const Checkout = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); 
+  const cart = useSelector(selectCart);
+
   return (
     <div className="bg-white">
       {/* Background color split screen for large screens */}
-      <div className="hidden lg:block fixed top-0 left-0 w-1/2 h-full bg-white" aria-hidden="true" />
-      <div className="hidden lg:block fixed top-0 right-0 w-1/2 h-full bg-gray-50" aria-hidden="true" />
+      <div className="hidden lg:block h-full bg-white" aria-hidden="true" />
+      <div className="hidden lg:block h-full bg-gray-50" aria-hidden="true" />
 
       <div className="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:px-8 lg:grid-cols-2 xl:gap-x-48">
         <h1 className="sr-only">Order information</h1>
 
         <section
           aria-labelledby="summary-heading"
-          className="bg-gray-50 pt-16 pb-10 px-4 sm:px-6 lg:px-0 lg:pb-16 lg:bg-transparent lg:row-start-1 lg:col-start-2"
+          className="bg-gray-50 mt-7 pt-10 pb-10  sm:px-6 lg:px-10 lg:pb-16 lg:row-start-1 lg:col-start-2"
         >
           <div className="max-w-lg mx-auto lg:max-w-none">
             <h2 id="summary-heading" className="text-lg font-medium text-gray-900">
@@ -53,19 +69,16 @@ export const Checkout = () => {
             </h2>
 
             <ul role="list" className="text-sm font-medium text-gray-900 divide-y divide-gray-200">
-              {products.map((product) => (
-                <li key={product.id} className="flex items-start py-6 space-x-4">
-                  <img
-                    src={product.imageSrc}
-                    alt={product.imageAlt}
-                    className="flex-none w-20 h-20 rounded-md object-center object-cover"
-                  />
+              {cart.map((item, id) => (
+                <li key={id} className="flex items-start py-6 space-x-4">
                   <div className="flex-auto space-y-1">
-                    <h3>{product.name}</h3>
-                    <p className="text-gray-500">{product.color}</p>
-                    <p className="text-gray-500">{product.size}</p>
+                    <h3>{item.model.name} x {item.qty}</h3>
+                    <p className="text-gray-500">{item.product?.productFields.find((field) => field.fieldName === "COLOUR").fieldValue}</p>
+                    <p className="text-gray-500">
+                          {item.product?.productFields.find((field) => field.fieldName === "SIZE").fieldValue}
+                    </p>
                   </div>
-                  <p className="flex-none text-base font-medium">{product.price}</p>
+                  <p className="flex-none text-base font-medium">${parseInt(item.model.listPrice) * item.qty}</p>
                 </li>
               ))}
             </ul>
@@ -73,7 +86,7 @@ export const Checkout = () => {
             <dl className="hidden text-sm font-medium text-gray-900 space-y-6 border-t border-gray-200 pt-6 lg:block">
               <div className="flex items-center justify-between">
                 <dt className="text-gray-600">Subtotal</dt>
-                <dd>$320.00</dd>
+                <dd>${cart !== null ? calculateSubTotal(cart) : 0}</dd>
               </div>
 
               <div className="flex items-center justify-between">
@@ -130,7 +143,7 @@ export const Checkout = () => {
                       <dl className="max-w-lg mx-auto space-y-6">
                         <div className="flex items-center justify-between">
                           <dt className="text-gray-600">Subtotal</dt>
-                          <dd>$320.00</dd>
+                          <dd>{cart !== null ? calculateSubTotal(cart) : 0}</dd>
                         </div>
 
                         <div className="flex items-center justify-between">

@@ -54,7 +54,6 @@ export const Cart = () => {
     async function calculate() {
       let lineItems = cart.map((item) => {
         const { model, ...lineItem } = item;
-        console.log(lineItem);
         return lineItem;
       });
       console.log(lineItems);
@@ -65,6 +64,9 @@ export const Cart = () => {
           .map((y) => y.map((x) => x.subTotal).reduce((x, y) => x + y, 0))
           .reduce((x, y) => x + y, 0)
       );
+      console.log(amount);
+      console.log(promotions);
+      console.log(response.data);
     }
     calculate();
   }, [cart]);

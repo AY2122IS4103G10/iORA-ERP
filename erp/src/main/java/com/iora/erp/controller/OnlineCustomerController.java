@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.iora.erp.model.site.Site;
+import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
 
 import javax.servlet.http.HttpServletRequest;
@@ -320,10 +322,21 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/viewStock/{skuCode}", produces = "application/json")
-    public StockLevelLI viewStock(@PathVariable String skuCode) {
+    @GetMapping(path = "/viewStock/product/{skuCode}", produces = "application/json")
+    public ResponseEntity<Object> viewStockByProduct(@PathVariable String skuCode) {
         try {
-            return siteService.getStockLevelLI(3L, skuCode);
+            return ResponseEntity.ok(siteService.getStockLevelLI(3L, skuCode));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/viewStock", produces = "application/json")
+    public StockLevel viewStockOfOnlineSite() {
+        try {
+            Site site = siteService.getSite(3L);
+            return site.getStockLevel();
         } catch (Exception e) {
             return null;
         }

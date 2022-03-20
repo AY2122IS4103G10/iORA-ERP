@@ -574,8 +574,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 "Status has been updated to " + onlineOrder.getLastStatus().name() + ": "
                         + onlineOrder.getLastStatus().getDescription());
 
-        Site site1 = onlineOrder.getSite();
-        site1.addNotification(noti);
+        onlineOrder.getSite().addNotification(noti);
         if (!onlineOrder.getDelivery() && !onlineOrder.getSite().equals(onlineOrder.getPickupSite())) {
             Site site2 = onlineOrder.getPickupSite();
             site2.addNotification(noti);
@@ -595,7 +594,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatus.PENDING));
         em.persist(onlineOrder);
         finaliseCustomerOrder(onlineOrder);
-        return updateOnlineOrder(onlineOrder);
+
+        onlineOrder.getSite().addNotification(new Notification("NEW Online Order #" + onlineOrder.getId(),
+                "Status is " + onlineOrder.getLastStatus().name() + ": "
+                        + onlineOrder.getLastStatus().getDescription()));
+
+        return onlineOrder;
     }
 
     @Override

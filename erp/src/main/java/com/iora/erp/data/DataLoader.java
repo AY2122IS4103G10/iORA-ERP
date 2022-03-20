@@ -429,10 +429,10 @@ public class DataLoader implements CommandLineRunner {
 		BirthdayPoints bday = new BirthdayPoints("STANDARD", 200, 1, 2.00);
 		em.persist(bday);
 
-		MembershipTier basic = new MembershipTier("BASIC", 1.00, 0, bday);
-		MembershipTier silver = new MembershipTier("SILVER", 1.03, 200, bday);
-		MembershipTier gold = new MembershipTier("GOLD", 1.05, 1000, bday);
-		MembershipTier diamond = new MembershipTier("DIAMOND", 1.07, 2500, bday);
+		MembershipTier basic = new MembershipTier("BASIC", 0.00, 0, bday);
+		MembershipTier silver = new MembershipTier("SILVER", 0.03, 200, bday);
+		MembershipTier gold = new MembershipTier("GOLD", 0.05, 1000, bday);
+		MembershipTier diamond = new MembershipTier("DIAMOND", 0.07, 2500, bday);
 		em.persist(basic);
 		em.persist(silver);
 		em.persist(gold);

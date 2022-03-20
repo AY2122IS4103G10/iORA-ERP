@@ -97,10 +97,8 @@ public class StockTransferServiceImpl implements StockTransferService {
             firstActor.addNotification(noti);
         }
 
-        Site site1 = stockTransferOrder.getFromSite();
-        site1.addNotification(noti);
-        Site site2 = stockTransferOrder.getToSite();
-        site2.addNotification(noti);
+        stockTransferOrder.getFromSite().addNotification(noti);
+        stockTransferOrder.getToSite().addNotification(noti);
         return em.merge(stockTransferOrder);
     }
 
@@ -120,7 +118,20 @@ public class StockTransferServiceImpl implements StockTransferService {
         }
 
         em.persist(stockTransferOrder);
-        return updateStockTransferOrder(stockTransferOrder);
+
+        Notification noti = new Notification("NEW Stock Transfer Order #" + stockTransferOrder.getId(),
+                "Status is " + stockTransferOrder.getLastStatus().name() + ": "
+                        + stockTransferOrder.getLastStatus().getDescription());
+        
+        stockTransferOrder.getFromSite().addNotification(noti);
+        stockTransferOrder.getToSite().addNotification(noti);
+        if (!actionBy.equals(stockTransferOrder.getFromSite()) && !actionBy.equals(stockTransferOrder.getToSite())) {
+            actionBy.addNotification(noti);
+        }
+
+        em.merge(actionBy);
+
+        return stockTransferOrder;
     }
 
     @Override

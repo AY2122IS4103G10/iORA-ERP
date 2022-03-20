@@ -2,20 +2,35 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XIcon } from '@heroicons/react/outline';
 import moment from "moment";
 import { Fragment, useEffect, useState } from 'react';
+import { useToasts } from "react-toast-notifications";
 import { api } from "../../../environments/Api";
 
 export function Notifications({
     open,
     setOpen,
-    siteId }) {
+    setNewNoti }) {
+    const { addToast } = useToasts();
     const [notifications, setNotifications] = useState([]);
 
+    const getNotifications = async () => {
+        const response = await api.get("admin/noti", localStorage.getItem("siteId"))
+        const data = await response.data;
+
+        if (notifications.length !== data.length) {
+            addToast("New Notifications!", {
+                appearance: "info",
+                autoDismiss: true,
+            })
+            setNewNoti(true);
+            setNotifications(data);
+        }
+    }
+
     useEffect(() => {
-        api.get("admin/noti", siteId).then((response) => {
-            setNotifications(response.data);
-        })
-    }, [siteId]
-    )
+        getNotifications();
+        //const timer = setInterval(getNotifications, 2000);
+        //return () => clearInterval(timer);
+    }, [notifications]);
 
     return (
         <Transition.Root show={open} as={Fragment}>
@@ -50,10 +65,10 @@ export function Notifications({
                                             </div>
                                         </div>
                                     </div>
-                                    <ul role="list" className="flex-1 divide-y divide-gray-200 overflow-y-auto">
+                                    <ul className="flex-1 divide-y divide-gray-200 overflow-y-auto">
                                         {notifications.slice(0)
-                                            .reverse().map((noti) => (
-                                                <li key={noti.timeStamp}>
+                                            .reverse().map((noti, index) => (
+                                                <li key={index}>
                                                     <div className="group relative flex items-center py-6 px-5">
                                                         <a href={noti.href} className="-m-1 block flex-1 p-1">
                                                             <div className="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true" />

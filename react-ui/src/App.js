@@ -199,14 +199,7 @@ function App() {
 
             {/* Customer Orders */}
             <Route path="orders" element={<Outlet />}>
-              <Route
-                index
-                element={
-                  <ManageOrders subsys="sm">
-                    <OrderList subsys="sm" />
-                  </ManageOrders>
-                }
-              />
+             
               <Route
                 path="search"
                 element={

@@ -330,6 +330,12 @@ export const orderApi = {
   getAll() {
     return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder?orderId=`);
   },
+  getAllOnline() {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/onlineOrder?orderId=`);
+  },
+  getAllStore() {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/storeOrder?orderId=`);
+  },
   get(orderId) {
     return axiosPrivate.get(
       `${REST_ENDPOINT}store/customerOrder/view/${orderId}`

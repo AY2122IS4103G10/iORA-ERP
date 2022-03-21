@@ -55,6 +55,9 @@ import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductPrint } from "./views/containers/Products/ProductPrint";
 import { ProductsList } from "./views/containers/Products/ProductsList";
+import { ManageProfile } from "./views/containers/Profile/ManageProfile/index.js";
+import { Profile } from "./views/containers/Profile/Profile/index.js";
+import { Settings } from "./views/containers/Profile/Settings/index.js";
 // import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
@@ -94,9 +97,6 @@ function App() {
         <Route path="/" element={<Auth />}>
           {/* Common Infrastructure */}
           <Route index element={<Login />} />
-          <Route path="home" element={<HomeIndex />}>
-            <Route index element={<Home />} />
-          </Route>
 
           {/* Sales and Marketing Subsystem */}
           <Route
@@ -303,6 +303,7 @@ function App() {
                 element={<AProductStock subsys="str" />}
               />
             </Route>
+
             {/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
               <Route
@@ -593,6 +594,15 @@ function App() {
                 path="edit/:id"
                 element={<StockTransferForm subsys="wh" />}
               />
+            </Route>
+          </Route>
+
+          {/* Common Infrastructure Subsystem */}
+          <Route path="/" element={<HomeIndex />}>
+            <Route path="home" element={<Home />} />
+            <Route path="account" element={<ManageProfile />}>
+              <Route index element={<Profile />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
           </Route>
         </Route>

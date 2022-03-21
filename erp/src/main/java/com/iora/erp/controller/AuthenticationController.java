@@ -94,6 +94,7 @@ public class AuthenticationController {
             Employee out = new Employee(employee.getName(), employee.getEmail(), employee.getSalary(),
                     employee.getUsername(), "", employee.getAvailStatus(), employee.getPayType(),
                     employee.getJobTitle(), employee.getDepartment(), employee.getCompany());
+            out.setId(employee.getId());
             return ResponseEntity.ok(out);
         } catch (AuthenticationException e) {
             throw new RuntimeException("Refresh token is missing");

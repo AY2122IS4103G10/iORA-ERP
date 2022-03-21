@@ -131,15 +131,14 @@ const userSlice = createSlice({
       state.error = "Login failed";
     });
     builder.addCase(loginJwt.fulfilled, (state, action) => {
-      state = {
-        ...state,
-        user: { ...action.payload },
-        status: "succeeded",
-        loggedIn: true,
-      };
+      state.status = "succeeded";
     });
     builder.addCase(loginJwt.rejected, (state, action) => {
       state.error = "Login failed";
+    });
+    builder.addCase(postLoginJwt.fulfilled, (state, action) => {
+      state.user = { ...action.payload };
+      state.loggedIn = true;
     });
     builder.addCase(updateCurrSite, (state, action) => {
       state.currSite = action.payload;
@@ -152,7 +151,7 @@ export const { logout, updateCurrSite } = userSlice.actions;
 export const selectUserLoggedIn = (state) => state.user.loggedIn;
 
 export const selectUser = (state) => {
-  return { ...state.user.user };
+  return { ...state?.user?.user };
 };
 
 export const selectUserId = (state) => state.user.user.id;

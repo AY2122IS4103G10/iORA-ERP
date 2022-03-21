@@ -35,9 +35,6 @@ public class StockTransferOrder {
     @ManyToOne
     private Site toSite;
 
-    private boolean hqAccepted;
-    private boolean opAccepeted;
-
     public StockTransferOrder() {
         this.lineItems = new ArrayList<>();
         this.statusHistory = new ArrayList<>();
@@ -113,22 +110,6 @@ public class StockTransferOrder {
 
     public void setToSite(Site toSite) {
         this.toSite = toSite;
-    }
-
-    public boolean isHqAccepted() {
-        return this.hqAccepted;
-    }
-
-    public void setHqAccepted(boolean hqAccepted) {
-        this.hqAccepted = hqAccepted;
-    }
-
-    public boolean isOpAccepeted() {
-        return this.opAccepeted;
-    }
-
-    public void setOpAccepeted(boolean opAccepeted) {
-        this.opAccepeted = opAccepeted;
     }
 
     @Override

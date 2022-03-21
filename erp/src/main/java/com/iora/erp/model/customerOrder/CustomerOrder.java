@@ -10,12 +10,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.site.Site;
 
 @Entity
@@ -51,7 +54,9 @@ public class CustomerOrder {
 
     private Long customerId;
 
-    private String voucherCode;
+    @OneToOne
+    @JoinColumn(name = "voucher_code")
+    private Voucher voucher;
 
     public CustomerOrder() {
         dateTime = new Date();
@@ -156,5 +161,13 @@ public class CustomerOrder {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    public Voucher getVoucher() {
+        return this.voucher;
+    }
+
+    public void setVoucher(Voucher voucher) {
+        this.voucher = voucher;
     }
 }

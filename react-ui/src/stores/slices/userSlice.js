@@ -156,16 +156,21 @@ const userSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.responsibility = action.payload.responsibility;
+      localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("refreshToken", action.payload.refreshToken);
     });
     builder.addCase(updateProfile.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.responsibility = action.payload.responsibility;
+      localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("refreshToken", action.payload.refreshToken);
     });
     builder.addCase(refreshTokenJwt.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.accessToken = action.payload.accessToken;
+      localStorage.setItem("accessToken", action.payload.accessToken);
     });
     builder.addCase(loginJwt.rejected, (state, action) => {
       state.error = "Login failed";

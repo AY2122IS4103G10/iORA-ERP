@@ -225,6 +225,11 @@ export const authApi = {
       },
     });
   },
+  isUsernameAvailable(username) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}admin/usernameAvailable/${username}`
+    );
+  },
 };
 
 export const employeeApi = {
@@ -312,9 +317,7 @@ export const onlineOrderApi = {
     );
   },
   deliverOrder(orderId) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}online/deliver/${orderId}`
-    );
+    return axiosPrivate.put(`${REST_ENDPOINT}online/deliver/${orderId}`);
   },
   deliverMultiple(orderId) {
     return axiosPrivate.put(
@@ -322,14 +325,10 @@ export const onlineOrderApi = {
     );
   },
   receive(orderId) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}online/receive/${orderId}`
-    );
+    return axiosPrivate.put(`${REST_ENDPOINT}online/receive/${orderId}`);
   },
   collect(orderId) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}online/collect/${orderId}`
-    );
+    return axiosPrivate.put(`${REST_ENDPOINT}online/collect/${orderId}`);
   },
 };
 

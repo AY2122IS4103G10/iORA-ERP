@@ -70,6 +70,24 @@ public class ProcurementServiceImpl implements ProcurementService {
         return new ArrayList<>();
     }
 
+    @Override
+    public List<ProcurementOrder> getPOBySiteStatus(Long siteId, String status) throws ProcurementOrderException {
+        Site site = em.find(Site.class, siteId);
+        if (site == null) {
+            throw new ProcurementOrderException("Site cannot be found.");
+        }
+
+        List<ProcurementOrder> deliveries = new ArrayList<>();
+
+        for (ProcurementOrder po : getProcurementOrdersOfSite(site)) {
+            if (po.getLastStatus() == ProcurementOrderStatus.valueOf(status.toUpperCase())) {
+                deliveries.add(po);
+            }
+        }
+
+        return deliveries;
+    }
+
     private ProcurementOrder updateProcurementOrder(ProcurementOrder procurementOrder) {
         Notification noti = new Notification("Procurement Order #" + procurementOrder.getId(),
                 "Status has been updated to " + procurementOrder.getLastStatus().name() + ": "
@@ -91,7 +109,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
             em.persist(procurementOrder);
 
-            Notification noti = new Notification("NEW Procurement Order #" + procurementOrder.getId(),
+            Notification noti = new Notification("Procurement Order (NEW) #" + procurementOrder.getId(),
                     "Status is " + procurementOrder.getLastStatus().name() + ": "
                             + procurementOrder.getLastStatus().getDescription());
 

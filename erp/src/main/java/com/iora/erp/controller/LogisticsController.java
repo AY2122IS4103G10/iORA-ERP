@@ -3,6 +3,7 @@ package com.iora.erp.controller;
 import java.util.List;
 
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
+import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.StockTransferService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class LogisticsController {
 
     @Autowired
     private StockTransferService stockTransferService;
+    @Autowired
+    private ProcurementService procurementService;
 
     /*
      * ---------------------------------------------------------
@@ -44,6 +47,24 @@ public class LogisticsController {
     public ResponseEntity<Object> deliverStockTransferOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity.ok(stockTransferService.deliverStockTransferOrder(orderId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/po/{siteId}/{status}", produces = "application/json")
+    public ResponseEntity<Object> getPOBySiteStatus(@PathVariable Long siteId, @PathVariable String status) {
+        try {
+            return ResponseEntity.ok(procurementService.getPOBySiteStatus(siteId, status));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/sto/{siteId}/{status}", produces = "application/json")
+    public ResponseEntity<Object> getSTOBySiteStatus(@PathVariable Long siteId, @PathVariable String status) {
+        try {
+            return ResponseEntity.ok(stockTransferService.getSTOBySiteStatus(siteId, status));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

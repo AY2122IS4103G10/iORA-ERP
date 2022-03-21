@@ -63,6 +63,23 @@ public class StockTransferServiceImpl implements StockTransferService {
         q.setParameter("site", site);
         return q.getResultList();
     }
+    
+    @Override
+    public List<StockTransferOrder> getSTOBySiteStatus(Long siteId, String status) throws StockTransferException {
+        Site site = em.find(Site.class, siteId);
+        if (site == null) {
+            throw new StockTransferException("Site cannot be found.");
+        }
+        
+        List<StockTransferOrder> deliveryOrders = new ArrayList<>();
+        
+        for (StockTransferOrder sto : getStockTransferOrderOfSite(site)) {
+            if (sto.getLastStatus() == StockTransferStatus.valueOf(status.toUpperCase())) {
+                deliveryOrders.add(sto);
+            }
+        }
+        return deliveryOrders;
+    }
 
     @Override
     public List<StockTransferOrder> getStockTransferOrdersForDelivery() {
@@ -119,7 +136,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         em.persist(stockTransferOrder);
 
-        Notification noti = new Notification("NEW Stock Transfer Order #" + stockTransferOrder.getId(),
+        Notification noti = new Notification("Stock Transfer Order (NEW) #" + stockTransferOrder.getId(),
                 "Status is " + stockTransferOrder.getLastStatus().name() + ": "
                         + stockTransferOrder.getLastStatus().getDescription());
         

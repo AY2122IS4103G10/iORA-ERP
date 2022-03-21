@@ -216,6 +216,23 @@ function App() {
                 }
               />
               <Route
+                path="store"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" type="store"/>
+                  </ManageOrders>
+                }
+              />{" "}
+              <Route
+                path="online"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" type="online"/>
+                  </ManageOrders>
+                }
+              />
+              <Route />
+              <Route
                 path=":orderId"
                 element={<CustomerOrderWrapper subsys="sm" />}
               >

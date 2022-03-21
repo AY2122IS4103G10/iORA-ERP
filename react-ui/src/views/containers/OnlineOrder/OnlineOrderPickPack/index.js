@@ -79,9 +79,9 @@ export const OnlineOrderPickPack = () => {
   const { addToast } = useToasts();
   const {
     subsys,
-    order,
+    orderId,
     currSiteId,
-    status,
+    status: st,
     setStatus,
     statusHistory,
     setStatusHistory,
@@ -89,6 +89,7 @@ export const OnlineOrderPickPack = () => {
     setLineItems,
     openInvoice,
   } = useOutletContext();
+  const status = st.status;
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const onConfirmClicked = () => handlePickPack();
@@ -99,17 +100,17 @@ export const OnlineOrderPickPack = () => {
   };
 
   const handlePickPack = async () => {
-    const { data } = await onlineOrderApi.pickPack(order.id, currSiteId);
+    const { data } = await onlineOrderApi.pickPack(orderId, currSiteId);
     const { statusHistory } = data;
     setStatus(statusHistory[statusHistory.length - 1]);
     setStatusHistory(statusHistory);
     addToast(
-      `Order #${order.id}  ${
+      `Order #${orderId}  ${
         status === "PENDING"
           ? "has begun picking"
           : status === "PICKED"
           ? "has begun packing"
-          : "is ready for shipping"
+          : "is ready for delivery"
       }.`,
       {
         appearance: "success",
@@ -118,13 +119,13 @@ export const OnlineOrderPickPack = () => {
     );
     if (status === "PACKED") {
       openInvoice();
-      navigate(`/${subsys}/orders/${order.id}/delivery`);
+      navigate(`/${subsys}/orders/${orderId}/delivery`);
     }
   };
 
   const handleScan = async (barcode) => {
     try {
-      const { data } = await onlineOrderApi.scanItem(order.id, barcode);
+      const { data } = await onlineOrderApi.scanItem(orderId, barcode);
       const { lineItems: lIs, statusHistory } = data;
       setLineItems(
         lineItems.map((item, index) => ({
@@ -135,10 +136,15 @@ export const OnlineOrderPickPack = () => {
       );
       setStatus(statusHistory[statusHistory.length - 1]);
       setStatusHistory(statusHistory);
-      addToast(`Successfully picked ${barcode}.`, {
-        appearance: "success",
-        autoDismiss: true,
-      });
+      addToast(
+        `Successfully ${
+          status === "PICKING" || status === "PENDING" ? "picked" : "packed"
+        } ${barcode}.`,
+        {
+          appearance: "success",
+          autoDismiss: true,
+        }
+      );
       setSearch("");
     } catch (error) {
       addToast(`Error: ${error.message}`, {
@@ -147,7 +153,7 @@ export const OnlineOrderPickPack = () => {
       });
     }
   };
-  
+
   const onSearchChanged = (e) => {
     if (
       e.target.value.length - search.length > 10 &&
@@ -176,7 +182,7 @@ export const OnlineOrderPickPack = () => {
                   >
                     <ConfirmSection
                       subsys={subsys}
-                      procurementId={order.id}
+                      procurementId={orderId}
                       title={`Confirm items ${
                         status === "PICKED" ? "picked" : "packed"
                       }`}

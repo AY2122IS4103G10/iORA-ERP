@@ -14,8 +14,14 @@ const Header = ({ subsys }) => {
     },
     {
       id: 2,
-      name: "All Orders",
-      href: `/${subsys}/orders`,
+      name: "Store",
+      href: `/${subsys}/orders/store`,
+      current: true,
+    },
+    {
+      id: 2,
+      name: "Online",
+      href: `/${subsys}/orders/online`,
       current: true,
     },
   ];

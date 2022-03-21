@@ -228,24 +228,41 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const componentRef = useRef();
   const navigate = useNavigate();
   const handlePrint = useReactToPrint({ content: () => componentRef.current });
-  const [order, setOrder] = useState(null);
+  // const [order, setOrder] = useState(null);
   const [lineItems, setLineItems] = useState([]);
   const [status, setStatus] = useState("");
   const [statusHistory, setStatusHistory] = useState([]);
+  const [delivery, setDelivery] = useState(null);
+  const [dateTime, setDateTime] = useState(-1);
+  const [customerId, setCustomerId] = useState(-1);
+  const [totalAmount, setTotalAmount] = useState(-1);
+  const [payments, setPayments] = useState([]);
+  const [paid, setPaid] = useState(false);
+  const [country, setCountry] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const currSiteId = useSelector(selectUserSite);
 
   useEffect(() => {
     const fetchOrder = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
         const { data } = await orderApi.get(orderId);
-        const { lineItems, statusHistory } = data;
+        const {
+          lineItems,
+          delivery,
+          dateTime,
+          customerId,
+          totalAmount,
+          payments,
+          paid,
+          country,
+          statusHistory,
+        } = data;
         fetchAllModelsBySkus(lineItems).then((data) => {
           setLineItems(
             lineItems.map((item, index) => ({
@@ -258,11 +275,17 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             }))
           );
         });
-        setStatus(statusHistory[statusHistory.length - 1].status);
+        setStatus(statusHistory[statusHistory.length - 1]);
         setStatusHistory(statusHistory);
-        setOrder(data);
+        setDelivery(delivery);
+        setDateTime(dateTime);
+        setCustomerId(customerId);
+        setTotalAmount(totalAmount);
+        setPayments(payments);
+        setPaid(paid);
+        setCountry(country);
         setQrValue(`/${subsys}/orders/${orderId}/pick-pack`);
-        setLoading(false)
+        setLoading(false);
       } catch (error) {
         addToast(`Error: ${error.message}`, {
           appearance: "error",
@@ -272,110 +295,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     };
     fetchOrder();
   }, [subsys, orderId, addToast]);
-
-  // const onDeleteProcurementClicked = () => {
-  //   dispatch(
-  //     deleteExistingProcurement({
-  //       orderId: orderId,
-  //       siteId: headquarters.id,
-  //     })
-  //   )
-  //     .unwrap()
-  //     .then(() => {
-  //       addToast("Successfully deleted procurement order", {
-  //         appearance: "success",
-  //         autoDismiss: true,
-  //       });
-  //       closeModal();
-  //       navigate("/sm/procurements");
-  //     })
-  //     .catch((err) =>
-  //       addToast(`Error: ${err.message}`, {
-  //         appearance: "error",
-  //         autoDismiss: true,
-  //       })
-  //     );
-  // };
-
-  // const onCancelOrderClicked = () => {
-  //   procurementApi
-  //     .cancelOrder(orderId, manufacturing.id)
-  //     .then((response) => {
-  //       const { statusHistory } = response.data;
-  //       setStatus({
-  //         status: statusHistory[statusHistory.length - 1].status,
-  //         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-  //       });
-  //     })
-  //     .then(() => {
-  //       addToast("Successfully cancelled procurement order", {
-  //         appearance: "success",
-  //         autoDismiss: true,
-  //       });
-  //       closeConfirmModal();
-  //     })
-  //     .catch((err) =>
-  //       addToast(`Error: ${err.message}`, {
-  //         appearance: "error",
-  //         autoDismiss: true,
-  //       })
-  //     );
-  // };
-
-  // const onFulfilClicked = () => {
-  //   procurementApi
-  //     .fulfillOrder(manufacturing.id, {
-  //       id: orderId,
-  //       lineItems,
-  //     })
-  //     .then((response) => {
-  //       const { lineItems, statusHistory } = response.data;
-  //       setLineItems(lineItems);
-  //       setStatus({
-  //         status: statusHistory[statusHistory.length - 1].status,
-  //         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-  //       });
-  //     })
-  //     .then(() => {
-  //       addToast("Successfully fulfilled procurement order", {
-  //         appearance: "success",
-  //         autoDismiss: true,
-  //       });
-  //       closeConfirmModal();
-  //     })
-  //     .catch((err) =>
-  //       addToast(`Error: ${err.message}`, {
-  //         appearance: "error",
-  //         autoDismiss: true,
-  //       })
-  //     );
-  // };
-
-  // const onShippedClicked = () => {
-  //   procurementApi
-  //     .shipOrder(manufacturing.id, {
-  //       id: orderId,
-  //       lineItems,
-  //     })
-  //     .then((response) => {
-  //       const { lineItems, statusHistory } = response.data;
-  //       // setHeadquarters(headquarters);
-  //       // setManufacturing(manufacturing);
-  //       // setWarehouse(warehouse);
-  //       setLineItems(lineItems);
-  //       // lineItems.map((item) => ({
-  //       //   ...item,
-  //       //   actualQuantity: fulfilledProductItems.length,
-  //       // }))
-  //       setStatus({
-  //         status: statusHistory[statusHistory.length - 1].status,
-  //         timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-  //       });
-  //     })
-  //     .catch((error) =>
-  //       console.error("Failed to ship procurement: ", error.message)
-  //     );
-  // };
 
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
@@ -405,39 +324,42 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       <TailSpin color="#00BFFF" height={20} width={20} />
     </div>
   ) : (
-    Boolean(order) && (
-      <>
-        <div className="py-8 xl:py-10">
-          <Header
-            subsys={subsys}
-            navigate={navigate}
-            disableTabs={order.delivery === null}
-            tabs={tabs}
-            orderId={orderId}
-            status={status}
-            openModal={openModal}
-            handlePrint={handlePrint}
-            openInvoice={openInvoice}
-            setAction={setAction}
-            openConfirm={openConfirmModal}
-          />
-          <Outlet
-            context={{
-              subsys,
-              orderId,
-              order,
-              status,
-              setStatus,
-              lineItems,
-              setLineItems,
-              statusHistory,
-              setStatusHistory,
-              currSiteId,
-            }}
-          />
-        </div>
-        {
-        /*
+    <>
+      <div className="py-8 xl:py-10">
+        <Header
+          subsys={subsys}
+          navigate={navigate}
+          disableTabs={delivery === null}
+          tabs={tabs}
+          orderId={orderId}
+          status={status}
+          openModal={openModal}
+          handlePrint={handlePrint}
+          openInvoice={openInvoice}
+          setAction={setAction}
+          openConfirm={openConfirmModal}
+        />
+        <Outlet
+          context={{
+            subsys,
+            orderId,
+            dateTime,
+            customerId,
+            totalAmount,
+            payments,
+            paid,
+            country,
+            status,
+            setStatus,
+            lineItems,
+            setLineItems,
+            statusHistory,
+            setStatusHistory,
+            currSiteId,
+          }}
+        />
+      </div>
+      {/*
         <div className="hidden">
           <ProcurementInvoice
             ref={componentRef}
@@ -473,7 +395,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             onConfirm={action.action}
           />
         )} */}
-      </>
-    )
+    </>
   );
 };

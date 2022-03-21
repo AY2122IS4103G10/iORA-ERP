@@ -46,7 +46,7 @@ const OrderTable = ({ data, handleOnClick }) => {
   );
 };
 
-export const OrderList = ({ subsys }) => {
+export const OrderList = ({ subsys, type }) => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const currSiteId = parseInt(useSelector(selectUserSite));
@@ -60,7 +60,6 @@ export const OrderList = ({ subsys }) => {
           setData(response.data);
         });
   }, [subsys, currSiteId]);
-  console.log(data)
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);

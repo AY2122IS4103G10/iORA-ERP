@@ -109,14 +109,6 @@ export const scanReceiveStockTransfer = createAsyncThunk(
   }
 );
 
-// export const readyStockTransfer = createAsyncThunk(
-//   "stocktransfer/ready",
-//   async (data) => {
-//     const response = await stockTransferApi.readyOrder(data.order, data.siteId);
-//     return response.data;
-//   }
-// );
-
 export const deliverStockTransfer = createAsyncThunk(
   "stocktransfer/deliver",
   async (data) => {
@@ -136,10 +128,7 @@ export const deliverMultipleStockTransfer = createAsyncThunk(
 export const completeStockTransfer = createAsyncThunk(
   "stocktransfer/complete",
   async (data) => {
-    const response = await stockTransferApi.completeOrder(
-      data.order,
-      data.siteId
-    );
+    const response = await stockTransferApi.completeOrder(data);
     return response.data;
   }
 );
@@ -254,15 +243,6 @@ const stocktransferSlice = createSlice({
     builder.addCase(scanReceiveStockTransfer.rejected, (state, action) => {
       state.status = "failed";
     });
-    // builder.addCase(readyStockTransfer.pending, (state, action) => {
-    //   state.status = "loading";
-    // });
-    // builder.addCase(readyStockTransfer.fulfilled, (state, action) => {
-    //   state.status = "succeeded";
-    // });
-    // builder.addCase(readyStockTransfer.rejected, (state, action) => {
-    //   state.status = "failed";
-    // });
     builder.addCase(deliverStockTransfer.pending, (state, action) => {
       state.status = "loading";
     });
@@ -293,6 +273,10 @@ const stocktransferSlice = createSlice({
       state.status = "loading";
     });
     builder.addCase(completeStockTransfer.fulfilled, (state, action) => {
+      const { statusHistory } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+      }
       state.status = "succeeded";
     });
     builder.addCase(completeStockTransfer.rejected, (state, action) => {

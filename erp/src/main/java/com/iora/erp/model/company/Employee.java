@@ -12,7 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import com.iora.erp.enumeration.PayType;
+import com.iora.erp.enumeration.PayTypeEnum;
 
 @Entity
 public class Employee implements Serializable {
@@ -32,7 +32,7 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     private Boolean availStatus;
     @Enumerated
-    private PayType payType;
+    private PayTypeEnum payType;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private JobTitle jobTitle;
@@ -49,7 +49,7 @@ public class Employee implements Serializable {
     }
 
     public Employee(String name, String email, Double salary, String username, String password, Boolean availStatus,
-            PayType payType, JobTitle jobTitle, Department department, Company company) {
+            PayTypeEnum payType, JobTitle jobTitle, Department department, Company company) {
         this.name = name;
         this.email = email;
         this.salary = salary;
@@ -147,11 +147,11 @@ public class Employee implements Serializable {
         return "Employee[ id=" + id + " ]";
     }
 
-    public PayType getPayType() {
+    public PayTypeEnum getPayType() {
         return payType;
     }
 
-    public void setPayType(PayType payType) {
+    public void setPayType(PayTypeEnum payType) {
         this.payType = payType;
     }
 

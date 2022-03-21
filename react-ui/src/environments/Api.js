@@ -194,10 +194,9 @@ export const stockTransferApi = {
       `${REST_ENDPOINT}store/stockTransfer/deliverMultiple/${orderId}`
     );
   },
-  completeOrder(order, siteId) {
+  completeOrder(orderId) {
     return axiosPrivate.put(
-      `${REST_ENDPOINT}store/stockTransfer/complete/${siteId}`,
-      order
+      `${REST_ENDPOINT}store/stockTransfer/complete/${orderId}`
     );
   },
 };
@@ -335,6 +334,12 @@ export const onlineOrderApi = {
 export const orderApi = {
   getAll() {
     return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder?orderId=`);
+  },
+  getAllOnline() {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/onlineOrder?orderId=`);
+  },
+  getAllStore() {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/storeOrder?orderId=`);
   },
   get(orderId) {
     return axiosPrivate.get(

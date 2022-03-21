@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import { updateCurrSite } from "../../../../stores/slices/userSlice";
 import { Tabs } from "../../../components/Tabs";
 
@@ -14,8 +13,14 @@ const Header = ({ subsys }) => {
     },
     {
       id: 2,
-      name: "All Orders",
-      href: `/${subsys}/orders`,
+      name: "Store",
+      href: `/${subsys}/orders/store`,
+      current: true,
+    },
+    {
+      id: 2,
+      name: "Online",
+      href: `/${subsys}/orders/online`,
       current: true,
     },
   ];
@@ -30,18 +35,6 @@ const Header = ({ subsys }) => {
               </h1>
             </div>
           </div>
-          {subsys === "sm" && (
-            <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-              <Link to={`/${subsys}/procurements/create`}>
-                <button
-                  type="button"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                >
-                  Create order
-                </button>
-              </Link>
-            </div>
-          )}
         </div>
         <div className="ml-3">
           <Tabs tabs={tabs} />

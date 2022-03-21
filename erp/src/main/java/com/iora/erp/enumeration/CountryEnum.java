@@ -1,6 +1,6 @@
 package com.iora.erp.enumeration;
 
-public enum Country {
+public enum CountryEnum {
     Afghanistan("AF"),
     Åland_Islands("AX"),
     Albania("AL"),
@@ -251,7 +251,7 @@ public enum Country {
 
     private final String code;
 
-    Country (String code) {
+    CountryEnum(String code) {
         this.code = code;
     }
 

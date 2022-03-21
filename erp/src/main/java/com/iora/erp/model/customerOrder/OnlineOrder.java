@@ -11,8 +11,8 @@ import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iora.erp.enumeration.Country;
-import com.iora.erp.enumeration.OnlineOrderStatus;
+import com.iora.erp.enumeration.CountryEnum;
+import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 
@@ -20,7 +20,7 @@ import com.iora.erp.model.site.StoreSite;
 public class OnlineOrder extends CustomerOrder {
 
     @Enumerated(EnumType.STRING)
-    private OnlineOrderStatus status;
+    private OnlineOrderStatusEnum status;
 
     private boolean delivery;
 
@@ -29,7 +29,7 @@ public class OnlineOrder extends CustomerOrder {
     private StoreSite pickupSite;
 
     @Enumerated(EnumType.STRING)
-    private Country country;
+    private CountryEnum country;
 
     private String deliveryAddress;
 
@@ -38,21 +38,21 @@ public class OnlineOrder extends CustomerOrder {
 
     public OnlineOrder() {
         super();
-        this.status = OnlineOrderStatus.PENDING;
+        this.status = OnlineOrderStatusEnum.PENDING;
         this.statusHistory = new ArrayList<>();
     }
 
-    public OnlineOrder(boolean delivery, Country country) {
+    public OnlineOrder(boolean delivery, CountryEnum country) {
         this();
         this.delivery = delivery;
         this.country = country;
     }
 
-    public OnlineOrderStatus getStatus() {
+    public OnlineOrderStatusEnum getStatus() {
         return this.status;
     }
 
-    public void setStatus(OnlineOrderStatus status) {
+    public void setStatus(OnlineOrderStatusEnum status) {
         this.status = status;
     }
 
@@ -76,11 +76,11 @@ public class OnlineOrder extends CustomerOrder {
         this.pickupSite = pickupSite;
     }
 
-    public Country getCountry() {
+    public CountryEnum getCountry() {
         return this.country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(CountryEnum country) {
         this.country = country;
     }
 
@@ -105,7 +105,7 @@ public class OnlineOrder extends CustomerOrder {
     }
 
     @JsonIgnore
-    public OnlineOrderStatus getLastStatus() {
+    public OnlineOrderStatusEnum getLastStatus() {
         try {
             return this.statusHistory.get(this.statusHistory.size() - 1).getStatus();
         } catch (Exception ex) {

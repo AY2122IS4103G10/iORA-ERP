@@ -1,6 +1,6 @@
 package com.iora.erp.enumeration;
 
-public enum AccessRights {
+public enum AccessRightsEnum {
     SYSADMIN_BASIC("Can manage all other aspects of admin subsystem"),
     SYSADMIN_EMPLOYEE("Can manage employees and job titles"),
     SYSADMIN_COMPANY("Can manage companies, departments, sites, vendors"),
@@ -16,7 +16,7 @@ public enum AccessRights {
 
     private String description;
 
-    private AccessRights(String description) {
+    private AccessRightsEnum(String description) {
         this.description = description;
     }
 

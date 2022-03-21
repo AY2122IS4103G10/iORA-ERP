@@ -12,7 +12,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
-import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.enumeration.AccessRightsEnum;
 import com.iora.erp.exception.AddressException;
 import com.iora.erp.exception.CompanyException;
 import com.iora.erp.exception.DepartmentException;
@@ -117,8 +117,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<String> getAccessRights() {
-        return Stream.of(AccessRights.values())
-                .map(AccessRights::name)
+        return Stream.of(AccessRightsEnum.values())
+                .map(AccessRightsEnum::name)
                 .collect(Collectors.toList());
     }
 

@@ -15,6 +15,7 @@ import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { classNames } from "../../../../utilities/Util";
+import { useSelector } from "react-redux";
 
 export const EnterStoreModal = ({
   open,
@@ -80,7 +81,7 @@ export const EnterStoreModal = ({
   );
 };
 
-const Header = ({ name, jobTitle, stats }) => {
+const Header = ({ name, jobTitle, stats, img }) => {
   return (
     <div className="rounded-lg bg-white overflow-hidden shadow">
       <h2 className="sr-only" id="profile-overview-title">
@@ -91,10 +92,8 @@ const Header = ({ name, jobTitle, stats }) => {
           <div className="sm:flex sm:space-x-5">
             <div className="flex-shrink-0">
               <img
-                className="mx-auto h-20 w-20 rounded-full"
-                src={
-                  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                }
+                className="h-20 w-20 rounded-full"
+                src={img}
                 alt=""
               />
             </div>
@@ -304,7 +303,7 @@ export function Home() {
 
   const openEnterStoreModal = () => setOpenEnterStore(true);
   const closeEnterStoreModal = () => setOpenEnterStore(false);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = useSelector((state) => state.user.user);
   const stats = [
     { label: "Company", value: user.company.name },
     { label: "Department", value: user.department.deptName },
@@ -325,6 +324,7 @@ export function Home() {
         jobTitle={user.jobTitle.description}
         name={user.name}
         stats={stats}
+        img={`https://randomuser.me/api/portraits/${user?.id % 2 === 0 ? "wo" : ""}men/${user?.id}.jpg`}
       />
       <Tiles
         actions={availablePaths}

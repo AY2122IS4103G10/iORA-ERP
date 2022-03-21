@@ -199,14 +199,7 @@ function App() {
 
             {/* Customer Orders */}
             <Route path="orders" element={<Outlet />}>
-              <Route
-                index
-                element={
-                  <ManageOrders subsys="sm">
-                    <OrderList subsys="sm" />
-                  </ManageOrders>
-                }
-              />
+             
               <Route
                 path="search"
                 element={
@@ -215,6 +208,23 @@ function App() {
                   </ManageOrders>
                 }
               />
+              <Route
+                path="store"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" type="store"/>
+                  </ManageOrders>
+                }
+              />{" "}
+              <Route
+                path="online"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" type="online"/>
+                  </ManageOrders>
+                }
+              />
+              <Route />
               <Route
                 path=":orderId"
                 element={<CustomerOrderWrapper subsys="sm" />}

@@ -56,7 +56,7 @@ const VoucherDetailsBody = ({
               >
                 <span>Issue</span>
               </button>
-              <button
+              {/* <button
                 type="button"
                 className={classNames(
                   !redeemed && issued
@@ -68,7 +68,7 @@ const VoucherDetailsBody = ({
                 disabled={redeemed || !issued}
               >
                 <span>Redeem</span>
-              </button>
+              </button> */}
               {!issued && (
                 <button
                   type="button"

@@ -396,6 +396,8 @@ export const StockTransferWrapper = ({ subsys }) => {
   const [lineItems, setLineItems] = useState({});
   const [openDelete, setOpenDelete] = useState(false);
   const [openReject, setOpenReject] = useState(false);
+  const [action, setAction] = useState(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [openVerifyItems, setOpenVerifyItems] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [qrDelivery, setQrDelivery] = useState("");
@@ -424,6 +426,9 @@ export const StockTransferWrapper = ({ subsys }) => {
 
   const openRejectModal = () => setOpenReject(true);
   const closeRejectModal = () => setOpenReject(false);
+
+  const openConfirmModal = () => setOpenConfirm(true);
+  const closeConfirmModal = () => setOpenConfirm(false);
 
   const openInvoiceModal = () => setOpenInvoice(true);
   const closeInvoiceModal = () => setOpenInvoice(false);
@@ -632,6 +637,8 @@ export const StockTransferWrapper = ({ subsys }) => {
               openInvoiceModal,
               stOrderStatus,
               addToast,
+              setAction,
+              openConfirmModal,
             }}
           />
         </div>
@@ -758,6 +765,21 @@ export const StockTransferWrapper = ({ subsys }) => {
             />
           </ProcurementInvoice>
         </InvoiceModal>
+        {action && (
+          <Confirmation
+            title={`${action.name} "Order #${order.id}"`}
+            body={
+              action.body
+                ? action.body
+                : `Are you sure you want to ${action.name.toLowerCase()} "Order #${
+                    order.id
+                  }"? This action cannot be undone.`
+            }
+            open={openConfirm}
+            closeModal={closeConfirmModal}
+            onConfirm={action.action}
+          />
+        )}
       </>
     )
   );

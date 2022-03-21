@@ -2,6 +2,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XIcon } from '@heroicons/react/outline';
 import moment from "moment";
 import { Fragment, useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { api } from "../../../environments/Api";
 
@@ -27,9 +28,8 @@ export function Notifications({
     }
 
     useEffect(() => {
-        getNotifications();
-        //const timer = setInterval(getNotifications, 2000);
-        //return () => clearInterval(timer);
+        const timer = setInterval(getNotifications, 10000);
+        return () => clearInterval(timer);
     });
 
     return (
@@ -69,19 +69,21 @@ export function Notifications({
                                         {notifications.slice(0)
                                             .reverse().map((noti, index) => (
                                                 <li key={index}>
-                                                    <div className="group relative flex items-center py-6 px-5">
-                                                        <a href={noti.href} className="-m-1 block flex-1 p-1">
-                                                            <div className="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true" />
-                                                            <div className="relative flex min-w-0 flex-1 items-center">
-                                                                <div className="ml-4 truncate">
-                                                                    <p className="truncate text-sm font-semibold text-gray-900 whitespace-pre-line">{noti.title}</p>
-                                                                    <p className="truncate text-sm text-gray-500 whitespace-pre-line">{noti.message}</p>
-                                                                    <br />
-                                                                    <p className="truncate text-sm text-gray-500">{moment.unix(noti.timeStamp / 1000).format(" H:mm:ss, DD/MM/YYYY")}</p>
+                                                    <Link to={`${noti.title.split(' ')[0] === "Stock" ? "stocktransfer" : noti.title.split(' ')[0] === "Procurement" ? "procurements" : "orders"}/${noti.title.charAt(noti.title.length - 1)}`}>
+                                                        <div className="group relative flex items-center py-6 px-5">
+                                                            <a href={noti.href} className="-m-1 block flex-1 p-1">
+                                                                <div className="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true" />
+                                                                <div className="relative flex min-w-0 flex-1 items-center">
+                                                                    <div className="ml-4 truncate">
+                                                                        <p className="truncate text-sm font-semibold text-gray-900 whitespace-pre-line">{noti.title}</p>
+                                                                        <p className="truncate text-sm text-gray-500 whitespace-pre-line">{noti.message}</p>
+                                                                        <br />
+                                                                        <p className="truncate text-sm text-gray-500">{moment.unix(noti.timeStamp / 1000).format(" H:mm:ss, DD/MM/YYYY")}</p>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </a>
-                                                    </div>
+                                                            </a>
+                                                        </div>
+                                                    </Link>
                                                 </li>
                                             ))}
                                     </ul>

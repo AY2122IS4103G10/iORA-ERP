@@ -136,7 +136,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         em.persist(stockTransferOrder);
 
-        Notification noti = new Notification("NEW Stock Transfer Order #" + stockTransferOrder.getId(),
+        Notification noti = new Notification("Stock Transfer Order (NEW) #" + stockTransferOrder.getId(),
                 "Status is " + stockTransferOrder.getLastStatus().name() + ": "
                         + stockTransferOrder.getLastStatus().getDescription());
         

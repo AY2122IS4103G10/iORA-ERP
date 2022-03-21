@@ -1,6 +1,6 @@
 package com.iora.erp.enumeration;
 
-public enum StockTransferStatus implements StatusEnum {
+public enum StockTransferStatusEnum implements StatusEnum {
     PENDING("Pending approval from origin site."),
     ACCEPTED("Order has been approved and will be picked soon."),
     PICKING("Items are being picked."),
@@ -15,7 +15,7 @@ public enum StockTransferStatus implements StatusEnum {
 
     private String description;
 
-    private StockTransferStatus(String description) {
+    private StockTransferStatusEnum(String description) {
         this.description = description;
     }
 

@@ -8,7 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.iora.erp.enumeration.PaymentType;
+import com.iora.erp.enumeration.PaymentTypeEnum;
 
 //no status?
 //payement
@@ -26,7 +26,7 @@ public class Payment {
     private LocalDateTime dateTime;
 
     @Column(nullable = false)
-    private PaymentType paymentType;
+    private PaymentTypeEnum paymentType;
 
     @Column
     private String ccTransactionId;
@@ -35,7 +35,7 @@ public class Payment {
         this.dateTime = LocalDateTime.now();
     }
 
-    public Payment(double amount, String ccTransactionId, PaymentType pt) {
+    public Payment(double amount, String ccTransactionId, PaymentTypeEnum pt) {
         this();
         this.amount = amount;
         this.ccTransactionId = ccTransactionId;
@@ -74,11 +74,11 @@ public class Payment {
         this.ccTransactionId = ccTransactionId;
     }
 
-    public PaymentType getPaymentType() {
+    public PaymentTypeEnum getPaymentType() {
         return paymentType;
     }
 
-    public void setPaymentType(PaymentType paymentType) {
+    public void setPaymentType(PaymentTypeEnum paymentType) {
         this.paymentType = paymentType;
     }
 }

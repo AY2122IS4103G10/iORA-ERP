@@ -1,6 +1,6 @@
 package com.iora.erp.enumeration;
 
-public enum ProcurementOrderStatus implements StatusEnum {
+public enum ProcurementOrderStatusEnum implements StatusEnum {
     PENDING("Pending confirmation from factory."),
     ACCEPTED("Order has been accepted by factory."),
     MANUFACTURED("Factory has completed the manufacturing process."),
@@ -16,7 +16,7 @@ public enum ProcurementOrderStatus implements StatusEnum {
 
     private String description;
 
-    private ProcurementOrderStatus(String description) {
+    private ProcurementOrderStatusEnum(String description) {
         this.description = description;
     }
 

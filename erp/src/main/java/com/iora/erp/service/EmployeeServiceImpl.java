@@ -10,7 +10,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
-import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.enumeration.AccessRightsEnum;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
@@ -33,10 +33,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmailService emailService;
     @Autowired
     private AdminService adminService;
+
     @Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Override
     public Employee createEmployee(Employee employee) throws EmployeeException {
@@ -196,12 +197,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
+    public Set<AccessRightsEnum> getEmployeeAccessRights(Long id) throws EmployeeException {
         return getEmployeeById(id).getJobTitle().getResponsibility();
     }
 
     @Override
-    public Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
+    public Set<AccessRightsEnum> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
         return getEmployeeByUsername(username).getJobTitle().getResponsibility();
     }
 

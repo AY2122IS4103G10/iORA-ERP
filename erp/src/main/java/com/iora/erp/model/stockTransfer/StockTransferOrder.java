@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iora.erp.enumeration.StockTransferStatus;
+import com.iora.erp.enumeration.StockTransferStatusEnum;
 import com.iora.erp.model.site.Site;
 
 @Entity
@@ -70,7 +70,7 @@ public class StockTransferOrder {
     }
 
     @JsonIgnore
-    public StockTransferStatus getLastStatus() {
+    public StockTransferStatusEnum getLastStatus() {
         try {
             return this.statusHistory.get(this.statusHistory.size() - 1).getStatus();
         } catch (Exception ex) {

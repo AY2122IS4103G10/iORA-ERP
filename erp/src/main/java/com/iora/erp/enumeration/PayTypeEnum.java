@@ -1,12 +1,12 @@
 package com.iora.erp.enumeration;
 
-public enum PayType {
+public enum PayTypeEnum {
     MONTHLY("Pay by month"),
     HOURLY("Pay by hour");
-  
+
     private String description;
 
-    private PayType(String description) {
+    private PayTypeEnum(String description) {
         this.description = description;
     }
 

@@ -226,8 +226,11 @@ export const authApi = {
   },
   isUsernameAvailable(username) {
     return axiosPrivate.get(
-      `${REST_ENDPOINT}admin/usernameAvailable/${username}`
+      `${REST_ENDPOINT}auth/usernameAvailable/${username}`
     );
+  },
+  updateProfile(details) {
+    return axiosPrivate.put(`${REST_ENDPOINT}auth/editProfile`, details);
   },
 };
 

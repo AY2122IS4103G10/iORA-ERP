@@ -1,36 +1,40 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { refreshTokenJwt } from "../../../../stores/slices/userSlice";
+import { logout, refreshTokenJwt } from "../../../../stores/slices/userSlice";
 
 export function Auth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { addToast } = useToasts();
   const location = useLocation();
-  const refreshToken = localStorage.getItem("refreshToken");
+  const refreshToken =
+    useSelector((state) => state.user.refreshToken) ||
+    localStorage.getItem("refreshToken");
 
   useEffect(() => {
-    if (refreshToken != null) {
+    if (refreshToken) {
       dispatch(refreshTokenJwt(refreshToken))
         .unwrap()
-        .then((data) => {
-          localStorage.setItem("accessToken", data.accessToken);
-          location.pathname === "/" &&
-            data?.username !== null &&
-            navigate("/home");
+        .then(({ username }) => {
+          location.pathname === "/" && username !== null && navigate("/home");
         })
         .catch((err) => {
           addToast(`Error: ${err.message}`, {
             appearance: "error",
             autoDismiss: true,
           });
-          localStorage.removeItem("refreshToken");
+          dispatch(logout());
           location.pathname !== "/" && navigate("/");
         });
-    } else {
-      location.pathname !== "/" && navigate("/");
+    } else if (location.pathname !== "/") {
+      addToast(`Error: You were logged out ${refreshToken === ""}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+      dispatch(logout());
+      navigate("/");
     }
   }, [location, dispatch, navigate, refreshToken, addToast]);
 

@@ -1,17 +1,22 @@
-import { KeyIcon } from "@heroicons/react/outline";
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
-  ExclamationIcon,
   InformationCircleIcon,
 } from "@heroicons/react/solid";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { authApi } from "../../../../environments/Api";
+import {
+  postLoginJwt,
+  updateProfile,
+} from "../../../../stores/slices/userSlice";
 
 export const ProfileForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { addToast } = useToasts();
   const user = useSelector((state) => state.user.user);
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -29,6 +34,28 @@ export const ProfileForm = () => {
     if (e.target?.value && e.target.value !== user?.username) {
       const { data } = await authApi.isUsernameAvailable(e.target.value);
       setUsernameErr(!data);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    try {
+      const { payload } = await dispatch(
+        updateProfile({ name, username, email })
+      );
+      addToast(
+        `Successfully updated details for employee with username ${payload.username}`,
+        {
+          appearance: "success",
+          autoDismiss: true,
+        }
+      );
+      dispatch(postLoginJwt(payload?.accessToken));
+      navigate("/account");
+    } catch (err) {
+      addToast(`Error: ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
     }
   };
 
@@ -146,12 +173,15 @@ export const ProfileForm = () => {
                 <button
                   type="button"
                   className="inline-flex items-center px-3 py-3 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  onClick={() => navigate("/account")}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  disabled={usernameErr}
+                  onClick={handleUpdate}
                 >
                   Save
                 </button>

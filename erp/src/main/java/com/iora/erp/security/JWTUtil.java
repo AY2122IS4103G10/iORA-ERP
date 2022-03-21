@@ -11,7 +11,7 @@ import com.iora.erp.exception.AuthenticationException;
 
 public class JWTUtil {
     private static final Algorithm algorithm = Algorithm.HMAC256("iora-ERP".getBytes());
-    private static final long ACCESS_TOKEN_EXPIRY = 15 * 60 * 1000;
+    private static final long ACCESS_TOKEN_EXPIRY = 30 * 60 * 1000;
     private static final long REFRESH_TOKEN_EXPIRY = 365 * 24 * 60 * 60 * 1000;
 
     public static DecodedJWT decodeHeader(String authenticationHeader) throws AuthenticationException {

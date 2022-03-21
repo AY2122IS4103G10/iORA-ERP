@@ -336,15 +336,6 @@ public class AdminController {
         }
     }
 
-    @GetMapping(path= "/usernameAvailable/{username}", produces = "application/json")
-    public Boolean isUsernameAvailable(@PathVariable("username") String username) {
-        try {
-            return employeeService.usernameAvailability(username);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     @PutMapping(path = "/editEmployee", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editEmployee(@RequestBody Employee employee) {
         try {

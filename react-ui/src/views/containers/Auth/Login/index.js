@@ -58,12 +58,14 @@ export function Login() {
       );
       setResetPassword(false);
     } catch (err) {
-      addToast(`Error: ${err.response.data}`, {
-        appearance: "error",
-        autoDismiss: true,
-      });
+      setTimeout(() => {
+        addToast(`Error: ${err.response.data}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+        setProcessing(false);
+      }, 600);
     }
-    setProcessing(false);
   };
 
   return (
@@ -141,9 +143,7 @@ export function Login() {
                       disabled={processing}
                     >
                       {processing ? (
-                        <p className="animate-bounce">
-                          Processing...
-                        </p>
+                        <p className="animate-bounce">Processing...</p>
                       ) : (
                         "Reset Password"
                       )}

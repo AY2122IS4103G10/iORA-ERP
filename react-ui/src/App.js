@@ -430,7 +430,6 @@ function App() {
                 <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
-              <Route path="edit/:orderId" element={<VoucherForm />} />
             </Route>
           </Route>
 
@@ -564,6 +563,32 @@ function App() {
               </PrivateRoute>
             }
           >
+            <Route path="procurements" element={<Outlet />}>
+              <Route
+                index
+                element={
+                  <ManageProcurement subsys="lg">
+                    <ProcurementList pathname={pathname} subsys="lg" />
+                  </ManageProcurement>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageProcurement subsys="lg">
+                    <ProcurementSearch subsys="lg" />
+                  </ManageProcurement>
+                }
+              />
+              <Route
+                path=":procurementId"
+                element={<ProcurementWrapper subsys="lg" />}
+              >
+                <Route index element={<ProcurementDetails subsys="lg" />} />
+                <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
+              </Route>
+            </Route>
             <Route path="stocktransfer" element={<Outlet />}>
               <Route
                 index

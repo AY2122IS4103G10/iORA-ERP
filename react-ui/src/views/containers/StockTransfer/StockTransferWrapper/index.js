@@ -25,7 +25,6 @@ import { XIcon } from "@heroicons/react/solid";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useToasts } from "react-toast-notifications";
 import { Outlet } from "react-router-dom";
-import { PrinterIcon } from "@heroicons/react/outline";
 import { Tabs } from "../../../components/Tabs";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { InvoiceModal } from "../../Procurement/ProcurementWrapper";
@@ -113,8 +112,6 @@ export const StockTransferHeader = ({
   openDeleteModal,
   openRejectModal,
   handleConfirmOrder,
-  openVerifyItemsModal,
-  handleDeliveringOrder,
   openInvoiceModal,
 }) => {
   let status = order.statusHistory[order.statusHistory.length - 1].status;
@@ -124,7 +121,7 @@ export const StockTransferHeader = ({
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev
         page="Stock Transfer Orders"
-        path={`/${subsys}/stockTransfer`}
+        path={`/${subsys}/stocktransfer`}
       />
       <div className="relative pb-5 border-b border-gray-200 sm:pb-0">
         <div className="md:flex md:items-center md:justify-between">
@@ -139,17 +136,6 @@ export const StockTransferHeader = ({
                 <span>View Invoice</span>
               </button>
             )}
-            <button
-              type="button"
-              className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={() => window.print()}
-            >
-              <PrinterIcon
-                className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              <span>Print</span>
-            </button>
             {status === "PENDING" && userSiteId === orderMadeBy ? (
               <Link to={`/${subsys}/stocktransfer/edit/${order.id}`}>
                 <button
@@ -476,32 +462,6 @@ export const StockTransferWrapper = ({ subsys }) => {
         });
       });
   };
-
-  // const handleReadyOrder = (e) => {
-  //   e.preventDefault();
-  //   let temp = { ...order };
-  //   temp.lineItems = lineItems;
-  //   order = temp;
-  //   dispatch(readyStockTransfer({ order: order, siteId: userSiteId }))
-  //     .unwrap()
-  //     .then(() => {
-  //       addToast(`Stock Transfer Order Ready for Delivery`, {
-  //         appearance: "success",
-  //         autoDismiss: true,
-  //       });
-  //       // navigate(`/${subsys.subsys}/stocktransfer/${id}`)
-  //       // setReload(reload + 1);
-  //       dispatch(getStockTransfer(id));
-  //     })
-  //     .catch((err) => {
-  //       addToast(`${err.message}`, {
-  //         appearance: "error",
-  //         autoDismiss: true,
-  //       });
-  //     });
-
-  //   closeVerifyItemsModal();
-  // };
 
   const handleDeliveringOrder = (e) => {
     e.preventDefault();

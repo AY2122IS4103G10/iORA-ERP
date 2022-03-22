@@ -1,6 +1,6 @@
 package com.iora.erp.enumeration;
 
-public enum OnlineOrderStatus implements StatusEnum {
+public enum OnlineOrderStatusEnum implements StatusEnum {
     PENDING("Order has been confirmed and will be prepared soon."),
     PICKING("Items are being picked by warehouse staff."),
     PICKED("Items are picked and is ready to be packed"),
@@ -16,7 +16,7 @@ public enum OnlineOrderStatus implements StatusEnum {
 
     private String description;
 
-    private OnlineOrderStatus(String description) {
+    private OnlineOrderStatusEnum(String description) {
         this.description = description;
     }
 

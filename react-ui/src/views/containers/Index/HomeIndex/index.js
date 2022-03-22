@@ -11,12 +11,12 @@ import {
 } from "@heroicons/react/outline";
 
 const navigation = [
-  { name: "Home", href: "/home", icon: HomeIcon, current: true },
-  { name: "Account", href: "/account", icon: UserIcon, current: false },
+  { name: "Home", href: "/home", icon: HomeIcon },
+  { name: "Account", href: "/account", icon: UserIcon },
+  { name: "Settings", href: "/account/settings", icon: CogIcon },
 ];
 
 const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
   { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];

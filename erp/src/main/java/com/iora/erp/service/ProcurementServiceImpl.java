@@ -7,7 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.iora.erp.enumeration.ProcurementOrderStatus;
+import com.iora.erp.enumeration.ProcurementOrderStatusEnum;
 import com.iora.erp.exception.IllegalPOModificationException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
@@ -70,6 +70,24 @@ public class ProcurementServiceImpl implements ProcurementService {
         return new ArrayList<>();
     }
 
+    @Override
+    public List<ProcurementOrder> getPOBySiteStatus(Long siteId, String status) throws ProcurementOrderException {
+        Site site = em.find(Site.class, siteId);
+        if (site == null) {
+            throw new ProcurementOrderException("Site cannot be found.");
+        }
+
+        List<ProcurementOrder> deliveries = new ArrayList<>();
+
+        for (ProcurementOrder po : getProcurementOrdersOfSite(site)) {
+            if (po.getLastStatus() == ProcurementOrderStatusEnum.valueOf(status.toUpperCase())) {
+                deliveries.add(po);
+            }
+        }
+
+        return deliveries;
+    }
+
     private ProcurementOrder updateProcurementOrder(ProcurementOrder procurementOrder) {
         Notification noti = new Notification("Procurement Order #" + procurementOrder.getId(),
                 "Status has been updated to " + procurementOrder.getLastStatus().name() + ": "
@@ -86,12 +104,12 @@ public class ProcurementServiceImpl implements ProcurementService {
             throws SiteConfirmationException {
         HeadquartersSite actionBy = em.find(HeadquartersSite.class, siteId);
         if (actionBy != null) {
-            procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.PENDING));
+            procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatusEnum.PENDING));
             procurementOrder.setHeadquarters(actionBy);
 
             em.persist(procurementOrder);
 
-            Notification noti = new Notification("NEW Procurement Order #" + procurementOrder.getId(),
+            Notification noti = new Notification("Procurement Order (NEW) #" + procurementOrder.getId(),
                     "Status is " + procurementOrder.getLastStatus().name() + ": "
                             + procurementOrder.getLastStatus().getDescription());
 
@@ -114,7 +132,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         if (oldOrder == null) {
             throw new ProcurementOrderException("Procurement Order not found");
-        } else if (oldOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+        } else if (oldOrder.getLastStatus() != ProcurementOrderStatusEnum.PENDING) {
             throw new IllegalPOModificationException(
                     "Procurement Order is not pending and cannot be updated.");
         } else if (actionBy == null) {
@@ -122,7 +140,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         }
 
         procurementOrder.setStatusHistory(oldOrder.getStatusHistory());
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.PENDING));
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatusEnum.PENDING));
         procurementOrder.setHeadquarters(actionBy);
 
         return updateProcurementOrder(procurementOrder);
@@ -135,14 +153,14 @@ public class ProcurementServiceImpl implements ProcurementService {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
         ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.PENDING) {
             throw new IllegalPOModificationException(
                     "Procurement Order is not pending and cannot be rejected.");
         } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to reject Procurement Order.");
         }
 
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CANCELLED));
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatusEnum.CANCELLED));
         procurementOrder.setManufacturing(actionBy);
 
         return updateProcurementOrder(procurementOrder);
@@ -155,14 +173,14 @@ public class ProcurementServiceImpl implements ProcurementService {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
         HeadquartersSite actionBy = em.find(HeadquartersSite.class, siteId);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.PENDING) {
             throw new IllegalPOModificationException(
                     "Procurement Order is not pending and cannot be deleted.");
         } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to delete Procurement Order.");
         }
 
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.CANCELLED));
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatusEnum.CANCELLED));
         procurementOrder.setHeadquarters(actionBy);
 
         return updateProcurementOrder(procurementOrder);
@@ -175,14 +193,14 @@ public class ProcurementServiceImpl implements ProcurementService {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
         ManufacturingSite actionBy = em.find(ManufacturingSite.class, siteId);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.PENDING) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.PENDING) {
             throw new IllegalPOModificationException("Procurement Order is not pending.");
         } else if (actionBy == null) {
             throw new SiteConfirmationException("Site is not authorised to confirm Procurement Order.");
         }
 
         procurementOrder.setManufacturing(actionBy);
-        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatus.ACCEPTED));
+        procurementOrder.addStatus(new POStatus(actionBy, new Date(), ProcurementOrderStatusEnum.ACCEPTED));
 
         return updateProcurementOrder(procurementOrder);
     }
@@ -194,12 +212,12 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.ACCEPTED) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.ACCEPTED) {
             throw new IllegalPOModificationException("Procurement Order is not confirmed.");
         }
 
         procurementOrder.addStatus(
-                new POStatus(procurementOrder.getManufacturing(), new Date(), ProcurementOrderStatus.MANUFACTURED));
+                new POStatus(procurementOrder.getManufacturing(), new Date(), ProcurementOrderStatusEnum.MANUFACTURED));
 
         return updateProcurementOrder(procurementOrder);
 
@@ -247,16 +265,16 @@ public class ProcurementServiceImpl implements ProcurementService {
     public ProcurementOrder pickPackProcurementOrder(Long id) throws ProcurementOrderException {
         ProcurementOrder po = getProcurementOrder(id);
 
-        if (po.getLastStatus() == ProcurementOrderStatus.MANUFACTURED) {
-            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.PICKING));
-        } else if (po.getLastStatus() == ProcurementOrderStatus.PICKING) {
-            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.PICKED));
-        } else if (po.getLastStatus() == ProcurementOrderStatus.PICKED) {
-            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.PACKING));
-        } else if (po.getLastStatus() == ProcurementOrderStatus.PACKING) {
-            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.PACKED));
-        } else if (po.getLastStatus() == ProcurementOrderStatus.PACKED) {
-            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatus.READY_FOR_SHIPPING));
+        if (po.getLastStatus() == ProcurementOrderStatusEnum.MANUFACTURED) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatusEnum.PICKING));
+        } else if (po.getLastStatus() == ProcurementOrderStatusEnum.PICKING) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatusEnum.PICKED));
+        } else if (po.getLastStatus() == ProcurementOrderStatusEnum.PICKED) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatusEnum.PACKING));
+        } else if (po.getLastStatus() == ProcurementOrderStatusEnum.PACKING) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatusEnum.PACKED));
+        } else if (po.getLastStatus() == ProcurementOrderStatusEnum.PACKED) {
+            po.addStatus(new POStatus(po.getLastActor(), new Date(), ProcurementOrderStatusEnum.READY_FOR_SHIPPING));
         } else {
             throw new ProcurementOrderException("Order is not due to pick or pack.");
         }
@@ -272,7 +290,7 @@ public class ProcurementServiceImpl implements ProcurementService {
         Product product = productService.getProduct(rfidsku);
         List<ProcurementOrderLI> lineItems = procurementOrder.getLineItems();
 
-        if (procurementOrder.getLastStatus() == ProcurementOrderStatus.PICKING) {
+        if (procurementOrder.getLastStatus() == ProcurementOrderStatusEnum.PICKING) {
             for (ProcurementOrderLI poli : lineItems) {
                 if (poli.getProduct().equals(product)) {
                     if (poli.getPickedQty() + qty > poli.getRequestedQty()) {
@@ -290,14 +308,14 @@ public class ProcurementServiceImpl implements ProcurementService {
                     }
                     if (picked) {
                         procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
-                                ProcurementOrderStatus.PICKED));
+                                ProcurementOrderStatusEnum.PICKED));
                     }
                     return em.merge(procurementOrder);
                 }
             }
             throw new ProcurementOrderException(
                     "The product scanned is not required in the order that you are picking");
-        } else if (procurementOrder.getLastStatus() == ProcurementOrderStatus.PACKING) {
+        } else if (procurementOrder.getLastStatus() == ProcurementOrderStatusEnum.PACKING) {
             for (ProcurementOrderLI poli : lineItems) {
                 if (poli.getProduct().equals(product)) {
                     if (poli.getPackedQty() + qty > poli.getPickedQty()) {
@@ -312,7 +330,7 @@ public class ProcurementServiceImpl implements ProcurementService {
                         }
                         if (packed) {
                             procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
-                                    ProcurementOrderStatus.PACKED));
+                                    ProcurementOrderStatusEnum.PACKED));
                         }
                         return em.merge(procurementOrder);
                     }
@@ -330,12 +348,13 @@ public class ProcurementServiceImpl implements ProcurementService {
             throws IllegalPOModificationException, ProcurementOrderException {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.READY_FOR_SHIPPING) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.READY_FOR_SHIPPING) {
             throw new IllegalPOModificationException("Procurement Order is not ready.");
         }
 
         procurementOrder
-                .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(), ProcurementOrderStatus.SHIPPING));
+                .addStatus(
+                        new POStatus(procurementOrder.getLastActor(), new Date(), ProcurementOrderStatusEnum.SHIPPING));
         return updateProcurementOrder(procurementOrder);
     }
 
@@ -344,13 +363,13 @@ public class ProcurementServiceImpl implements ProcurementService {
             throws IllegalPOModificationException, ProcurementOrderException {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.READY_FOR_SHIPPING) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.READY_FOR_SHIPPING) {
             throw new IllegalPOModificationException("Procurement Order is not ready.");
         }
 
         procurementOrder
                 .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
-                        ProcurementOrderStatus.SHIPPING_MULTIPLE));
+                        ProcurementOrderStatusEnum.SHIPPING_MULTIPLE));
         return updateProcurementOrder(procurementOrder);
     }
 
@@ -360,8 +379,8 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING
-                && procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.SHIPPING
+                && procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.SHIPPING_MULTIPLE) {
             throw new ProcurementOrderException("Order does not need scanning.");
         }
 
@@ -381,7 +400,7 @@ public class ProcurementServiceImpl implements ProcurementService {
                 }
                 if (picked) {
                     procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
-                            ProcurementOrderStatus.COMPLETED));
+                            ProcurementOrderStatusEnum.COMPLETED));
                 }
 
                 try {
@@ -401,12 +420,13 @@ public class ProcurementServiceImpl implements ProcurementService {
             throws IllegalPOModificationException, ProcurementOrderException {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
-        if (procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING
-                && procurementOrder.getLastStatus() != ProcurementOrderStatus.SHIPPING_MULTIPLE) {
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.SHIPPING
+                && procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.SHIPPING_MULTIPLE) {
             throw new IllegalPOModificationException("Procurement Order has not been received.");
         }
         procurementOrder
-                .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(), ProcurementOrderStatus.COMPLETED));
+                .addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                        ProcurementOrderStatusEnum.COMPLETED));
 
         return updateProcurementOrder(procurementOrder);
     }

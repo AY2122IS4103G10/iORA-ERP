@@ -55,6 +55,11 @@ import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductPrint } from "./views/containers/Products/ProductPrint";
 import { ProductsList } from "./views/containers/Products/ProductsList";
+import { ManageProfile } from "./views/containers/Profile/ManageProfile/index.js";
+import { PasswordForm } from "./views/containers/Profile/PasswordForm/index.js";
+import { Profile } from "./views/containers/Profile/Profile/index.js";
+import { ProfileForm } from "./views/containers/Profile/ProfileForm/index.js";
+import { Settings } from "./views/containers/Profile/Settings/index.js";
 // import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
@@ -94,9 +99,6 @@ function App() {
         <Route path="/" element={<Auth />}>
           {/* Common Infrastructure */}
           <Route index element={<Login />} />
-          <Route path="home" element={<HomeIndex />}>
-            <Route index element={<Home />} />
-          </Route>
 
           {/* Sales and Marketing Subsystem */}
           <Route
@@ -199,14 +201,7 @@ function App() {
 
             {/* Customer Orders */}
             <Route path="orders" element={<Outlet />}>
-              <Route
-                index
-                element={
-                  <ManageOrders subsys="sm">
-                    <OrderList subsys="sm" />
-                  </ManageOrders>
-                }
-              />
+             
               <Route
                 path="search"
                 element={
@@ -215,6 +210,23 @@ function App() {
                   </ManageOrders>
                 }
               />
+              <Route
+                path="store"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" type="store"/>
+                  </ManageOrders>
+                }
+              />{" "}
+              <Route
+                path="online"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" type="online"/>
+                  </ManageOrders>
+                }
+              />
+              <Route />
               <Route
                 path=":orderId"
                 element={<CustomerOrderWrapper subsys="sm" />}
@@ -293,6 +305,7 @@ function App() {
                 element={<AProductStock subsys="str" />}
               />
             </Route>
+
             {/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
               <Route
@@ -583,6 +596,17 @@ function App() {
                 path="edit/:id"
                 element={<StockTransferForm subsys="wh" />}
               />
+            </Route>
+          </Route>
+
+          {/* Common Infrastructure Subsystem */}
+          <Route path="/" element={<HomeIndex />}>
+            <Route path="home" element={<Home />} />
+            <Route path="account" element={<ManageProfile />}>
+              <Route index element={<Profile />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="edit" element={<ProfileForm />} />
+              <Route path="changepass" element={<PasswordForm />} />
             </Route>
           </Route>
         </Route>

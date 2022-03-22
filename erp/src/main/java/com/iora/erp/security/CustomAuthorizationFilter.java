@@ -64,12 +64,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     private boolean toAuthenticate(HttpServletRequest request) {
         return !request.getServletPath().equals("/auth/login")
+                && !request.getServletPath().equals("/auth/resetPassword")
                 && !request.getServletPath().equals("/auth/refreshToken")
                 && !request.getServletPath().equals("/online/login")
                 && !request.getServletPath().equals("/online/refreshToken")
                 && !request.getServletPath().startsWith("/online/model")
                 && !request.getServletPath().startsWith("/online/viewStock")
-                && !request.getServletPath().startsWith("/online/customerOrder");
+                && !request.getServletPath().startsWith("/online/customerOrder")
+                && !request.getServletPath().equals("/h2-console");
     }
 
 }

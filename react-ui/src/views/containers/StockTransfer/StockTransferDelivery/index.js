@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import {
+  completeStockTransfer,
   deliverMultipleStockTransfer,
   deliverStockTransfer,
   scanReceiveStockTransfer,
@@ -12,7 +13,7 @@ import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { NumDeliveriesSection } from "../../Procurement/ProcurementDelivery";
 import { ScanItemsSection } from "../../Procurement/ProcurementPickPack";
 
-const DeliveryList = ({ data, status }) => {
+const DeliveryList = ({ data, status, setAction, openConfirmModal, onCompleteClicked, orderId}) => {
   const columns = useMemo(() => {
     return [
       {
@@ -60,6 +61,24 @@ const DeliveryList = ({ data, status }) => {
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           Delivery List
         </h3>
+        {(status === "DELIVERING" || status === "DELIVERING_MULTIPLE") && (
+          <button
+            type="button"
+            className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+            onClick={() => {
+              setAction({
+                name: "Complete",
+                action: onCompleteClicked,
+                body: `The quantity received of one or more items have not reached their quantity delivered.
+                Are you sure you want to complete "Order #${orderId}"? 
+                This action cannot be undone.`,
+              });
+              openConfirmModal();
+            }}
+          >
+            <span>Complete Order</span>
+          </button>
+        )}
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
@@ -71,7 +90,7 @@ const DeliveryList = ({ data, status }) => {
 };
 
 export const StockTransferDelivery = () => {
-  const { subsys, order, lineItems, setLineItems, addToast, userSiteId } =
+  const { subsys, order, lineItems, setLineItems, addToast, userSiteId, setAction, openConfirmModal } =
     useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -89,8 +108,19 @@ export const StockTransferDelivery = () => {
       });
   };
 
-  const onSingleClicked = async () => {
+  const onSingleClicked = () => {
     dispatch(deliverStockTransfer(order.id))
+      .unwrap()
+      .then(() => {
+        addToast(`Order #${order.id} has been delivered.`, {
+          appearance: "success",
+          autoDismiss: true,
+        });
+      });
+  };
+
+  const onCompleteClicked = () => {
+    dispatch(completeStockTransfer(order.id))
       .unwrap()
       .then(() => {
         addToast(`Order #${order.id} has been delivered.`, {
@@ -158,6 +188,7 @@ export const StockTransferDelivery = () => {
               />
             </div>
           ) : (
+            (status === "DELIVERING" || status === "DELIVERING_MULTIPLE") &&
             order.toSite.id === userSiteId &&
             subsys !== "lg" && (
               <section aria-labelledby="scan-items">
@@ -186,12 +217,16 @@ export const StockTransferDelivery = () => {
         {["READY_FOR_DELIVERY", "DELIVERING", "DELIVERING_MULTIPLE"].some(
           (s) => s === status
         ) &&
-          ["sm", "str", "wh"].some((s) => s === subsys) && (
+          ["sm", "str", "wh", "lg"].some((s) => s === subsys) && (
             <section aria-labelledby="order-summary">
               <DeliveryList
                 data={lineItems}
                 setData={setLineItems}
                 status={status}
+                setAction={setAction}
+                onCompleteClicked={onCompleteClicked}
+                openConfirmModal={openConfirmModal}
+                orderId={order.id}
               />
             </section>
           )}

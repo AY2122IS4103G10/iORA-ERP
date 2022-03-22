@@ -11,17 +11,17 @@ import javax.persistence.Id;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-import com.iora.erp.enumeration.Country;
+import com.iora.erp.enumeration.CountryEnum;
 
 @Entity
-public class Address implements Serializable{
+public class Address implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Enumerated
     @Column(nullable = false)
-    private Country country;
+    private CountryEnum country;
     @Column(nullable = false)
     private String city;
     @Column(nullable = false)
@@ -42,7 +42,8 @@ public class Address implements Serializable{
     @Max(180)
     private double longitude;
 
-    public Address(Country country, String city, String building, String state, String unit, String road, String postalCode,
+    public Address(CountryEnum country, String city, String building, String state, String unit, String road,
+            String postalCode,
             Boolean billing, double latitude, double longitude) {
         this.country = country;
         this.city = city.toUpperCase();
@@ -67,11 +68,11 @@ public class Address implements Serializable{
         this.id = id;
     }
 
-    public Country getCountry() {
+    public CountryEnum getCountry() {
         return country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(CountryEnum country) {
         this.country = country;
     }
 

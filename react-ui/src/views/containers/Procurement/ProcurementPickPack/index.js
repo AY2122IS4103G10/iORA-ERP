@@ -9,7 +9,14 @@ import { procurementApi } from "../../../../environments/Api";
 import { scanItem } from "../../../../stores/slices/procurementSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
-export const PickPackList = ({ data }) => {
+export const PickPackList = ({
+  data,
+  status,
+  procurementId,
+  openConfirmModal,
+  handlePickPack,
+  setAction,
+}) => {
   const columns = useMemo(() => {
     return [
       {
@@ -64,6 +71,24 @@ export const PickPackList = ({ data }) => {
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           Picking / Packing List
         </h3>
+        {status === "PICKING" && (
+          <button
+            type="button"
+            className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+            onClick={() => {
+              setAction({
+                name: "Complete",
+                action: handlePickPack,
+                body: `The quantity picked of one or more items have not reached their requested quantity.
+                Are you sure you want to complete picking for "Order #${procurementId}"? 
+                This action cannot be undone.`,
+              });
+              openConfirmModal();
+            }}
+          >
+            <span>Complete Picking</span>
+          </button>
+        )}
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
@@ -170,6 +195,9 @@ export const ProcurementPickPack = () => {
     lineItems,
     setLineItems,
     openInvoice,
+    setAction,
+    openConfirmModal,
+    closeConfirmModal,
   } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -208,19 +236,21 @@ export const ProcurementPickPack = () => {
     const { statusHistory } = data;
     setStatus(statusHistory[statusHistory.length - 1]);
     setStatusHistory(statusHistory);
-    addToast(
-      `Order #${procurementId}  ${
-        status.status === "MANUFACTURED"
-          ? "has begun picking"
-          : status.status === "PICKED"
-          ? "has begun packing"
-          : "is ready for shipping. Please print the delivery invoice."
-      }.`,
-      {
-        appearance: "success",
-        autoDismiss: true,
-      }
-    );
+    if (status.status !== "PICKING") {
+      addToast(
+        `Order #${procurementId}  ${
+          status.status === "MANUFACTURED"
+            ? "has begun picking"
+            : status.status === "PICKED"
+            ? "has begun packing"
+            : "is ready for shipping. Please print the delivery invoice"
+        }.`,
+        {
+          appearance: "success",
+          autoDismiss: true,
+        }
+      );
+    } else closeConfirmModal();
     if (status.status === "PACKED") {
       openInvoice();
       navigate(`/${subsys}/procurements/${procurementId}/delivery`);
@@ -358,7 +388,14 @@ export const ProcurementPickPack = () => {
         ) &&
           ["sm", "mf", "wh"].some((s) => s === subsys) && (
             <section aria-labelledby="order-summary">
-              <PickPackList data={lineItems} />
+              <PickPackList
+                data={lineItems}
+                status={status.status}
+                setAction={setAction}
+                openConfirmModal={openConfirmModal}
+                handlePickPack={handlePickPack}
+                procurementId={procurementId}
+              />
             </section>
           )}
       </div>

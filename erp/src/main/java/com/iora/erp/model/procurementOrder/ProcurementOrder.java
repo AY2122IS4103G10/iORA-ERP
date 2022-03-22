@@ -16,7 +16,7 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.iora.erp.enumeration.ProcurementOrderStatus;
+import com.iora.erp.enumeration.ProcurementOrderStatusEnum;
 import com.iora.erp.model.site.Site;
 
 @Entity
@@ -72,7 +72,7 @@ public class ProcurementOrder {
     }
 
     @JsonIgnore
-    public ProcurementOrderStatus getLastStatus() {
+    public ProcurementOrderStatusEnum getLastStatus() {
         try {
             return this.statusHistory.get(this.statusHistory.size() - 1).getStatus();
         } catch (Exception ex) {

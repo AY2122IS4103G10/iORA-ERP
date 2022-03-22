@@ -59,7 +59,17 @@ const ItemTable = ({ data }) => {
   );
 };
 
-const OrderDetailsBody = ({ history, order, lineItems, status }) => {
+const OrderDetailsBody = ({
+  history,
+  dateTime,
+  customerId,
+  totalAmount,
+  payments,
+  paid,
+  country,
+  lineItems,
+  status,
+}) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -86,7 +96,7 @@ const OrderDetailsBody = ({ history, order, lineItems, status }) => {
                     Date Created
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {moment(order.dateTime).format("DD/MM/YYYY, hh:mm:ss")}
+                    {moment(dateTime).format("DD/MM/YYYY, hh:mm:ss")}
                   </dd>
                 </div>
 
@@ -94,9 +104,7 @@ const OrderDetailsBody = ({ history, order, lineItems, status }) => {
                   <dt className="text-sm font-medium text-gray-500">
                     Customer No.
                   </dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {order.customerId}
-                  </dd>
+                  <dd className="mt-1 text-sm text-gray-900">{customerId}</dd>
                 </div>
 
                 <div className="sm:col-span-1">
@@ -105,7 +113,7 @@ const OrderDetailsBody = ({ history, order, lineItems, status }) => {
                   </dt>
 
                   <dd className="mt-1 text-sm text-gray-900">
-                    {order.totalAmount.toFixed(2)}
+                    {totalAmount.toFixed(2)}
                   </dd>
                 </div>
 
@@ -114,23 +122,19 @@ const OrderDetailsBody = ({ history, order, lineItems, status }) => {
                     Payment Type
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {order.payments
-                      .map((payment) => payment.paymentType)
-                      .join(", ")}
+                    {payments.map((payment) => payment.paymentType).join(", ")}
                   </dd>
                 </div>
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Paid</dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {order.paid ? "YES" : "NO"}
+                    {paid ? "YES" : "NO"}
                   </dd>
                 </div>
 
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Country</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {order.country}
-                  </dd>
+                  <dd className="mt-1 text-sm text-gray-900">{country}</dd>
                 </div>
               </dl>
             </div>
@@ -138,7 +142,7 @@ const OrderDetailsBody = ({ history, order, lineItems, status }) => {
         </section>
       </div>
       {history && <ActivitySection history={history} />}
-      {Boolean(order.lineItems.length) && (
+      {Boolean(lineItems.length) && (
         <div className="lg:col-start-1 lg:col-span-3">
           <section aria-labelledby="departments">
             <ItemTable data={lineItems} />
@@ -153,12 +157,18 @@ export const CustomerOrderDetails = () => {
   const {
     subsys,
     orderId,
-    order,
+    dateTime,
+    customerId,
+    totalAmount,
+    payments,
+    paid,
+    country,
     status,
     lineItems,
     setLineItems,
     statusHistory,
   } = useOutletContext();
+  console.log(status)
   const [history, setHistory] = useState([]);
   useEffect(() => {
     fetchAllActionBy(statusHistory).then((data) => {
@@ -187,5 +197,17 @@ export const CustomerOrderDetails = () => {
       );
     });
   }, [statusHistory]);
-  return Boolean(order) && <OrderDetailsBody order={order} status={status} lineItems={lineItems} history={history} />;
+  return (
+    <OrderDetailsBody
+      dateTime={dateTime}
+      customerId={customerId}
+      totalAmount={totalAmount}
+      payments={payments}
+      paid={paid}
+      country={country}
+      status={status.status}
+      lineItems={lineItems}
+      history={history}
+    />
+  );
 };

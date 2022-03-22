@@ -274,6 +274,12 @@ export const customerApi = {
   },
 };
 
+export const ticketApi = {
+  resolveTicket(ticketId) {
+    return axiosPrivate.put(`${REST_ENDPOINT}sam/ticket/resolve/${ticketId}`);
+  }
+};
+
 export const departmentApi = {
   getDepartment(id) {
     return axiosPrivate.get(`${REST_ENDPOINT}admin/viewDepartment?id=${id}`);

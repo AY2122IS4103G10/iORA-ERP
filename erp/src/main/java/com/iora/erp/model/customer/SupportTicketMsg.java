@@ -3,40 +3,28 @@ package com.iora.erp.model.customer;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-@Entity
+@Embeddable
 public class SupportTicketMsg {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeStamp;
 
     @Column(nullable = false)
     private String message;
 
+    private String name;
+
     public SupportTicketMsg() {
         this.timeStamp = new Date();
     }
 
-    public SupportTicketMsg(String message) {
+    public SupportTicketMsg(String message, String name) {
         this();
         this.message = message;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.name = name;
     }
 
     public Date getTimeStamp() {
@@ -53,5 +41,13 @@ public class SupportTicketMsg {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

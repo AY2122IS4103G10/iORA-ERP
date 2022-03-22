@@ -26,6 +26,8 @@ import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.customer.SupportTicket;
+import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
@@ -46,6 +48,7 @@ import com.iora.erp.model.stockTransfer.StockTransferOrderLI;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
@@ -80,6 +83,8 @@ public class DataLoader implements CommandLineRunner {
 	private EntityManager em;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private EmployeeService employeeService;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -703,6 +708,19 @@ public class DataLoader implements CommandLineRunner {
 		oo1.addPayment(payment2);
 		oo1.setSite(siteService.getSite(3L));
 		customerOrderService.createOnlineOrder(oo1, null);
+
+		Customer cust = customerService.getCustomerById(2L);
+		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");
+		st.addMessage(new SupportTicketMsg("Please give me free products :D",
+				cust.getFirstName() + " " + cust.getLastName()));
+		st.addMessage(new SupportTicketMsg("Go and **** yourself", employeeService.getEmployeeById(7L).getName()));
+
+		st.setCustomer(cust);
+		st.setCustomerOrder(co1);
+		customerService.createSupportTicket(st);
+
+		cust.addSupportTicke(st);
+		customerService.updateCustomerAccount(cust);
 	}
 
 }

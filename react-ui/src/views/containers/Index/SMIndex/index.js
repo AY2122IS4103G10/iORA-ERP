@@ -8,7 +8,8 @@ import {
   QuestionMarkCircleIcon, ShieldCheckIcon,
   ShoppingBagIcon,
   TicketIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  InformationCircleIcon
 } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -53,6 +54,12 @@ const navigation = [
     name: "Customers",
     href: "/sm/customers",
     icon: UserGroupIcon,
+    current: false,
+  },
+  {
+    name: "Support Centre",
+    href: "/sm/support",
+    icon: InformationCircleIcon,
     current: false,
   },
   {

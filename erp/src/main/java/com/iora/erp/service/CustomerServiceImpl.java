@@ -16,6 +16,7 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.exception.SupportTicketException;
+import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
@@ -37,8 +38,8 @@ public class CustomerServiceImpl implements CustomerService {
     private EmailService emailService;
     @PersistenceContext
     private EntityManager em;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Customer createCustomerAccount(Customer customer) throws RegistrationException {
@@ -58,7 +59,7 @@ public class CustomerServiceImpl implements CustomerService {
 
             return customer;
         }
-     }
+    }
 
     @Override
     public Customer updateCustomerAccount(Customer customer) throws CustomerException {
@@ -325,18 +326,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<SupportTicket> searchSupportTicket(Long id) {
-        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.id = :id",
-                SupportTicket.class);
-        q.setParameter("id", id);
-        return q.getResultList();
-    }
-
-    @Override
-    public List<SupportTicket> searchSupportTicketBySubject(String subject) {
-        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.subject LIKE :subject",
-                SupportTicket.class);
-        q.setParameter("subject", "%" + subject + "%");
+    public List<SupportTicket> getAllSupportTickets() {
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st", SupportTicket.class);
         return q.getResultList();
     }
 
@@ -353,9 +344,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public SupportTicket replySupportTicket(Long id, String message) throws SupportTicketException {
+    public SupportTicket resolveSupportTicket(Long id) throws SupportTicketException {
         SupportTicket st = getSupportTicket(id);
-        st.addMessage(createSTMsg(new SupportTicketMsg(message)));
+        st.setStatus(SupportTicket.Status.RESOLVED);
+        return em.merge(st);
+    }
+
+    @Override
+    public SupportTicket replySupportTicket(Long id, String message, String name) throws SupportTicketException {
+        SupportTicket st = getSupportTicket(id);
+        if (st.getStatus() != SupportTicket.Status.PENDING) {
+            throw new SupportTicketException("Ticket is not pending employee reply.");
+        }
+
+        st.addMessage(new SupportTicketMsg(message, name));
+        st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
         return em.merge(st);
     }
 
@@ -363,11 +366,5 @@ public class CustomerServiceImpl implements CustomerService {
     public Long deleteSupportTicket(Long id) throws SupportTicketException {
         em.remove(getSupportTicket(id));
         return id;
-    }
-
-    @Override
-    public SupportTicketMsg createSTMsg(SupportTicketMsg supportTicketMsg) {
-        em.persist(supportTicketMsg);
-        return supportTicketMsg;
     }
 }

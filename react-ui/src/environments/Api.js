@@ -235,6 +235,9 @@ export const authApi = {
   changePassword(details) {
     return axiosPrivate.put(`${REST_ENDPOINT}auth/changePassword`, details);
   },
+  resetPassword(details) {
+    return axiosPublic.post(`${REST_ENDPOINT}auth/resetPassword`, details);
+  }
 };
 
 export const employeeApi = {

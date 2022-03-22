@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -175,6 +176,22 @@ public class AuthenticationController {
             throw new RuntimeException("Refresh token is missing");
         } catch (EmployeeException | JWTVerificationException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/resetPassword", produces = "application/json")
+    public ResponseEntity<Object> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            String username = body.get("username");
+            String name = body.get("name");
+            Employee e = employeeService.getEmployeeByUsername(username);
+            if (e.getName().equals(name)) {
+                employeeService.resetPassword(e.getId());
+                return ResponseEntity.ok("Email with temporary password has been sent.");
+            } 
+            return ResponseEntity.badRequest().body("Name does not match");            
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 

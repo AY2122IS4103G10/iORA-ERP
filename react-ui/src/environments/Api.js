@@ -402,3 +402,12 @@ export const posApi = {
     return axiosPrivate.post(`${REST_ENDPOINT}online/pay`, lineItems);
   },
 };
+
+export const logisticsApi = {
+  getSTOBySiteStatus(siteId, status) {
+    return axiosPrivate.get(`${REST_ENDPOINT}logistics/sto/${siteId}/${status}`);
+  },
+  getPOBySiteStatus(siteId, status) {
+    return axiosPrivate.get(`${REST_ENDPOINT}logistics/po/${siteId}/${status}`);
+  },
+}

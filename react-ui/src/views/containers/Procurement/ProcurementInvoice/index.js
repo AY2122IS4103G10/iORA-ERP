@@ -57,7 +57,7 @@ export const ProcurementInvoiceBody = ({
           <div>
             <dd>
               <Barcode
-                value="barcode-example"
+                value={orderId.toString()}
                 width={1}
                 height={40}
                 displayValue={false}

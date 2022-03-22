@@ -5,7 +5,7 @@ import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { api } from "../../../../environments/Api";
+import { api, logisticsApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import {
@@ -68,11 +68,13 @@ export const ProcurementList = ({ subsys }) => {
     const fetchAllProcurement = async () => {
       setLoading(true);
       try {
-        const { data } = await api.getAll(
-          subsys === "sm"
-            ? "sam/procurementOrder/all"
-            : `manufacturing/procurementOrder/site/${currSiteId}`
-        );
+        const { data } = await (subsys === "lg"
+          ? logisticsApi.getPOBySiteStatus(currSiteId, "READY_FOR_SHIPPING")
+          : api.getAll(
+              subsys === "sm"
+                ? "sam/procurementOrder/all"
+                : `manufacturing/procurementOrder/site/${currSiteId}`
+            ));
         setData(data);
       } catch (err) {
         addToast(`Error: ${err.message}`, {

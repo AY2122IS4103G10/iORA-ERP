@@ -10,7 +10,7 @@ export function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [resetPassword, setResetPassword] = useState(false);
   const [processing, setProcessing] = useState(false);
   const { addToast } = useToasts();
@@ -48,7 +48,7 @@ export function Login() {
     e.preventDefault();
     setProcessing(true);
     try {
-      const { data } = await authApi.resetPassword({ name, username });
+      const { data } = await authApi.resetPassword({ email, username });
       addToast(
         `Password was successfuly reset. ${data} Check your e-mail for temporary password`,
         {
@@ -110,20 +110,20 @@ export function Login() {
                 <>
                   <div>
                     <label
-                      htmlFor="name"
+                      htmlFor="email"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Enter your full name for confirmation.
+                      Enter your recovery and work e-mail for verification.
                     </label>
                     <div className="mt-1">
                       <input
-                        id="name"
-                        name="name"
-                        type="name"
+                        id="email"
+                        name="email"
+                        type="email"
                         required
                         className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                     </div>
                   </div>

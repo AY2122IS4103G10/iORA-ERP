@@ -157,4 +157,25 @@ public class AuthenticationController {
         }
     }
 
+    @PutMapping(path = "/changePassword", consumes = "application/json")
+    public ResponseEntity<Object> changePassword(HttpServletRequest request, HttpServletResponse response,
+            @RequestBody Map<String, String> body) throws IOException {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        try {
+            DecodedJWT decodedJWT = JWTUtil.decodeHeader(authHeader);
+            String username = decodedJWT.getSubject();
+            Employee employee = employeeService.getEmployeeByUsername(username);
+            Employee newE = new Employee(employee.getName(), employee.getEmail(),
+                    employee.getSalary(), employee.getUsername(), body.get("password"), employee.getAvailStatus(),
+                    employee.getPayType(), employee.getJobTitle(), employee.getDepartment(), employee.getCompany());
+            newE.setId(employee.getId());
+            employeeService.updateEmployeeAccount(newE);
+            return ResponseEntity.ok().build();
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Refresh token is missing");
+        } catch (EmployeeException | JWTVerificationException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

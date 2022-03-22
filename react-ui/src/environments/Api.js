@@ -232,6 +232,9 @@ export const authApi = {
   updateProfile(details) {
     return axiosPrivate.put(`${REST_ENDPOINT}auth/editProfile`, details);
   },
+  changePassword(details) {
+    return axiosPrivate.put(`${REST_ENDPOINT}auth/changePassword`, details);
+  },
 };
 
 export const employeeApi = {

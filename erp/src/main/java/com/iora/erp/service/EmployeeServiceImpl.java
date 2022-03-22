@@ -80,7 +80,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                         old.setUsername(employee.getUsername());
                         old.setEmail(employee.getEmail());
-
+                        
                         if (employee.getPassword() != null && employee.getPassword() != ""
                                 && !employee.getPassword().equals(old.getPassword())) {
                             old.setPassword(passwordEncoder().encode(employee.getPassword()));
@@ -94,7 +94,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         if (!old.getCompany().getId().equals(employee.getCompany().getId())) {
                             old.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
                         }
-
+                        em.merge(old);
                         return old;
 
                     } else {

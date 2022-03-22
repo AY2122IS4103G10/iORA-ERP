@@ -5,9 +5,9 @@ const guest = {
   id: -1,
   name: "Guest",
   email: "NA",
+  payType: "MONTHLY",
   salary: 0,
   username: "guest",
-  salt: "",
   password: "",
   availStatus: "true",
   department: {
@@ -18,6 +18,9 @@ const guest = {
   company: {
     id: 1,
     name: "iORA Singapore",
+  },
+  jobTitle: {
+    responsibility: [],
   },
 };
 
@@ -31,6 +34,9 @@ const initialStore = localStorage.getItem("siteId")
 const initialState = {
   user: { ...initialUser },
   loggedIn: localStorage.getItem("user") ? true : false,
+  accessToken: "",
+  refreshToken: "",
+  responsibility: [],
   currSite: initialStore,
   status: "idle",
   currSiteStatus: "idle",
@@ -85,6 +91,18 @@ export const refreshTokenJwt = createAsyncThunk(
   }
 );
 
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (details) => {
+    try {
+      const response = await authApi.updateProfile(details);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.message);
+    }
+  }
+);
+
 // export const updateCurrSite = createAction("updateCurrSite");
 
 const userSlice = createSlice({
@@ -97,6 +115,9 @@ const userSlice = createSlice({
       localStorage.removeItem("refreshToken");
       state.loggedIn = false;
       state.user = { ...guest };
+      state.accessToken = "";
+      state.refreshToken = "";
+      state.responsibility = [];
     },
     updateCurrSite(state, action) {
       if (action.payload) {
@@ -132,6 +153,24 @@ const userSlice = createSlice({
     });
     builder.addCase(loginJwt.fulfilled, (state, action) => {
       state.status = "succeeded";
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+      state.responsibility = action.payload.responsibility;
+      localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("refreshToken", action.payload.refreshToken);
+    });
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+      state.responsibility = action.payload.responsibility;
+      localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("refreshToken", action.payload.refreshToken);
+    });
+    builder.addCase(refreshTokenJwt.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.accessToken = action.payload.accessToken;
+      localStorage.setItem("accessToken", action.payload.accessToken);
     });
     builder.addCase(loginJwt.rejected, (state, action) => {
       state.error = "Login failed";

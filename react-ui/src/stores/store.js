@@ -10,6 +10,7 @@ import stocktransferReducer from "./slices/stocktransferSlice";
 import voucherReducer from "./slices/voucherSlice";
 import companyReducer from "./slices/companySlice";
 import customerReducer from "./slices/customerSlice";
+import supportTicketReducer from "./slices/supportTicketSlice"
 import employeeReducer from "./slices/employeeSlice";
 import jobTitleReducer from "./slices/jobTitleSlice";
 import notificationsReducer from "./slices/notificationsSlice";
@@ -35,6 +36,7 @@ export default configureStore({
     user: userReducer,
     stocklevel: stocklevelReducer,
     stocktransfer: stocktransferReducer,
+    supportTickets: supportTicketReducer,
     vendors: vendorReducer,
     vouchers: voucherReducer,
     pos: posReducer,

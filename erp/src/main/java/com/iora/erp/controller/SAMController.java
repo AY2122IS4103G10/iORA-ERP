@@ -17,6 +17,7 @@ import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
@@ -44,6 +45,8 @@ public class SAMController {
     private CustomerService customerService;
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private EmployeeService employeeService;
     @Autowired
     private ProcurementService procurementService;
 
@@ -519,14 +522,9 @@ public class SAMController {
         }
     }
 
-    @GetMapping(path = "/ticket/search", produces = "application/json")
-    public List<SupportTicket> searchSupportTicket(@RequestParam String id) {
-        return customerService.searchSupportTicket(Long.valueOf(id));
-    }
-
-    @GetMapping(path = "/ticket/searchSubject", produces = "application/json")
-    public List<SupportTicket> searchSupportTicketBySubject(@RequestParam String subject) {
-        return customerService.searchSupportTicketBySubject(subject);
+    @GetMapping(path = "/ticket/all", produces = "application/json")
+    public List<SupportTicket> getAllSupportTickets() {
+        return customerService.getAllSupportTickets();
     }
 
     @PostMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
@@ -547,17 +545,29 @@ public class SAMController {
         }
     }
 
-    @PatchMapping(path = "/ticket/reply/{id}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> replySupportTicket(@PathVariable Long id, @RequestBody String message) {
+    @PutMapping(path = "/ticket/resolve/{id}", produces = "application/json")
+    public ResponseEntity<Object> resolveSupportTicket(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(customerService.replySupportTicket(id, message));
+            return ResponseEntity.ok(customerService.resolveSupportTicket(id));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @DeleteMapping(path = "/ticket/{id}", produces = "application/json")
-    public ResponseEntity<Object> replySupportTicket(@PathVariable Long id) {
+    @PutMapping(path = "/ticket/reply/{ticketId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> replySupportTicket(@PathVariable Long ticketId, @RequestParam String name,
+            @RequestBody Map<String, String> message) {
+        try {
+            return ResponseEntity.ok(
+                    customerService.replySupportTicket(ticketId, message.get("input"), name));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/ticket/delete/{id}", produces = "application/json")
+    public ResponseEntity<Object> deleteSupportTicket(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(customerService.deleteSupportTicket(id));
         } catch (Exception ex) {

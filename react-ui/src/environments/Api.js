@@ -224,6 +224,20 @@ export const authApi = {
       },
     });
   },
+  isUsernameAvailable(username) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}auth/usernameAvailable/${username}`
+    );
+  },
+  updateProfile(details) {
+    return axiosPrivate.put(`${REST_ENDPOINT}auth/editProfile`, details);
+  },
+  changePassword(details) {
+    return axiosPrivate.put(`${REST_ENDPOINT}auth/changePassword`, details);
+  },
+  resetPassword(details) {
+    return axiosPublic.post(`${REST_ENDPOINT}auth/resetPassword`, details);
+  }
 };
 
 export const employeeApi = {
@@ -258,6 +272,12 @@ export const customerApi = {
       `${REST_ENDPOINT}sam/customer/unblock/${customerId}`
     );
   },
+};
+
+export const ticketApi = {
+  resolveTicket(ticketId) {
+    return axiosPrivate.put(`${REST_ENDPOINT}sam/ticket/resolve/${ticketId}`);
+  }
 };
 
 export const departmentApi = {

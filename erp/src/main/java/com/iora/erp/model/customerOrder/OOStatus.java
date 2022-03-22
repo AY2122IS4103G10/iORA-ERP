@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.iora.erp.enumeration.OnlineOrderStatus;
+import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.model.site.Site;
 
 @Embeddable
@@ -23,12 +23,12 @@ public class OOStatus {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private OnlineOrderStatus status;
+    private OnlineOrderStatusEnum status;
 
     public OOStatus() {
     }
 
-    public OOStatus(Site actionBy, Date timeStamp, OnlineOrderStatus status) {
+    public OOStatus(Site actionBy, Date timeStamp, OnlineOrderStatusEnum status) {
         this.actionBy = actionBy;
         this.timeStamp = timeStamp;
         this.status = status;
@@ -50,11 +50,11 @@ public class OOStatus {
         this.timeStamp = timeStamp;
     }
 
-    public OnlineOrderStatus getStatus() {
+    public OnlineOrderStatusEnum getStatus() {
         return this.status;
     }
 
-    public void setStatus(OnlineOrderStatus status) {
+    public void setStatus(OnlineOrderStatusEnum status) {
         this.status = status;
     }
 

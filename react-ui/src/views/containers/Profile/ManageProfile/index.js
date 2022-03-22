@@ -3,8 +3,10 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { classNames } from "../../../../utilities/Util";
 
 const tabs = [
-  { name: "Profile", href: "/account", index: 0 },
-  { name: "Settings", href: "/account/settings", index: 1 },
+  { name: "View Profile", href: "/account", index: 0 },
+  { name: "Edit Profile", href: "/account/edit", index: 1 },
+  { name: "Change Password", href: "/account/changepass", index: 2 },
+  { name: "Settings", href: "/account/settings", index: 3 },
 ];
 
 export const Header = ({ path }) => {
@@ -37,12 +39,12 @@ export const Header = ({ path }) => {
             </div>
           </div>
           <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-            <Link to={`${path}`}>
+            <Link to={`/account/edit`}>
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
               >
-                Update Profile
+                Edit My Profile
               </button>
             </Link>
           </div>
@@ -77,7 +79,7 @@ export const Header = ({ path }) => {
 export const ManageProfile = () => {
   return (
     <>
-      <Header path="/sm/Profiles/create" />
+      <Header/>
       <Outlet />
     </>
   );

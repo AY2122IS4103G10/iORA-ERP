@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.iora.erp.enumeration.StockTransferStatus;
+import com.iora.erp.enumeration.StockTransferStatusEnum;
 import com.iora.erp.model.site.Site;
 
 @Embeddable
@@ -23,12 +23,12 @@ public class STOStatus {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private StockTransferStatus status;
+    private StockTransferStatusEnum status;
 
     public STOStatus() {
     }
 
-    public STOStatus(Site actionBy, Date timeStamp, StockTransferStatus status) {
+    public STOStatus(Site actionBy, Date timeStamp, StockTransferStatusEnum status) {
         this.actionBy = actionBy;
         this.timeStamp = timeStamp;
         this.status = status;
@@ -50,11 +50,11 @@ public class STOStatus {
         this.timeStamp = timeStamp;
     }
 
-    public StockTransferStatus getStatus() {
+    public StockTransferStatusEnum getStatus() {
         return this.status;
     }
 
-    public void setStatus(StockTransferStatus status) {
+    public void setStatus(StockTransferStatusEnum status) {
         this.status = status;
     }
 

@@ -11,7 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.enumeration.AccessRightsEnum;
 
 @Entity
 public class JobTitle implements Serializable {
@@ -24,13 +24,13 @@ public class JobTitle implements Serializable {
     private String title;
     private String description;
     @ElementCollection
-    private Set<AccessRights> responsibility;
+    private Set<AccessRightsEnum> responsibility;
 
     public JobTitle() {
         responsibility = new HashSet<>();
     }
 
-    public JobTitle(String title, String description, Set<AccessRights> responsibility) {
+    public JobTitle(String title, String description, Set<AccessRightsEnum> responsibility) {
         this.title = title;
         this.description = description;
         this.responsibility = responsibility;
@@ -65,11 +65,11 @@ public class JobTitle implements Serializable {
         this.id = id;
     }
 
-    public Set<AccessRights> getResponsibility() {
+    public Set<AccessRightsEnum> getResponsibility() {
         return this.responsibility;
     }
 
-    public void setResponsibility(Set<AccessRights> responsibility) {
+    public void setResponsibility(Set<AccessRightsEnum> responsibility) {
         this.responsibility = responsibility;
     }
 

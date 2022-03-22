@@ -56,8 +56,12 @@ import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductPrint } from "./views/containers/Products/ProductPrint";
 import { ProductsList } from "./views/containers/Products/ProductsList";
 import { ManageProfile } from "./views/containers/Profile/ManageProfile/index.js";
+import { PasswordForm } from "./views/containers/Profile/PasswordForm/index.js";
 import { Profile } from "./views/containers/Profile/Profile/index.js";
+import { ProfileForm } from "./views/containers/Profile/ProfileForm/index.js";
 import { Settings } from "./views/containers/Profile/Settings/index.js";
+import { ManageSupportTicket } from "./views/containers/SupportTicket/ManageSupportTicket";
+import { SupportTicketDetails } from "./views/containers/SupportTicket/SupportTicketDetails/index.js";
 // import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
@@ -199,7 +203,7 @@ function App() {
 
             {/* Customer Orders */}
             <Route path="orders" element={<Outlet />}>
-             
+
               <Route
                 path="search"
                 element={
@@ -212,7 +216,7 @@ function App() {
                 path="store"
                 element={
                   <ManageOrders subsys="sm">
-                    <OrderList subsys="sm" type="store"/>
+                    <OrderList subsys="sm" type="store" />
                   </ManageOrders>
                 }
               />{" "}
@@ -220,7 +224,7 @@ function App() {
                 path="online"
                 element={
                   <ManageOrders subsys="sm">
-                    <OrderList subsys="sm" type="online"/>
+                    <OrderList subsys="sm" type="online" />
                   </ManageOrders>
                 }
               />
@@ -234,6 +238,20 @@ function App() {
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
+            </Route>
+
+            {/* Customers */}
+            <Route path="customers" element={<Outlet />}>
+              <Route index element={<ManageCustomer />} />
+              <Route path=":customerId" element={<CustomerDetails />} />
+              <Route path="create" element={<CustomerForm />} />
+              <Route path="edit/:customerId" element={<CustomerForm />} />
+            </Route>
+            
+            {/* Support Centre */}
+            <Route path="support" element={<Outlet />}>
+              <Route index element={<ManageSupportTicket/>}/>
+              <Route path=":ticketId" element={<SupportTicketDetails/>}/>
             </Route>
 
             {/* Rewards & Loyalty */}
@@ -273,13 +291,6 @@ function App() {
               </Route>
             </Route>
 
-            {/* Customers */}
-            <Route path="customers" element={<Outlet />}>
-              <Route index element={<ManageCustomer />} />
-              <Route path=":customerId" element={<CustomerDetails />} />
-              <Route path="create" element={<CustomerForm />} />
-              <Route path="edit/:customerId" element={<CustomerForm />} />
-            </Route>
           </Route>
 
           {/* Store Management Subsystem */}
@@ -628,6 +639,8 @@ function App() {
             <Route path="account" element={<ManageProfile />}>
               <Route index element={<Profile />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="edit" element={<ProfileForm />} />
+              <Route path="changepass" element={<PasswordForm />} />
             </Route>
           </Route>
         </Route>

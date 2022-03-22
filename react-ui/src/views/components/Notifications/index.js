@@ -71,17 +71,15 @@ export function Notifications({
                                                 <li key={index}>
                                                     <Link to={`${noti.title.split(' ')[0] === "Stock" ? "stocktransfer" : noti.title.split(' ')[0] === "Procurement" ? "procurements" : "orders"}/${noti.title.charAt(noti.title.length - 1)}`}>
                                                         <div className="group relative flex items-center py-6 px-5">
-                                                            <a href={noti.href} className="-m-1 block flex-1 p-1">
-                                                                <div className="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true" />
-                                                                <div className="relative flex min-w-0 flex-1 items-center">
-                                                                    <div className="ml-4 truncate">
-                                                                        <p className="truncate text-sm font-semibold text-gray-900 whitespace-pre-line">{noti.title}</p>
-                                                                        <p className="truncate text-sm text-gray-500 whitespace-pre-line">{noti.message}</p>
-                                                                        <br />
-                                                                        <p className="truncate text-sm text-gray-500">{moment.unix(noti.timeStamp / 1000).format(" H:mm:ss, DD/MM/YYYY")}</p>
-                                                                    </div>
+                                                            <div className="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true" />
+                                                            <div className="relative flex min-w-0 flex-1 items-center">
+                                                                <div className="ml-4 truncate">
+                                                                    <p className="truncate text-sm font-semibold text-gray-900 whitespace-pre-line">{noti.title}</p>
+                                                                    <p className="truncate text-sm text-gray-500 whitespace-pre-line">{noti.message}</p>
+                                                                    <br />
+                                                                    <p className="truncate text-sm text-gray-500">{moment.unix(noti.timeStamp / 1000).format(" H:mm:ss, DD/MM/YYYY")}</p>
                                                                 </div>
-                                                            </a>
+                                                            </div>
                                                         </div>
                                                     </Link>
                                                 </li>

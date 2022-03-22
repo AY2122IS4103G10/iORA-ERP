@@ -4,19 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 
 @Entity
 public class SupportTicket {
     public enum Status {
-        PENDING, RESOLVED;
+        PENDING, PENDING_CUSTOMER, RESOLVED;
     }
 
     public enum Category {
@@ -36,10 +39,14 @@ public class SupportTicket {
     @Column(nullable = false)
     private String subject;
 
-    @ManyToOne
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @ManyToOne (optional = false)
+    private Customer customer;
+
+    @OneToOne
     private CustomerOrder customerOrder;
     
-    @OneToMany
+    @ElementCollection
     private List<SupportTicketMsg> messages;
 
     public SupportTicket() {
@@ -52,7 +59,6 @@ public class SupportTicket {
         this.category = category;
         this.subject = subject;
     }
-
 
     public Long getId() {
         return this.id;
@@ -84,6 +90,14 @@ public class SupportTicket {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public Customer getCustomer() {
+        return this.customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     public CustomerOrder getCustomerOrder() {

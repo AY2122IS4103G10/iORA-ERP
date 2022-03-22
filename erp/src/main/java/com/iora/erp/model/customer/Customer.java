@@ -2,6 +2,7 @@ package com.iora.erp.model.customer;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -13,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 
 @Entity
@@ -39,6 +42,9 @@ public class Customer implements Serializable {
     @JoinColumn(name = "customerId")
     private List<CustomerOrder> orders;
     private Boolean availStatus;
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @OneToMany
+    private List<SupportTicket> supportTickets;
 
     @Column(nullable = false)
     private String password;
@@ -47,6 +53,7 @@ public class Customer implements Serializable {
         this.membershipPoints = 0;
         this.storeCredit = 0.0;
         this.availStatus = true;
+        this.supportTickets = new ArrayList<>();
     }
 
     public Customer(String firstName, String lastName, String email, LocalDate dob, String contactNumber,
@@ -170,4 +177,27 @@ public class Customer implements Serializable {
         this.id = id;
     }
 
+    public List<CustomerOrder> getOrders() {
+        return this.orders;
+    }
+
+    public void setOrders(List<CustomerOrder> orders) {
+        this.orders = orders;
+    }
+
+    public void addOrder(CustomerOrder order) {
+        this.orders.add(order);
+    }
+
+    public List<SupportTicket> getSupportTickets() {
+        return this.supportTickets;
+    }
+
+    public void setSupportTickets(List<SupportTicket> supportTickets) {
+        this.supportTickets = supportTickets;
+    }
+
+    public void addSupportTicke(SupportTicket supportTicket) {
+        this.supportTickets.add(supportTicket);
+    }
 }

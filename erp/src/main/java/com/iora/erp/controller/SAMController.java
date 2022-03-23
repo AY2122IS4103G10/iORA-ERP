@@ -126,17 +126,6 @@ public class SAMController {
         }
     }
 
-    // Creates multiple Product instances with given Model Code in URL,
-    @PostMapping(path = "/product/{modelCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProduct(@PathVariable String modelCode,
-            @RequestBody List<ProductField> productFields) {
-        try {
-            return ResponseEntity.ok(productService.createProduct(modelCode, productFields));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
     @GetMapping(path = "/model/{modelCode}", produces = "application/json")
     public ResponseEntity<Object> getModel(@PathVariable String modelCode) {
         try {

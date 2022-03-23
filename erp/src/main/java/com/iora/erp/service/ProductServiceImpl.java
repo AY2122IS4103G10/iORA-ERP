@@ -195,21 +195,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Model createModel(Model model) throws ModelException {
         try {
-            em.persist(model);
+            em.persist(createProduct(model));
             return model;
-        } catch (EntityExistsException ex) {
-            throw new ModelException("Model with model code " + model.getModelCode() + " already exist.");
+        } catch (ProductException | ProductFieldException | EntityExistsException ex) {
+            ex.printStackTrace();
+            throw new ModelException(ex.getMessage());
         }
     }
 
-    @Override
-    public List<Product> createProduct(String modelCode, List<ProductField> productFields)
-            throws ProductException, ProductFieldException {
+    private Model createProduct(Model model) throws ProductException, ProductFieldException {
         try {
             List<String> colours = new ArrayList<>();
             List<String> sizes = new ArrayList<>();
 
-            for (ProductField pf : productFields) {
+            for (ProductField pf : model.getProductFields()) {
                 if (pf.getFieldName().equals("COLOUR")) {
                     colours.add(pf.getFieldValue());
                 } else if (pf.getFieldName().equals("SIZE")) {
@@ -217,14 +216,13 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
 
-            Model model = getModel(modelCode);
             List<Product> products = new ArrayList<>();
             int count = 1;
 
             // Loop for each combination of size and colour
             for (int i = 0; i < colours.size(); i++) {
                 for (int j = 0; j < sizes.size(); j++) {
-                    Product p = new Product(modelCode + "-" + count);
+                    Product p = new Product(model.getModelCode() + "-" + count);
 
                     ProductField colourField = getProductFieldByNameValue("colour", colours.get(i));
                     p.addProductField(colourField);
@@ -239,10 +237,8 @@ public class ProductServiceImpl implements ProductService {
             }
 
             model.setProducts(products);
-            return products;
+            return model;
 
-        } catch (ModelException ex) {
-            throw new ProductException("Model with model code " + modelCode + " does not exist.");
         } catch (EntityExistsException ex) {
             throw new ProductException("Product was already created.");
         }

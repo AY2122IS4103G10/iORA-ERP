@@ -1,5 +1,5 @@
 import {
-  ArchiveIcon, ClockIcon, CogIcon, CollectionIcon, CreditCardIcon, DocumentReportIcon, HomeIcon, QuestionMarkCircleIcon,
+  ArchiveIcon, ClockIcon, CogIcon, CollectionIcon, CreditCardIcon, DocumentReportIcon, LogoutIcon, QuestionMarkCircleIcon,
   ShieldCheckIcon
 } from "@heroicons/react/outline";
 import { useEffect } from "react";
@@ -10,7 +10,7 @@ import MainWrapper from "../../../components/MainWrapper";
 
 
 const navigation = [
-  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
   {
     name: "POS",
     href: "/str/pos/orderPurchase",
@@ -42,7 +42,7 @@ const navigation = [
 ];
 
 const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
+  { name: "Settings", href: "/account/settings", icon: CogIcon },
   { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];

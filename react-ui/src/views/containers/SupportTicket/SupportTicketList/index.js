@@ -20,12 +20,12 @@ export const SupportTicketTable = ({ data, handleOnClick }) => {
                 accessor: "status",
                 Filter: SelectColumnFilter,
                 filter: "includes",
-                Cell: (e) => (e.value == "PENDING" ? (
+                Cell: (e) => (e.value === "PENDING" ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         Pending
                     </span>
                 ) :
-                    (e.value == "PENDING_CUSTOMER" ? (
+                    (e.value === "PENDING_CUSTOMER" ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800">
                             Pending Customer
                         </span>
@@ -36,8 +36,6 @@ export const SupportTicketTable = ({ data, handleOnClick }) => {
                             </span>
                         ))
                 ),
-                Filter: SelectColumnFilter,
-                filter: "includes",
             },
             {
                 Header: "Category",

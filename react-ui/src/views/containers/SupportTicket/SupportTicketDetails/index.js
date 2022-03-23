@@ -5,9 +5,8 @@ import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { fetchSupportTickets, resolveSupportTicket, selectTicketById, replySupportTicket } from "../../../../stores/slices/supportTicketSlice";
+import { fetchSupportTickets, replySupportTicket, resolveSupportTicket, selectTicketById } from "../../../../stores/slices/supportTicketSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { SimpleTextArea } from '../../../components/Input/SimpleTextArea';
 
 const Header = ({
     ticketId,
@@ -24,7 +23,7 @@ const Header = ({
                 </div>
             </div>
             <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-                {status == "PENDING" &&
+                {status === "PENDING" &&
                     <button
                         type="button"
                         className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500`}
@@ -152,7 +151,7 @@ const SupportTicketBody = ({ messages, customer, order, status, input, onInputCh
                         </h2>
                     </div>
                     <div className="border-t border-gray-200 px-4 py-1 sm:px-6">
-                        <ul role="list" className="divide-y divide-gray-200">
+                        <ul className="divide-y divide-gray-200">
                             {messages.map((msg, index) => (
                                 <li key={index} className="px-6 py-4">
                                     <p className="font-bold text-lg align-top mb-5">{msg.name}</p>

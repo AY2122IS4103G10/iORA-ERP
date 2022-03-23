@@ -1,9 +1,7 @@
 import {
   ArchiveIcon,
-  CogIcon,
-  HomeIcon,
-  QuestionMarkCircleIcon,
-  ShieldCheckIcon,
+  CogIcon, LogoutIcon, QuestionMarkCircleIcon,
+  ShieldCheckIcon
 } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,12 +9,12 @@ import { Outlet } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { sitesApi } from "../../../../environments/Api";
 import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
-import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
 
 const navigation = [
-  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
   {
     name: "Procurement",
     href: "/lg/procurements",
@@ -32,7 +30,7 @@ const navigation = [
 ];
 
 const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
+  { name: "Settings", href: "/account/settings", icon: CogIcon },
   { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];

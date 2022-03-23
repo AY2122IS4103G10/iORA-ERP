@@ -18,7 +18,7 @@ const navigation = [
 
 const secondaryNavigation = [
   { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
-  { name: "Privacy", href: "#", icon: ShieldCheckIcon },
+  { name: "Privacy", href: "#", icon: ShieldCheckIcon }, 
 ];
 
 export const HomeIndex = () => {

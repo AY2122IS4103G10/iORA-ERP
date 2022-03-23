@@ -1,22 +1,20 @@
-import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
-import { NavBar } from "../../../components/NavBar";
-import { SideBar } from "../../../components/SideBar";
 import {
   CogIcon,
-  CreditCardIcon,
-  HomeIcon,
-  QuestionMarkCircleIcon,
-  ShieldCheckIcon,
+  CreditCardIcon, LogoutIcon, QuestionMarkCircleIcon,
+  ShieldCheckIcon
 } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+import { Outlet } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { sitesApi } from "../../../../environments/Api";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
 import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
+import { NavBar } from "../../../components/NavBar";
+import { SideBar } from "../../../components/SideBar";
 
 const navigation = [
-  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
   {
     name: "Procurement",
     href: "/mf/procurements/search",
@@ -26,7 +24,7 @@ const navigation = [
 ];
 
 const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
+  { name: "Settings", href: "/account/settings", icon: CogIcon },
   { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];

@@ -1,22 +1,26 @@
 import {
   ArchiveIcon,
-  CogIcon,
-  HomeIcon,
-  QuestionMarkCircleIcon,
-  ShieldCheckIcon,
+  CogIcon, LogoutIcon, QuestionMarkCircleIcon,
+  ShieldCheckIcon
 } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { api } from "../../../../environments/Api";
-import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { sitesApi } from "../../../../environments/Api";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
-import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
 
 const navigation = [
-  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
+  {
+    name: "Procurement",
+    href: "/lg/procurements",
+    icon: ArchiveIcon,
+    current: false,
+  },
   {
     name: "Stock Transfer",
     href: "/lg/stocktransfer",
@@ -26,12 +30,13 @@ const navigation = [
 ];
 
 const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
+  { name: "Settings", href: "/account/settings", icon: CogIcon },
   { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];
 
 export const LGIndex = () => {
+  const dispatch = useDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const siteId = useSelector(selectUserSite);
@@ -39,15 +44,15 @@ export const LGIndex = () => {
   const [siteSelected, setSiteSelected] = useState(sites[0]);
   const [siteCode, setSiteCode] = useState("");
   const { addToast } = useToasts();
-
+  
   useEffect(() => {
-    api
-      .getAll("admin/viewSites/all")
-      .then((response) => {
-        setSites(response.data);
-        setSiteSelected(response.data[0]);
-      })
-      .then(() => siteId === 0 && openSiteModal());
+    const fetchAllSites = async () => {
+      const { data } = await sitesApi.getAll();
+      setSites(data);
+      setSiteSelected(data[0]);
+      siteId === 0 && openSiteModal();
+    };
+    fetchAllSites();
   }, [siteId]);
 
   const handleEnterSite = (evt) => {
@@ -58,6 +63,7 @@ export const LGIndex = () => {
         appearance: "success",
         autoDismiss: true,
       });
+      dispatch(updateCurrSite())
       setSiteCode("");
       closeSiteModal();
     } else {

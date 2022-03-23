@@ -258,7 +258,7 @@ export const Slideover = ({
   );
 };
 
-export const QuantityTable = ({ qty, reserveQty }) => {
+export const QuantityTable = ({ qty, baselineQty }) => {
   return (
     <div className="mt-4 flex flex-col">
       <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -271,14 +271,14 @@ export const QuantityTable = ({ qty, reserveQty }) => {
                     Quantity
                   </th>
                   <th scope="col" className="py-3.5 text-center text-sm font-semibold text-gray-900">
-                    Reserved Quantity
+                    Baseline Quantity
                   </th>
                 </tr>
               </thead>
               <tbody className="text-center divide-y divide-gray-200 bg-white">
                 <tr>
                   <td className="whitespace-nowrap px-3 py-4 text-base text-black">{qty ?? 0}</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-black">{reserveQty ?? 0}</td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-black">{baselineQty ?? 0}</td>
                 </tr>
               </tbody>
             </table>
@@ -375,7 +375,6 @@ export const StockLevelForm = (subsys) => {
 
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
-
   const handleEditQty = (e) => {
     let qty = productStock?.qty ?? 0;
     if (selected.id === 1) {
@@ -571,8 +570,7 @@ export const StockLevelForm = (subsys) => {
                 </div>
                 <QuantityTable
                   qty={productStock?.qty}
-                  reserveQty={productStock?.reserveQty}
-
+                  baselineQty={productStock?.product.baselineQty}
                 />
               </section>
             </div>

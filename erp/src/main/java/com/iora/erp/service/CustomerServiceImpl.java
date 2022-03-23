@@ -16,7 +16,6 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.exception.SupportTicketException;
-import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
@@ -353,12 +352,16 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public SupportTicket replySupportTicket(Long id, String message, String name) throws SupportTicketException {
         SupportTicket st = getSupportTicket(id);
-        if (st.getStatus() != SupportTicket.Status.PENDING) {
-            throw new SupportTicketException("Ticket is not pending employee reply.");
+        
+        if (st.getStatus() == SupportTicket.Status.RESOLVED) {
+            throw new SupportTicketException("Ticket has already been resolved.");
+        } else if (st.getStatus() == SupportTicket.Status.PENDING) {
+            st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
+        } else {
+            st.setStatus(SupportTicket.Status.PENDING);
         }
 
         st.addMessage(new SupportTicketMsg(message, name));
-        st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
         return em.merge(st);
     }
 

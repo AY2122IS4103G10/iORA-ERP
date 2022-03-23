@@ -18,7 +18,7 @@ export const SimpleInlineRG = ({ options, selected, onSelectedChanged }) => {
                 type="radio"
                 checked={selected}
                 onChange={onSelectedChanged}
-                className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300"
               />
               <label
                 htmlFor={option.id}

@@ -1,13 +1,12 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { ExclamationIcon } from '@heroicons/react/outline';
+import { ExclamationIcon, PaperClipIcon } from '@heroicons/react/outline';
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { fetchSupportTickets, resolveSupportTicket, selectTicketById, replySupportTicket } from "../../../../stores/slices/supportTicketSlice";
+import { fetchSupportTickets, replySupportTicket, resolveSupportTicket, selectTicketById } from "../../../../stores/slices/supportTicketSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { SimpleTextArea } from '../../../components/Input/SimpleTextArea';
 
 const Header = ({
     ticketId,
@@ -24,7 +23,7 @@ const Header = ({
                 </div>
             </div>
             <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-                {status == "PENDING" &&
+                {status === "PENDING" &&
                     <button
                         type="button"
                         className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500`}
@@ -152,7 +151,7 @@ const SupportTicketBody = ({ messages, customer, order, status, input, onInputCh
                         </h2>
                     </div>
                     <div className="border-t border-gray-200 px-4 py-1 sm:px-6">
-                        <ul role="list" className="divide-y divide-gray-200">
+                        <ul className="divide-y divide-gray-200">
                             {messages.map((msg, index) => (
                                 <li key={index} className="px-6 py-4">
                                     <p className="font-bold text-lg align-top mb-5">{msg.name}</p>
@@ -176,33 +175,39 @@ const SupportTicketBody = ({ messages, customer, order, status, input, onInputCh
 
 const InputArea = ({ input, onInputChanged, onReplyClicked }) => {
     return (
-        <form className="relative">
-            <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+        <form className="relative px-4">
+            <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500">
                 <label htmlFor="input" className="sr-only">
                     Input
                 </label>
                 <textarea
-                    rows={6}
+                    rows={2}
                     name="input"
                     id="input"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="block w-full border-0 py-0 resize-none placeholder-gray-500 mt-1 focus:ring-0 sm:text-sm"
                     placeholder="Write a message..."
                     value={input}
                     onChange={onInputChanged}
                 />
             </div>
-
-            <div className="absolute bottom-0 inset-x-px">
-                <div className="border-t border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
-                    <div className="flex-shrink-0">
-                        <button
-                            type="submit"
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            onClick={onReplyClicked}
-                        >
-                            Reply
-                        </button>
-                    </div>
+            <div className="border-t border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
+                <div className="flex">
+                    <button
+                        type="button"
+                        className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
+                    >
+                        <PaperClipIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
+                        <span className="text-sm text-gray-500 group-hover:text-gray-600 italic">Attach a file</span>
+                    </button>
+                </div>
+                <div className="flex-shrink-0">
+                    <button
+                        type="submit"
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                        onClick={onReplyClicked}
+                    >
+                        Reply
+                    </button>
                 </div>
             </div>
         </form>
@@ -265,7 +270,7 @@ const ResolveModal = ({ open, setOpen, ticketId, onResolveClicked }) => {
                                 </button>
                                 <button
                                     type="button"
-                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:w-auto sm:text-sm"
                                     onClick={() => setOpen(false)}
                                 >
                                     Cancel

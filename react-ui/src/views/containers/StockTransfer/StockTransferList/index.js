@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllStockTransfer,
+  getLogisticsSTOBySite,
   selectAllOrders,
 } from "../../../../stores/slices/stocktransferSlice";
 import {
@@ -61,8 +62,12 @@ export const StockTransferList = ({ subsys }) => {
   const path = `/${subsys}/stocktransfer`;
   useEffect(() => {
     dispatch(updateCurrSite());
-    dispatch(getAllStockTransfer(currSiteId));
-  }, [dispatch, currSiteId]);
+    dispatch(
+      subsys === "lg"
+        ? getLogisticsSTOBySite(currSiteId)
+        : getAllStockTransfer(currSiteId)
+    );
+  }, [dispatch, currSiteId, subsys]);
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
@@ -77,7 +82,7 @@ export const StockTransferList = ({ subsys }) => {
             <DashedBorderES item="stock transfer" />
           </Link>
         ) : (
-          <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
             <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-400" />
             <span className="mt-2 block text-sm font-medium text-gray-900">
               No orders requiring attention.

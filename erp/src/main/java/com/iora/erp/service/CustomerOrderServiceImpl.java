@@ -570,7 +570,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
      */
 
     private OnlineOrder updateOnlineOrder(OnlineOrder onlineOrder) {
-        Notification noti = new Notification("Online Order #" + onlineOrder.getId(),
+        Notification noti = new Notification("Online Order # " + onlineOrder.getId(),
                 "Status has been updated to " + onlineOrder.getLastStatus().name() + ": "
                         + onlineOrder.getLastStatus().getDescription());
 
@@ -595,7 +595,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         em.persist(onlineOrder);
         finaliseCustomerOrder(onlineOrder);
 
-        onlineOrder.getSite().addNotification(new Notification("NEW Online Order #" + onlineOrder.getId(),
+        onlineOrder.getSite().addNotification(new Notification("NEW Online Order # " + onlineOrder.getId(),
                 "Status is " + onlineOrder.getLastStatus().name() + ": "
                         + onlineOrder.getLastStatus().getDescription()));
 

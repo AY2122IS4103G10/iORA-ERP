@@ -138,6 +138,8 @@ export const ViewStockTransfer = () => {
                 ? `${index === 0 ? "Created" : "Updated"} by`
                 : status === "READY_FOR_DELIVERY"
                 ? "Ready for delivery by"
+                : status === "DELIVERING" || status === "DELIVERING_MULTIPLE"
+                ? "Delivering"
                 : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
             target: data[index].name,
             date: moment(timeStamp).format("DD/MM, H:mm"),

@@ -5,7 +5,7 @@ import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { api } from "../../../../environments/Api";
+import { api, logisticsApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import {
@@ -68,11 +68,13 @@ export const ProcurementList = ({ subsys }) => {
     const fetchAllProcurement = async () => {
       setLoading(true);
       try {
-        const { data } = await api.getAll(
-          subsys === "sm"
-            ? "sam/procurementOrder/all"
-            : `manufacturing/procurementOrder/site/${currSiteId}`
-        );
+        const { data } = await (subsys === "lg"
+          ? logisticsApi.getPOBySiteStatus(currSiteId, "READY_FOR_SHIPPING")
+          : api.getAll(
+              subsys === "sm"
+                ? "sam/procurementOrder/all"
+                : `manufacturing/procurementOrder/site/${currSiteId}`
+            ));
         setData(data);
       } catch (err) {
         addToast(`Error: ${err.message}`, {
@@ -103,7 +105,7 @@ export const ProcurementList = ({ subsys }) => {
             <DashedBorderES item="procurement order" />
           </Link>
         ) : (
-          <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
             <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-400" />
             <span className="mt-2 block text-sm font-medium text-gray-900">
               No orders requiring attention.

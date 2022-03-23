@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -15,9 +16,11 @@ import com.iora.erp.model.site.StockLevelLI;
 
 @Entity
 public class Product {
-    
     @Id
     private String sku;
+
+    @Column(nullable = false)
+    private int baselineQty;
 
     @ManyToMany
     private Set<ProductField> productFields;
@@ -27,12 +30,14 @@ public class Product {
     private List<StockLevelLI> stockLevels;
 
     public Product() {
+        this.baselineQty = 0;
+        this.productFields = new HashSet<>();
+        this.stockLevels = new ArrayList<>();
     }
 
     public Product(String sku) {
+        this();
         this.sku = sku;
-        this.productFields = new HashSet<>();
-        this.stockLevels = new ArrayList<>();
     }
 
     public String getSku() {
@@ -41,6 +46,14 @@ public class Product {
 
     public void setSku(String sku) {
         this.sku = sku;
+    }
+
+    public int getBaselineQty() {
+        return this.baselineQty;
+    }
+
+    public void setBaselineQty(int baselineQty) {
+        this.baselineQty = baselineQty;
     }
 
     public Set<ProductField> getProductFields() {

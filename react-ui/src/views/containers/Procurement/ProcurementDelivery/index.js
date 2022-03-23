@@ -114,7 +114,7 @@ export const ProcurementDelivery = () => {
     setStatus,
     setStatusHistory,
     manufacturing,
-    // warehouse,
+    warehouse,
     lineItems,
     setLineItems,
     addToast,
@@ -216,7 +216,6 @@ export const ProcurementDelivery = () => {
     setSearch(e.target.value);
   };
 
-  console.log(lineItems);
   return (
     <div className="space-y-6 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-12 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -224,7 +223,8 @@ export const ProcurementDelivery = () => {
           (s) => s === status.status
         ) ? (
           status.status === "READY_FOR_SHIPPING" &&
-          manufacturing.id === currSiteId ? (
+          manufacturing.id === currSiteId &&
+          subsys === "lg" ? (
             <div className="flex justify-center">
               <NumDeliveriesSection
                 subsys={subsys}
@@ -236,24 +236,18 @@ export const ProcurementDelivery = () => {
               />
             </div>
           ) : (
-            // <ConfirmSection
-            //   subsys={subsys}
-            //   procurementId={procurementId}
-            //   title={"Confirm items received"}
-            //   body={
-            //     "Confirm that all the items in this order have been? This action cannot be undone."
-            //   }
-            //   onConfirmClicked={onConfirmClicked}
-
-            // />
-            <section aria-labelledby="scan-items">
-              <ScanItemsSection
-                search={search}
-                searchHelper={`Scan barcode or enter product SKU to confirm receipt of item.`}
-                onSearchChanged={onSearchChanged}
-                onScanClicked={onScanClicked}
-              />
-            </section>
+            (status === "DELIVERING" || status === "DELIVERING_MULTIPLE") &&
+            warehouse.id === currSiteId &&
+            subsys !== "lg" && (
+              <section aria-labelledby="scan-items">
+                <ScanItemsSection
+                  search={search}
+                  searchHelper={`Scan barcode or enter product SKU to confirm receipt of item.`}
+                  onSearchChanged={onSearchChanged}
+                  onScanClicked={onScanClicked}
+                />
+              </section>
+            )
           )
         ) : (
           <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">

@@ -162,12 +162,4 @@ public class Employee implements Serializable {
     public void setCompany(Company company) {
         this.company = company;
     }
-
-    public boolean authentication(String password2) {
-        if (password2.equals(this.password)) {
-            return true;
-        }
-        return false;
-    }
-
 }

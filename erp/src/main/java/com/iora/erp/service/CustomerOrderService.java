@@ -21,6 +21,7 @@ public interface CustomerOrderService {
     public abstract List<CustomerOrder> searchCustomerOrders(Long siteId, Long orderId);
     public abstract List<CustomerOrder> searchStoreOrders(Long siteId, Long orderId);
     public abstract List<OnlineOrder> searchOnlineOrders(Long siteId, Long orderId);
+    public abstract List<OnlineOrder> getPickupOrdersBySite(Long siteId);
 
     public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;
     public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;

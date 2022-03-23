@@ -163,7 +163,6 @@ export const ViewStockTransfer = () => {
       );
     });
   }, [order]);
-  // console.log(history)
   return (
     <StockTransferBody
       order={order}

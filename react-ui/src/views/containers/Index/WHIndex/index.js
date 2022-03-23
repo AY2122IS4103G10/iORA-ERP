@@ -1,26 +1,25 @@
-import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-
-import { NavBar } from "../../../components/NavBar";
-import { SideBar } from "../../../components/SideBar";
 import {
   CogIcon,
   CollectionIcon,
-  DocumentTextIcon,
-  HomeIcon,
+  DocumentTextIcon, LogoutIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
   ShoppingBagIcon,
-  TruckIcon,
+  TruckIcon
 } from "@heroicons/react/outline";
-import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Outlet } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
 import { sitesApi } from "../../../../environments/Api";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
+import { NavBar } from "../../../components/NavBar";
+import { SideBar } from "../../../components/SideBar";
+
 
 const navigation = [
-  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
   {
     name: "Products",
     href: "/wh/products/print",

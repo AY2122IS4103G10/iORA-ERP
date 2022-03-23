@@ -65,11 +65,11 @@ export const ProcurementInvoiceBody = ({
               />
               <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">No.</dt>
-                <dd className="text-indigo-600 mt-2">{orderId}</dd>
+                <dd className="text-cyan-600 mt-2">{orderId}</dd>
               </dl>
               <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">Date</dt>
-                <dd className="text-indigo-600 mt-2">
+                <dd className="text-cyan-600 mt-2">
                   {moment
                     .unix(orderStatus.timeStamp / 1000)
                     .format("DD/MM/YYYY, hh:mm:ss")}
@@ -77,12 +77,12 @@ export const ProcurementInvoiceBody = ({
               </dl>
               <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">Status</dt>
-                <dd className="text-indigo-600 mt-2">{orderStatus.status}</dd>
+                <dd className="text-cyan-600 mt-2">{orderStatus.status}</dd>
               </dl>
 
               {/* <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">Tracking number</dt>
-                <dd className="text-indigo-600 mt-2">51547878755545848512</dd>
+                <dd className="text-cyan-600 mt-2">51547878755545848512</dd>
               </dl> */}
               <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">For enquiries, call</dt>

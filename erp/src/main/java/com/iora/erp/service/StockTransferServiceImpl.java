@@ -65,6 +65,18 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
+    public List<StockTransferOrder> getStockTransferOrdersByStatus(String status) {
+        List<StockTransferOrder> stOrders = new ArrayList<>();
+
+        for (StockTransferOrder sto : getStockTransferOrders()) {
+            if (sto.getLastStatus() == StockTransferStatusEnum.valueOf(status.toUpperCase())) {
+                stOrders.add(sto);
+            }
+        }
+        return stOrders;
+    }
+
+    @Override
     public List<StockTransferOrder> getSTOBySiteStatus(Long siteId, String status) throws StockTransferException {
         Site site = em.find(Site.class, siteId);
         if (site == null) {
@@ -81,29 +93,8 @@ public class StockTransferServiceImpl implements StockTransferService {
         return deliveryOrders;
     }
 
-    @Override
-    public List<StockTransferOrder> getStockTransferOrdersForDelivery() {
-        /*
-         * TypedQuery<StockTransferOrder> q = em.createQuery(
-         * "SELECT DISTINCT(sto) FROM StockTransferOrder sto RIGHT JOIN .statusHistory st WHERE st.status = 'READY_FOR_DELIVERY' OR st.status = 'DELIVERING' ORDER BY st.timeStamp DESC"
-         * , StockTransferOrder.class);
-         * q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY);
-         */
-
-        List<StockTransferOrder> deliveryOrders = new ArrayList<>();
-
-        for (StockTransferOrder sto : getStockTransferOrders()) {
-            if (sto.getLastStatus() == StockTransferStatusEnum.READY_FOR_DELIVERY
-                    || sto.getLastStatus() == StockTransferStatusEnum.DELIVERING
-                    || sto.getLastStatus() == StockTransferStatusEnum.DELIVERING_MULTIPLE) {
-                deliveryOrders.add(sto);
-            }
-        }
-        return deliveryOrders;
-    }
-
     private StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder) {
-        Notification noti = new Notification("Stock Transfer Order #" + stockTransferOrder.getId(),
+        Notification noti = new Notification("Stock Transfer Order # " + stockTransferOrder.getId(),
                 "Status has been updated to " + stockTransferOrder.getLastStatus().name() + ": "
                         + stockTransferOrder.getLastStatus().getDescription());
 
@@ -136,7 +127,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         em.persist(stockTransferOrder);
 
-        Notification noti = new Notification("Stock Transfer Order (NEW) #" + stockTransferOrder.getId(),
+        Notification noti = new Notification("Stock Transfer Order (NEW) # " + stockTransferOrder.getId(),
                 "Status is " + stockTransferOrder.getLastStatus().name() + ": "
                         + stockTransferOrder.getLastStatus().getDescription());
 

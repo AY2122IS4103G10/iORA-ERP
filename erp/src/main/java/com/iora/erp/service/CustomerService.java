@@ -5,11 +5,9 @@ import java.util.List;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.exception.SupportTicketException;
-import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
-import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customer.Voucher;
 
 public interface CustomerService {

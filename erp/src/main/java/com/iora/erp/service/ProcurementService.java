@@ -14,6 +14,7 @@ public interface ProcurementService {
     public abstract ProcurementOrder getProcurementOrder(Long id) throws ProcurementOrderException;
     public abstract List<ProcurementOrder> getProcurementOrders();
     public abstract List<ProcurementOrder> getProcurementOrdersOfSite(Site site);
+    public abstract List<ProcurementOrder> getProcurementOrdersByStatus(String status);
     public abstract List<ProcurementOrder> getPOBySiteStatus(Long siteId, String status) throws ProcurementOrderException;
 
     public abstract ProcurementOrder createProcurementOrder(ProcurementOrder procurementOrder, Long siteId) throws SiteConfirmationException;

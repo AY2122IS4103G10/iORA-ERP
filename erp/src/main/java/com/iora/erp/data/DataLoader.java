@@ -573,8 +573,7 @@ public class DataLoader implements CommandLineRunner {
 					productFields.add(category);
 				}
 			}
-			em.persist(model);
-			productService.createProduct(modelCode, productFields);
+			productService.createModel(model);
 		}
 
 		List<Product> products = productService.searchProductsBySKU(null);

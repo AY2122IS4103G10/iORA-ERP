@@ -77,6 +77,14 @@ export const getProductDetails = createAsyncThunk(
   }
 );
 
+export const updateBaselineQty = createAsyncThunk(
+  "products/updateBaselineQty",
+  async ({ sku, qty }) => {
+    const response = await api.update(`sam/product/baseline/${sku}/${qty}`);
+    return response.data;
+  }
+);
+
 const productSlice = createSlice({
   name: "products",
   initialState,
@@ -143,6 +151,9 @@ const productSlice = createSlice({
     });
     builder.addCase(getProductDetails.rejected, (state, action) => {
       state.status = "failed";
+    });
+    builder.addCase(updateBaselineQty.fulfilled, (state, action) => {
+      state.status = "idle";
     });
   },
 });

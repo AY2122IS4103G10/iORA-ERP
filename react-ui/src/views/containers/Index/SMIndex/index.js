@@ -100,7 +100,7 @@ export const SMIndex = () => {
           setSidebarOpen={setSidebarOpen}
           badge={
             <div className="flex-1 flex py-4">
-              <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+              <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-cyan-100 text-cyan-800">
                 Sales and Marketing
               </span>
             </div>

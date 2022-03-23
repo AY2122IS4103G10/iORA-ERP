@@ -1,30 +1,20 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-
 import {
-  selectAProduct,
-  getAProduct,
+  getAProduct, selectAProduct
 } from "../../../../stores/slices/productSlice";
 import {
   getProductStockLevel,
-  selectProductStock,
+  selectProductStock
 } from "../../../../stores/slices/stocklevelSlice";
-import {
-  getAllSites,
-  selectAllSites,
-} from "../../../../stores/slices/siteSlice";
-import { SelectableTable } from "../../../components/Tables/SelectableTable";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
+
 
 const columns = [
   {
     Header: "Quantity",
     accessor: "qty",
-  },
-  {
-    Header: "Reserved Qty",
-    accessor: "reserveQty"
   }
 ];
 

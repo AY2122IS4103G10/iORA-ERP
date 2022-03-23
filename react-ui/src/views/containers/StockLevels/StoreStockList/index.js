@@ -86,11 +86,7 @@ export const MyStoreStock = (subsys) => {
     {
       Header: "Qty",
       accessor: "qty",
-    },
-    {
-      Header: "Reserved",
-      accessor: "reserveQty",
-    },
+    }
     // {
     //   Header: "",
     //   accessor: "accessor",

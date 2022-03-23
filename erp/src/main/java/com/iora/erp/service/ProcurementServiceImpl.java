@@ -89,7 +89,7 @@ public class ProcurementServiceImpl implements ProcurementService {
     }
 
     private ProcurementOrder updateProcurementOrder(ProcurementOrder procurementOrder) {
-        Notification noti = new Notification("Procurement Order #" + procurementOrder.getId(),
+        Notification noti = new Notification("Procurement Order # " + procurementOrder.getId(),
                 "Status has been updated to " + procurementOrder.getLastStatus().name() + ": "
                         + procurementOrder.getLastStatus().getDescription());
 
@@ -109,7 +109,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
             em.persist(procurementOrder);
 
-            Notification noti = new Notification("Procurement Order (NEW) #" + procurementOrder.getId(),
+            Notification noti = new Notification("Procurement Order (NEW) # " + procurementOrder.getId(),
                     "Status is " + procurementOrder.getLastStatus().name() + ": "
                             + procurementOrder.getLastStatus().getDescription());
 

@@ -17,7 +17,6 @@ import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.service.CustomerService;
-import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
@@ -26,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,8 +43,6 @@ public class SAMController {
     private CustomerService customerService;
     @Autowired
     private SiteService siteService;
-    @Autowired
-    private EmployeeService employeeService;
     @Autowired
     private ProcurementService procurementService;
 
@@ -251,6 +247,17 @@ public class SAMController {
     @PutMapping(path = "/product", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> updateProduct(@RequestBody Product product) {
         try {
+            return ResponseEntity.ok(productService.updateProduct(product));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/product/baseline/{sku}/{qty}", produces = "application/json")
+    public ResponseEntity<Object> updateBaselineQty(@PathVariable String sku, @PathVariable int qty) {
+        try {
+            Product product = productService.getProduct(sku);
+            product.setBaselineQty(qty);
             return ResponseEntity.ok(productService.updateProduct(product));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());

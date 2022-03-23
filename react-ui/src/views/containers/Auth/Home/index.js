@@ -206,9 +206,9 @@ const paths = [
     title: "Sales and Marketing",
     href: "/sm",
     icon: UsersIcon,
-    focus: "focus-within:ring-indigo-500",
-    iconForeground: "text-indigo-700",
-    iconBackground: "bg-indigo-50",
+    focus: "focus-within:ring-cyan-500",
+    iconForeground: "text-cyan-700",
+    iconBackground: "bg-cyan-50",
     description:
       "View and modify product inventories. Access Customer Relations Management. Launch Procurement Orders.",
   },

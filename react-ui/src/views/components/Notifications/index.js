@@ -56,7 +56,7 @@ export function Notifications({
                                             <div className="ml-3 flex h-7 items-center">
                                                 <button
                                                     type="button"
-                                                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500"
+                                                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-cyan-500"
                                                     onClick={() => setOpen(false)}
                                                 >
                                                     <span className="sr-only">Close panel</span>
@@ -69,7 +69,12 @@ export function Notifications({
                                         {notifications.slice(0)
                                             .reverse().map((noti, index) => (
                                                 <li key={index}>
-                                                    <Link to={`${noti.title.split(' ')[0] === "Stock" ? "stocktransfer" : noti.title.split(' ')[0] === "Procurement" ? "procurements" : "orders"}/${noti.title.charAt(noti.title.length - 1)}`}>
+
+                                                    <Link to={`${noti.title.split(' ')[0] === "Stock" ? "stocktransfer/" + noti.title.split(" ")[noti.title.split(" ").length - 1] :
+                                                        noti.title.split(' ')[0] === "Procurement" ? "procurements/" + noti.title.split(" ")[noti.title.split(" ").length - 1] :
+                                                            noti.title.split(' ')[0] === "Online" ? "orders/" + noti.title.split(" ")[noti.title.split(" ").length - 1] :
+                                                                "stocktransfer/create"}`}>
+
                                                         <div className="group relative flex items-center py-6 px-5">
                                                             <div className="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true" />
                                                             <div className="relative flex min-w-0 flex-1 items-center">

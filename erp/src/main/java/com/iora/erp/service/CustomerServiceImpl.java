@@ -16,7 +16,6 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.exception.SupportTicketException;
-import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;

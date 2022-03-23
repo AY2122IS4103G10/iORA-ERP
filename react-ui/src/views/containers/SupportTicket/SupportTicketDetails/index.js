@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { ExclamationIcon } from '@heroicons/react/outline';
+import { ExclamationIcon, PaperClipIcon } from '@heroicons/react/outline';
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -176,33 +176,39 @@ const SupportTicketBody = ({ messages, customer, order, status, input, onInputCh
 
 const InputArea = ({ input, onInputChanged, onReplyClicked }) => {
     return (
-        <form className="relative">
+        <form className="relative px-4">
             <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
                 <label htmlFor="input" className="sr-only">
                     Input
                 </label>
                 <textarea
-                    rows={6}
+                    rows={2}
                     name="input"
                     id="input"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="block w-full border-0 py-0 resize-none placeholder-gray-500 mt-1 focus:ring-0 sm:text-sm"
                     placeholder="Write a message..."
                     value={input}
                     onChange={onInputChanged}
                 />
             </div>
-
-            <div className="absolute bottom-0 inset-x-px">
-                <div className="border-t border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
-                    <div className="flex-shrink-0">
-                        <button
-                            type="submit"
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            onClick={onReplyClicked}
-                        >
-                            Reply
-                        </button>
-                    </div>
+            <div className="border-t border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
+                <div className="flex">
+                    <button
+                        type="button"
+                        className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
+                    >
+                        <PaperClipIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
+                        <span className="text-sm text-gray-500 group-hover:text-gray-600 italic">Attach a file</span>
+                    </button>
+                </div>
+                <div className="flex-shrink-0">
+                    <button
+                        type="submit"
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        onClick={onReplyClicked}
+                    >
+                        Reply
+                    </button>
                 </div>
             </div>
         </form>

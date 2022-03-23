@@ -6,6 +6,7 @@ import {
     selectAllSupportTickets
 } from "../../../../stores/slices/supportTicketSlice";
 import { SelectColumnFilter, SimpleTable } from "../../../components/Tables/SimpleTable";
+import moment from "moment";
 
 export const SupportTicketTable = ({ data, handleOnClick }) => {
     const columns = useMemo(
@@ -13,20 +14,6 @@ export const SupportTicketTable = ({ data, handleOnClick }) => {
             {
                 Header: "Ticket Id",
                 accessor: "id",
-            },
-            {
-                Header: "Customer Id",
-                accessor: "customer.id",
-            },
-            {
-                Header: "Category",
-                accessor: "category",
-                Filter: SelectColumnFilter,
-                filter: "includes",
-            },
-            {
-                Header: "Subject",
-                accessor: "subject",
             },
             {
                 Header: "Status",
@@ -37,13 +24,35 @@ export const SupportTicketTable = ({ data, handleOnClick }) => {
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         Pending
                     </span>
-                ) : (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        Resolved
-                    </span>
-                )),
+                ) :
+                    (e.value == "PENDING_CUSTOMER" ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800">
+                            Pending Customer
+                        </span>
+                    ) :
+                        (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Resolved
+                            </span>
+                        ))
+                ),
                 Filter: SelectColumnFilter,
                 filter: "includes",
+            },
+            {
+                Header: "Category",
+                accessor: "category",
+                Filter: SelectColumnFilter,
+                filter: "includes"
+            },
+            {
+                Header: "Subject",
+                accessor: "subject",
+            },
+            {
+                Header: "Last Response",
+                accessor: (row) => `${row.messages[row.messages.length - 1]}`,
+                Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, hh:mm")
             }
         ],
         []

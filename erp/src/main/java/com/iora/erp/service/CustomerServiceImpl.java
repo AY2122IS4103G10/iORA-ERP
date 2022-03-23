@@ -353,12 +353,16 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public SupportTicket replySupportTicket(Long id, String message, String name) throws SupportTicketException {
         SupportTicket st = getSupportTicket(id);
-        if (st.getStatus() != SupportTicket.Status.PENDING) {
-            throw new SupportTicketException("Ticket is not pending employee reply.");
+        
+        if (st.getStatus() == SupportTicket.Status.RESOLVED) {
+            throw new SupportTicketException("Ticket has already been resolved.");
+        } else if (st.getStatus() == SupportTicket.Status.PENDING) {
+            st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
+        } else {
+            st.setStatus(SupportTicket.Status.PENDING);
         }
 
         st.addMessage(new SupportTicketMsg(message, name));
-        st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
         return em.merge(st);
     }
 

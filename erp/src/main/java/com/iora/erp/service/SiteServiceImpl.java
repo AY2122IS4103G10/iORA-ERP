@@ -8,6 +8,7 @@ import javax.persistence.PersistenceContext;
 
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
+import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.site.HeadquartersSite;
@@ -18,6 +19,7 @@ import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,8 @@ public class SiteServiceImpl implements SiteService {
 
     @PersistenceContext
     private EntityManager em;
+    @Autowired
+    private ProductService productService;
 
     @Override
     public Site createSite(Site site, String siteType) {
@@ -197,7 +201,7 @@ public class SiteServiceImpl implements SiteService {
             return lineItem;
         } catch (NoResultException ex) {
             Product product = em.find(Product.class, SKUCode);
-            StockLevelLI lineItem = new StockLevelLI(product, stockLevel, 0, 0);
+            StockLevelLI lineItem = new StockLevelLI(product, stockLevel, 0);
             em.persist(lineItem);
             return lineItem;
         }
@@ -219,16 +223,29 @@ public class SiteServiceImpl implements SiteService {
     public StockLevel removeProducts(Long siteId, String SKUCode, int qty)
             throws NoStockLevelException, IllegalTransferException {
         try {
+            Site site = em.find(Site.class, siteId);
+            if (site == null) {
+                throw new Exception("Site cannot be found");
+            }
+
             StockLevelLI lineItem = getStockLevelLI(siteId, SKUCode);
             if (lineItem.getQty() < qty) {
                 throw new IllegalTransferException("Quantity to remove more than expected.");
             }
+
             lineItem.setQty(lineItem.getQty() - qty);
-            return em.find(Site.class, siteId).getStockLevel();
-        } catch (IllegalTransferException ex1) {
-            throw new IllegalTransferException(ex1.getMessage());
-        } catch (Exception ex2) {
-            throw new NoStockLevelException("Products cannot be removed from stock level.");
+            Product product = productService.getProduct(SKUCode);
+            if (lineItem.getQty() < product.getBaselineQty()) {
+                site.addNotification(new Notification("Low Quantity!",
+                        "The quantity of product " + product.getSku()
+                                + " is below the baseline! Click here to perform a Stock Transfer."));
+            }
+
+            return site.getStockLevel();
+        } catch (ProductException ex) {
+            throw new IllegalTransferException(ex.getMessage());
+        } catch (Exception ex) {
+            throw new NoStockLevelException(ex.getMessage());
         }
     }
 

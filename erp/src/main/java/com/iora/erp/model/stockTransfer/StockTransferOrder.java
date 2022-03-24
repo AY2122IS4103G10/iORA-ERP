@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iora.erp.enumeration.StockTransferStatus;
+import com.iora.erp.enumeration.StockTransferStatusEnum;
 import com.iora.erp.model.site.Site;
 
 @Entity
@@ -29,14 +29,11 @@ public class StockTransferOrder {
     @OneToMany(cascade = CascadeType.ALL)
     private List<StockTransferOrderLI> lineItems;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Site fromSite;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Site toSite;
-
-    private boolean hqAccepted;
-    private boolean opAccepeted;
 
     public StockTransferOrder() {
         this.lineItems = new ArrayList<>();
@@ -70,7 +67,7 @@ public class StockTransferOrder {
     }
 
     @JsonIgnore
-    public StockTransferStatus getLastStatus() {
+    public StockTransferStatusEnum getLastStatus() {
         try {
             return this.statusHistory.get(this.statusHistory.size() - 1).getStatus();
         } catch (Exception ex) {
@@ -113,22 +110,6 @@ public class StockTransferOrder {
 
     public void setToSite(Site toSite) {
         this.toSite = toSite;
-    }
-
-    public boolean isHqAccepted() {
-        return this.hqAccepted;
-    }
-
-    public void setHqAccepted(boolean hqAccepted) {
-        this.hqAccepted = hqAccepted;
-    }
-
-    public boolean isOpAccepeted() {
-        return this.opAccepeted;
-    }
-
-    public void setOpAccepeted(boolean opAccepeted) {
-        this.opAccepeted = opAccepeted;
     }
 
     @Override

@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { login } from "../../../../stores/slices/userSlice";
+import { loginJwt, postLoginJwt } from "../../../../stores/slices/userSlice";
 
 export const Login = () => {
   const dispatch = useDispatch();
@@ -12,29 +11,33 @@ export const Login = () => {
   const [password, setPassword] = useState("");
   const { addToast } = useToasts();
 
-  const handleLogin = (evt) => {
-    evt.preventDefault();
-    dispatch(login({ email, password }))
-      .unwrap()
-      .then((data) => {
-        if (data.id !== -1 && data.availStatus) {
-          localStorage.setItem("user", JSON.stringify(data.id));
-          setEmail("");
-          setPassword("");
-          addToast("Login Successfully", {
-            appearance: "success",
-            autoDismiss: true,
-          });
-          return data.id;
-        }
-      })
-      .then((id) => id !== -1 && navigate("/"))
-      .catch((err) => {
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = dispatch(
+        loginJwt({ username: email, password: password })
+      );
+      const data = await response.unwrap();
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      const postLogin = dispatch(postLoginJwt(data.accessToken));
+      const user = await postLogin.unwrap();
+      localStorage.setItem("user", JSON.stringify(user));
+      setEmail("");
+      setPassword("");
+      addToast("Login Successful", {
+        appearance: "success",
+        autoDismiss: true,
       });
+      if (user.id !== -1) {
+        navigate("/");
+      }
+    } catch (err) {
+      addToast(`Error: ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
   };
 
   return (
@@ -55,7 +58,7 @@ export const Login = () => {
               to="/register"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              create an account
+              Create an Account
             </Link>
           </p>
         </div>

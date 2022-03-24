@@ -1,7 +1,5 @@
 package com.iora.erp.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -12,7 +10,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
-import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.enumeration.AccessRightsEnum;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
@@ -20,11 +18,6 @@ import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service("employeeServiceImpl")
 @Transactional
-public class EmployeeServiceImpl implements EmployeeService, UserDetailsService {
+public class EmployeeServiceImpl implements EmployeeService {
 
     @PersistenceContext
     private EntityManager em;
@@ -40,10 +33,11 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
     private EmailService emailService;
     @Autowired
     private AdminService adminService;
+
     @Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Override
     public Employee createEmployee(Employee employee) throws EmployeeException {
@@ -52,8 +46,6 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
                     employee.getJobTitle().getId()) == true) {
 
                 String tempPassword = StringGenerator.generateRandom(48, 122, 8);
-                // employee.setSalt(StringGenerator.saltGeneration());
-                // employee.setPassword(StringGenerator.generateProtectedPassword(employee.getSalt(), tempPassword));
                 employee.setPassword(passwordEncoder().encode(tempPassword));
                 em.persist(employee);
                 emailService.sendTemporaryPassword(employee, tempPassword);
@@ -73,7 +65,6 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
         if (old == null) {
             throw new EmployeeException("Employee not found");
         }
-        // String salt = old.getSalt();
 
         try {
             if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
@@ -89,9 +80,9 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
 
                         old.setUsername(employee.getUsername());
                         old.setEmail(employee.getEmail());
-
-                        if (employee.getPassword() != null && employee.getPassword() != "") {
-                            // old.setPassword(StringGenerator.generateProtectedPassword(salt, employee.getPassword()));
+                        
+                        if (employee.getPassword() != null && employee.getPassword() != ""
+                                && !employee.getPassword().equals(old.getPassword())) {
                             old.setPassword(passwordEncoder().encode(employee.getPassword()));
                         }
                         old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
@@ -103,7 +94,7 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
                         if (!old.getCompany().getId().equals(employee.getCompany().getId())) {
                             old.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
                         }
-
+                        em.merge(old);
                         return old;
 
                     } else {
@@ -207,12 +198,12 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
     }
 
     @Override
-    public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
+    public Set<AccessRightsEnum> getEmployeeAccessRights(Long id) throws EmployeeException {
         return getEmployeeById(id).getJobTitle().getResponsibility();
     }
 
     @Override
-    public Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
+    public Set<AccessRightsEnum> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
         return getEmployeeByUsername(username).getJobTitle().getResponsibility();
     }
 
@@ -239,11 +230,9 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
                 } else {
                     throw new AuthenticationException("Your account has been terminated.");
                 }
-
             } else {
                 throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
             }
-
         } catch (EmployeeException ex) {
             throw new AuthenticationException("Authentication Fail. Invalid Username or Password.");
         }
@@ -253,23 +242,8 @@ public class EmployeeServiceImpl implements EmployeeService, UserDetailsService 
     public void resetPassword(Long id) throws EmployeeException {
         Employee e = getEmployeeById(id);
         String tempPassword = StringGenerator.generateRandom(48, 122, 8);
-        // e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(), tempPassword));
         e.setPassword(passwordEncoder().encode(tempPassword));
 
         emailService.sendTemporaryPassword(e, tempPassword);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        try {
-            Employee employee = getEmployeeByUsername(username);
-            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            employee.getJobTitle().getResponsibility().forEach(accessRight -> {
-                authorities.add(new SimpleGrantedAuthority(accessRight.name()));
-            });
-            return new User(employee.getUsername(), employee.getPassword(), authorities);
-        } catch (EmployeeException ex) {
-            throw new UsernameNotFoundException("Employee not found in the database");
-        }
     }
 }

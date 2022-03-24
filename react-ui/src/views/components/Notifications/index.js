@@ -2,20 +2,35 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XIcon } from '@heroicons/react/outline';
 import moment from "moment";
 import { Fragment, useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { api } from "../../../environments/Api";
 
 export function Notifications({
     open,
     setOpen,
-    siteId }) {
+    setNewNoti }) {
+    const { addToast } = useToasts();
     const [notifications, setNotifications] = useState([]);
 
+    const getNotifications = async () => {
+        const response = await api.get("admin/noti", localStorage.getItem("siteId"))
+        const data = await response.data;
+
+        if (notifications.length !== data.length) {
+            addToast("New Notifications!", {
+                appearance: "info",
+                autoDismiss: true,
+            })
+            setNewNoti(true);
+            setNotifications(data);
+        }
+    }
+
     useEffect(() => {
-        api.get("admin/noti", siteId).then((response) => {
-            setNotifications(response.data);
-        })
-    }, [siteId]
-    )
+        const timer = setInterval(getNotifications, 10000);
+        return () => clearInterval(timer);
+    });
 
     return (
         <Transition.Root show={open} as={Fragment}>
@@ -41,7 +56,7 @@ export function Notifications({
                                             <div className="ml-3 flex h-7 items-center">
                                                 <button
                                                     type="button"
-                                                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500"
+                                                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-cyan-500"
                                                     onClick={() => setOpen(false)}
                                                 >
                                                     <span className="sr-only">Close panel</span>
@@ -50,12 +65,17 @@ export function Notifications({
                                             </div>
                                         </div>
                                     </div>
-                                    <ul role="list" className="flex-1 divide-y divide-gray-200 overflow-y-auto">
+                                    <ul className="flex-1 divide-y divide-gray-200 overflow-y-auto">
                                         {notifications.slice(0)
-                                            .reverse().map((noti) => (
-                                                <li key={noti.timeStamp}>
-                                                    <div className="group relative flex items-center py-6 px-5">
-                                                        <a href={noti.href} className="-m-1 block flex-1 p-1">
+                                            .reverse().map((noti, index) => (
+                                                <li key={index}>
+
+                                                    <Link to={`${noti.title.split(' ')[0] === "Stock" ? "stocktransfer/" + noti.title.split(" ")[noti.title.split(" ").length - 1] :
+                                                        noti.title.split(' ')[0] === "Procurement" ? "procurements/" + noti.title.split(" ")[noti.title.split(" ").length - 1] :
+                                                            noti.title.split(' ')[0] === "Online" ? "orders/" + noti.title.split(" ")[noti.title.split(" ").length - 1] :
+                                                                "stocktransfer/create"}`}>
+
+                                                        <div className="group relative flex items-center py-6 px-5">
                                                             <div className="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true" />
                                                             <div className="relative flex min-w-0 flex-1 items-center">
                                                                 <div className="ml-4 truncate">
@@ -65,8 +85,8 @@ export function Notifications({
                                                                     <p className="truncate text-sm text-gray-500">{moment.unix(noti.timeStamp / 1000).format(" H:mm:ss, DD/MM/YYYY")}</p>
                                                                 </div>
                                                             </div>
-                                                        </a>
-                                                    </div>
+                                                        </div>
+                                                    </Link>
                                                 </li>
                                             ))}
                                     </ul>

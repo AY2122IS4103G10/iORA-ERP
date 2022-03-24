@@ -90,6 +90,15 @@ public class StoreController {
         }
     }
 
+    @GetMapping(path = "/viewStock/sites/{siteId}/{skuCode}", produces = "application/json")
+    public StockLevelLI viewStock(@PathVariable Long siteId, @PathVariable String skuCode) {
+        try {
+            return siteService.getStockLevelLI(siteId, skuCode);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
     public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
@@ -293,6 +302,11 @@ public class StoreController {
     @GetMapping(path = "/onlineOrder/{siteId}", produces = "application/json")
     public List<OnlineOrder> searchOnlineOrdersBySite(@PathVariable Long siteId, @RequestParam String orderId) {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
+    }
+
+    @GetMapping(path = "/onlineOrder/pickup/{siteId}", produces = "application/json")
+    public List<OnlineOrder> getPickupOrdersOfSite(@PathVariable Long siteId) {
+        return customerOrderService.getPickupOrdersBySite(siteId);
     }
 
     @PostMapping(path = "/customerOrder/add/{rfidsku}", consumes = "application/json", produces = "application/json")

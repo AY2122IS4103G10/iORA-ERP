@@ -42,7 +42,6 @@ public interface ProductService {
     public abstract List<Model> getModelsByCategory(String category);
     public abstract Model updateModel(Model model) throws ModelException;
 
-    public abstract List<Product> createProduct(String modelCode, List<ProductField> productFields) throws ProductException, ProductFieldException;
     public abstract Product getProduct(String rfidsku) throws ProductException;
     public abstract List<Product> getProducts(List<String> rfidskus) throws ProductException;
     public abstract List<Product> searchProductsBySKU(String sku);

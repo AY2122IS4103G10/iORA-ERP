@@ -1,20 +1,24 @@
+import { Dialog, Transition } from '@headlessui/react';
 import { CurrencyDollarIcon } from "@heroicons/react/outline";
 import {
-  PencilIcon,
-  CurrencyDollarIcon as CurrencyDollarSolid,
+  CurrencyDollarIcon as CurrencyDollarSolid, PencilIcon
 } from "@heroicons/react/solid";
-import { useEffect, useMemo } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import {
   fetchProducts,
   selectProductByCode,
-  updateExistingProduct,
+  updateBaselineQty,
+  updateExistingProduct
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { SimpleButton } from "../../../components/Buttons/SimpleButton";
+import { SimpleInputBox } from '../../../components/Input/SimpleInputBox';
+import { SelectColumnFilter, SimpleTable } from "../../../components/Tables/SimpleTable";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
+
 
 const FieldSection = ({ fieldName, fields }) => {
   return Boolean(fields.length) ? (
@@ -55,18 +59,144 @@ export const SKUTable = ({ data }) => {
         accessor: (row) =>
           row.productFields.find((field) => field.fieldName === "COLOUR")
             .fieldValue,
+        Filter: SelectColumnFilter,
+        filter: "includes"
       },
       {
         Header: "Size",
         accessor: (row) =>
           row.productFields.find((field) => field.fieldName === "SIZE")
             .fieldValue,
+        Filter: SelectColumnFilter,
+        filter: "includes"
       },
+      {
+        Header: "Baseline Qty",
+        accessor: "accessor",
+        Cell: (e) => {
+          const [open, setOpen] = useState(false);
+          const cancelButtonRef = useRef(null)
+          const [qty, setQty] = useState(e.row.original.baselineQty);
+          const onQtyChange = (e) => setQty(e.target.value);
+          const { addToast } = useToasts();
+          const dispatch = useDispatch();
+          const onEditClicked = (evt) => {
+            evt.preventDefault();
+            const sku = e.row.original.sku
+            dispatch(updateBaselineQty({ sku, qty }))
+              .unwrap()
+              .then(() => {
+                addToast("Baseline Quantity Updated", {
+                  appearance: "success",
+                  autoDismiss: true,
+                });
+              })
+              .catch((err) =>
+                addToast(`Error: ${err.message}`, {
+                  appearance: "error",
+                  autoDismiss: true,
+                })
+              ).finally(() => setOpen(false))
+          }
+
+          return (
+            <div>
+              {qty}
+              <SimpleButton
+                onClick={() => setOpen(true)}
+                className="ml-5"
+              >
+                Edit
+              </SimpleButton>
+              <EditModal
+                open={open}
+                setOpen={setOpen}
+                cancelButtonRef={cancelButtonRef}
+                qty={qty} onQtyChange={onQtyChange}
+                sku={e.row.original.sku}
+                onEditClicked={onEditClicked} />
+            </div>
+          );
+        },
+      }
     ],
     []
   );
   return <SimpleTable columns={columns} data={data} />;
 };
+
+const EditModal = ({ open, setOpen, cancelButtonRef, qty, onQtyChange, sku, onEditClicked }) => {
+  return (
+    <Transition.Root show={open} as={Fragment}>
+      <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={cancelButtonRef} onClose={() => setOpen(false)}>
+        <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </Transition.Child>
+
+          {/* This element is to trick the browser into centering the modal contents. */}
+          <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+            &#8203;
+          </span>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            enterTo="opacity-100 translate-y-0 sm:scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          >
+
+            <div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+              <form>
+                <div>
+                  <div className="mt-3 text-center sm:mt-5">
+                    <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                      Edit baseline quantity for {sku}
+                    </Dialog.Title>
+                    <div className="mt-2">
+                      <SimpleInputBox
+                        type="number"
+                        name="baselineQty"
+                        id="baselineQty"
+                        value={qty}
+                        onChange={onQtyChange} />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                  <button
+                    type="submit"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:col-start-2 sm:text-sm"
+                    onClick={onEditClicked}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                    onClick={() => setOpen(false)}
+                    ref={cancelButtonRef}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Transition.Child>
+        </div>
+      </Dialog>
+    </Transition.Root>)
+}
 
 const ProductDetailsBody = ({
   prodCode,
@@ -272,8 +402,8 @@ export const ProductDetails = () => {
               f1.fieldValue < f2.fieldValue
                 ? -1
                 : f1.fieldValue > f2.fieldValue
-                ? 1
-                : 0
+                  ? 1
+                  : 0
             )}
           sizes={product.productFields.filter(
             (field) => field.fieldName === "SIZE"
@@ -284,8 +414,8 @@ export const ProductDetails = () => {
               f1.fieldValue < f2.fieldValue
                 ? -1
                 : f1.fieldValue > f2.fieldValue
-                ? 1
-                : 0
+                  ? 1
+                  : 0
             )}
           categories={product.productFields
             .filter((field) => field.fieldName === "CATEGORY")
@@ -293,8 +423,8 @@ export const ProductDetails = () => {
               f1.fieldValue < f2.fieldValue
                 ? -1
                 : f1.fieldValue > f2.fieldValue
-                ? 1
-                : 0
+                  ? 1
+                  : 0
             )}
           available={product.available}
           products={product.products}

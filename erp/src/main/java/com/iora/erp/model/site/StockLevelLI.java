@@ -26,17 +26,13 @@ public class StockLevelLI {
     @Column(nullable = false)
     private int qty = 0;
 
-    @Column(nullable = false)
-    private int reserveQty = 0;
-
     public StockLevelLI() {
     }
 
-    public StockLevelLI(Product product, StockLevel stockLevel, int qty, int reserveQty) {
+    public StockLevelLI(Product product, StockLevel stockLevel, int qty) {
         this.product = product;
         this.stockLevel = stockLevel;
         this.qty = qty;
-        this.reserveQty = reserveQty;
     }
 
     public Long getId() {
@@ -74,13 +70,4 @@ public class StockLevelLI {
     public void setQty(int qty) {
         this.qty = qty;
     }
-
-    public int getReserveQty() {
-        return this.reserveQty;
-    }
-
-    public void setReserveQty(int reserveQty) {
-        this.reserveQty = reserveQty;
-    }
-
 }

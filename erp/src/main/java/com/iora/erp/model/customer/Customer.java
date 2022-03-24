@@ -2,6 +2,7 @@ package com.iora.erp.model.customer;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -13,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 
 @Entity
@@ -39,20 +42,22 @@ public class Customer implements Serializable {
     @JoinColumn(name = "customerId")
     private List<CustomerOrder> orders;
     private Boolean availStatus;
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @OneToMany
+    private List<SupportTicket> supportTickets;
 
     @Column(nullable = false)
-    private String hashPass;
-    @Column
-    private String salt;
+    private String password;
 
     public Customer() {
         this.membershipPoints = 0;
         this.storeCredit = 0.0;
         this.availStatus = true;
+        this.supportTickets = new ArrayList<>();
     }
 
     public Customer(String firstName, String lastName, String email, LocalDate dob, String contactNumber,
-            MembershipTier membershipTier, String hashPass, String salt) {
+            MembershipTier membershipTier, String password) {
         this();
         this.firstName = firstName;
         this.lastName = lastName;
@@ -60,8 +65,7 @@ public class Customer implements Serializable {
         this.dob = dob;
         this.contactNumber = contactNumber;
         this.membershipTier = membershipTier;
-        this.salt = salt;
-        this.hashPass = hashPass;
+        this.password = password;
     }
 
     public Customer(String firstName, String lastName) {
@@ -70,20 +74,12 @@ public class Customer implements Serializable {
         this.lastName = lastName;
     }
 
-    public String getSalt() {
-        return salt;
+    public String getPassword() {
+        return password;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public String gethashPass() {
-        return hashPass;
-    }
-
-    public void sethashPass(String password) {
-        this.hashPass = password;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Long getId() {
@@ -181,11 +177,27 @@ public class Customer implements Serializable {
         this.id = id;
     }
 
-    public boolean authentication(String password2) {
-        if (password2.equals(this.hashPass)) {
-            return true;
-        }
-        return false;
+    public List<CustomerOrder> getOrders() {
+        return this.orders;
     }
 
+    public void setOrders(List<CustomerOrder> orders) {
+        this.orders = orders;
+    }
+
+    public void addOrder(CustomerOrder order) {
+        this.orders.add(order);
+    }
+
+    public List<SupportTicket> getSupportTickets() {
+        return this.supportTickets;
+    }
+
+    public void setSupportTickets(List<SupportTicket> supportTickets) {
+        this.supportTickets = supportTickets;
+    }
+
+    public void addSupportTicke(SupportTicket supportTicket) {
+        this.supportTickets.add(supportTicket);
+    }
 }

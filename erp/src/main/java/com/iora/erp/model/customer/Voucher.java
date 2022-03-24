@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
+import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.utils.StringGenerator;
 
 @Entity
@@ -24,6 +26,9 @@ public class Voucher {
 
     @Column(nullable = false)
     private boolean redeemed;
+
+    @OneToOne(mappedBy = "voucher")
+    private CustomerOrder customerOrder;
 
     public Voucher() {
     }
@@ -75,5 +80,13 @@ public class Voucher {
 
     public void setRedeemed(boolean redeemed) {
         this.redeemed = redeemed;
+    }
+
+    public CustomerOrder getCustomerOrder() {
+        return this.customerOrder;
+    }
+
+    public void setCustomerOrder(CustomerOrder customerOrder) {
+        this.customerOrder = customerOrder;
     }
 }

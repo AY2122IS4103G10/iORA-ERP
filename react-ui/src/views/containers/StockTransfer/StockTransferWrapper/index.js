@@ -12,7 +12,6 @@ import {
   confirmStockTransfer,
   // readyStockTransfer,
   completeStockTransfer,
-  deliverStockTransfer,
 } from "../../../../stores/slices/stocktransferSlice";
 import {
   selectUserSite,
@@ -25,7 +24,6 @@ import { XIcon } from "@heroicons/react/solid";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useToasts } from "react-toast-notifications";
 import { Outlet } from "react-router-dom";
-import { PrinterIcon } from "@heroicons/react/outline";
 import { Tabs } from "../../../components/Tabs";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { InvoiceModal } from "../../Procurement/ProcurementWrapper";
@@ -113,8 +111,6 @@ export const StockTransferHeader = ({
   openDeleteModal,
   openRejectModal,
   handleConfirmOrder,
-  openVerifyItemsModal,
-  handleDeliveringOrder,
   openInvoiceModal,
 }) => {
   let status = order.statusHistory[order.statusHistory.length - 1].status;
@@ -124,7 +120,7 @@ export const StockTransferHeader = ({
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev
         page="Stock Transfer Orders"
-        path={`/${subsys}/stockTransfer`}
+        path={`/${subsys}/stocktransfer`}
       />
       <div className="relative pb-5 border-b border-gray-200 sm:pb-0">
         <div className="md:flex md:items-center md:justify-between">
@@ -139,17 +135,6 @@ export const StockTransferHeader = ({
                 <span>View Invoice</span>
               </button>
             )}
-            <button
-              type="button"
-              className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={() => window.print()}
-            >
-              <PrinterIcon
-                className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              <span>Print</span>
-            </button>
             {status === "PENDING" && userSiteId === orderMadeBy ? (
               <Link to={`/${subsys}/stocktransfer/edit/${order.id}`}>
                 <button
@@ -228,7 +213,6 @@ export const StockTransferHeader = ({
           </div>
         </div>
       </div>
-      <div className="mt-6 absolute right-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3"></div>
     </div>
   );
 };
@@ -396,6 +380,8 @@ export const StockTransferWrapper = ({ subsys }) => {
   const [lineItems, setLineItems] = useState({});
   const [openDelete, setOpenDelete] = useState(false);
   const [openReject, setOpenReject] = useState(false);
+  const [action, setAction] = useState(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [openVerifyItems, setOpenVerifyItems] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [qrDelivery, setQrDelivery] = useState("");
@@ -425,29 +411,32 @@ export const StockTransferWrapper = ({ subsys }) => {
   const openRejectModal = () => setOpenReject(true);
   const closeRejectModal = () => setOpenReject(false);
 
+  const openConfirmModal = () => setOpenConfirm(true);
+  const closeConfirmModal = () => setOpenConfirm(false);
+
   const openInvoiceModal = () => setOpenInvoice(true);
   const closeInvoiceModal = () => setOpenInvoice(false);
 
-  const openVerifyItemsModal = (e) => {
-    e.preventDefault();
-    const orderStatus =
-      order.statusHistory[order.statusHistory.length - 1].status;
-    let temp = order.lineItems;
-    if (orderStatus === "CONFIRMED") {
-      temp = order.lineItems.map((item) => ({
-        ...item,
-        sentQty: item.requestedQty,
-      }));
-    }
-    if (orderStatus === "DELIVERING" || orderStatus === "READY") {
-      temp = order.lineItems.map((item) => ({
-        ...item,
-        actualQty: item.sentQty,
-      }));
-    }
-    setLineItems(temp);
-    setOpenVerifyItems(true);
-  };
+  // const openVerifyItemsModal = (e) => {
+  //   e.preventDefault();
+  //   const orderStatus =
+  //     order.statusHistory[order.statusHistory.length - 1].status;
+  //   let temp = order.lineItems;
+  //   if (orderStatus === "CONFIRMED") {
+  //     temp = order.lineItems.map((item) => ({
+  //       ...item,
+  //       sentQty: item.requestedQty,
+  //     }));
+  //   }
+  //   if (orderStatus === "DELIVERING" || orderStatus === "READY") {
+  //     temp = order.lineItems.map((item) => ({
+  //       ...item,
+  //       actualQty: item.sentQty,
+  //     }));
+  //   }
+  //   setLineItems(temp);
+  //   setOpenVerifyItems(true);
+  // };
 
   const closeVerifyItemsModal = () => setOpenVerifyItems(false);
 
@@ -466,53 +455,6 @@ export const StockTransferWrapper = ({ subsys }) => {
       })
       .catch((error) => {
         addToast(`Confirm Stock Transfer Order failed. ${error.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      });
-  };
-
-  // const handleReadyOrder = (e) => {
-  //   e.preventDefault();
-  //   let temp = { ...order };
-  //   temp.lineItems = lineItems;
-  //   order = temp;
-  //   dispatch(readyStockTransfer({ order: order, siteId: userSiteId }))
-  //     .unwrap()
-  //     .then(() => {
-  //       addToast(`Stock Transfer Order Ready for Delivery`, {
-  //         appearance: "success",
-  //         autoDismiss: true,
-  //       });
-  //       // navigate(`/${subsys.subsys}/stocktransfer/${id}`)
-  //       // setReload(reload + 1);
-  //       dispatch(getStockTransfer(id));
-  //     })
-  //     .catch((err) => {
-  //       addToast(`${err.message}`, {
-  //         appearance: "error",
-  //         autoDismiss: true,
-  //       });
-  //     });
-
-  //   closeVerifyItemsModal();
-  // };
-
-  const handleDeliveringOrder = (e) => {
-    e.preventDefault();
-    dispatch(deliverStockTransfer({ order: order, siteId: userSiteId }))
-      .unwrap()
-      .then(() => {
-        addToast(`Stock Transfer Order is being delivered`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        // navigate(`/${subsys.subsys}/stocktransfer/${id}`)
-        // setReload(reload + 1);
-        dispatch(getStockTransfer(id));
-      })
-      .catch((err) => {
-        addToast(`${err.message}`, {
           appearance: "error",
           autoDismiss: true,
         });
@@ -618,8 +560,6 @@ export const StockTransferWrapper = ({ subsys }) => {
             openDeleteModal={openDeleteModal}
             openRejectModal={openRejectModal}
             handleConfirmOrder={handleConfirmOrder}
-            openVerifyItemsModal={openVerifyItemsModal}
-            handleDeliveringOrder={handleDeliveringOrder}
             openInvoiceModal={openInvoiceModal}
           />
           <Outlet
@@ -632,6 +572,8 @@ export const StockTransferWrapper = ({ subsys }) => {
               openInvoiceModal,
               stOrderStatus,
               addToast,
+              setAction,
+              openConfirmModal,
             }}
           />
         </div>
@@ -758,6 +700,21 @@ export const StockTransferWrapper = ({ subsys }) => {
             />
           </ProcurementInvoice>
         </InvoiceModal>
+        {action && (
+          <Confirmation
+            title={`${action.name} "Order #${order.id}"`}
+            body={
+              action.body
+                ? action.body
+                : `Are you sure you want to ${action.name.toLowerCase()} "Order #${
+                    order.id
+                  }"? This action cannot be undone.`
+            }
+            open={openConfirm}
+            closeModal={closeConfirmModal}
+            onConfirm={action.action}
+          />
+        )}
       </>
     )
   );

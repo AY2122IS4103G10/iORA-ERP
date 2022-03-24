@@ -46,7 +46,7 @@ const membershipTierSlice = createSlice({
     });
     builder.addCase(fetchMembershipTiers.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.membershipTiers = state.membershipTiers.concat(action.payload);
+      state.membershipTiers = action.payload;
     });
     builder.addCase(fetchMembershipTiers.rejected, (state, action) => {
       state.status = "failed";

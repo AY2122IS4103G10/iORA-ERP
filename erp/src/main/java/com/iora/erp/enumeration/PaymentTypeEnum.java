@@ -1,6 +1,6 @@
 package com.iora.erp.enumeration;
 
-public enum PaymentType {
+public enum PaymentTypeEnum {
     CASH,
     MASTERCARD,
     VISA,

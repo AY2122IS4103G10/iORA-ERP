@@ -414,7 +414,7 @@ const Cash = ({ amount, handleSubmit, addToast }) => {
                   Attention
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700">
-                  <p>Please confirm the cash tendered before proceeding</p>
+                  <p>Please confirm the cash tendered before proceeding with checkout.</p>
                 </div>
               </div>
             </div>
@@ -534,31 +534,38 @@ const Card = ({ addToast, checkoutItems, handleSubmit }) => {
   return (
     <div className="rounded-lg bg-white overflow-hidden divide-y divide-gray-200 sm:divide-y-0 flex justify-center">
       <div className="grow max-w-md sm:grid sm:grid-cols-1 pl-3">
-        {connected ? (
-          <button
-            type="button"
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            onClick={simulatedCheckout}
-          >
-            <DeviceTabletIcon
-              className="-ml-1 mr-2 h-5 w-5"
-              aria-hidden="true"
-            />
-            Checkout
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            onClick={setSimulated}
-          >
-            <DeviceTabletIcon
-              className="-ml-1 mr-2 h-5 w-5"
-              aria-hidden="true"
-            />
-            Connect to Simulated Reader
-          </button>
-        )}
+        <div className="text-center justify-center border-2 border-gray-300 rounded-lg px-12 pt-6 mx-2">
+          <img
+            className="mx-auto h-24 w-24 text-gray-400"
+            src={process.env.PUBLIC_URL + '/cardreader.svg'}
+          />
+          <h3 className="mt-2 text-sm font-medium text-gray-900">{connected ? `Reader ${localStorage.getItem("pos-posdeviceid").replace(/"/g,"")}` : "No readers"}</h3>
+          <p className="mt-1 text-sm text-gray-500">{connected ? "You are successfully connected to the reader. The customer can now use the card reader." : "Get started by connecting your reader via Bluetooth."}</p>
+          <div className="my-6">
+            {connected ? (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={simulatedCheckout}
+              >
+                <DeviceTabletIcon
+                  className="-ml-1 mr-2 h-5 w-5"
+                  aria-hidden="true"
+                />
+                Simulate Checkout
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={setSimulated}
+              >
+                <DeviceTabletIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                Connect to Simulated Reader
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

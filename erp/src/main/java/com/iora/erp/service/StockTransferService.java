@@ -14,7 +14,8 @@ public interface StockTransferService {
     public abstract StockTransferOrder getStockTransferOrder(Long id) throws StockTransferException;
     public abstract List<StockTransferOrder> getStockTransferOrders();
     public abstract List<StockTransferOrder> getStockTransferOrderOfSite(Site site);
-    public abstract List<StockTransferOrder> getStockTransferOrdersForDelivery();
+    public abstract List<StockTransferOrder> getStockTransferOrdersByStatus(String status);
+    public abstract List<StockTransferOrder> getSTOBySiteStatus(Long siteId, String status) throws StockTransferException;
 
     public abstract StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, InvalidAttributesException;
     public abstract StockTransferOrder updateOrderDetails(StockTransferOrder stockTransferOrder, Long siteId) throws SiteConfirmationException, StockTransferException;

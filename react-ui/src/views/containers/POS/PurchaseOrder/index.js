@@ -137,7 +137,7 @@ const OrderList = ({
                 Promotions
               </p>
             )}
-            <ul className="border-t border-b border-gray-200">
+            <ul className="border-b border-gray-200">
               {promotions.map((lineItem, index) => (
                 <li key={index} className="flex py-6">
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
@@ -209,7 +209,7 @@ const OrderList = ({
             type="button"
             disabled={amount === 0}
             onClick={openModal}
-            className="mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+            className="mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-cyan-500"
           >
             Payment
           </button>
@@ -398,7 +398,7 @@ export const PosPurchaseOrder = () => {
           <div className="flex justify-center gap-4">
             <button
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
               onClick={closeSureModal}
             >
               Cancel

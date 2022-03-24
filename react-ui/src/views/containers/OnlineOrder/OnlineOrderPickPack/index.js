@@ -79,15 +79,17 @@ export const OnlineOrderPickPack = () => {
   const { addToast } = useToasts();
   const {
     subsys,
-    order,
+    orderId,
     currSiteId,
-    status,
+    status: st,
     setStatus,
+    statusHistory,
     setStatusHistory,
     lineItems,
     setLineItems,
     openInvoice,
   } = useOutletContext();
+  const status = st.status;
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const onConfirmClicked = () => handlePickPack();
@@ -98,17 +100,17 @@ export const OnlineOrderPickPack = () => {
   };
 
   const handlePickPack = async () => {
-    const { data } = await onlineOrderApi.pickPack(order.id, currSiteId);
-    const { status, statusHistory } = data;
-    setStatus(status);
+    const { data } = await onlineOrderApi.pickPack(orderId, currSiteId);
+    const { statusHistory } = data;
+    setStatus(statusHistory[statusHistory.length - 1]);
     setStatusHistory(statusHistory);
     addToast(
-      `Order #${order.id}  ${
+      `Order #${orderId}  ${
         status === "PENDING"
           ? "has begun picking"
           : status === "PICKED"
           ? "has begun packing"
-          : "is ready for shipping"
+          : "is ready for delivery"
       }.`,
       {
         appearance: "success",
@@ -117,14 +119,14 @@ export const OnlineOrderPickPack = () => {
     );
     if (status === "PACKED") {
       openInvoice();
-      navigate(`/${subsys}/orders/${order.id}/delivery`);
+      navigate(`/${subsys}/orders/${orderId}/delivery`);
     }
   };
 
   const handleScan = async (barcode) => {
     try {
-      const { data } = await onlineOrderApi.scanItem(order.id, barcode);
-      const { lineItems: lIs, status, statusHistory } = data;
+      const { data } = await onlineOrderApi.scanItem(orderId, barcode);
+      const { lineItems: lIs, statusHistory } = data;
       setLineItems(
         lineItems.map((item, index) => ({
           ...item,
@@ -132,12 +134,17 @@ export const OnlineOrderPickPack = () => {
           packedQty: lIs[index].packedQty,
         }))
       );
-      setStatus(status);
+      setStatus(statusHistory[statusHistory.length - 1]);
       setStatusHistory(statusHistory);
-      addToast(`Successfully picked ${barcode}.`, {
-        appearance: "success",
-        autoDismiss: true,
-      });
+      addToast(
+        `Successfully ${
+          status === "PICKING" || status === "PENDING" ? "picked" : "packed"
+        } ${barcode}.`,
+        {
+          appearance: "success",
+          autoDismiss: true,
+        }
+      );
       setSearch("");
     } catch (error) {
       addToast(`Error: ${error.message}`, {
@@ -168,14 +175,14 @@ export const OnlineOrderPickPack = () => {
               (s) => s === status
             ) ? (
               ["PICKED", "PACKED"].some((s) => s === status) ? (
-                subsys === "mf" ? (
+                statusHistory[0].actionBy.id === currSiteId ? (
                   <section
                     aria-labelledby="confirm"
                     className="flex justify-center"
                   >
                     <ConfirmSection
                       subsys={subsys}
-                      procurementId={order.id}
+                      procurementId={orderId}
                       title={`Confirm items ${
                         status === "PICKED" ? "picked" : "packed"
                       }`}
@@ -197,7 +204,7 @@ export const OnlineOrderPickPack = () => {
                   </div>
                 )
               ) : (
-                subsys === "wh" && (
+                statusHistory[0].actionBy.id === currSiteId && (
                   <section aria-labelledby="scan-items">
                     <ScanItemsSection
                       search={search}

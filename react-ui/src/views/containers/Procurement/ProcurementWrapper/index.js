@@ -232,7 +232,7 @@ const InvoiceSummary = ({ data, status }) => {
             .fieldValue,
       },
       {
-        Header: `${status === "READY_FOR_SHIPPING" ? "Ful" : "Req"}`,
+        Header: "Qty",
         accessor: `${
           status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"
         }`,
@@ -484,6 +484,9 @@ export const ProcurementWrapper = ({ subsys }) => {
               currSiteId,
               loading,
               setLoading,
+              setAction,
+              openConfirmModal,
+              closeConfirmModal,
             }}
           />
         </div>
@@ -550,7 +553,11 @@ export const ProcurementWrapper = ({ subsys }) => {
         {Boolean(action) && (
           <Confirmation
             title={`${action.name} "Order #${procurementId}"`}
-            body={`Are you sure you want to ${action.name.toLowerCase()} "Order #${procurementId}"? This action cannot be undone.`}
+            body={
+              action.body
+                ? action.body
+                : `Are you sure you want to ${action.name.toLowerCase()} "Order #${procurementId}"? This action cannot be undone.`
+            }
             open={openConfirm}
             closeModal={closeConfirmModal}
             onConfirm={action.action}

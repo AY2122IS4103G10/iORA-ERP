@@ -1,21 +1,20 @@
-import { useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { NavBar } from "../../../components/NavBar";
-import { SideBar } from "../../../components/SideBar";
 import {
   CogIcon,
-  DocumentReportIcon,
-  HomeIcon,
-  LibraryIcon,
+  DocumentReportIcon, LibraryIcon,
+  LogoutIcon,
   OfficeBuildingIcon,
   QuestionMarkCircleIcon,
   ShieldCheckIcon,
   TruckIcon,
   UserGroupIcon,
   UserIcon,
-  UsersIcon,
+  UsersIcon
 } from "@heroicons/react/outline";
+import { useState } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { classNames } from "../../../../utilities/Util";
+import { NavBar } from "../../../components/NavBar";
+import { SideBar } from "../../../components/SideBar";
 
 export const tabs = [
   { name: "Employees", href: "/ad/employees", icon: UsersIcon, index: 0 },
@@ -32,12 +31,12 @@ export const tabs = [
   },
 ]
 const navigation = [
-  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
   ...tabs
 ];
 
 const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
+  { name: "Settings", href: "/account/settings", icon: CogIcon },
   { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];

@@ -33,7 +33,7 @@ export const Listings = () => {
 
                         <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-4 xl:gap-x-8">
                             {listings.map((model) => (
-                                <Link key={model.modelCode} to={`/products/${model.modelCode}`} className="group">
+                                <Link key={model.modelCode} to={`/products/view/${model.modelCode}`} className="group">
                                     <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
                                         <img
                                             src="https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-02.jpg"

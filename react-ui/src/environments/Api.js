@@ -8,10 +8,10 @@ let axiosPrivate = axios.create();
 
 if (localStorage.getItem("accessToken")) {
   axiosPrivate.defaults.headers.common["Authorization"] =
-    localStorage.getItem("accessToken");
+    "Bearer " + localStorage.getItem("accessToken");
 }
 
-export const axiosPublic = axios.create();
+let axiosPublic = axios.create();
 
 export const api = {
   getAll(path) {
@@ -194,10 +194,9 @@ export const stockTransferApi = {
       `${REST_ENDPOINT}store/stockTransfer/deliverMultiple/${orderId}`
     );
   },
-  completeOrder(order, siteId) {
+  completeOrder(orderId) {
     return axiosPrivate.put(
-      `${REST_ENDPOINT}store/stockTransfer/complete/${siteId}`,
-      order
+      `${REST_ENDPOINT}store/stockTransfer/complete/${orderId}`
     );
   },
 };
@@ -225,6 +224,20 @@ export const authApi = {
       },
     });
   },
+  isUsernameAvailable(username) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}auth/usernameAvailable/${username}`
+    );
+  },
+  updateProfile(details) {
+    return axiosPrivate.put(`${REST_ENDPOINT}auth/editProfile`, details);
+  },
+  changePassword(details) {
+    return axiosPrivate.put(`${REST_ENDPOINT}auth/changePassword`, details);
+  },
+  resetPassword(details) {
+    return axiosPublic.post(`${REST_ENDPOINT}auth/resetPassword`, details);
+  }
 };
 
 export const employeeApi = {
@@ -259,6 +272,12 @@ export const customerApi = {
       `${REST_ENDPOINT}sam/customer/unblock/${customerId}`
     );
   },
+};
+
+export const ticketApi = {
+  resolveTicket(ticketId) {
+    return axiosPrivate.put(`${REST_ENDPOINT}sam/ticket/resolve/${ticketId}`);
+  }
 };
 
 export const departmentApi = {
@@ -299,7 +318,7 @@ export const onlineOrderApi = {
     );
   },
   getPaymentIntent(lineItems) {
-    return axiosPublic.post(`${REST_ENDPOINT}online/pay`, lineItems);
+    return axiosPrivate.post(`${REST_ENDPOINT}online/pay`, lineItems);
   },
   pickPack(orderId, siteId) {
     return axiosPrivate.put(
@@ -312,9 +331,7 @@ export const onlineOrderApi = {
     );
   },
   deliverOrder(orderId) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}online/deliver/${orderId}`
-    );
+    return axiosPrivate.put(`${REST_ENDPOINT}online/deliver/${orderId}`);
   },
   deliverMultiple(orderId) {
     return axiosPrivate.put(
@@ -322,14 +339,10 @@ export const onlineOrderApi = {
     );
   },
   receive(orderId) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}online/receive/${orderId}`
-    );
+    return axiosPrivate.put(`${REST_ENDPOINT}online/receive/${orderId}`);
   },
   collect(orderId) {
-    return axiosPrivate.put(
-      `${REST_ENDPOINT}online/collect/${orderId}`
-    );
+    return axiosPrivate.put(`${REST_ENDPOINT}online/collect/${orderId}`);
   },
 };
 
@@ -337,13 +350,19 @@ export const orderApi = {
   getAll() {
     return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder?orderId=`);
   },
+  getAllOnline() {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/onlineOrder?orderId=`);
+  },
+  getAllStore() {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/storeOrder?orderId=`);
+  },
   get(orderId) {
     return axiosPrivate.get(
       `${REST_ENDPOINT}store/customerOrder/view/${orderId}`
     );
   },
   createOrder(order, paymentIntentId) {
-    return axiosPublic.post(
+    return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/create?clientSecret=${paymentIntentId}`,
       order
     );
@@ -357,19 +376,19 @@ export const posApi = {
     );
   },
   addProductToLineItems(rfidsku, lineItems) {
-    return axiosPublic.post(
+    return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/add/${rfidsku}`,
       lineItems
     );
   },
   removeProductFromLineItems(rfidsku, lineItems) {
-    return axiosPublic.post(
+    return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/remove/${rfidsku}`,
       lineItems
     );
   },
   calculatePromotions(lineItems) {
-    return axiosPublic.post(
+    return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/calculate`,
       lineItems
     );
@@ -383,3 +402,12 @@ export const posApi = {
     return axiosPrivate.post(`${REST_ENDPOINT}online/pay`, lineItems);
   },
 };
+
+export const logisticsApi = {
+  getSTOBySiteStatus(siteId, status) {
+    return axiosPrivate.get(`${REST_ENDPOINT}logistics/sto/${siteId}/${status}`);
+  },
+  getPOBySiteStatus(siteId, status) {
+    return axiosPrivate.get(`${REST_ENDPOINT}logistics/po/${siteId}/${status}`);
+  },
+}

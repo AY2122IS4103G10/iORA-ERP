@@ -408,6 +408,6 @@ export const logisticsApi = {
     return axiosPrivate.get(`${REST_ENDPOINT}logistics/sto/${siteId}/${status}`);
   },
   getPOBySiteStatus(siteId, status) {
-    return axiosPrivate.get(`${REST_ENDPOINT}logistics/po/${siteId}/${status}`);
+    return axiosPrivate.get(`${REST_ENDPOINT}logistics/procurementOrder/${siteId}/${status}`);
   },
 }

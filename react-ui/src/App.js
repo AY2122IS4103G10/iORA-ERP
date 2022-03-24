@@ -92,6 +92,7 @@ import { ManageRewardsLoyalty } from "./views/containers/Vouchers/ManageVouchers
 import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VouchersList } from "./views/containers/Vouchers/VouchersList";
+import { ProductRFID } from "./views/containers/Products/ProductRFID/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -126,6 +127,7 @@ function App() {
               <Route path="edit/:prodId" element={<ProductForm />} />
               <Route path="promotions" element={<ManagePromotions />} />
             </Route>
+
             {/* Stock Levels */}
             <Route path="stocklevels">
               <Route path="my/:id" element={<StockLevelForm subsys="sm" />} />
@@ -203,7 +205,6 @@ function App() {
 
             {/* Customer Orders */}
             <Route path="orders" element={<Outlet />}>
-
               <Route
                 path="search"
                 element={
@@ -247,11 +248,11 @@ function App() {
               <Route path="create" element={<CustomerForm />} />
               <Route path="edit/:customerId" element={<CustomerForm />} />
             </Route>
-            
+
             {/* Support Centre */}
             <Route path="support" element={<Outlet />}>
-              <Route index element={<ManageSupportTicket/>}/>
-              <Route path=":ticketId" element={<SupportTicketDetails/>}/>
+              <Route index element={<ManageSupportTicket />} />
+              <Route path=":ticketId" element={<SupportTicketDetails />} />
             </Route>
 
             {/* Rewards & Loyalty */}
@@ -290,7 +291,6 @@ function App() {
                 <Route path="create" element={<MembershipTierForm />} />
               </Route>
             </Route>
-
           </Route>
 
           {/* Store Management Subsystem */}
@@ -354,18 +354,41 @@ function App() {
               </Route>
               <Route path="orderPurchase" element={<PosPurchaseOrder />} />
             </Route>
+            <Route path="orders" element={<Outlet />}>
+              <Route
+                index
+                element={
+                  <ManageOnlineOrders subsys="str">
+                    <OnlineOrderList subsys="str" />
+                  </ManageOnlineOrders>
+                }
+              />
+
+              <Route
+                path="search"
+                element={
+                  <ManageOnlineOrders subsys="str">
+                    <OnlineOrderSearch subsys="str" />
+                  </ManageOnlineOrders>
+                }
+              />
+              <Route
+                path=":orderId"
+                element={<CustomerOrderWrapper subsys="str" />}
+              >
+                <Route index element={<CustomerOrderDetails />} />
+                <Route path="pick-pack" element={<OnlineOrderPickPack />} />
+              </Route>
+            </Route>
           </Route>
 
           {/* Admin Subsystem */}
           <Route
             path="ad"
             element={
-              //Change to admin route
               <PrivateRoute>
                 <AdminIndex />
               </PrivateRoute>
-              // <ADRoute>
-              /* </ADRoute> */
             }
           >
             <Route path="sites" element={<Outlet />}>
@@ -459,6 +482,14 @@ function App() {
                 element={
                   <ManageProducts subsys="wh">
                     <ProductPrint subsys="wh" />
+                  </ManageProducts>
+                }
+              />
+              <Route
+                path="rfid"
+                element={
+                  <ManageProducts subsys="wh">
+                    <ProductRFID subsys="wh" />
                   </ManageProducts>
                 }
               />

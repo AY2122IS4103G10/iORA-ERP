@@ -154,7 +154,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public List<OnlineOrder> getPickupOrdersBySite(Long siteId) {
         TypedQuery<OnlineOrder> q = em.createQuery(
-                "SELECT oo FROM OnlineOrder oo WHERE oo.site.id = :siteId AND oo.delivery = false",
+                "SELECT oo FROM OnlineOrder oo WHERE oo.pickupSite.id = :siteId AND oo.delivery = false",
                 OnlineOrder.class);
         q.setParameter("siteId", siteId);
 

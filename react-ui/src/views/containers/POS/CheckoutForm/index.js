@@ -89,8 +89,8 @@ export const CheckoutForm = ({
         payments: [
           {
             amount: amount,
-            paymentType: "CASH",
-            ccTransactionId: null,
+            paymentType: paymentIntentId ? "CARD" : "CASH",
+            ccTransactionId: paymentIntentId,
           },
         ],
       }, paymentIntentId);

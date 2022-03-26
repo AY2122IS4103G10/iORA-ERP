@@ -86,4 +86,10 @@ export const checkoutApi = {
       lineItems
     );
   },
+  getStores() {
+    return axiosPublic.get(
+      `${REST_ENDPOINT}online/stores/singapore`,
+    )
+  }
+
 }

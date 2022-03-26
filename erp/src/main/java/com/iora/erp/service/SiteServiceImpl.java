@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
+import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
@@ -102,6 +103,7 @@ public class SiteServiceImpl implements SiteService {
         List<? extends Site> resultList = em
                 .createQuery(siteQuery("SELECT s FROM StoreSite s", country, company),
                         StoreSite.class)
+                .setParameter("country", CountryEnum.Singapore)
                 .getResultList();
         return resultList;
     }
@@ -122,7 +124,7 @@ public class SiteServiceImpl implements SiteService {
                     country.toUpperCase(),
                     company);
         } else if (!country.equals("")) {
-            return mainQuery + String.format(" WHERE UPPER(s.address.country) = '%s'", country.toUpperCase());
+            return mainQuery + String.format(" WHERE s.address.country = :country", country);
         } else if (!company.equals("")) {
             return mainQuery + String.format(" WHERE s.company.name = '%s Fashion Pte. Ltd.'", company);
         } else {

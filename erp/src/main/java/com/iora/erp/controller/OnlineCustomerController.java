@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
+import com.iora.erp.enumeration.CountryEnum;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -350,5 +353,22 @@ public class OnlineCustomerController {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    // @GetMapping(path = "/countries", produces = "application/json")
+    // public List<String> getCountries() {
+    //     try {
+    //         List<String> country = Stream.of(CountryEnum.values()).map(
+    //                 CountryEnum::name).collect(Collectors.toList());
+
+    //         return country;
+    //     } catch (Exception e) {
+    //         return null;
+    //     }
+    // }
+
+    @GetMapping(path = "/stores/{country}", produces = "application/json")
+    public List<? extends Site> viewStores(@PathVariable String country) {
+        return siteService.searchStores(country, "");
     }
 }

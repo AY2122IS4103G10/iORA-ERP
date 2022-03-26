@@ -12,7 +12,6 @@ import {
   confirmStockTransfer,
   // readyStockTransfer,
   completeStockTransfer,
-  deliverStockTransfer,
 } from "../../../../stores/slices/stocktransferSlice";
 import {
   selectUserSite,
@@ -214,7 +213,6 @@ export const StockTransferHeader = ({
           </div>
         </div>
       </div>
-      <div className="mt-6 absolute right-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3"></div>
     </div>
   );
 };
@@ -419,26 +417,26 @@ export const StockTransferWrapper = ({ subsys }) => {
   const openInvoiceModal = () => setOpenInvoice(true);
   const closeInvoiceModal = () => setOpenInvoice(false);
 
-  const openVerifyItemsModal = (e) => {
-    e.preventDefault();
-    const orderStatus =
-      order.statusHistory[order.statusHistory.length - 1].status;
-    let temp = order.lineItems;
-    if (orderStatus === "CONFIRMED") {
-      temp = order.lineItems.map((item) => ({
-        ...item,
-        sentQty: item.requestedQty,
-      }));
-    }
-    if (orderStatus === "DELIVERING" || orderStatus === "READY") {
-      temp = order.lineItems.map((item) => ({
-        ...item,
-        actualQty: item.sentQty,
-      }));
-    }
-    setLineItems(temp);
-    setOpenVerifyItems(true);
-  };
+  // const openVerifyItemsModal = (e) => {
+  //   e.preventDefault();
+  //   const orderStatus =
+  //     order.statusHistory[order.statusHistory.length - 1].status;
+  //   let temp = order.lineItems;
+  //   if (orderStatus === "CONFIRMED") {
+  //     temp = order.lineItems.map((item) => ({
+  //       ...item,
+  //       sentQty: item.requestedQty,
+  //     }));
+  //   }
+  //   if (orderStatus === "DELIVERING" || orderStatus === "READY") {
+  //     temp = order.lineItems.map((item) => ({
+  //       ...item,
+  //       actualQty: item.sentQty,
+  //     }));
+  //   }
+  //   setLineItems(temp);
+  //   setOpenVerifyItems(true);
+  // };
 
   const closeVerifyItemsModal = () => setOpenVerifyItems(false);
 
@@ -457,27 +455,6 @@ export const StockTransferWrapper = ({ subsys }) => {
       })
       .catch((error) => {
         addToast(`Confirm Stock Transfer Order failed. ${error.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      });
-  };
-
-  const handleDeliveringOrder = (e) => {
-    e.preventDefault();
-    dispatch(deliverStockTransfer({ order: order, siteId: userSiteId }))
-      .unwrap()
-      .then(() => {
-        addToast(`Stock Transfer Order is being delivered`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        // navigate(`/${subsys.subsys}/stocktransfer/${id}`)
-        // setReload(reload + 1);
-        dispatch(getStockTransfer(id));
-      })
-      .catch((err) => {
-        addToast(`${err.message}`, {
           appearance: "error",
           autoDismiss: true,
         });
@@ -583,8 +560,6 @@ export const StockTransferWrapper = ({ subsys }) => {
             openDeleteModal={openDeleteModal}
             openRejectModal={openRejectModal}
             handleConfirmOrder={handleConfirmOrder}
-            openVerifyItemsModal={openVerifyItemsModal}
-            handleDeliveringOrder={handleDeliveringOrder}
             openInvoiceModal={openInvoiceModal}
           />
           <Outlet

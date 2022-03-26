@@ -304,6 +304,11 @@ public class StoreController {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
+    @GetMapping(path = "/onlineOrder/pickup/{siteId}", produces = "application/json")
+    public List<OnlineOrder> getPickupOrdersOfSite(@PathVariable Long siteId) {
+        return customerOrderService.getPickupOrdersBySite(siteId);
+    }
+
     @PostMapping(path = "/customerOrder/add/{rfidsku}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addItemToLineItems(@RequestBody List<CustomerOrderLI> lineItems,
             @PathVariable String rfidsku) {

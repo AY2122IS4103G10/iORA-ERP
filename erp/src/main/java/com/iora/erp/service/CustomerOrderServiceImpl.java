@@ -152,6 +152,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    public List<OnlineOrder> getPickupOrdersBySite(Long siteId) {
+        TypedQuery<OnlineOrder> q = em.createQuery(
+                "SELECT oo FROM OnlineOrder oo WHERE oo.site.id = :siteId AND oo.delivery = false",
+                OnlineOrder.class);
+        q.setParameter("siteId", siteId);
+
+        return q.getResultList();
+    }
+
+    @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret)
             throws StripeException, InsufficientPaymentException, CustomerException {
         if (clientSecret != null && clientSecret != "") {

@@ -65,6 +65,18 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
+    public List<StockTransferOrder> getStockTransferOrdersByStatus(String status) {
+        List<StockTransferOrder> stOrders = new ArrayList<>();
+
+        for (StockTransferOrder sto : getStockTransferOrders()) {
+            if (sto.getLastStatus() == StockTransferStatusEnum.valueOf(status.toUpperCase())) {
+                stOrders.add(sto);
+            }
+        }
+        return stOrders;
+    }
+
+    @Override
     public List<StockTransferOrder> getSTOBySiteStatus(Long siteId, String status) throws StockTransferException {
         Site site = em.find(Site.class, siteId);
         if (site == null) {
@@ -75,27 +87,6 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         for (StockTransferOrder sto : getStockTransferOrderOfSite(site)) {
             if (sto.getLastStatus() == StockTransferStatusEnum.valueOf(status.toUpperCase())) {
-                deliveryOrders.add(sto);
-            }
-        }
-        return deliveryOrders;
-    }
-
-    @Override
-    public List<StockTransferOrder> getStockTransferOrdersForDelivery() {
-        /*
-         * TypedQuery<StockTransferOrder> q = em.createQuery(
-         * "SELECT DISTINCT(sto) FROM StockTransferOrder sto RIGHT JOIN .statusHistory st WHERE st.status = 'READY_FOR_DELIVERY' OR st.status = 'DELIVERING' ORDER BY st.timeStamp DESC"
-         * , StockTransferOrder.class);
-         * q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY);
-         */
-
-        List<StockTransferOrder> deliveryOrders = new ArrayList<>();
-
-        for (StockTransferOrder sto : getStockTransferOrders()) {
-            if (sto.getLastStatus() == StockTransferStatusEnum.READY_FOR_DELIVERY
-                    || sto.getLastStatus() == StockTransferStatusEnum.DELIVERING
-                    || sto.getLastStatus() == StockTransferStatusEnum.DELIVERING_MULTIPLE) {
                 deliveryOrders.add(sto);
             }
         }

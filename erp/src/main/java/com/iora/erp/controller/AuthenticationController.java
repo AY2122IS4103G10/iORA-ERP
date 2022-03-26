@@ -188,8 +188,8 @@ public class AuthenticationController {
             if (e.getEmail().equals(email)) {
                 employeeService.resetPassword(e.getId());
                 return ResponseEntity.ok("Email with temporary password has been sent.");
-            } 
-            return ResponseEntity.badRequest().body("Email does not match");            
+            }
+            return ResponseEntity.badRequest().body("Email does not match");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

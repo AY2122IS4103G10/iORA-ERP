@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.exception.IllegalTransferException;
@@ -100,12 +101,14 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public List<? extends Site> searchStores(String country, String company) {
-        List<? extends Site> resultList = em
+        Query query = em
                 .createQuery(siteQuery("SELECT s FROM StoreSite s", country, company),
-                        StoreSite.class)
-                .setParameter("country", CountryEnum.Singapore)
-                .getResultList();
-        return resultList;
+                        StoreSite.class);
+
+        if (!country.equals("")){
+            query.setParameter("country", CountryEnum.Singapore);
+        }
+        return query.getResultList();
     }
 
     @Override
@@ -124,7 +127,7 @@ public class SiteServiceImpl implements SiteService {
                     country.toUpperCase(),
                     company);
         } else if (!country.equals("")) {
-            return mainQuery + String.format(" WHERE s.address.country = :country", country);
+            return mainQuery + " WHERE s.address.country = :country";
         } else if (!company.equals("")) {
             return mainQuery + String.format(" WHERE s.company.name = '%s Fashion Pte. Ltd.'", company);
         } else {

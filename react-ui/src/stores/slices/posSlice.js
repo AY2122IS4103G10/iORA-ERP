@@ -23,6 +23,14 @@ export const addProductToLineItems = createAsyncThunk(
   }
 );
 
+export const getVoucherByCode = createAsyncThunk(
+  "vouchers/getVoucherByCode",
+  async (voucher) => {
+    const response = await posApi.getVoucherByCode(voucher);
+    return response.data;
+  }
+);
+
 const posSlice = createSlice({
   name: "pos",
   initialState,

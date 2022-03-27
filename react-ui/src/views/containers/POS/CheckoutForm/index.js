@@ -17,6 +17,7 @@ import { orderApi, posApi } from "../../../../environments/Api";
 import { getCustomerByPhone } from "../../../../stores/slices/customerSlice";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { loadStripeTerminal } from "@stripe/terminal-js";
+import { getVoucherByCode } from "../../../../stores/slices/posSlice";
 
 const paymentTypes = [
   {
@@ -68,6 +69,9 @@ export const CheckoutForm = ({
   const [customerId, setCustomerId] = useState(null);
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucher, setVoucher] = useState({});
+  const [voucherDiscount, setVoucherDiscount] = useState(0);
   const [showChoice, setShowChoice] = useState(false);
   const { addToast } = useToasts();
   const dispatch = useDispatch();
@@ -86,10 +90,11 @@ export const CheckoutForm = ({
         ...order,
         customerId: customerId,
         paid: true,
+        voucher,
         payments: [
           {
-            amount: amount,
-            paymentType: paymentIntentId ? "CARD" : "CASH",
+            amount: Math.max(amount - voucherDiscount, 0),
+            paymentType: paymentTypes[mode]?.name.toUpperCase(),
             ccTransactionId: paymentIntentId,
           },
         ],
@@ -114,7 +119,6 @@ export const CheckoutForm = ({
         appearance: "info",
         autoDismiss: true,
       });
-      setShowChoice(true);
     } else {
       const data = await dispatch(getCustomerByPhone(phone)).unwrap();
       if (data.length === 0) {
@@ -133,10 +137,43 @@ export const CheckoutForm = ({
             autoDismiss: true,
           }
         );
-        setShowChoice(true);
       }
     }
   };
+
+  const getVoucherDetails = async () => {
+    if (voucherCode === "") {
+      addToast(`Info: You did not key in a voucher code`, {
+        appearance: "info",
+        autoDismiss: true,
+      });
+    } else {
+      const data = await dispatch(getVoucherByCode(voucherCode)).unwrap();
+      if (data.length === 0) {
+        setVoucherCode("");
+        addToast(`Error: No Voucher found`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      } else {
+        setVoucher(data);
+        setVoucherDiscount(data?.amount);
+        addToast(
+          `Success: Voucher with code: ${voucher} of $${data?.amount} was found`,
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
+        );
+      }
+    }
+  }
+
+  const handleConfirm = () => {
+    getCustomerId();
+    getVoucherDetails();
+    setShowChoice(true);
+  }
 
   return (
     <SimpleModal open={open} closeModal={closeModalComplex}>
@@ -172,10 +209,39 @@ export const CheckoutForm = ({
                   <div className="ml-3 flex-1 md:flex md:justify-between">
                     <p className="text-sm text-blue-700">
                       Please enter the customer's phone number if they are a
-                      iORA member.
+                      iORA member, and the voucher code if they are using one.
                     </p>
                   </div>
                 </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Voucher Code
+                </label>
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    name="voucher"
+                    id="voucher"
+                    value={voucherCode}
+                    placeholder="XXXXXXXX"
+                    onChange={(e) => setVoucherCode(e.target.value)}
+                    onBlur={getVoucherDetails}
+                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-3 sm:text-lg border-gray-300 rounded-md"
+                    aria-describedby="price-currency"
+                  />
+                </div>
+                <p
+                  className="mt-2 text-sm text-gray-500"
+                  id="email-description"
+                >
+                  {voucherDiscount === 0
+                    ? "No voucher used"
+                    : `Voucher used has $${voucherDiscount} value`}
+                </p>
               </div>
               <div>
                 <label
@@ -210,7 +276,7 @@ export const CheckoutForm = ({
                 <button
                   type="button"
                   disabled={amount === 0}
-                  onClick={getCustomerId}
+                  onClick={handleConfirm}
                   className="w-4/12 mt-3 bg-cyan-700 border border-transparent rounded-md shadow-sm py-2 px-2 text-base font-medium text-white hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyan-50 focus:ring-cyan-600"
                 >
                   Confirm
@@ -227,7 +293,7 @@ export const CheckoutForm = ({
           ))}
         {mode === 1 && (
           <Cash
-            amount={amount}
+            amount={Math.max(amount - voucherDiscount, 0)}
             handleSubmit={() => handleSubmit("")}
             addToast={addToast}
           />
@@ -425,7 +491,7 @@ const Cash = ({ amount, handleSubmit, addToast }) => {
   );
 };
 
-const Card = ({ addToast, checkoutItems, handleSubmit }) => {
+export const Card = ({ addToast, checkoutItems, handleSubmit }) => {
   const [terminal, setTerminal] = useState(null);
   const [connected, setConnected] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
@@ -538,6 +604,7 @@ const Card = ({ addToast, checkoutItems, handleSubmit }) => {
           <img
             className="mx-auto h-24 w-24 text-gray-400"
             src={process.env.PUBLIC_URL + '/cardreader.svg'}
+            alt="card-reader"
           />
           <h3 className="mt-2 text-sm font-medium text-gray-900">{connected ? `Reader ${localStorage.getItem("pos-posdeviceid").replace(/"/g,"")}` : "No readers"}</h3>
           <p className="mt-1 text-sm text-gray-500">{connected ? "You are successfully connected to the reader. The customer can now use the card reader." : "Get started by connecting your reader via Bluetooth."}</p>

@@ -29,7 +29,7 @@ export function Auth() {
           location.pathname !== "/" && navigate("/");
         });
     } else if (location.pathname !== "/") {
-      addToast(`Error: You were logged out ${refreshToken === ""}`, {
+      addToast(`Error: You are not logged in`, {
         appearance: "error",
         autoDismiss: true,
       });

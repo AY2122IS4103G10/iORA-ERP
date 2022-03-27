@@ -194,6 +194,16 @@ public class OnlineCustomerController {
         }
     }
 
+    @PostMapping(path = "/createDelivery/{orderId}/{siteId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
+            @RequestBody Delivery deliveryParcel) {
+        try {
+            return ResponseEntity.ok(easyPostService.createParcel(orderId, siteId, deliveryParcel));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     // Haven't get into making it work
     @PutMapping(path = "/cancel/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> cancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
@@ -208,16 +218,6 @@ public class OnlineCustomerController {
     public ResponseEntity<Object> pickPackOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
             return ResponseEntity.ok(customerOrderService.pickPackOnlineOrder(orderId, siteId));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PutMapping(path = "/createDelivery/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> createOnlineOrderDelivery(@PathVariable Long orderId, @PathVariable Long siteId,
-            @RequestBody Delivery delivery) {
-        try {
-            return ResponseEntity.ok(easyPostService.createParcel(orderId, siteId, delivery));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -352,5 +352,4 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
 }

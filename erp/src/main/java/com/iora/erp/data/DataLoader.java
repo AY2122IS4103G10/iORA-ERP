@@ -30,6 +30,7 @@ import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.DeliveryAddress;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
@@ -707,6 +708,11 @@ public class DataLoader implements CommandLineRunner {
 		oo1.addPayment(payment2);
 		oo1.setSite(siteService.getSite(3L));
 		customerOrderService.createOnlineOrder(oo1, null);
+
+		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
+				"189554", "", "60981335");
+		em.persist(da);
+		oo1.setDeliveryAddress(da);
 
 		Customer cust = customerService.getCustomerById(2L);
 		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");

@@ -4,7 +4,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
@@ -47,8 +49,12 @@ public class SiteServiceImpl implements SiteService {
 
             case "Store":
                 StoreSite store = new StoreSite(site);
-                em.persist(store);
-                return store;
+                if (siteNameAvail(site.getName())) {
+                    em.persist(store);
+                    return store;
+                } else {
+                    throw new IllegalArgumentException("Site name has already been used");
+                }
 
             case "Warehouse":
                 WarehouseSite warehouse = new WarehouseSite(site);
@@ -64,6 +70,19 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public Site getSite(Long id) {
         return em.find(Site.class, id);
+    }
+
+    @Override
+    public Boolean siteNameAvail(String name) {
+        Query q = em.createQuery("SELECT s from Site s WHERE s.name =:name");
+        q.setParameter("name", name);
+
+        try {
+            Site s = (Site) q.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            return true;
+        }
+        return false;
     }
 
     @Override

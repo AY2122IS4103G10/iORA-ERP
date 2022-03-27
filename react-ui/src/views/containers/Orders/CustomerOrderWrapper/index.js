@@ -8,14 +8,13 @@ import { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { TailSpin } from "react-loader-spinner";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
-import { api, orderApi, procurementApi } from "../../../../environments/Api";
-import { deleteExistingProcurement } from "../../../../stores/slices/procurementSlice";
+import {  orderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import Confirmation from "../../../components/Modals/Confirmation";
@@ -159,6 +158,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [status, setStatus] = useState("");
   const [statusHistory, setStatusHistory] = useState([]);
   const [delivery, setDelivery] = useState(null);
+  const [deliveryAddress, setDeliveryAddress] = useState(null)
   const [dateTime, setDateTime] = useState(-1);
   const [customerId, setCustomerId] = useState(-1);
   const [totalAmount, setTotalAmount] = useState(-1);
@@ -181,6 +181,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         const {
           lineItems,
           delivery,
+          deliveryAddress,
           dateTime,
           customerId,
           totalAmount,
@@ -204,6 +205,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         setStatus(statusHistory[statusHistory.length - 1]);
         setStatusHistory(statusHistory);
         setDelivery(delivery);
+        setDeliveryAddress(deliveryAddress)
         setDateTime(dateTime);
         setCustomerId(customerId);
         setTotalAmount(totalAmount);
@@ -244,7 +246,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     },
     { name: "Delivery", href: "#", current: false },
   ];
-
   return loading ? (
     <div className="flex mt-5 items-center justify-center">
       <TailSpin color="#00BFFF" height={20} width={20} />
@@ -271,6 +272,8 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             orderId,
             dateTime,
             customerId,
+            delivery,
+            deliveryAddress,
             totalAmount,
             payments,
             paid,

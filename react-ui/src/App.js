@@ -350,7 +350,7 @@ function App() {
             <Route path="pos" element={<ManagePOS />}>
               <Route path="orderHistory" element={<Outlet />}>
                 <Route index element={<PosPurchaseHistory />} />
-                <Route path=":orderId" element={<OrderDetails />} />
+                <Route path=":orderId" element={<OrderDetails />}/>
               </Route>
               <Route path="orderPurchase" element={<PosPurchaseOrder />} />
             </Route>

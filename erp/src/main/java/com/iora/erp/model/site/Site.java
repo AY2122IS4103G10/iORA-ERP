@@ -1,11 +1,13 @@
 package com.iora.erp.model.site;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,6 +20,7 @@ import javax.persistence.OneToOne;
 
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 
 @Entity
@@ -52,17 +55,22 @@ public class Site implements Serializable {
     @OneToMany
     private List<CustomerOrder> customerOrders;
 
+    @ElementCollection
+    private List<Notification> notifications;
+
     protected Site() {
         this.stockLevel = new StockLevel();
+        this.customerOrders = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     public Site(String name, Address address, String siteCode, String phoneNumber, Company company) {
+        this();
         this.name = name;
         this.address = address;
         this.siteCode = siteCode;
         this.phoneNumber = phoneNumber;
         this.company = company;
-        this.stockLevel = new StockLevel();
         this.active = true;
     }
 
@@ -139,8 +147,24 @@ public class Site implements Serializable {
         return customerOrders;
     }
 
+    public void setCustomerOrders(List<CustomerOrder> customerOrders) {
+        this.customerOrders = customerOrders;
+    }
+
     public void addCustomerOrder(CustomerOrder customerOrder) {
         this.customerOrders.add(customerOrder);
+    }
+
+    public List<Notification> getNotifications() {
+        return this.notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
+    public void addNotification(Notification notification) {
+        this.notifications.add(notification);
     }
 
     @Override

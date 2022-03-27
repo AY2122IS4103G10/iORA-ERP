@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.directory.InvalidAttributesException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
-import com.iora.erp.enumeration.StockTransferStatus;
+import com.iora.erp.enumeration.StockTransferStatusEnum;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.exception.StockTransferException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.product.Product;
-import com.iora.erp.model.site.HeadquartersSite;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.stockTransfer.STOStatus;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
@@ -64,58 +65,98 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public List<StockTransferOrder> getStockTransferOrdersForDelivery() {
-        /*
-         * TypedQuery<StockTransferOrder> q = em.createQuery(
-         * "SELECT DISTINCT(sto) FROM StockTransferOrder sto RIGHT JOIN .statusHistory st WHERE st.status = 'READY_FOR_DELIVERY' OR st.status = 'DELIVERING' ORDER BY st.timeStamp DESC"
-         * , StockTransferOrder.class);
-         * q.setParameter("status", StockTransferStatus.READY_FOR_DELIVERY);
-         */
+    public List<StockTransferOrder> getStockTransferOrdersByStatus(String status) {
+        List<StockTransferOrder> stOrders = new ArrayList<>();
+
+        for (StockTransferOrder sto : getStockTransferOrders()) {
+            if (sto.getLastStatus() == StockTransferStatusEnum.valueOf(status.toUpperCase())) {
+                stOrders.add(sto);
+            }
+        }
+        return stOrders;
+    }
+
+    @Override
+    public List<StockTransferOrder> getSTOBySiteStatus(Long siteId, String status) throws StockTransferException {
+        Site site = em.find(Site.class, siteId);
+        if (site == null) {
+            throw new StockTransferException("Site cannot be found.");
+        }
 
         List<StockTransferOrder> deliveryOrders = new ArrayList<>();
 
-        for (StockTransferOrder sto : getStockTransferOrders()) {
-            if (sto.getLastStatus() == StockTransferStatus.READY_FOR_DELIVERY
-                    || sto.getLastStatus() == StockTransferStatus.DELIVERING) {
+        for (StockTransferOrder sto : getStockTransferOrderOfSite(site)) {
+            if (sto.getLastStatus() == StockTransferStatusEnum.valueOf(status.toUpperCase())) {
                 deliveryOrders.add(sto);
             }
         }
         return deliveryOrders;
     }
 
+    private StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder) {
+        Notification noti = new Notification("Stock Transfer Order # " + stockTransferOrder.getId(),
+                "Status has been updated to " + stockTransferOrder.getLastStatus().name() + ": "
+                        + stockTransferOrder.getLastStatus().getDescription());
+
+        // If HQ is creator, need to include HQ in the loop too
+        Site firstActor = stockTransferOrder.getStatusHistory().get(0).getActionBy();
+        if (!firstActor.equals(stockTransferOrder.getFromSite())
+                && !firstActor.equals(stockTransferOrder.getToSite())) {
+            firstActor.addNotification(noti);
+        }
+
+        stockTransferOrder.getFromSite().addNotification(noti);
+        stockTransferOrder.getToSite().addNotification(noti);
+        return em.merge(stockTransferOrder);
+    }
+
     @Override
     public StockTransferOrder createStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
-            throws SiteConfirmationException {
+            throws SiteConfirmationException, InvalidAttributesException {
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
         } else if (actionBy.equals(stockTransferOrder.getFromSite())) {
             stockTransferOrder
-                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.ACCEPTED));
+                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatusEnum.ACCEPTED));
         } else {
             stockTransferOrder
-                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.PENDING));
+                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatusEnum.PENDING));
         }
+
         em.persist(stockTransferOrder);
+
+        Notification noti = new Notification("Stock Transfer Order (NEW) # " + stockTransferOrder.getId(),
+                "Status is " + stockTransferOrder.getLastStatus().name() + ": "
+                        + stockTransferOrder.getLastStatus().getDescription());
+
+        stockTransferOrder.getFromSite().addNotification(noti);
+        stockTransferOrder.getToSite().addNotification(noti);
+        if (!actionBy.equals(stockTransferOrder.getFromSite()) && !actionBy.equals(stockTransferOrder.getToSite())) {
+            actionBy.addNotification(noti);
+        }
+
+        em.merge(actionBy);
+
         return stockTransferOrder;
     }
 
     @Override
-    public StockTransferOrder updateStockTransferOrder(StockTransferOrder stockTransferOrder, Long siteId)
+    public StockTransferOrder updateOrderDetails(StockTransferOrder stockTransferOrder, Long siteId)
             throws SiteConfirmationException, StockTransferException {
         Site actionBy = em.find(Site.class, siteId);
 
         if (actionBy == null || !actionBy.equals(stockTransferOrder.getLastActor())) {
             throw new SiteConfirmationException(
                     "Site is not the creator of this order and is not permitted to update it.");
-        } else if (stockTransferOrder.getLastStatus() != StockTransferStatus.PENDING) {
+        } else if (stockTransferOrder.getLastStatus() != StockTransferStatusEnum.PENDING) {
             throw new StockTransferException(
                     "Stock Transfer Order has been accepted and cannot be amended.");
         } else {
             stockTransferOrder
-                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.PENDING));
-            return em.merge(stockTransferOrder);
+                    .addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatusEnum.PENDING));
+            return updateStockTransferOrder(stockTransferOrder);
         }
     }
 
@@ -127,7 +168,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
-        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDING) {
+        } else if (stOrder.getLastStatus() != StockTransferStatusEnum.PENDING) {
             throw new StockTransferException(
                     "Stock Transfer Order has been accepted and cannot be deleted.");
         } else if (!actionBy.equals(stOrder.getLastActor())) {
@@ -135,8 +176,8 @@ public class StockTransferServiceImpl implements StockTransferService {
                     "Site is not the creator of this order and is not permitted to update it.");
         }
 
-        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.CANCELLED));
-        return em.merge(stOrder);
+        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatusEnum.CANCELLED));
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -147,13 +188,13 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         if (actionBy == null || !actionBy.equals(stOrder.getFromSite())) {
             throw new SiteConfirmationException("Site is not allowed to reject the order.");
-        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDING) {
+        } else if (stOrder.getLastStatus() != StockTransferStatusEnum.PENDING) {
             throw new StockTransferException(
                     "Stock Transfer Order has already been accepted.");
         }
 
-        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.CANCELLED));
-        return em.merge(stOrder);
+        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatusEnum.CANCELLED));
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -164,11 +205,11 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         if (actionBy == null || !actionBy.equals(stOrder.getFromSite())) {
             throw new SiteConfirmationException("Site is not allowed to confirm the order.");
-        } else if (stOrder.getLastStatus() != StockTransferStatus.PENDING) {
+        } else if (stOrder.getLastStatus() != StockTransferStatusEnum.PENDING) {
             throw new StockTransferException("Stock Transfer Order is not pending for approval.");
         }
-        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatus.ACCEPTED));
-        return em.merge(stOrder);
+        stOrder.addStatusHistory(new STOStatus(actionBy, new Date(), StockTransferStatusEnum.ACCEPTED));
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -180,26 +221,26 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
-        } else if (stOrder.getLastStatus() == StockTransferStatus.ACCEPTED) {
+        } else if (stOrder.getLastStatus() == StockTransferStatusEnum.ACCEPTED) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.PICKING));
-        } else if (stOrder.getLastStatus() == StockTransferStatus.PICKING) {
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.PICKING));
+        } else if (stOrder.getLastStatus() == StockTransferStatusEnum.PICKING) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.PICKED));
-        } else if (stOrder.getLastStatus() == StockTransferStatus.PICKED) {
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.PICKED));
+        } else if (stOrder.getLastStatus() == StockTransferStatusEnum.PICKED) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.PACKING));
-        } else if (stOrder.getLastStatus() == StockTransferStatus.PACKING) {
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.PACKING));
+        } else if (stOrder.getLastStatus() == StockTransferStatusEnum.PACKING) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.PACKED));
-        } else if (stOrder.getLastStatus() == StockTransferStatus.PACKED) {
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.PACKED));
+        } else if (stOrder.getLastStatus() == StockTransferStatusEnum.PACKED) {
             stOrder.addStatusHistory(
-                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.READY_FOR_DELIVERY));
+                    new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.READY_FOR_DELIVERY));
         } else {
             throw new StockTransferException("Order is not due to pick or pack.");
         }
 
-        return em.merge(stOrder);
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -210,9 +251,15 @@ public class StockTransferServiceImpl implements StockTransferService {
         Product product = productService.getProduct(rfidsku);
         List<StockTransferOrderLI> lineItems = stOrder.getLineItems();
 
-        if (stOrder.getLastStatus() == StockTransferStatus.PICKING) {
+        if (stOrder.getLastStatus() == StockTransferStatusEnum.PICKING) {
             for (StockTransferOrderLI stoli : lineItems) {
                 if (stoli.getProduct().equals(product)) {
+                    if (stoli.getPickedQty() + qty > stoli.getRequestedQty()) {
+                        throw new StockTransferException(
+                                "The quantity of this product has exceeded the requested quantity by "
+                                        + (stoli.getPickedQty() + qty - stoli.getRequestedQty())
+                                        + " and cannot be picked.");
+                    }
                     stoli.setPickedQty(stoli.getPickedQty() + qty);
 
                     boolean picked = true;
@@ -223,7 +270,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                     }
                     if (picked) {
                         stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                                StockTransferStatus.PICKED));
+                                StockTransferStatusEnum.PICKED));
                     }
 
                     return em.merge(stOrder);
@@ -231,14 +278,14 @@ public class StockTransferServiceImpl implements StockTransferService {
                 }
             }
             throw new StockTransferException("The product scanned is not required in the order that you are picking");
-        } else if (stOrder.getLastStatus() == StockTransferStatus.PACKING) {
+        } else if (stOrder.getLastStatus() == StockTransferStatusEnum.PACKING) {
             for (StockTransferOrderLI stoli : lineItems) {
                 if (stoli.getProduct().equals(product)) {
                     if (stoli.getPackedQty() + qty > stoli.getPickedQty()) {
                         throw new StockTransferException("You are packing items that are not meant for this order.");
                     } else {
-                        stoli.setPackedQty(stoli.getPackedQty() + qty);
                         try {
+                            stoli.setPackedQty(stoli.getPackedQty() + qty);
                             siteService.removeProducts(stOrder.getFromSite().getId(), product.getSku(), qty);
                         } catch (NoStockLevelException | IllegalTransferException e) {
                             e.printStackTrace();
@@ -252,7 +299,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                         }
                         if (packed) {
                             stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                                    StockTransferStatus.PACKED));
+                                    StockTransferStatusEnum.PACKED));
                         }
                         return em.merge(stOrder);
                     }
@@ -265,34 +312,31 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
-    public StockTransferOrder deliverStockTransferOrder(Long id)
-            throws SiteConfirmationException, StockTransferException {
+    public StockTransferOrder deliverStockTransferOrder(Long id) throws StockTransferException {
 
         StockTransferOrder stOrder = getStockTransferOrder(id);
 
-        if (stOrder.getLastStatus() != StockTransferStatus.READY_FOR_DELIVERY) {
+        if (stOrder.getLastStatus() != StockTransferStatusEnum.READY_FOR_DELIVERY) {
             throw new StockTransferException("Stock Transfer Order is ready for delivery.");
         }
 
         stOrder.addStatusHistory(
-                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.DELIVERING));
-        return em.merge(stOrder);
+                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.DELIVERING));
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
-    public StockTransferOrder receiveStockTransferOrder(Long id, Long siteId) throws StockTransferException {
-        StockTransferOrder stOrder = getStockTransferOrder(id);
-        Site actionBy = em.find(Site.class, siteId);
+    public StockTransferOrder deliverMultipleStockTransferOrder(Long id) throws StockTransferException {
 
-        if (actionBy == null || !actionBy.equals(stOrder.getToSite())) {
-            throw new StockTransferException("Site is not supposed to receive this order.");
-        } else if (stOrder.getLastStatus() != StockTransferStatus.DELIVERING) {
-            throw new StockTransferException("Stock Transfer Order cannot be received.");
+        StockTransferOrder stOrder = getStockTransferOrder(id);
+
+        if (stOrder.getLastStatus() != StockTransferStatusEnum.READY_FOR_DELIVERY) {
+            throw new StockTransferException("Stock Transfer Order is ready for delivery.");
         }
 
         stOrder.addStatusHistory(
-                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.DELIVERED));
-        return em.merge(stOrder);
+                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.DELIVERING_MULTIPLE));
+        return updateStockTransferOrder(stOrder);
     }
 
     @Override
@@ -300,7 +344,8 @@ public class StockTransferServiceImpl implements StockTransferService {
             throws StockTransferException, ProductException {
         StockTransferOrder stOrder = getStockTransferOrder(id);
 
-        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERED) {
+        if (stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING_MULTIPLE
+                && stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING) {
             throw new StockTransferException("Order cannot be verified yet.");
         }
 
@@ -318,7 +363,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                 }
                 if (picked) {
                     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                            StockTransferStatus.COMPLETED));
+                            StockTransferStatusEnum.COMPLETED));
                 }
                 try {
                     siteService.addProducts(stOrder.getToSite().getId(), product.getSku(), qty);
@@ -337,12 +382,13 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         StockTransferOrder stOrder = getStockTransferOrder(orderId);
 
-        if (stOrder.getLastStatus() != StockTransferStatus.DELIVERED) {
+        if (stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING
+                && stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING_MULTIPLE) {
             throw new StockTransferException("Stock Transfer Order is not due to be confirmed.");
         }
 
         stOrder.addStatusHistory(
-                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatus.COMPLETED));
-        return em.merge(stOrder);
+                new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.COMPLETED));
+        return updateStockTransferOrder(stOrder);
     }
 }

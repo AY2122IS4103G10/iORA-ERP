@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api, stockTransferApi } from "../../environments/Api";
+import { api, logisticsApi, stockTransferApi } from "../../environments/Api";
 
 const initialState = {
   orders: [],
@@ -11,7 +11,6 @@ const initialState = {
 export const getAllStockTransfer = createAsyncThunk(
   "stocktransfer/getAllOrders",
   async (currSiteId) => {
-    console.log(currSiteId);
     if (currSiteId === 1) {
       //if by hq then get all stock transfer
       const response = await api.getAll("store/stockTransfer/all");
@@ -22,6 +21,14 @@ export const getAllStockTransfer = createAsyncThunk(
       );
       return response.data;
     }
+  }
+);
+
+export const getLogisticsSTOBySite = createAsyncThunk(
+  "stocktransfer/getAllOrders",
+  async (data) => {
+    const response = await logisticsApi.getSTOBySiteStatus(data, "READY_FOR_DELIVERY");
+    return response.data;
   }
 );
 
@@ -101,10 +108,10 @@ export const scanItemStockTransfer = createAsyncThunk(
   }
 );
 
-export const readyStockTransfer = createAsyncThunk(
-  "stocktransfer/ready",
-  async (data) => {
-    const response = await stockTransferApi.readyOrder(data.order, data.siteId);
+export const scanReceiveStockTransfer = createAsyncThunk(
+  "stocktransfer/scanReceive",
+  async ({ orderId, barcode }) => {
+    const response = await stockTransferApi.scanReceive(orderId, barcode);
     return response.data;
   }
 );
@@ -112,10 +119,15 @@ export const readyStockTransfer = createAsyncThunk(
 export const deliverStockTransfer = createAsyncThunk(
   "stocktransfer/deliver",
   async (data) => {
-    const response = await stockTransferApi.deliverOrder(
-      data.order,
-      data.siteId
-    );
+    const response = await stockTransferApi.deliverOrder(data);
+    return response.data;
+  }
+);
+
+export const deliverMultipleStockTransfer = createAsyncThunk(
+  "stocktransfer/deliverMultiple",
+  async (data) => {
+    const response = await stockTransferApi.deliverMultiple(data);
     return response.data;
   }
 );
@@ -123,10 +135,7 @@ export const deliverStockTransfer = createAsyncThunk(
 export const completeStockTransfer = createAsyncThunk(
   "stocktransfer/complete",
   async (data) => {
-    const response = await stockTransferApi.completeOrder(
-      data.order,
-      data.siteId
-    );
+    const response = await stockTransferApi.completeOrder(data);
     return response.data;
   }
 );
@@ -208,6 +217,7 @@ const stocktransferSlice = createSlice({
       if (state.currOrder) {
         state.currOrder.statusHistory = statusHistory;
       }
+      state.status = "succeeded";
     });
     builder.addCase(pickPackStockTransfer.rejected, (state, action) => {
       state.status = "failed";
@@ -221,32 +231,59 @@ const stocktransferSlice = createSlice({
         state.currOrder.statusHistory = statusHistory;
         state.currOrder.lineItems = lineItems;
       }
+      state.status = "succeeded";
     });
     builder.addCase(scanItemStockTransfer.rejected, (state, action) => {
       state.status = "failed";
     });
-    builder.addCase(readyStockTransfer.pending, (state, action) => {
+    builder.addCase(scanReceiveStockTransfer.pending, (state, action) => {
       state.status = "loading";
     });
-    builder.addCase(readyStockTransfer.fulfilled, (state, action) => {
+    builder.addCase(scanReceiveStockTransfer.fulfilled, (state, action) => {
+      const { statusHistory, lineItems } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+        state.currOrder.lineItems = lineItems;
+      }
       state.status = "succeeded";
     });
-    builder.addCase(readyStockTransfer.rejected, (state, action) => {
+    builder.addCase(scanReceiveStockTransfer.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(deliverStockTransfer.pending, (state, action) => {
       state.status = "loading";
     });
     builder.addCase(deliverStockTransfer.fulfilled, (state, action) => {
+      const { statusHistory } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+      }
       state.status = "succeeded";
     });
     builder.addCase(deliverStockTransfer.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(deliverMultipleStockTransfer.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(deliverMultipleStockTransfer.fulfilled, (state, action) => {
+      const { statusHistory } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+      }
+      state.status = "succeeded";
+    });
+    builder.addCase(deliverMultipleStockTransfer.rejected, (state, action) => {
       state.status = "failed";
     });
     builder.addCase(completeStockTransfer.pending, (state, action) => {
       state.status = "loading";
     });
     builder.addCase(completeStockTransfer.fulfilled, (state, action) => {
+      const { statusHistory } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+      }
       state.status = "succeeded";
     });
     builder.addCase(completeStockTransfer.rejected, (state, action) => {

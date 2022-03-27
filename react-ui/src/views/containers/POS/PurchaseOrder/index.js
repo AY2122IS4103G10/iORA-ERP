@@ -137,7 +137,7 @@ const OrderList = ({
                 Promotions
               </p>
             )}
-            <ul className="border-t border-b border-gray-200">
+            <ul className="border-b border-gray-200">
               {promotions.map((lineItem, index) => (
                 <li key={index} className="flex py-6">
                   <div className="ml-4 flex-1 flex flex-col sm:ml-6">
@@ -209,13 +209,13 @@ const OrderList = ({
             type="button"
             disabled={amount === 0}
             onClick={openModal}
-            className="w-2/12 mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+            className="mt-3 bg-zinc-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-zinc-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-cyan-500"
           >
             Payment
           </button>
           <button
             type="button"
-            className="w-2/12 mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-0 px-4 text-base font-medium text-white hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-500"
+            className="mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-500"
             onClick={openSureModal}
           >
             Clear All
@@ -250,11 +250,7 @@ export const PosPurchaseOrder = () => {
       exchangedLIs: [],
       site: {
         id: siteId,
-      },
-      customerId:
-        localStorage.getItem("customer") === null
-          ? JSON.parse(localStorage.getItem("customer"))?.id
-          : null,
+      }
     });
   };
   const closeModal = () => setModalState(false);
@@ -372,6 +368,7 @@ export const PosPurchaseOrder = () => {
         clear={clear}
         amount={amount}
         order={order}
+        checkoutItems={order?.lineItems}
       />
       <SimpleModal open={sureModalState} closeModal={closeSureModal}>
         <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:p-6">
@@ -401,7 +398,7 @@ export const PosPurchaseOrder = () => {
           <div className="flex justify-center gap-4">
             <button
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
               onClick={closeSureModal}
             >
               Cancel

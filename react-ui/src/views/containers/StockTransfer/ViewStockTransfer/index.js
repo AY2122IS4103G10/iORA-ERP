@@ -84,26 +84,24 @@ export const StockTransferBody = ({
       {history && <ActivitySection history={history} />}
       <div className="lg:col-start-1 lg:col-span-3">
         {lineItems !== undefined &&
-        lineItems !== undefined &&
-        Object.keys(lineItems).length !== 0 ? (
-          <LineItems
-            lineItems={lineItems}
-            status={status}
-            userSiteId={userSiteId}
-            fromSiteId={order.fromSite.id}
-            toSiteId={order.toSite.id}
-            editable={false}
-          />
-        ) : (
-          <p>loading</p>
-        )}
+          lineItems !== undefined &&
+          Object.keys(lineItems).length !== 0 && (
+            <LineItems
+              lineItems={lineItems}
+              status={status}
+              userSiteId={userSiteId}
+              fromSiteId={order.fromSite.id}
+              toSiteId={order.toSite.id}
+              editable={false}
+            />
+          )}
       </div>
     </div>
   );
 };
 
 export const ViewStockTransfer = () => {
-  const { order, lineItems, userSiteId } = useOutletContext();
+  const { order, userSiteId } = useOutletContext();
   const [history, setHistory] = useState([]);
   const [lItems, setLItems] = useState([]);
 
@@ -138,8 +136,10 @@ export const ViewStockTransfer = () => {
             content:
               status === "PENDING"
                 ? `${index === 0 ? "Created" : "Updated"} by`
-                : status === "READY_FOR_SHIPPING"
-                ? "Ready for shipping by"
+                : status === "READY_FOR_DELIVERY"
+                ? "Ready for delivery by"
+                : status === "DELIVERING" || status === "DELIVERING_MULTIPLE"
+                ? "Delivering"
                 : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
             target: data[index].name,
             date: moment(timeStamp).format("DD/MM, H:mm"),
@@ -150,9 +150,9 @@ export const ViewStockTransfer = () => {
   }, [order]);
 
   useEffect(() => {
-    fetchAllModelsBySkus(lineItems).then((data) => {
+    fetchAllModelsBySkus(order.lineItems).then((data) => {
       setLItems(
-        lineItems.map((item, index) => ({
+        order.lineItems.map((item, index) => ({
           ...item,
           product: {
             ...item.product,
@@ -162,8 +162,7 @@ export const ViewStockTransfer = () => {
         }))
       );
     });
-  }, [lineItems]);
-  // console.log(history)
+  }, [order]);
   return (
     <StockTransferBody
       order={order}

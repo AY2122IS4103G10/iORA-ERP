@@ -1,23 +1,33 @@
-import { Fragment } from "react";
-import { useDispatch } from "react-redux";
-import {
-  MenuAlt1Icon,
-  BellIcon,
-  ChevronDownIcon,
-} from "@heroicons/react/outline";
 import { Menu, Transition } from "@headlessui/react";
-import { classNames } from "../../../utilities/Util";
-import { logout } from "../../../stores/slices/userSlice";
+import {
+  BellIcon,
+  ExclamationIcon,
+  ChevronDownIcon,
+  MenuAlt1Icon,
+} from "@heroicons/react/outline";
+import { Fragment, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../../../stores/slices/userSlice";
+import { classNames } from "../../../utilities/Util";
+import { Notifications } from "../../components/Notifications";
 
 export const NavBar = ({ setSidebarOpen, badge }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = useSelector((state) => state.user.user);
   const handleLogout = (e) => {
     e.preventDefault();
     dispatch(logout());
     navigate("/");
+  };
+
+  const [open, setOpen] = useState(false);
+  const [newNoti, setNewNoti] = useState(false);
+
+  const notiClicked = () => {
+    setNewNoti(false);
+    setOpen(true);
   };
 
   return (
@@ -35,23 +45,33 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
         <div className="ml-4 flex items-center md:ml-6">
           <button
             type="button"
+            onClick={() => notiClicked()}
             className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
           >
             <span className="sr-only">View notifications</span>
-            <BellIcon className="h-6 w-6" aria-hidden="true" />
-          </button>
 
+            <BellIcon className="h-6 w-6" aria-hidden="true" />
+            {newNoti && (
+              <ExclamationIcon
+                className="h-6 w-6 w-5 text-red-500"
+                aria-hidden="true"
+              />
+            )}
+          </button>
           {/* Profile dropdown */}
           <Menu as="div" className="ml-3 relative">
             <div>
               <Menu.Button className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
                 <img
                   className="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  src={`https://randomuser.me/api/portraits/${
+                    user?.id % 2 === 0 ? "wo" : ""
+                  }men/${user?.id}.jpg`}
                   alt=""
                 />
                 <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-                  <span className="sr-only">Open user menu for </span>{user.name}
+                  <span className="sr-only">Open user menu for </span>
+                  {user.name}
                 </span>
                 <ChevronDownIcon
                   className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"
@@ -85,7 +105,7 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
                 <Menu.Item>
                   {({ active }) => (
                     <a
-                      href="/home"
+                      href="/account/settings"
                       className={classNames(
                         active ? "bg-gray-100" : "",
                         "block px-4 py-2 text-sm text-gray-700"
@@ -114,6 +134,7 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
           </Menu>
         </div>
       </div>
+      <Notifications open={open} setOpen={setOpen} setNewNoti={setNewNoti} />
     </div>
   );
 };

@@ -20,11 +20,7 @@ const columns = [
   {
     Header: "Qty",
     accessor: "qty",
-  },
-  {
-    Header: "Reserved Qty",
-    accessor: "reserve",
-  },
+  }
 ];
 
 const processAddress = (addressObj) => {

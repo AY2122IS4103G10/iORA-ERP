@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -118,17 +117,6 @@ public class SAMController {
     public ResponseEntity<Object> createModel(@RequestBody Model model) {
         try {
             return ResponseEntity.ok(productService.createModel(model));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    // Creates multiple Product instances with given Model Code in URL,
-    @PostMapping(path = "/product/{modelCode}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createProduct(@PathVariable String modelCode,
-            @RequestBody List<ProductField> productFields) {
-        try {
-            return ResponseEntity.ok(productService.createProduct(modelCode, productFields));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -259,6 +247,17 @@ public class SAMController {
     @PutMapping(path = "/product", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> updateProduct(@RequestBody Product product) {
         try {
+            return ResponseEntity.ok(productService.updateProduct(product));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/product/baseline/{sku}/{qty}", produces = "application/json")
+    public ResponseEntity<Object> updateBaselineQty(@PathVariable String sku, @PathVariable int qty) {
+        try {
+            Product product = productService.getProduct(sku);
+            product.setBaselineQty(qty);
             return ResponseEntity.ok(productService.updateProduct(product));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -489,7 +488,7 @@ public class SAMController {
         try {
 
             return ResponseEntity
-                    .ok(procurementService.updateProcurementOrder(procurementOrder, siteId));
+                    .ok(procurementService.updateProcurementOrderDetails(procurementOrder, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -519,14 +518,9 @@ public class SAMController {
         }
     }
 
-    @GetMapping(path = "/ticket/search", produces = "application/json")
-    public List<SupportTicket> searchSupportTicket(@RequestParam String id) {
-        return customerService.searchSupportTicket(Long.valueOf(id));
-    }
-
-    @GetMapping(path = "/ticket/searchSubject", produces = "application/json")
-    public List<SupportTicket> searchSupportTicketBySubject(@RequestParam String subject) {
-        return customerService.searchSupportTicketBySubject(subject);
+    @GetMapping(path = "/ticket/all", produces = "application/json")
+    public List<SupportTicket> getAllSupportTickets() {
+        return customerService.getAllSupportTickets();
     }
 
     @PostMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
@@ -547,17 +541,29 @@ public class SAMController {
         }
     }
 
-    @PatchMapping(path = "/ticket/reply/{id}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> replySupportTicket(@PathVariable Long id, @RequestBody String message) {
+    @PutMapping(path = "/ticket/resolve/{id}", produces = "application/json")
+    public ResponseEntity<Object> resolveSupportTicket(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(customerService.replySupportTicket(id, message));
+            return ResponseEntity.ok(customerService.resolveSupportTicket(id));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @DeleteMapping(path = "/ticket/{id}", produces = "application/json")
-    public ResponseEntity<Object> replySupportTicket(@PathVariable Long id) {
+    @PutMapping(path = "/ticket/reply/{ticketId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> replySupportTicket(@PathVariable Long ticketId, @RequestParam String name,
+            @RequestBody Map<String, String> message) {
+        try {
+            return ResponseEntity.ok(
+                    customerService.replySupportTicket(ticketId, message.get("input"), name));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/ticket/delete/{id}", produces = "application/json")
+    public ResponseEntity<Object> deleteSupportTicket(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(customerService.deleteSupportTicket(id));
         } catch (Exception ex) {
@@ -627,6 +633,15 @@ public class SAMController {
     public ResponseEntity<Object> getCustomerByPhone(@PathVariable String phone) {
         try {
             return ResponseEntity.ok(customerService.getCustomerByPhone(phone));
+        } catch (CustomerException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/customer/email/{email}", produces = "application/json")
+    public ResponseEntity<Object> getCustomerByEmail(@PathVariable String email) {
+        try {
+            return ResponseEntity.ok(customerService.getCustomerByEmail(email));
         } catch (CustomerException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

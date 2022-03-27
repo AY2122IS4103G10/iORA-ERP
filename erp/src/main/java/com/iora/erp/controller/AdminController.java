@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.iora.erp.enumeration.Country;
+import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.company.JobTitle;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.company.Vendor;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.service.AdminService;
@@ -463,8 +464,8 @@ public class AdminController {
     @GetMapping(path = "/countries", produces = "application/json")
     public List<String> getCountries() {
         try {
-            List<String> country = Stream.of(Country.values()).map(
-                    Country::name).collect(Collectors.toList());
+            List<String> country = Stream.of(CountryEnum.values()).map(
+                    CountryEnum::name).collect(Collectors.toList());
 
             return country;
         } catch (Exception e) {
@@ -472,4 +473,11 @@ public class AdminController {
         }
     }
 
+    @GetMapping(path = "/noti/{siteId}", produces = "application/json")
+    public List<Notification> getNotifications(@PathVariable String siteId) {
+        if (siteId.equals("0") || siteId.equals("null")) {
+            return new ArrayList<>();
+        }
+        return siteService.getNotifications(Long.valueOf(siteId));
+    }
 }

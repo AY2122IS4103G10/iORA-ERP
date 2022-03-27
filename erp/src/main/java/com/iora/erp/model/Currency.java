@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import com.iora.erp.enumeration.Country;
+import com.iora.erp.enumeration.CountryEnum;
 
 @Entity
 public class Currency {
@@ -13,12 +13,12 @@ public class Currency {
     @Column(nullable = false, unique = true)
     private String name;
     @Column(nullable = false)
-    private Country country;
+    private CountryEnum country;
 
     public Currency() {
     }
 
-    public Currency(String code, String name, Country country) {
+    public Currency(String code, String name, CountryEnum country) {
         this.code = code;
         this.name = name;
         this.country = country;
@@ -40,11 +40,11 @@ public class Currency {
         this.name = name;
     }
 
-    public Country getCountry() {
+    public CountryEnum getCountry() {
         return this.country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(CountryEnum country) {
         this.country = country;
     }
 

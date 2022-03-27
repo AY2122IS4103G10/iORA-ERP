@@ -12,10 +12,10 @@ import { eventTypes } from "../../../../constants/eventTypes";
 const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
   const columns = useMemo(() => {
     return [
-      {
-        Header: "Prod Code",
-        accessor: "product.modelCode",
-      },
+      // {
+      //   Header: "Prod Code",
+      //   accessor: "product.modelCode",
+      // },
       {
         Header: "SKU",
         accessor: "product.sku",
@@ -44,7 +44,6 @@ const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
       {
         Header: "Ful",
         accessor: "packedQty",
-        disableSortBy: true,
       },
       // {
       //   Header: "Shipped",
@@ -57,22 +56,10 @@ const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
       //       : "-";
       //   },
       // },
-      // {
-      //   Header: "Received",
-      //   accessor: "actualQty",
-      //   Cell: (row) => {
-      //     return status === "SHIPPED" && pathname.includes("wh") ? (
-      //       <EditableCell
-      //         value={0}
-      //         row={row.row}
-      //         column={row.column}
-      //         updateMyData={updateMyData}
-      //       />
-      //     ) : (
-      //       "-"
-      //     );
-      //   },
-      // },
+      {
+        Header: "Rec",
+        accessor: "receivedQty",
+      },
     ];
   }, []);
   return (

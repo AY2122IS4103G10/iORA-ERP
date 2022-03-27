@@ -1,20 +1,33 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { api } from "../../../../environments/Api";
 
-export const StockTransferSearch = () => {
+export const StockTransferSearch = ({ subsys }) => {
   const { pathname } = useLocation();
+  const { addToast } = useToasts();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const onSearchChanged = (e) => setSearch(e.target.value);
   const onSearchClicked = (evt) => {
+    const fetchStockTransfer = async () => {
+      try {
+        const { data } =
+          subsys === "lg"
+            ? api.get("logistics/stockTransferOrder", search.trim())
+            : api.get("store/stockTransfer", search.trim());
+            console.log(data)
+        navigate(pathname.replace("search", data.id));
+      } catch (error) {
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      }
+    };
     evt.preventDefault();
-    api
-      .get("store/stockTransfer", search.trim())
-      .then((response) =>
-        navigate(pathname.replace("search", response.data.id))
-      );
+    fetchStockTransfer();
   };
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
@@ -43,6 +56,7 @@ export const StockTransferSearch = () => {
                   placeholder="Search orders..."
                   value={search}
                   onChange={onSearchChanged}
+                  autoFocus
                 />
               </div>
               <button

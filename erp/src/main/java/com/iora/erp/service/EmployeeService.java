@@ -3,7 +3,7 @@ package com.iora.erp.service;
 import java.util.List;
 import java.util.Set;
 
-import com.iora.erp.enumeration.AccessRights;
+import com.iora.erp.enumeration.AccessRightsEnum;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.EmployeeException;
 import com.iora.erp.model.company.Employee;
@@ -27,11 +27,9 @@ public interface EmployeeService {
 
     public abstract Employee getEmployeeByUsername(String username) throws EmployeeException;
 
-    public abstract Employee getEmployeeByEmail(String email) throws EmployeeException;
+    public abstract Set<AccessRightsEnum> getEmployeeAccessRights(Long id) throws EmployeeException;
 
-    public abstract Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException;
-
-    public abstract Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException;
+    public abstract Set<AccessRightsEnum> getEmployeeAccessRightsByUsername(String username) throws EmployeeException;
 
     public abstract Employee loginAuthentication(String username, String password) throws AuthenticationException;
 

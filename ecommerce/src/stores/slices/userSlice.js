@@ -46,6 +46,42 @@ export const login = createAsyncThunk(
   }
 );
 
+export const loginJwt = createAsyncThunk(
+  "auth/loginJwt",
+  async (credentials) => {
+    try {
+      const response = await authApi.loginJwt(credentials);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
+export const postLoginJwt = createAsyncThunk(
+  "auth/postLoginJwt",
+  async (accessToken) => {
+    try {
+      const response = await authApi.postLoginJwt(accessToken);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
+export const refreshTokenJwt = createAsyncThunk(
+  "auth/refreshTokenJwt",
+  async (refreshToken) => {
+    try {
+      const response = await authApi.refreshTokenJwt(refreshToken);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.message);
+    }
+  }
+);
+
 export const register = createAsyncThunk("auth/register", async (user) => {
   try {
     const response = await authApi.register(user);
@@ -94,9 +130,19 @@ const userSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.error = action.error;
     });
+    builder.addCase(loginJwt.fulfilled, (state, action) => {
+      state = {
+        ...state,
+        user: { ...action.payload },
+        status: "succeeded",
+        loggedIn: true,
+      };
+    });
+    builder.addCase(loginJwt.rejected, (state, action) => {
+      state.error = "Login failed";
+    });
     builder.addCase(register.fulfilled, (state, action) => {
-      action.payload.salt !== undefined && delete action.payload.salt;
-      action.payload.hashPass !== undefined && delete action.payload.hashPass;
+      action.payload.password !== undefined && delete action.payload.password;
       state.user = action.payload;
       state.status = "succeeded";
       state.loggedIn = true;
@@ -105,8 +151,7 @@ const userSlice = createSlice({
       state.error = "Register failed";
     });
     builder.addCase(updateAccount.fulfilled, (state, action) => {
-      action.payload.salt !== undefined && delete action.payload.salt;
-      action.payload.hashPass !== undefined && delete action.payload.hashPass;
+      action.payload.password !== undefined && delete action.payload.password;
       state.user = action.payload;
       state.status = "succeeded";
     });

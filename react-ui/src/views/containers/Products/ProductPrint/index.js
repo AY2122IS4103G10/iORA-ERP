@@ -7,6 +7,7 @@ import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
 import { productApi } from "../../../../environments/Api";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 
 const ProductList = ({
   products,
@@ -41,13 +42,15 @@ const ProductList = ({
                   <div>
                     <div className="mt-1 flex rounded-md shadow-sm">
                       <div className="relative flex items-stretch flex-grow focus-within:z-10">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <span className="text-gray-500 sm:text-sm">Qty:</span>
+                        </div>
                         <input
                           type="number"
                           name="qty"
                           id="qty"
                           min="1"
-                          className="focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                          placeholder="Quantity"
+                          className="pl-12 focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
                           value={printQty}
                           onChange={onPrintQtyChanged}
                         />
@@ -131,6 +134,7 @@ export const ProductPrint = () => {
       return Promise.resolve();
     },
   });
+  const [enabled, setEnabled] = useState(false);
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
@@ -155,6 +159,7 @@ export const ProductPrint = () => {
     }
   };
 
+  const onEnabledChanged = () => setEnabled(!enabled);
   const onSearchChanged = (e) => setSearch(e.target.value);
   const onProductSelectedChanged = (e) => setProductSelected(e);
   const onPrintQtyChanged = (e) => setPrintQty(e.target.value);
@@ -168,34 +173,71 @@ export const ProductPrint = () => {
         <div className="mt-4">
           <div className="bg-white shadow sm:rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Print Product Label(s)
-              </h3>
+              <div className="flex">
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Print Product Label(s)
+                </h3>
+                <ToggleLeftLabel
+                  enabled={enabled}
+                  onEnabledChanged={onEnabledChanged}
+                  label="Boxes"
+                />
+              </div>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
-                <p>Scan barcodes or enter product SKUs separated by a comma ",".</p>
+                <p>
+                  Scan barcodes or enter product SKUs separated by a comma ",".
+                </p>
               </div>
               <form onSubmit={onSearchClicked}>
-                <div className="mt-5 sm:flex sm:items-center">
-                  <div className="w-full sm:max-w-md">
-                    <label htmlFor="sku" className="sr-only">
-                      Product SKU
-                    </label>
-                    <textarea
-                      rows={4}
-                      name="skus"
-                      id="skus"
-                      className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      value={search}
-                      onChange={onSearchChanged}
-                    />
+                <div>
+                  <div className="mt-5 sm:flex sm:items-center">
+                    <div className="w-full sm:max-w-md">
+                      <label htmlFor="sku" className="sr-only">
+                        Product SKU
+                      </label>
+                      {!enabled ? (
+                        <textarea
+                          rows={4}
+                          name="skus"
+                          id="skus"
+                          className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          placeholder="XXXXXXXXXX-X, XXXXXXXXXX-X, ..."
+                          value={search}
+                          onChange={onSearchChanged}
+                        />
+                      ) : (
+                        <div className="sm:grid sm:grid-cols-3 sm:gap-3 sm:grid-flow-row-dense">
+                          <input
+                            type="text"
+                            name="sku"
+                            id="sku"
+                            className="col-span-2 shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            placeholder="XXXXXXXXXX-X"
+                            value={search}
+                            onChange={onSearchChanged}
+                            autoFocus
+                          />
+                          <input
+                            type="number"
+                            name="qty"
+                            id="qty"
+                            min="1"
+                            className="col-span-1 focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-md sm:text-sm border-gray-300"
+                            placeholder="Quantity"
+                            value={printQty}
+                            onChange={onPrintQtyChanged}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
+                  <button
+                    type="submit"
+                    className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-3 sm:w-auto sm:text-sm"
+                  >
+                    Search
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-3 sm:w-auto sm:text-sm"
-                >
-                  Search
-                </button>
               </form>
             </div>
           </div>

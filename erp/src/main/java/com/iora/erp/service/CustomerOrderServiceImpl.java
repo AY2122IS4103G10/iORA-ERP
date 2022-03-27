@@ -12,19 +12,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
-import com.iora.erp.enumeration.OnlineOrderStatus;
+import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -43,6 +45,7 @@ import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
+import com.stripe.exception.StripeException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,6 +60,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     private ProductService productService;
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private StripeService stripeService;
     @PersistenceContext
     private EntityManager em;
 
@@ -147,9 +152,24 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public CustomerOrder createCustomerOrder(CustomerOrder customerOrder) {
+    public List<OnlineOrder> getPickupOrdersBySite(Long siteId) {
+        TypedQuery<OnlineOrder> q = em.createQuery(
+                "SELECT oo FROM OnlineOrder oo WHERE oo.pickupSite.id = :siteId AND oo.delivery = false",
+                OnlineOrder.class);
+        q.setParameter("siteId", siteId);
+
+        return q.getResultList();
+    }
+
+    @Override
+    public CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret)
+            throws StripeException, InsufficientPaymentException, CustomerException {
+        if (clientSecret != null && clientSecret != "") {
+            stripeService.capturePayment(clientSecret);
+        }
+
         em.persist(customerOrder);
-        return customerOrder;
+        return finaliseCustomerOrder(customerOrder);
     }
 
     @Override
@@ -163,18 +183,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder, List<Payment> payments)
-            throws CustomerOrderException, InsufficientPaymentException {
-        CustomerOrder old = getCustomerOrder(customerOrder.getId());
-        if (payments.stream().mapToDouble(x -> x.getAmount()).sum() < old.getTotalAmount()) {
+    public CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder)
+            throws InsufficientPaymentException, CustomerException {
+        List<Payment> payments = customerOrder.getPayments();
+        if (payments.stream().mapToDouble(x -> x.getAmount()).sum() < customerOrder.getTotalAmount()) {
             throw new InsufficientPaymentException("Insufficient Payment");
         }
-        old.setPaid(true);
-        old.setPayments(payments);
-        try {
-            updateMembershipPoints(old);
-        } catch (CustomerException e) {
-            old.setCustomerId(null);
+        customerOrder.setPaid(true);
+
+        if (customerOrder.getCustomerId() != null) {
+            updateMembershipPoints(customerOrder);
         }
         return em.merge(customerOrder);
     }
@@ -507,15 +525,17 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
-        Double spending = em
-                .createQuery("SELECT o.payments FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
-                        Payment.class)
-                .setParameter("id", customer.getId())
-                .setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP)
-                .getResultList()
+        TypedQuery<CustomerOrder> q = em.createQuery(
+                "SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date", CustomerOrder.class);
+        q.setParameter("id", customer.getId());
+        q.setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP);
+
+        double spending = q.getResultList()
                 .stream()
-                .mapToDouble(x -> x.getAmount())
-                .sum();
+                .map(x -> x.getPayments())
+                .map(x -> x.stream().mapToDouble(y -> y.getAmount()).sum())
+                .collect(Collectors.summingDouble(Double::doubleValue));
+
         List<MembershipTier> tiers = em
                 .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
                 .getResultList();
@@ -548,8 +568,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             }
         }
         Integer membershipPoints = customer.getMembershipPoints();
-        membershipPoints = Integer.sum(membershipPoints,
-                (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier()));
+        membershipPoints = membershipPoints
+                + (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier());
         customer.setMembershipPoints(membershipPoints);
     }
 
@@ -559,6 +579,39 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
      * ---------------------------------------------------------
      */
 
+    private OnlineOrder updateOnlineOrder(OnlineOrder onlineOrder) {
+        Notification noti = new Notification("Online Order # " + onlineOrder.getId(),
+                "Status has been updated to " + onlineOrder.getLastStatus().name() + ": "
+                        + onlineOrder.getLastStatus().getDescription());
+
+        onlineOrder.getSite().addNotification(noti);
+        if (!onlineOrder.getDelivery() && !onlineOrder.getSite().equals(onlineOrder.getPickupSite())) {
+            Site site2 = onlineOrder.getPickupSite();
+            site2.addNotification(noti);
+        }
+
+        return em.merge(onlineOrder);
+    }
+
+    @Override
+    public OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret)
+            throws StripeException, InsufficientPaymentException, CustomerException {
+        if (clientSecret != null && clientSecret != "") {
+            stripeService.capturePayment(clientSecret);
+        }
+
+        onlineOrder.setSite(siteService.getSite(3L));
+        onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
+        em.persist(onlineOrder);
+        finaliseCustomerOrder(onlineOrder);
+
+        onlineOrder.getSite().addNotification(new Notification("NEW Online Order # " + onlineOrder.getId(),
+                "Status is " + onlineOrder.getLastStatus().name() + ": "
+                        + onlineOrder.getLastStatus().getDescription()));
+
+        return onlineOrder;
+    }
+
     @Override
     public OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
         Site actionBy = em.find(Site.class, siteId);
@@ -567,13 +620,13 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (actionBy == null || !(actionBy instanceof WarehouseSite) || !(actionBy instanceof StoreSite)) {
             throw new CustomerOrderException("Site is not authorised to cancel the order.");
         } else if (actionBy instanceof WarehouseSite) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.CANCELLED));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.CANCELLED));
         } else {
             onlineOrder.setSite(siteService.getSite(3L));
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.CANCELLED));
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.CANCELLED));
         }
 
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 
     @Override
@@ -583,25 +636,25 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         if (actionBy == null || !actionBy.equals(onlineOrder.getSite())) {
             throw new CustomerOrderException("Site is unauthorised to pick/pack this order.");
-        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PENDING) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.PICKING));
-        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PICKING) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.PICKED));
-        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PICKED) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.PACKING));
-        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PACKING) {
-            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatus.PACKED));
-        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PACKED) {
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PENDING) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.PICKING));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PICKING) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.PICKED));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PICKED) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.PACKING));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PACKING) {
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.PACKED));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PACKED) {
             if (onlineOrder.getSite().equals(onlineOrder.getPickupSite())) {
                 onlineOrder.addStatusHistory(
-                        new OOStatus(actionBy, new Date(), OnlineOrderStatus.READY_FOR_COLLECTION));
+                        new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_COLLECTION));
             } else {
                 onlineOrder.addStatusHistory(
-                        new OOStatus(actionBy, new Date(), OnlineOrderStatus.READY_FOR_DELIVERY));
+                        new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_DELIVERY));
             }
         }
 
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
     }
 
     @Override
@@ -613,7 +666,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         Product product = productService.getProduct(rfidsku);
         List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
 
-        if (onlineOrder.getLastStatus() == OnlineOrderStatus.PICKING) {
+        if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PICKING) {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
                     coli.setPickedQty(coli.getPickedQty() + qty);
@@ -625,14 +678,14 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     }
                     if (picked) {
                         onlineOrder.addStatusHistory(
-                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.PICKED));
+                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
                     }
                     return em.merge(onlineOrder);
                 }
             }
             throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
 
-        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.PACKING) {
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PACKING) {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
                     if (coli.getPackedQty() + qty > coli.getPickedQty()) {
@@ -653,7 +706,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         }
                         if (packed) {
                             onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.PACKED));
+                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
                         }
                         return em.merge(onlineOrder);
                     }
@@ -669,17 +722,34 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     public OnlineOrder deliverOnlineOrder(Long orderId) throws CustomerOrderException {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 
-        if (onlineOrder.getLastStatus() == OnlineOrderStatus.READY_FOR_DELIVERY) {
+        if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.READY_FOR_DELIVERY) {
             onlineOrder.addStatusHistory(
-                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.DELIVERING));
-        } else if (onlineOrder.getLastStatus() == OnlineOrderStatus.DELIVERING) {
+                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.DELIVERING));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.DELIVERING) {
             onlineOrder.addStatusHistory(
-                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.DELIVERED));
+                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.DELIVERED));
         } else {
             throw new CustomerOrderException("Order is not up for delivery.");
         }
 
-        return em.merge(onlineOrder);
+        return updateOnlineOrder(onlineOrder);
+    }
+
+    @Override
+    public OnlineOrder deliverMultipleOnlineOrder(Long orderId) throws CustomerOrderException {
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
+
+        if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.READY_FOR_DELIVERY) {
+            onlineOrder.addStatusHistory(
+                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.DELIVERING_MULTIPLE));
+        } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.DELIVERING_MULTIPLE) {
+            onlineOrder.addStatusHistory(
+                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.DELIVERED));
+        } else {
+            throw new CustomerOrderException("Order is not up for delivery.");
+        }
+
+        return updateOnlineOrder(onlineOrder);
     }
 
     // Only for self-pickup order
@@ -690,25 +760,26 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         if (actionBy == null || !actionBy.equals(onlineOrder.getPickupSite())) {
             throw new CustomerOrderException("Site is not supposed to be receiving this order.");
-        } else if (onlineOrder.getLastStatus() != OnlineOrderStatus.DELIVERING) {
+        } else if (onlineOrder.getLastStatus() != OnlineOrderStatusEnum.DELIVERING
+                && onlineOrder.getLastStatus() != OnlineOrderStatusEnum.DELIVERING_MULTIPLE) {
             throw new CustomerOrderException("Order is not ready for delivery.");
         }
 
         onlineOrder.addStatusHistory(
-                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.READY_FOR_COLLECTION));
-        return em.merge(onlineOrder);
+                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.READY_FOR_COLLECTION));
+        return updateOnlineOrder(onlineOrder);
     }
 
     @Override
     public OnlineOrder collectOnlineOrder(Long orderId) throws CustomerOrderException {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 
-        if (onlineOrder.getLastStatus() != OnlineOrderStatus.READY_FOR_COLLECTION) {
+        if (onlineOrder.getLastStatus() != OnlineOrderStatusEnum.READY_FOR_COLLECTION) {
             throw new CustomerOrderException("Order is not ready for collection.");
         }
 
         onlineOrder.addStatusHistory(
-                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatus.COLLECTED));
-        return em.merge(onlineOrder);
+                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.COLLECTED));
+        return updateOnlineOrder(onlineOrder);
     }
 }

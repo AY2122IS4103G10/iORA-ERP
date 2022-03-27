@@ -28,9 +28,13 @@ import { ProcurementInvoice } from "../ProcurementInvoice";
 
 const Header = ({
   subsys,
+  currSiteId,
   tabs,
   navigate,
   procurementId,
+  headquartersId,
+  manufacturingId,
+  warehouseId,
   status,
   openModal,
   onAcceptClicked,
@@ -49,13 +53,15 @@ const Header = ({
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${procurementId}`}</h1>
           <div className="mt-3 flex md:mt-0 md:absolute md:top-3 md:right-0">
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={openInvoice}
-            >
-              <span>View Invoice</span>
-            </button>
+            {status !== "PENDING" && (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                onClick={openInvoice}
+              >
+                <span>View Invoice</span>
+              </button>
+            )}
             <button
               type="button"
               className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -68,7 +74,7 @@ const Header = ({
               <span>Print</span>
             </button>
             {status === "PENDING" ? (
-              subsys === "sm" ? (
+              headquartersId === currSiteId ? (
                 <div>
                   <button
                     type="button"
@@ -98,7 +104,7 @@ const Header = ({
                     <span>Delete</span>
                   </button>
                 </div>
-              ) : subsys === "mf" ? (
+              ) : manufacturingId === currSiteId ? (
                 <div>
                   <button
                     type="button"
@@ -129,8 +135,6 @@ const Header = ({
               ) : (
                 <div></div>
               )
-            ) : status === "ACCEPTED" && subsys === "mf" ? (
-              <div></div>
             ) : (
               <div></div>
             )}
@@ -228,10 +232,11 @@ const InvoiceSummary = ({ data, status }) => {
             .fieldValue,
       },
       {
-        Header: `${status === "READY_FOR_SHIPPING" ? "Ful" : "Req"}`,
-        accessor: `${status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"}`,
+        Header: "Qty",
+        accessor: `${
+          status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"
+        }`,
       },
-
     ];
   }, [status]);
   return (
@@ -246,6 +251,11 @@ const InvoiceSummary = ({ data, status }) => {
       )}
     </div>
   );
+};
+
+export const fetchSite = async (site) => {
+  const { data } = await api.get("sam/viewSite", site);
+  return data;
 };
 
 export const ProcurementWrapper = ({ subsys }) => {
@@ -267,14 +277,10 @@ export const ProcurementWrapper = ({ subsys }) => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const currSiteId = useSelector(selectUserSite);
   const [loading, setLoading] = useState(false);
+  const currSiteId = useSelector(selectUserSite);
 
   useEffect(() => {
-    const fetchSite = async (site) => {
-      const { data } = await api.get("sam/viewSite", site);
-      return data;
-    };
     const fetchProcurementOrder = async () => {
       setLoading(true);
       try {
@@ -441,9 +447,13 @@ export const ProcurementWrapper = ({ subsys }) => {
         <div className="py-8 xl:py-10">
           <Header
             subsys={subsys}
+            currSiteId={currSiteId}
             navigate={navigate}
             tabs={tabs}
             procurementId={procurementId}
+            headquartersId={headquarters.id}
+            manufacturingId={manufacturing.id}
+            warehouseId={warehouse.id}
             status={status.status}
             openModal={openModal}
             onAcceptClicked={onAcceptClicked}
@@ -474,6 +484,9 @@ export const ProcurementWrapper = ({ subsys }) => {
               currSiteId,
               loading,
               setLoading,
+              setAction,
+              openConfirmModal,
+              closeConfirmModal,
             }}
           />
         </div>
@@ -540,7 +553,11 @@ export const ProcurementWrapper = ({ subsys }) => {
         {Boolean(action) && (
           <Confirmation
             title={`${action.name} "Order #${procurementId}"`}
-            body={`Are you sure you want to ${action.name.toLowerCase()} "Order #${procurementId}"? This action cannot be undone.`}
+            body={
+              action.body
+                ? action.body
+                : `Are you sure you want to ${action.name.toLowerCase()} "Order #${procurementId}"? This action cannot be undone.`
+            }
             open={openConfirm}
             closeModal={closeConfirmModal}
             onConfirm={action.action}

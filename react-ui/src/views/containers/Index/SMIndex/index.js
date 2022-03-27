@@ -3,9 +3,7 @@ import {
   CogIcon,
   CollectionIcon,
   DocumentReportIcon,
-  DocumentTextIcon,
-  HomeIcon,
-  QuestionMarkCircleIcon, ShieldCheckIcon,
+  DocumentTextIcon, InformationCircleIcon, LogoutIcon, QuestionMarkCircleIcon, ShieldCheckIcon,
   ShoppingBagIcon,
   TicketIcon,
   UserGroupIcon
@@ -18,7 +16,7 @@ import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 
 const navigation = [
-  { name: "Home", href: "/home", icon: HomeIcon, current: true },
+  { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
   {
     name: "Products",
     href: "/sm/products",
@@ -56,6 +54,12 @@ const navigation = [
     current: false,
   },
   {
+    name: "Support Centre",
+    href: "/sm/support",
+    icon: InformationCircleIcon,
+    current: false,
+  },
+  {
     name: "Rewards & Loyalty",
     href: "/sm/rewards-loyalty/tiers",
     icon: TicketIcon,
@@ -70,7 +74,7 @@ const navigation = [
 ];
 
 const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
+  { name: "Settings", href: "/account/settings", icon: CogIcon },
   { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];
@@ -96,7 +100,7 @@ export const SMIndex = () => {
           setSidebarOpen={setSidebarOpen}
           badge={
             <div className="flex-1 flex py-4">
-              <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+              <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-cyan-100 text-cyan-800">
                 Sales and Marketing
               </span>
             </div>

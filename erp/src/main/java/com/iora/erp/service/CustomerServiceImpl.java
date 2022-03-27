@@ -25,6 +25,7 @@ import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,20 +37,23 @@ public class CustomerServiceImpl implements CustomerService {
     private EmailService emailService;
     @PersistenceContext
     private EntityManager em;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Customer createCustomerAccount(Customer customer) throws RegistrationException {
+        try {
+            getCustomerByPhone(customer.getContactNumber());
+            throw new RegistrationException("Phone number already exists.");
+        } catch (CustomerException e) {
+            // Do nothing
+        }
 
         try {
-            if (getCustomerByPhone(customer.getContactNumber()) != null) {
-                throw new RegistrationException(
-                        "Phone number " + customer.getContactNumber() + " has already been used");
-            }
             getCustomerByEmail(customer.getEmail());
-            throw new RegistrationException("Account with " + customer.getEmail() + " has already been created");
-        } catch (CustomerException ex) {
-            customer.setSalt(StringGenerator.saltGeneration());
-            customer.sethashPass(StringGenerator.generateProtectedPassword(customer.getSalt(), customer.gethashPass()));
+            throw new RegistrationException("Email already exists.");
+        } catch (CustomerException e) {
+            customer.setPassword(passwordEncoder.encode(customer.getPassword()));
             em.persist(customer);
 
             return customer;
@@ -183,10 +187,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer loginAuthentication(String email, String password) throws CustomerException {
         try {
-
             Customer c = getCustomerByEmail(email);
 
-            if (c.authentication(StringGenerator.generateProtectedPassword(c.getSalt(), password))) {
+            if (passwordEncoder.matches(password, c.getPassword())) {
                 return c;
             } else {
                 throw new CustomerException("Authentication Fail");
@@ -200,7 +203,7 @@ public class CustomerServiceImpl implements CustomerService {
     public void resetPassword(Long id) throws CustomerException {
         Customer c = getCustomerById(id);
         String tempPassword = StringGenerator.generateRandom(48, 122, 8);
-        c.sethashPass(StringGenerator.generateProtectedPassword(c.getSalt(), tempPassword));
+        c.setPassword(passwordEncoder.encode(tempPassword));
 
         emailService.sendCustomerPassword(c, tempPassword);
     }
@@ -322,18 +325,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<SupportTicket> searchSupportTicket(Long id) {
-        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.id = :id",
-                SupportTicket.class);
-        q.setParameter("id", id);
-        return q.getResultList();
-    }
-
-    @Override
-    public List<SupportTicket> searchSupportTicketBySubject(String subject) {
-        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.subject LIKE :subject",
-                SupportTicket.class);
-        q.setParameter("subject", "%" + subject + "%");
+    public List<SupportTicket> getAllSupportTickets() {
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st", SupportTicket.class);
         return q.getResultList();
     }
 
@@ -350,9 +343,25 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public SupportTicket replySupportTicket(Long id, String message) throws SupportTicketException {
+    public SupportTicket resolveSupportTicket(Long id) throws SupportTicketException {
         SupportTicket st = getSupportTicket(id);
-        st.addMessage(createSTMsg(new SupportTicketMsg(message)));
+        st.setStatus(SupportTicket.Status.RESOLVED);
+        return em.merge(st);
+    }
+
+    @Override
+    public SupportTicket replySupportTicket(Long id, String message, String name) throws SupportTicketException {
+        SupportTicket st = getSupportTicket(id);
+        
+        if (st.getStatus() == SupportTicket.Status.RESOLVED) {
+            throw new SupportTicketException("Ticket has already been resolved.");
+        } else if (st.getStatus() == SupportTicket.Status.PENDING) {
+            st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
+        } else {
+            st.setStatus(SupportTicket.Status.PENDING);
+        }
+
+        st.addMessage(new SupportTicketMsg(message, name));
         return em.merge(st);
     }
 
@@ -360,11 +369,5 @@ public class CustomerServiceImpl implements CustomerService {
     public Long deleteSupportTicket(Long id) throws SupportTicketException {
         em.remove(getSupportTicket(id));
         return id;
-    }
-
-    @Override
-    public SupportTicketMsg createSTMsg(SupportTicketMsg supportTicketMsg) {
-        em.persist(supportTicketMsg);
-        return supportTicketMsg;
     }
 }

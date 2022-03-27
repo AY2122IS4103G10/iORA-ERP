@@ -12,7 +12,7 @@ import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.iora.erp.enumeration.ProcurementOrderStatus;
+import com.iora.erp.enumeration.ProcurementOrderStatusEnum;
 import com.iora.erp.model.site.Site;
 
 @Embeddable
@@ -24,13 +24,12 @@ public class POStatus {
     private Date timeStamp;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProcurementOrderStatus status;
-
+    private ProcurementOrderStatusEnum status;
 
     public POStatus() {
     }
 
-    public POStatus(Site actionBy, Date timeStamp, ProcurementOrderStatus status) {
+    public POStatus(Site actionBy, Date timeStamp, ProcurementOrderStatusEnum status) {
         this.actionBy = actionBy;
         this.timeStamp = timeStamp;
         this.status = status;
@@ -52,11 +51,11 @@ public class POStatus {
         this.timeStamp = timeStamp;
     }
 
-    public ProcurementOrderStatus getStatus() {
+    public ProcurementOrderStatusEnum getStatus() {
         return this.status;
     }
 
-    public void setStatus(ProcurementOrderStatus status) {
+    public void setStatus(ProcurementOrderStatusEnum status) {
         this.status = status;
     }
 
@@ -70,7 +69,7 @@ public class POStatus {
         return this;
     }
 
-    public POStatus status(ProcurementOrderStatus status) {
+    public POStatus status(ProcurementOrderStatusEnum status) {
         setStatus(status);
         return this;
     }
@@ -78,10 +77,10 @@ public class POStatus {
     @Override
     public String toString() {
         return "{" +
-            " actionBy='" + getActionBy() + "'" +
-            ", timeStamp='" + getTimeStamp() + "'" +
-            ", status='" + getStatus() + "'" +
-            "}";
+                " actionBy='" + getActionBy() + "'" +
+                ", timeStamp='" + getTimeStamp() + "'" +
+                ", status='" + getStatus() + "'" +
+                "}";
     }
-    
+
 }

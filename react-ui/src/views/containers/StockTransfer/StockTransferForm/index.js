@@ -25,6 +25,13 @@ import {
 } from "../../../components/Tables/ClickableRowTable";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useToasts } from "react-toast-notifications";
+import { fetchSite } from "../../Procurement/ProcurementWrapper";
+import { SimpleInlineRG } from "../../../components/RadioGroups/SimpleInlineRG";
+
+const orderTypes = [
+  { id: 1, title: "Send" },
+  { id: 2, title: "Request" },
+];
 
 const cols = [
   {
@@ -50,6 +57,7 @@ function isObjectEmpty(obj) {
 }
 
 export const SelectSiteModal = ({
+  subsys,
   open,
   closeModal,
   data,
@@ -62,6 +70,7 @@ export const SelectSiteModal = ({
   setProdTableData,
   fetchStockLevel,
   fetchAllModelsBySkus,
+  selectedOrderType,
 }) => {
   const columns = useMemo(() => cols, []);
   const fromRef = useRef(null);
@@ -147,32 +156,35 @@ export const SelectSiteModal = ({
                 >
                   From Site
                 </label>
-
-                <div className="mt-3 flex rounded-md shadow-sm">
-                  <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
-                    <input
-                      name="from"
-                      id="from"
-                      ref={fromRef}
-                      type="text"
-                      value={isObjectEmpty(from) ? "" : from.name}
-                      className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
-                      placeholder="Select From Site"
-                      readOnly
-                      autoFocus
-                    ></input>
-                    <button
-                      type="button"
-                      className="-ml-px relative h-full inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100"
-                      onClick={() => {
-                        setFrom({});
-                        handleFocus(fromRef);
-                      }}
-                    >
-                      <XIcon className="h-5 w-5" />
-                    </button>
+                {subsys === "sm" || selectedOrderType.id === 2 ? (
+                  <div className="mt-3 flex rounded-md shadow-sm">
+                    <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
+                      <input
+                        name="from"
+                        id="from"
+                        ref={fromRef}
+                        type="text"
+                        value={isObjectEmpty(from) ? "" : from.name}
+                        className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                        placeholder="Select From Site"
+                        readOnly
+                        autoFocus
+                      ></input>
+                      <button
+                        type="button"
+                        className="-ml-px relative h-full inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100"
+                        onClick={() => {
+                          setFrom({});
+                          handleFocus(fromRef);
+                        }}
+                      >
+                        <XIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <h3 className="mt-3 flex">{from.name}</h3>
+                )}
 
                 {error ? (
                   <div className="flex mt-2">
@@ -201,31 +213,34 @@ export const SelectSiteModal = ({
                 >
                   To Site
                 </label>
-
-                <div className="mt-3 flex rounded-md shadow-sm">
-                  <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
-                    <input
-                      name="to"
-                      id="to"
-                      ref={toRef}
-                      type="text"
-                      value={isObjectEmpty(to) ? "" : to.name}
-                      className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
-                      placeholder="Select To Site"
-                      readOnly
-                    ></input>
-                    <button
-                      type="button"
-                      className="-ml-px relative h-full inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100"
-                      onClick={() => {
-                        setTo({});
-                        handleFocus(toRef);
-                      }}
-                    >
-                      <XIcon className="h-5 w-5" />
-                    </button>
+                {subsys === "sm" || selectedOrderType.id === 1 ? (
+                  <div className="mt-3 flex rounded-md shadow-sm">
+                    <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
+                      <input
+                        name="to"
+                        id="to"
+                        ref={toRef}
+                        type="text"
+                        value={isObjectEmpty(to) ? "" : to.name}
+                        className="block w-full h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                        placeholder="Select To Site"
+                        readOnly
+                      ></input>
+                      <button
+                        type="button"
+                        className="-ml-px relative h-full inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100"
+                        onClick={() => {
+                          setTo({});
+                          handleFocus(toRef);
+                        }}
+                      >
+                        <XIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <h3 className="mt-3 flex">{to.name}</h3>
+                )}
               </div>
             </div>
           </div>
@@ -394,10 +409,11 @@ const LineItemsTable = ({ data, setLineItems }) => {
         Cell: (row) => {
           return (
             <EditableCell
-              value={row.row.original.requestedQty}
+              value={row.value}
               row={row.row}
               column={row.column}
               updateMyData={updateMyData}
+              max={row.row.original.qty}
             />
           );
         },
@@ -406,7 +422,13 @@ const LineItemsTable = ({ data, setLineItems }) => {
   }, [setLineItems]);
 
   return (
-    <SimpleTable columns={columns} data={data} skipPageReset={skipPageReset} />
+    <div className="mt-4">
+      <SimpleTable
+        columns={columns}
+        data={data}
+        skipPageReset={skipPageReset}
+      />
+    </div>
   );
 };
 
@@ -419,11 +441,14 @@ export const fetchAllModelsBySkus = async (items) => {
   return Promise.all(items.map((item) => fetchModelBySku(item.product.sku)));
 };
 
-export const StockTransferForm = (subsys) => {
+export const StockTransferForm = ({ subsys }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useToasts();
   const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedOrderType, setSelectedOrderType] = useState(orderTypes[0]);
+  const [site, setSite] = useState(false);
   const [from, setFrom] = useState({});
   const [to, setTo] = useState({});
   const [openSites, setOpenSites] = useState(false);
@@ -433,8 +458,6 @@ export const StockTransferForm = (subsys) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [originalOrder, setOriginalOrder] = useState({});
   const currSite = useSelector(selectUserSite);
-  const { addToast } = useToasts();
-
   //get stock level and product information
   const [prodTableData, setProdTableData] = useState([]);
 
@@ -447,6 +470,34 @@ export const StockTransferForm = (subsys) => {
     dispatch(updateCurrSite());
     dispatch(getAllSites());
   }, [dispatch, from]);
+
+  useEffect(() => {
+    currSite &&
+      subsys !== "sm" &&
+      fetchSite(currSite)
+        .then((data) => {
+          setSite(data);
+          setFrom(data);
+          fetchStockLevel(data.id).then(({ data: stocklevel }) => {
+            fetchAllModelsBySkus(stocklevel.products).then((data) => {
+              setProdTableData({
+                ...stocklevel,
+                products: stocklevel.products.map((product, index) => ({
+                  ...product,
+                  modelCode: data[index].modelCode,
+                  name: data[index].name,
+                })),
+              });
+            });
+          });
+        })
+        .catch((error) =>
+          addToast(`Error: ${error.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          })
+        );
+  }, [currSite, addToast, subsys]);
 
   //editing
 
@@ -522,6 +573,31 @@ export const StockTransferForm = (subsys) => {
   const closeItemsModal = () => setOpenItems(false);
   const closeErrorModal = () => setErrorModal(false);
 
+  const onSelectedOrderTypeChanged = (e) => {
+    if (e.id === 1) {
+      setFrom(site);
+      fetchStockLevel(site.id).then(({ data: stocklevel }) => {
+        fetchAllModelsBySkus(stocklevel.products).then((data) => {
+          setProdTableData({
+            ...stocklevel,
+            products: stocklevel.products.map((product, index) => ({
+              ...product,
+              modelCode: data[index].modelCode,
+              name: data[index].name,
+            })),
+          });
+        });
+      });
+      setTo({});
+      setLineItems([])
+    } else if (e.id === 2) {
+      setTo(site);
+      setFrom({});
+      setLineItems([])
+    }
+    setSelectedOrderType(e);
+  };
+
   //Handle add line items
 
   const onAddItemsClicked = (e) => {
@@ -563,7 +639,7 @@ export const StockTransferForm = (subsys) => {
           autoDismiss: true,
         });
         console.log(response);
-        navigate(`/${subsys.subsys}/stocktransfer/${response.id}`);
+        navigate(`/${subsys}/stocktransfer/${response.id}`);
       })
       .catch((error) => {
         addToast(`${error.message}`, {
@@ -582,7 +658,6 @@ export const StockTransferForm = (subsys) => {
     originalOrder.lineItems = stockTransferLI;
     originalOrder.fromSite = from;
     originalOrder.toSite = to;
-    console.log(originalOrder);
     dispatch(
       editStockTransfer({
         order: originalOrder,
@@ -595,7 +670,7 @@ export const StockTransferForm = (subsys) => {
           appearance: "success",
           autoDismiss: true,
         });
-        navigate(`/${subsys.subsys}/stocktransfer/${id}`);
+        navigate(`/${subsys}/stocktransfer/${id}`);
       })
       .catch((error) => {
         addToast(`Edit stock transfer failed. ${error.message}`, {
@@ -604,13 +679,12 @@ export const StockTransferForm = (subsys) => {
         });
       });
   };
-
   // cancel
   const onCancelClicked = () => {
     if (isEditing) {
-      navigate(`/${subsys.subsys}/stocktransfer/${id}`);
+      navigate(`/${subsys}/stocktransfer/${id}`);
     } else {
-      navigate(`/${subsys.subsys}/stocktransfer`);
+      navigate(`/${subsys}/stocktransfer`);
     }
   };
   return (
@@ -622,9 +696,16 @@ export const StockTransferForm = (subsys) => {
               <div className="rounded-lg bg-white overflow-hidden shadow">
                 <div className="p-8 space-y-8 divide-y divide-gray-200">
                   <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                      {isEditing ? "Edit" : "Create"} Stock Transfer Order
-                    </h3>
+                    <div>
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">
+                        {isEditing ? "Edit" : "Create"} Stock Transfer Order
+                      </h3>
+                      <SimpleInlineRG
+                        options={orderTypes}
+                        selected={selectedOrderType}
+                        onSelectedChanged={onSelectedOrderTypeChanged}
+                      />
+                    </div>
                     <div className="grid grid-cols-2">
                       <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">
                         <div>
@@ -635,26 +716,30 @@ export const StockTransferForm = (subsys) => {
                             From Site
                           </label>
 
-                          <div className="mt-3 flex rounded-md shadow-sm">
-                            <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
-                              <input
-                                name="from"
-                                id="from"
-                                type="text"
-                                value={isObjectEmpty(from) ? "" : from.name}
-                                className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
-                                placeholder="Select"
-                                readOnly
-                              ></input>
-                              <button
-                                type="button"
-                                className="-ml-px relative h-full inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
-                                onClick={openSitesModal}
-                              >
-                                Select
-                              </button>
+                          {subsys === "sm" || selectedOrderType.id === 2 ? (
+                            <div className="mt-3 flex">
+                              <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
+                                <input
+                                  name="from"
+                                  id="from"
+                                  type="text"
+                                  value={isObjectEmpty(from) ? "" : from.name}
+                                  className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                                  placeholder="Select"
+                                  readOnly
+                                ></input>
+                                <button
+                                  type="button"
+                                  className="-ml-px relative h-full inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
+                                  onClick={openSitesModal}
+                                >
+                                  Select
+                                </button>
+                              </div>
                             </div>
-                          </div>
+                          ) : (
+                            <h3 className="mt-3 flex">{from.name}</h3>
+                          )}
                         </div>
                       </div>
 
@@ -666,27 +751,30 @@ export const StockTransferForm = (subsys) => {
                           >
                             To Site
                           </label>
-
-                          <div className="mt-3 flex rounded-md shadow-sm">
-                            <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
-                              <input
-                                name="to"
-                                id="to"
-                                type="text"
-                                value={isObjectEmpty(to) ? "" : to.name}
-                                className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
-                                placeholder="Search Site"
-                                readOnly
-                              ></input>
-                              <button
-                                type="button"
-                                className="-ml-px relative h-full inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
-                                onClick={openSitesModal}
-                              >
-                                Select
-                              </button>
+                          {subsys === "sm" || selectedOrderType.id === 1 ? (
+                            <div className="mt-3 flex">
+                              <div className="relative flex items-stretch flex-grow focus-within:z-10 h-9">
+                                <input
+                                  name="to"
+                                  id="to"
+                                  type="text"
+                                  value={isObjectEmpty(to) ? "" : to.name}
+                                  className="block w-3/5 h-full rounded-l-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-20"
+                                  placeholder="Search Site"
+                                  readOnly
+                                ></input>
+                                <button
+                                  type="button"
+                                  className="-ml-px relative h-full inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
+                                  onClick={openSitesModal}
+                                >
+                                  Select
+                                </button>
+                              </div>
                             </div>
-                          </div>
+                          ) : (
+                            <h3 className="mt-3 flex">{to.name}</h3>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -706,38 +794,40 @@ export const StockTransferForm = (subsys) => {
                           </button>
                         </div>
                       </div>
-                      <div className="m-2">
+                      {Boolean(lineItems.length) && (
                         <LineItemsTable
                           data={lineItems}
                           setLineItems={setLineItems}
                         />
-                      </div>
-                      <div className="flex justify-end">
+                      )}
+                    </div>
+                  </div>
+                  <div className="pt-5">
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                        onClick={onCancelClicked}
+                      >
+                        Cancel
+                      </button>
+                      {!isEditing ? (
                         <button
-                          type="button"
-                          className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                          onClick={onCancelClicked}
+                          type="submit"
+                          className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          onClick={handleSubmit}
                         >
-                          Cancel
+                          Create
                         </button>
-                        {!isEditing ? (
-                          <button
-                            type="submit"
-                            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                            onClick={handleSubmit}
-                          >
-                            Create
-                          </button>
-                        ) : (
-                          <button
-                            type="submit"
-                            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                            onClick={handleSaveEdit}
-                          >
-                            Save Edit
-                          </button>
-                        )}
-                      </div>
+                      ) : (
+                        <button
+                          type="submit"
+                          className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          onClick={handleSaveEdit}
+                        >
+                          Save Edit
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -747,6 +837,7 @@ export const StockTransferForm = (subsys) => {
         </div>
 
         <SelectSiteModal
+          subsys={subsys}
           open={openSites}
           closeModal={closeSitesModal}
           from={from}
@@ -759,6 +850,7 @@ export const StockTransferForm = (subsys) => {
           setProdTableData={setProdTableData}
           fetchStockLevel={fetchStockLevel}
           fetchAllModelsBySkus={fetchAllModelsBySkus}
+          selectedOrderType={selectedOrderType}
         />
 
         <AddItemsModal

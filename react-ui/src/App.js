@@ -31,6 +31,7 @@ import {MembershipTierForm} from "./views/containers/MembershipTier/MembershipTi
 import {MembershipTierList} from "./views/containers/MembershipTier/MembershipTierList";
 import {ManageOnlineOrders} from "./views/containers/OnlineOrder/ManageOnlineOrders";
 import {OnlineOrderList} from "./views/containers/OnlineOrder/OnlineOrderList";
+import {OnlineOrderPickPack} from "./views/containers/OnlineOrder/OnlineOrderPickPack/index.js";
 import {OnlineOrderSearch} from "./views/containers/OnlineOrder/OnlineOrderSearch";
 import {CustomerOrderDetails} from "./views/containers/Orders/CustomerOrderDetails";
 import {CustomerOrderWrapper} from "./views/containers/Orders/CustomerOrderWrapper";
@@ -54,6 +55,13 @@ import {ProductDetails} from "./views/containers/Products/ProductDetails";
 import {ProductForm} from "./views/containers/Products/ProductForm";
 import {ProductPrint} from "./views/containers/Products/ProductPrint";
 import {ProductsList} from "./views/containers/Products/ProductsList";
+import {ManageProfile} from "./views/containers/Profile/ManageProfile/index.js";
+import {PasswordForm} from "./views/containers/Profile/PasswordForm/index.js";
+import {Profile} from "./views/containers/Profile/Profile/index.js";
+import {ProfileForm} from "./views/containers/Profile/ProfileForm/index.js";
+import {Settings} from "./views/containers/Profile/Settings/index.js";
+import {ManageSupportTicket} from "./views/containers/SupportTicket/ManageSupportTicket";
+import {SupportTicketDetails} from "./views/containers/SupportTicket/SupportTicketDetails/index.js";
 // import { SMRoute } from "./routes/SMRoute";
 import {ManagePromotions} from "./views/containers/Promotions/ManagePromotions";
 import {FrontPage} from "./views/containers/SelfService/FrontPage";
@@ -70,6 +78,7 @@ import {EditStockLevel} from "./views/containers/StockLevels/EditStockLevel";
 import {StockLevelForm} from "./views/containers/StockLevels/ProdStockLevelForm";
 import {MyStoreStock} from "./views/containers/StockLevels/StoreStockList";
 import {ManageStockTransfer} from "./views/containers/StockTransfer/ManageStockTransfer";
+import {StockTransferDelivery} from "./views/containers/StockTransfer/StockTransferDelivery/index.js";
 import {StockTransferForm} from "./views/containers/StockTransfer/StockTransferForm";
 import {StockTransferList} from "./views/containers/StockTransfer/StockTransferList";
 import {StockTransferPickPack} from "./views/containers/StockTransfer/StockTransferPickPack";
@@ -93,9 +102,6 @@ function App() {
         <Route path="/" element={<Auth />}>
           {/* Common Infrastructure */}
           <Route index element={<Login />} />
-          <Route path="home" element={<HomeIndex />}>
-            <Route index element={<Home />} />
-          </Route>
 
           {/* Sales and Marketing Subsystem */}
           <Route
@@ -151,6 +157,7 @@ function App() {
               <Route path=":id" element={<StockTransferWrapper subsys="sm" />}>
                 <Route index element={<ViewStockTransfer subsys="sm" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
+                <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
               <Route path="edit/:id" element={<StockTransferForm subsys="sm" />} />
             </Route>
@@ -185,14 +192,6 @@ function App() {
             {/* Customer Orders */}
             <Route path="orders" element={<Outlet />}>
               <Route
-                index
-                element={
-                  <ManageOrders subsys="sm">
-                    <OrderList subsys="sm" />
-                  </ManageOrders>
-                }
-              />
-              <Route
                 path="search"
                 element={
                   <ManageOrders subsys="sm">
@@ -200,12 +199,43 @@ function App() {
                   </ManageOrders>
                 }
               />
+              <Route
+                path="store"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" type="store" />
+                  </ManageOrders>
+                }
+              />{" "}
+              <Route
+                path="online"
+                element={
+                  <ManageOrders subsys="sm">
+                    <OrderList subsys="sm" type="online" />
+                  </ManageOrders>
+                }
+              />
+              <Route />
               <Route path=":orderId" element={<CustomerOrderWrapper subsys="sm" />}>
                 <Route index element={<CustomerOrderDetails subsys="sm" />} />
-                <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="pick-pack" element={<OnlineOrderPickPack />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
+            </Route>
+
+            {/* Customers */}
+            <Route path="customers" element={<Outlet />}>
+              <Route index element={<ManageCustomer />} />
+              <Route path=":customerId" element={<CustomerDetails />} />
+              <Route path="create" element={<CustomerForm />} />
+              <Route path="edit/:customerId" element={<CustomerForm />} />
+            </Route>
+
+            {/* Support Centre */}
+            <Route path="support" element={<Outlet />}>
+              <Route index element={<ManageSupportTicket />} />
+              <Route path=":ticketId" element={<SupportTicketDetails />} />
             </Route>
 
             {/* Rewards & Loyalty */}
@@ -241,20 +271,6 @@ function App() {
                 <Route path="create" element={<MembershipTierForm />} />
               </Route>
             </Route>
-
-            {/* Customers */}
-            <Route path="customers" element={<Outlet />}>
-              <Route index element={<ManageCustomer />} />
-              <Route path=":customerId" element={<CustomerDetails />} />
-              <Route path="create" element={<CustomerForm />} />
-              <Route path="edit/:customerId" element={<CustomerForm />} />
-              {/* <Route path="tiers" element={<Outlet />}>
-                <Route index element={<ManageMembershipTier />} />
-                <Route path=":name" element={<MembershipTierDetails />} />
-                <Route path="create" element={<MembershipTierForm />} />
-                <Route path="edit/:name" element={<MembershipTierForm />} />
-              </Route> */}
-            </Route>
           </Route>
 
           {/* Store Management Subsystem */}
@@ -274,6 +290,7 @@ function App() {
               <Route path=":id" element={<AsiteStock />} />
               <Route path="products/:id" element={<AProductStock subsys="str" />} />
             </Route>
+
             {/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
               <Route
@@ -296,6 +313,7 @@ function App() {
               <Route path=":id" element={<StockTransferWrapper subsys="str" />}>
                 <Route index element={<ViewStockTransfer subsys="str" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
+                <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
               <Route path="edit/:id" element={<StockTransferForm subsys="str" />} />
             </Route>
@@ -388,7 +406,6 @@ function App() {
                 <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
-              <Route path="edit/:orderId" element={<VoucherForm />} />
             </Route>
           </Route>
 
@@ -446,7 +463,7 @@ function App() {
             </Route>
 
             {/* Online Orders */}
-            <Route path="online-orders" element={<Outlet />}>
+            <Route path="orders" element={<Outlet />}>
               <Route
                 index
                 element={
@@ -464,13 +481,10 @@ function App() {
                   </ManageOnlineOrders>
                 }
               />
-              {/* <Route
-                path=":procurementId"
-                element={<ProcurementWrapper subsys="wh" />}
-              >
-                <Route index element={<ProcurementDetails subsys="wh" />} />
-                <Route path="pick-pack" element={<ProcurementPickPack />} />
-              </Route> */}
+              <Route path=":orderId" element={<CustomerOrderWrapper subsys="wh" />}>
+                <Route index element={<CustomerOrderDetails />} />
+                <Route path="pick-pack" element={<OnlineOrderPickPack />} />
+              </Route>
             </Route>
             {/* Stock Transfer Orders */}
             <Route path="stocktransfer" element={<Outlet />}>
@@ -494,6 +508,7 @@ function App() {
               <Route path=":id" element={<StockTransferWrapper subsys="wh" />}>
                 <Route index element={<ViewStockTransfer subsys="wh" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
+                <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
               <Route path="edit/:id" element={<StockTransferForm subsys="wh" />} />
             </Route>
@@ -507,9 +522,64 @@ function App() {
                 <LGIndex />
               </PrivateRoute>
             }>
+            <Route path="procurements" element={<Outlet />}>
+              <Route
+                index
+                element={
+                  <ManageProcurement subsys="lg">
+                    <ProcurementList pathname={pathname} subsys="lg" />
+                  </ManageProcurement>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageProcurement subsys="lg">
+                    <ProcurementSearch subsys="lg" />
+                  </ManageProcurement>
+                }
+              />
+              <Route path=":procurementId" element={<ProcurementWrapper subsys="lg" />}>
+                <Route index element={<ProcurementDetails subsys="lg" />} />
+                <Route path="pick-pack" element={<ProcurementPickPack />} />
+                <Route path="delivery" element={<ProcurementDelivery />} />
+              </Route>
+            </Route>
             <Route path="stocktransfer" element={<Outlet />}>
-              <Route index element={<ManageStockTransfer subsys="lg" />} />
-              <Route path=":id" element={<ViewStockTransfer subsys="lg" />} />
+              <Route
+                index
+                element={
+                  <ManageStockTransfer subsys="lg">
+                    <StockTransferList subsys="lg" />
+                  </ManageStockTransfer>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ManageStockTransfer subsys="lg">
+                    <StockTransferSearch subsys="lg" />
+                  </ManageStockTransfer>
+                }
+              />
+              <Route path="create" element={<StockTransferForm subsys="lg" />} />
+              <Route path=":id" element={<StockTransferWrapper subsys="lg" />}>
+                <Route index element={<ViewStockTransfer />} />
+                <Route path="pick-pack" element={<StockTransferPickPack />} />
+                <Route path="delivery" element={<StockTransferDelivery />} />
+              </Route>
+              <Route path="edit/:id" element={<StockTransferForm subsys="wh" />} />
+            </Route>
+          </Route>
+
+          {/* Common Infrastructure Subsystem */}
+          <Route path="/" element={<HomeIndex />}>
+            <Route path="home" element={<Home />} />
+            <Route path="account" element={<ManageProfile />}>
+              <Route index element={<Profile />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="edit" element={<ProfileForm />} />
+              <Route path="changepass" element={<PasswordForm />} />
             </Route>
           </Route>
         </Route>

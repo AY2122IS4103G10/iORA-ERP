@@ -1,18 +1,12 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { CustomerList } from "../CustomerList";
-import { classNames } from "../../../../utilities/Util";
 
 const tabs = [
   { name: "View Customers", href: "/sm/customers", index: 0 },
   { name: "Support Center", href: "/sm/customers/support", index: 1 },
 ];
 
-export const Header = ({type, path}) => {
-  const location = useLocation();
-  const [currTab, setCurrTab] = useState(tabs.filter(x => x.href === location.pathname)[0].index);
-
-  const changeTab = (tabnumber) => setCurrTab(tabnumber);
+export const Header = ({ type, path }) => {
   return (
     <div className="bg-white shadow">
       <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
@@ -39,32 +33,12 @@ export const Header = ({type, path}) => {
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
               >
-                Create New {type}
+                Create New Customer Account
               </button>
             </Link>
           </div>
         </div>
         <div className="ml-3">
-          <div className="sm:block">
-            <nav className="-mb-px flex space-x-8">
-              {tabs.map((tab) => (
-                <Link
-                  key={tab.name}
-                  to={tab.href}
-                  className={classNames(
-                    tab.index === currTab
-                      ? "border-cyan-500 text-cyan-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-                    "whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
-                  )}
-                  aria-current={currTab ? "page" : undefined}
-                  onClick={() => changeTab(tab.index)}
-                >
-                  {tab.name}
-                </Link>
-              ))}
-            </nav>
-          </div>
         </div>
       </div>
     </div>
@@ -74,7 +48,7 @@ export const Header = ({type, path}) => {
 export const ManageCustomer = () => {
   return (
     <>
-      {<Header type="Customer" path="/sm/customers/create"/>}
+      {<Header type="Customer" path="/sm/customers/create" />}
       {<CustomerList />}
     </>
   );

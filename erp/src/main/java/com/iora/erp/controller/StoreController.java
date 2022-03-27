@@ -17,6 +17,7 @@ import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
+import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,8 @@ public class StoreController {
     private ProductService productService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private StripeService stripeService;
 
     /*
      * ---------------------------------------------------------
@@ -82,6 +85,15 @@ public class StoreController {
         try {
             Site site = siteService.getSite(siteId);
             return site.getStockLevel();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @GetMapping(path = "/viewStock/sites/{siteId}/{skuCode}", produces = "application/json")
+    public StockLevelLI viewStock(@PathVariable Long siteId, @PathVariable String skuCode) {
+        try {
+            return siteService.getStockLevelLI(siteId, skuCode);
         } catch (Exception e) {
             return null;
         }
@@ -144,7 +156,7 @@ public class StoreController {
             @PathVariable Long siteId) {
         try {
             return ResponseEntity
-                    .ok(stockTransferService.updateStockTransferOrder(stockTransferOrder, siteId));
+                    .ok(stockTransferService.updateOrderDetails(stockTransferOrder, siteId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -213,10 +225,10 @@ public class StoreController {
         }
     }
 
-    @PutMapping(path = "/stockTransfer/receive/{orderId}/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> receiveStockTransferOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
+    @PutMapping(path = "/stockTransfer/deliverMultiple/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverMultipleStockTransferOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity.ok(stockTransferService.receiveStockTransferOrder(orderId, siteId));
+            return ResponseEntity.ok(stockTransferService.deliverMultipleStockTransferOrder(orderId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -226,10 +238,10 @@ public class StoreController {
     public ResponseEntity<Object> scanProductAtToSite(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
             if (!barcode.contains("/")) {
-                return ResponseEntity.ok(stockTransferService.scanProductAtFromSite(orderId, barcode, 1));
+                return ResponseEntity.ok(stockTransferService.scanProductAtToSite(orderId, barcode, 1));
             } else {
                 return ResponseEntity.ok(
-                        stockTransferService.scanProductAtFromSite(orderId, barcode.substring(0, barcode.indexOf("/")),
+                        stockTransferService.scanProductAtToSite(orderId, barcode.substring(0, barcode.indexOf("/")),
                                 Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
             }
         } catch (Exception ex) {
@@ -292,6 +304,11 @@ public class StoreController {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
+    @GetMapping(path = "/onlineOrder/pickup/{siteId}", produces = "application/json")
+    public List<OnlineOrder> getPickupOrdersOfSite(@PathVariable Long siteId) {
+        return customerOrderService.getPickupOrdersBySite(siteId);
+    }
+
     @PostMapping(path = "/customerOrder/add/{rfidsku}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addItemToLineItems(@RequestBody List<CustomerOrderLI> lineItems,
             @PathVariable String rfidsku) {
@@ -334,11 +351,31 @@ public class StoreController {
         }
     }
 
-    @PostMapping(path = "/customerOrder/create", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createOnlineOrder(@RequestBody CustomerOrder customerOrder) {
+    @PostMapping(path = "/customerOrder/connectionToken", produces = "application/json")
+    public ResponseEntity<Object> createConnectionToken() {
         try {
-            return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder));
+            return ResponseEntity.ok(stripeService.createConnnectionToken());
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/create", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createCustomerOrder(@RequestBody CustomerOrder customerOrder,
+            @RequestParam String clientSecret) {
+        try {
+            return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder, clientSecret));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/pay", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems) {
+        try {
+            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems));
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

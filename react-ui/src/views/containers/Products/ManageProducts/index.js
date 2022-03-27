@@ -1,11 +1,20 @@
 import { Link } from "react-router-dom";
 import { Tabs } from "../../../components/Tabs";
 
-const tabs = [
+const smTabs = [
   { name: "All Products", href: "/sm/products", current: true },
   {
     name: "Promotions",
     href: "/sm/products/promotions",
+    current: false,
+  },
+];
+
+const whTabs = [
+  { name: "Print Label", href: "/wh/products/print", current: true },
+  {
+    name: "RFID",
+    href: "/wh/products/rfid",
     current: false,
   },
 ];
@@ -35,11 +44,10 @@ const Header = ({ subsys }) => {
             </div>
           )}
         </div>
-        {subsys === "sm" && (
-          <div className="ml-3">
-            <Tabs tabs={tabs} />
-          </div>
-        )}
+
+        <div className="ml-3">
+          <Tabs tabs={subsys === "sm" ? smTabs : whTabs} />
+        </div>
       </div>
     </div>
   );

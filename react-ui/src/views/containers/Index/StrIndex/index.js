@@ -1,13 +1,19 @@
 import {
-  ArchiveIcon, ClockIcon, CogIcon, CollectionIcon, CreditCardIcon, DocumentReportIcon, LogoutIcon, QuestionMarkCircleIcon,
-  ShieldCheckIcon
+  ArchiveIcon,
+  ClockIcon,
+  CogIcon,
+  CollectionIcon,
+  DocumentReportIcon,
+  LogoutIcon,
+  QuestionMarkCircleIcon,
+  ShieldCheckIcon,
+  ShoppingBagIcon,
 } from "@heroicons/react/outline";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { updateCurrSite } from "../../../../stores/slices/userSlice";
 import MainWrapper from "../../../components/MainWrapper";
-
 
 const navigation = [
   { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
@@ -18,19 +24,21 @@ const navigation = [
     current: false,
   },
   {
+    name: "Online Orders",
+    href: "/str/orders/search",
+    icon: ShoppingBagIcon,
+    current: false,
+  },
+  {
     name: "Stock Levels",
     href: "/str/stocklevels/my",
     icon: CollectionIcon,
     current: false,
   },
-  { name: "Stock Transfer", 
-    href: "/str/stocktransfer", 
-    icon: ArchiveIcon, 
-    current: false },
   {
-    name: "Pickup Orders",
-    href: "/str/pickup",
-    icon: CreditCardIcon,
+    name: "Stock Transfer",
+    href: "/str/stocktransfer/search",
+    icon: ArchiveIcon,
     current: false,
   },
   {

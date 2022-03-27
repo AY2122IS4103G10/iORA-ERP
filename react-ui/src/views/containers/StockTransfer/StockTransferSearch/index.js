@@ -1,24 +1,37 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { api } from "../../../../environments/Api";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 
 export const StockTransferSearch = ({ subsys }) => {
   const { pathname } = useLocation();
   const { addToast } = useToasts();
+  const currSiteId = useSelector(selectUserSite);
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const onSearchChanged = (e) => setSearch(e.target.value);
   const onSearchClicked = (evt) => {
     const fetchStockTransfer = async () => {
       try {
-        const { data } =
-          subsys === "lg"
-            ? api.get("logistics/stockTransferOrder", search.trim())
-            : api.get("store/stockTransfer", search.trim());
-            console.log(data)
-        navigate(pathname.replace("search", data.id));
+        const { data } = api.get("store/stockTransfer", search.trim());
+        if (data === undefined)
+          throw new Error("Stock Transfer Order not found");
+        const { id, fromSite, statusHistory } = data;
+        if (subsys === "lg") {
+          if (
+            currSiteId !== fromSite.id ||
+            statusHistory[statusHistory.length - 1].status ===
+              "READY_FOR_DELIVERY"
+          )
+            throw new Error("Not authorised to view order.");
+        } else if (subsys === "str" || subsys === "wh") {
+          if (currSiteId === fromSite.id)
+            throw new Error("Not authorised to view order.");
+        }
+        navigate(pathname.replace("search", id));
       } catch (error) {
         addToast(`Error: ${error.message}`, {
           appearance: "error",
@@ -27,7 +40,7 @@ export const StockTransferSearch = ({ subsys }) => {
       }
     };
     evt.preventDefault();
-    fetchStockTransfer();
+    search && fetchStockTransfer();
   };
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

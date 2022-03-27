@@ -16,6 +16,7 @@ public class Delivery {
     private Long id;
 
     private String parcelID;
+    private String shipmentID;
     private Integer quantity;
 
     @Enumerated(EnumType.STRING)
@@ -59,6 +60,14 @@ public class Delivery {
 
     public void setPs(ParcelSize ps) {
         this.ps = ps;
+    }
+
+    public String getShipmentID() {
+        return shipmentID;
+    }
+
+    public void setShipmentID(String shipmentID) {
+        this.shipmentID = shipmentID;
     }
 
 }

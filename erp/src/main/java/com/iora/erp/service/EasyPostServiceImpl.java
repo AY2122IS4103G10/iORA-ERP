@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 import com.easypost.EasyPost;
 import com.easypost.exception.EasyPostException;
 import com.easypost.model.Address;
+import com.easypost.model.CustomsInfo;
 import com.easypost.model.Parcel;
 import com.easypost.model.Shipment;
 import com.iora.erp.exception.CustomerException;
@@ -20,6 +21,7 @@ import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.site.Site;
+import com.stripe.model.Mandate.CustomerAcceptance.Online;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +55,6 @@ public class EasyPostServiceImpl implements EasyPostService {
     public OnlineOrder createParcel(Long orderId, Long siteId, Delivery parcelInfo) throws CustomerOrderException {
         OnlineOrder onlineOrder = (OnlineOrder) customerOrderService.getCustomerOrder(orderId);
         em.persist(parcelInfo);
-        onlineOrder.getParcelDelivery().add(parcelInfo);
 
         Site site = siteService.getSite(siteId);
 
@@ -87,26 +88,24 @@ public class EasyPostServiceImpl implements EasyPostService {
             parcelMap.put("length", parcelInfo.getPs().getLength());
             parcelMap.put("mode", "test");
             Parcel parcel = Parcel.create(parcelMap);
+            parcelInfo.setParcelID(parcel.getId());
 
             Map<String, Object> shipmentMap = new HashMap<String, Object>();
             shipmentMap.put("to_address", toAddress);
             shipmentMap.put("from_address", fromAddress);
             shipmentMap.put("parcel", parcel);
-            /*
-             * shipmentMap.put("customs_info",
-             * customerService.getCustomerById(onlineOrder.getCustomerId()).getFirstName() +
-             * " "
-             * +
-             * customerService.getCustomerById(onlineOrder.getCustomerId()).getLastName());
-             */
 
             Shipment shipment = Shipment.create(shipmentMap);
+            parcelInfo.setShipmentID(shipment.getId());
+            onlineOrder.getParcelDelivery().add(parcelInfo);
 
-            List<String> buyCarriers = new ArrayList<String>();
-            buyCarriers.add("DHL");
-            List<String> buyServices = new ArrayList<String>();
-            buyServices.add("First");
-            shipment.buy(shipment.lowestRate(buyCarriers, buyServices));
+            /*
+             * List<String> buyCarriers = new ArrayList<String>();
+             * buyCarriers.add("DHL");
+             * List<String> buyServices = new ArrayList<String>();
+             * buyServices.add("First");
+             * shipment.buy(shipment.lowestRate(buyCarriers, buyServices));
+             */
 
         } catch (EasyPostException e) {
             throw new CustomerOrderException("Fail to create delivery: " + e);

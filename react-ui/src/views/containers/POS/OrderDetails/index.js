@@ -105,7 +105,6 @@ export const OrderDetails = () => {
         );
       });
   }, [orderLineItems]);
-
   return (
     Boolean(order) && (
       <div className="py-4 xl:py-6">
@@ -167,8 +166,10 @@ export const OrderDetails = () => {
               </div>
             </section>
             {Boolean(order.lineItems.length) && (
-              <section aria-labelledby="departments">
-                <ItemTable data={lineItems} />
+              <section aria-labelledby="line-items">
+                <ItemTable
+                  data={lineItems.filter((item) => item.subTotal > 0)}
+                />
               </section>
             )}
           </div>

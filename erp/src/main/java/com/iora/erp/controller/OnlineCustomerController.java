@@ -17,10 +17,12 @@ import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.EasyPostService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.StripeService;
 import com.iora.erp.service.SiteService;
@@ -51,6 +53,8 @@ public class OnlineCustomerController {
     private ProductService productService;
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private EasyPostService easyPostService;
 
     /*
      * ---------------------------------------------------------
@@ -209,6 +213,16 @@ public class OnlineCustomerController {
         }
     }
 
+    @PutMapping(path = "/createDelivery/{orderId}/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> createOnlineOrderDelivery(@PathVariable Long orderId, @PathVariable Long siteId,
+            @RequestBody Delivery delivery) {
+        try {
+            return ResponseEntity.ok(easyPostService.createParcel(orderId, siteId, delivery));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PatchMapping(path = "/scan/{orderId}", produces = "application/json")
     public ResponseEntity<Object> scanProduct(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
@@ -292,7 +306,7 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-    
+
     @GetMapping(path = "/model/{modelCode}", produces = "application/json")
     public ResponseEntity<Object> getModel(@PathVariable String modelCode) {
         try {
@@ -338,4 +352,5 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
 }

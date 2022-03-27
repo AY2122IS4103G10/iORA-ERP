@@ -1,100 +1,44 @@
-import {
-    PaymentElement,
-    useElements,
-    useStripe,
-  } from "@stripe/react-stripe-js";
-  import React, { useEffect, useState } from "react";
-  import { orderApi } from "../../../../environments/Api";
-  
-  export default function PaymentForm({
-    setIsLoading,
+import { useState, useEffect } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+
+import PaymentForm from "../PaymentForm";
+import { checkoutApi } from "../../../../environments/Api";
+
+const PUBLIC_KEY = "pk_test_51KctAyIg5oaI7BMzEzTNnU7xnLmOYawYBDbGziHVJJhlyGZ1Y86QvYSh0zy5MfmBCyOOnQAdvXIq0K4fqQMr0QMQ00LwoM8VzL"
+
+const stripePromise = loadStripe(PUBLIC_KEY)
+
+export default function ManagePayment({ cart, isDelivery }) {
+  const [clientSecret, setClientSecret] = useState(null);
+
+  let lineItems = cart.map((item) => {
+    const { model, ...lineItem } = item;
+    return {...lineItem, subTotal: model.listPrice * item.qty};
+  });
+  console.log(lineItems);
+  useEffect(() => {
+    lineItems.length > 0 &&
+    checkoutApi
+      .createPaymentIntent(lineItems, isDelivery)
+      .then((response) => setClientSecret(response.data))
+      .catch((err) => console.log(err))
+  }, [cart, isDelivery])
+
+  const options = {
     clientSecret,
-    order,
-    amount,
-  }) {
-    const stripe = useStripe();
-    const elements = useElements();
-  
-    const [message, setMessage] = useState(null);
-    const [paymentIntentId, setPaymentIntentId] = useState("");
-  
-    useEffect(() => {
-      if (!stripe) {
-        return;
-      }
-  
-      if (!clientSecret) {
-        return;
-      }
-  
-      stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-        switch (paymentIntent.status) {
-          case "succeeded":
-            setMessage("Payment succeeded!");
-            setPaymentIntentId(paymentIntent.id);
-            break;
-          case "processing":
-            setMessage("Your payment is processing.");
-            break;
-          case "requires_payment_method":
-            setMessage("");
-            break;
-          default:
-            setMessage("Something went wrong.");
-            break;
-        }
-      });
-    }, [stripe, clientSecret]);
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      if (!stripe || !elements || !paymentIntentId) {
-        return;
-      }
-  
-      setIsLoading(true);
-      const { data } = await orderApi.createOrder({
-        ...order,
-        paid: true,
-        payments: [
-          {
-            amount: amount,
-            paymentType: "MASTERCARD",
-            ccTransactionId: clientSecret,
-          },
-        ],
-      }, paymentIntentId);
-  
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `http://localhost:3000/ss/order/${data?.id}`,
-        },
-      });
-  
-      if (error.type === "card_error" || error.type === "validation_error") {
-        setMessage(error.message);
-      } else {
-        setMessage("An unexpected error occured.");
-      }
-  
-      setIsLoading(false);
-    };
-  
-    return (
-      <form id="payment-form" onSubmit={handleSubmit}>
-        <PaymentElement id="payment-element" />
-        {/* Show any error or success messages */}
-        {message && <div id="payment-message">{message}</div>}
-        <div className="sm:mt-6 sm:flex sm:flex-row">
-          <button
-            type="submit"
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
-          >
-            Checkout
-          </button>
-        </div>
-      </form>
-    );
-  }
-  
+  };
+  return (
+    <div>
+      {clientSecret !== null ? (
+        <div>
+          <Elements options={options} stripe={stripePromise}>
+            <PaymentForm clientSecret={clientSecret}/>
+          </Elements>
+        </div>)
+        : (
+          <p className="text-center">loading</p>
+        )}
+    </div>
+  );
+}

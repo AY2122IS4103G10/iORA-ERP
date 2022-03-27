@@ -174,10 +174,10 @@ public class OnlineCustomerController {
     @Autowired
     StripeService stripeService;
 
-    @PostMapping(path = "/pay", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems) {
+    @PostMapping(path = "/pay/{isDelivery}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems, @PathVariable Boolean isDelivery) {
         try {
-            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems));
+            return ResponseEntity.ok(stripeService.createPaymentIntentOnlineOrder(lineItems, isDelivery));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());

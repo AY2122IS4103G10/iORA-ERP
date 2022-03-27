@@ -51,6 +51,28 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
+    public String createPaymentIntentOnlineOrder(List<CustomerOrderLI> lineItems, Boolean isDelivery) throws StripeException {
+        Long deliveryFee = 0L;
+        if (isDelivery) {
+            deliveryFee = 2L * 100 + 50L;
+        }
+
+        PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+                .setAmount(calculateOrderAmount(lineItems) + deliveryFee)
+                .setCurrency("sgd")
+                .addPaymentMethodType("card_present")
+                .addPaymentMethodType("card")
+                .setCaptureMethod(CaptureMethod.MANUAL)
+                .build();
+
+        // Create a PaymentIntent with the order amount and currency
+        PaymentIntent paymentIntent = PaymentIntent.create(params);
+
+        return paymentIntent.getClientSecret();
+    }
+
+
+    @Override
     public Map<String, String> createConnnectionToken() throws StripeException {
         ConnectionTokenCreateParams params = ConnectionTokenCreateParams.builder().build();
         ConnectionToken connectionToken = ConnectionToken.create(params);

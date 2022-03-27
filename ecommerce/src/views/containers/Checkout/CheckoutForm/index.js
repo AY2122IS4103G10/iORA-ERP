@@ -1,5 +1,5 @@
 import { useEffect, useState, Fragment } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { Popover, Transition } from '@headlessui/react'
 import { ChevronUpIcon } from '@heroicons/react/solid'
@@ -9,6 +9,7 @@ import { checkoutApi } from "../../../../environments/Api";
 import { countries } from "../../../../utilities/Util";
 import { RadioGroupComponent } from "../../../components/RadioGroup";
 import { SimpleComboBox } from "../../../components/ComboBoxes/SimpleComboBox";
+import ManagePayment from "../ManagePayment";
 
 const deliveryMethods = [
   { id: 1, title: 'Standard Shipping', description: '4–10 business days', footer: '$2.50' },
@@ -218,9 +219,13 @@ export const OrderSummary = ({ cart, subTotal, totalDiscount, promotions, select
 
           <div className="flex items-center justify-between border-t border-gray-200 pt-6">
             <dt className="text-base">Total</dt>
-            <dd className="text-base">${subTotal - totalDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0) }</dd>
+            <dd className="text-base">${subTotal + totalDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0) }</dd>
           </div>
         </dl>
+
+        <ManagePayment cart={cart} isDelivery={selectedDeliveryMethod.id === 1 ? true : false} />
+
+  
 
         <Popover className="fixed bottom-0 inset-x-0 flex flex-col-reverse text-sm font-medium text-gray-900 lg:hidden">
           <div className="relative z-10 bg-white border-t border-gray-200 px-4 sm:px-6">
@@ -284,12 +289,25 @@ export const OrderSummary = ({ cart, subTotal, totalDiscount, promotions, select
 }
 
 export const CheckoutForm = ({
-  cart, subTotal, totalDiscount, promotions,
-  setEmail, setFirstName, setLastName,
-  setPhoneNumber, country, setCountry,
-  address, setAddress, sameAddress, setSameAddress,
-  selectedDeliveryMethod, setSelectedDeliveryMethod,
-  store, setStore, storeList }) => {
+  cart, 
+  subTotal, 
+  totalDiscount, 
+  promotions,
+  setEmail, 
+  setFirstName, 
+  setLastName,
+  setPhoneNumber, 
+  country, 
+  setCountry,
+  address, 
+  setAddress, 
+  sameAddress, 
+  setSameAddress,
+  selectedDeliveryMethod, 
+  setSelectedDeliveryMethod,
+  store, 
+  setStore, 
+  storeList }) => {
 
 
   return (
@@ -298,7 +316,10 @@ export const CheckoutForm = ({
         Checkout
       </h1>
       <p className="text-gray-900 text-center">
-        Returning customer? Click here to login
+        Returning customer? {' '}
+        <Link to="/login" className="underline underline-offset-1">
+          Click here to login
+        </Link>
       </p>
       {/* Background color split screen for large screens */}
       <div className="hidden lg:block h-full bg-white" aria-hidden="true" />
@@ -473,7 +494,7 @@ export const Checkout = () => {
           .map((y) => y.map((x) => x.subTotal).reduce((x, y) => x + y, 0))
           .reduce((x, y) => x + y, 0)
       );
-      //discount amount
+      
       console.log(promotions);
     }
 

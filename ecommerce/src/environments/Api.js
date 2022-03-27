@@ -90,6 +90,18 @@ export const checkoutApi = {
     return axiosPublic.get(
       `${REST_ENDPOINT}online/stores/singapore`,
     )
+  }, 
+  createPaymentIntent(lineItems, deliveryFee) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}online/pay/${deliveryFee}`,
+      lineItems
+    )
+  },
+  createOnlineOrder(onlineOrder, clientSecret) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}online/create/${clientSecret}`,
+      onlineOrder
+    )
   }
 
 }

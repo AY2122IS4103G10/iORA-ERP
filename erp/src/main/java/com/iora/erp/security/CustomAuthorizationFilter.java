@@ -73,6 +73,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 && !request.getServletPath().startsWith("/online/customerOrder")
                 && !request.getServletPath().startsWith("/online/countries")
                 && !request.getServletPath().startsWith("/online/stores")
+                && !request.getServletPath().startsWith("/online/pay")
                 && !request.getServletPath().equals("/h2-console");
     }
 

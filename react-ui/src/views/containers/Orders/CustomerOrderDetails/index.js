@@ -64,7 +64,7 @@ const OrderDetailsBody = ({
   dateTime,
   delivery,
   deliveryAddress,
-  customerId,
+  customer,
   totalAmount,
   payments,
   paid,
@@ -104,9 +104,15 @@ const OrderDetailsBody = ({
 
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
-                    Customer No.
+                    Customer
                   </dt>
-                  <dd className="mt-1 text-sm text-gray-900">{customerId}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    <address className="not-italic">
+                      <span className="block">{customer.firstName} {customer.lastName}</span>
+                      <span className="block">{customer.email}</span>
+                      <span className="block">{customer.contactNumber}</span>
+                    </address>
+                  </dd>
                 </div>
 
                 <div className="sm:col-span-1">
@@ -180,7 +186,7 @@ export const CustomerOrderDetails = () => {
     subsys,
     orderId,
     dateTime,
-    customerId,
+    customer,
     delivery,
     deliveryAddress,
     totalAmount,
@@ -192,7 +198,6 @@ export const CustomerOrderDetails = () => {
     setLineItems,
     statusHistory,
   } = useOutletContext();
-  console.log(status)
   const [history, setHistory] = useState([]);
   useEffect(() => {
     fetchAllActionBy(statusHistory).then((data) => {
@@ -224,7 +229,7 @@ export const CustomerOrderDetails = () => {
   return (
     <OrderDetailsBody
       dateTime={dateTime}
-      customerId={customerId}
+      customer={customer}
       delivery={delivery}
       deliveryAddress={deliveryAddress}
       totalAmount={totalAmount}

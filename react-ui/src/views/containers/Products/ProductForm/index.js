@@ -69,6 +69,7 @@ const SKUModal = ({
                                 value={sku}
                                 onChange={onSkuChanged}
                                 required
+                                autoFocus
                               />
                             </SimpleInputGroup>
                             <SimpleInputGroup
@@ -965,7 +966,7 @@ export const ProductForm = () => {
   const closeModal = () => setOpenAddField(false);
 
   const [skus, setSkus] = useState([]);
-  const [sku, setSku] = useState(null);
+  const [sku, setSku] = useState("");
   const [skuColors, setSkuColors] = useState([]);
   const [skuColorSelected, setSkuColorSelected] = useState(null);
   const [skuSizes, setSkuSizes] = useState([]);
@@ -974,20 +975,20 @@ export const ProductForm = () => {
 
   const onSkuChanged = (e) => setSku(e.target.value);
   const openSkuModal = () => {
-    setSkuColors(
-      colors
-        .filter((color, index) => colorCheckedState[index])
-        .map((color) => ({ ...color, name: color.fieldName }))
+    const c = [],
+      s = [];
+    colors.forEach(
+      (color, index) =>
+        colorCheckedState[index] && c.push({ ...color, name: color.fieldValue })
     );
-    console.log(skuColors)
-    setSkuSizes(
-      sizes
-        .filter((_, index) => sizeCheckedState[index])
-        .map((size) => ({ ...size, name: size.fieldName }))
+    sizes.forEach(
+      (size, index) =>
+        sizeCheckedState[index] && s.push({ ...size, name: size.fieldValue })
     );
-    console.log(skuSizes)
-    setSkuColorSelected(skuColors[0]);
-    setSkuSizeSelected(skuSizes[0]);
+    setSkuColors(c);
+    setSkuSizes(s);
+    setSkuColorSelected(c[0]);
+    setSkuSizeSelected(s[0]);
     setOpenAddSku(true);
   };
   const closeSkuModal = () => setOpenAddSku(false);
@@ -1044,7 +1045,7 @@ export const ProductForm = () => {
         colors={skuColors}
         skuColorSelected={skuColorSelected}
         setSkuColorSelected={setSkuColorSelected}
-        sizes={prepareFields(sizes, sizeCheckedState)}
+        sizes={skuSizes}
         skuSizeSelected={skuSizeSelected}
         setSkuSizeSelected={setSkuSizeSelected}
         isEditing={isEditing}

@@ -165,45 +165,34 @@ const Header = ({
   );
 };
 
-export const InvoiceModal = ({
-  open,
-  closeModal,
-  company,
-  createdBy,
-  fromSite,
-  toSite,
-  handlePrint,
-  children,
-}) => {
+export const InvoiceModal = ({ open, closeModal, handlePrint, children }) => {
   return (
-    [company, createdBy, fromSite, toSite].every(Boolean) && (
-      <SimpleModal open={open} closeModal={closeModal}>
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
-          <div className="sm:block absolute top-0 right-0 pt-4 pr-4">
-            <button
-              type="button"
-              className="mr-10 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-              onClick={handlePrint}
-            >
-              <PrinterIcon
-                className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              <span>Print</span>
-            </button>
-            <button
-              type="button"
-              className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={closeModal}
-            >
-              <span className="sr-only">Close</span>
-              <XIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
-          </div>
-          {children}
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        <div className="sm:block absolute top-0 right-0 pt-4 pr-4">
+          <button
+            type="button"
+            className="mr-10 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+            onClick={handlePrint}
+          >
+            <PrinterIcon
+              className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+              aria-hidden="true"
+            />
+            <span>Print</span>
+          </button>
+          <button
+            type="button"
+            className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+            onClick={closeModal}
+          >
+            <span className="sr-only">Close</span>
+            <XIcon className="h-6 w-6" aria-hidden="true" />
+          </button>
         </div>
-      </SimpleModal>
-    )
+        {children}
+      </div>
+    </SimpleModal>
   );
 };
 

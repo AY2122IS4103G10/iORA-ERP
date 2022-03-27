@@ -220,6 +220,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Employee getEmployeeByEmail(String email) {
+        return (Employee) em.createQuery("SELECT e FROM Employee e WHERE e.email = :email")
+                .setParameter("email", email).getSingleResult();
+    }
+
+    @Override
     public Employee loginAuthentication(String username, String password) throws AuthenticationException {
         try {
             Employee c = getEmployeeByUsername(username);

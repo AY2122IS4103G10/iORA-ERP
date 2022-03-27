@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
+import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
@@ -398,6 +399,20 @@ public class StoreController {
                     .ok(customerService.getCustomerByPhone(phone));
         } catch (Exception ex) {
             ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/voucher/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> getVoucher(@PathVariable String voucherCode) {
+        try {
+            Voucher v = customerService.getVoucher(voucherCode);
+            if (v.isIssued() && !v.isRedeemed()) {
+                return ResponseEntity.ok(v);
+            } else {
+                throw new RuntimeException("Invalid voucher");
+            }
+        } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

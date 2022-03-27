@@ -404,6 +404,9 @@ export const posApi = {
   getPaymentIntent(lineItems) {
     return axiosPrivate.post(`${REST_ENDPOINT}online/pay`, lineItems);
   },
+  getVoucherByCode(voucher) {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/voucher/${voucher}`);
+  },
 };
 
 export const logisticsApi = {

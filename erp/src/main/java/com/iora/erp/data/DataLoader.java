@@ -48,7 +48,6 @@ import com.iora.erp.model.stockTransfer.StockTransferOrderLI;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
-import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
@@ -83,8 +82,6 @@ public class DataLoader implements CommandLineRunner {
 	private EntityManager em;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	@Autowired
-	private EmployeeService employeeService;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -708,11 +705,19 @@ public class DataLoader implements CommandLineRunner {
 		oo1.setSite(siteService.getSite(3L));
 		customerOrderService.createOnlineOrder(oo1, null);
 
+		OnlineOrder oo2 = new OnlineOrder(true, CountryEnum.Singapore);
+		oo2.setCustomerId(2L);
+		oo2.addLineItem(coli1);
+		oo2.addLineItem(coli2);
+		oo2.setPaid(false);
+		oo2.setSite(siteService.getSite(10L));
+		oo2.setDeliveryAddress("13 Computing Drive NUS School of Computing, COM1 Singapore 117417");
+		customerOrderService.createOnlineOrder(oo2, null);
+
 		Customer cust = customerService.getCustomerById(2L);
 		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");
 		st.addMessage(new SupportTicketMsg("Please give me free products :D",
-				cust.getFirstName() + " " + cust.getLastName()));
-		st.addMessage(new SupportTicketMsg("Go and **** yourself", employeeService.getEmployeeById(7L).getName()));
+				cust.getFirstName() + " " + cust.getLastName(), ""));
 
 		st.setCustomer(cust);
 		st.setCustomerOrder(co1);

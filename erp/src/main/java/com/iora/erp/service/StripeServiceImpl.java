@@ -55,14 +55,10 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
-    public String createPaymentIntentOnlineOrder(List<CustomerOrderLI> lineItems, Boolean isDelivery) throws StripeException {
-        Long deliveryFee = 0L;
-        if (isDelivery) {
-            deliveryFee = 2L * 100 + 50L;
-        }
+    public String createPaymentIntentOnlineOrder(Long totalAmount, Boolean isDelivery) throws StripeException {
 
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount(calculateOrderAmount(lineItems) + deliveryFee)
+                .setAmount(totalAmount)
                 .setCurrency("sgd")
                 .addPaymentMethodType("card_present")
                 .addPaymentMethodType("card")

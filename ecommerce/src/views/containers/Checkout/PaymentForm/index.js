@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { checkoutApi } from "../../../../environments/Api";
 
 
 export default function PaymentForm({ clientSecret, order }) {
@@ -8,16 +9,16 @@ export default function PaymentForm({ clientSecret, order }) {
     const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState("");
+    const [paymentIntentId, setPaymentIntentId] = useState("");
 
     useEffect(() => {
-        console.log("Reload");
-        console.log(clientSecret);
-        console.log(stripe);
+
         if (!clientSecret || !stripe) {
             return;
         }
 
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+            setPaymentIntentId(paymentIntent.id)
             switch (paymentIntent.status) {
                 case "succeeded":
                     setMessage("Payment succeeded!");
@@ -34,22 +35,25 @@ export default function PaymentForm({ clientSecret, order }) {
             }
         });
         console.log("hello");
-    }, [stripe, clientSecret, loading]);
+    }, [stripe, clientSecret]); 
+
+    console.log(paymentIntentId);
 
     const handleSubmit = async (e) => {
         console.log('submit');
         e.preventDefault();
-        setLoading(true);
 
-        if (!stripe || !elements || !clientSecret) {
+        if (!stripe || !elements || !paymentIntentId) {
             return;
         }
-
-        const  error  = await stripe.confirmPayment({
+        setLoading(true);
+       
+        //confirm payment
+        const error = await stripe.confirmPayment({
             elements,
             confirmParams: {
                 //payment completion page
-                return_url: `http://localhost:3000/checkout/order/complete`,
+                return_url: `http://localhost:3000/checkout/complete`,
             }
         })
 
@@ -59,20 +63,28 @@ export default function PaymentForm({ clientSecret, order }) {
             setMessage("An unexpected error occured.");
         }
 
-        //capture payment
-        
+        // checkoutApi.createOnlineOrder({
+        //     ...order,
+        //     payments: [
+        //         {
+        //             amount: order.totalAmount,
+        //             paymentType: "MASTERCARD",
+        //             ccTransactionId: clientSecret,
+        //         },
+        //     ]
+        // }, paymentIntentId)
+        //     .then((response) => console.log(response.data))
+        //     .catch((err) => setMessage(err))
+
 
 
         setLoading(false);
     }
 
-    console.log(message);
-
-
 
     return (
         <form id="payment-form" onSubmit={handleSubmit}>
-            <PaymentElement id="payment-element"/>
+            <PaymentElement id="payment-element" />
             {message && <div id="payment-message">{message}</div>}
             <button
                 type="submit"

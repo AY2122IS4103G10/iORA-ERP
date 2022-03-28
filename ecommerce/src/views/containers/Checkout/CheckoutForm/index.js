@@ -160,7 +160,7 @@ export const StorePickupForm = ({ store, setStore, storeList }) => {
 }
 
 
-export const OrderSummary = ({ cart, order, subTotal, totalDiscount, promotions, selectedDeliveryMethod }) => {
+export const OrderSummary = ({ cart, order, subTotal, afterDiscount, promotions, selectedDeliveryMethod }) => {
   return (
     <section
       aria-labelledby="summary-heading"
@@ -195,7 +195,7 @@ export const OrderSummary = ({ cart, order, subTotal, totalDiscount, promotions,
           {promotions.map((promo) => (
             <div className="flex items-center justify-between">
               <dt className="text-gray-600">{promo.promotion.fieldValue}</dt>
-              <dd>${promo.subTotal}</dd>
+              <dd>-${Math.abs(promo.subTotal)}</dd>
             </div>
             )
           )}
@@ -210,7 +210,7 @@ export const OrderSummary = ({ cart, order, subTotal, totalDiscount, promotions,
 
           <div className="flex items-center justify-between">
             <dt className="text-gray-600">Discounts/Promotions</dt>
-            <dd>${totalDiscount}</dd>
+            <dd>-${subTotal - afterDiscount}</dd>
           </div>
 
           <div className="flex items-center justify-between">
@@ -223,9 +223,11 @@ export const OrderSummary = ({ cart, order, subTotal, totalDiscount, promotions,
             <dd className="text-base">${order?.totalAmount}</dd>
           </div>
         </dl>
-
-        <ManagePayment cart={cart} isDelivery={selectedDeliveryMethod.id === 1 ? true : false} order={order} />  
-
+        {  
+          order?.lineItems?.length > 0 ? 
+          <ManagePayment order={order} isDelivery={selectedDeliveryMethod.id === 1 ? true : false}  />  
+          : <p className="text-center text-gray-600">No items in cart</p>
+        }
         <Popover className="fixed bottom-0 inset-x-0 flex flex-col-reverse text-sm font-medium text-gray-900 lg:hidden">
           <div className="relative z-10 bg-white border-t border-gray-200 px-4 sm:px-6">
             <div className="max-w-lg mx-auto">
@@ -291,7 +293,7 @@ export const CheckoutForm = ({
   cart, 
   order,
   subTotal, 
-  totalDiscount, 
+  afterDiscount, 
   promotions,
   setEmail, 
   setFirstName, 
@@ -332,7 +334,7 @@ export const CheckoutForm = ({
           cart={cart}
           order={order}
           subTotal={subTotal}
-          totalDiscount={totalDiscount}
+          afterDiscount={afterDiscount}
           promotions={promotions}
           selectedDeliveryMethod={selectedDeliveryMethod}
         />
@@ -430,9 +432,9 @@ export const CheckoutForm = ({
 export const Checkout = () => {
   const dispatch = useDispatch();
   const [subTotal, setSubTotal] = useState(0);
-  const [totalDiscount, setTotalDiscount] = useState(0);
+  const [afterDiscount, setAfterDiscount] = useState(0);
   const [promotions, setPromotions] = useState([]);
-  const [lineItems, setLineItems] = useState();
+  const [lineItems, setLineItems] = useState(null);
   const [order, setOrder] = useState();
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -462,16 +464,16 @@ export const Checkout = () => {
         subTotal = subTotal + item.qty * model.listPrice;
         return {...lineItem, subTotal: model.listPrice * item.qty};
       });
+      setLineItems(lineItems);
       setSubTotal(subTotal);
       
       const response = await checkoutApi.calculatePromotions(lineItems);
       setPromotions(response.data[1]);
-      setTotalDiscount(
+      setAfterDiscount(
         response.data
           .map((y) => y.map((x) => x.subTotal).reduce((x, y) => x + y, 0))
           .reduce((x, y) => x + y, 0)
       );
-      console.log(response.data);
     }
 
     calculate();
@@ -479,14 +481,20 @@ export const Checkout = () => {
   }, [])
 
   useEffect(() => {
-    let totalAmount = subTotal + totalDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0) 
+    let delivery = selectedDeliveryMethod.id === 1 ? true : false
+    let totalAmount = afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0) 
     let order = {
       lineItems,
       customerId,
-      totalAmount: totalAmount
+      totalAmount: totalAmount,
+      country: country.name,
+      delivery,
+      deliveryAddress: address,
+      pickupSite: selectedDeliveryMethod.id === 1 ? null : store,
+
     }
     setOrder(order);
-  }, [subTotal, totalDiscount, selectedDeliveryMethod, store])
+  }, [subTotal, afterDiscount, selectedDeliveryMethod, store])
 
 
   return (
@@ -495,7 +503,7 @@ export const Checkout = () => {
       order={order}
       subTotal={subTotal}
       promotions={promotions}
-      totalDiscount={totalDiscount}
+      afterDiscount={afterDiscount}
       setEmail={setEmail}
       setPhoneNumber={setPhoneNumber}
       country={country}

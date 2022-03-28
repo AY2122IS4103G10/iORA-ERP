@@ -3,6 +3,12 @@ import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 import { Combobox } from '@headlessui/react'
 import { classNames } from '../../../../utilities/Util'
 
+// Sample Data
+// const options = [
+//     { id: 1, title: 'Standard Shipping', description: '4–10 business days', footer: '$2.50' },
+//     { id: 2, title: 'Store Pickup', description: '5-7 business days', footer: 'Free' },
+//   ]
+
 export const SimpleComboBox = ({ label, options, value, onChange }) => {
     const [query, setQuery] = useState('');
 
@@ -28,9 +34,9 @@ export const SimpleComboBox = ({ label, options, value, onChange }) => {
 
                 {filteredOptions.length > 0 && (
                     <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                        {filteredOptions.map((option) => (
+                        {filteredOptions.map((option, id) => (
                             <Combobox.Option
-                                key={option.id}
+                                key={id}
                                 value={option}
                                 className={({ active }) =>
                                     classNames(

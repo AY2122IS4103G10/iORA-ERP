@@ -24,7 +24,7 @@ import {
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 
 const FieldSection = ({ fieldName, fields }) => {
-  return Boolean(fields.length) ? (
+  return (
     <div>
       <h2 className="text-sm font-medium text-gray-500">{fieldName}</h2>
       <ul className="mt-2 leading-8">
@@ -45,8 +45,6 @@ const FieldSection = ({ fieldName, fields }) => {
         ))}
       </ul>
     </div>
-  ) : (
-    <div>No {fieldName}</div>
   );
 };
 
@@ -300,10 +298,18 @@ const ProductDetailsBody = ({
                 </div>
               </div>
               <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
-                <FieldSection fieldName="Colors" fields={colors} />
-                <FieldSection fieldName="Sizes" fields={sizes} />
-                <FieldSection fieldName="Categories" fields={categories} />
-                <FieldSection fieldName="Tags" fields={tags} />
+                {Boolean(colors.length) && (
+                  <FieldSection fieldName="Colors" fields={colors} />
+                )}
+                {Boolean(sizes.length) && (
+                  <FieldSection fieldName="Sizes" fields={sizes} />
+                )}
+                {Boolean(categories.length) && (
+                  <FieldSection fieldName="Categories" fields={categories} />
+                )}
+                {Boolean(tags.length) && (
+                  <FieldSection fieldName="Tags" fields={tags} />
+                )}
               </div>
             </aside>
             <div className="py-3 xl:pt-6 xl:pb-0">
@@ -361,10 +367,18 @@ const ProductDetailsBody = ({
             </div>
           </div>
           <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
-            <FieldSection fieldName="Colors" fields={colors} />
-            <FieldSection fieldName="Sizes" fields={sizes} />
-            <FieldSection fieldName="Categories" fields={categories} />
-            <FieldSection fieldName="Tags" fields={tags} />
+            {Boolean(colors.length) && (
+              <FieldSection fieldName="Colors" fields={colors} />
+            )}
+            {Boolean(sizes.length) && (
+              <FieldSection fieldName="Sizes" fields={sizes} />
+            )}
+            {Boolean(categories.length) && (
+              <FieldSection fieldName="Categories" fields={categories} />
+            )}
+            {Boolean(tags.length) && (
+              <FieldSection fieldName="Tags" fields={tags} />
+            )}
           </div>
         </aside>
       </div>

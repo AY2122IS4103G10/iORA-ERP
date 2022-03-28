@@ -774,13 +774,13 @@ export const ProductForm = () => {
 
   const onSaveClicked = (evt) => {
     evt.preventDefault();
-    const fields = [];
-    fields.concat(prepareFields(colors, colorCheckedState));
-    fields.concat(prepareFields(sizes, sizeCheckedState));
-    fields.concat(prepareFields(tags, tagCheckedState));
-    fields.concat(prepareFields(categories, catCheckedState));
-    fields.concat(prepareFields(promotions, promoCheckedState));
-
+    var fields = [];
+    fields = fields.concat(prepareFields(colors, colorCheckedState));
+    fields = fields.concat(prepareFields(sizes, sizeCheckedState));
+    fields = fields.concat(prepareFields(tags, tagCheckedState));
+    fields = fields.concat(prepareFields(categories, catCheckedState));
+    fields = fields.concat(prepareFields(promotions, promoCheckedState));
+    
     if (canAdd) {
       if (!isEditing) {
         dispatch(

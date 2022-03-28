@@ -92,7 +92,7 @@ public class StoreController {
     }
 
     @GetMapping(path = "/viewStock/sites/{siteId}/{skuCode}", produces = "application/json")
-    public StockLevelLI viewStock(@PathVariable Long siteId, @PathVariable String skuCode) {
+    public StockLevelLI viewStockByProductAndSite(@PathVariable Long siteId, @PathVariable String skuCode) {
         try {
             return siteService.getStockLevelLI(siteId, skuCode);
         } catch (Exception e) {

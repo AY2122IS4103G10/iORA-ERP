@@ -4,8 +4,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
+import com.iora.erp.model.site.Site;
+import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
+import com.iora.erp.enumeration.CountryEnum;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -169,11 +174,10 @@ public class OnlineCustomerController {
     @Autowired
     StripeService stripeService;
 
-    @PostMapping(path = "/pay", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createPaymentIntent(@RequestParam(required = false) Long amt,
-            @RequestBody List<CustomerOrderLI> lineItems) {
+    @PostMapping(path = "/pay/{isDelivery}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems, @PathVariable Boolean isDelivery) {
         try {
-            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems, (amt == null) ? 0L : amt * 100));
+            return ResponseEntity.ok(stripeService.createPaymentIntentOnlineOrder(lineItems, isDelivery));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -321,10 +325,21 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/viewStock/{skuCode}", produces = "application/json")
-    public StockLevelLI viewStock(@PathVariable String skuCode) {
+    @GetMapping(path = "/viewStock/product/{skuCode}", produces = "application/json")
+    public ResponseEntity<Object> viewStockByProduct(@PathVariable String skuCode) {
         try {
-            return siteService.getStockLevelLI(3L, skuCode);
+            return ResponseEntity.ok(siteService.getStockLevelLI(3L, skuCode));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/viewStock", produces = "application/json")
+    public StockLevel viewStockOfOnlineSite() {
+        try {
+            Site site = siteService.getSite(3L);
+            return site.getStockLevel();
         } catch (Exception e) {
             return null;
         }
@@ -338,5 +353,22 @@ public class OnlineCustomerController {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    // @GetMapping(path = "/countries", produces = "application/json")
+    // public List<String> getCountries() {
+    //     try {
+    //         List<String> country = Stream.of(CountryEnum.values()).map(
+    //                 CountryEnum::name).collect(Collectors.toList());
+
+    //         return country;
+    //     } catch (Exception e) {
+    //         return null;
+    //     }
+    // }
+
+    @GetMapping(path = "/stores/{country}", produces = "application/json")
+    public List<? extends Site> viewStores(@PathVariable String country) {
+        return siteService.searchStores(country, "");
     }
 }

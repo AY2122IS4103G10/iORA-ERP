@@ -197,7 +197,7 @@ export default function ViewModel() {
     //fetch the stock availability
     useEffect(() => {
         console.log(model);
-        if (model !== null || model !== undefined) {
+        if (model !== null && model !== undefined) {
             const product = findProduct(model, selectedColor, selectedSize);
             if (product !== undefined) {
                 dispatch(fetchProductStock(product?.sku));
@@ -295,6 +295,7 @@ export default function ViewModel() {
                                     type="submit"
                                     className="mt-8 w-full bg-gray-800 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                     onClick={onAddCartClicked}
+                                    disabled={productStock === null || productStock?.qty === 0 ? true : false}
                                 >
                                     Add to cart
                                 </button>

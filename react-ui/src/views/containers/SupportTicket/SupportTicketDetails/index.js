@@ -1,7 +1,7 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { ExclamationIcon, PaperClipIcon } from '@heroicons/react/outline';
+import { ExclamationIcon, PaperClipIcon, XIcon } from '@heroicons/react/outline';
 import moment from "moment";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
@@ -37,7 +37,7 @@ const Header = ({
     );
 };
 
-const SupportTicketBody = ({ messages, customer, order, status, input, onInputChanged, onReplyClicked }) => {
+const SupportTicketBody = ({ messages, customer, order }) => {
     return (
         <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
             <div className="space-y-3 lg:col-start-1 lg:col-span-2">
@@ -155,16 +155,13 @@ const SupportTicketBody = ({ messages, customer, order, status, input, onInputCh
                             {messages.map((msg, index) => (
                                 <li key={index} className="px-6 py-4">
                                     <p className="font-bold text-lg align-top mb-5">{msg.name}</p>
+                                    {Boolean(msg.imageUrl) && <img src={msg.imageUrl} width="500"/>}
                                     <p className="text-m align-bottom mb-5">{msg.message}</p>
                                     <p className="text-xs italic align-bottom mb-5">{moment.unix(msg.timeStamp / 1000).format("H:mm:ss, DD/MM/YYYY")}</p>
                                 </li>
                             ))}
                         </ul>
-                        {status === "PENDING" &&
-                            <InputArea
-                                input={input}
-                                onInputChanged={onInputChanged}
-                                onReplyClicked={onReplyClicked} />}
+
                     </div>
                 </div>
             </div>
@@ -173,44 +170,69 @@ const SupportTicketBody = ({ messages, customer, order, status, input, onInputCh
     )
 }
 
-const InputArea = ({ input, onInputChanged, onReplyClicked }) => {
+const InputArea = ({ input, onInputChanged, onReplyClicked, file, setFile }) => {
+    const fileRef = useRef();
+
+    const handleChange = (e) => {
+        setFile(e.target.files[0]);
+    };
+
     return (
-        <form className="relative px-4">
-            <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500">
-                <label htmlFor="input" className="sr-only">
-                    Input
-                </label>
-                <textarea
-                    rows={2}
-                    name="input"
-                    id="input"
-                    className="block w-full border-0 py-0 resize-none placeholder-gray-500 mt-1 focus:ring-0 sm:text-sm"
-                    placeholder="Write a message..."
-                    value={input}
-                    onChange={onInputChanged}
-                />
-            </div>
-            <div className="border-t border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
-                <div className="flex">
-                    <button
-                        type="button"
-                        className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
-                    >
-                        <PaperClipIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
-                        <span className="text-sm text-gray-500 group-hover:text-gray-600 italic">Attach a file</span>
-                    </button>
+        <div className="border-gray-200 px-4 py-1 mt-5 sm:px-6">
+            <form className="relative px-4">
+                <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500">
+                    <label htmlFor="input" className="sr-only">
+                        Input
+                    </label>
+                    <textarea
+                        rows={2}
+                        name="input"
+                        id="input"
+                        className="block w-full border-0 py-0 resize-none placeholder-gray-500 mt-1 focus:ring-0 sm:text-sm"
+                        placeholder="Write a message..."
+                        value={input}
+                        onChange={onInputChanged}
+                    />
                 </div>
-                <div className="flex-shrink-0">
-                    <button
-                        type="submit"
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                        onClick={onReplyClicked}
-                    >
-                        Reply
-                    </button>
+                <div className="border-t border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
+                    <div className="flex">
+                        <input ref={fileRef}
+                            onChange={handleChange}
+                            multiple={false}
+                            type="file"
+                            accept="image/*"
+                            hidden />
+                        <button
+                            type="button"
+                            className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
+                            onClick={() => fileRef.current.click()}
+                        >
+                            <PaperClipIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
+                            <span className="text-sm text-gray-500 group-hover:text-gray-600 italic">
+                                {Boolean(file.name) ? file.name : "Attach a file"}
+                            </span>
+                        </button>
+                        {Boolean(file.name) &&
+                            <button
+                                type="button"
+                                className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
+                                onClick={() => setFile([])}
+                            >
+                                <XIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
+                            </button>}
+                    </div>
+                    <div className="flex-shrink-0">
+                        <button
+                            type="submit"
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                            onClick={onReplyClicked}
+                        >
+                            Reply
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     )
 }
 
@@ -296,6 +318,7 @@ export const SupportTicketDetails = () => {
 
     const [open, setOpen] = useState(false);
     const [input, setInput] = useState("");
+    const [file, setFile] = useState({});
 
     useEffect(() => {
         ticketStatus === "idle" && dispatch(fetchSupportTickets());
@@ -320,25 +343,42 @@ export const SupportTicketDetails = () => {
     }
 
     const onInputChanged = (e) => setInput(e.target.value);
-
+    const [url, setUrl] = useState("");
     const onReplyClicked = (evt) => {
         evt.preventDefault();
         if (Boolean(input)) {
+            const image = new FormData();
+            image.append('image', file)
+
             const name = JSON.parse(localStorage.getItem("user")).name
+
+            Boolean(file.name) && fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
+                {
+                    method: 'POST',
+                    body: image,
+                }
+            ).then((response) => response.json())
+                .then((data) => { setUrl(data.data.url) });
+
             dispatch(replySupportTicket(
                 {
                     ticketId,
                     name,
-                    input
+                    body: { input, url }
                 }
             ))
                 .unwrap()
+                .then(() => {
+                    setFile([]);
+                    setInput("");
+                    setUrl("");
+                })
                 .then(() => {
                     addToast("Successfully replied to ticket", {
                         appearance: "success",
                         autoDismiss: true,
                     });
-                    navigate(`/sm/support/${ticketId}`);
+
                 })
                 .catch((err) => {
                     addToast(`Error: ${err.message}`, {
@@ -361,10 +401,14 @@ export const SupportTicketDetails = () => {
                     messages={ticket.messages}
                     customer={ticket.customer}
                     order={ticket.customerOrder}
-                    status={ticket.status}
-                    input={input}
-                    onInputChanged={onInputChanged}
-                    onReplyClicked={onReplyClicked} />
+                    status={ticket.status} />
+                {ticket.status === "PENDING" &&
+                    <InputArea
+                        input={input}
+                        onInputChanged={onInputChanged}
+                        onReplyClicked={onReplyClicked}
+                        file={file}
+                        setFile={setFile} />}
                 <ResolveModal
                     open={open}
                     setOpen={setOpen}

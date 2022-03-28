@@ -99,10 +99,6 @@ export const ProcurementList = ({ subsys }) => {
           </div>
         ) : Boolean(data.length) ? (
           <ProcurementTable data={data} handleOnClick={handleOnClick} />
-        ) : subsys === "sm" ? (
-          <Link to="/sm/procurements/create">
-            <DashedBorderES item="procurement order" />
-          </Link>
         ) : (
           <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
             <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-400" />

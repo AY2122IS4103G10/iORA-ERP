@@ -30,6 +30,7 @@ import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.DeliveryAddress;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
@@ -523,7 +524,7 @@ public class DataLoader implements CommandLineRunner {
 			List<String> colours = (ArrayList<String>) json.get(3);
 			List<String> sizes = (ArrayList<String>) json.get(4);
 			List<String> tags = (ArrayList<String>) json.get(5);
-			String company = (String) json.get(6);			
+			String company = (String) json.get(6);
 			List<String> categories = (ArrayList<String>) json.get(7);
 			List<String> imageLinks = (ArrayList<String>) json.get(10);
 
@@ -577,7 +578,7 @@ public class DataLoader implements CommandLineRunner {
 		List<Product> products = productService.searchProductsBySKU(null);
 		for (Product p : products) {
 			Random r = new Random();
-			int stockLevel = r.nextInt(7) + 3; 
+			int stockLevel = r.nextInt(7) + 3;
 			siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), stockLevel);
 		}
 
@@ -707,8 +708,11 @@ public class DataLoader implements CommandLineRunner {
 		oo2.addLineItem(coli2);
 		oo2.setPaid(false);
 		oo2.setSite(siteService.getSite(10L));
-		oo2.setDeliveryAddress("13 Computing Drive NUS School of Computing, COM1 Singapore 117417");
 		customerOrderService.createOnlineOrder(oo2, null);
+		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
+				"189554", "", "60981335");
+		em.persist(oo2);
+		oo2.setDeliveryAddress(da);
 
 		Customer cust = customerService.getCustomerById(2L);
 		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");

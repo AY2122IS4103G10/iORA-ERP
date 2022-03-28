@@ -668,11 +668,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 onlineOrder.addStatusHistory(
                         new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_COLLECTION));
             } else {
+
                 onlineOrder.addStatusHistory(
                         new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_DELIVERY));
             }
         }
-
         return updateOnlineOrder(onlineOrder);
     }
 

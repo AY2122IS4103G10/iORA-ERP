@@ -2,10 +2,14 @@ package com.iora.erp.controller;
 
 import java.util.List;
 
+import com.easypost.exception.EasyPostException;
+import com.easypost.model.ShipmentCollection;
+import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
+import com.iora.erp.service.EasyPostService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.SiteService;
 
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +33,8 @@ public class WarehouseController {
     private SiteService siteService;
     @Autowired
     private ProcurementService procurementService;
+    @Autowired
+    private EasyPostService easyPostService;
 
     /*
      * ---------------------------------------------------------
@@ -109,5 +116,36 @@ public class WarehouseController {
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    // Online Delivery
+
+    @PostMapping(path = "/onlineDelivery/create/{orderId}/{siteId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
+            @RequestBody Delivery deliveryParcel) {
+        try {
+            return ResponseEntity.ok(easyPostService.createParcel(orderId, siteId, deliveryParcel));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/onlineDelivery/createBatch/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> createBatchOnlineOrderDelivery(@PathVariable Long siteId) {
+        try {
+            return ResponseEntity.ok(easyPostService.createBatchDelivery(siteId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/onlineDelivery/retreiveShipments", produces = "application/json")
+    public ShipmentCollection retreiveShipment() {
+        try {
+            return easyPostService.retreiveListOfShipments();
+        } catch (EasyPostException e) {
+            return null;
+        }
+
     }
 }

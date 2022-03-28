@@ -9,7 +9,7 @@ const PUBLIC_KEY = "pk_test_51KctAyIg5oaI7BMzEzTNnU7xnLmOYawYBDbGziHVJJhlyGZ1Y86
 
 const stripePromise = loadStripe(PUBLIC_KEY)
 
-export default function ManagePayment({ cart, isDelivery }) {
+export default function ManagePayment({ cart, isDelivery, order }) {
   const [clientSecret, setClientSecret] = useState(null);
 
   let lineItems = cart.map((item) => {
@@ -33,7 +33,7 @@ export default function ManagePayment({ cart, isDelivery }) {
       {clientSecret !== null ? (
         <div>
           <Elements options={options} stripe={stripePromise}>
-            <PaymentForm clientSecret={clientSecret}/>
+            <PaymentForm clientSecret={clientSecret} order={order}/>
           </Elements>
         </div>)
         : (

@@ -10,6 +10,7 @@ import { countries } from "../../../../utilities/Util";
 import { RadioGroupComponent } from "../../../components/RadioGroup";
 import { SimpleComboBox } from "../../../components/ComboBoxes/SimpleComboBox";
 import ManagePayment from "../ManagePayment";
+import { selectUserId } from "../../../../stores/slices/userSlice";
 
 const deliveryMethods = [
   { id: 1, title: 'Standard Shipping', description: '4–10 business days', footer: '$2.50' },
@@ -159,7 +160,7 @@ export const StorePickupForm = ({ store, setStore, storeList }) => {
 }
 
 
-export const OrderSummary = ({ cart, subTotal, totalDiscount, promotions, selectedDeliveryMethod }) => {
+export const OrderSummary = ({ cart, order, subTotal, totalDiscount, promotions, selectedDeliveryMethod }) => {
   return (
     <section
       aria-labelledby="summary-heading"
@@ -187,7 +188,7 @@ export const OrderSummary = ({ cart, subTotal, totalDiscount, promotions, select
           ))}
         </ul>
 
-        <dl className="hidden text-sm font-medium text-gray-900 space-y-6 border-t border-gray-200 py-6 lg:block">
+        <dl className="text-sm font-medium text-gray-900 space-y-6 border-t border-gray-200 py-6 lg:block">
           <p>
             Discounts/Promotions
           </p>
@@ -200,7 +201,7 @@ export const OrderSummary = ({ cart, subTotal, totalDiscount, promotions, select
           )}
         </dl>
 
-        <dl className="hidden text-sm font-medium text-gray-900 space-y-6 border-t border-gray-200 pt-6 lg:block">
+        <dl className="text-sm font-medium text-gray-900 space-y-6 border-t border-gray-200 pt-6 lg:block">
           <div className="flex items-center justify-between">
             <dt className="text-gray-600">Subtotal</dt>
             <dd>${subTotal}</dd>
@@ -219,13 +220,11 @@ export const OrderSummary = ({ cart, subTotal, totalDiscount, promotions, select
 
           <div className="flex items-center justify-between border-t border-gray-200 pt-6">
             <dt className="text-base">Total</dt>
-            <dd className="text-base">${subTotal + totalDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0) }</dd>
+            <dd className="text-base">${order?.totalAmount}</dd>
           </div>
         </dl>
 
-        <ManagePayment cart={cart} isDelivery={selectedDeliveryMethod.id === 1 ? true : false} />
-
-  
+        <ManagePayment cart={cart} isDelivery={selectedDeliveryMethod.id === 1 ? true : false} order={order} />  
 
         <Popover className="fixed bottom-0 inset-x-0 flex flex-col-reverse text-sm font-medium text-gray-900 lg:hidden">
           <div className="relative z-10 bg-white border-t border-gray-200 px-4 sm:px-6">
@@ -290,6 +289,7 @@ export const OrderSummary = ({ cart, subTotal, totalDiscount, promotions, select
 
 export const CheckoutForm = ({
   cart, 
+  order,
   subTotal, 
   totalDiscount, 
   promotions,
@@ -330,6 +330,7 @@ export const CheckoutForm = ({
 
         <OrderSummary
           cart={cart}
+          order={order}
           subTotal={subTotal}
           totalDiscount={totalDiscount}
           promotions={promotions}
@@ -357,32 +358,7 @@ export const CheckoutForm = ({
                   />
                 </div>
               </div>
-              <div className="mt-6">
-                <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
-                  First Name
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="first-name"
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-              <div className="mt-6">
-                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
-                  Last Name
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="last-name"
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
-                  />
-                </div>
-              </div>
+            
               <div className="mt-6">
                 <label htmlFor="contact-number" className="block text-sm font-medium text-gray-700">
                   Contact Number
@@ -453,13 +429,12 @@ export const CheckoutForm = ({
 
 export const Checkout = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [subTotal, setSubTotal] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [promotions, setPromotions] = useState([]);
+  const [lineItems, setLineItems] = useState();
+  const [order, setOrder] = useState();
   const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [country, setCountry] = useState({ name: countries[197] });
   const [address, setAddress] = useState("");
@@ -472,6 +447,7 @@ export const Checkout = () => {
   const [storeList, setStoreList] = useState();
 
   const cart = useSelector(selectCart);
+  const customerId = useSelector(selectUserId);
 
   useEffect(() => {
     checkoutApi.getStores()
@@ -484,9 +460,10 @@ export const Checkout = () => {
       let lineItems = cart.map((item) => {
         const { model, ...lineItem } = item;
         subTotal = subTotal + item.qty * model.listPrice;
-        return lineItem;
+        return {...lineItem, subTotal: model.listPrice * item.qty};
       });
       setSubTotal(subTotal);
+      
       const response = await checkoutApi.calculatePromotions(lineItems);
       setPromotions(response.data[1]);
       setTotalDiscount(
@@ -494,24 +471,32 @@ export const Checkout = () => {
           .map((y) => y.map((x) => x.subTotal).reduce((x, y) => x + y, 0))
           .reduce((x, y) => x + y, 0)
       );
-      
-      console.log(promotions);
+      console.log(response.data);
     }
 
     calculate();
 
   }, [])
 
+  useEffect(() => {
+    let totalAmount = subTotal + totalDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0) 
+    let order = {
+      lineItems,
+      customerId,
+      totalAmount: totalAmount
+    }
+    setOrder(order);
+  }, [subTotal, totalDiscount, selectedDeliveryMethod, store])
+
 
   return (
     <CheckoutForm
       cart={cart}
+      order={order}
       subTotal={subTotal}
       promotions={promotions}
       totalDiscount={totalDiscount}
       setEmail={setEmail}
-      setFirstName={setFirstName}
-      setLastName={setLastName}
       setPhoneNumber={setPhoneNumber}
       country={country}
       setCountry={setCountry}

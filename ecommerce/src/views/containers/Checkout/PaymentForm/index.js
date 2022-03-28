@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 
 
-export default function PaymentForm({ clientSecret }) {
+export default function PaymentForm({ clientSecret, order }) {
     const stripe = useStripe();
     const elements = useElements();
     const [success, setSuccess] = useState(false);
@@ -58,6 +58,10 @@ export default function PaymentForm({ clientSecret }) {
         } else {
             setMessage("An unexpected error occured.");
         }
+
+        //capture payment
+        
+
 
         setLoading(false);
     }

@@ -1,6 +1,8 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,16 +10,22 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import com.easypost.EasyPost;
 import com.easypost.exception.EasyPostException;
 import com.easypost.model.Address;
+import com.easypost.model.Batch;
 import com.easypost.model.CustomsInfo;
 import com.easypost.model.Parcel;
+import com.easypost.model.ScanForm;
 import com.easypost.model.Shipment;
+import com.easypost.model.ShipmentCollection;
+import com.easypost.model.Webhook;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.site.Site;
@@ -33,6 +41,12 @@ public class EasyPostServiceImpl implements EasyPostService {
 
     @Value("${EASYPOST_SECRET_KEY}")
     private String secretKey;
+
+    @Value("${WEBHOOKS_ID}")
+    private String webhookID;
+
+    @Value("${WEBHOOKS_URL}")
+    private String url;
 
     @PostConstruct
     public void init() {
@@ -52,9 +66,12 @@ public class EasyPostServiceImpl implements EasyPostService {
     private EntityManager em;
 
     @Override
-    public OnlineOrder createParcel(Long orderId, Long siteId, Delivery parcelInfo) throws CustomerOrderException {
+    public OnlineOrder createParcel(Long orderId, Long siteId, Delivery parcelInfo)
+            throws CustomerOrderException, CustomerException {
         OnlineOrder onlineOrder = (OnlineOrder) customerOrderService.getCustomerOrder(orderId);
         em.persist(parcelInfo);
+
+        Customer cust = customerService.getCustomerById(onlineOrder.getCustomerId());
 
         Site site = siteService.getSite(siteId);
 
@@ -67,10 +84,11 @@ public class EasyPostServiceImpl implements EasyPostService {
             fromAddressMap.put("country", site.getAddress().getCountry());
             fromAddressMap.put("zip", site.getAddress().getPostalCode());
             fromAddressMap.put("phone", site.getPhoneNumber());
+            fromAddressMap.put("company", site.getCompany().getName());
             Address fromAddress = Address.create(fromAddressMap);
 
             Map<String, Object> toAddressMap = new HashMap<String, Object>();
-            toAddressMap.put("name", onlineOrder.getDeliveryAddress().getName());
+            toAddressMap.put("name", cust.getFirstName() + " " + cust.getLastName());
             toAddressMap.put("street1", onlineOrder.getDeliveryAddress().getStreet1());
             toAddressMap.put("street2", onlineOrder.getDeliveryAddress().getStreet2());
             toAddressMap.put("city", onlineOrder.getDeliveryAddress().getState());
@@ -78,6 +96,7 @@ public class EasyPostServiceImpl implements EasyPostService {
             toAddressMap.put("zip", onlineOrder.getDeliveryAddress().getZip());
             toAddressMap.put("phone", onlineOrder.getDeliveryAddress().getPhone());
             toAddressMap.put("country", onlineOrder.getCountry());
+            toAddressMap.put("email", cust.getEmail());
             Address toAddress = Address.create(toAddressMap);
 
             Map<String, Object> parcelMap = new HashMap<String, Object>();
@@ -97,11 +116,19 @@ public class EasyPostServiceImpl implements EasyPostService {
 
             Shipment shipment = Shipment.create(shipmentMap);
             parcelInfo.setShipmentID(shipment.getId());
+            parcelInfo.setSiteId(siteId);
+            parcelInfo.setDateTime(shipment.getCreatedAt());
             onlineOrder.getParcelDelivery().add(parcelInfo);
+
+            Map<String, Object> buyMap = new HashMap<String, Object>();
+            buyMap.put("rate", shipment.lowestRate());
+            buyMap.put("insurance", 249.99);
+
+            shipment.buy(buyMap);
 
             /*
              * List<String> buyCarriers = new ArrayList<String>();
-             * buyCarriers.add("DHL");
+             * buyCarriers.add("USPS");
              * List<String> buyServices = new ArrayList<String>();
              * buyServices.add("First");
              * shipment.buy(shipment.lowestRate(buyCarriers, buyServices));
@@ -111,6 +138,60 @@ public class EasyPostServiceImpl implements EasyPostService {
             throw new CustomerOrderException("Fail to create delivery: " + e);
         }
         return onlineOrder;
+    }
+
+    @Override
+    public Batch createBatchDelivery(Long siteId) throws EasyPostException {
+        Calendar calendar = Calendar.getInstance();
+        // delivery goods before 2pm
+        calendar.set(Calendar.HOUR_OF_DAY, 14);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date today = calendar.getTime();
+        calendar.set(Calendar.DATE, -1);
+        Date previous = calendar.getTime();
+        System.out.println(previous);
+
+        List<Map<String, Object>> shipmentsList = new ArrayList<Map<String, Object>>();
+
+        List<Delivery> pdList = onlineParcelAvailDeliveryBySite(siteId, previous);
+        List<Shipment> sList = new ArrayList<Shipment>();
+
+        for (Delivery x : pdList) {
+            Map<String, Object> shipment1 = new HashMap<String, Object>();
+            shipment1.put("id", x.getShipmentID());
+            shipmentsList.add(shipment1);
+            sList.add(Shipment.retrieve(x.getShipmentID()));
+        }
+
+        Map<String, Object> batchMap = new HashMap<String, Object>();
+        batchMap.put("shipment", shipmentsList);
+        Batch batch = Batch.create(batchMap);
+
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("shipments", sList);
+        ScanForm scanForm = ScanForm.create(paramMap);
+
+        return batch;
+
+    }
+
+    @Override
+    public List<Delivery> onlineParcelAvailDeliveryBySite(Long siteId, Date dayBefore) {
+        Query q = em.createQuery("SELECT o FROM Delivery o WHERE o.dateTime >= :dayBefore AND o.siteId = :siteId");
+        q.setParameter("dayBefore", dayBefore);
+        q.setParameter("siteId", siteId);
+        return q.getResultList();
+    }
+
+    @Override
+    public ShipmentCollection retreiveListOfShipments() throws EasyPostException {
+        Map<String, Object> list_params = new HashMap<>();
+        list_params.put("page_size", 20);
+        list_params.put("start_datetime", "2022-03-026T08:50:00Z");
+
+        ShipmentCollection shipments = Shipment.all(list_params);
+        return shipments;
     }
 
 }

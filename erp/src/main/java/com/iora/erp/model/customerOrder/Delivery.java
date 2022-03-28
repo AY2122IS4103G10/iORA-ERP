@@ -1,5 +1,7 @@
 package com.iora.erp.model.customerOrder;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -18,6 +20,8 @@ public class Delivery {
     private String parcelID;
     private String shipmentID;
     private Integer quantity;
+    private Date dateTime;
+    private Long siteId;
 
     @Enumerated(EnumType.STRING)
     private ParcelSize ps;
@@ -68,6 +72,22 @@ public class Delivery {
 
     public void setShipmentID(String shipmentID) {
         this.shipmentID = shipmentID;
+    }
+
+    public Date getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(Date dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public Long getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(Long siteId) {
+        this.siteId = siteId;
     }
 
 }

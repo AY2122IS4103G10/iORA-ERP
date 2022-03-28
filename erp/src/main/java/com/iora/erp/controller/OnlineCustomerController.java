@@ -53,8 +53,6 @@ public class OnlineCustomerController {
     private ProductService productService;
     @Autowired
     private SiteService siteService;
-    @Autowired
-    private EasyPostService easyPostService;
 
     /*
      * ---------------------------------------------------------
@@ -189,16 +187,6 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(
                     customerOrderService.createOnlineOrder(onlineOrder, (clientSecret == "") ? null : clientSecret));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PostMapping(path = "/createDelivery/{orderId}/{siteId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
-            @RequestBody Delivery deliveryParcel) {
-        try {
-            return ResponseEntity.ok(easyPostService.createParcel(orderId, siteId, deliveryParcel));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

@@ -700,6 +700,9 @@ public class DataLoader implements CommandLineRunner {
 		oo1.setPaid(true);
 		oo1.addPayment(payment2);
 		oo1.setSite(siteService.getSite(4L));
+		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
+				"189554", "", "60981335");
+		oo1.setDeliveryAddress(da);
 		customerOrderService.createOnlineOrder(oo1, null);
 
 		OnlineOrder oo2 = new OnlineOrder(true, CountryEnum.Singapore);
@@ -708,11 +711,11 @@ public class DataLoader implements CommandLineRunner {
 		oo2.addLineItem(coli2);
 		oo2.setPaid(false);
 		oo2.setSite(siteService.getSite(10L));
+		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
+				"Singapore",
+				"117417", "", "65162727");
+		oo2.setDeliveryAddress(da1);
 		customerOrderService.createOnlineOrder(oo2, null);
-		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
-				"189554", "", "60981335");
-		em.persist(oo2);
-		oo2.setDeliveryAddress(da);
 
 		Customer cust = customerService.getCustomerById(2L);
 		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");

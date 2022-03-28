@@ -3,6 +3,7 @@ package com.iora.erp.model.customerOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -33,7 +34,7 @@ public class OnlineOrder extends CustomerOrder {
     @Enumerated(EnumType.STRING)
     private CountryEnum country;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private DeliveryAddress deliveryAddress;
 
     @OneToMany

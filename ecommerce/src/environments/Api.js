@@ -88,7 +88,7 @@ export const checkoutApi = {
   },
   getStores() {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/stores/singapore`,
+      `${REST_ENDPOINT}online/public/stores/singapore`,
     )
   }, 
   createPaymentIntent(totalAmount, isDelivery) {

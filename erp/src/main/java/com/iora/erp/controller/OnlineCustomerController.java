@@ -364,18 +364,6 @@ public class OnlineCustomerController {
         }
     }
 
-    // @GetMapping(path = "/countries", produces = "application/json")
-    // public List<String> getCountries() {
-    // try {
-    // List<String> country = Stream.of(CountryEnum.values()).map(
-    // CountryEnum::name).collect(Collectors.toList());
-
-    // return country;
-    // } catch (Exception e) {
-    // return null;
-    // }
-    // }
-
     @GetMapping(path = "/public/stores/{country}", produces = "application/json")
     public List<? extends Site> viewStores(@PathVariable String country) {
         return siteService.searchStores(country, "");

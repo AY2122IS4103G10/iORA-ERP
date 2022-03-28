@@ -17,8 +17,15 @@ export default function PaymentForm({ clientSecret, order }) {
             return;
         }
 
+        getPaymentStatus();
+
+    }, [stripe, clientSecret, loading]);
+    
+    const getPaymentStatus = () => {
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-            setPaymentIntentId(paymentIntent.id)
+            setPaymentIntentId(paymentIntent.id);
+            console.log("STATUS:", paymentIntent.status);
+            console.log("Client Secret:", clientSecret)
             switch (paymentIntent.status) {
                 case "succeeded":
                     setMessage("Payment succeeded!");
@@ -29,56 +36,54 @@ export default function PaymentForm({ clientSecret, order }) {
                 case "requires_payment_method":
                     setMessage("Your payment was not successful, please try again.");
                     break;
+                case "requires_capture":
+                    console.log("yesss")
+                    createOnlineOrder();
                 default:
                     setMessage("Something went wrong.");
                     break;
             }
         });
-        console.log("hello");
-    }, [stripe, clientSecret]); 
+    }
 
-    console.log(paymentIntentId);
 
     const handleSubmit = async (e) => {
         console.log('submit');
         e.preventDefault();
 
         if (!stripe || !elements || !paymentIntentId) {
-            return;
+            return; 
         }
         setLoading(true);
-       
+
         //confirm payment
         const error = await stripe.confirmPayment({
             elements,
-            confirmParams: {
-                //payment completion page
-                return_url: `http://localhost:3000/checkout/complete`,
-            }
+            redirect: "if_required"
         })
-
+        console.log(error);
         if (error.type === "card_error" || error.type === "validation_error") {
             setMessage(error.message);
         } else {
             setMessage("An unexpected error occured.");
         }
-
-        // checkoutApi.createOnlineOrder({
-        //     ...order,
-        //     payments: [
-        //         {
-        //             amount: order.totalAmount,
-        //             paymentType: "MASTERCARD",
-        //             ccTransactionId: clientSecret,
-        //         },
-        //     ]
-        // }, paymentIntentId)
-        //     .then((response) => console.log(response.data))
-        //     .catch((err) => setMessage(err))
-
-
-
+        
         setLoading(false);
+    }
+
+    const createOnlineOrder = () => {
+        checkoutApi.createOnlineOrder({
+            ...order,
+            payments: [
+                {
+                    amount: order.totalAmount,
+                    paymentType: "MASTERCARD",
+                    ccTransactionId: clientSecret,
+                },
+            ]
+        }, paymentIntentId)
+            .then((response) => console.log(response.data))
+            .catch((err) => setMessage(err))
     }
 
 

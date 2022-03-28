@@ -44,6 +44,6 @@ public interface CustomerService {
     public abstract SupportTicket createSupportTicket(SupportTicket supportTicket);
     public abstract SupportTicket updateSupportTicket(SupportTicket supportTicket) throws SupportTicketException;
     public abstract SupportTicket resolveSupportTicket(Long id) throws SupportTicketException;
-    public abstract SupportTicket replySupportTicket(Long id, String message, String name) throws SupportTicketException;
+    public abstract SupportTicket replySupportTicket(Long id, String message, String name, String imageUrl) throws SupportTicketException;
     public abstract Long deleteSupportTicket(Long id) throws SupportTicketException;
 }

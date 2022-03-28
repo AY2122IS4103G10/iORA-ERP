@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.utils.StringGenerator;
 
@@ -27,8 +28,8 @@ public class Voucher {
     @Column(nullable = false)
     private boolean redeemed;
 
-    @OneToOne(mappedBy = "voucher")
-    private CustomerOrder customerOrder;
+    // @OneToOne(mappedBy = "voucher")
+    // private CustomerOrder customerOrder;
 
     public Voucher() {
     }
@@ -82,11 +83,11 @@ public class Voucher {
         this.redeemed = redeemed;
     }
 
-    public CustomerOrder getCustomerOrder() {
-        return this.customerOrder;
-    }
+    // public CustomerOrder getCustomerOrder() {
+    //     return this.customerOrder;
+    // }
 
-    public void setCustomerOrder(CustomerOrder customerOrder) {
-        this.customerOrder = customerOrder;
-    }
+    // public void setCustomerOrder(CustomerOrder customerOrder) {
+    //     this.customerOrder = customerOrder;
+    // }
 }

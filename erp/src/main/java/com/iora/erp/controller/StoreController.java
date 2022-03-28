@@ -92,7 +92,7 @@ public class StoreController {
     }
 
     @GetMapping(path = "/viewStock/sites/{siteId}/{skuCode}", produces = "application/json")
-    public StockLevelLI viewStock(@PathVariable Long siteId, @PathVariable String skuCode) {
+    public StockLevelLI viewStockByProductAndSite(@PathVariable Long siteId, @PathVariable String skuCode) {
         try {
             return siteService.getStockLevelLI(siteId, skuCode);
         } catch (Exception e) {
@@ -372,9 +372,10 @@ public class StoreController {
     }
 
     @PostMapping(path = "/customerOrder/pay", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems) {
+    public ResponseEntity<Object> createPaymentIntent(@RequestParam(required = false) Long amt,
+            @RequestBody List<CustomerOrderLI> lineItems) {
         try {
-            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems));
+            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems, false, (amt == null) ? 0L : amt * 100));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());

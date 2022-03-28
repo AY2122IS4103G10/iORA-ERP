@@ -350,18 +350,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public SupportTicket replySupportTicket(Long id, String message, String name) throws SupportTicketException {
+    public SupportTicket replySupportTicket(Long id, String message, String name, String imageUrl) throws SupportTicketException {
         SupportTicket st = getSupportTicket(id);
-        
-        if (st.getStatus() == SupportTicket.Status.RESOLVED) {
+        /* if (st.getStatus() == SupportTicket.Status.RESOLVED) {
             throw new SupportTicketException("Ticket has already been resolved.");
         } else if (st.getStatus() == SupportTicket.Status.PENDING) {
             st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
         } else {
             st.setStatus(SupportTicket.Status.PENDING);
-        }
+        } */
 
-        st.addMessage(new SupportTicketMsg(message, name));
+        st.addMessage(new SupportTicketMsg(message, name, imageUrl));
         return em.merge(st);
     }
 

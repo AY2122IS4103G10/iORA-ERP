@@ -74,7 +74,7 @@ export const listingApi = {
   },
   getProductStock(sku) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/viewStock/${sku}`
+      `${REST_ENDPOINT}online/viewStock/product/${sku}`
     );
   },
 }
@@ -86,4 +86,22 @@ export const checkoutApi = {
       lineItems
     );
   },
+  getStores() {
+    return axiosPublic.get(
+      `${REST_ENDPOINT}online/stores/singapore`,
+    )
+  }, 
+  createPaymentIntent(lineItems, deliveryFee) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}online/pay/${deliveryFee}`,
+      lineItems
+    )
+  },
+  createOnlineOrder(onlineOrder, clientSecret) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}online/create/${clientSecret}`,
+      onlineOrder
+    )
+  }
+
 }

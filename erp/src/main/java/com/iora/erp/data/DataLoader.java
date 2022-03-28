@@ -48,12 +48,10 @@ import com.iora.erp.model.stockTransfer.StockTransferOrderLI;
 import com.iora.erp.service.AdminService;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
-import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
-import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -83,8 +81,6 @@ public class DataLoader implements CommandLineRunner {
 	private EntityManager em;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	@Autowired
-	private EmployeeService employeeService;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -501,10 +497,10 @@ public class DataLoader implements CommandLineRunner {
 		customerService.createCustomerAccount(c7);
 
 		// Generate 10 $10 vouchers
-		customerService.generateVouchers(10, 10, "2022-02-16");
+		customerService.generateVouchers(10, 10, "2024-02-16");
 
 		// Generate 10 $5 vouchers
-		customerService.generateVouchers(5, 10, "2022-02-16");
+		customerService.generateVouchers(5, 10, "2024-02-16");
 
 		// Adding Promotions
 		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5),
@@ -526,9 +522,10 @@ public class DataLoader implements CommandLineRunner {
 			String description = (String) json.get(2);
 			List<String> colours = (ArrayList<String>) json.get(3);
 			List<String> sizes = (ArrayList<String>) json.get(4);
-			String company = (String) json.get(5);
-			List<String> tags = (ArrayList<String>) json.get(6);
+			List<String> tags = (ArrayList<String>) json.get(5);
+			String company = (String) json.get(6);			
 			List<String> categories = (ArrayList<String>) json.get(7);
+			List<String> imageLinks = (ArrayList<String>) json.get(10);
 
 			LinkedHashMap<Object, Object> priceMap = (LinkedHashMap<Object, Object>) json.get(8);
 			List<Object> priceList = (ArrayList<Object>) priceMap.values().stream().collect(Collectors.toList());
@@ -573,31 +570,27 @@ public class DataLoader implements CommandLineRunner {
 					productFields.add(category);
 				}
 			}
+			model.setImageLinks(imageLinks);
 			productService.createModel(model);
 		}
 
 		List<Product> products = productService.searchProductsBySKU(null);
 		for (Product p : products) {
 			Random r = new Random();
-			int stockLevel = r.nextInt(7) + 3;
-
-			for (int i = 0; i < stockLevel; i++) {
-				String rfid = StringGenerator.generateRFID(p.getSku());
-				productService.createProductItem(rfid, p.getSku());
-			}
+			int stockLevel = r.nextInt(7) + 3; 
 			siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), stockLevel);
 		}
 
 		// ProcurementOrders
-		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("BDQ0010497X-1"), 50);
+		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("BBV0010201H-1"), 50);
 		em.persist(poli1);
-		ProcurementOrderLI poli2 = new ProcurementOrderLI(productService.getProduct("BDQ0010497X-2"), 30);
+		ProcurementOrderLI poli2 = new ProcurementOrderLI(productService.getProduct("ASK0009709Y-2"), 30);
 		em.persist(poli2);
-		ProcurementOrderLI poli3 = new ProcurementOrderLI(productService.getProduct("BDQ0010497X-3"), 45);
+		ProcurementOrderLI poli3 = new ProcurementOrderLI(productService.getProduct("AKB0009339J-3"), 45);
 		em.persist(poli3);
-		ProcurementOrderLI poli4 = new ProcurementOrderLI(productService.getProduct("AB0009644H-1"), 75);
+		ProcurementOrderLI poli4 = new ProcurementOrderLI(productService.getProduct("ASK0007868Y-1"), 75);
 		em.persist(poli4);
-		ProcurementOrderLI poli5 = new ProcurementOrderLI(productService.getProduct("AB0009644H-2"), 70);
+		ProcurementOrderLI poli5 = new ProcurementOrderLI(productService.getProduct("AB0008084Y-A-2"), 70);
 		em.persist(poli5);
 
 		ProcurementOrder po1 = new ProcurementOrder();
@@ -620,15 +613,15 @@ public class DataLoader implements CommandLineRunner {
 		procurementService.createProcurementOrder(po2, 1L);
 
 		// StockTransferOrders
-		StockTransferOrderLI stoli1 = new StockTransferOrderLI(productService.getProduct("AT0009862Z-1"), 5);
+		StockTransferOrderLI stoli1 = new StockTransferOrderLI(productService.getProduct("BBV0010199H-1"), 5);
 		em.persist(stoli1);
-		StockTransferOrderLI stoli2 = new StockTransferOrderLI(productService.getProduct("AT0009862Z-2"), 7);
+		StockTransferOrderLI stoli2 = new StockTransferOrderLI(productService.getProduct("ADQ0008254W-2"), 7);
 		em.persist(stoli2);
-		StockTransferOrderLI stoli3 = new StockTransferOrderLI(productService.getProduct("AT0010054D-1"), 12);
+		StockTransferOrderLI stoli3 = new StockTransferOrderLI(productService.getProduct("ADQ0009202H-1"), 12);
 		em.persist(stoli3);
-		StockTransferOrderLI stoli4 = new StockTransferOrderLI(productService.getProduct("AT0010054D-2"), 15);
+		StockTransferOrderLI stoli4 = new StockTransferOrderLI(productService.getProduct("AB0009040H-2"), 15);
 		em.persist(stoli4);
-		StockTransferOrderLI stoli5 = new StockTransferOrderLI(productService.getProduct("AT0010054D-3"), 4);
+		StockTransferOrderLI stoli5 = new StockTransferOrderLI(productService.getProduct("BSK0010245Y-3"), 4);
 		em.persist(stoli5);
 
 		StockTransferOrder sto1 = new StockTransferOrder(siteService.getSite(10L), siteService.getSite(15L));
@@ -644,40 +637,40 @@ public class DataLoader implements CommandLineRunner {
 
 		// Customer Order
 		CustomerOrderLI coli1 = new CustomerOrderLI();
-		coli1.setProduct(productService.getProduct("BPL0009803M-1"));
+		coli1.setProduct(productService.getProduct("AB0010031H-1"));
 		coli1.setQty(1);
 		coli1.setSubTotal(39.0);
 
 		CustomerOrderLI coli2 = new CustomerOrderLI();
-		coli2.setProduct(productService.getProduct("BDQ0010043X-1"));
+		coli2.setProduct(productService.getProduct("ASK0009136A-1"));
 		coli2.setQty(2);
 		coli2.setSubTotal(78.0);
 
 		CustomerOrderLI coli3 = new CustomerOrderLI();
-		coli3.setProduct(productService.getProduct("APL0009197A-1"));
+		coli3.setProduct(productService.getProduct("ASK0009273W-1"));
 		coli3.setQty(2);
 		coli3.setSubTotal(38.0);
 
 		CustomerOrderLI coli4 = new CustomerOrderLI();
-		coli4.setProduct(productService.getProduct("BPD0010528A-1"));
+		coli4.setProduct(productService.getProduct("AB0009153W-1"));
 		coli4.setQty(2);
 		coli4.setSubTotal(98.0);
 		customerOrderService.createCustomerOrderLI(coli4);
 
 		CustomerOrderLI coli5 = new CustomerOrderLI();
-		coli5.setProduct(productService.getProduct("BPS0009808X-1"));
+		coli5.setProduct(productService.getProduct("ASK0007868Y-1"));
 		coli5.setQty(1);
 		coli5.setSubTotal(29.0);
 		customerOrderService.createCustomerOrderLI(coli5);
 
 		CustomerOrderLI coli6 = new CustomerOrderLI();
-		coli6.setProduct(productService.getProduct("BSK0009530X-1"));
+		coli6.setProduct(productService.getProduct("ASK0010155H-1"));
 		coli6.setQty(1);
 		coli6.setSubTotal(29.0);
 		customerOrderService.createCustomerOrderLI(coli6);
 
 		CustomerOrderLI coli7 = new CustomerOrderLI();
-		coli7.setProduct(productService.getProduct("BPD0010304X-1"));
+		coli7.setProduct(productService.getProduct("AB0010059H-1"));
 		coli7.setQty(1);
 		coli7.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli7);
@@ -705,14 +698,22 @@ public class DataLoader implements CommandLineRunner {
 		oo1.addLineItem(coli7);
 		oo1.setPaid(true);
 		oo1.addPayment(payment2);
-		oo1.setSite(siteService.getSite(3L));
+		oo1.setSite(siteService.getSite(4L));
 		customerOrderService.createOnlineOrder(oo1, null);
+
+		OnlineOrder oo2 = new OnlineOrder(true, CountryEnum.Singapore);
+		oo2.setCustomerId(2L);
+		oo2.addLineItem(coli1);
+		oo2.addLineItem(coli2);
+		oo2.setPaid(false);
+		oo2.setSite(siteService.getSite(10L));
+		oo2.setDeliveryAddress("13 Computing Drive NUS School of Computing, COM1 Singapore 117417");
+		customerOrderService.createOnlineOrder(oo2, null);
 
 		Customer cust = customerService.getCustomerById(2L);
 		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");
 		st.addMessage(new SupportTicketMsg("Please give me free products :D",
-				cust.getFirstName() + " " + cust.getLastName()));
-		st.addMessage(new SupportTicketMsg("Go and **** yourself", employeeService.getEmployeeById(7L).getName()));
+				cust.getFirstName() + " " + cust.getLastName(), ""));
 
 		st.setCustomer(cust);
 		st.setCustomerOrder(co1);

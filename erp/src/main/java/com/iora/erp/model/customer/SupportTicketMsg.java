@@ -9,22 +9,24 @@ import javax.persistence.TemporalType;
 
 @Embeddable
 public class SupportTicketMsg {
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeStamp;
-
     @Column(nullable = false)
     private String message;
-
+    @Column(nullable = false)
     private String name;
+    private String imageUrl;
 
     public SupportTicketMsg() {
         this.timeStamp = new Date();
     }
 
-    public SupportTicketMsg(String message, String name) {
+    public SupportTicketMsg(String message, String name, String imageUrl) {
         this();
         this.message = message;
         this.name = name;
+        this.imageUrl = imageUrl;
     }
 
     public Date getTimeStamp() {
@@ -49,5 +51,13 @@ public class SupportTicketMsg {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

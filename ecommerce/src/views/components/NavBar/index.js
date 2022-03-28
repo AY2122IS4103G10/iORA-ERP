@@ -81,7 +81,6 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
   const [open, setOpen] = useState(false);
   const cartCount = useSelector(selectCartQty);
 
-
   return (
     <>
       {/* Mobile menu */}

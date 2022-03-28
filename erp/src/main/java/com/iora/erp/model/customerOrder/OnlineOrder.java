@@ -9,7 +9,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
@@ -24,7 +23,6 @@ public class OnlineOrder extends CustomerOrder {
 
     private boolean delivery;
 
-    @JsonBackReference(value = "pickupSite-onlineOrder")
     @ManyToOne
     private StoreSite pickupSite;
 

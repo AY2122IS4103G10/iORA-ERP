@@ -43,56 +43,57 @@ const PromoModal = ({
   return (
     <SimpleModal open={open} closeModal={closeModal}>
       <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
-        <form onSubmit={onSaveClicked}>
-          <div className="p-4 space-y-8 divide-y divide-gray-200">
-            <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-              <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  {modalState === "add"
-                    ? "Add New"
-                    : modalState === "edit"
-                    ? "Edit"
-                    : "View"}{" "}
-                  Promotion
-                </h3>
-                <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                  <SimpleInputGroup
-                    label="Name"
-                    inputField="name"
-                    className="sm:mt-0 sm:col-span-2"
-                  >
-                    <SimpleInputBox
-                      type="text"
-                      name="name"
-                      id="name"
-                      value={name}
-                      onChange={onNameChanged}
-                      required
-                      disabled={modalState === "view"}
-                    />
-                  </SimpleInputGroup>
-                  <SimpleInputGroup
-                    label="Quota"
-                    inputField="quota"
-                    className="relative rounded-md sm:mt-0 sm:col-span-2"
-                  >
-                    <SimpleInputBox
-                      type="number"
-                      name="quota"
-                      id="quota"
-                      value={quota}
-                      onChange={onQuotaChanged}
-                      required
-                      disabled={modalState === "view"}
-                    />
-                  </SimpleInputGroup>
-                  <SimpleInputGroup
-                    label="Discount Type"
-                    inputField="global-stackable"
-                    className="relative rounded-md sm:mt-0"
-                  >
-                    <div className="py-2 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                      <div className="sm:col-span-1">
+        <div className="max-w-3xl mx-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <form onSubmit={onSaveClicked}>
+            <div className="p-4 space-y-8 divide-y divide-gray-200">
+              <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+                <div>
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    {modalState === "add"
+                      ? "Add New"
+                      : modalState === "edit"
+                      ? "Edit"
+                      : "View"}{" "}
+                    Promotion
+                  </h3>
+                  <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                    <SimpleInputGroup
+                      label="Name"
+                      inputField="name"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="name"
+                        id="name"
+                        value={name}
+                        onChange={onNameChanged}
+                        required
+                        disabled={modalState === "view"}
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Quota"
+                      inputField="quota"
+                      className="relative rounded-md sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="number"
+                        name="quota"
+                        id="quota"
+                        value={quota}
+                        onChange={onQuotaChanged}
+                        required
+                        disabled={modalState === "view"}
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Discount Type"
+                      inputField="global-stackable"
+                      // className="relative rounded-md sm:mt-0"
+                    >
+                      <fieldset className="space y-5">
+                        <legend className="sr-only">Discount Type</legend>
                         <div className="relative flex items-start">
                           <div className="flex items-center h-5">
                             <input
@@ -114,10 +115,15 @@ const PromoModal = ({
                             >
                               Percentage
                             </label>
+                            <p
+                              id="candidates-description"
+                              className="text-gray-500"
+                            >
+                              Discounts as a percentage of original price. (Eg.
+                              10% off)
+                            </p>
                           </div>
                         </div>
-                      </div>
-                      <div className="sm:col-span-1">
                         <div className="relative flex items-start">
                           <div className="flex items-center h-5">
                             <input
@@ -139,66 +145,71 @@ const PromoModal = ({
                             >
                               Fixed
                             </label>
+                            <p
+                              id="candidates-description"
+                              className="text-gray-500"
+                            >
+                              Fixed price discount. (Eg. $25 off)
+                            </p>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </SimpleInputGroup>
-                  {percent && (
-                    <SimpleInputGroup
-                      label="% Discount(s)"
-                      inputField="coefficients"
-                      className="relative rounded-md sm:mt-0 sm:col-span-2"
-                    >
-                      <SimpleInputBox
-                        type="text"
-                        name="coefficients"
-                        id="coefficients"
-                        value={coefficients}
-                        onChange={onCoefficientsChanged}
-                        helper={
-                          modalState !== "view" && percent && fixed
-                            ? "Final price calculated using formula (100 - %disc) x price + fixedPrice."
-                            : `Enter percentage discount(s) separated with a comma ",".
+                      </fieldset>
+                    </SimpleInputGroup>
+                    {percent && (
+                      <SimpleInputGroup
+                        label="% Discount(s)"
+                        inputField="coefficients"
+                        className="relative rounded-md sm:mt-0 sm:col-span-2"
+                      >
+                        <SimpleInputBox
+                          type="text"
+                          name="coefficients"
+                          id="coefficients"
+                          value={coefficients}
+                          onChange={onCoefficientsChanged}
+                          helper={
+                            modalState !== "view" && percent && fixed
+                              ? "Final price calculated using formula (100 - %disc) x price + fixedPrice."
+                              : `Enter percentage discount(s) separated with a comma ",".
                           Eg. 10% off for items within quota: "10".
                           Eg. 50% off second item: "100,50".
                           Eg. 1 for 1: "100,0" (takes 100% of higher price)`
-                        }
-                        required
-                        disabled={modalState === "view"}
-                      />
-                    </SimpleInputGroup>
-                  )}
-                  {fixed && (
-                    <SimpleInputGroup
-                      label="Discounted Price(s)"
-                      inputField="constants"
-                      className="relative rounded-md sm:mt-0 sm:col-span-2"
-                    >
-                      <SimpleInputBox
-                        type="text"
-                        name="constants"
-                        id="constants"
-                        value={constants}
-                        onChange={onConstantsChanged}
-                        helper={
-                          modalState !== "view" && percent && fixed
-                            ? "Final price calculated using formula (100 - %disc) x price + fixedPrice."
-                            : `Enter fixed prices(s) separated with a comma ",".
+                          }
+                          required
+                          disabled={modalState === "view"}
+                        />
+                      </SimpleInputGroup>
+                    )}
+                    {fixed && (
+                      <SimpleInputGroup
+                        label="Discounted Price(s)"
+                        inputField="constants"
+                        className="relative rounded-md sm:mt-0 sm:col-span-2"
+                      >
+                        <SimpleInputBox
+                          type="text"
+                          name="constants"
+                          id="constants"
+                          value={constants}
+                          onChange={onConstantsChanged}
+                          helper={
+                            modalState !== "view" && percent && fixed
+                              ? "Final price calculated using formula (100 - %disc) x price + fixedPrice."
+                              : `Enter fixed prices(s) separated with a comma ",".
                           Eg. 2 for $49: "24.5, 24.5".`
-                        }
-                        required
-                        disabled={modalState === "view"}
-                      />
-                    </SimpleInputGroup>
-                  )}
-                  <SimpleInputGroup
-                    label="Options"
-                    inputField="global-stackable"
-                    className="relative rounded-md sm:mt-0"
-                  >
-                    <div className="py-2 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                      <div className="sm:col-span-1">
+                          }
+                          required
+                          disabled={modalState === "view"}
+                        />
+                      </SimpleInputGroup>
+                    )}
+                    <SimpleInputGroup
+                      label="Options"
+                      inputField="global-stackable"
+                      className="relative rounded-md sm:mt-0"
+                    >
+                      <fieldset className="space y-5">
+                        <legend className="sr-only">Discount Type</legend>
                         <div className="relative flex items-start">
                           <div className="flex items-center h-5">
                             <input
@@ -219,10 +230,15 @@ const PromoModal = ({
                             >
                               Global
                             </label>
+                            <p
+                              id="candidates-description"
+                              className="text-gray-500"
+                            >
+                              Promotion applies to ALL products. (Eg. sitewide
+                              discount)
+                            </p>
                           </div>
                         </div>
-                      </div>
-                      <div className="sm:col-span-1">
                         <div className="relative flex items-start">
                           <div className="flex items-center h-5">
                             <input
@@ -243,46 +259,52 @@ const PromoModal = ({
                             >
                               Stackable
                             </label>
+                            <p
+                              id="candidates-description"
+                              className="text-gray-500"
+                            >
+                              Promotion can be used with other promotions.
+                            </p>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </SimpleInputGroup>
+                      </fieldset>
+                    </SimpleInputGroup>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="pt-5">
-              <div className="flex justify-end">
-                {modalState === "view" ? (
-                  <button
-                    type="submit"
-                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                    onClick={() => setModalState("edit")}
-                  >
-                    Edit
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={closeModal}
-                    >
-                      Cancel
-                    </button>
+              <div className="pt-5">
+                <div className="flex justify-end">
+                  {modalState === "view" ? (
                     <button
                       type="submit"
                       className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                      onClick={() => setModalState("edit")}
                     >
-                      {modalState === "add" ? "Add" : "Save"} promotion
+                      Edit
                     </button>
-                  </>
-                )}
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                        onClick={closeModal}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                      >
+                        {modalState === "add" ? "Add" : "Save"} promotion
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </SimpleModal>
   );

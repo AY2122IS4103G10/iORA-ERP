@@ -17,12 +17,116 @@ import {
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { SimpleButton } from "../../../components/Buttons/SimpleButton";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
+import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import {
   SelectColumnFilter,
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
-import { SKUModal } from "../ProductForm";
+import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+
+export const SKUModal = ({
+  open,
+  closeModal,
+  colors,
+  skuColorSelected,
+  setSkuColorSelected,
+  sizes,
+  skuSizeSelected,
+  setSkuSizeSelected,
+  sku,
+  onSkuChanged,
+  onSaveClicked,
+}) => {
+  return (
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        <div className="max-w-3xl mx-auto lg:max-w-7xl ">
+          <h1 className="sr-only">Add SKU</h1>
+          {/* Main 3 column grid */}
+          <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
+            {/* Left column */}
+            <div className="grid grid-cols-1 gap-4 lg:col-span-3">
+              {/* Form */}
+              <section aria-labelledby="product-form">
+                <form onSubmit={onSaveClicked}>
+                  <div className="p-8 space-y-8 divide-y divide-gray-200">
+                    <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+                      <div>
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">
+                          Add SKU
+                        </h3>
+                        <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                          <SimpleInputGroup
+                            label="SKU Code"
+                            inputField="sku"
+                            className="sm:mt-0 sm:col-span-2"
+                          >
+                            <SimpleInputBox
+                              type="text"
+                              name="sku"
+                              id="sku"
+                              autoComplete="sku"
+                              value={sku}
+                              onChange={onSkuChanged}
+                              required
+                              autoFocus
+                            />
+                          </SimpleInputGroup>
+                          <SimpleInputGroup
+                            label="Color"
+                            inputField="color"
+                            className="relative rounded-md sm:mt-0 sm:col-span-2"
+                          >
+                            <SimpleSelectMenu
+                              options={colors}
+                              selected={skuColorSelected}
+                              setSelected={setSkuColorSelected}
+                            />
+                          </SimpleInputGroup>
+                          <SimpleInputGroup
+                            label="Size"
+                            inputField="size"
+                            className="relative rounded-md sm:mt-0 sm:col-span-2"
+                          >
+                            <SimpleSelectMenu
+                              options={sizes}
+                              selected={skuSizeSelected}
+                              setSelected={setSkuSizeSelected}
+                            />
+                          </SimpleInputGroup>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-5">
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          onClick={closeModal}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                        >
+                          Add SKU
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SimpleModal>
+  );
+};
 
 const FieldSection = ({ fieldName, fields }) => {
   return (
@@ -49,7 +153,7 @@ const FieldSection = ({ fieldName, fields }) => {
   );
 };
 
-export const SKUTable = ({ data }) => {
+const SKUTable = ({ data, onDeleteSkuClicked }) => {
   const columns = useMemo(
     () => [
       {
@@ -121,6 +225,13 @@ export const SKUTable = ({ data }) => {
           );
         },
       },
+      // {
+      //   Header: "",
+      //   accessor: "delete",
+      //   Cell: (e) => (
+      //     <DeleteCell onClick={() => onDeleteSkuClicked(e.row.original.sku)} />
+      //   ),
+      // },
     ],
     []
   );
@@ -233,7 +344,7 @@ const ProductDetailsBody = ({
   available,
   products,
   onToggleEnableClicked,
-  openSkuModal,
+  onDeleteSkuClicked,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
@@ -329,18 +440,12 @@ const ProductDetailsBody = ({
                 >
                   SKUs
                 </h2>
-                {Boolean(colors.length) && Boolean(sizes.length) && (
-                  <button
-                    type="button"
-                    className="ml-3 inline-flex items-center justify-center bg-cyan-600 hover:bg-cyan-700 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-                    onClick={openSkuModal}
-                  >
-                    <span>Add SKU</span>
-                  </button>
-                )}
               </div>
               <div className="pt-6">
-                <SKUTable data={products} />
+                <SKUTable
+                  data={products}
+                  onDeleteSkuClicked={onDeleteSkuClicked}
+                />
               </div>
             </div>
           </section>
@@ -407,50 +512,50 @@ export const ProductDetails = () => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
 
-  const [openAddSku, setOpenAddSku] = useState(false);
-  const [skus, setSkus] = useState([]);
-  const [sku, setSku] = useState("");
-  const [skuColors, setSkuColors] = useState([]);
-  const [skuColorSelected, setSkuColorSelected] = useState(null);
-  const [skuSizes, setSkuSizes] = useState([]);
-  const [skuSizeSelected, setSkuSizeSelected] = useState(null);
+  // const [openAddSku, setOpenAddSku] = useState(false);
+  // const [skus, setSkus] = useState([]);
+  // const [sku, setSku] = useState("");
+  // const [skuColors, setSkuColors] = useState([]);
+  // const [skuColorSelected, setSkuColorSelected] = useState(null);
+  // const [skuSizes, setSkuSizes] = useState([]);
+  // const [skuSizeSelected, setSkuSizeSelected] = useState(null);
 
-  useEffect(() => {
-    if (product) {
-      const colors = product.productFields
-        .filter((field) => field.fieldName === "COLOUR")
-        .map((field) => ({ ...field, name: field.fieldValue }));
-      const sizes = product.productFields
-        .filter((field) => field.fieldName === "SIZE")
-        .map((field) => ({ ...field, name: field.fieldValue }));
-      setSku(`${product.modelCode}-`);
-      setSkuColors(colors);
-      setSkuSizes(sizes);
-      setSkuColorSelected(colors[0]);
-      setSkuSizeSelected(sizes[0]);
-    }
-  }, [product]);
+  // useEffect(() => {
+  //   if (product) {
+  //     const colors = product.productFields
+  //       .filter((field) => field.fieldName === "COLOUR")
+  //       .map((field) => ({ ...field, name: field.fieldValue }));
+  //     const sizes = product.productFields
+  //       .filter((field) => field.fieldName === "SIZE")
+  //       .map((field) => ({ ...field, name: field.fieldValue }));
+  //     setSku(`${product.modelCode}-`);
+  //     setSkuColors(colors);
+  //     setSkuSizes(sizes);
+  //     setSkuColorSelected(colors[0]);
+  //     setSkuSizeSelected(sizes[0]);
+  //   }
+  // }, [product]);
 
-  const onSkuChanged = (e) => setSku(e.target.value);
+  // const onSkuChanged = (e) => setSku(e.target.value);
 
-  const openSkuModal = () => {
-    setSku(`${product.modelCode}-`);
-    setOpenAddSku(true);
-  };
-  const closeSkuModal = () => setOpenAddSku(false);
-  
-  const onAddSkuClicked = (evt) => {
-    evt.preventDefault();
-    const s = skus;
-    s.push({
-      sku,
-      color: skuColorSelected,
-      size: skuSizeSelected,
-    });
-    setSkus(s);
-    setSku("");
-    closeSkuModal();
-  };
+  // const openSkuModal = () => {
+  //   setSku(`${product.modelCode}-`);
+  //   setOpenAddSku(true);
+  // };
+  // const closeSkuModal = () => setOpenAddSku(false);
+
+  // const onAddSkuClicked = (evt) => {
+  //   evt.preventDefault();
+  //   const s = skus;
+  //   s.push({
+  //     sku,
+  //     color: skuColorSelected,
+  //     size: skuSizeSelected,
+  //   });
+  //   setSkus(s);
+  //   setSku("");
+  //   closeSkuModal();
+  // };
 
   const onToggleEnableClicked = () => {
     dispatch(
@@ -476,6 +581,17 @@ export const ProductDetails = () => {
         })
       );
   };
+
+  // const onDeleteSkuClicked = (sku) => {
+  //   dispatch(deleteSku(sku))
+  //     .unwrap()
+  //     .then(() => {
+  //       addToast("Successfully deleted SKU", {
+  //         appearance: "success",
+  //         autoDismiss: true,
+  //       });
+  //     });
+  // };
 
   return (
     Boolean(product) && (
@@ -519,9 +635,9 @@ export const ProductDetails = () => {
           available={product.available}
           products={product.products}
           onToggleEnableClicked={onToggleEnableClicked}
-          openSkuModal={openSkuModal}
+          // onDeleteSkuClicked={onDeleteSkuClicked}
         />
-        <SKUModal
+        {/* <SKUModal
           open={openAddSku}
           closeModal={closeSkuModal}
           colors={skuColors}
@@ -533,7 +649,7 @@ export const ProductDetails = () => {
           sku={sku}
           onSkuChanged={onSkuChanged}
           onSaveClicked={onAddSkuClicked}
-        />
+        /> */}
       </>
     )
   );

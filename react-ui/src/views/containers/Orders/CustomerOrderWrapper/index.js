@@ -1,4 +1,3 @@
-import { PrinterIcon } from "@heroicons/react/outline";
 import { useMemo } from "react";
 import { useRef } from "react";
 import { useState } from "react";
@@ -30,7 +29,14 @@ const deliveryStatuses = [
   "COMPLETED",
 ];
 
-const Header = ({ subsys, disableTabs, tabs, orderId, openInvoice }) => {
+const Header = ({
+  subsys,
+  disableTabs,
+  tabs,
+  orderId,
+  openInvoice,
+  disableInvoice,
+}) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev page="Orders" path={`/${subsys}/orders/search`} />
@@ -38,13 +44,15 @@ const Header = ({ subsys, disableTabs, tabs, orderId, openInvoice }) => {
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${orderId}`}</h1>
           <div className="mt-3 flex md:mt-0 md:absolute md:top-3 md:right-0">
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={openInvoice}
-            >
-              <span>View Invoice</span>
-            </button>
+            {disableInvoice && (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                onClick={openInvoice}
+              >
+                <span>View Invoice</span>
+              </button>
+            )}
           </div>
         </div>
         <div className="mt-4">
@@ -180,7 +188,8 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             }))
           );
         });
-        setStatus(statusHistory[statusHistory.length - 1]);
+        Boolean(statusHistory) &&
+          setStatus(statusHistory[statusHistory.length - 1]);
         setStatusHistory(statusHistory);
         setDelivery(delivery);
         setDeliveryAddress(deliveryAddress);
@@ -237,16 +246,11 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       <div className="py-8 xl:py-10">
         <Header
           subsys={subsys}
-          navigate={navigate}
-          disableTabs={delivery === null}
+          disableTabs={delivery === null || delivery === undefined}
           tabs={tabs}
           orderId={orderId}
-          status={status}
-          openModal={openModal}
-          handlePrint={handlePrint}
+          disableInvoice={status === undefined}
           openInvoice={openInvoice}
-          setAction={setAction}
-          openConfirm={openConfirmModal}
         />
         <Outlet
           context={{
@@ -271,59 +275,68 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         />
       </div>
 
-      <div className="hidden">
-        <OnlineOrderInvoice
-          ref={componentRef}
-          title={`${
-            Boolean(statusHistory.length) &&
-            deliveryStatuses.some(
-              (s) => s === statusHistory[statusHistory.length - 1].status
-            )
-              ? "Delivery"
-              : ""
-          } Invoice`}
-          orderId={orderId}
-          orderStatus={status}
-          delivery={delivery}
-          customer={customer}
-          deliveryAddress={deliveryAddress}
-          data={lineItems}
-          qrValue={qrValue}
+      {Boolean(statusHistory) && Boolean(statusHistory.length) && (
+        <div className="hidden">
+          <OnlineOrderInvoice
+            ref={componentRef}
+            title={`${
+              Boolean(statusHistory.length) &&
+              deliveryStatuses.some(
+                (s) => s === statusHistory[statusHistory.length - 1].status
+              )
+                ? "Delivery"
+                : ""
+            } Invoice`}
+            orderId={orderId}
+            orderStatus={status}
+            dateTime={dateTime}
+            fromSite={statusHistory[0].actionBy}
+            delivery={delivery}
+            customer={customer}
+            deliveryAddress={deliveryAddress}
+            data={lineItems}
+            qrValue={qrValue}
+          >
+            <InvoiceSummary data={lineItems} status={status.status} />
+          </OnlineOrderInvoice>
+        </div>
+      )}
+      {Boolean(statusHistory) && Boolean(statusHistory.length) && (
+        <InvoiceModal
+          open={open}
+          closeModal={closeInvoice}
+          handlePrint={handlePrint}
         >
-          <InvoiceSummary data={lineItems} status={status.status} />
-        </OnlineOrderInvoice>
-      </div>
-      <InvoiceModal
-        open={open}
-        closeModal={closeInvoice}
-        handlePrint={handlePrint}
-      >
-        <OnlineOrderInvoice
-          title={`${
-            Boolean(statusHistory.length) &&
-            deliveryStatuses.some(
-              (s) => s === statusHistory[statusHistory.length - 1].status
-            )
-              ? "Delivery"
-              : ""
-          } Invoice`}
-          orderId={orderId}
-          orderStatus={status}
-          delivery={delivery}
-          customer={customer}
-          deliveryAddress={deliveryAddress}
-          qrValue={
-            status.status !== "READY_FOR_SHIPPING" ? qrValue : qrDelivery
-          }
-          qrHelper={
-            status.status !== "READY_FOR_SHIPPING"
-              ? "Scan to start picking."
-              : "Scan to start delivery."
-          }
-        >
-          <InvoiceSummary data={lineItems} status={status.status} />
-        </OnlineOrderInvoice>
-      </InvoiceModal>
+          <OnlineOrderInvoice
+            title={`${
+              Boolean(statusHistory.length) &&
+              deliveryStatuses.some(
+                (s) => s === statusHistory[statusHistory.length - 1].status
+              )
+                ? "Delivery"
+                : ""
+            } Invoice`}
+            orderId={orderId}
+            orderStatus={status}
+            dateTime={dateTime}
+            fromSite={statusHistory[0].actionBy}
+            delivery={delivery}
+            customer={customer}
+            deliveryAddress={deliveryAddress}
+            qrValue={
+              status.status !== "READY_FOR_SHIPPING" ? qrValue : qrDelivery
+            }
+            qrHelper={
+              status.status !== "READY_FOR_SHIPPING"
+                ? "Scan to start picking."
+                : "Scan to start delivery."
+            }
+          >
+            <InvoiceSummary data={lineItems} status={status.status} />
+          </OnlineOrderInvoice>
+        </InvoiceModal>
+      )}
+
       {Boolean(action) && (
         <Confirmation
           title={`${action.name} "Order #${orderId}"`}

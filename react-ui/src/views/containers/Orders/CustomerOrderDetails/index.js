@@ -9,6 +9,7 @@ import {
 import { useEffect } from "react";
 import { useState } from "react";
 import { eventTypes } from "../../../../constants/eventTypes";
+import { classNames } from "../../../../utilities/Util";
 
 const ItemTable = ({ data }) => {
   const columns = useMemo(
@@ -74,7 +75,12 @@ const OrderDetailsBody = ({
 }) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
-      <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+      <div
+        className={classNames(
+          "space-y-6 lg:col-start-1 ",
+          Boolean(history.length) ? "lg:col-span-2" : "lg:col-span-3"
+        )}
+      >
         {/* Site Information list*/}
         <section aria-labelledby="applicant-information-title">
           <div className="bg-white shadow sm:rounded-lg">
@@ -88,17 +94,21 @@ const OrderDetailsBody = ({
             </div>
             <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
               <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Status</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{status}</dd>
-                </div>
+                {status && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Status
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">{status}</dd>
+                  </div>
+                )}
 
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
                     Date Created
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {moment(dateTime).format("DD/MM/YYYY, hh:mm:ss")}
+                    {moment(dateTime).format("DD/MM/YYYY, H:mm:ss")}
                   </dd>
                 </div>
 
@@ -108,21 +118,25 @@ const OrderDetailsBody = ({
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     <address className="not-italic">
-                      <span className="block">{customer.firstName} {customer.lastName}</span>
+                      <span className="block">
+                        {customer.firstName} {customer.lastName}
+                      </span>
                       <span className="block">{customer.email}</span>
                       <span className="block">{customer.contactNumber}</span>
                     </address>
                   </dd>
                 </div>
 
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Delivery Type
-                  </dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {delivery ? "DELIVERY" : "SELF-COLLECT"}
-                  </dd>
-                </div>
+                {delivery !== undefined && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Delivery Type
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {delivery ? "DELIVERY" : "SELF-COLLECT"}
+                    </dd>
+                  </div>
+                )}
 
                 {deliveryAddress && (
                   <div className="sm:col-span-1">
@@ -132,6 +146,15 @@ const OrderDetailsBody = ({
                     <dd className="mt-1 text-sm text-gray-900">
                       {deliveryAddress}
                     </dd>
+                  </div>
+                )}
+
+                {country && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Country
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">{country}</dd>
                   </div>
                 )}
 
@@ -146,30 +169,30 @@ const OrderDetailsBody = ({
                 </div>
 
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Payment Type
-                  </dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {payments.map((payment) => payment.paymentType).join(", ")}
-                  </dd>
-                </div>
-                <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Paid</dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     {paid ? "YES" : "NO"}
                   </dd>
                 </div>
 
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Country</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{country}</dd>
-                </div>
+                {Boolean(payments.length) && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Payment Type
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {payments
+                        .map((payment) => payment.paymentType)
+                        .join(", ")}
+                    </dd>
+                  </div>
+                )}
               </dl>
             </div>
           </div>
         </section>
       </div>
-      {history && <ActivitySection history={history} />}
+      {Boolean(history.length) && <ActivitySection history={history} />}
       {Boolean(lineItems.length) && (
         <div className="lg:col-start-1 lg:col-span-3">
           <section aria-labelledby="departments">
@@ -183,8 +206,6 @@ const OrderDetailsBody = ({
 
 export const CustomerOrderDetails = () => {
   const {
-    subsys,
-    orderId,
     dateTime,
     customer,
     delivery,
@@ -195,36 +216,37 @@ export const CustomerOrderDetails = () => {
     country,
     status,
     lineItems,
-    setLineItems,
     statusHistory,
   } = useOutletContext();
   const [history, setHistory] = useState([]);
+
   useEffect(() => {
-    fetchAllActionBy(statusHistory).then((data) => {
-      setHistory(
-        statusHistory.map(({ status, timeStamp }, index) => ({
-          id: index,
-          type:
-            status === "PENDING"
-              ? index === 0
-                ? eventTypes.created
-                : eventTypes.completed
-              : ["PICKING", "PACKING", "SHIPPING"].some((s) => s === status)
-              ? eventTypes.action
-              : status === "CANCELLED"
-              ? eventTypes.cancelled
-              : eventTypes.completed,
-          content:
-            status === "PENDING"
-              ? `${index === 0 ? "Created" : "Updated"} by`
-              : status === "READY_FOR_SHIPPING"
-              ? "Ready for shipping by"
-              : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
-          target: data[index].name,
-          date: moment.unix(timeStamp / 1000).format("DD/MM, H:mm"),
-        }))
-      );
-    });
+    statusHistory !== undefined &&
+      fetchAllActionBy(statusHistory).then((data) => {
+        setHistory(
+          statusHistory.map(({ status, timeStamp }, index) => ({
+            id: index,
+            type:
+              status === "PENDING"
+                ? index === 0
+                  ? eventTypes.created
+                  : eventTypes.completed
+                : ["PICKING", "PACKING", "SHIPPING"].some((s) => s === status)
+                ? eventTypes.action
+                : status === "CANCELLED"
+                ? eventTypes.cancelled
+                : eventTypes.completed,
+            content:
+              status === "PENDING"
+                ? `${index === 0 ? "Created" : "Updated"} by`
+                : status === "READY_FOR_SHIPPING"
+                ? "Ready for shipping by"
+                : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
+            target: data[index].name,
+            date: moment.unix(timeStamp / 1000).format("DD/MM, H:mm"),
+          }))
+        );
+      });
   }, [statusHistory]);
   return (
     <OrderDetailsBody

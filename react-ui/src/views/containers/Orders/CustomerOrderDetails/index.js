@@ -69,6 +69,7 @@ const OrderDetailsBody = ({
   totalAmount,
   payments,
   paid,
+  pickupSite,
   country,
   lineItems,
   status,
@@ -137,17 +138,48 @@ const OrderDetailsBody = ({
                     </dd>
                   </div>
                 )}
-
-                {deliveryAddress && (
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Delivery Address
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {deliveryAddress}
-                    </dd>
-                  </div>
-                )}
+                {delivery !== undefined &&
+                  (delivery ? (
+                    deliveryAddress && (
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          Delivery Address
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900">
+                          <address className="not-italic">
+                            <span className="block">
+                              {deliveryAddress.street1},{" "}
+                              {deliveryAddress.street2}
+                            </span>
+                            <span className="block">
+                              {deliveryAddress.city}, {deliveryAddress.zip}
+                            </span>
+                          </address>
+                        </dd>
+                      </div>
+                    )
+                  ) : (
+                    pickupSite && <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Pickup At
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900">
+                        <address className="not-italic">
+                          <span className="block">{pickupSite.name}</span>
+                          <span className="block">
+                            {pickupSite.address.road}
+                          </span>
+                          <span className="block">
+                            {pickupSite.address.city},{" "}
+                            {pickupSite.address.postalCode}
+                          </span>
+                          <span className="block">
+                            {pickupSite.phoneNumber}
+                          </span>
+                        </address>
+                      </dd>
+                    </div>
+                  ))}
 
                 {country && (
                   <div className="sm:col-span-1">
@@ -213,6 +245,7 @@ export const CustomerOrderDetails = () => {
     totalAmount,
     payments,
     paid,
+    pickupSite,
     country,
     status,
     lineItems,
@@ -231,7 +264,7 @@ export const CustomerOrderDetails = () => {
                 ? index === 0
                   ? eventTypes.created
                   : eventTypes.completed
-                : ["PICKING", "PACKING", "SHIPPING"].some((s) => s === status)
+                : ["PICKING", "PACKING", "DELIVERING"].some((s) => s === status)
                 ? eventTypes.action
                 : status === "CANCELLED"
                 ? eventTypes.cancelled
@@ -239,8 +272,10 @@ export const CustomerOrderDetails = () => {
             content:
               status === "PENDING"
                 ? `${index === 0 ? "Created" : "Updated"} by`
-                : status === "READY_FOR_SHIPPING"
-                ? "Ready for shipping by"
+                : status === "READY_FOR_DELIVERY"
+                ? "Ready for delivery by"
+                : status === "READY_FOR_COLLECTION"
+                ? "Ready for collection by"
                 : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
             target: data[index].name,
             date: moment.unix(timeStamp / 1000).format("DD/MM, H:mm"),
@@ -257,6 +292,7 @@ export const CustomerOrderDetails = () => {
       totalAmount={totalAmount}
       payments={payments}
       paid={paid}
+      pickupSite={pickupSite}
       country={country}
       status={status.status}
       lineItems={lineItems}

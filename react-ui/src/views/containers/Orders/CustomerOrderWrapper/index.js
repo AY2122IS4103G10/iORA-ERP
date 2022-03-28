@@ -44,7 +44,7 @@ const Header = ({
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${orderId}`}</h1>
           <div className="mt-3 flex md:mt-0 md:absolute md:top-3 md:right-0">
-            {disableInvoice && (
+            {!disableInvoice && (
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -132,7 +132,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const { addToast } = useToasts();
   const { orderId } = useParams();
   const componentRef = useRef();
-  const navigate = useNavigate();
   const handlePrint = useReactToPrint({ content: () => componentRef.current });
   const [lineItems, setLineItems] = useState([]);
   const [status, setStatus] = useState("");
@@ -144,8 +143,8 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [totalAmount, setTotalAmount] = useState(-1);
   const [payments, setPayments] = useState([]);
   const [paid, setPaid] = useState(false);
+  const [pickupSite, setPickupSite] = useState(null);
   const [country, setCountry] = useState(null);
-  const [openDelete, setOpenDelete] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [qrDelivery, setQrDelivery] = useState("");
   const [open, setOpen] = useState(false);
@@ -173,9 +172,11 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           totalAmount,
           payments,
           paid,
+          pickupSite,
           country,
           statusHistory,
         } = data;
+
         fetchAllModelsBySkus(lineItems).then((data) => {
           setLineItems(
             lineItems.map((item, index) => ({
@@ -198,6 +199,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         setTotalAmount(totalAmount);
         setPayments(payments);
         setPaid(paid);
+        setPickupSite(pickupSite);
         setCountry(country);
         setQrValue(
           `http://localhost:3000/${subsys}/orders/${orderId}/pick-pack`
@@ -216,9 +218,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     fetchOrder();
   }, [subsys, orderId, addToast]);
 
-  const openModal = () => setOpenDelete(true);
-  const closeModal = () => setOpenDelete(false);
-
   const openInvoice = () => setOpen(true);
   const closeInvoice = () => setOpen(false);
 
@@ -235,8 +234,11 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       href: `/${subsys}/orders/${orderId}/pick-pack`,
       current: false,
     },
-    { name: "Delivery", href: "#", current: false },
+    status !== "" && delivery
+      ? { name: "Delivery", href: "#", current: false }
+      : { name: "Collection", href: `/${subsys}/orders/${orderId}/collect`, current: false },
   ];
+
   return loading ? (
     <div className="flex mt-5 items-center justify-center">
       <TailSpin color="#00BFFF" height={20} width={20} />
@@ -249,7 +251,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           disableTabs={delivery === null || delivery === undefined}
           tabs={tabs}
           orderId={orderId}
-          disableInvoice={status === undefined}
+          disableInvoice={status === "" || !delivery}
           openInvoice={openInvoice}
         />
         <Outlet
@@ -263,6 +265,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             totalAmount,
             payments,
             paid,
+            pickupSite,
             country,
             status,
             setStatus,

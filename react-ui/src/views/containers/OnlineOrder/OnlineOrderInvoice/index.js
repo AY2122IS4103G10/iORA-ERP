@@ -70,9 +70,7 @@ export const OnlineInvoiceBody = ({
               <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">Date</dt>
                 <dd className="text-cyan-600 mt-2">
-                  {moment
-                    .unix(dateTime / 1000)
-                    .format("DD/MM/YYYY, hh:mm:ss")}
+                  {moment.unix(dateTime / 1000).format("DD/MM/YYYY, hh:mm:ss")}
                 </dd>
               </dl>
               <dl className="mt-4 text-sm font-medium">
@@ -81,7 +79,9 @@ export const OnlineInvoiceBody = ({
               </dl>
               <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">Delivery Type</dt>
-                <dd className="text-cyan-600 mt-2">{delivery ? "DELIVERY" : "SELF-COLLECT"}</dd>
+                <dd className="text-cyan-600 mt-2">
+                  {delivery ? "DELIVERY" : "SELF-COLLECT"}
+                </dd>
               </dl>
               {/* <dl className="mt-4 text-sm font-medium">
                 <dt className="text-gray-900">Tracking number</dt>
@@ -118,16 +118,11 @@ export const OnlineInvoiceBody = ({
                     <span className="block">
                       {customer.firstName} {customer.lastName}
                     </span>
-                    {/* <span className="block">{deliveryAddress.name}</span>
                     <span className="block">
-                      {deliveryAddress.address.road}
+                      {deliveryAddress.street1}, {deliveryAddress.street2}
                     </span>
                     <span className="block">
-                      {deliveryAddress.address.city},{" "}
-                      {deliveryAddress.address.postalCode}
-                    </span> */}
-                    <span className="block">
-                      {deliveryAddress}
+                      {deliveryAddress.city}, {deliveryAddress.zip}
                     </span>
                     <span className="block">{customer.contactNumber}</span>
                   </address>

@@ -62,8 +62,6 @@ const ProductList = ({
                           Promise.resolve(
                             onProductSelectedChanged(product)
                           ).then(() => handlePrint());
-
-                          // handlePrint();
                         }}
                       >
                         <PrinterIcon
@@ -135,10 +133,6 @@ export const ProductPrint = () => {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
-    // onBeforeGetContent: (product) => {
-    //   onProductSelectedChanged(product);
-    //   return Promise.resolve();
-    // },
   });
   const [enabled, setEnabled] = useState(false);
   const [search, setSearch] = useState("");

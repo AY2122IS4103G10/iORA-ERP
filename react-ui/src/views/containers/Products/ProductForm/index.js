@@ -16,6 +16,7 @@ import { api } from "../../../../environments/Api";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { classNames } from "../../../../utilities/Util";
+import { TrashIcon } from "@heroicons/react/outline";
 
 const prepareFields = (fields, checkedState) => {
   const f = [];
@@ -23,7 +24,7 @@ const prepareFields = (fields, checkedState) => {
   return f;
 };
 
-const SKUModal = ({
+export const SKUModal = ({
   open,
   closeModal,
   colors,
@@ -127,49 +128,32 @@ const SKUModal = ({
 
 const SKUList = ({ products }) => {
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-md">
+    <div className="bg-white border border-gray-300 overflow-hidden sm:rounded-md">
       <ul className="divide-y divide-gray-200">
         {products.map((product) => (
           <li key={product.sku}>
-            <div className="px-4 py-4 flex items-center sm:px-6">
-              <div className="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
-                <div className="truncate">
-                  <p className="text-base font-medium text-cyan-600 truncate">
-                    {product.sku}
-                  </p>
-                </div>
-
-                {/* <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
-                  <div>
-                    <div className="mt-1 flex rounded-md shadow-sm">
-                      <div className="relative flex items-stretch flex-grow focus-within:z-10">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">Qty:</span>
-                        </div>
-                        <input
-                          type="number"
-                          name="qty"
-                          id="qty"
-                          min="1"
-                          className="pl-12 focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                          value={printQty}
-                          onChange={onPrintQtyChanged}
-                        />
+            <div className="block">
+              <div className="px-4 py-4 flex items-center sm:px-6">
+                <div className="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div className="truncate">
+                    <div className="flex text-sm">
+                      <p className="text-base font-medium text-cyan-600 truncate">
+                        {product.sku}
+                      </p>
+                    </div>
+                    <div className="mt-2 flex">
+                      <div className="flex items-center text-sm text-gray-500">
+                        {product.color.fieldValue}, {product.size.fieldValue}
                       </div>
-                      <button
-                        type="button"
-                        className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
-                        onClick={handlePrint}
-                      >
-                        <PrinterIcon
-                          className="h-5 w-5 text-gray-400"
-                          aria-hidden="true"
-                        />
-                        <span>Print</span>
-                      </button>
                     </div>
                   </div>
-                </div> */}
+                </div>
+                <div className="ml-5 flex-shrink-0">
+                  <TrashIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </div>
               </div>
             </div>
           </li>
@@ -936,6 +920,7 @@ export const ProductForm = () => {
   const onFieldValueChanged = (e) => setFieldValue(e.target.value);
 
   const canAddField = fieldNameSelected && fieldValue;
+  
   const onAddFieldClicked = (evt) => {
     evt.preventDefault();
     if (canAddField)
@@ -991,8 +976,18 @@ export const ProductForm = () => {
   };
   const closeSkuModal = () => setOpenAddSku(false);
 
-  const onAddSkuClicked = () => {};
-
+  const onAddSkuClicked = (evt) => {
+    evt.preventDefault();
+    const s = skus;
+    s.push({
+      sku,
+      color: skuColorSelected,
+      size: skuSizeSelected,
+    });
+    setSkus(s);
+    setSku("");
+    closeSkuModal();
+  };
   return (
     <>
       <AddProductFormBody
@@ -1048,10 +1043,9 @@ export const ProductForm = () => {
         sizes={skuSizes}
         skuSizeSelected={skuSizeSelected}
         setSkuSizeSelected={setSkuSizeSelected}
-        isEditing={isEditing}
         sku={sku}
         onSkuChanged={onSkuChanged}
-        onSaveClicked={onSaveClicked}
+        onSaveClicked={onAddSkuClicked}
       />
     </>
   );

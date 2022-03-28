@@ -55,15 +55,6 @@ const ItemTable = ({ data }) => {
         Header: "Qty",
         accessor: "qty",
       },
-      // {
-      //   Header: "Disc",
-      //   accessor: "subTotal",
-      //   Cell: ({ value, row }) => {
-      //     const {product, subTotal} = row.original;
-      //     if (subTotal <= 0 )
-      //     return value <= 0 ? value : "-";
-      //   },
-      // },
     ],
     []
   );
@@ -72,6 +63,41 @@ const ItemTable = ({ data }) => {
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
         <h3 className="text-lg leading-6 font-medium text-gray-900">Items</h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
+const PromoTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Name",
+        accessor: "promotion.fieldValue",
+      },
+      {
+        Header: "Qty",
+        accessor: "qty",
+      },
+      {
+        Header: "Discount",
+        accessor: "subTotal",
+        Cell: (e) => e.value.toFixed(2),
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Promotions Applied
+        </h3>
       </div>
 
       <div className="mt-4">
@@ -97,26 +123,24 @@ export const OrderDetails = () => {
 
   useEffect(() => {
     const orderLineItems = Boolean(order) ? order.lineItems : [];
-    if (orderLineItems.length) {
-      const lIs = orderLineItems.filter((item) => item.subTotal > 0);
-      const promoLIs = orderLineItems.filter((item) => item.subTotal <= 0);
-      lIs.forEach((item) => {
-        const promo = promoLIs.find((i) => i.product.sku === item.product.sku);
-        if (promo !== undefined) item["prodDisc"] = promo.subTotal;
-      });
-      fetchAllModelsBySkus(lIs).then((data) =>
-        setLineItems(
-          lIs.map((item, index) => ({
+    fetchAllModelsBySkus(orderLineItems).then((data) =>
+      setLineItems(
+        orderLineItems.map((item, index) => {
+          const promo = order.promotions.find(
+            (promo) => promo.product.sku === item.product.sku
+          );
+          return {
             ...item,
             product: {
               ...item.product,
               modelCode: data[index].modelCode,
               name: data[index].name,
             },
-          }))
-        )
-      );
-    }
+            promo: promo !== undefined ? promo.promotion.fieldValue : null,
+          };
+        })
+      )
+    );
   }, [order]);
 
   return orderStatus === "loading" ? (
@@ -156,7 +180,7 @@ export const OrderDetails = () => {
                         Transaction Date
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900">
-                        {moment(order.dateTime).format("DD/MM/YYYY")}
+                        {moment(order.dateTime).format("DD/MM/YYYY, H:mm:ss")}
                       </dd>
                     </div>
                     <div className="sm:col-span-1">
@@ -179,6 +203,23 @@ export const OrderDetails = () => {
                           .join(", ")}
                       </dd>
                     </div>
+                    {order.voucher && (
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          Voucher
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900">
+                          <address className="not-italic">
+                            <span className="block">
+                              ${order.voucher.amount}
+                            </span>
+                            <span className="block">
+                              {order.voucher.voucherCode}
+                            </span>
+                          </address>
+                        </dd>
+                      </div>
+                    )}
                   </dl>
                 </div>
               </div>
@@ -186,6 +227,11 @@ export const OrderDetails = () => {
             {Boolean(lineItems.length) && (
               <section aria-labelledby="line-items">
                 <ItemTable data={lineItems} />
+              </section>
+            )}
+            {Boolean(order.promotions.length) && (
+              <section aria-labelledby="line-items">
+                <PromoTable data={order.promotions} />
               </section>
             )}
           </div>

@@ -18,7 +18,8 @@ const columns = [
   },
   {
     Header: "Transaction Date",
-    accessor: (row) => moment(row.dateTime).format("DD/MM/YYYY"),
+    accessor: "dateTime",
+    Cell: (e) => moment(e.value).format("DD/MM/YYYY, H:mm:ss"),
   },
   {
     Header: "Total Amount",

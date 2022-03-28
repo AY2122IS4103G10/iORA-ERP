@@ -47,7 +47,9 @@ public interface ProductService {
     public abstract List<Product> searchProductsBySKU(String sku);
     public abstract List<Product> getProductsByModel(String modelCode) throws ProductException;
     public abstract List<Product> getProductsByFieldValue(String fieldName, String fieldValue);
+    public abstract Product createProduct(Product product) throws ProductException;
     public abstract Product updateProduct(Product product) throws ProductException;
+    public abstract String deleteProduct(String sku) throws ProductException;
 
     public abstract ProductItem createProductItem(String rfid, String sku) throws ProductItemException;
     public abstract List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException;

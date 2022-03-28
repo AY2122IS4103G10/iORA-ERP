@@ -469,6 +469,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product createProduct(Product product) throws ProductException {
+        try {
+            Model model = getModel(product.getSku().substring(0, product.getSku().indexOf("-")));
+
+            for (ProductField pf : product.getProductFields()) {
+                model.addProductField(pf);
+            }
+            em.merge(model);
+            em.persist(product);
+        } catch (ModelException | EntityExistsException e) {
+            e.printStackTrace();
+            System.err.println(e);
+        }
+        return product;
+    }
+
+    @Override
     public Product updateProduct(Product product) throws ProductException {
         Product old = em.find(Product.class, product.getSku());
 
@@ -478,6 +495,12 @@ public class ProductServiceImpl implements ProductService {
 
         old.setProductFields(product.getProductFields());
         return em.merge(old);
+    }
+
+    @Override
+    public String deleteProduct(String sku) throws ProductException {
+        em.remove(getProduct(sku));
+        return sku;
     }
 
     @Override

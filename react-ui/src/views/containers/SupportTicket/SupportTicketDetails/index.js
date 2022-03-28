@@ -155,13 +155,12 @@ const SupportTicketBody = ({ messages, customer, order }) => {
                             {messages.map((msg, index) => (
                                 <li key={index} className="px-6 py-4">
                                     <p className="font-bold text-lg align-top mb-5">{msg.name}</p>
-                                    {Boolean(msg.imageUrl) && <img src={msg.imageUrl} width="500"/>}
+                                    {Boolean(msg.imageUrl) && <img src={msg.imageUrl} width="500" />}
                                     <p className="text-m align-bottom mb-5">{msg.message}</p>
                                     <p className="text-xs italic align-bottom mb-5">{moment.unix(msg.timeStamp / 1000).format("H:mm:ss, DD/MM/YYYY")}</p>
                                 </li>
                             ))}
                         </ul>
-
                     </div>
                 </div>
             </div>
@@ -178,7 +177,7 @@ const InputArea = ({ input, onInputChanged, onReplyClicked, file, setFile }) => 
     };
 
     return (
-        <div className="border-gray-200 px-4 py-1 mt-5 sm:px-6">
+        <div className="border-gray-200 mx-auto lg:max-w-7xl px-4 py-1 mt-5 sm:px-6">
             <form className="relative px-4">
                 <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500">
                     <label htmlFor="input" className="sr-only">

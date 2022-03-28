@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.iora.erp.model.site.StockLevelLI;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,12 +16,14 @@ import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
+import com.iora.erp.model.site.Site;
+import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
-import com.iora.erp.service.StripeService;
 import com.iora.erp.service.SiteService;
+import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -169,11 +169,12 @@ public class OnlineCustomerController {
     @Autowired
     StripeService stripeService;
 
-    @PostMapping(path = "/pay", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createPaymentIntent(@RequestParam(required = false) Long amt,
-            @RequestBody List<CustomerOrderLI> lineItems) {
+    @PostMapping(path = "/pay/{delivery}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems,
+            @PathVariable Boolean delivery, @RequestParam(required = false) Long amt) {
         try {
-            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems, (amt == null) ? 0L : amt * 100));
+            return ResponseEntity
+                    .ok(stripeService.createPaymentIntent(lineItems, delivery, (amt == null) ? 0L : amt * 100));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -321,10 +322,21 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/viewStock/{skuCode}", produces = "application/json")
-    public StockLevelLI viewStock(@PathVariable String skuCode) {
+    @GetMapping(path = "/viewStock/product/{skuCode}", produces = "application/json")
+    public ResponseEntity<Object> viewStockByProduct(@PathVariable String skuCode) {
         try {
-            return siteService.getStockLevelLI(3L, skuCode);
+            return ResponseEntity.ok(siteService.getStockLevelLI(3L, skuCode));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/viewStock", produces = "application/json")
+    public StockLevel viewStockOfOnlineSite() {
+        try {
+            Site site = siteService.getSite(3L);
+            return site.getStockLevel();
         } catch (Exception e) {
             return null;
         }
@@ -338,5 +350,22 @@ public class OnlineCustomerController {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    // @GetMapping(path = "/countries", produces = "application/json")
+    // public List<String> getCountries() {
+    // try {
+    // List<String> country = Stream.of(CountryEnum.values()).map(
+    // CountryEnum::name).collect(Collectors.toList());
+
+    // return country;
+    // } catch (Exception e) {
+    // return null;
+    // }
+    // }
+
+    @GetMapping(path = "/stores/{country}", produces = "application/json")
+    public List<? extends Site> viewStores(@PathVariable String country) {
+        return siteService.searchStores(country, "");
     }
 }

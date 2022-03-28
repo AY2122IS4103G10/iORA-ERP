@@ -35,8 +35,12 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
-    public String createPaymentIntent(List<CustomerOrderLI> lineItems, Long voucherAmount) throws StripeException {
+    public String createPaymentIntent(List<CustomerOrderLI> lineItems, Boolean delivery, Long voucherAmount)
+            throws StripeException {
         Long totalAmount = calculateOrderAmount(lineItems) - voucherAmount;
+        if (delivery) {
+            totalAmount += 250L;
+        }
         totalAmount = Math.max(totalAmount, 0);
 
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()

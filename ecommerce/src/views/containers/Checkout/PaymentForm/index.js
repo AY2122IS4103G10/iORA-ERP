@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { checkoutApi } from "../../../../environments/Api";
 
 
 export default function PaymentForm({ clientSecret, order }) {
@@ -8,16 +9,23 @@ export default function PaymentForm({ clientSecret, order }) {
     const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState("");
+    const [paymentIntentId, setPaymentIntentId] = useState("");
 
     useEffect(() => {
-        console.log("Reload");
-        console.log(clientSecret);
-        console.log(stripe);
+
         if (!clientSecret || !stripe) {
             return;
         }
 
+        getPaymentStatus();
+
+    }, [stripe, clientSecret, loading]);
+    
+    const getPaymentStatus = () => {
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+            setPaymentIntentId(paymentIntent.id);
+            console.log("STATUS:", paymentIntent.status);
+            console.log("Client Secret:", clientSecret)
             switch (paymentIntent.status) {
                 case "succeeded":
                     setMessage("Payment succeeded!");
@@ -28,51 +36,60 @@ export default function PaymentForm({ clientSecret, order }) {
                 case "requires_payment_method":
                     setMessage("Your payment was not successful, please try again.");
                     break;
+                case "requires_capture":
+                    console.log("yesss")
+                    createOnlineOrder();
                 default:
                     setMessage("Something went wrong.");
                     break;
             }
         });
-        console.log("hello");
-    }, [stripe, clientSecret, loading]);
+    }
+
 
     const handleSubmit = async (e) => {
         console.log('submit');
         e.preventDefault();
+
+        if (!stripe || !elements || !paymentIntentId) {
+            return; 
+        }
         setLoading(true);
 
-        if (!stripe || !elements || !clientSecret) {
-            return;
-        }
-
-        const  error  = await stripe.confirmPayment({
+        //confirm payment
+        const error = await stripe.confirmPayment({
             elements,
-            confirmParams: {
-                //payment completion page
-                return_url: `http://localhost:3000/checkout/order/complete`,
-            }
+            redirect: "if_required"
         })
-
+        console.log(error);
         if (error.type === "card_error" || error.type === "validation_error") {
             setMessage(error.message);
         } else {
             setMessage("An unexpected error occured.");
         }
-
-        //capture payment
         
-
-
         setLoading(false);
     }
 
-    console.log(message);
-
+    const createOnlineOrder = () => {
+        checkoutApi.createOnlineOrder({
+            ...order,
+            payments: [
+                {
+                    amount: order.totalAmount,
+                    paymentType: "MASTERCARD",
+                    ccTransactionId: clientSecret,
+                },
+            ]
+        }, paymentIntentId)
+            .then((response) => console.log(response.data))
+            .catch((err) => setMessage(err))
+    }
 
 
     return (
         <form id="payment-form" onSubmit={handleSubmit}>
-            <PaymentElement id="payment-element"/>
+            <PaymentElement id="payment-element" />
             {message && <div id="payment-message">{message}</div>}
             <button
                 type="submit"

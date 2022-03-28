@@ -59,22 +59,22 @@ export const authApi = {
 export const listingApi = {
   getListingByLineAndTag(line, tag) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/model/tag/${line}/${tag}`
+      `${REST_ENDPOINT}online/public/model/tag/${line}/${tag}`
     );
   },
   getListingByLine(line) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/model/tag/${line}`
+      `${REST_ENDPOINT}online/public/model/tag/${line}`
     );
   },
   getModel(modelCode) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/model/${modelCode}`
+      `${REST_ENDPOINT}online/public/model/${modelCode}`
     );
   },
   getProductStock(sku) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/viewStock/product/${sku}`
+      `${REST_ENDPOINT}online/public/viewStock/product/${sku}`
     );
   },
 }
@@ -82,24 +82,24 @@ export const listingApi = {
 export const checkoutApi = {
   calculatePromotions(lineItems) {
     return axiosPublic.post(
-      `${REST_ENDPOINT}online/customerOrder/calculate`,
+      `${REST_ENDPOINT}online/public/customerOrder/calculate`,
       lineItems
     );
   },
   getStores() {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/stores/singapore`,
+      `${REST_ENDPOINT}online/public/stores/singapore`,
     )
   }, 
-  createPaymentIntent(lineItems, deliveryFee) {
+  createPaymentIntent(totalAmount, isDelivery) {
     return axiosPublic.post(
-      `${REST_ENDPOINT}online/pay/${deliveryFee}`,
-      lineItems
+      `${REST_ENDPOINT}online/public/pay/${totalAmount}/${isDelivery}`,
+      totalAmount
     )
   },
-  createOnlineOrder(onlineOrder, clientSecret) {
+  createOnlineOrder(onlineOrder, paymentIntentId) {
     return axiosPublic.post(
-      `${REST_ENDPOINT}online/create/${clientSecret}`,
+      `${REST_ENDPOINT}online/public/create?paymentIntentId=${paymentIntentId}`,
       onlineOrder
     )
   }

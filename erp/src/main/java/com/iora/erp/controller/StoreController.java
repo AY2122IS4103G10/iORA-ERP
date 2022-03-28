@@ -375,7 +375,7 @@ public class StoreController {
     public ResponseEntity<Object> createPaymentIntent(@RequestParam(required = false) Long amt,
             @RequestBody List<CustomerOrderLI> lineItems) {
         try {
-            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems, false, (amt == null) ? 0L : amt * 100));
+            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems, (amt == null) ? 0L : amt * 100));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());

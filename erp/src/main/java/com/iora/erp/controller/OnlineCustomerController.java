@@ -15,12 +15,14 @@ import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
+import com.iora.erp.service.EasyPostService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StripeService;
@@ -169,25 +171,37 @@ public class OnlineCustomerController {
     }
 
 
-    @PostMapping(path = "/pay/{delivery}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems,
-            @PathVariable Boolean delivery, @RequestParam(required = false) Long amt) {
+
+
+    @PostMapping(path = "/pay", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createPaymentIntent(@RequestParam(required = false) Long amt, @RequestBody List<CustomerOrderLI> lineItems) {
         try {
-            return ResponseEntity
-                    .ok(stripeService.createPaymentIntent(lineItems, delivery, (amt == null) ? 0L : amt * 100));
+            return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems, (amt == null) ? 0L : amt * 100));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
+    
+    @PostMapping(path = "/public/pay/{totalAmount}/{isDelivery}", produces = "application/json")
+    public ResponseEntity<Object> createPaymentIntentOnlineOrder(@PathVariable Long totalAmount , @PathVariable Boolean isDelivery) {
+        try {
+            return ResponseEntity.ok(stripeService.createPaymentIntentOnlineOrder(totalAmount, isDelivery));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/public/create", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createOnlineOrder(@RequestBody OnlineOrder onlineOrder,
-            @RequestParam String clientSecret) {
+            @RequestParam String paymentIntentId) {
         try {
             return ResponseEntity.ok(
-                    customerOrderService.createOnlineOrder(onlineOrder, (clientSecret == "") ? null : clientSecret));
+                    customerOrderService.createOnlineOrder(onlineOrder, (paymentIntentId == "") ? null : paymentIntentId));
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
@@ -264,7 +278,7 @@ public class OnlineCustomerController {
 
     // Get models by fashion line (iORA) and tag (top)
     // Return empty list if no results
-    @GetMapping(path = "/model/tag/{company}/{tag}", produces = "application/json")
+    @GetMapping(path = "/public/model/tag/{company}/{tag}", produces = "application/json")
     public ResponseEntity<Object> getModelsByCompanyAndTag(@PathVariable String company, @PathVariable String tag) {
         try {
             return ResponseEntity.ok(productService.getModelsByCompanyAndTag(company, tag));
@@ -275,7 +289,7 @@ public class OnlineCustomerController {
 
     // Get models by tag (top)
     // Return empty list if no results
-    @GetMapping(path = "/model/tag/{tag}", produces = "application/json")
+    @GetMapping(path = "/public/model/tag/{tag}", produces = "application/json")
     public ResponseEntity<Object> getModelsByTag(@PathVariable String tag) {
         try {
             return ResponseEntity.ok(productService.getModelsByTag(tag));
@@ -286,7 +300,7 @@ public class OnlineCustomerController {
 
     // Get models by category (2 FOR S$49 / IORA NEW ARRIVALS)
     // Return empty list if no results
-    @GetMapping(path = "/model/category/{category}", produces = "application/json")
+    @GetMapping(path = "/public/model/category/{category}", produces = "application/json")
     public ResponseEntity<Object> getModelsByCategory(@PathVariable String category) {
         try {
             return ResponseEntity.ok(productService.getModelsByCategory(category));
@@ -295,7 +309,7 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/model/{modelCode}", produces = "application/json")
+    @GetMapping(path = "/public/model/{modelCode}", produces = "application/json")
     public ResponseEntity<Object> getModel(@PathVariable String modelCode) {
         try {
             return ResponseEntity.ok(productService.getModel(modelCode));
@@ -304,7 +318,7 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/model/skuCode/{sku}", produces = "application/json")
+    @GetMapping(path = "/public/model/skuCode/{sku}", produces = "application/json")
     public ResponseEntity<Object> getModelsNameBySKU(@PathVariable String sku) {
         try {
             return ResponseEntity.ok(productService.getModelByProduct(productService.getProduct(sku)));
@@ -313,7 +327,7 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/model/modelCode/{modelCode}", produces = "application/json")
+    @GetMapping(path = "/public/model/modelCode/{modelCode}", produces = "application/json")
     public ResponseEntity<Object> getModelsNameByModelCode(@PathVariable String modelCode) {
         try {
             return ResponseEntity.ok(productService.getModel(modelCode));
@@ -322,7 +336,7 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/viewStock/product/{skuCode}", produces = "application/json")
+    @GetMapping(path = "/public/viewStock/product/{skuCode}", produces = "application/json")
     public ResponseEntity<Object> viewStockByProduct(@PathVariable String skuCode) {
         try {
             return ResponseEntity.ok(siteService.getStockLevelLI(3L, skuCode));
@@ -332,7 +346,7 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/viewStock", produces = "application/json")
+    @GetMapping(path = "/public/viewStock", produces = "application/json")
     public StockLevel viewStockOfOnlineSite() {
         try {
             Site site = siteService.getSite(3L);
@@ -342,7 +356,7 @@ public class OnlineCustomerController {
         }
     }
 
-    @PostMapping(path = "/customerOrder/calculate", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/public/customerOrder/calculate", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> calculatePromotions(@RequestBody List<CustomerOrderLI> lineItems) {
         try {
             return ResponseEntity.ok(customerOrderService.calculatePromotions(lineItems));
@@ -352,19 +366,7 @@ public class OnlineCustomerController {
         }
     }
 
-    // @GetMapping(path = "/countries", produces = "application/json")
-    // public List<String> getCountries() {
-    // try {
-    // List<String> country = Stream.of(CountryEnum.values()).map(
-    // CountryEnum::name).collect(Collectors.toList());
-
-    // return country;
-    // } catch (Exception e) {
-    // return null;
-    // }
-    // }
-
-    @GetMapping(path = "/stores/{country}", produces = "application/json")
+    @GetMapping(path = "/public/stores/{country}", produces = "application/json")
     public List<? extends Site> viewStores(@PathVariable String country) {
         return siteService.searchStores(country, "");
     }

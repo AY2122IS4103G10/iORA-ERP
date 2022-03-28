@@ -35,12 +35,10 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
-    public String createPaymentIntent(List<CustomerOrderLI> lineItems, Boolean delivery, Long voucherAmount)
+    public String createPaymentIntent(List<CustomerOrderLI> lineItems, Long voucherAmount)
             throws StripeException {
         Long totalAmount = calculateOrderAmount(lineItems) - voucherAmount;
-        if (delivery) {
-            totalAmount += 250L;
-        }
+
         totalAmount = Math.max(totalAmount, 0);
 
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
@@ -56,6 +54,24 @@ public class StripeServiceImpl implements StripeService {
 
         return paymentIntent.getClientSecret();
     }
+
+    @Override
+    public String createPaymentIntentOnlineOrder(Long totalAmount, Boolean isDelivery) throws StripeException {
+
+        PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+                .setAmount(totalAmount)
+                .setCurrency("sgd")
+                .addPaymentMethodType("card_present")
+                .addPaymentMethodType("card")
+                .setCaptureMethod(CaptureMethod.MANUAL)
+                .build();
+
+        // Create a PaymentIntent with the order amount and currency
+        PaymentIntent paymentIntent = PaymentIntent.create(params);
+
+        return paymentIntent.getClientSecret();
+    }
+
 
     @Override
     public Map<String, String> createConnnectionToken() throws StripeException {
@@ -103,4 +119,5 @@ public class StripeServiceImpl implements StripeService {
 
         return Refund.create(params);
     }
+
 }

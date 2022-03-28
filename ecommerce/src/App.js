@@ -11,6 +11,7 @@ import { HomeIndex } from "./views/containers/Index/HomeIndex";
 import { Listings } from "./views/containers/Listings";
 import { Checkout } from "./views/containers/Checkout/CheckoutForm";
 import ViewModel from "./views/containers/ViewModel";
+import { ManageCheckout } from "./views/containers/Checkout/ManageCheckout";
 
 function App() {
   return (
@@ -34,7 +35,7 @@ function App() {
             <Route path="" element={<Listings/>}/>
           </Route>
           <Route path="cart" element={<Cart/>}/>
-          <Route path="cart/checkout" element={<Checkout/>}/>
+          <Route path="cart/checkout" element={<ManageCheckout/>}/>
           <Route path="settings" element={<SettingsIndex />}>
             <Route path="profile" element={<Profile />} />
             <Route path="account" element={<Account />} />

@@ -37,5 +37,9 @@ public interface EmployeeService {
 
     public abstract Boolean emailAvailability(String email);
 
-    public abstract void resetPassword(Long id) throws EmployeeException;
+    public abstract Employee getEmployeeByEmail(String email);
+
+    public abstract void resetPasswordAdmin(Long id) throws EmployeeException;
+
+    public abstract void resetPasswordUser(String email) throws EmployeeException;
 }

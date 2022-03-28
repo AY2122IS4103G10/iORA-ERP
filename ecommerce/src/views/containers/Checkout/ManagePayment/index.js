@@ -9,29 +9,29 @@ const PUBLIC_KEY = "pk_test_51KctAyIg5oaI7BMzEzTNnU7xnLmOYawYBDbGziHVJJhlyGZ1Y86
 
 const stripePromise = loadStripe(PUBLIC_KEY)
 
-export default function ManagePayment({ cart, isDelivery, order }) {
+export const ManagePayment = ({ order, isDelivery }) => {
   const [clientSecret, setClientSecret] = useState(null);
 
-  let lineItems = cart.map((item) => {
-    const { model, ...lineItem } = item;
-    return {...lineItem, subTotal: model.listPrice * item.qty};
-  });
-  console.log(lineItems);
+  
+  console.log("Create payment Intent", order?.totalAmount)
   useEffect(() => {
-    lineItems.length > 0 &&
-    checkoutApi
-      .createPaymentIntent(lineItems, isDelivery)
+    if (order !== null && order.lineItems !== null && order.lineItems.length > 0) {
+      checkoutApi
+      .createPaymentIntent(order.totalAmount * 100, isDelivery)
       .then((response) => setClientSecret(response.data))
       .catch((err) => console.log(err))
-  }, [cart, isDelivery])
+    }
+     
+  }, [])
 
   const options = {
     clientSecret,
   };
+   
   return (
     <div>
       {clientSecret !== null ? (
-        <div>
+        <div className="m-10">
           <Elements options={options} stripe={stripePromise}>
             <PaymentForm clientSecret={clientSecret} order={order}/>
           </Elements>

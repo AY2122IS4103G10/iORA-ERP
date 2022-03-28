@@ -186,7 +186,7 @@ public class AuthenticationController {
             String email = body.get("email");
             Employee e = employeeService.getEmployeeByUsername(username);
             if (e.getEmail().equals(email)) {
-                employeeService.resetPassword(e.getId());
+                employeeService.resetPasswordAdmin(e.getId());
                 return ResponseEntity.ok("Email with temporary password has been sent.");
             }
             return ResponseEntity.badRequest().body("Email does not match");

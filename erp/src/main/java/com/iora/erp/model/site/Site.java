@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Notification;
@@ -52,6 +53,7 @@ public class Site implements Serializable {
     @ManyToOne
     private Company company;
 
+    @JsonBackReference
     @OneToMany
     private List<CustomerOrder> customerOrders;
 

@@ -4,13 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
-import java.util.stream.Collectors;
-
-import com.iora.erp.model.site.Site;
-import com.iora.erp.model.site.StockLevel;
-import com.iora.erp.model.site.StockLevelLI;
-import com.iora.erp.enumeration.CountryEnum;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,12 +16,14 @@ import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
+import com.iora.erp.model.site.Site;
+import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
-import com.iora.erp.service.StripeService;
 import com.iora.erp.service.SiteService;
+import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -174,10 +169,12 @@ public class OnlineCustomerController {
     @Autowired
     StripeService stripeService;
 
-    @PostMapping(path = "/pay/{isDelivery}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems, @PathVariable Boolean isDelivery) {
+    @PostMapping(path = "/pay/{delivery}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems,
+            @PathVariable Boolean delivery, @RequestParam(required = false) Long amt) {
         try {
-            return ResponseEntity.ok(stripeService.createPaymentIntentOnlineOrder(lineItems, isDelivery));
+            return ResponseEntity
+                    .ok(stripeService.createPaymentIntent(lineItems, delivery, (amt == null) ? 0L : amt * 100));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -357,14 +354,14 @@ public class OnlineCustomerController {
 
     // @GetMapping(path = "/countries", produces = "application/json")
     // public List<String> getCountries() {
-    //     try {
-    //         List<String> country = Stream.of(CountryEnum.values()).map(
-    //                 CountryEnum::name).collect(Collectors.toList());
+    // try {
+    // List<String> country = Stream.of(CountryEnum.values()).map(
+    // CountryEnum::name).collect(Collectors.toList());
 
-    //         return country;
-    //     } catch (Exception e) {
-    //         return null;
-    //     }
+    // return country;
+    // } catch (Exception e) {
+    // return null;
+    // }
     // }
 
     @GetMapping(path = "/stores/{country}", produces = "application/json")

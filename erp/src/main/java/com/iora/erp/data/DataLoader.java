@@ -52,7 +52,6 @@ import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StockTransferService;
-import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

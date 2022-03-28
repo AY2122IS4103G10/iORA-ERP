@@ -1,5 +1,8 @@
 package com.iora.erp.service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -225,20 +228,14 @@ public class CustomerServiceImpl implements CustomerService {
 
         IntStream.range(0, qty)
                 .forEach(i -> {
-                    Voucher voucher1 = new Voucher(amount, LocalDate.parse(date));
                     try {
-                        getVoucher(voucher1.getVoucherCode());
-                        // Voucher with the generate voucher code already exist
-                        Voucher voucher2 = new Voucher(amount, LocalDate.parse(date));
-                        em.persist(voucher2);
-                        vouchers.add(voucher2);
-                    } catch (CustomerException ex) {
-                        // Voucher code does not already exist
+                        Voucher voucher1 = new Voucher(amount, new SimpleDateFormat("yyyy-MM-dd").parse(date));
                         em.persist(voucher1);
                         vouchers.add(voucher1);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
                 });
-
         return vouchers;
     }
 
@@ -275,7 +272,7 @@ public class CustomerServiceImpl implements CustomerService {
         emailService.sendSimpleMessage(customer.getEmail(), "iORA S$" + voucher.getAmount() + " Voucher",
                 "Dear customer, Your S$" + voucher.getAmount() + " voucher code is " + voucher.getVoucherCode()
                         + ". Please redeem it any of our physical or online stores before the expiry date "
-                        + voucher.getExpiry().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                        + new SimpleDateFormat("yyyy-mm-dd").format(voucher.getExpiry()));
         voucher.setIssued(true);
 
         return voucher;
@@ -350,15 +347,18 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public SupportTicket replySupportTicket(Long id, String message, String name, String imageUrl) throws SupportTicketException {
+    public SupportTicket replySupportTicket(Long id, String message, String name, String imageUrl)
+            throws SupportTicketException {
         SupportTicket st = getSupportTicket(id);
-        /* if (st.getStatus() == SupportTicket.Status.RESOLVED) {
-            throw new SupportTicketException("Ticket has already been resolved.");
-        } else if (st.getStatus() == SupportTicket.Status.PENDING) {
-            st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
-        } else {
-            st.setStatus(SupportTicket.Status.PENDING);
-        } */
+        /*
+         * if (st.getStatus() == SupportTicket.Status.RESOLVED) {
+         * throw new SupportTicketException("Ticket has already been resolved.");
+         * } else if (st.getStatus() == SupportTicket.Status.PENDING) {
+         * st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
+         * } else {
+         * st.setStatus(SupportTicket.Status.PENDING);
+         * }
+         */
 
         st.addMessage(new SupportTicketMsg(message, name, imageUrl));
         return em.merge(st);

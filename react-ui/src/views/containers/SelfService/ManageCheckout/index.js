@@ -3,9 +3,10 @@ import { XIcon } from "@heroicons/react/outline";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import React, { Fragment, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { onlineOrderApi } from "../../../../environments/Api";
+import { orderApi, posApi } from "../../../../environments/Api";
+import { Card } from "../../POS/CheckoutForm";
 import CheckoutForm from "../CheckoutForm";
 import OrderSuccess from "../OrderSuccess";
 
@@ -14,25 +15,26 @@ const stripePromise = loadStripe(
 );
 
 export default function ManageCheckout({
+  useReader,
   open,
   closeModal,
   checkoutItems,
   order,
   amount,
-  setIsLoading,
+  voucherAmt,
 }) {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
-  const paymentIntent = params?.get("payment_intent");
   const redirectStatus = params?.get("redirect_status");
   const paymentIntentClientSecret = params?.get("payment_intent_client_secret");
-  const [clientSecret, setClientSecret] = useState("");
+  const [clientSecret, setClientSecret] = useState(null);
   const { addToast } = useToasts();
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkoutItems.length > 0 &&
-      onlineOrderApi
-        .getPaymentIntent(checkoutItems)
+      posApi
+        .getPaymentIntent(checkoutItems, voucherAmt)
         .then((response) => setClientSecret(response.data))
         .catch((err) => {
           addToast(`Error: ${err.response.data.message}`, {
@@ -40,25 +42,51 @@ export default function ManageCheckout({
             autoDismiss: true,
           });
         });
-  }, [checkoutItems, addToast]);
+  }, [checkoutItems, voucherAmt, addToast]);
 
   useEffect(() => {
     setClientSecret(paymentIntentClientSecret);
   }, [paymentIntentClientSecret]);
 
-  const options = {
-    clientSecret,
+  const options = clientSecret
+    ? {
+        clientSecret,
+      }
+    : {};
+
+  const handleSubmit = async (paymentIntentId) => {
+    try {
+      const { data } = await orderApi.createOrder(
+        {
+          ...order,
+          paid: true,
+          payments: [
+            {
+              amount: Math.max(amount - voucherAmt, 0),
+              paymentType: "MASTERCARD",
+              ccTransactionId: paymentIntentId,
+            },
+          ],
+        },
+        paymentIntentId
+      );
+      navigate(
+        `/ss/order/${data.id}?redirect_status=succeeded&payment_intent_client_secret=${clientSecret}`
+      );
+    } catch (err) {
+      addToast(`Error: Order was not created`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
   };
 
   return (
     <div className="stripe">
-      {clientSecret && (
+      {clientSecret !== null && (
         <Elements options={options} stripe={stripePromise}>
           {redirectStatus === "succeeded" ? (
-            <OrderSuccess
-              paymentIntent={paymentIntent}
-              clientSecret={paymentIntentClientSecret}
-            />
+            <OrderSuccess clientSecret={paymentIntentClientSecret} />
           ) : (
             clientSecret && (
               <Transition.Root show={open} as={Fragment}>
@@ -107,21 +135,42 @@ export default function ManageCheckout({
                             <XIcon className="h-6 w-6" aria-hidden="true" />
                           </button>
                         </div>
-                        <div className="sm:mt-3 sm:ml-3 sm:text-left sm:items-stretch sm:justify-items-stretch">
-                          <Dialog.Title
-                            as="h3"
-                            className="text-lg leading-6 font-medium text-gray-900 mb-6"
-                          >
-                            Checkout using Stripe
-                          </Dialog.Title>
-                          <CheckoutForm
-                            setIsLoading={setIsLoading}
-                            clientSecret={clientSecret}
-                            closeModal={closeModal}
-                            order={order}
-                            amount={amount}
-                          />
-                        </div>
+                        {amount > 0 ? (
+                          useReader ? (
+                            <div className="sm:mt-3 sm:ml-3 sm:text-left sm:items-stretch sm:justify-items-stretch">
+                              <Dialog.Title
+                                as="h3"
+                                className="text-lg leading-6 font-medium text-gray-900 mb-6"
+                              >
+                                Checkout using Card Reader
+                              </Dialog.Title>
+                              <Card
+                                clientSecret={clientSecret}
+                                addToast={addToast}
+                                checkoutItems={checkoutItems}
+                                voucherAmt={voucherAmt}
+                                handleSubmit={handleSubmit}
+                              />
+                            </div>
+                          ) : (
+                            <div className="sm:mt-3 sm:ml-3 sm:text-left sm:items-stretch sm:justify-items-stretch">
+                              <Dialog.Title
+                                as="h3"
+                                className="text-lg leading-6 font-medium text-gray-900 mb-6"
+                              >
+                                Checkout using Stripe
+                              </Dialog.Title>
+                              <CheckoutForm
+                                clientSecret={clientSecret}
+                                closeModal={closeModal}
+                                order={order}
+                                amount={amount}
+                              />
+                            </div>
+                          )
+                        ) : (
+                          <>test2</>
+                        )}
                       </div>
                     </Transition.Child>
                   </div>

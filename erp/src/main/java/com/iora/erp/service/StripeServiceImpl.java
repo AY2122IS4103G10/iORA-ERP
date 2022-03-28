@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.validation.constraints.Max;
 
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.stripe.Stripe;
@@ -16,8 +15,8 @@ import com.stripe.model.terminal.ConnectionToken;
 import com.stripe.param.PaymentIntentCancelParams;
 import com.stripe.param.PaymentIntentCaptureParams;
 import com.stripe.param.PaymentIntentCreateParams;
-import com.stripe.param.RefundCreateParams;
 import com.stripe.param.PaymentIntentCreateParams.CaptureMethod;
+import com.stripe.param.RefundCreateParams;
 import com.stripe.param.terminal.ConnectionTokenCreateParams;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -36,8 +35,12 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
-    public String createPaymentIntent(List<CustomerOrderLI> lineItems, Long voucherAmount) throws StripeException {
+    public String createPaymentIntent(List<CustomerOrderLI> lineItems, Boolean delivery, Long voucherAmount)
+            throws StripeException {
         Long totalAmount = calculateOrderAmount(lineItems) - voucherAmount;
+        if (delivery) {
+            totalAmount += 250L;
+        }
         totalAmount = Math.max(totalAmount, 0);
 
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()

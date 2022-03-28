@@ -350,7 +350,7 @@ function App() {
             <Route path="pos" element={<ManagePOS />}>
               <Route path="orderHistory" element={<Outlet />}>
                 <Route index element={<PosPurchaseHistory />} />
-                <Route path=":orderId" element={<OrderDetails />}/>
+                <Route path=":orderId" element={<OrderDetails />} />
               </Route>
               <Route path="orderPurchase" element={<PosPurchaseOrder />} />
             </Route>
@@ -674,16 +674,15 @@ function App() {
               <Route path="changepass" element={<PasswordForm />} />
             </Route>
           </Route>
-        </Route>
+          {/* Self Service Kiosk*/}
+          <Route path="ss" element={<Outlet />}>
+            <Route index element={<FrontPage />} />
+            <Route path="order" element={<Order />} />
+            <Route path="order/:id" element={<Order />} />
+          </Route>
 
-        {/* Self Service Kiosk*/}
-        <Route path="ss" element={<Outlet />}>
-          <Route index element={<FrontPage />} />
-          <Route path="order" element={<Order />} />
-          <Route path="order/:id" element={<Order />} />
+          <Route path="*" element={<Error />} />
         </Route>
-
-        <Route path="*" element={<Error />} />
       </Routes>
     </div>
   );

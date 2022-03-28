@@ -42,6 +42,9 @@ public class CustomerOrder {
     private List<CustomerOrderLI> lineItems;
 
     @OneToMany(cascade = CascadeType.ALL)
+    private List<PromotionLI> promotions;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Payment> payments;
 
     private Boolean paid;
@@ -101,6 +104,14 @@ public class CustomerOrder {
 
     public void addLineItem(CustomerOrderLI lineItem) {
         this.lineItems.add(lineItem);
+    }
+
+    public List<PromotionLI> getPromotions() {
+        return this.promotions;
+    }
+
+    public void setPromotions(List<PromotionLI> promotions) {
+        this.promotions = promotions;
     }
 
     public List<Payment> getPayments() {

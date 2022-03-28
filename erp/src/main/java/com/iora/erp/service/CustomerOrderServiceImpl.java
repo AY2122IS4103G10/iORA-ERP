@@ -167,6 +167,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (clientSecret != null && clientSecret != "") {
             stripeService.capturePayment(clientSecret);
         }
+        if (customerOrder.getVoucher() != null) {
+            customerService.redeemVoucher(customerOrder.getVoucher().getVoucherCode());
+        }
 
         em.persist(customerOrder);
         return finaliseCustomerOrder(customerOrder);

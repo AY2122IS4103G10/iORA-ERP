@@ -9,8 +9,8 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
 
 public interface StripeService {
-    public abstract String createPaymentIntent(List<CustomerOrderLI> lineItems, Long voucherAmount) throws StripeException;
     public abstract String createPaymentIntentOnlineOrder(Long totalAmount, Boolean isDelivery) throws StripeException;
+    public abstract String createPaymentIntent(List<CustomerOrderLI> lineItems, Boolean isDelivery, Long voucherAmount) throws StripeException;
     public abstract Map<String, String> createConnnectionToken() throws StripeException;
     public abstract PaymentIntent capturePayment(String clientSecret) throws StripeException;
 

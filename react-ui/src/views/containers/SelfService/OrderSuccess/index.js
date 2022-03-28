@@ -1,13 +1,13 @@
+import { HomeIcon, PrinterIcon } from "@heroicons/react/solid";
 import { useStripe } from "@stripe/react-stripe-js";
-import { useEffect, useState } from "react";
 import moment from "moment";
-import { orderApi } from "../../../../environments/Api";
+import { useEffect, useState } from "react";
+import Barcode from "react-barcode";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import Barcode from "react-barcode";
-import { HomeIcon, PrinterIcon } from "@heroicons/react/solid";
+import { orderApi } from "../../../../environments/Api";
 
-export default function OrderSuccess({ paymentIntent, clientSecret }) {
+export default function OrderSuccess({ clientSecret }) {
   const stripe = useStripe();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -39,6 +39,7 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
   }, [stripe, clientSecret, setPaymentData, addToast]);
 
   useEffect(() => {
+    localStorage.removeItem("customer");
     orderApi
       .get(id)
       .then(({ data }) => {
@@ -65,11 +66,17 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
           <p className="mt-2 text-base text-gray-500 flex-grow">
             Status: Successful
           </p>
-          <p className="mt-6 font-medium text-base text-gray-800">
-            You have paid {paymentData?.currency?.toUpperCase()}$
-            {Number.parseFloat(paymentData?.amount / 100).toFixed(2)} on{" "}
-            {moment.unix(paymentData?.created).format("DD MMM YYYY HH:mm:SS")}
-          </p>
+          {clientSecret ? (
+            <p className="mt-6 font-medium text-base text-gray-800">
+              You have paid {paymentData?.currency?.toUpperCase()}$
+              {Number.parseFloat(paymentData?.amount / 100).toFixed(2)} on{" "}
+              {moment.unix(paymentData?.created).format("DD MMM YYYY HH:mm:SS")}
+            </p>
+          ) : (
+            <p className="mt-6 font-medium text-base text-gray-800">
+              You have successfully completed your purchase
+            </p>
+          )}
 
           <div className="flex flex-row pt-12">
             <dl className="text-lg font-medium flex-grow">
@@ -88,20 +95,20 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
 
         <section
           aria-labelledby="order-heading"
-          className="mt-10 border-t border-gray-200 max-w-xl"
+          className="mt-10 border-t border-gray-200 max-w-xl grid grid-cols-1 gap-3"
         >
           <h2 id="order-heading" className="sr-only">
             Your order
           </h2>
 
-          <h3 className="text-lg font-medium text-indigo-600 mb-3">Items</h3>
+          <h3 className="text-lg font-medium text-indigo-600 mt-3">Items</h3>
           {order.lineItems?.map((lineItem, index) => (
             <div
               key={index}
               className="py-3 border-b border-gray-200 flex space-x-6"
             >
-              <div className="flex-auto flex flex-row">
-                <div className="grow">
+              <div className="grid grid-cols-4 gap-2 w-full">
+                <div className="col-span-2">
                   <h4 className="font-medium text-gray-900">
                     {lineItem?.product.sku}
                   </h4>
@@ -118,23 +125,82 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
                     )}
                   </p>
                 </div>
-                <div className="mt-6 flex-1 flex items-end">
-                  <dl className="flex text-sm divide-x divide-gray-200 space-x-4 sm:space-x-6">
-                    <div className="flex">
-                      <dt className="font-medium text-gray-900">Quantity</dt>
-                      <dd className="ml-2 text-gray-700">{lineItem?.qty}</dd>
-                    </div>
-                    <div className="pl-4 flex sm:pl-6">
-                      <dt className="font-medium text-gray-900">Subtotal</dt>
-                      <dd className="ml-2 text-gray-700">
-                        ${Number.parseFloat(lineItem?.subTotal).toFixed(2)}
-                      </dd>
-                    </div>
-                  </dl>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Quantity
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    {lineItem?.qty}
+                  </dd>
+                </div>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Subtotal
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    ${Number.parseFloat(lineItem?.subTotal).toFixed(2)}
+                  </dd>
                 </div>
               </div>
             </div>
           ))}
+          {order.promotions?.length > 0 && (
+            <h3 className="text-lg font-medium text-indigo-600">
+              Promotions
+            </h3>
+          )}
+          {order.promotions?.map((promotion, index) => (
+            <div
+              key={`p${index}`}
+              className="py-3 border-b border-gray-200 flex space-x-6"
+            >
+              <div className="grid grid-cols-4 gap-2 w-full">
+                <div className="col-span-2 flex items-center">
+                  <h4 className="font-medium text-gray-900">
+                    {promotion?.promotion?.fieldValue}
+                  </h4>
+                </div>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Quantity
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    {promotion?.qty}
+                  </dd>
+                </div>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Subtotal
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    -${Number.parseFloat(-promotion?.subTotal).toFixed(2)}
+                  </dd>
+                </div>
+              </div>
+            </div>
+          ))}
+          {order.voucher && (
+            <>
+              <h3 className="text-lg font-medium text-indigo-600">
+                Voucher
+              </h3>
+              <div className="grid grid-cols-4 gap-2 w-full">
+                <div className="col-span-3 flex items-center">
+                  <h4 className="font-medium text-gray-900">
+                    {order.voucher?.voucherCode}
+                  </h4>
+                </div>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Discount
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    -${Number.parseFloat(-order.voucher?.amount).toFixed(2)}
+                  </dd>
+                </div>
+              </div>
+            </>
+          )}
         </section>
         <div className="mt-6 flex justify-center space-x-6">
           <button
@@ -148,7 +214,7 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
           <button
             type="button"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            onClick={() => (navigate("/ss"))}
+            onClick={() => navigate("/ss")}
           >
             <HomeIcon className="h-5 w-5 mr-2" aria-hidden="true" />
             Return to Home

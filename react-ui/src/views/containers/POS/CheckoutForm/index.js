@@ -10,14 +10,14 @@ import {
   ExclamationIcon,
   InformationCircleIcon,
 } from "@heroicons/react/solid";
+import { loadStripeTerminal } from "@stripe/terminal-js";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { orderApi, posApi } from "../../../../environments/Api";
 import { getCustomerByPhone } from "../../../../stores/slices/customerSlice";
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import { loadStripeTerminal } from "@stripe/terminal-js";
 import { getVoucherByCode } from "../../../../stores/slices/posSlice";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
 const paymentTypes = [
   {
@@ -70,7 +70,7 @@ export const CheckoutForm = ({
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
   const [voucherCode, setVoucherCode] = useState("");
-  const [voucher, setVoucher] = useState({});
+  const [voucher, setVoucher] = useState(null);
   const [voucherDiscount, setVoucherDiscount] = useState(0);
   const [showChoice, setShowChoice] = useState(false);
   const { addToast } = useToasts();
@@ -86,19 +86,22 @@ export const CheckoutForm = ({
 
   const handleSubmit = async (paymentIntentId) => {
     try {
-      const response = await orderApi.createOrder({
-        ...order,
-        customerId: customerId,
-        paid: true,
-        voucher,
-        payments: [
-          {
-            amount: Math.max(amount - voucherDiscount, 0),
-            paymentType: paymentTypes[mode]?.name.toUpperCase(),
-            ccTransactionId: paymentIntentId,
-          },
-        ],
-      }, paymentIntentId);
+      const response = await orderApi.createOrder(
+        {
+          ...order,
+          customerId: customerId,
+          paid: true,
+          voucher,
+          payments: [
+            {
+              amount: Math.max(amount - voucherDiscount, 0),
+              paymentType: paymentTypes[mode-1]?.name.toUpperCase(),
+              ccTransactionId: paymentIntentId,
+            },
+          ],
+        },
+        paymentIntentId
+      );
       addToast(`Success: Order with ID ${response.data.id} created`, {
         appearance: "success",
         autoDismiss: true,
@@ -167,13 +170,13 @@ export const CheckoutForm = ({
         );
       }
     }
-  }
+  };
 
   const handleConfirm = () => {
     getCustomerId();
     getVoucherDetails();
     setShowChoice(true);
-  }
+  };
 
   return (
     <SimpleModal open={open} closeModal={closeModalComplex}>
@@ -302,6 +305,7 @@ export const CheckoutForm = ({
           <Card
             addToast={addToast}
             checkoutItems={checkoutItems}
+            voucherAmt={voucherDiscount}
             handleSubmit={handleSubmit}
           />
         )}
@@ -480,7 +484,10 @@ const Cash = ({ amount, handleSubmit, addToast }) => {
                   Attention
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700">
-                  <p>Please confirm the cash tendered before proceeding with checkout.</p>
+                  <p>
+                    Please confirm the cash tendered before proceeding with
+                    checkout.
+                  </p>
                 </div>
               </div>
             </div>
@@ -491,7 +498,13 @@ const Cash = ({ amount, handleSubmit, addToast }) => {
   );
 };
 
-export const Card = ({ addToast, checkoutItems, handleSubmit }) => {
+export const Card = ({
+  addToast,
+  checkoutItems,
+  voucherAmt,
+  handleSubmit,
+  clientSecret: cs,
+}) => {
   const [terminal, setTerminal] = useState(null);
   const [connected, setConnected] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
@@ -516,17 +529,19 @@ export const Card = ({ addToast, checkoutItems, handleSubmit }) => {
   }, [addToast]);
 
   useEffect(() => {
-    checkoutItems.length > 0 &&
-      posApi
-        .getPaymentIntent(checkoutItems)
-        .then((response) => setClientSecret(response.data))
-        .catch((err) => {
-          addToast(`Error: ${err.response.data.message}`, {
-            appearance: "error",
-            autoDismiss: true,
+    cs
+      ? setClientSecret(cs)
+      : checkoutItems.length > 0 &&
+        posApi
+          .getPaymentIntent(checkoutItems, voucherAmt)
+          .then((response) => setClientSecret(response.data))
+          .catch((err) => {
+            addToast(`Error: ${err.response.data.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
           });
-        });
-  }, [checkoutItems, addToast]);
+  }, [checkoutItems, voucherAmt, addToast, cs]);
 
   const setSimulated = async () => {
     const config = { simulated: true };
@@ -603,11 +618,21 @@ export const Card = ({ addToast, checkoutItems, handleSubmit }) => {
         <div className="text-center justify-center border-2 border-gray-300 rounded-lg px-12 pt-6 mx-2">
           <img
             className="mx-auto h-24 w-24 text-gray-400"
-            src={process.env.PUBLIC_URL + '/cardreader.svg'}
+            src={process.env.PUBLIC_URL + "/cardreader.svg"}
             alt="card-reader"
           />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">{connected ? `Reader ${localStorage.getItem("pos-posdeviceid").replace(/"/g,"")}` : "No readers"}</h3>
-          <p className="mt-1 text-sm text-gray-500">{connected ? "You are successfully connected to the reader. The customer can now use the card reader." : "Get started by connecting your reader via Bluetooth."}</p>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            {connected
+              ? `Reader ${localStorage
+                  .getItem("pos-posdeviceid")
+                  .replace(/"/g, "")}`
+              : "No readers"}
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {connected
+              ? "You are successfully connected to the reader. The customer can now use the card reader."
+              : "Get started by connecting your reader via Bluetooth."}
+          </p>
           <div className="my-6">
             {connected ? (
               <button
@@ -627,7 +652,10 @@ export const Card = ({ addToast, checkoutItems, handleSubmit }) => {
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={setSimulated}
               >
-                <DeviceTabletIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                <DeviceTabletIcon
+                  className="-ml-1 mr-2 h-5 w-5"
+                  aria-hidden="true"
+                />
                 Connect to Simulated Reader
               </button>
             )}

@@ -9,7 +9,7 @@ import { orderApi } from "../../../../environments/Api";
 import { TailSpin } from "react-loader-spinner";
 
 export default function CheckoutForm({
-  clientSecret,
+  clientSecret = "",
   closeModal,
   order,
   amount,
@@ -62,6 +62,7 @@ export default function CheckoutForm({
       elements,
       redirect: "if_required",
     });
+    setTimeout(() => {}, 5000);
 
     const { data } = await orderApi.createOrder(
       {

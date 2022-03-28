@@ -3,9 +3,10 @@ import { XIcon } from "@heroicons/react/outline";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import React, { Fragment, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { onlineOrderApi } from "../../../../environments/Api";
+import { orderApi, posApi } from "../../../../environments/Api";
+import { Card } from "../../POS/CheckoutForm";
 import CheckoutForm from "../CheckoutForm";
 import OrderSuccess from "../OrderSuccess";
 
@@ -21,7 +22,6 @@ export default function ManageCheckout({
   order,
   amount,
   voucherAmt,
-  setIsLoading,
 }) {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -29,10 +29,11 @@ export default function ManageCheckout({
   const paymentIntentClientSecret = params?.get("payment_intent_client_secret");
   const [clientSecret, setClientSecret] = useState(null);
   const { addToast } = useToasts();
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkoutItems.length > 0 &&
-      onlineOrderApi
+      posApi
         .getPaymentIntent(checkoutItems, voucherAmt)
         .then((response) => setClientSecret(response.data))
         .catch((err) => {
@@ -52,6 +53,33 @@ export default function ManageCheckout({
         clientSecret,
       }
     : {};
+
+  const handleSubmit = async (paymentIntentId) => {
+    try {
+      const { data } = await orderApi.createOrder(
+        {
+          ...order,
+          paid: true,
+          payments: [
+            {
+              amount: Math.max(amount - voucherAmt, 0),
+              paymentType: "MASTERCARD",
+              ccTransactionId: paymentIntentId,
+            },
+          ],
+        },
+        paymentIntentId
+      );
+      navigate(
+        `/ss/order/${data.id}?redirect_status=succeeded&payment_intent_client_secret=${clientSecret}`
+      );
+    } catch (err) {
+      addToast(`Error: Order was not created`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
 
   return (
     <div className="stripe">
@@ -109,7 +137,20 @@ export default function ManageCheckout({
                         </div>
                         {amount > 0 ? (
                           useReader ? (
-                            <>test</>
+                            <div className="sm:mt-3 sm:ml-3 sm:text-left sm:items-stretch sm:justify-items-stretch">
+                              <Dialog.Title
+                                as="h3"
+                                className="text-lg leading-6 font-medium text-gray-900 mb-6"
+                              >
+                                Checkout using Card Reader
+                              </Dialog.Title>
+                              <Card
+                                addToast={addToast}
+                                checkoutItems={checkoutItems}
+                                voucherAmt={voucherAmt}
+                                handleSubmit={handleSubmit}
+                              />
+                            </div>
                           ) : (
                             <div className="sm:mt-3 sm:ml-3 sm:text-left sm:items-stretch sm:justify-items-stretch">
                               <Dialog.Title

@@ -51,7 +51,9 @@ public class OnlineCustomerController {
     private ProductService productService;
     @Autowired
     private SiteService siteService;
-
+    @Autowired
+    StripeService stripeService;
+    
     /*
      * ---------------------------------------------------------
      * G.1 Customer Purchase Management
@@ -166,8 +168,6 @@ public class OnlineCustomerController {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
-    @Autowired
-    StripeService stripeService;
 
     @PostMapping(path = "/pay/{delivery}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createPaymentIntent(@RequestBody List<CustomerOrderLI> lineItems,

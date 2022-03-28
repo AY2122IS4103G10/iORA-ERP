@@ -10,7 +10,7 @@ import {
   ExclamationIcon,
   InformationCircleIcon,
 } from "@heroicons/react/solid";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { orderApi, posApi } from "../../../../environments/Api";
@@ -518,16 +518,16 @@ export const Card = ({ addToast, checkoutItems, voucherAmt, handleSubmit }) => {
 
   useEffect(() => {
     checkoutItems.length > 0 &&
-      posApi
-        .getPaymentIntent(checkoutItems, voucherAmt)
-        .then((response) => setClientSecret(response.data))
-        .catch((err) => {
-          addToast(`Error: ${err.response.data.message}`, {
-            appearance: "error",
-            autoDismiss: true,
-          });
-        });
-  }, [checkoutItems, voucherAmt, addToast]);
+       posApi
+         .getPaymentIntent(checkoutItems, voucherAmt)
+         .then((response) => setClientSecret(response.data))
+         .catch((err) => {
+           addToast(`Error: ${err.response.data.message}`, {
+             appearance: "error",
+             autoDismiss: true,
+           });
+         });
+   }, [checkoutItems, voucherAmt, addToast]);
 
   const setSimulated = async () => {
     const config = { simulated: true };

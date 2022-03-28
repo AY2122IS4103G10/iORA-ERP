@@ -402,7 +402,7 @@ export const posApi = {
     );
   },
   getPaymentIntent(lineItems, voucherAmt) {
-    return axiosPrivate.post(`${REST_ENDPOINT}online/pay?amt=${voucherAmt}`, lineItems);
+    return axiosPrivate.post(`${REST_ENDPOINT}store/customerOrder/pay?amt=${voucherAmt}`, lineItems);
   },
   getVoucherByCode(voucher) {
     return axiosPrivate.get(`${REST_ENDPOINT}store/voucher/${voucher}`);

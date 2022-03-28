@@ -315,7 +315,7 @@ const OrderList = ({
               type="button"
               className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
               onClick={
-                amount > 0 ? openCheckoutModal : handleZeroDollarCheckout
+                amount > 0 ? () => openCheckoutModal(false) : handleZeroDollarCheckout
               }
               disabled={lineItems.length === 0}
             >
@@ -325,7 +325,7 @@ const OrderList = ({
               type="button"
               className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
               onClick={
-                amount > 0 ? openCheckoutModal : handleZeroDollarCheckout
+                amount > 0 ? () => openCheckoutModal(true) : handleZeroDollarCheckout
               }
               disabled={lineItems.length === 0}
             >
@@ -469,6 +469,7 @@ export function Order() {
   const [checkoutItems, setCheckoutItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [order, setOrder] = useState({});
+  const [useReader, setUseReader] = useState(true);
   const siteId = localStorage?.getItem("siteId");
 
   const navigate = useNavigate();
@@ -479,7 +480,8 @@ export function Order() {
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
 
-  const openCheckoutModal = () => {
+  const openCheckoutModal = (reader) => {
+    setUseReader(reader);
     setOpenCheckout(true);
     const concat = lineItems.concat(promotions);
     setCheckoutItems(concat);
@@ -667,7 +669,7 @@ export function Order() {
         />
       )}
       <ManageCheckout
-        useReader={false}
+        useReader={useReader}
         open={openCheckout}
         openModal={openCheckoutModal}
         closeModal={closeCheckoutModal}

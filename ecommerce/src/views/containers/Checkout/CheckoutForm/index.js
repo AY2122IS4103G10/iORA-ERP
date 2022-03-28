@@ -17,7 +17,7 @@ const deliveryMethods = [
   { id: 2, title: 'Store Pickup', description: '5-7 business days', footer: 'Free' },
 ]
 
-export const AddressForm = ({ country, setCountry, setAddress }) => {
+export const AddressForm = ({ country, setCountry, setAddress, setCity, setState, setPostalCode }) => {
   let convertCountries = countries.map((country) => ({ name: country }));
 
   return (
@@ -56,6 +56,7 @@ export const AddressForm = ({ country, setCountry, setAddress }) => {
             type="text"
             id="city"
             autoComplete="address-level2"
+            onChange={(e) => setCity(e.target.value)}
             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
           />
         </div>
@@ -70,6 +71,7 @@ export const AddressForm = ({ country, setCountry, setAddress }) => {
             type="text"
             id="region"
             autoComplete="address-level1"
+            onChange={(e) => setState(e.target.value)}
             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
           />
         </div>
@@ -84,6 +86,7 @@ export const AddressForm = ({ country, setCountry, setAddress }) => {
             type="number"
             id="postal-code"
             autoComplete="postal-code"
+            onChange={(e) => setPostalCode(e.target.value)}
             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
           />
         </div>
@@ -153,11 +156,15 @@ export const StorePickupForm = ({ store, setStore, storeList }) => {
 
 export const CheckoutForm = ({
   setEmail,
+  setName,
   setPhoneNumber,
   country,
   setCountry,
   address,
   setAddress,
+  setPostalCode,
+  setCity,
+  setState,
   sameAddress,
   setSameAddress,
   selectedDeliveryMethod,
@@ -193,6 +200,20 @@ export const CheckoutForm = ({
 
               <div className="mt-6">
                 <label htmlFor="contact-number" className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    id="name"
+                    onChange={(e) => setName(e.target.value)}
+                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <label htmlFor="contact-number" className="block text-sm font-medium text-gray-700">
                   Contact Number
                 </label>
                 <div className="mt-1">
@@ -214,6 +235,9 @@ export const CheckoutForm = ({
                 country={country}
                 setCountry={setCountry}
                 setAddress={setAddress}
+                setPostalCode={setPostalCode}
+                setCity={setCity}
+                setState={setState}
               />
             </section>
 

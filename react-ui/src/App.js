@@ -93,6 +93,7 @@ import {VoucherDetails} from "./views/containers/Vouchers/VoucherDetails";
 import {VoucherForm} from "./views/containers/Vouchers/VoucherForm";
 import {VouchersList} from "./views/containers/Vouchers/VouchersList";
 import {ProductRFID} from "./views/containers/Products/ProductRFID/index.js";
+import { ResetPassword } from "./views/containers/Auth/ResetPassword/index.js";
 
 function App() {
   const {pathname} = useLocation();

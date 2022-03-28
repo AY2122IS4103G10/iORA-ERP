@@ -9,7 +9,6 @@ import { Account } from "./views/containers/Auth/Settings/Account";
 import { Auth } from "./views/containers/Auth/Auth";
 import { HomeIndex } from "./views/containers/Index/HomeIndex";
 import { Listings } from "./views/containers/Listings";
-import { Checkout } from "./views/containers/Checkout/CheckoutForm";
 import ViewModel from "./views/containers/ViewModel";
 import { ManageCheckout } from "./views/containers/Checkout/ManageCheckout";
 

@@ -72,16 +72,18 @@ export default function PaymentForm({ clientSecret, order }) {
     }
 
     const createOnlineOrder = () => {
-        checkoutApi.createOnlineOrder({
+        let newOrder = {
             ...order,
             payments: [
                 {
                     amount: order.totalAmount,
                     paymentType: "MASTERCARD",
-                    ccTransactionId: clientSecret,
+                    ccTransactionId: paymentIntentId,
                 },
             ]
-        }, paymentIntentId)
+        }
+        console.log(newOrder);
+        checkoutApi.createOnlineOrder(newOrder, paymentIntentId)
             .then((response) => console.log(response.data))
             .catch((err) => setMessage(err))
     }

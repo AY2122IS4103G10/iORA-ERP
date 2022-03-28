@@ -80,7 +80,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                         old.setUsername(employee.getUsername());
                         old.setEmail(employee.getEmail());
-                        
+
                         if (employee.getPassword() != null && employee.getPassword() != ""
                                 && !employee.getPassword().equals(old.getPassword())) {
                             old.setPassword(passwordEncoder().encode(employee.getPassword()));
@@ -220,6 +220,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Employee getEmployeeByEmail(String email) {
+        return (Employee) em.createQuery("SELECT e FROM Employee e WHERE e.email = :email")
+                .setParameter("email", email).getSingleResult();
+    }
+
+    @Override
     public Employee loginAuthentication(String username, String password) throws AuthenticationException {
         try {
             Employee c = getEmployeeByUsername(username);
@@ -239,7 +245,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void resetPassword(Long id) throws EmployeeException {
+    public void resetPasswordUser(String email) throws EmployeeException {
+        Employee e = getEmployeeByEmail(email);
+        String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+        // e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(),
+        // tempPassword));
+        e.setPassword(passwordEncoder().encode(tempPassword));
+
+        emailService.sendTemporaryPassword(e, tempPassword);
+    }
+
+    @Override
+    public void resetPasswordAdmin(Long id) throws EmployeeException {
         Employee e = getEmployeeById(id);
         String tempPassword = StringGenerator.generateRandom(48, 122, 8);
         e.setPassword(passwordEncoder().encode(tempPassword));

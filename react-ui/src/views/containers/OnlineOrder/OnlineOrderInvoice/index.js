@@ -8,6 +8,7 @@ export const OnlineInvoiceBody = ({
   orderId,
   orderStatus,
   // company,
+  dateTime,
   delivery,
   customer,
   deliveryAddress,
@@ -70,7 +71,7 @@ export const OnlineInvoiceBody = ({
                 <dt className="text-gray-900">Date</dt>
                 <dd className="text-cyan-600 mt-2">
                   {moment
-                    .unix(orderStatus.timeStamp / 1000)
+                    .unix(dateTime / 1000)
                     .format("DD/MM/YYYY, hh:mm:ss")}
                 </dd>
               </dl>
@@ -117,15 +118,17 @@ export const OnlineInvoiceBody = ({
                     <span className="block">
                       {customer.firstName} {customer.lastName}
                     </span>
-                    <span className="block">{deliveryAddress.name}</span>
+                    {/* <span className="block">{deliveryAddress.name}</span>
                     <span className="block">
                       {deliveryAddress.address.road}
                     </span>
                     <span className="block">
                       {deliveryAddress.address.city},{" "}
                       {deliveryAddress.address.postalCode}
+                    </span> */}
+                    <span className="block">
+                      {deliveryAddress}
                     </span>
-                    <span className="block">{deliveryAddress.phoneNumber}</span>
                     <span className="block">{customer.contactNumber}</span>
                   </address>
                 </dd>
@@ -147,6 +150,7 @@ export const OnlineOrderInvoice = forwardRef(
       orderId,
       orderStatus,
       // company,
+      dateTime,
       delivery,
       customer,
       deliveryAddress,
@@ -165,6 +169,7 @@ export const OnlineOrderInvoice = forwardRef(
           orderId={orderId}
           orderStatus={orderStatus}
           // company={company}
+          dateTime={dateTime}
           delivery={delivery}
           customer={customer}
           deliveryAddress={deliveryAddress}

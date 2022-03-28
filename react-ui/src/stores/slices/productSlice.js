@@ -53,14 +53,6 @@ export const updateExistingProduct = createAsyncThunk(
   }
 );
 
-export const deleteExistingProduct = createAsyncThunk(
-  "products/deleteExistingProduct",
-  async (existingModelCode) => {
-    const response = await api.delete("sam/model", existingModelCode);
-    return response.data;
-  }
-);
-
 export const getProductItem = createAsyncThunk(
   "products/getProductItem",
   async (rfid) => {
@@ -81,6 +73,14 @@ export const updateBaselineQty = createAsyncThunk(
   "products/updateBaselineQty",
   async ({ sku, qty }) => {
     const response = await api.update(`sam/product/baseline/${sku}/${qty}`);
+    return response.data;
+  }
+);
+
+export const deleteSku = createAsyncThunk(
+  "products/deleteSku",
+  async (data) => {
+    const response = await api.delete("sam/product/delete", data);
     return response.data;
   }
 );
@@ -126,12 +126,7 @@ const productSlice = createSlice({
     builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
       state.status = "idle";
     });
-    builder.addCase(deleteExistingProduct.fulfilled, (state, action) => {
-      state.products = state.products.filter(
-        ({ prodCode }) => prodCode !== action.payload.prodCode
-      );
-      // state.status = "idle"
-    });
+    
     builder.addCase(getProductItem.pending, (state, action) => {
       state.status = "loading";
     });
@@ -153,6 +148,9 @@ const productSlice = createSlice({
       state.status = "failed";
     });
     builder.addCase(updateBaselineQty.fulfilled, (state, action) => {
+      state.status = "idle";
+    });
+    builder.addCase(deleteSku.fulfilled, (state, action) => {
       state.status = "idle";
     });
   },

@@ -36,7 +36,7 @@ const OrderTable = ({ data, handleOnClick, type }) => {
               filter: "includes",
             },
             {
-              Header: "Date Created",
+              Header: "Date",
               accessor: "dateTime",
               Cell: (e) => moment(e.value).format("DD/MM/YY, HH:mm:ss"),
             },
@@ -56,7 +56,7 @@ const OrderTable = ({ data, handleOnClick, type }) => {
               Cell: (row) => `${row.value.toFixed(2)}`,
             },
             {
-              Header: "Date Created",
+              Header: "Date",
               accessor: "dateTime",
               Cell: (e) => moment(e.value).format("DD/MM/YY, HH:mm:ss"),
             },
@@ -89,7 +89,7 @@ export const OrderList = ({ subsys, type }) => {
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);
-
+  console.log(data)
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

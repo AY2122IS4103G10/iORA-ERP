@@ -1,7 +1,8 @@
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, Transition } from "@headlessui/react";
 import { CurrencyDollarIcon } from "@heroicons/react/outline";
 import {
-  CurrencyDollarIcon as CurrencyDollarSolid, PencilIcon
+  CurrencyDollarIcon as CurrencyDollarSolid,
+  PencilIcon,
 } from "@heroicons/react/solid";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,14 +12,16 @@ import {
   fetchProducts,
   selectProductByCode,
   updateBaselineQty,
-  updateExistingProduct
+  updateExistingProduct,
 } from "../../../../stores/slices/productSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { SimpleButton } from "../../../components/Buttons/SimpleButton";
-import { SimpleInputBox } from '../../../components/Input/SimpleInputBox';
-import { SelectColumnFilter, SimpleTable } from "../../../components/Tables/SimpleTable";
+import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
+import {
+  SelectColumnFilter,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
-
 
 const FieldSection = ({ fieldName, fields }) => {
   return Boolean(fields.length) ? (
@@ -60,7 +63,7 @@ export const SKUTable = ({ data }) => {
           row.productFields.find((field) => field.fieldName === "COLOUR")
             .fieldValue,
         Filter: SelectColumnFilter,
-        filter: "includes"
+        filter: "includes",
       },
       {
         Header: "Size",
@@ -68,21 +71,21 @@ export const SKUTable = ({ data }) => {
           row.productFields.find((field) => field.fieldName === "SIZE")
             .fieldValue,
         Filter: SelectColumnFilter,
-        filter: "includes"
+        filter: "includes",
       },
       {
         Header: "Baseline Qty",
         accessor: "accessor",
         Cell: (e) => {
           const [open, setOpen] = useState(false);
-          const cancelButtonRef = useRef(null)
+          const cancelButtonRef = useRef(null);
           const [qty, setQty] = useState(e.row.original.baselineQty);
           const onQtyChange = (e) => setQty(e.target.value);
           const { addToast } = useToasts();
           const dispatch = useDispatch();
           const onEditClicked = (evt) => {
             evt.preventDefault();
-            const sku = e.row.original.sku
+            const sku = e.row.original.sku;
             dispatch(updateBaselineQty({ sku, qty }))
               .unwrap()
               .then(() => {
@@ -96,39 +99,52 @@ export const SKUTable = ({ data }) => {
                   appearance: "error",
                   autoDismiss: true,
                 })
-              ).finally(() => setOpen(false))
-          }
+              )
+              .finally(() => setOpen(false));
+          };
 
           return (
             <div>
               {qty}
-              <SimpleButton
-                onClick={() => setOpen(true)}
-                className="ml-5"
-              >
+              <SimpleButton onClick={() => setOpen(true)} className="ml-5">
                 Edit
               </SimpleButton>
               <EditModal
                 open={open}
                 setOpen={setOpen}
                 cancelButtonRef={cancelButtonRef}
-                qty={qty} onQtyChange={onQtyChange}
+                qty={qty}
+                onQtyChange={onQtyChange}
                 sku={e.row.original.sku}
-                onEditClicked={onEditClicked} />
+                onEditClicked={onEditClicked}
+              />
             </div>
           );
         },
-      }
+      },
     ],
     []
   );
   return <SimpleTable columns={columns} data={data} />;
 };
 
-const EditModal = ({ open, setOpen, cancelButtonRef, qty, onQtyChange, sku, onEditClicked }) => {
+const EditModal = ({
+  open,
+  setOpen,
+  cancelButtonRef,
+  qty,
+  onQtyChange,
+  sku,
+  onEditClicked,
+}) => {
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={cancelButtonRef} onClose={() => setOpen(false)}>
+      <Dialog
+        as="div"
+        className="fixed z-10 inset-0 overflow-y-auto"
+        initialFocus={cancelButtonRef}
+        onClose={() => setOpen(false)}
+      >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
             as={Fragment}
@@ -143,7 +159,10 @@ const EditModal = ({ open, setOpen, cancelButtonRef, qty, onQtyChange, sku, onEd
           </Transition.Child>
 
           {/* This element is to trick the browser into centering the modal contents. */}
-          <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+          <span
+            className="hidden sm:inline-block sm:align-middle sm:h-screen"
+            aria-hidden="true"
+          >
             &#8203;
           </span>
           <Transition.Child
@@ -155,12 +174,14 @@ const EditModal = ({ open, setOpen, cancelButtonRef, qty, onQtyChange, sku, onEd
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-
             <div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
               <form>
                 <div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg leading-6 font-medium text-gray-900"
+                    >
                       Edit baseline quantity for {sku}
                     </Dialog.Title>
                     <div className="mt-2">
@@ -169,7 +190,8 @@ const EditModal = ({ open, setOpen, cancelButtonRef, qty, onQtyChange, sku, onEd
                         name="baselineQty"
                         id="baselineQty"
                         value={qty}
-                        onChange={onQtyChange} />
+                        onChange={onQtyChange}
+                      />
                     </div>
                   </div>
                 </div>
@@ -195,8 +217,9 @@ const EditModal = ({ open, setOpen, cancelButtonRef, qty, onQtyChange, sku, onEd
           </Transition.Child>
         </div>
       </Dialog>
-    </Transition.Root>)
-}
+    </Transition.Root>
+  );
+};
 
 const ProductDetailsBody = ({
   prodCode,
@@ -291,19 +314,17 @@ const ProductDetailsBody = ({
             </div>
           </div>
           <section aria-labelledby="activity-title" className="mt-8 xl:mt-10">
-            <div>
-              <div className="divide-y divide-gray-200">
-                <div className="pb-4">
-                  <h2
-                    id="activity-title"
-                    className="text-lg font-medium text-gray-900"
-                  >
-                    SKUs
-                  </h2>
-                </div>
-                <div className="pt-6">
-                  <SKUTable data={products} />
-                </div>
+            <div className="divide-y divide-gray-200">
+              <div className="pb-4">
+                <h2
+                  id="activity-title"
+                  className="text-lg font-medium text-gray-900"
+                >
+                  SKUs
+                </h2>
+              </div>
+              <div className="pt-6">
+                <SKUTable data={products} />
               </div>
             </div>
           </section>
@@ -402,8 +423,8 @@ export const ProductDetails = () => {
               f1.fieldValue < f2.fieldValue
                 ? -1
                 : f1.fieldValue > f2.fieldValue
-                  ? 1
-                  : 0
+                ? 1
+                : 0
             )}
           sizes={product.productFields.filter(
             (field) => field.fieldName === "SIZE"
@@ -414,8 +435,8 @@ export const ProductDetails = () => {
               f1.fieldValue < f2.fieldValue
                 ? -1
                 : f1.fieldValue > f2.fieldValue
-                  ? 1
-                  : 0
+                ? 1
+                : 0
             )}
           categories={product.productFields
             .filter((field) => field.fieldName === "CATEGORY")
@@ -423,8 +444,8 @@ export const ProductDetails = () => {
               f1.fieldValue < f2.fieldValue
                 ? -1
                 : f1.fieldValue > f2.fieldValue
-                  ? 1
-                  : 0
+                ? 1
+                : 0
             )}
           available={product.available}
           products={product.products}

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/solid";
 
-export const NavigatePrev = ({ page, path }) => {
+export const NavigatePrev = () => {
   return (
     <nav
       className="flex items-start px-2 py-3 sm:px-4 lg:px-6"

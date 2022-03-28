@@ -154,7 +154,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public List<OnlineOrder> getPickupOrdersBySite(Long siteId) {
         TypedQuery<OnlineOrder> q = em.createQuery(
-                "SELECT oo FROM OnlineOrder oo WHERE oo.site.id = :siteId AND oo.delivery = false",
+                "SELECT oo FROM OnlineOrder oo WHERE oo.pickupSite.id = :siteId AND oo.delivery = false",
                 OnlineOrder.class);
         q.setParameter("siteId", siteId);
 
@@ -194,6 +194,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (customerOrder.getCustomerId() != null) {
             updateMembershipPoints(customerOrder);
         }
+
+        // Remove stocks from site
+        if (!(customerOrder instanceof OnlineOrder)) {
+            for (CustomerOrderLI coli : customerOrder.getLineItems()) {
+                try {
+                    siteService.removeProducts(customerOrder.getSite().getId(), coli.getProduct().getSku(),
+                            coli.getPackedQty());
+                } catch (NoStockLevelException | IllegalTransferException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         return em.merge(customerOrder);
     }
 
@@ -599,6 +612,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (clientSecret != null && clientSecret != "") {
             stripeService.capturePayment(clientSecret);
         }
+        if (onlineOrder.getVoucher() != null) {
+            customerService.redeemVoucher(onlineOrder.getVoucher().getVoucherCode());
+        }
 
         onlineOrder.setSite(siteService.getSite(3L));
         onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
@@ -692,11 +708,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         throw new CustomerOrderException("You are packing items that are not meant for this order.");
                     } else {
                         coli.setPackedQty(coli.getPackedQty() + qty);
-                        try {
-                            siteService.removeProducts(onlineOrder.getSite().getId(), product.getSku(), qty);
-                        } catch (NoStockLevelException | IllegalTransferException e) {
-                            e.printStackTrace();
-                        }
 
                         boolean packed = true;
                         for (CustomerOrderLI coli2 : lineItems) {
@@ -732,6 +743,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             throw new CustomerOrderException("Order is not up for delivery.");
         }
 
+        // Remove stocks from site
+        for (CustomerOrderLI ooli : onlineOrder.getLineItems()) {
+            try {
+                siteService.removeProducts(onlineOrder.getSite().getId(), ooli.getProduct().getSku(),
+                        ooli.getPackedQty());
+            } catch (NoStockLevelException | IllegalTransferException e) {
+                e.printStackTrace();
+            }
+        }
+
         return updateOnlineOrder(onlineOrder);
     }
 
@@ -747,6 +768,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.DELIVERED));
         } else {
             throw new CustomerOrderException("Order is not up for delivery.");
+        }
+
+        // Remove stocks from site
+        for (CustomerOrderLI ooli : onlineOrder.getLineItems()) {
+            try {
+                siteService.removeProducts(onlineOrder.getSite().getId(), ooli.getProduct().getSku(),
+                        ooli.getPackedQty());
+            } catch (NoStockLevelException | IllegalTransferException e) {
+                e.printStackTrace();
+            }
         }
 
         return updateOnlineOrder(onlineOrder);
@@ -780,6 +811,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         onlineOrder.addStatusHistory(
                 new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.COLLECTED));
+
+        // Remove stocks from site
+        if (onlineOrder.getSite().equals(onlineOrder.getPickupSite())) {
+            for (CustomerOrderLI ooli : onlineOrder.getLineItems()) {
+                try {
+                    siteService.removeProducts(onlineOrder.getSite().getId(), ooli.getProduct().getSku(),
+                            ooli.getPackedQty());
+                } catch (NoStockLevelException | IllegalTransferException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         return updateOnlineOrder(onlineOrder);
     }
 }

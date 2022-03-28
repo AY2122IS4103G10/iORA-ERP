@@ -59,7 +59,9 @@ export const OnlineOrderList = ({ subsys }) => {
     const fetchOnlineOrdersOfSite = async () => {
       setLoading(true);
       try {
-        const { data } = await onlineOrderApi.getAllBySite(currSiteId);
+        const { data } = await (subsys === "str"
+          ? onlineOrderApi.getAllPickupOfSite(currSiteId)
+          : onlineOrderApi.getAllBySite(currSiteId));
         setData(data);
         setLoading(false);
       } catch (error) {
@@ -70,7 +72,7 @@ export const OnlineOrderList = ({ subsys }) => {
       }
     };
     fetchOnlineOrdersOfSite();
-  }, [currSiteId, addToast]);
+  }, [currSiteId, addToast, subsys]);
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);

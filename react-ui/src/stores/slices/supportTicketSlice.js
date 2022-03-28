@@ -17,8 +17,8 @@ export const fetchSupportTickets = createAsyncThunk(
 
 export const replySupportTicket = createAsyncThunk(
   "supportTickets/replySupportTicket",
-  async ({ ticketId, name, input }) => {
-    const response = await api.update(`sam/ticket/reply/${ticketId}?name=${name}`, { input });
+  async ({ ticketId, name, body }) => {
+    const response = await api.update(`sam/ticket/reply/${ticketId}?name=${name}`, body);
     return response.data;
   }
 );

@@ -307,6 +307,9 @@ export const onlineOrderApi = {
   getAll() {
     return axiosPrivate.get(`${REST_ENDPOINT}store/onlineOrder?orderId=`);
   },
+  getAllPickupOfSite(siteId) {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/onlineOrder/pickup/${siteId}`);
+  },
   get(orderId) {
     return axiosPrivate.get(
       `${REST_ENDPOINT}sam/onlineOrder?orderId=${orderId}`
@@ -401,6 +404,9 @@ export const posApi = {
   getPaymentIntent(lineItems) {
     return axiosPrivate.post(`${REST_ENDPOINT}online/pay`, lineItems);
   },
+  getVoucherByCode(voucher) {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/voucher/${voucher}`);
+  },
 };
 
 export const logisticsApi = {
@@ -408,6 +414,6 @@ export const logisticsApi = {
     return axiosPrivate.get(`${REST_ENDPOINT}logistics/sto/${siteId}/${status}`);
   },
   getPOBySiteStatus(siteId, status) {
-    return axiosPrivate.get(`${REST_ENDPOINT}logistics/po/${siteId}/${status}`);
+    return axiosPrivate.get(`${REST_ENDPOINT}logistics/procurementOrder/${siteId}/${status}`);
   },
 }

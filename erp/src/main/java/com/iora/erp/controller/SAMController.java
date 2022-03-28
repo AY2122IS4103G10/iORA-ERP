@@ -554,8 +554,9 @@ public class SAMController {
     public ResponseEntity<Object> replySupportTicket(@PathVariable Long ticketId, @RequestParam String name,
             @RequestBody Map<String, String> message) {
         try {
+            System.out.println(message);
             return ResponseEntity.ok(
-                    customerService.replySupportTicket(ticketId, message.get("input"), name));
+                    customerService.replySupportTicket(ticketId, message.get("input"), name, message.get("url")));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());

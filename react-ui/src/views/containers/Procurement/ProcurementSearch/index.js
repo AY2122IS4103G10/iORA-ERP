@@ -1,35 +1,52 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { api } from "../../../../environments/Api";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 
 export const ProcurementSearch = ({ subsys }) => {
+  const { addToast } = useToasts();
   const { pathname } = useLocation();
+  const currSiteId = useSelector(selectUserSite);
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const { addToast } = useToasts();
 
   const canSearch = Boolean(search);
+  const errorToast = () =>
+    addToast(`Error: Procurement Order not found.`, {
+      appearance: "error",
+      autoDismiss: true,
+    });
   const onSearchClicked = (evt) => {
     evt.preventDefault();
-    if (canSearch)
-      api
-        .get(
+    const fetchOrder = async () => {
+      try {
+        const url =
           subsys === "sm"
             ? "sam/procurementOrder"
-            : "manufacturing/procurementOrder",
-          search.trim()
-        )
-        .then((response) => {
-          if (response.data !== "")
-            navigate(pathname.replace("search", response.data.id));
-          else
-            addToast(`Error: Procurement Order not found.`, {
-              appearance: "error",
-              autoDismiss: true,
-            });
-        });
+            : "manufacturing/procurementOrder";
+        const { data } = await api.get(url, search.trim());
+        const { id, manufacturing, statusHistory } = data;
+        if (subsys === "lg") {
+          if (
+            currSiteId === manufacturing &&
+            statusHistory[statusHistory.length - 1].status ===
+              "READY_FOR_SHIPPING"
+          )
+            navigate(pathname.replace("search", id));
+          else errorToast();
+        } else if (subsys === "mf") {
+          if (currSiteId === manufacturing)
+            navigate(pathname.replace("search", id));
+          else errorToast();
+        } else navigate(pathname.replace("search", id));
+      } catch (error) {
+        errorToast();
+      }
+    };
+    if (canSearch) fetchOrder();
   };
 
   const onSearchChanged = (e) => setSearch(e.target.value);

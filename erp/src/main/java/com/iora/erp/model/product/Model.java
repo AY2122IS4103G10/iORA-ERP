@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -36,6 +37,9 @@ public class Model {
 
     @Column(nullable = false)
     private boolean available;
+
+    @ElementCollection
+    private List<String> imageLinks;
 
     @OneToMany
     private List<Product> products;
@@ -122,6 +126,14 @@ public class Model {
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+
+    public List<String> getImageLinks() {
+        return this.imageLinks;
+    }
+
+    public void setImageLinks(List<String> imageLinks) {
+        this.imageLinks = imageLinks;
     }
 
     public List<Product> getProducts() {

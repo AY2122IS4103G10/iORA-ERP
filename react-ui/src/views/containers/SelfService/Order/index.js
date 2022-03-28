@@ -12,13 +12,18 @@ const OrderList = ({
   productDetails,
   amount,
   rfid,
+  voucher,
+  voucherCode,
   onRfidChanged,
   addRfidClicked,
+  onVoucherChanged,
+  addVoucherClicked,
   Modify,
   openModal,
   openCheckoutModal,
   isLoading,
   error,
+  voucherError,
 }) => (
   <main>
     <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-0">
@@ -149,6 +154,43 @@ const OrderList = ({
               ))}
             </ul>
           )}
+          {voucher && (
+            <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
+              <li key="header" className="flex py-2">
+                <div className="ml-4 flex-1 flex flex-col sm:ml-6">
+                  <div className="flex justify-between items-center">
+                    <div className="text-lg">
+                      <h3>
+                        <strong>Voucher</strong>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li className="flex py-6">
+                <div className="ml-4 flex-1 flex flex-col sm:ml-6">
+                  <div className="flex justify-between items-center">
+                    <div className="text-lg w-6/12">
+                      <h4>
+                        <strong className="font-medium text-gray-700 hover:text-gray-800">
+                          {voucher?.voucherCode}
+                        </strong>
+                      </h4>
+                    </div>
+                    <div className="text-lg w-2/12">
+                      <p>-${Number.parseFloat(voucher?.amount).toFixed(2)}</p>
+                    </div>
+                    <div className="text-lg w-2/12">
+                      <p>1</p>
+                    </div>
+                    <div className="text-lg w-2/12">
+                      <p>-${Number.parseFloat(voucher?.amount).toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          )}
         </section>
         <section aria-labelledby="summary-heading" className="mt-5">
           <h2 id="summary-heading" className="sr-only">
@@ -213,6 +255,47 @@ const OrderList = ({
               onClick={addRfidClicked}
             >
               Add product
+            </button>
+          </div>
+          <label
+            htmlFor="voucher"
+            className="block mt-8 text-sm font-medium text-gray-700"
+          >
+            Voucher
+          </label>
+          <div className="mt-1">
+            <input
+              type="text"
+              name="voucher"
+              id="voucher"
+              autoComplete="voucher"
+              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              placeholder="XXXXXXXXXX"
+              value={voucherCode}
+              onChange={onVoucherChanged}
+              aria-describedby="voucher"
+            />
+            {voucherError && (
+              <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <XCircleIcon
+                      className="h-5 w-5 text-red-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-800">Voucher not found.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <button
+              type="submit"
+              className="inline-flex justify-end mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={addVoucherClicked}
+            >
+              Add voucher
             </button>
           </div>
         </div>
@@ -360,8 +443,12 @@ export function Order() {
   const [promotions, setPromotions] = useState([]);
   const [productDetails, setProductDetails] = useState(new Map());
   const [amount, setAmount] = useState(0);
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucher, setVoucher] = useState(null);
+  const [voucherDiscount, setVoucherDiscount] = useState(0);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
+  const [voucherError, setVoucherError] = useState("");
   const [openCheckout, setOpenCheckout] = useState(false);
   const [checkoutItems, setCheckoutItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -387,6 +474,7 @@ export function Order() {
       paid: false,
       refundedLIs: [],
       exchangedLIs: [],
+      voucher,
       site: {
         id: siteId,
       },
@@ -401,6 +489,12 @@ export function Order() {
     setOpenCheckout(false);
     setCheckoutItems([]);
   };
+
+  const addRfidClicked = (e) => {
+    e.preventDefault();
+    addProduct(rfid);
+  };
+
   const onRfidChanged = (e) => {
     if (
       e.target.value.length - rfid.length > 10 &&
@@ -457,9 +551,28 @@ export function Order() {
     calculate();
   }, [setPromotions, lineItems]);
 
-  const addRfidClicked = (e) => {
+  const addVoucherClicked = (e) => {
     e.preventDefault();
-    addProduct(rfid);
+    fetchVoucher(voucherCode);
+  };
+
+  const onVoucherChanged = (e) => {
+    if (e.target.value.length - voucherCode.length > 9) {
+      fetchVoucher(e.target.value);
+    }
+    setVoucherCode(e.target.value);
+  };
+
+  const fetchVoucher = async (code) => {
+    try {
+      const { data } = await posApi.getVoucherByCode(code);
+      setVoucher(data);
+      setVoucherDiscount(data?.amount);
+      setVoucherCode("");
+    } catch (err) {
+      setVoucherCode("");
+      setVoucherError("No such voucher found");
+    }
   };
 
   const Modify = (props) => {
@@ -513,22 +626,27 @@ export function Order() {
         setIsLoading={setIsLoading}
         checkoutItems={checkoutItems}
         order={order}
-        amount={amount}
+        amount={Math.max(amount - voucherDiscount, 0)}
       />
       {!renderSummary && (
         <OrderList
           rfid={rfid}
+          voucher={voucher}
+          voucherCode={voucherCode}
           lineItems={lineItems}
           productDetails={productDetails}
           promotions={promotions}
-          amount={amount}
+          amount={Math.max(amount - voucherDiscount, 0)}
           onRfidChanged={onRfidChanged}
           addRfidClicked={addRfidClicked}
+          onVoucherChanged={onVoucherChanged}
+          addVoucherClicked={addVoucherClicked}
           Modify={Modify}
           openModal={openModal}
           openCheckoutModal={openCheckoutModal}
           isLoading={isLoading}
           error={error}
+          voucherError={voucherError}
         />
       )}
     </>

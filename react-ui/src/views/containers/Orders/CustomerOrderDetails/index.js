@@ -62,7 +62,9 @@ const ItemTable = ({ data }) => {
 const OrderDetailsBody = ({
   history,
   dateTime,
-  customerId,
+  delivery,
+  deliveryAddress,
+  customer,
   totalAmount,
   payments,
   paid,
@@ -102,10 +104,36 @@ const OrderDetailsBody = ({
 
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
-                    Customer No.
+                    Customer
                   </dt>
-                  <dd className="mt-1 text-sm text-gray-900">{customerId}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    <address className="not-italic">
+                      <span className="block">{customer.firstName} {customer.lastName}</span>
+                      <span className="block">{customer.email}</span>
+                      <span className="block">{customer.contactNumber}</span>
+                    </address>
+                  </dd>
                 </div>
+
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Delivery Type
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {delivery ? "DELIVERY" : "SELF-COLLECT"}
+                  </dd>
+                </div>
+
+                {deliveryAddress && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Delivery Address
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {deliveryAddress}
+                    </dd>
+                  </div>
+                )}
 
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
@@ -158,7 +186,9 @@ export const CustomerOrderDetails = () => {
     subsys,
     orderId,
     dateTime,
-    customerId,
+    customer,
+    delivery,
+    deliveryAddress,
     totalAmount,
     payments,
     paid,
@@ -168,7 +198,6 @@ export const CustomerOrderDetails = () => {
     setLineItems,
     statusHistory,
   } = useOutletContext();
-  console.log(status)
   const [history, setHistory] = useState([]);
   useEffect(() => {
     fetchAllActionBy(statusHistory).then((data) => {
@@ -200,7 +229,9 @@ export const CustomerOrderDetails = () => {
   return (
     <OrderDetailsBody
       dateTime={dateTime}
-      customerId={customerId}
+      customer={customer}
+      delivery={delivery}
+      deliveryAddress={deliveryAddress}
       totalAmount={totalAmount}
       payments={payments}
       paid={paid}

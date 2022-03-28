@@ -8,15 +8,12 @@ export const Profile = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-      <div className="mt-4">
+      <div className="ml-3 mt-4">
         <div className="mt-10 divide-y divide-gray-200 mx-3">
           <div className="space-y-1">
             <h3 className="text-lg leading-6 font-medium text-gray-900">
               Profile
             </h3>
-            <p className="max-w-2xl text-sm text-gray-500">
-              View your personal information here!
-            </p>
           </div>
           <div className="mt-6">
             <dl className="divide-y divide-gray-200">

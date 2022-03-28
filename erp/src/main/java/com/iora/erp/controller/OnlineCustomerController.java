@@ -297,7 +297,7 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-    
+
     @GetMapping(path = "/model/{modelCode}", produces = "application/json")
     public ResponseEntity<Object> getModel(@PathVariable String modelCode) {
         try {

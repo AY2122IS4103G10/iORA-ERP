@@ -614,7 +614,7 @@ export const StockTransferWrapper = ({ subsys }) => {
                 ? "Delivery"
                 : ""
             } Invoice`}
-            ref={componentRef}
+            ref={componentRef}  
             orderId={order.id}
             orderStatus={order.statusHistory[order.statusHistory.length - 1]}
             company={order.statusHistory[0].actionBy.company}

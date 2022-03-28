@@ -33,8 +33,6 @@ export const PosPurchaseHistory = (subsys) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const data = useSelector(selectAllOrder);
-  // const orderStatus = useSelector((state) => state.pos.status);
-  // const siteStatus = useSelector((state) => state.sites.status);
   const siteId = useSelector(selectUserSite);
   const site = useSelector(selectSite);
 
@@ -47,7 +45,7 @@ export const PosPurchaseHistory = (subsys) => {
   useEffect(() => {
     dispatch(getASite(siteId));
   }, [dispatch, siteId]);
-
+  
   return (
     <>
       <div className="min-h-full">

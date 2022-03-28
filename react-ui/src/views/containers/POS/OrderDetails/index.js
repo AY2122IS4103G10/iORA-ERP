@@ -30,10 +30,6 @@ const ItemTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
-        Header: "#",
-        accessor: "id",
-      },
-      {
         Header: "SKU",
         accessor: "product.sku",
       },
@@ -58,6 +54,15 @@ const ItemTable = ({ data }) => {
         Header: "Qty",
         accessor: "qty",
       },
+      // {
+      //   Header: "Disc",
+      //   accessor: "subTotal",
+      //   Cell: ({ value, row }) => {
+      //     const {product, subTotal} = row.original;
+      //     if (subTotal <= 0 )
+      //     return value <= 0 ? value : "-";
+      //   },
+      // },
     ],
     []
   );
@@ -91,10 +96,16 @@ export const OrderDetails = () => {
   }, [orderStatus, dispatch, siteId]);
 
   useEffect(() => {
-    orderLineItems &&
-      fetchAllModelsBySkus(orderLineItems).then((data) => {
+    if (orderLineItems) {
+      const lIs = orderLineItems.filter((item) => item.subTotal > 0);
+      const promoLIs = orderLineItems.filter((item) => item.subTotal <= 0);
+      lIs.forEach((item) => {
+        const promo = promoLIs.find((i) => i.product.sku === item.product.sku);
+        if (promo !== undefined) item["prodDisc"] = promo.subTotal;
+      });
+      fetchAllModelsBySkus(lIs).then((data) =>
         setLineItems(
-          orderLineItems.map((item, index) => ({
+          lIs.map((item, index) => ({
             ...item,
             product: {
               ...item.product,
@@ -102,8 +113,9 @@ export const OrderDetails = () => {
               name: data[index].name,
             },
           }))
-        );
-      });
+        )
+      );
+    }
   }, [orderLineItems]);
   return (
     Boolean(order) && (
@@ -167,9 +179,7 @@ export const OrderDetails = () => {
             </section>
             {Boolean(order.lineItems.length) && (
               <section aria-labelledby="line-items">
-                <ItemTable
-                  data={lineItems.filter((item) => item.subTotal > 0)}
-                />
+                <ItemTable data={lineItems} />
               </section>
             )}
           </div>

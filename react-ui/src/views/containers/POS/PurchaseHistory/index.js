@@ -2,7 +2,10 @@ import moment from "moment";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { fetchSiteOrders, selectAllOrder } from "../../../../stores/slices/posSlice";
+import {
+  fetchSiteOrders,
+  selectAllOrder,
+} from "../../../../stores/slices/posSlice";
 import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
@@ -15,12 +18,11 @@ const columns = [
   {
     Header: "Transaction Date",
     accessor: (row) => moment(row.dateTime).format("DD/MM/YYYY"),
-
   },
   {
     Header: "Total Amount",
     accessor: "totalAmount",
-    Cell: (row) => `$${row.value.toFixed(2)}`
+    Cell: (row) => `$${row.value.toFixed(2)}`,
   },
   {
     Header: "Customer No.",
@@ -28,8 +30,8 @@ const columns = [
   },
 ];
 
-export const PosPurchaseHistory = (subsys) => {
-  const {pathname} = useLocation();
+export const PosPurchaseHistory = () => {
+  const { pathname } = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const data = useSelector(selectAllOrder);
@@ -45,7 +47,7 @@ export const PosPurchaseHistory = (subsys) => {
   useEffect(() => {
     dispatch(getASite(siteId));
   }, [dispatch, siteId]);
-  
+
   return (
     <>
       <div className="min-h-full">
@@ -66,7 +68,11 @@ export const PosPurchaseHistory = (subsys) => {
                   {data === undefined ? (
                     <p>No Records</p>
                   ) : (
-                    <SimpleTable columns={columns} data={data} handleOnClick={handleOnClick} />
+                    <SimpleTable
+                      columns={columns}
+                      data={data}
+                      handleOnClick={handleOnClick}
+                    />
                   )}
                 </div>
               </section>

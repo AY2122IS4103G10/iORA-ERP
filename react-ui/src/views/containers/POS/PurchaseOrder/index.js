@@ -240,10 +240,10 @@ export const PosPurchaseOrder = () => {
 
   const openModal = () => {
     setModalState(true);
-    const concat = lineItems.concat(promotions);
     setOrder({
       totalAmount: 0.0,
-      lineItems: concat,
+      lineItems: lineItems,
+      promotions: promotions,
       payments: [],
       paid: false,
       refundedLIs: [],

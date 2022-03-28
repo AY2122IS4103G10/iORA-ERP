@@ -70,7 +70,7 @@ export const CheckoutForm = ({
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
   const [voucherCode, setVoucherCode] = useState("");
-  const [voucher, setVoucher] = useState({});
+  const [voucher, setVoucher] = useState(null);
   const [voucherDiscount, setVoucherDiscount] = useState(0);
   const [showChoice, setShowChoice] = useState(false);
   const { addToast } = useToasts();
@@ -95,7 +95,7 @@ export const CheckoutForm = ({
           payments: [
             {
               amount: Math.max(amount - voucherDiscount, 0),
-              paymentType: paymentTypes[mode]?.name.toUpperCase(),
+              paymentType: paymentTypes[mode-1]?.name.toUpperCase(),
               ccTransactionId: paymentIntentId,
             },
           ],

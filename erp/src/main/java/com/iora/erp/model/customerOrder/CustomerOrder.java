@@ -18,7 +18,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.site.Site;
 
@@ -41,6 +40,9 @@ public class CustomerOrder {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<CustomerOrderLI> lineItems;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<PromotionLI> promotions;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Payment> payments;
@@ -102,6 +104,14 @@ public class CustomerOrder {
 
     public void addLineItem(CustomerOrderLI lineItem) {
         this.lineItems.add(lineItem);
+    }
+
+    public List<PromotionLI> getPromotions() {
+        return this.promotions;
+    }
+
+    public void setPromotions(List<PromotionLI> promotions) {
+        this.promotions = promotions;
     }
 
     public List<Payment> getPayments() {

@@ -363,7 +363,7 @@ public class StoreController {
 
     @PostMapping(path = "/customerOrder/create", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createCustomerOrder(@RequestBody CustomerOrder customerOrder,
-            @RequestParam String clientSecret) {
+            @RequestParam(required = false) String clientSecret) {
         try {
             return ResponseEntity.ok(customerOrderService.createCustomerOrder(customerOrder, clientSecret));
         } catch (Exception ex) {

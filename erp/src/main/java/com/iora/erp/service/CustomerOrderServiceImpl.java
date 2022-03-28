@@ -31,6 +31,7 @@ import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.DeliveryAddress;
 import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OOStatus;
 import com.iora.erp.model.customerOrder.OnlineOrder;
@@ -169,6 +170,14 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
         if (customerOrder.getVoucher() != null) {
             customerService.redeemVoucher(customerOrder.getVoucher().getVoucherCode());
+        }
+
+        if (customerOrder instanceof OnlineOrder) {
+            OnlineOrder oo = (OnlineOrder) customerOrder;
+            DeliveryAddress da = oo.getDeliveryAddress();
+            em.persist(da);
+            oo.setDeliveryAddress(null);
+            customerOrder = oo;
         }
 
         em.persist(customerOrder);
@@ -668,11 +677,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 onlineOrder.addStatusHistory(
                         new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_COLLECTION));
             } else {
+
                 onlineOrder.addStatusHistory(
                         new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_DELIVERY));
             }
         }
-
         return updateOnlineOrder(onlineOrder);
     }
 

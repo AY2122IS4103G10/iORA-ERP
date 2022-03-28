@@ -1,6 +1,6 @@
 package com.iora.erp.model.customer;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,7 +20,7 @@ public class Voucher {
     private double amount;
 
     @Column(nullable = false)
-    private LocalDate expiry;
+    private Date expiry;
 
     @Column(nullable = false)
     private boolean issued;
@@ -28,19 +28,20 @@ public class Voucher {
     @Column(nullable = false)
     private boolean redeemed;
 
-    // @OneToOne(mappedBy = "voucher")
-    // private CustomerOrder customerOrder;
+    @JsonBackReference
+    @OneToOne(mappedBy = "voucher")
+    CustomerOrder customerOrder;
 
     public Voucher() {
-    }
-
-    public Voucher(double amount, LocalDate expiry) {
-        this();
         this.voucherCode = StringGenerator.generateRandom(48, 122, 10);
-        this.amount = amount;
-        this.expiry = expiry;
         this.issued = false;
         this.redeemed = false;
+    }
+
+    public Voucher(double amount, Date expiry) {
+        this();
+        this.amount = amount;
+        this.expiry = expiry;
     }
 
     public String getVoucherCode() {
@@ -59,11 +60,11 @@ public class Voucher {
         this.amount = amount;
     }
 
-    public LocalDate getExpiry() {
+    public Date getExpiry() {
         return this.expiry;
     }
 
-    public void setExpiry(LocalDate expiry) {
+    public void setExpiry(Date expiry) {
         this.expiry = expiry;
     }
 
@@ -83,11 +84,11 @@ public class Voucher {
         this.redeemed = redeemed;
     }
 
-    // public CustomerOrder getCustomerOrder() {
-    //     return this.customerOrder;
-    // }
+    public CustomerOrder getCustomerOrder() {
+        return this.customerOrder;
+    }
 
-    // public void setCustomerOrder(CustomerOrder customerOrder) {
-    //     this.customerOrder = customerOrder;
-    // }
+    public void setCustomerOrder(CustomerOrder customerOrder) {
+        this.customerOrder = customerOrder;
+    }
 }

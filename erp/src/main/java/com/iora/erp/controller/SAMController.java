@@ -244,10 +244,28 @@ public class SAMController {
         }
     }
 
+    @PostMapping(path = "/product", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createProduct(@RequestBody Product product) {
+        try {
+            return ResponseEntity.ok(productService.createProduct(product));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/product", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> updateProduct(@RequestBody Product product) {
         try {
             return ResponseEntity.ok(productService.updateProduct(product));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/product/delete/{sku}", produces = "application/json")
+    public ResponseEntity<Object> deleteProduct(@PathVariable String sku) {
+        try {
+            return ResponseEntity.ok(productService.deleteProduct(sku));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

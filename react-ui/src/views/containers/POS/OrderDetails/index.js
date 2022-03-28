@@ -11,6 +11,7 @@ import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { useState } from "react";
 import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
+import { TailSpin } from "react-loader-spinner";
 
 const Header = ({ order }) => {
   return (
@@ -29,10 +30,6 @@ const Header = ({ order }) => {
 const ItemTable = ({ data }) => {
   const columns = useMemo(
     () => [
-      {
-        Header: "#",
-        accessor: "id",
-      },
       {
         Header: "SKU",
         accessor: "product.sku",
@@ -75,12 +72,46 @@ const ItemTable = ({ data }) => {
   );
 };
 
+const PromoTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Name",
+        accessor: "promotion.fieldValue",
+      },
+      {
+        Header: "Qty",
+        accessor: "qty",
+      },
+      {
+        Header: "Discount",
+        accessor: "subTotal",
+        Cell: (e) => e.value.toFixed(2),
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Promotions Applied
+        </h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
 export const OrderDetails = () => {
   const { orderId } = useParams();
   const order = useSelector((state) =>
     selectOrderById(state, parseInt(orderId))
   );
-  const orderLineItems = order.lineItems;
   const [lineItems, setLineItems] = useState([]);
   const siteId = useSelector(selectUserSite);
   const dispatch = useDispatch();
@@ -91,22 +122,33 @@ export const OrderDetails = () => {
   }, [orderStatus, dispatch, siteId]);
 
   useEffect(() => {
-    orderLineItems &&
-      fetchAllModelsBySkus(orderLineItems).then((data) => {
-        setLineItems(
-          orderLineItems.map((item, index) => ({
+    const orderLineItems = Boolean(order) ? order.lineItems : [];
+    fetchAllModelsBySkus(orderLineItems).then((data) =>
+      setLineItems(
+        orderLineItems.map((item, index) => {
+          const promo = order.promotions.find(
+            (promo) => promo.product.sku === item.product.sku
+          );
+          return {
             ...item,
             product: {
               ...item.product,
               modelCode: data[index].modelCode,
               name: data[index].name,
             },
-          }))
-        );
-      });
-  }, [orderLineItems]);
-  return (
-    Boolean(order) && (
+            promo: promo !== undefined ? promo.promotion.fieldValue : null,
+          };
+        })
+      )
+    );
+  }, [order]);
+
+  return orderStatus === "loading" ? (
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BFFF" height={20} width={20} />
+    </div>
+  ) : (
+    orderStatus === "succeeded" && (
       <div className="py-4 xl:py-6">
         <NavigatePrev />
         <Header order={order} />
@@ -138,7 +180,7 @@ export const OrderDetails = () => {
                         Transaction Date
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900">
-                        {moment(order.dateTime).format("DD/MM/YYYY")}
+                        {moment(order.dateTime).format("DD/MM/YYYY, H:mm:ss")}
                       </dd>
                     </div>
                     <div className="sm:col-span-1">
@@ -161,15 +203,35 @@ export const OrderDetails = () => {
                           .join(", ")}
                       </dd>
                     </div>
+                    {order.voucher && (
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          Voucher
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900">
+                          <address className="not-italic">
+                            <span className="block">
+                              ${order.voucher.amount}
+                            </span>
+                            <span className="block">
+                              {order.voucher.voucherCode}
+                            </span>
+                          </address>
+                        </dd>
+                      </div>
+                    )}
                   </dl>
                 </div>
               </div>
             </section>
-            {Boolean(order.lineItems.length) && (
+            {Boolean(lineItems.length) && (
               <section aria-labelledby="line-items">
-                <ItemTable
-                  data={lineItems.filter((item) => item.subTotal > 0)}
-                />
+                <ItemTable data={lineItems} />
+              </section>
+            )}
+            {Boolean(order.promotions.length) && (
+              <section aria-labelledby="line-items">
+                <PromoTable data={order.promotions} />
               </section>
             )}
           </div>

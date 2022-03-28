@@ -10,14 +10,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.site.Site;
 
@@ -34,7 +32,6 @@ public class CustomerOrder {
     private Double totalAmount;
 
     // This site will be supplying the inventory for the order
-    @JsonBackReference(value="site-CustomerOrder")
     @ManyToOne
     private Site site;
 
@@ -58,7 +55,6 @@ public class CustomerOrder {
     private Long customerId;
 
     @OneToOne
-    @JoinColumn(name = "voucher_code")
     private Voucher voucher;
 
     public CustomerOrder() {

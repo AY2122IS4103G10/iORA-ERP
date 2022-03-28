@@ -12,8 +12,11 @@ public interface StripeService {
     public abstract String createPaymentIntentOnlineOrder(Long totalAmount, Boolean isDelivery) throws StripeException;
     public abstract String createPaymentIntent(List<CustomerOrderLI> lineItems, Long voucherAmount) throws StripeException;
     public abstract Map<String, String> createConnnectionToken() throws StripeException;
+
     public abstract PaymentIntent capturePayment(String clientSecret) throws StripeException;
 
     public abstract PaymentIntent cancelPayment(String clientSecret) throws StripeException;
+
     public abstract Refund refundPayment(String clientSecret, double amount) throws StripeException;
+
 }

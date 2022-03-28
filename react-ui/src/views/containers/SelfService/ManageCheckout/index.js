@@ -14,25 +14,26 @@ const stripePromise = loadStripe(
 );
 
 export default function ManageCheckout({
+  useReader,
   open,
   closeModal,
   checkoutItems,
   order,
   amount,
+  voucherAmt,
   setIsLoading,
 }) {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
-  const paymentIntent = params?.get("payment_intent");
   const redirectStatus = params?.get("redirect_status");
   const paymentIntentClientSecret = params?.get("payment_intent_client_secret");
-  const [clientSecret, setClientSecret] = useState("");
+  const [clientSecret, setClientSecret] = useState(null);
   const { addToast } = useToasts();
 
   useEffect(() => {
     checkoutItems.length > 0 &&
       onlineOrderApi
-        .getPaymentIntent(checkoutItems)
+        .getPaymentIntent(checkoutItems, voucherAmt)
         .then((response) => setClientSecret(response.data))
         .catch((err) => {
           addToast(`Error: ${err.response.data.message}`, {
@@ -40,25 +41,24 @@ export default function ManageCheckout({
             autoDismiss: true,
           });
         });
-  }, [checkoutItems, addToast]);
+  }, [checkoutItems, voucherAmt, addToast]);
 
   useEffect(() => {
     setClientSecret(paymentIntentClientSecret);
   }, [paymentIntentClientSecret]);
 
-  const options = {
-    clientSecret,
-  };
+  const options = clientSecret
+    ? {
+        clientSecret,
+      }
+    : {};
 
   return (
     <div className="stripe">
-      {clientSecret && (
+      {clientSecret !== null && (
         <Elements options={options} stripe={stripePromise}>
           {redirectStatus === "succeeded" ? (
-            <OrderSuccess
-              paymentIntent={paymentIntent}
-              clientSecret={paymentIntentClientSecret}
-            />
+            <OrderSuccess clientSecret={paymentIntentClientSecret} />
           ) : (
             clientSecret && (
               <Transition.Root show={open} as={Fragment}>
@@ -107,21 +107,28 @@ export default function ManageCheckout({
                             <XIcon className="h-6 w-6" aria-hidden="true" />
                           </button>
                         </div>
-                        <div className="sm:mt-3 sm:ml-3 sm:text-left sm:items-stretch sm:justify-items-stretch">
-                          <Dialog.Title
-                            as="h3"
-                            className="text-lg leading-6 font-medium text-gray-900 mb-6"
-                          >
-                            Checkout using Stripe
-                          </Dialog.Title>
-                          <CheckoutForm
-                            setIsLoading={setIsLoading}
-                            clientSecret={clientSecret}
-                            closeModal={closeModal}
-                            order={order}
-                            amount={amount}
-                          />
-                        </div>
+                        {amount > 0 ? (
+                          useReader ? (
+                            <>test</>
+                          ) : (
+                            <div className="sm:mt-3 sm:ml-3 sm:text-left sm:items-stretch sm:justify-items-stretch">
+                              <Dialog.Title
+                                as="h3"
+                                className="text-lg leading-6 font-medium text-gray-900 mb-6"
+                              >
+                                Checkout using Stripe
+                              </Dialog.Title>
+                              <CheckoutForm
+                                clientSecret={clientSecret}
+                                closeModal={closeModal}
+                                order={order}
+                                amount={amount}
+                              />
+                            </div>
+                          )
+                        ) : (
+                          <>test2</>
+                        )}
                       </div>
                     </Transition.Child>
                   </div>

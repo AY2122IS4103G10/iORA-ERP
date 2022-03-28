@@ -302,6 +302,7 @@ export const CheckoutForm = ({
           <Card
             addToast={addToast}
             checkoutItems={checkoutItems}
+            voucherAmt={voucherDiscount}
             handleSubmit={handleSubmit}
           />
         )}
@@ -491,7 +492,7 @@ const Cash = ({ amount, handleSubmit, addToast }) => {
   );
 };
 
-export const Card = ({ addToast, checkoutItems, handleSubmit }) => {
+export const Card = ({ addToast, checkoutItems, voucherAmt, handleSubmit }) => {
   const [terminal, setTerminal] = useState(null);
   const [connected, setConnected] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
@@ -518,7 +519,7 @@ export const Card = ({ addToast, checkoutItems, handleSubmit }) => {
   useEffect(() => {
     checkoutItems.length > 0 &&
       posApi
-        .getPaymentIntent(checkoutItems)
+        .getPaymentIntent(checkoutItems, voucherAmt)
         .then((response) => setClientSecret(response.data))
         .catch((err) => {
           addToast(`Error: ${err.response.data.message}`, {
@@ -526,7 +527,7 @@ export const Card = ({ addToast, checkoutItems, handleSubmit }) => {
             autoDismiss: true,
           });
         });
-  }, [checkoutItems, addToast]);
+  }, [checkoutItems, voucherAmt, addToast]);
 
   const setSimulated = async () => {
     const config = { simulated: true };

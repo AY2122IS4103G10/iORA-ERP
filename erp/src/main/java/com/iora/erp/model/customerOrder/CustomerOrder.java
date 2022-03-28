@@ -18,6 +18,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.site.Site;
 
@@ -55,6 +56,7 @@ public class CustomerOrder {
     private Long customerId;
 
     @OneToOne
+    @JsonManagedReference
     @JoinColumn(name = "voucher_code")
     private Voucher voucher;
 

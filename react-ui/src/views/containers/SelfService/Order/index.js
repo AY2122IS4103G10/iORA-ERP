@@ -1,9 +1,10 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
 import { MinusSmIcon, PlusSmIcon, XCircleIcon } from "@heroicons/react/solid";
+import { TailSpin } from "react-loader-spinner";
 import { Fragment, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { api, posApi } from "../../../../environments/Api";
+import { api, orderApi, posApi } from "../../../../environments/Api";
 import ManageCheckout from "../ManageCheckout";
 
 const OrderList = ({
@@ -18,6 +19,7 @@ const OrderList = ({
   addRfidClicked,
   onVoucherChanged,
   addVoucherClicked,
+  handleZeroDollarCheckout,
   Modify,
   openModal,
   openCheckoutModal,
@@ -214,115 +216,129 @@ const OrderList = ({
             </p>
           </div>
         </section>
-        <div>
+        <div className="grid grid-cols-4 gap-2">
           <label
             htmlFor="rfid"
-            className="block mt-5 text-sm font-medium text-gray-700"
+            className="block mt-6 text-sm font-medium text-gray-700 col-span-4"
           >
             SKU Code or RFID
           </label>
-          <div className="mt-1">
-            <input
-              type="text"
-              name="rfid"
-              id="rfid"
-              autoComplete="rfid"
-              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-              placeholder="AA0009876-1 or 10-0001234-0XXXXX-0000XXXXX"
-              value={rfid}
-              onChange={onRfidChanged}
-              required
-              aria-describedby="rfid"
-            />
-            {error && (
-              <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <XCircleIcon
-                      className="h-5 w-5 text-red-400"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-800">Product not found.</p>
-                  </div>
+          <input
+            type="text"
+            name="rfid"
+            id="rfid"
+            autoComplete="rfid"
+            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block col-span-3 sm:text-sm border-gray-300 rounded-md"
+            placeholder="AA0009876-1 or 10-0001234-0XXXXX-0000XXXXX"
+            value={rfid}
+            onChange={onRfidChanged}
+            required
+            aria-describedby="rfid"
+          />
+          <button
+            type="submit"
+            className="col-span-1 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={addRfidClicked}
+          >
+            Add product
+          </button>
+          {error && (
+            <div className="col-span-4 mt-3 bg-red-50 border-l-4 border-red-400 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <XCircleIcon
+                    className="h-5 w-5 text-red-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-800">Product not found.</p>
                 </div>
               </div>
-            )}
-            <button
-              type="submit"
-              className="inline-flex justify-end mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick={addRfidClicked}
-            >
-              Add product
-            </button>
-          </div>
+            </div>
+          )}
           <label
             htmlFor="voucher"
-            className="block mt-8 text-sm font-medium text-gray-700"
+            className="block mt-3 text-sm font-medium text-gray-700 col-span-4"
           >
             Voucher
           </label>
-          <div className="mt-1">
-            <input
-              type="text"
-              name="voucher"
-              id="voucher"
-              autoComplete="voucher"
-              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-              placeholder="XXXXXXXXXX"
-              value={voucherCode}
-              onChange={onVoucherChanged}
-              aria-describedby="voucher"
-            />
-            {voucherError && (
-              <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <XCircleIcon
-                      className="h-5 w-5 text-red-400"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-800">Voucher not found.</p>
-                  </div>
+          <input
+            type="text"
+            name="voucher"
+            id="voucher"
+            autoComplete="voucher"
+            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block col-span-3 sm:text-sm border-gray-300 rounded-md"
+            placeholder="XXXXXXXXXX"
+            value={voucherCode}
+            onChange={onVoucherChanged}
+            aria-describedby="voucher"
+          />
+          <button
+            type="submit"
+            className="col-span-1 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={addVoucherClicked}
+          >
+            Add voucher
+          </button>
+          {voucherError && (
+            <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <XCircleIcon
+                    className="h-5 w-5 text-red-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-800">Voucher not found.</p>
                 </div>
               </div>
-            )}
-            <button
-              type="submit"
-              className="inline-flex justify-end mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick={addVoucherClicked}
-            >
-              Add voucher
-            </button>
-          </div>
+            </div>
+          )}
         </div>
         {/* Order summary */}
         <section aria-labelledby="summary-heading" className="mt-10">
-          <div className="mt-10">
+          <div className="mt-12 grid grid-cols-2 gap-x-12">
+            <label
+              htmlFor="rfid"
+              className="block text-lg font-medium mb-2 text-gray-700 col-span-2"
+            >
+              Thank you for shopping with us
+              {localStorage.getItem("customer") === null
+                ? ""
+                : `, ${JSON.parse(localStorage.customer).firstName} ${
+                    JSON.parse(localStorage.customer).lastName
+                  }`}! How would you like to checkout?
+            </label>
             <button
               type="button"
-              className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
-              onClick={openCheckoutModal}
+              className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+              onClick={
+                amount > 0 ? openCheckoutModal : handleZeroDollarCheckout
+              }
               disabled={lineItems.length === 0}
             >
-              {localStorage.getItem("customer") === null ? (
-                <>Checkout as Guest</>
-              ) : (
-                <>
-                  Checkout as {JSON.parse(localStorage.customer).firstName}{" "}
-                  {JSON.parse(localStorage.customer).lastName}
-                </>
-              )}
+              Keyboard Input
+            </button>
+            <button
+              type="button"
+              className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+              onClick={
+                amount > 0 ? openCheckoutModal : handleZeroDollarCheckout
+              }
+              disabled={lineItems.length === 0}
+            >
+              Card Reader
             </button>
             {isLoading ? (
-              <div className="spinner" id="spinner" />
-            ) : (
+          <div className="flex mt-5 items-center justify-center">
+            <TailSpin color="#00BFFF" height={20} width={20} />
+          </div>
+        ) : (
               <button
                 type="button"
-                className="w-full mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                className="col-span-2 mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                 onClick={() => openModal()}
               >
                 Cancel
@@ -485,6 +501,38 @@ export function Order() {
     });
   };
 
+  const handleZeroDollarCheckout = async () => {
+    const concat = lineItems.concat(promotions);
+    const { data } = await orderApi.createOrder(
+      {
+        totalAmount: 0.0,
+        lineItems: concat,
+        payments: [
+          {
+            amount: 0,
+            paymentType: "CASH",
+            ccTransactionId: "",
+          },
+        ],
+        paid: true,
+        refundedLIs: [],
+        exchangedLIs: [],
+        voucher,
+        site: {
+          id: siteId,
+        },
+        customerId:
+          localStorage.getItem("customer") === null
+            ? JSON.parse(localStorage.getItem("customer"))?.id
+            : null,
+      },
+      ""
+    );
+    navigate(
+      `/ss/order/${data.id}?redirect_status=succeeded&payment_intent_client_secret=`
+    );
+  };
+
   const closeCheckoutModal = () => {
     setOpenCheckout(false);
     setCheckoutItems([]);
@@ -619,6 +667,7 @@ export function Order() {
         />
       )}
       <ManageCheckout
+        useReader={false}
         open={openCheckout}
         openModal={openCheckoutModal}
         closeModal={closeCheckoutModal}
@@ -627,6 +676,7 @@ export function Order() {
         checkoutItems={checkoutItems}
         order={order}
         amount={Math.max(amount - voucherDiscount, 0)}
+        voucherAmt={voucherDiscount}
       />
       {!renderSummary && (
         <OrderList
@@ -644,6 +694,7 @@ export function Order() {
           Modify={Modify}
           openModal={openModal}
           openCheckoutModal={openCheckoutModal}
+          handleZeroDollarCheckout={handleZeroDollarCheckout}
           isLoading={isLoading}
           error={error}
           voucherError={voucherError}

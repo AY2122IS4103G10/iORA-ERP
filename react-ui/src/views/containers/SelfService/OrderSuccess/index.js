@@ -7,7 +7,7 @@ import { useToasts } from "react-toast-notifications";
 import Barcode from "react-barcode";
 import { HomeIcon, PrinterIcon } from "@heroicons/react/solid";
 
-export default function OrderSuccess({ paymentIntent, clientSecret }) {
+export default function OrderSuccess({ clientSecret }) {
   const stripe = useStripe();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -26,6 +26,7 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
           setPaymentData(data?.paymentIntent);
         })
         .catch((err) => {
+          console.log(err?.response?.data?.message)
           addToast(
             `Error: ${
               err?.response?.data?.message || "Stripe unable to connect"
@@ -65,11 +66,17 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
           <p className="mt-2 text-base text-gray-500 flex-grow">
             Status: Successful
           </p>
-          <p className="mt-6 font-medium text-base text-gray-800">
-            You have paid {paymentData?.currency?.toUpperCase()}$
-            {Number.parseFloat(paymentData?.amount / 100).toFixed(2)} on{" "}
-            {moment.unix(paymentData?.created).format("DD MMM YYYY HH:mm:SS")}
-          </p>
+          {clientSecret ? (
+            <p className="mt-6 font-medium text-base text-gray-800">
+              You have paid {paymentData?.currency?.toUpperCase()}$
+              {Number.parseFloat(paymentData?.amount / 100).toFixed(2)} on{" "}
+              {moment.unix(paymentData?.created).format("DD MMM YYYY HH:mm:SS")}
+            </p>
+          ) : (
+            <p className="mt-6 font-medium text-base text-gray-800">
+              You have successfully completed your purchase
+            </p>
+          )}
 
           <div className="flex flex-row pt-12">
             <dl className="text-lg font-medium flex-grow">
@@ -148,7 +155,7 @@ export default function OrderSuccess({ paymentIntent, clientSecret }) {
           <button
             type="button"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            onClick={() => (navigate("/ss"))}
+            onClick={() => navigate("/ss")}
           >
             <HomeIcon className="h-5 w-5 mr-2" aria-hidden="true" />
             Return to Home

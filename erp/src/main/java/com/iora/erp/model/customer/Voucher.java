@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.utils.StringGenerator;
 
@@ -28,6 +29,7 @@ public class Voucher {
     private boolean redeemed;
 
     @OneToOne(mappedBy = "voucher")
+    @JsonBackReference
     private CustomerOrder customerOrder;
 
     public Voucher() {

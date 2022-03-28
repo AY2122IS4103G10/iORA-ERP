@@ -145,6 +145,7 @@ export default function ManageCheckout({
                                 Checkout using Card Reader
                               </Dialog.Title>
                               <Card
+                                clientSecret={clientSecret}
                                 addToast={addToast}
                                 checkoutItems={checkoutItems}
                                 voucherAmt={voucherAmt}

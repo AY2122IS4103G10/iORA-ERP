@@ -1,11 +1,11 @@
+import { HomeIcon, PrinterIcon } from "@heroicons/react/solid";
 import { useStripe } from "@stripe/react-stripe-js";
-import { useEffect, useState } from "react";
 import moment from "moment";
-import { orderApi } from "../../../../environments/Api";
+import { useEffect, useState } from "react";
+import Barcode from "react-barcode";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import Barcode from "react-barcode";
-import { HomeIcon, PrinterIcon } from "@heroicons/react/solid";
+import { orderApi } from "../../../../environments/Api";
 
 export default function OrderSuccess({ clientSecret }) {
   const stripe = useStripe();

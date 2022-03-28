@@ -9,7 +9,7 @@ import { orderApi } from "../../../../environments/Api";
 import { TailSpin } from "react-loader-spinner";
 
 export default function CheckoutForm({
-  clientSecret = "",
+  clientSecret,
   closeModal,
   order,
   amount,

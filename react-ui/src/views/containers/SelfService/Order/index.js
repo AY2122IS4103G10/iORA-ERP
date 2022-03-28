@@ -1,8 +1,8 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
 import { MinusSmIcon, PlusSmIcon, XCircleIcon } from "@heroicons/react/solid";
-import { TailSpin } from "react-loader-spinner";
 import { Fragment, useEffect, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api, orderApi, posApi } from "../../../../environments/Api";
 import ManageCheckout from "../ManageCheckout";

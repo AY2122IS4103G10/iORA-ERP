@@ -28,9 +28,8 @@ public class Voucher {
     @Column(nullable = false)
     private boolean redeemed;
 
-    @OneToOne(mappedBy = "voucher")
-    @JsonBackReference
-    private CustomerOrder customerOrder;
+    // @OneToOne(mappedBy = "voucher")
+    // private CustomerOrder customerOrder;
 
     public Voucher() {
     }
@@ -84,11 +83,11 @@ public class Voucher {
         this.redeemed = redeemed;
     }
 
-    public CustomerOrder getCustomerOrder() {
-        return this.customerOrder;
-    }
+    // public CustomerOrder getCustomerOrder() {
+    //     return this.customerOrder;
+    // }
 
-    public void setCustomerOrder(CustomerOrder customerOrder) {
-        this.customerOrder = customerOrder;
-    }
+    // public void setCustomerOrder(CustomerOrder customerOrder) {
+    //     this.customerOrder = customerOrder;
+    // }
 }

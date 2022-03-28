@@ -56,7 +56,6 @@ public class CustomerOrder {
     private Long customerId;
 
     @OneToOne
-    @JsonManagedReference
     @JoinColumn(name = "voucher_code")
     private Voucher voucher;
 

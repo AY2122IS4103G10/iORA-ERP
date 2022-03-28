@@ -25,6 +25,7 @@ export const ManageCheckout = () => {
     const [lineItems, setLineItems] = useState(null);
     const [order, setOrder] = useState(null);
     const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [country, setCountry] = useState({ name: countries[197] });
     const [address, setAddress] = useState("");
@@ -68,7 +69,7 @@ export const ManageCheckout = () => {
 
     }, [])
 
-    useEffect(() => {
+    const handleMakePayment = () => {
         let delivery = selectedDeliveryMethod.id === 1 ? true : false
         let totalAmount = afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0)
         let order = {
@@ -77,17 +78,22 @@ export const ManageCheckout = () => {
             totalAmount: totalAmount,
             country: country.name,
             delivery,
-            deliveryAddress: address,
+            deliveryAddress: {
+                name: name, 
+                street1: address,
+                city: city,
+                zip: postalCode,
+                state : state,
+                phone: phoneNumber
+            },
             pickupSite: selectedDeliveryMethod.id === 1 ? null : store,
 
         }
         setOrder(order);
-    }, [subTotal, afterDiscount, selectedDeliveryMethod, store])
-
-    const handleMakePayment = () => {
+    
         setEnterPayment(true);
     }
-
+    console.log(order)
 
     return (
         <div className="bg-white">
@@ -120,10 +126,14 @@ export const ManageCheckout = () => {
                     : <CheckoutForm
                         setEmail={setEmail}
                         setPhoneNumber={setPhoneNumber}
+                        setName={setName}
                         country={country}
                         setCountry={setCountry}
                         address={address}
                         setAddress={setAddress}
+                        setPostalCode={setPostalCode}
+                        setCity={setCity}
+                        setState={setState}
                         sameAddress={sameAddress}
                         setSameAddress={setSameAddress}
                         selectedDeliveryMethod={selectedDeliveryMethod}

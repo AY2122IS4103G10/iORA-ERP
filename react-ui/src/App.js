@@ -67,32 +67,33 @@ import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
 import { Order } from "./views/containers/SelfService/Order";
 // import { ADRoute } from "./routes/ADRoute";
-import { ManageSites } from "./views/containers/Sites/ManageSites";
-import { SiteDetails } from "./views/containers/Sites/SiteDetails";
-import { SiteForm } from "./views/containers/Sites/SiteForm";
-import { AProductStock } from "./views/containers/StockLevels/AProductStock";
-import { AsiteStock } from "./views/containers/StockLevels/ASiteStock";
-import { ProductStocks } from "./views/containers/StockLevels/ByProduct";
-import { SiteStocks } from "./views/containers/StockLevels/BySite";
-import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel";
-import { StockLevelForm } from "./views/containers/StockLevels/ProdStockLevelForm";
-import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList";
-import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
-import { StockTransferDelivery } from "./views/containers/StockTransfer/StockTransferDelivery/index.js";
-import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
-import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList";
-import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack";
-import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch";
-import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTransferWrapper";
-import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTransfer";
-import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
-import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
-import { VendorForm } from "./views/containers/Vendor/VendorForm";
-import { ManageRewardsLoyalty } from "./views/containers/Vouchers/ManageVouchers";
-import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails";
-import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
-import { VouchersList } from "./views/containers/Vouchers/VouchersList";
-import { ProductRFID } from "./views/containers/Products/ProductRFID/index.js";
+import {ManageSites} from "./views/containers/Sites/ManageSites";
+import {SiteDetails} from "./views/containers/Sites/SiteDetails";
+import {SiteForm} from "./views/containers/Sites/SiteForm";
+import {AProductStock} from "./views/containers/StockLevels/AProductStock";
+import {AsiteStock} from "./views/containers/StockLevels/ASiteStock";
+import {ProductStocks} from "./views/containers/StockLevels/ByProduct";
+import {SiteStocks} from "./views/containers/StockLevels/BySite";
+import {EditStockLevel} from "./views/containers/StockLevels/EditStockLevel";
+import {StockLevelForm} from "./views/containers/StockLevels/ProdStockLevelForm";
+import {MyStoreStock} from "./views/containers/StockLevels/StoreStockList";
+import {ManageStockTransfer} from "./views/containers/StockTransfer/ManageStockTransfer";
+import {StockTransferDelivery} from "./views/containers/StockTransfer/StockTransferDelivery/index.js";
+import {StockTransferForm} from "./views/containers/StockTransfer/StockTransferForm";
+import {StockTransferList} from "./views/containers/StockTransfer/StockTransferList";
+import {StockTransferPickPack} from "./views/containers/StockTransfer/StockTransferPickPack";
+import {StockTransferSearch} from "./views/containers/StockTransfer/StockTransferSearch";
+import {StockTransferWrapper} from "./views/containers/StockTransfer/StockTransferWrapper";
+import {ViewStockTransfer} from "./views/containers/StockTransfer/ViewStockTransfer";
+import {ManageVendors} from "./views/containers/Vendor/ManageVendors";
+import {VendorDetails} from "./views/containers/Vendor/VendorDetails";
+import {VendorForm} from "./views/containers/Vendor/VendorForm";
+import {ManageRewardsLoyalty} from "./views/containers/Vouchers/ManageVouchers";
+import {VoucherDetails} from "./views/containers/Vouchers/VoucherDetails";
+import {VoucherForm} from "./views/containers/Vouchers/VoucherForm";
+import {VouchersList} from "./views/containers/Vouchers/VouchersList";
+import {ProductRFID} from "./views/containers/Products/ProductRFID/index.js";
+import { ResetPassword } from "./views/containers/Auth/ResetPassword/index.js";
 import { OnlineOrderCollection } from "./views/containers/OnlineOrder/OnlineOrderCollection/index.js";
 
 function App() {
@@ -100,7 +101,7 @@ function App() {
   return (
     <div>
       <Routes>
-        {/* <Route path="resetPassword" element={<ResetPassword />} /> */}
+        <Route path="resetPassword" element={<ResetPassword />} />
         <Route path="/" element={<Auth />}>
           {/* Common Infrastructure */}
           <Route index element={<Login />} />

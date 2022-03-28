@@ -583,7 +583,7 @@ public class DataLoader implements CommandLineRunner {
 		}
 
 		// ProcurementOrders
-		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("ABA20765E-1"), 50);
+		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("BBV0010201H-1"), 50);
 		em.persist(poli1);
 		ProcurementOrderLI poli2 = new ProcurementOrderLI(productService.getProduct("ASK0009709Y-2"), 30);
 		em.persist(poli2);
@@ -614,7 +614,7 @@ public class DataLoader implements CommandLineRunner {
 		procurementService.createProcurementOrder(po2, 1L);
 
 		// StockTransferOrders
-		StockTransferOrderLI stoli1 = new StockTransferOrderLI(productService.getProduct("ABA20781E-1"), 5);
+		StockTransferOrderLI stoli1 = new StockTransferOrderLI(productService.getProduct("BBV0010199H-1"), 5);
 		em.persist(stoli1);
 		StockTransferOrderLI stoli2 = new StockTransferOrderLI(productService.getProduct("ADQ0008254W-2"), 7);
 		em.persist(stoli2);
@@ -643,7 +643,7 @@ public class DataLoader implements CommandLineRunner {
 		coli1.setSubTotal(39.0);
 
 		CustomerOrderLI coli2 = new CustomerOrderLI();
-		coli2.setProduct(productService.getProduct("ABA20776D-1"));
+		coli2.setProduct(productService.getProduct("ASK0009136A-1"));
 		coli2.setQty(2);
 		coli2.setSubTotal(78.0);
 
@@ -699,7 +699,7 @@ public class DataLoader implements CommandLineRunner {
 		oo1.addLineItem(coli7);
 		oo1.setPaid(true);
 		oo1.addPayment(payment2);
-		oo1.setSite(siteService.getSite(3L));
+		oo1.setSite(siteService.getSite(4L));
 		customerOrderService.createOnlineOrder(oo1, null);
 
 		OnlineOrder oo2 = new OnlineOrder(true, CountryEnum.Singapore);

@@ -220,28 +220,15 @@ public class ProductServiceImpl implements ProductService {
             int count = 1;
 
             // Loop for each combination of size and colour
-            if (!sizes.isEmpty()) {
-                for (int i = 0; i < colours.size(); i++) {
-                    for (int j = 0; j < sizes.size(); j++) {
-                        Product p = new Product(model.getModelCode() + "-" + count);
-
-                        ProductField colourField = getProductFieldByNameValue("colour", colours.get(i));
-                        p.addProductField(colourField);
-
-                        ProductField sizeField = getProductFieldByNameValue("size", sizes.get(j));
-                        p.addProductField(sizeField);
-
-                        em.persist(p);
-                        products.add(p);
-                        count++;
-                    }
-                }
-            } else {
-                for (int i = 0; i < colours.size(); i++) {
+            for (int i = 0; i < colours.size(); i++) {
+                for (int j = 0; j < sizes.size(); j++) {
                     Product p = new Product(model.getModelCode() + "-" + count);
 
                     ProductField colourField = getProductFieldByNameValue("colour", colours.get(i));
                     p.addProductField(colourField);
+
+                    ProductField sizeField = getProductFieldByNameValue("size", sizes.get(j));
+                    p.addProductField(sizeField);
 
                     em.persist(p);
                     products.add(p);

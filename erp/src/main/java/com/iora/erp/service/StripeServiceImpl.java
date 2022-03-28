@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.Max;
 
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.stripe.Stripe;
@@ -35,9 +36,12 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
-    public String createPaymentIntent(List<CustomerOrderLI> lineItems) throws StripeException {
+    public String createPaymentIntent(List<CustomerOrderLI> lineItems, Long voucherAmount) throws StripeException {
+        Long totalAmount = calculateOrderAmount(lineItems) - voucherAmount;
+        totalAmount = Math.max(totalAmount, 0);
+
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount(calculateOrderAmount(lineItems))
+                .setAmount(totalAmount)
                 .setCurrency("sgd")
                 .addPaymentMethodType("card_present")
                 .addPaymentMethodType("card")

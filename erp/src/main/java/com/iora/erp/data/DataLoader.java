@@ -498,10 +498,10 @@ public class DataLoader implements CommandLineRunner {
 		customerService.createCustomerAccount(c7);
 
 		// Generate 10 $10 vouchers
-		customerService.generateVouchers(10, 10, "2022-02-16");
+		customerService.generateVouchers(10, 10, "2024-02-16");
 
 		// Generate 10 $5 vouchers
-		customerService.generateVouchers(5, 10, "2022-02-16");
+		customerService.generateVouchers(5, 10, "2024-02-16");
 
 		// Adding Promotions
 		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5),

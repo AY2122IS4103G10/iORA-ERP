@@ -599,7 +599,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (clientSecret != null && clientSecret != "") {
             stripeService.capturePayment(clientSecret);
         }
-
+        if (onlineOrder.getVoucher() != null) {
+            customerService.redeemVoucher(onlineOrder.getVoucher().getVoucherCode());
+        }
+        
         onlineOrder.setSite(siteService.getSite(3L));
         onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
         em.persist(onlineOrder);

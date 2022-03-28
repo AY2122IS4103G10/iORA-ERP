@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -34,7 +33,7 @@ public class CustomerOrder {
     private Double totalAmount;
 
     // This site will be supplying the inventory for the order
-    @JsonBackReference(value="site-CustomerOrder")
+    @JsonBackReference(value = "site-CustomerOrder")
     @ManyToOne
     private Site site;
 
@@ -58,7 +57,6 @@ public class CustomerOrder {
     private Long customerId;
 
     @OneToOne
-    @JoinColumn(name = "voucher_code")
     private Voucher voucher;
 
     public CustomerOrder() {

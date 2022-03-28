@@ -22,9 +22,10 @@ import {
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
+import { SKUModal } from "../ProductForm";
 
 const FieldSection = ({ fieldName, fields }) => {
-  return Boolean(fields.length) ? (
+  return (
     <div>
       <h2 className="text-sm font-medium text-gray-500">{fieldName}</h2>
       <ul className="mt-2 leading-8">
@@ -45,8 +46,6 @@ const FieldSection = ({ fieldName, fields }) => {
         ))}
       </ul>
     </div>
-  ) : (
-    <div>No {fieldName}</div>
   );
 };
 
@@ -234,6 +233,7 @@ const ProductDetailsBody = ({
   available,
   products,
   onToggleEnableClicked,
+  openSkuModal,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
@@ -244,7 +244,6 @@ const ProductDetailsBody = ({
             <div className="md:flex md:items-center md:justify-between md:space-x-4 xl:border-b xl:pb-6">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
-
                 <p className="mt-2 text-sm text-gray-500">{prodCode}</p>
               </div>
               <div className="mt-4 flex space-x-3 md:mt-0">
@@ -300,10 +299,18 @@ const ProductDetailsBody = ({
                 </div>
               </div>
               <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
-                <FieldSection fieldName="Colors" fields={colors} />
-                <FieldSection fieldName="Sizes" fields={sizes} />
-                <FieldSection fieldName="Categories" fields={categories} />
-                <FieldSection fieldName="Tags" fields={tags} />
+                {Boolean(colors.length) && (
+                  <FieldSection fieldName="Colors" fields={colors} />
+                )}
+                {Boolean(sizes.length) && (
+                  <FieldSection fieldName="Sizes" fields={sizes} />
+                )}
+                {Boolean(categories.length) && (
+                  <FieldSection fieldName="Categories" fields={categories} />
+                )}
+                {Boolean(tags.length) && (
+                  <FieldSection fieldName="Tags" fields={tags} />
+                )}
               </div>
             </aside>
             <div className="py-3 xl:pt-6 xl:pb-0">
@@ -315,13 +322,22 @@ const ProductDetailsBody = ({
           </div>
           <section aria-labelledby="activity-title" className="mt-8 xl:mt-10">
             <div className="divide-y divide-gray-200">
-              <div className="pb-4">
+              <div className="pb-4 md:flex md:items-center md:justify-between">
                 <h2
                   id="activity-title"
                   className="text-lg font-medium text-gray-900"
                 >
                   SKUs
                 </h2>
+                {Boolean(colors.length) && Boolean(sizes.length) && (
+                  <button
+                    type="button"
+                    className="ml-3 inline-flex items-center justify-center bg-cyan-600 hover:bg-cyan-700 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+                    onClick={openSkuModal}
+                  >
+                    <span>Add SKU</span>
+                  </button>
+                )}
               </div>
               <div className="pt-6">
                 <SKUTable data={products} />
@@ -361,10 +377,18 @@ const ProductDetailsBody = ({
             </div>
           </div>
           <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
-            <FieldSection fieldName="Colors" fields={colors} />
-            <FieldSection fieldName="Sizes" fields={sizes} />
-            <FieldSection fieldName="Categories" fields={categories} />
-            <FieldSection fieldName="Tags" fields={tags} />
+            {Boolean(colors.length) && (
+              <FieldSection fieldName="Colors" fields={colors} />
+            )}
+            {Boolean(sizes.length) && (
+              <FieldSection fieldName="Sizes" fields={sizes} />
+            )}
+            {Boolean(categories.length) && (
+              <FieldSection fieldName="Categories" fields={categories} />
+            )}
+            {Boolean(tags.length) && (
+              <FieldSection fieldName="Tags" fields={tags} />
+            )}
           </div>
         </aside>
       </div>
@@ -382,6 +406,51 @@ export const ProductDetails = () => {
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
+
+  const [openAddSku, setOpenAddSku] = useState(false);
+  const [skus, setSkus] = useState([]);
+  const [sku, setSku] = useState("");
+  const [skuColors, setSkuColors] = useState([]);
+  const [skuColorSelected, setSkuColorSelected] = useState(null);
+  const [skuSizes, setSkuSizes] = useState([]);
+  const [skuSizeSelected, setSkuSizeSelected] = useState(null);
+
+  useEffect(() => {
+    if (product) {
+      const colors = product.productFields
+        .filter((field) => field.fieldName === "COLOUR")
+        .map((field) => ({ ...field, name: field.fieldValue }));
+      const sizes = product.productFields
+        .filter((field) => field.fieldName === "SIZE")
+        .map((field) => ({ ...field, name: field.fieldValue }));
+      setSku(`${product.modelCode}-`);
+      setSkuColors(colors);
+      setSkuSizes(sizes);
+      setSkuColorSelected(colors[0]);
+      setSkuSizeSelected(sizes[0]);
+    }
+  }, [product]);
+
+  const onSkuChanged = (e) => setSku(e.target.value);
+
+  const openSkuModal = () => {
+    setSku(`${product.modelCode}-`);
+    setOpenAddSku(true);
+  };
+  const closeSkuModal = () => setOpenAddSku(false);
+  
+  const onAddSkuClicked = (evt) => {
+    evt.preventDefault();
+    const s = skus;
+    s.push({
+      sku,
+      color: skuColorSelected,
+      size: skuSizeSelected,
+    });
+    setSkus(s);
+    setSku("");
+    closeSkuModal();
+  };
 
   const onToggleEnableClicked = () => {
     dispatch(
@@ -450,6 +519,20 @@ export const ProductDetails = () => {
           available={product.available}
           products={product.products}
           onToggleEnableClicked={onToggleEnableClicked}
+          openSkuModal={openSkuModal}
+        />
+        <SKUModal
+          open={openAddSku}
+          closeModal={closeSkuModal}
+          colors={skuColors}
+          skuColorSelected={skuColorSelected}
+          setSkuColorSelected={setSkuColorSelected}
+          sizes={skuSizes}
+          skuSizeSelected={skuSizeSelected}
+          setSkuSizeSelected={setSkuSizeSelected}
+          sku={sku}
+          onSkuChanged={onSkuChanged}
+          onSaveClicked={onAddSkuClicked}
         />
       </>
     )

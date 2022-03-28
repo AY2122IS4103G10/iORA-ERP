@@ -58,7 +58,13 @@ const ProductList = ({
                       <button
                         type="button"
                         className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
-                        onClick={handlePrint}
+                        onClick={() => {
+                          Promise.resolve(
+                            onProductSelectedChanged(product)
+                          ).then(() => handlePrint());
+
+                          // handlePrint();
+                        }}
                       >
                         <PrinterIcon
                           className="h-5 w-5 text-gray-400"
@@ -129,10 +135,10 @@ export const ProductPrint = () => {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
-    onBeforeGetContent: (product) => {
-      onProductSelectedChanged(product);
-      return Promise.resolve();
-    },
+    // onBeforeGetContent: (product) => {
+    //   onProductSelectedChanged(product);
+    //   return Promise.resolve();
+    // },
   });
   const [enabled, setEnabled] = useState(false);
   const [search, setSearch] = useState("");
@@ -144,18 +150,18 @@ export const ProductPrint = () => {
   const canSearch = Boolean(search);
   const onSearchClicked = (evt) => {
     evt.preventDefault();
+    const searchProducts = async (skus) => {
+      const { data } = await productApi.searchProductsBySku(skus);
+      if (data !== "") setProducts(data);
+      else
+        addToast(`Error: Product(s) not found.`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+    };
     if (canSearch) {
       const skus = search.split(",").map((sku) => sku.trim());
-      productApi.searchProductsBySku(skus).then((response) => {
-        const products = response.data;
-        if (response.data !== "") {
-          setProducts(products);
-        } else
-          addToast(`Error: Product(s) not found.`, {
-            appearance: "error",
-            autoDismiss: true,
-          });
-      });
+      searchProducts(skus);
     }
   };
 

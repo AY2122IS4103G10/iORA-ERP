@@ -38,8 +38,8 @@ const SKUModal = ({
 }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-bottom bg-gray-100 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
-        <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+      <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        <div className="max-w-3xl mx-auto lg:max-w-7xl ">
           <h1 className="sr-only">Add SKU</h1>
           {/* Main 3 column grid */}
           <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
@@ -47,77 +47,75 @@ const SKUModal = ({
             <div className="grid grid-cols-1 gap-4 lg:col-span-3">
               {/* Form */}
               <section aria-labelledby="product-form">
-                <div className="rounded-lg bg-white overflow-hidden shadow">
-                  <form onSubmit={onSaveClicked}>
-                    <div className="p-8 space-y-8 divide-y divide-gray-200">
-                      <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-                        <div>
-                          <h3 className="text-lg leading-6 font-medium text-gray-900">
-                            Add SKU
-                          </h3>
-                          <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                            <SimpleInputGroup
-                              label="SKU Code"
-                              inputField="sku"
-                              className="sm:mt-0 sm:col-span-2"
-                            >
-                              <SimpleInputBox
-                                type="text"
-                                name="sku"
-                                id="sku"
-                                autoComplete="sku"
-                                value={sku}
-                                onChange={onSkuChanged}
-                                required
-                                autoFocus
-                              />
-                            </SimpleInputGroup>
-                            <SimpleInputGroup
-                              label="Color"
-                              inputField="color"
-                              className="relative rounded-md sm:mt-0 sm:col-span-2"
-                            >
-                              <SimpleSelectMenu
-                                options={colors}
-                                selected={skuColorSelected}
-                                setSelected={setSkuColorSelected}
-                              />
-                            </SimpleInputGroup>
-                            <SimpleInputGroup
-                              label="Size"
-                              inputField="size"
-                              className="relative rounded-md sm:mt-0 sm:col-span-2"
-                            >
-                              <SimpleSelectMenu
-                                options={sizes}
-                                selected={skuSizeSelected}
-                                setSelected={setSkuSizeSelected}
-                              />
-                            </SimpleInputGroup>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-5">
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                            onClick={closeModal}
+                <form onSubmit={onSaveClicked}>
+                  <div className="p-8 space-y-8 divide-y divide-gray-200">
+                    <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+                      <div>
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">
+                          Add SKU
+                        </h3>
+                        <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                          <SimpleInputGroup
+                            label="SKU Code"
+                            inputField="sku"
+                            className="sm:mt-0 sm:col-span-2"
                           >
-                            Cancel
-                          </button>
-                          <button
-                            type="submit"
-                            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                            <SimpleInputBox
+                              type="text"
+                              name="sku"
+                              id="sku"
+                              autoComplete="sku"
+                              value={sku}
+                              onChange={onSkuChanged}
+                              required
+                              autoFocus
+                            />
+                          </SimpleInputGroup>
+                          <SimpleInputGroup
+                            label="Color"
+                            inputField="color"
+                            className="relative rounded-md sm:mt-0 sm:col-span-2"
                           >
-                            Add SKU
-                          </button>
+                            <SimpleSelectMenu
+                              options={colors}
+                              selected={skuColorSelected}
+                              setSelected={setSkuColorSelected}
+                            />
+                          </SimpleInputGroup>
+                          <SimpleInputGroup
+                            label="Size"
+                            inputField="size"
+                            className="relative rounded-md sm:mt-0 sm:col-span-2"
+                          >
+                            <SimpleSelectMenu
+                              options={sizes}
+                              selected={skuSizeSelected}
+                              setSelected={setSkuSizeSelected}
+                            />
+                          </SimpleInputGroup>
                         </div>
                       </div>
                     </div>
-                  </form>
-                </div>
+
+                    <div className="pt-5">
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          onClick={closeModal}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                        >
+                          Add SKU
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </section>
             </div>
           </div>
@@ -780,7 +778,7 @@ export const ProductForm = () => {
     fields = fields.concat(prepareFields(tags, tagCheckedState));
     fields = fields.concat(prepareFields(categories, catCheckedState));
     fields = fields.concat(prepareFields(promotions, promoCheckedState));
-    
+
     if (canAdd) {
       if (!isEditing) {
         dispatch(
@@ -992,6 +990,8 @@ export const ProductForm = () => {
     setOpenAddSku(true);
   };
   const closeSkuModal = () => setOpenAddSku(false);
+
+  const onAddSkuClicked = () => {};
 
   return (
     <>

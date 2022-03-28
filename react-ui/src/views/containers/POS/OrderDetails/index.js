@@ -11,6 +11,7 @@ import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { useState } from "react";
 import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
+import { TailSpin } from "react-loader-spinner";
 
 const Header = ({ order }) => {
   return (
@@ -85,7 +86,6 @@ export const OrderDetails = () => {
   const order = useSelector((state) =>
     selectOrderById(state, parseInt(orderId))
   );
-  const orderLineItems = order.lineItems;
   const [lineItems, setLineItems] = useState([]);
   const siteId = useSelector(selectUserSite);
   const dispatch = useDispatch();
@@ -96,7 +96,8 @@ export const OrderDetails = () => {
   }, [orderStatus, dispatch, siteId]);
 
   useEffect(() => {
-    if (orderLineItems) {
+    const orderLineItems = Boolean(order) ? order.lineItems : [];
+    if (orderLineItems.length) {
       const lIs = orderLineItems.filter((item) => item.subTotal > 0);
       const promoLIs = orderLineItems.filter((item) => item.subTotal <= 0);
       lIs.forEach((item) => {
@@ -116,9 +117,14 @@ export const OrderDetails = () => {
         )
       );
     }
-  }, [orderLineItems]);
-  return (
-    Boolean(order) && (
+  }, [order]);
+
+  return orderStatus === "loading" ? (
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BFFF" height={20} width={20} />
+    </div>
+  ) : (
+    orderStatus === "succeeded" && (
       <div className="py-4 xl:py-6">
         <NavigatePrev />
         <Header order={order} />
@@ -177,7 +183,7 @@ export const OrderDetails = () => {
                 </div>
               </div>
             </section>
-            {Boolean(order.lineItems.length) && (
+            {Boolean(lineItems.length) && (
               <section aria-labelledby="line-items">
                 <ItemTable data={lineItems} />
               </section>

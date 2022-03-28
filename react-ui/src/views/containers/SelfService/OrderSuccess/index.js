@@ -26,7 +26,6 @@ export default function OrderSuccess({ clientSecret }) {
           setPaymentData(data?.paymentIntent);
         })
         .catch((err) => {
-          console.log(err?.response?.data?.message)
           addToast(
             `Error: ${
               err?.response?.data?.message || "Stripe unable to connect"
@@ -40,6 +39,7 @@ export default function OrderSuccess({ clientSecret }) {
   }, [stripe, clientSecret, setPaymentData, addToast]);
 
   useEffect(() => {
+    localStorage.removeItem("customer");
     orderApi
       .get(id)
       .then(({ data }) => {
@@ -95,20 +95,20 @@ export default function OrderSuccess({ clientSecret }) {
 
         <section
           aria-labelledby="order-heading"
-          className="mt-10 border-t border-gray-200 max-w-xl"
+          className="mt-10 border-t border-gray-200 max-w-xl grid grid-cols-1 gap-3"
         >
           <h2 id="order-heading" className="sr-only">
             Your order
           </h2>
 
-          <h3 className="text-lg font-medium text-indigo-600 mb-3">Items</h3>
+          <h3 className="text-lg font-medium text-indigo-600 mt-3">Items</h3>
           {order.lineItems?.map((lineItem, index) => (
             <div
               key={index}
               className="py-3 border-b border-gray-200 flex space-x-6"
             >
-              <div className="flex-auto flex flex-row">
-                <div className="grow">
+              <div className="grid grid-cols-4 gap-2 w-full">
+                <div className="col-span-2">
                   <h4 className="font-medium text-gray-900">
                     {lineItem?.product.sku}
                   </h4>
@@ -125,23 +125,82 @@ export default function OrderSuccess({ clientSecret }) {
                     )}
                   </p>
                 </div>
-                <div className="mt-6 flex-1 flex items-end">
-                  <dl className="flex text-sm divide-x divide-gray-200 space-x-4 sm:space-x-6">
-                    <div className="flex">
-                      <dt className="font-medium text-gray-900">Quantity</dt>
-                      <dd className="ml-2 text-gray-700">{lineItem?.qty}</dd>
-                    </div>
-                    <div className="pl-4 flex sm:pl-6">
-                      <dt className="font-medium text-gray-900">Subtotal</dt>
-                      <dd className="ml-2 text-gray-700">
-                        ${Number.parseFloat(lineItem?.subTotal).toFixed(2)}
-                      </dd>
-                    </div>
-                  </dl>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Quantity
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    {lineItem?.qty}
+                  </dd>
+                </div>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Subtotal
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    ${Number.parseFloat(lineItem?.subTotal).toFixed(2)}
+                  </dd>
                 </div>
               </div>
             </div>
           ))}
+          {order.promotions?.length > 0 && (
+            <h3 className="text-lg font-medium text-indigo-600">
+              Promotions
+            </h3>
+          )}
+          {order.promotions?.map((promotion, index) => (
+            <div
+              key={`p${index}`}
+              className="py-3 border-b border-gray-200 flex space-x-6"
+            >
+              <div className="grid grid-cols-4 gap-2 w-full">
+                <div className="col-span-2 flex items-center">
+                  <h4 className="font-medium text-gray-900">
+                    {promotion?.promotion?.fieldValue}
+                  </h4>
+                </div>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Quantity
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    {promotion?.qty}
+                  </dd>
+                </div>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Subtotal
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    -${Number.parseFloat(-promotion?.subTotal).toFixed(2)}
+                  </dd>
+                </div>
+              </div>
+            </div>
+          ))}
+          {order.voucher && (
+            <>
+              <h3 className="text-lg font-medium text-indigo-600">
+                Voucher
+              </h3>
+              <div className="grid grid-cols-4 gap-2 w-full">
+                <div className="col-span-3 flex items-center">
+                  <h4 className="font-medium text-gray-900">
+                    {order.voucher?.voucherCode}
+                  </h4>
+                </div>
+                <div className="col-span-1 text-sm">
+                  <dt className="font-medium text-gray-900 flex justify-end items-end">
+                    Discount
+                  </dt>
+                  <dd className="mt-2 text-gray-700 flex justify-end items-end">
+                    -${Number.parseFloat(-order.voucher?.amount).toFixed(2)}
+                  </dd>
+                </div>
+              </div>
+            </>
+          )}
         </section>
         <div className="mt-6 flex justify-center space-x-6">
           <button

@@ -483,11 +483,11 @@ export function Order() {
   const openCheckoutModal = (reader) => {
     setUseReader(reader);
     setOpenCheckout(true);
-    const concat = lineItems.concat(promotions);
-    setCheckoutItems(concat);
+    setCheckoutItems(lineItems.concat(promotions));
     setOrder({
       totalAmount: 0.0,
-      lineItems: concat,
+      lineItems: lineItems,
+      promotions: promotions,
       payments: [],
       paid: false,
       refundedLIs: [],
@@ -504,11 +504,11 @@ export function Order() {
   };
 
   const handleZeroDollarCheckout = async () => {
-    const concat = lineItems.concat(promotions);
     const { data } = await orderApi.createOrder(
       {
         totalAmount: 0.0,
-        lineItems: concat,
+        lineItems: lineItems,
+        promotions: promotions,
         payments: [
           {
             amount: 0,

@@ -88,7 +88,9 @@ export const OnlineOrderPickPack = () => {
     lineItems,
     setLineItems,
     openInvoice,
+    pickupSite,
   } = useOutletContext();
+
   const status = st.status;
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -158,14 +160,14 @@ export const OnlineOrderPickPack = () => {
     if (
       e.target.value.length - search.length > 10 &&
       e.target.value.includes("-")
-    ) {
+    ) { 
       if (status === "PENDING")
         handlePickPack().then(() => handleScan(e.target.value));
       else handleScan(e.target.value);
     }
     setSearch(e.target.value);
   };
-  
+
   return (
     <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -175,7 +177,8 @@ export const OnlineOrderPickPack = () => {
               (s) => s === status
             ) ? (
               ["PICKED", "PACKED"].some((s) => s === status) ? (
-                statusHistory[0].actionBy.id === currSiteId ? (
+                statusHistory[0].actionBy.id === currSiteId ||
+                (pickupSite && pickupSite.id === currSiteId) ? (
                   <section
                     aria-labelledby="confirm"
                     className="flex justify-center"
@@ -204,7 +207,8 @@ export const OnlineOrderPickPack = () => {
                   </div>
                 )
               ) : (
-                statusHistory[0].actionBy.id === currSiteId && (
+                (statusHistory[0].actionBy.id === currSiteId ||
+                  (pickupSite && pickupSite.id === currSiteId)) && (
                   <section aria-labelledby="scan-items">
                     <ScanItemsSection
                       search={search}
@@ -224,7 +228,7 @@ export const OnlineOrderPickPack = () => {
             {["PENDING", "PICKING", "PICKED", "PACKING", "PACKED"].some(
               (s) => s === status
             ) &&
-              ["sm", "wh"].some((s) => s === subsys) && (
+              ["sm", "wh", "str"].some((s) => s === subsys) && (
                 <section aria-labelledby="order-summary">
                   <PickPackList data={lineItems} setData={setLineItems} />
                 </section>

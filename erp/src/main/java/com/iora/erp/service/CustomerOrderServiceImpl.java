@@ -662,7 +662,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
         Site actionBy = em.find(Site.class, siteId);
 
-        if (actionBy == null || !actionBy.equals(onlineOrder.getSite())) {
+        if (actionBy == null || (!actionBy.equals(onlineOrder.getSite())
+                && siteId != onlineOrder.getPickupSite().getId())) {
             throw new CustomerOrderException("Site is unauthorised to pick/pack this order.");
         } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PENDING) {
             onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.PICKING));

@@ -1,105 +1,106 @@
-import {Outlet, Route, Routes, useLocation} from "react-router-dom";
-import {PrivateRoute} from "./routes/PrivateRoute.js";
-import {Auth} from "./views/containers/Auth/Auth";
+import { Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { PrivateRoute } from "./routes/PrivateRoute.js";
+import { Auth } from "./views/containers/Auth/Auth";
 import Error from "./views/containers/Auth/Error";
-import {Home} from "./views/containers/Auth/Home";
-import {Login} from "./views/containers/Auth/Login";
-import {CompanyDetails} from "./views/containers/Companies/CompanyDetails";
-import {CompanyForm} from "./views/containers/Companies/CompanyForm";
-import {ManageCompanies} from "./views/containers/Companies/ManageCompanies";
-import {CustomerDetails} from "./views/containers/Customer/CustomerDetails";
-import {CustomerForm} from "./views/containers/Customer/CustomerForm";
-import {ManageCustomer} from "./views/containers/Customer/ManageCustomer";
-import {DepartmentDetails} from "./views/containers/Department/DepartmentDetails";
-import {DepartmentForm} from "./views/containers/Department/DepartmentForm";
-import {ManageDepartment} from "./views/containers/Department/ManageDepartment";
-import {EmployeeForm} from "./views/containers/Employee/CreateEmployeeForm";
-import {EmployeeDetails} from "./views/containers/Employee/EmployeeDetails";
-import {ManageEmployee} from "./views/containers/Employee/ManageEmployee";
-import {AdminIndex} from "./views/containers/Index/AdminIndex";
-import {HomeIndex} from "./views/containers/Index/HomeIndex";
-import {LGIndex} from "./views/containers/Index/LGIndex";
-import {MFIndex} from "./views/containers/Index/MFIndex";
-import {SMIndex} from "./views/containers/Index/SMIndex";
-import {StoreIndex} from "./views/containers/Index/StrIndex";
-import {WHIndex} from "./views/containers/Index/WHIndex";
-import {JobTitleDetails} from "./views/containers/JobTitle/JobTitleDetails";
-import {JobTitleForm} from "./views/containers/JobTitle/JobTitleForm";
-import {ManageJobTitle} from "./views/containers/JobTitle/ManageJobTitle";
-import {MembershipTierDetails} from "./views/containers/MembershipTier/MembershipTierDetails";
-import {MembershipTierForm} from "./views/containers/MembershipTier/MembershipTierForm";
-import {MembershipTierList} from "./views/containers/MembershipTier/MembershipTierList";
-import {ManageOnlineOrders} from "./views/containers/OnlineOrder/ManageOnlineOrders";
-import {OnlineOrderList} from "./views/containers/OnlineOrder/OnlineOrderList";
-import {OnlineOrderPickPack} from "./views/containers/OnlineOrder/OnlineOrderPickPack/index.js";
-import {OnlineOrderSearch} from "./views/containers/OnlineOrder/OnlineOrderSearch";
-import {CustomerOrderDetails} from "./views/containers/Orders/CustomerOrderDetails";
-import {CustomerOrderWrapper} from "./views/containers/Orders/CustomerOrderWrapper";
-import {ManageOrders} from "./views/containers/Orders/ManageOrders";
-import {OrderList} from "./views/containers/Orders/OrderList";
-import {OrderSearch} from "./views/containers/Orders/OrderSearch";
-import {ManagePOS} from "./views/containers/POS/ManagePOS";
-import {OrderDetails} from "./views/containers/POS/OrderDetails";
-import {PosPurchaseHistory} from "./views/containers/POS/PurchaseHistory";
-import {PosPurchaseOrder} from "./views/containers/POS/PurchaseOrder";
-import {ManageProcurement} from "./views/containers/Procurement/ManageProcurement";
-import {ProcurementDelivery} from "./views/containers/Procurement/ProcurementDelivery";
-import {ProcurementDetails} from "./views/containers/Procurement/ProcurementDetails";
-import {ProcurementForm} from "./views/containers/Procurement/ProcurementForm";
-import {ProcurementList} from "./views/containers/Procurement/ProcurementList";
-import {ProcurementPickPack} from "./views/containers/Procurement/ProcurementPickPack";
-import {ProcurementSearch} from "./views/containers/Procurement/ProcurementSearch";
-import {ProcurementWrapper} from "./views/containers/Procurement/ProcurementWrapper";
-import {ManageProducts} from "./views/containers/Products/ManageProducts";
-import {ProductDetails} from "./views/containers/Products/ProductDetails";
-import {ProductForm} from "./views/containers/Products/ProductForm";
-import {ProductPrint} from "./views/containers/Products/ProductPrint";
-import {ProductsList} from "./views/containers/Products/ProductsList";
-import {ManageProfile} from "./views/containers/Profile/ManageProfile/index.js";
-import {PasswordForm} from "./views/containers/Profile/PasswordForm/index.js";
-import {Profile} from "./views/containers/Profile/Profile/index.js";
-import {ProfileForm} from "./views/containers/Profile/ProfileForm/index.js";
-import {Settings} from "./views/containers/Profile/Settings/index.js";
-import {ManageSupportTicket} from "./views/containers/SupportTicket/ManageSupportTicket";
-import {SupportTicketDetails} from "./views/containers/SupportTicket/SupportTicketDetails/index.js";
+import { Home } from "./views/containers/Auth/Home";
+import { Login } from "./views/containers/Auth/Login";
+import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
+import { CompanyForm } from "./views/containers/Companies/CompanyForm";
+import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
+import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
+import { CustomerForm } from "./views/containers/Customer/CustomerForm";
+import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
+import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails";
+import { DepartmentForm } from "./views/containers/Department/DepartmentForm";
+import { ManageDepartment } from "./views/containers/Department/ManageDepartment";
+import { EmployeeForm } from "./views/containers/Employee/CreateEmployeeForm";
+import { EmployeeDetails } from "./views/containers/Employee/EmployeeDetails";
+import { ManageEmployee } from "./views/containers/Employee/ManageEmployee";
+import { AdminIndex } from "./views/containers/Index/AdminIndex";
+import { HomeIndex } from "./views/containers/Index/HomeIndex";
+import { LGIndex } from "./views/containers/Index/LGIndex";
+import { MFIndex } from "./views/containers/Index/MFIndex";
+import { SMIndex } from "./views/containers/Index/SMIndex";
+import { StoreIndex } from "./views/containers/Index/StrIndex";
+import { WHIndex } from "./views/containers/Index/WHIndex";
+import { JobTitleDetails } from "./views/containers/JobTitle/JobTitleDetails";
+import { JobTitleForm } from "./views/containers/JobTitle/JobTitleForm";
+import { ManageJobTitle } from "./views/containers/JobTitle/ManageJobTitle";
+import { MembershipTierDetails } from "./views/containers/MembershipTier/MembershipTierDetails";
+import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm";
+import { MembershipTierList } from "./views/containers/MembershipTier/MembershipTierList";
+import { ManageOnlineOrders } from "./views/containers/OnlineOrder/ManageOnlineOrders";
+import { OnlineOrderList } from "./views/containers/OnlineOrder/OnlineOrderList";
+import { OnlineOrderPickPack } from "./views/containers/OnlineOrder/OnlineOrderPickPack/index.js";
+import { OnlineOrderSearch } from "./views/containers/OnlineOrder/OnlineOrderSearch";
+import { CustomerOrderDetails } from "./views/containers/Orders/CustomerOrderDetails";
+import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper";
+import { ManageOrders } from "./views/containers/Orders/ManageOrders";
+import { OrderList } from "./views/containers/Orders/OrderList";
+import { OrderSearch } from "./views/containers/Orders/OrderSearch";
+import { ManagePOS } from "./views/containers/POS/ManagePOS";
+import { OrderDetails } from "./views/containers/POS/OrderDetails";
+import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory";
+import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder";
+import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
+import { ProcurementDelivery } from "./views/containers/Procurement/ProcurementDelivery";
+import { ProcurementDetails } from "./views/containers/Procurement/ProcurementDetails";
+import { ProcurementForm } from "./views/containers/Procurement/ProcurementForm";
+import { ProcurementList } from "./views/containers/Procurement/ProcurementList";
+import { ProcurementPickPack } from "./views/containers/Procurement/ProcurementPickPack";
+import { ProcurementSearch } from "./views/containers/Procurement/ProcurementSearch";
+import { ProcurementWrapper } from "./views/containers/Procurement/ProcurementWrapper";
+import { ManageProducts } from "./views/containers/Products/ManageProducts";
+import { ProductDetails } from "./views/containers/Products/ProductDetails";
+import { ProductForm } from "./views/containers/Products/ProductForm";
+import { ProductPrint } from "./views/containers/Products/ProductPrint";
+import { ProductsList } from "./views/containers/Products/ProductsList";
+import { ManageProfile } from "./views/containers/Profile/ManageProfile/index.js";
+import { PasswordForm } from "./views/containers/Profile/PasswordForm/index.js";
+import { Profile } from "./views/containers/Profile/Profile/index.js";
+import { ProfileForm } from "./views/containers/Profile/ProfileForm/index.js";
+import { Settings } from "./views/containers/Profile/Settings/index.js";
+import { ManageSupportTicket } from "./views/containers/SupportTicket/ManageSupportTicket";
+import { SupportTicketDetails } from "./views/containers/SupportTicket/SupportTicketDetails/index.js";
 // import { SMRoute } from "./routes/SMRoute";
-import {ManagePromotions} from "./views/containers/Promotions/ManagePromotions";
-import {FrontPage} from "./views/containers/SelfService/FrontPage";
-import {Order} from "./views/containers/SelfService/Order";
+import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
+import { FrontPage } from "./views/containers/SelfService/FrontPage";
+import { Order } from "./views/containers/SelfService/Order";
 // import { ADRoute } from "./routes/ADRoute";
-import {ManageSites} from "./views/containers/Sites/ManageSites";
-import {SiteDetails} from "./views/containers/Sites/SiteDetails";
-import {SiteForm} from "./views/containers/Sites/SiteForm";
-import {AProductStock} from "./views/containers/StockLevels/AProductStock";
-import {AsiteStock} from "./views/containers/StockLevels/ASiteStock";
-import {ProductStocks} from "./views/containers/StockLevels/ByProduct";
-import {SiteStocks} from "./views/containers/StockLevels/BySite";
-import {EditStockLevel} from "./views/containers/StockLevels/EditStockLevel";
-import {StockLevelForm} from "./views/containers/StockLevels/ProdStockLevelForm";
-import {MyStoreStock} from "./views/containers/StockLevels/StoreStockList";
-import {ManageStockTransfer} from "./views/containers/StockTransfer/ManageStockTransfer";
-import {StockTransferDelivery} from "./views/containers/StockTransfer/StockTransferDelivery/index.js";
-import {StockTransferForm} from "./views/containers/StockTransfer/StockTransferForm";
-import {StockTransferList} from "./views/containers/StockTransfer/StockTransferList";
-import {StockTransferPickPack} from "./views/containers/StockTransfer/StockTransferPickPack";
-import {StockTransferSearch} from "./views/containers/StockTransfer/StockTransferSearch";
-import {StockTransferWrapper} from "./views/containers/StockTransfer/StockTransferWrapper";
-import {ViewStockTransfer} from "./views/containers/StockTransfer/ViewStockTransfer";
-import {ManageVendors} from "./views/containers/Vendor/ManageVendors";
-import {VendorDetails} from "./views/containers/Vendor/VendorDetails";
-import {VendorForm} from "./views/containers/Vendor/VendorForm";
-import {ManageRewardsLoyalty} from "./views/containers/Vouchers/ManageVouchers";
-import {VoucherDetails} from "./views/containers/Vouchers/VoucherDetails";
-import {VoucherForm} from "./views/containers/Vouchers/VoucherForm";
-import {VouchersList} from "./views/containers/Vouchers/VouchersList";
-import {ProductRFID} from "./views/containers/Products/ProductRFID/index.js";
+import { ManageSites } from "./views/containers/Sites/ManageSites";
+import { SiteDetails } from "./views/containers/Sites/SiteDetails";
+import { SiteForm } from "./views/containers/Sites/SiteForm";
+import { AProductStock } from "./views/containers/StockLevels/AProductStock";
+import { AsiteStock } from "./views/containers/StockLevels/ASiteStock";
+import { ProductStocks } from "./views/containers/StockLevels/ByProduct";
+import { SiteStocks } from "./views/containers/StockLevels/BySite";
+import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel";
+import { StockLevelForm } from "./views/containers/StockLevels/ProdStockLevelForm";
+import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList";
+import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
+import { StockTransferDelivery } from "./views/containers/StockTransfer/StockTransferDelivery/index.js";
+import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
+import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList";
+import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack";
+import { StockTransferSearch } from "./views/containers/StockTransfer/StockTransferSearch";
+import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTransferWrapper";
+import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTransfer";
+import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
+import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
+import { VendorForm } from "./views/containers/Vendor/VendorForm";
+import { ManageRewardsLoyalty } from "./views/containers/Vouchers/ManageVouchers";
+import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails";
+import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
+import { VouchersList } from "./views/containers/Vouchers/VouchersList";
+import { ProductRFID } from "./views/containers/Products/ProductRFID/index.js";
+import { OnlineOrderCollection } from "./views/containers/OnlineOrder/OnlineOrderCollection/index.js";
 
 function App() {
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
   return (
     <div>
       <Routes>
-        <Route path="resetPassword" element={<ResetPassword />} />
+        {/* <Route path="resetPassword" element={<ResetPassword />} /> */}
         <Route path="/" element={<Auth />}>
           {/* Common Infrastructure */}
           <Route index element={<Login />} />
@@ -111,7 +112,8 @@ function App() {
               <PrivateRoute>
                 <SMIndex />
               </PrivateRoute>
-            }>
+            }
+          >
             {/* Products */}
             <Route path="products" element={<Outlet />}>
               <Route
@@ -135,7 +137,10 @@ function App() {
               <Route path="sites" element={<SiteStocks subsys="sm" />} />
               <Route path="products" element={<ProductStocks subsys="sm" />} />
               <Route path=":id" element={<AsiteStock />} />
-              <Route path="products/:id" element={<AProductStock subsys="sm" />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="sm" />}
+              />
             </Route>
             {/* Stock Transfer Orders */}
             <Route path="stocktransfer" element={<Outlet />}>
@@ -155,13 +160,19 @@ function App() {
                   </ManageStockTransfer>
                 }
               />
-              <Route path="create" element={<StockTransferForm subsys="sm" />} />
+              <Route
+                path="create"
+                element={<StockTransferForm subsys="sm" />}
+              />
               <Route path=":id" element={<StockTransferWrapper subsys="sm" />}>
                 <Route index element={<ViewStockTransfer subsys="sm" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
                 <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
-              <Route path="edit/:id" element={<StockTransferForm subsys="sm" />} />
+              <Route
+                path="edit/:id"
+                element={<StockTransferForm subsys="sm" />}
+              />
             </Route>
 
             {/* Procurement Orders */}
@@ -182,7 +193,10 @@ function App() {
                   </ManageProcurement>
                 }
               />
-              <Route path=":procurementId" element={<ProcurementWrapper subsys="sm" />}>
+              <Route
+                path=":procurementId"
+                element={<ProcurementWrapper subsys="sm" />}
+              >
                 <Route index element={<ProcurementDetails subsys="sm" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
                 <Route path="delivery" element={<ProcurementDelivery />} />
@@ -218,9 +232,13 @@ function App() {
                 }
               />
               <Route />
-              <Route path=":orderId" element={<CustomerOrderWrapper subsys="sm" />}>
+              <Route
+                path=":orderId"
+                element={<CustomerOrderWrapper subsys="sm" />}
+              >
                 <Route index element={<CustomerOrderDetails subsys="sm" />} />
                 <Route path="pick-pack" element={<OnlineOrderPickPack />} />
+                <Route path="collect" element={<OnlineOrderCollection />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
@@ -261,7 +279,10 @@ function App() {
                 <Route
                   index
                   element={
-                    <ManageRewardsLoyalty title="Membership Tiers" buttonText="tier">
+                    <ManageRewardsLoyalty
+                      title="Membership Tiers"
+                      buttonText="tier"
+                    >
                       <MembershipTierList />
                     </ManageRewardsLoyalty>
                   }
@@ -282,7 +303,8 @@ function App() {
               <PrivateRoute>
                 <StoreIndex />
               </PrivateRoute>
-            }>
+            }
+          >
             <Route path="stocklevels">
               <Route path="my/:id" element={<StockLevelForm subsys="str" />} />
               <Route path="my" element={<MyStoreStock subsys="str" />} />
@@ -290,7 +312,10 @@ function App() {
               <Route path="sites" element={<SiteStocks subsys="str" />} />
               <Route path="products" element={<ProductStocks subsys="str" />} />
               <Route path=":id" element={<AsiteStock />} />
-              <Route path="products/:id" element={<AProductStock subsys="str" />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="str" />}
+              />
             </Route>
 
             {/* Stock Transfer */}
@@ -311,14 +336,21 @@ function App() {
                   </ManageStockTransfer>
                 }
               />
-              <Route path="create" element={<StockTransferForm subsys="str" />} />
+              <Route
+                path="create"
+                element={<StockTransferForm subsys="str" />}
+              />
               <Route path=":id" element={<StockTransferWrapper subsys="str" />}>
                 <Route index element={<ViewStockTransfer subsys="str" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
                 <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
-              <Route path="edit/:id" element={<StockTransferForm subsys="str" />} />
+              <Route
+                path="edit/:id"
+                element={<StockTransferForm subsys="str" />}
+              />
             </Route>
+
             <Route path="pos" element={<ManagePOS />}>
               <Route path="orderHistory" element={<Outlet />}>
                 <Route index element={<PosPurchaseHistory />} />
@@ -326,6 +358,7 @@ function App() {
               </Route>
               <Route path="orderPurchase" element={<PosPurchaseOrder />} />
             </Route>
+
             <Route path="orders" element={<Outlet />}>
               <Route
                 index
@@ -335,7 +368,6 @@ function App() {
                   </ManageOnlineOrders>
                 }
               />
-
               <Route
                 path="search"
                 element={
@@ -344,9 +376,13 @@ function App() {
                   </ManageOnlineOrders>
                 }
               />
-              <Route path=":orderId" element={<CustomerOrderWrapper subsys="str" />}>
+              <Route
+                path=":orderId"
+                element={<CustomerOrderWrapper subsys="str" />}
+              >
                 <Route index element={<CustomerOrderDetails />} />
                 <Route path="pick-pack" element={<OnlineOrderPickPack />} />
+                <Route path="collect" element={<OnlineOrderCollection />} />
               </Route>
             </Route>
           </Route>
@@ -358,7 +394,8 @@ function App() {
               <PrivateRoute>
                 <AdminIndex />
               </PrivateRoute>
-            }>
+            }
+          >
             <Route path="sites" element={<Outlet />}>
               <Route index element={<ManageSites />} />
               <Route path=":siteId" element={<SiteDetails />} />
@@ -404,7 +441,8 @@ function App() {
               <PrivateRoute>
                 <MFIndex />
               </PrivateRoute>
-            }>
+            }
+          >
             <Route path="procurements" element={<Outlet />}>
               <Route
                 index
@@ -422,7 +460,10 @@ function App() {
                   </ManageProcurement>
                 }
               />
-              <Route path=":procurementId" element={<ProcurementWrapper subsys="mf" />}>
+              <Route
+                path=":procurementId"
+                element={<ProcurementWrapper subsys="mf" />}
+              >
                 <Route index element={<ProcurementDetails subsys="mf" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
                 <Route path="delivery" element={<ProcurementDelivery />} />
@@ -438,7 +479,8 @@ function App() {
               <PrivateRoute>
                 <WHIndex />
               </PrivateRoute>
-            }>
+            }
+          >
             <Route path="products" element={<Outlet />}>
               <Route
                 path="print"
@@ -465,7 +507,10 @@ function App() {
               <Route path="sites" element={<SiteStocks subsys="wh" />} />
               <Route path="products" element={<ProductStocks subsys="wh" />} />
               <Route path=":id" element={<AsiteStock />} />
-              <Route path="products/:id" element={<AProductStock subsys="wh" />} />
+              <Route
+                path="products/:id"
+                element={<AProductStock subsys="wh" />}
+              />
             </Route>
             {/* Procurement Orders */}
             <Route path="procurements" element={<Outlet />}>
@@ -485,7 +530,10 @@ function App() {
                   </ManageProcurement>
                 }
               />
-              <Route path=":procurementId" element={<ProcurementWrapper subsys="wh" />}>
+              <Route
+                path=":procurementId"
+                element={<ProcurementWrapper subsys="wh" />}
+              >
                 <Route index element={<ProcurementDetails />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
                 <Route path="delivery" element={<ProcurementDelivery />} />
@@ -511,7 +559,10 @@ function App() {
                   </ManageOnlineOrders>
                 }
               />
-              <Route path=":orderId" element={<CustomerOrderWrapper subsys="wh" />}>
+              <Route
+                path=":orderId"
+                element={<CustomerOrderWrapper subsys="wh" />}
+              >
                 <Route index element={<CustomerOrderDetails />} />
                 <Route path="pick-pack" element={<OnlineOrderPickPack />} />
               </Route>
@@ -534,13 +585,19 @@ function App() {
                   </ManageStockTransfer>
                 }
               />
-              <Route path="create" element={<StockTransferForm subsys="wh" />} />
+              <Route
+                path="create"
+                element={<StockTransferForm subsys="wh" />}
+              />
               <Route path=":id" element={<StockTransferWrapper subsys="wh" />}>
                 <Route index element={<ViewStockTransfer subsys="wh" />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
                 <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
-              <Route path="edit/:id" element={<StockTransferForm subsys="wh" />} />
+              <Route
+                path="edit/:id"
+                element={<StockTransferForm subsys="wh" />}
+              />
             </Route>
           </Route>
 
@@ -551,7 +608,8 @@ function App() {
               <PrivateRoute>
                 <LGIndex />
               </PrivateRoute>
-            }>
+            }
+          >
             <Route path="procurements" element={<Outlet />}>
               <Route
                 index
@@ -569,7 +627,10 @@ function App() {
                   </ManageProcurement>
                 }
               />
-              <Route path=":procurementId" element={<ProcurementWrapper subsys="lg" />}>
+              <Route
+                path=":procurementId"
+                element={<ProcurementWrapper subsys="lg" />}
+              >
                 <Route index element={<ProcurementDetails subsys="lg" />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
                 <Route path="delivery" element={<ProcurementDelivery />} />
@@ -592,13 +653,19 @@ function App() {
                   </ManageStockTransfer>
                 }
               />
-              <Route path="create" element={<StockTransferForm subsys="lg" />} />
+              <Route
+                path="create"
+                element={<StockTransferForm subsys="lg" />}
+              />
               <Route path=":id" element={<StockTransferWrapper subsys="lg" />}>
                 <Route index element={<ViewStockTransfer />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
                 <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
-              <Route path="edit/:id" element={<StockTransferForm subsys="wh" />} />
+              <Route
+                path="edit/:id"
+                element={<StockTransferForm subsys="wh" />}
+              />
             </Route>
           </Route>
 

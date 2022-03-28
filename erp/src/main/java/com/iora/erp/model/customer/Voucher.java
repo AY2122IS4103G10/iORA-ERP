@@ -5,7 +5,10 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.utils.StringGenerator;
 
 @Entity
@@ -24,6 +27,10 @@ public class Voucher {
 
     @Column(nullable = false)
     private boolean redeemed;
+
+    @JsonBackReference
+    @OneToOne(mappedBy = "voucher")
+    CustomerOrder customerOrder;
 
     public Voucher() {
         this.voucherCode = StringGenerator.generateRandom(48, 122, 10);
@@ -75,5 +82,13 @@ public class Voucher {
 
     public void setRedeemed(boolean redeemed) {
         this.redeemed = redeemed;
+    }
+
+    public CustomerOrder getCustomerOrder() {
+        return this.customerOrder;
+    }
+
+    public void setCustomerOrder(CustomerOrder customerOrder) {
+        this.customerOrder = customerOrder;
     }
 }

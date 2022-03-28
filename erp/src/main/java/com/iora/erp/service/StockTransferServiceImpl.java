@@ -284,13 +284,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                     if (stoli.getPackedQty() + qty > stoli.getPickedQty()) {
                         throw new StockTransferException("You are packing items that are not meant for this order.");
                     } else {
-                        try {
-                            stoli.setPackedQty(stoli.getPackedQty() + qty);
-                            siteService.removeProducts(stOrder.getFromSite().getId(), product.getSku(), qty);
-                        } catch (NoStockLevelException | IllegalTransferException e) {
-                            e.printStackTrace();
-                        }
-
+                        stoli.setPackedQty(stoli.getPackedQty() + qty);
                         boolean packed = true;
                         for (StockTransferOrderLI stoli2 : lineItems) {
                             if (stoli2.getPackedQty() < stoli2.getPickedQty()) {
@@ -322,6 +316,17 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         stOrder.addStatusHistory(
                 new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.DELIVERING));
+
+        // Remove stocks from site
+        for (StockTransferOrderLI stoli : stOrder.getLineItems()) {
+            try {
+                siteService.removeProducts(stOrder.getFromSite().getId(), stoli.getProduct().getSku(),
+                        stoli.getPackedQty());
+            } catch (NoStockLevelException | IllegalTransferException e) {
+                e.printStackTrace();
+            }
+        }
+
         return updateStockTransferOrder(stOrder);
     }
 
@@ -336,6 +341,17 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         stOrder.addStatusHistory(
                 new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.DELIVERING_MULTIPLE));
+
+        // Remove stocks from site
+        for (StockTransferOrderLI stoli : stOrder.getLineItems()) {
+            try {
+                siteService.removeProducts(stOrder.getFromSite().getId(), stoli.getProduct().getSku(),
+                        stoli.getPackedQty());
+            } catch (NoStockLevelException | IllegalTransferException e) {
+                e.printStackTrace();
+            }
+        }
+        
         return updateStockTransferOrder(stOrder);
     }
 

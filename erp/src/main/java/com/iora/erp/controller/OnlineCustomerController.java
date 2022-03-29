@@ -55,7 +55,7 @@ public class OnlineCustomerController {
     private SiteService siteService;
     @Autowired
     StripeService stripeService;
-    
+
     /*
      * ---------------------------------------------------------
      * G.1 Customer Purchase Management
@@ -170,11 +170,9 @@ public class OnlineCustomerController {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
     }
 
-
-
-
     @PostMapping(path = "/pay", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createPaymentIntent(@RequestParam(required = false) Long amt, @RequestBody List<CustomerOrderLI> lineItems) {
+    public ResponseEntity<Object> createPaymentIntent(@RequestParam(required = false) Long amt,
+            @RequestBody List<CustomerOrderLI> lineItems) {
         try {
             return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems, (amt == null) ? 0L : amt * 100));
         } catch (Exception ex) {
@@ -183,9 +181,9 @@ public class OnlineCustomerController {
         }
     }
 
-    
     @PostMapping(path = "/public/pay/{totalAmount}/{isDelivery}", produces = "application/json")
-    public ResponseEntity<Object> createPaymentIntentOnlineOrder(@PathVariable Long totalAmount , @PathVariable Boolean isDelivery) {
+    public ResponseEntity<Object> createPaymentIntentOnlineOrder(@PathVariable Long totalAmount,
+            @PathVariable Boolean isDelivery) {
         try {
             return ResponseEntity.ok(stripeService.createPaymentIntentOnlineOrder(totalAmount, isDelivery));
         } catch (Exception ex) {
@@ -196,10 +194,11 @@ public class OnlineCustomerController {
 
     @PostMapping(path = "/public/create", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createOnlineOrder(@RequestBody OnlineOrder onlineOrder,
-            @RequestParam String paymentIntentId) {
+            @RequestParam(required = false) String paymentIntentId) {
         try {
             return ResponseEntity.ok(
-                    customerOrderService.createOnlineOrder(onlineOrder, (paymentIntentId == "") ? null : paymentIntentId));
+                    customerOrderService.createOnlineOrder(onlineOrder,
+                            (paymentIntentId == "") ? null : paymentIntentId));
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.badRequest().body(ex.getMessage());

@@ -33,6 +33,7 @@ public interface CustomerService {
     public abstract void deleteVoucher(String voucherCode) throws CustomerException;
     public abstract Voucher issueVoucher(String voucherCode, Long customerId) throws CustomerException;
     public abstract Voucher redeemVoucher(String voucherCode) throws CustomerException;
+    public abstract Customer redeemPoints(Long customerId, int amount) throws CustomerException;
 
     public abstract List<MembershipTier> listOfMembershipTier();
     public abstract MembershipTier findMembershipTierById(String name);

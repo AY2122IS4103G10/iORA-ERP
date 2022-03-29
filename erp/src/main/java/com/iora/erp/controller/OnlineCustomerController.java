@@ -150,6 +150,26 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/history/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> getTransactionHistory(@PathVariable Long customerId) {
+        try {
+            return ResponseEntity.ok(customerService.getCustomerById(customerId).getCustomerOrders());
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/redeemPoints/{customerId}/{amount}", produces = "application/json")
+    public ResponseEntity<Object> redeemPoints(@PathVariable Long customerId, @PathVariable int amount) {
+        try {
+            return ResponseEntity.ok(customerService.redeemPoints(customerId, amount));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
     /*
      * ---------------------------------------------------------
      * Online Order

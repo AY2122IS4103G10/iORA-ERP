@@ -31,11 +31,11 @@ export const Header = () => {
     );
 };
 
-export const ManageSupportTicket = ({ status }) => {
+export const ManageSupportTicket = () => {
     return (
         <>
             <Header />
-            <SupportTicketList status={status} />
+            <SupportTicketList />
         </>
     );
 };

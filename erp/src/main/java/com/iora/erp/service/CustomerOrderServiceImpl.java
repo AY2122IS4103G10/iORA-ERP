@@ -503,9 +503,25 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public ExchangeLI createExchangeLI(Long orderId, ExchangeLI exchangeLI) throws CustomerOrderException {
-        em.persist(exchangeLI);
-
         CustomerOrder co = getCustomerOrder(orderId);
+        Boolean exchangeable = false;
+
+        List <CustomerOrderLI> colis = co.getLineItems();
+        for (CustomerOrderLI coli : colis) {
+            if (coli.getProduct().equals(exchangeLI.getOldItem())) {
+                exchangeable = true;
+                coli.setQty(coli.getQty() - 1);
+                if (coli.getQty() == 0) {
+                    colis.remove(coli);
+                }
+            }
+        }
+
+        if (!exchangeable) {
+            throw new CustomerOrderException("Item to be exchanged is not in the customer order.");
+        }
+
+        em.persist(exchangeLI);
         co.addExchangedLI(exchangeLI);
         em.merge(co);
         return exchangeLI;
@@ -538,9 +554,25 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public RefundLI createRefundLI(Long orderId, RefundLI refundLI) throws CustomerOrderException {
-        em.persist(refundLI);
-
         CustomerOrder co = getCustomerOrder(orderId);
+        Boolean refundable = false;
+
+        List <CustomerOrderLI> colis = co.getLineItems();
+        for (CustomerOrderLI coli : colis) {
+            if (coli.getProduct().equals(refundLI.getProduct()) && coli.getQty() >= refundLI.getQty()) {
+                refundable = true;
+                coli.setQty(coli.getQty() - refundLI.getQty());
+                if (coli.getQty() == 0) {
+                    colis.remove(coli);
+                }
+            }
+        }
+
+        if (!refundable) {
+            throw new CustomerOrderException("Item to be exchanged is not in the customer order.");
+        }
+
+        em.persist(refundLI);
         co.addRefundedLI(refundLI);
         em.merge(co);
         return refundLI;

@@ -1,14 +1,16 @@
-import { PencilIcon } from "@heroicons/react/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import {
   fetchMembershipTiers,
   selectMembershipTierByName,
-  deleteExistingMembershipTier
+  deleteExistingMembershipTier,
 } from "../../../../stores/slices/membershipTierSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 
 const Header = ({ name, openModal }) => {
   const navigate = useNavigate();
@@ -124,11 +126,13 @@ const MembershipTierDetailsBody = ({ minSpend, multiplier, birthday }) => (
 );
 
 export const MembershipTierDetails = () => {
+  const { addToast } = useToasts();
   const { name } = useParams();
   const membershipTier = useSelector((state) =>
     selectMembershipTierByName(state, name)
   );
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [openDelete, setOpenDelete] = useState(false);
   const memStatus = useSelector((state) => state.membershipTiers.status);
 
@@ -165,10 +169,7 @@ export const MembershipTierDetails = () => {
             page="Membership Tiers"
             path="/sm/rewards-loyalty/tiers"
           />
-          <Header 
-          name={membershipTier.name} 
-          openModal={openModal}
-          />
+          <Header name={membershipTier.name} openModal={openModal} />
           <MembershipTierDetailsBody
             minSpend={membershipTier.minSpend}
             // currency={membershipTier.currency}

@@ -16,9 +16,7 @@ export const StockTransferSearch = ({ subsys }) => {
   const onSearchClicked = (evt) => {
     const fetchStockTransfer = async () => {
       try {
-        const { data } = api.get("store/stockTransfer", search.trim());
-        if (data === undefined)
-          throw new Error("Stock Transfer Order not found");
+        const { data } = await api.get("store/stockTransfer", search.trim());
         const { id, fromSite, statusHistory } = data;
         if (subsys === "lg") {
           if (
@@ -33,10 +31,11 @@ export const StockTransferSearch = ({ subsys }) => {
         }
         navigate(pathname.replace("search", id));
       } catch (error) {
-        addToast(`Error: ${error.message}`, {
+        addToast(`Error: ${error.response.data}`, {
           appearance: "error",
           autoDismiss: true,
         });
+        setSearch("");
       }
     };
     evt.preventDefault();

@@ -12,10 +12,6 @@ import { eventTypes } from "../../../../constants/eventTypes";
 const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
   const columns = useMemo(() => {
     return [
-      // {
-      //   Header: "Prod Code",
-      //   accessor: "product.modelCode",
-      // },
       {
         Header: "SKU",
         accessor: "product.sku",
@@ -45,17 +41,6 @@ const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
         Header: "Ful",
         accessor: "packedQty",
       },
-      // {
-      //   Header: "Shipped",
-      //   accessor: "",
-      //   Cell: (row) => {
-      //     return status === "SHIPPED" ||
-      //       status === "VERIFIED" ||
-      //       status === "COMPLETED"
-      //       ? row.row.original.fulfilledProductItems.length
-      //       : "-";
-      //   },
-      // },
       {
         Header: "Rec",
         accessor: "receivedQty",
@@ -93,7 +78,7 @@ export const ActivitySection = ({ history }) => {
   return (
     <section
       aria-labelledby="timeline-title"
-      className="lg:col-start-3 lg:col-span-1"
+      className="lg:col-start-3 lg:col-span-1 max-h-96"
     >
       <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6 max-h-full overflow-auto">
         <h2 id="timeline-title" className="text-lg font-medium text-gray-900">
@@ -297,6 +282,8 @@ export const ProcurementDetails = () => {
               ? `${index === 0 ? "Created" : "Updated"} by`
               : status === "READY_FOR_SHIPPING"
               ? "Ready for shipping by"
+              : status === "SHIPPING_MULTIPLE"
+              ? "Shipping multiple"
               : `${status.charAt(0) + status.slice(1).toLowerCase()} by`,
           target: data[index].name,
           date: moment.unix(timeStamp / 1000).format("DD/MM, H:mm"),

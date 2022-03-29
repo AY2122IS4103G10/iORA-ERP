@@ -1,11 +1,11 @@
 import { CheckCircleIcon } from "@heroicons/react/outline";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { onlineOrderApi, orderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
-import { DashedBorderES } from "../../../components/EmptyStates/DashedBorder";
 import {
   SelectColumnFilter,
   SimpleTable,
@@ -71,34 +71,49 @@ const OrderTable = ({ data, handleOnClick, type }) => {
 export const OrderList = ({ subsys, type }) => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const currSiteId = parseInt(useSelector(selectUserSite));
 
   useEffect(() => {
-    subsys === "sm"
-      ? type === "store"
-        ? orderApi.getAllStore().then((response) => {
-            setData(response.data);
-          })
-        : orderApi.getAllOnline().then((response) => {
-            setData(response.data);
-          })
-      : onlineOrderApi.getAllBySite(currSiteId).then((response) => {
-          setData(response.data);
-        });
+    const fetchStoreOrders = async () => {
+      setLoading(true);
+      const { data } = await orderApi.getAllStore();
+      setData(data);
+      setLoading(false);
+    };
+
+    const fetchOnlineOrders = async () => {
+      setLoading(true);
+      const { data } = await orderApi.getAllOnline();
+      setData(data);
+      setLoading(false);
+    };
+
+    const fetchOnlineBySite = async (currSiteId) => {
+      setLoading(true);
+      const { data } = await onlineOrderApi.getAllBySite(currSiteId);
+      setData(data);
+      setLoading(false);
+    };
+
+    if (subsys === "sm") {
+      if (type === "store") fetchStoreOrders();
+      else fetchOnlineOrders();
+    } else fetchOnlineBySite(currSiteId);
   }, [subsys, currSiteId, type]);
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);
-  console.log(data)
+  
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        {Boolean(data.length) ? (
+        {loading ? (
+          <div className="flex mt-5 items-center justify-center">
+            <TailSpin color="#00BCD4" height={20} width={20} />
+          </div>
+        ) : Boolean(data.length) ? (
           <OrderTable data={data} handleOnClick={handleOnClick} type={type} />
-        ) : subsys === "sm" ? (
-          <Link to="/sm/procurements/create">
-            <DashedBorderES item="order" />
-          </Link>
         ) : (
           <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
             <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-400" />

@@ -13,17 +13,18 @@ export const OnlineOrderSearch = ({ subsys }) => {
   const canSearch = Boolean(search);
   const onSearchClicked = (evt) => {
     evt.preventDefault();
-    if (canSearch)
-      onlineOrderApi.get(search)
-        .then((response) => {
-          if (response.data !== "")
-            navigate(pathname.replace("search", response.data.id));
-          else
-            addToast(`Error: Online Order not found.`, {
-              appearance: "error",
-              autoDismiss: true,
-            });
+    const fetchOrder = async (search) => {
+      try {
+        const { data } = await onlineOrderApi.get(search);
+        navigate(pathname.replace("search", data.id));
+      } catch (error) {
+        addToast(`Error: ${error.response.data}.`, {
+          appearance: "error",
+          autoDismiss: true,
         });
+      }
+    };
+    if (canSearch) fetchOrder(search);
   };
 
   const onSearchChanged = (e) => setSearch(e.target.value);

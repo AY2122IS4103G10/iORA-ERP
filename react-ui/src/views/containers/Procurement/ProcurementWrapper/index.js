@@ -34,7 +34,6 @@ const Header = ({
   procurementId,
   headquartersId,
   manufacturingId,
-  warehouseId,
   status,
   openModal,
   onAcceptClicked,
@@ -62,17 +61,6 @@ const Header = ({
                 <span>View Invoice</span>
               </button>
             )}
-            <button
-              type="button"
-              className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={() => window.print()}
-            >
-              <PrinterIcon
-                className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              <span>Print</span>
-            </button>
             {status === "PENDING" ? (
               headquartersId === currSiteId ? (
                 <div>
@@ -426,6 +414,7 @@ export const ProcurementWrapper = ({ subsys }) => {
       current: false,
     },
   ];
+
   return loading ? (
     <div className="flex mt-5 items-center justify-center">
       <TailSpin color="#00BFFF" height={20} width={20} />

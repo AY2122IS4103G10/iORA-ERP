@@ -23,6 +23,7 @@ import com.iora.erp.service.StockTransferService;
 import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -133,7 +134,8 @@ public class StoreController {
         try {
             return ResponseEntity.ok(stockTransferService.getStockTransferOrder(orderId));
         } catch (StockTransferException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -396,7 +398,8 @@ public class StoreController {
     }
 
     @PostMapping(path = "/customerOrder/exchange/{orderId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addExchangeLineItem(@PathVariable Long orderId, @RequestBody ExchangeLI exchangeLineItem) {
+    public ResponseEntity<Object> addExchangeLineItem(@PathVariable Long orderId,
+            @RequestBody ExchangeLI exchangeLineItem) {
         try {
             customerOrderService.createExchangeLI(orderId, exchangeLineItem);
             return ResponseEntity.ok(customerOrderService.getCustomerOrder(orderId));

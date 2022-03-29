@@ -125,15 +125,15 @@ const MembershipTierDetailsBody = ({ minSpend, multiplier, birthday }) => (
 );
 
 export const MembershipTierDetails = () => {
+  const { addToast } = useToasts();
   const { name } = useParams();
   const membershipTier = useSelector((state) =>
     selectMembershipTierByName(state, name)
   );
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [openDelete, setOpenDelete] = useState(false);
   const memStatus = useSelector((state) => state.membershipTiers.status);
-  const { addToast } = useToasts();
-  const navigate = useNavigate();
 
   useEffect(() => {
     memStatus === "idle" && dispatch(fetchMembershipTiers());

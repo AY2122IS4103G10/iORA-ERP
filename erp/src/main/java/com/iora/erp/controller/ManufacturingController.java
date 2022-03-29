@@ -8,6 +8,7 @@ import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,7 +43,8 @@ public class ManufacturingController {
         try {
             return ResponseEntity.ok(procurementService.getProcurementOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -57,7 +59,8 @@ public class ManufacturingController {
         try {
             return ResponseEntity.ok(procurementService.acceptProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -66,7 +69,8 @@ public class ManufacturingController {
         try {
             return ResponseEntity.ok(procurementService.rejectProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -75,7 +79,8 @@ public class ManufacturingController {
         try {
             return ResponseEntity.ok(procurementService.manufactureProcurementOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -84,7 +89,8 @@ public class ManufacturingController {
         try {
             return ResponseEntity.ok(procurementService.pickPackProcurementOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -99,7 +105,8 @@ public class ManufacturingController {
                                 Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
             }
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -108,7 +115,8 @@ public class ManufacturingController {
         try {
             return ResponseEntity.ok(procurementService.shipProcurementOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -117,7 +125,8 @@ public class ManufacturingController {
         try {
             return ResponseEntity.ok(procurementService.shipMultipleProcurementOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 }

@@ -55,6 +55,7 @@ export const OrderSearch = ({ subsys }) => {
                   placeholder="Search orders..."
                   value={search}
                   onChange={onSearchChanged}
+                  autoFocus
                 />
               </div>
               <button

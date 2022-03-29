@@ -264,7 +264,7 @@ export const onlineOrderApi = {
     return axiosPrivate.get(`${REST_ENDPOINT}store/onlineOrder/pickup/${siteId}`);
   },
   get(orderId) {
-    return axiosPrivate.get(`${REST_ENDPOINT}sam/onlineOrder?orderId=${orderId}`);
+    return axiosPrivate.get(`${REST_ENDPOINT}online/order/${orderId}`);
   },
   getAllBySite(siteId) {
     return axiosPrivate.get(`${REST_ENDPOINT}online/searchOrder/${siteId}?orderId=`);
@@ -348,7 +348,7 @@ export const posApi = {
 
 export const logisticsApi = {
   getSTOBySiteStatus(siteId, status) {
-    return axiosPrivate.get(`${REST_ENDPOINT}logistics/sto/${siteId}/${status}`);
+    return axiosPrivate.get(`${REST_ENDPOINT}logistics/stockTransfer/${siteId}/${status}`);
   },
   getPOBySiteStatus(siteId, status) {
     return axiosPrivate.get(`${REST_ENDPOINT}logistics/procurementOrder/${siteId}/${status}`);

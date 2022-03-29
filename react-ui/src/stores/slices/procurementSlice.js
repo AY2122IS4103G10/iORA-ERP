@@ -71,7 +71,7 @@ export const scanItem = createAsyncThunk(
       const response = await procurementApi.scanItem(orderId, barcode);
       return response.data;
     } catch (error) {
-      return Promise.reject(error.response.message);
+      return Promise.reject(error.response.data);
     }
   }
 );

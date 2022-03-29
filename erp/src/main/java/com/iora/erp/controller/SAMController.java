@@ -22,6 +22,7 @@ import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -481,7 +482,8 @@ public class SAMController {
             return ResponseEntity
                     .ok(procurementService.createProcurementOrder(procurementOrder, siteId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -490,7 +492,8 @@ public class SAMController {
         try {
             return ResponseEntity.ok(procurementService.getProcurementOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -504,11 +507,11 @@ public class SAMController {
     public ResponseEntity<Object> updateProcurementOrder(@RequestBody ProcurementOrder procurementOrder,
             @PathVariable Long siteId) {
         try {
-
             return ResponseEntity
                     .ok(procurementService.updateProcurementOrderDetails(procurementOrder, siteId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -517,7 +520,8 @@ public class SAMController {
         try {
             return ResponseEntity.ok(procurementService.deleteProcurementOrder(orderId, siteId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 

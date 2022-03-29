@@ -124,49 +124,65 @@ export const ProcurementDelivery = () => {
   const [search, setSearch] = useState("");
 
   const onMultipleClicked = async () => {
-    const { data } = await procurementApi.shipMultiple(procurementId);
-    const { lineItems, statusHistory } = data;
-    setLineItems(
-      lineItems.map((item) => ({
-        ...item,
-        product: {
-          sku: item.product.sku,
-          productFields: item.product.productFields,
-        },
-      }))
-    );
-    setStatus({
-      status: statusHistory[statusHistory.length - 1].status,
-      timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-    });
-    setStatusHistory(statusHistory);
-    addToast(`Order #${procurementId} has begun shipping.`, {
-      appearance: "success",
-      autoDismiss: true,
-    });
+    try {
+      const { data } = await procurementApi.shipMultiple(procurementId);
+      const { lineItems, statusHistory } = data;
+      setLineItems(
+        lineItems.map((item) => ({
+          ...item,
+          product: {
+            sku: item.product.sku,
+            productFields: item.product.productFields,
+          },
+        }))
+      );
+      setStatus({
+        status: statusHistory[statusHistory.length - 1].status,
+        timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+      });
+      setStatusHistory(statusHistory);
+      addToast(`Order #${procurementId} has begun shipping.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      navigate("/lg/procurements")
+    } catch (error) {
+      addToast(`Error: ${error.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
   };
 
   const onSingleClicked = async () => {
-    const { data } = await procurementApi.shipOrder(procurementId);
-    const { lineItems, statusHistory } = data;
-    setLineItems(
-      lineItems.map((item) => ({
-        ...item,
-        product: {
-          sku: item.product.sku,
-          productFields: item.product.productFields,
-        },
-      }))
-    );
-    setStatus({
-      status: statusHistory[statusHistory.length - 1].status,
-      timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
-    });
-    setStatusHistory(statusHistory);
-    addToast(`Order #${procurementId} has been shipped.`, {
-      appearance: "success",
-      autoDismiss: true,
-    });
+    try {
+      const { data } = await procurementApi.shipOrder(procurementId);
+      const { lineItems, statusHistory } = data;
+      setLineItems(
+        lineItems.map((item) => ({
+          ...item,
+          product: {
+            sku: item.product.sku,
+            productFields: item.product.productFields,
+          },
+        }))
+      );
+      setStatus({
+        status: statusHistory[statusHistory.length - 1].status,
+        timeStamp: statusHistory[statusHistory.length - 1].timeStamp,
+      });
+      setStatusHistory(statusHistory);
+      addToast(`Order #${procurementId} has been shipped.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      navigate("/lg/procurements")
+    } catch (error) {
+      addToast(`Error: ${error.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
   };
 
   const onScanClicked = (evt) => {
@@ -199,7 +215,7 @@ export const ProcurementDelivery = () => {
         navigate(`/${subsys}/procurements/${procurementId}`);
       }
     } catch (error) {
-      addToast(`Error: ${error.message}`, {
+      addToast(`Error: ${error.response.data}`, {
         appearance: "error",
         autoDismiss: true,
       });
@@ -236,9 +252,9 @@ export const ProcurementDelivery = () => {
               />
             </div>
           ) : (
-            (status === "DELIVERING" || status === "DELIVERING_MULTIPLE") &&
-            warehouse.id === currSiteId &&
-            subsys !== "lg" && (
+            (status.status === "SHIPPING" ||
+              status.status === "SHIPPING_MULTIPLE") &&
+            warehouse.id === currSiteId && (
               <section aria-labelledby="scan-items">
                 <ScanItemsSection
                   search={search}

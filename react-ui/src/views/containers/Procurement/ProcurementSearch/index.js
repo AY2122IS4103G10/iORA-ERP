@@ -14,11 +14,7 @@ export const ProcurementSearch = ({ subsys }) => {
   const [search, setSearch] = useState("");
 
   const canSearch = Boolean(search);
-  const errorToast = () =>
-    addToast(`Error: Procurement Order not found.`, {
-      appearance: "error",
-      autoDismiss: true,
-    });
+
   const onSearchClicked = (evt) => {
     evt.preventDefault();
     const fetchOrder = async () => {
@@ -36,14 +32,18 @@ export const ProcurementSearch = ({ subsys }) => {
               "READY_FOR_SHIPPING"
           )
             navigate(pathname.replace("search", id));
-          else errorToast();
+          else throw new Error("Not authorised to view order.");
         } else if (subsys === "mf") {
           if (currSiteId === manufacturing)
             navigate(pathname.replace("search", id));
-          else errorToast();
+          else throw new Error("Not authorised to view order.");
         } else navigate(pathname.replace("search", id));
       } catch (error) {
-        errorToast();
+        addToast(`Error: ${error.response.data}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+        setSearch("");
       }
     };
     if (canSearch) fetchOrder();
@@ -78,6 +78,7 @@ export const ProcurementSearch = ({ subsys }) => {
                   placeholder="Search orders..."
                   value={search}
                   onChange={onSearchChanged}
+                  autoFocus
                 />
               </div>
               <button

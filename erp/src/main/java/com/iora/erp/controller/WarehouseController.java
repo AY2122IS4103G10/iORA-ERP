@@ -14,6 +14,7 @@ import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -83,7 +84,8 @@ public class WarehouseController {
         try {
             return ResponseEntity.ok(procurementService.getProcurementOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -105,7 +107,8 @@ public class WarehouseController {
                                 Integer.parseInt(barcode.substring(barcode.indexOf("/") + 1))));
             }
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 

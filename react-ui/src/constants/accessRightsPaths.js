@@ -12,6 +12,7 @@ accessRightsPaths.set("WAREHOUSE_BASIC", 3);
 accessRightsPaths.set("WAREHOUSE_ORDER", 3);
 accessRightsPaths.set("STORE_BASIC", 4);
 accessRightsPaths.set("STORE_INVENTORY", 4);
+accessRightsPaths.set("LOGISTICS_BASIC", 5);
 
 const accessRightsMap = (list) => {
     return [...new Set(list.map(x => accessRightsPaths.get(x)))].sort();

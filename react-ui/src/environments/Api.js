@@ -339,10 +339,10 @@ export const posApi = {
     return axiosPrivate.get(`${REST_ENDPOINT}store/voucher/${voucher}`);
   },
   addRefundLineItem(orderId, refundLI) {
-    return axiosPrivate.post(`${REST_ENDPOINT}store/customerOrder/refund/${orderId}}`, refundLI);
+    return axiosPrivate.post(`${REST_ENDPOINT}store/customerOrder/refund/${orderId}`, refundLI);
   },
   addExchangeLineItem(orderId, exchangeLI) {
-    return axiosPrivate.post(`${REST_ENDPOINT}store/customerOrder/refund/${orderId}}`, exchangeLI);
+    return axiosPrivate.post(`${REST_ENDPOINT}store/customerOrder/exchange/${orderId}`, exchangeLI);
   }
 };
 

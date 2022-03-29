@@ -1,28 +1,31 @@
-import { Fragment, useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import moment from "moment";
-import {
-  addRefundLineItem,
-  fetchSiteOrders,
-  selectOrderById,
-} from "../../../../stores/slices/posSlice";
-import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
-import { selectUserSite } from "../../../../stores/slices/userSlice";
-import { useState } from "react";
-import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
-import { TailSpin } from "react-loader-spinner";
-import { useToasts } from "react-toast-notifications";
+import { Dialog, Transition } from "@headlessui/react";
 import {
   InformationCircleIcon,
   ReceiptRefundIcon,
   ReceiptTaxIcon,
   XIcon,
 } from "@heroicons/react/solid";
-import { Dialog, Listbox, Transition } from "@headlessui/react";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import moment from "moment";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
+import {
+  addExchangeLineItem,
+  addRefundLineItem,
+  fetchSiteOrders,
+  selectOrderById,
+} from "../../../../stores/slices/posSlice";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
+import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import {
+  fetchAllModelsBySkus,
+  fetchModelBySku,
+} from "../../StockTransfer/StockTransferForm";
 
 const Header = ({ order, openRefundModal, openExchangeModal }) => {
   return (
@@ -167,7 +170,12 @@ export const OrderDetails = () => {
     name: "Choose One",
     qty: 0,
   });
-  const [exchangeSku, setExchangeSku] = useState(null);
+  const [exchangeSku, setExchangeSku] = useState({
+    id: -1,
+    name: "Choose One",
+    qty: 0,
+  });
+  const [exchangeOptions, setExchangeOptions] = useState([]);
 
   const mapRefundQty = (e) => {
     const maxQty =
@@ -181,6 +189,10 @@ export const OrderDetails = () => {
         ? maxQty
         : e.target.value;
     setRefundQty(q);
+  };
+
+  const mapExchangeSku = (e) => {
+    setExchangeSku(e);
   };
 
   useEffect(() => {
@@ -216,20 +228,33 @@ export const OrderDetails = () => {
     );
   }, [order, addToast, navigate, orderId]);
 
+  useEffect(() => {
+    exchangedSku.id !== -1 &&
+      fetchModelBySku(exchangedSku.name).then(({ products }) => {
+        setExchangeOptions(products);
+      });
+  }, [exchangedSku]);
+
   const openRefundModal = () => setOpenRefund(true);
   const closeRefundModal = () => setOpenRefund(false);
   const openExchangeModal = () => setOpenExchange(true);
   const closeExchangeModal = () => setOpenExchange(false);
   const updateOrder = async (event) => {
     if (event === "refund") {
-      const product = lineItems
+      const product = order.lineItems
         .map((lineItem) => lineItem.product)
-        .find((prod) => prod.sku === refundSku);
-      dispatch(addRefundLineItem(orderId, { product, qty: refundQty }));
+        .find((prod) => prod.sku === refundSku.name);
+      dispatch(addRefundLineItem({ orderId, product, qty: refundQty }));
       closeRefundModal();
     }
     if (event === "exchange") {
-      console.log("exchange");
+      const oldItem = order.lineItems
+        .map((lineItem) => lineItem.product)
+        .find((prod) => prod.sku === exchangedSku.name);
+      const newItem = exchangeOptions.find(
+        (prod) => prod.sku === exchangeSku.name
+      );
+      dispatch(addExchangeLineItem({ orderId, oldItem, newItem }));
       closeExchangeModal();
     }
   };
@@ -268,8 +293,11 @@ export const OrderDetails = () => {
           })}
           exchangedSku={exchangedSku}
           exchangeSku={exchangeSku}
+          exchangeOptions={exchangeOptions.map((product, index) => {
+            return { index, name: product.sku };
+          })}
           setExchangedSku={setExchangedSku}
-          setExchangeSku={setExchangeSku}
+          setExchangeSku={mapExchangeSku}
         />
         <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
           <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -406,7 +434,7 @@ const RefundModal = ({
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-visible shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
               <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
                 <button
                   type="button"
@@ -475,7 +503,17 @@ const RefundModal = ({
   );
 };
 
-const ExchangeModal = ({ open, closeModal, onConfirm, lineItems, exchangedSku, exchangeSku, setExchangedSku, setExchangeSku }) => {
+const ExchangeModal = ({
+  open,
+  closeModal,
+  onConfirm,
+  lineItems,
+  exchangedSku,
+  exchangeSku,
+  exchangeOptions,
+  setExchangedSku,
+  setExchangeSku,
+}) => {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
@@ -512,7 +550,7 @@ const ExchangeModal = ({ open, closeModal, onConfirm, lineItems, exchangedSku, e
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-visible shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
               <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
                 <button
                   type="button"
@@ -539,10 +577,17 @@ const ExchangeModal = ({ open, closeModal, onConfirm, lineItems, exchangedSku, e
                   </Dialog.Title>
                   <SimpleSelectMenu
                     className="m-3 p-3"
-                    label="SKU Code of Exchanged Item"
+                    label="Returned Item SKU Code"
                     options={lineItems}
                     selected={exchangedSku}
                     setSelected={setExchangedSku}
+                  />
+                  <SimpleSelectMenu
+                    className="m-3 p-3"
+                    label="Exchange Item SKU Code"
+                    options={exchangeOptions}
+                    selected={exchangeSku}
+                    setSelected={setExchangeSku}
                   />
                 </div>
               </div>

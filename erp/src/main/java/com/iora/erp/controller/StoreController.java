@@ -387,7 +387,8 @@ public class StoreController {
     @PostMapping(path = "/customerOrder/refund/{orderId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addRefundLineItem(@PathVariable Long orderId, @RequestBody RefundLI refundLineItem) {
         try {
-            return ResponseEntity.ok(customerOrderService.createRefundLI(orderId, refundLineItem));
+            customerOrderService.createRefundLI(orderId, refundLineItem);
+            return ResponseEntity.ok(customerOrderService.getCustomerOrder(orderId));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -397,7 +398,8 @@ public class StoreController {
     @PostMapping(path = "/customerOrder/exchange/{orderId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addExchangeLineItem(@PathVariable Long orderId, @RequestBody ExchangeLI exchangeLineItem) {
         try {
-            return ResponseEntity.ok(customerOrderService.createExchangeLI(orderId, exchangeLineItem));
+            customerOrderService.createExchangeLI(orderId, exchangeLineItem);
+            return ResponseEntity.ok(customerOrderService.getCustomerOrder(orderId));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());

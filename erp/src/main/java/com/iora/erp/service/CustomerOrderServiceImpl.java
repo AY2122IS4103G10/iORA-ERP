@@ -502,8 +502,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public ExchangeLI createExchangeLI(ExchangeLI exchangeLI) {
+    public ExchangeLI createExchangeLI(Long orderId, ExchangeLI exchangeLI) throws CustomerOrderException {
         em.persist(exchangeLI);
+
+        CustomerOrder co = getCustomerOrder(orderId);
+        co.addExchangedLI(exchangeLI);
+        em.merge(co);
         return exchangeLI;
     }
 
@@ -533,8 +537,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public RefundLI createRefundLI(RefundLI refundLI) {
+    public RefundLI createRefundLI(Long orderId, RefundLI refundLI) throws CustomerOrderException {
         em.persist(refundLI);
+
+        CustomerOrder co = getCustomerOrder(orderId);
+        co.addRefundedLI(refundLI);
+        em.merge(co);
         return refundLI;
     }
 

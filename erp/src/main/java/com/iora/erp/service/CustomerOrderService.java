@@ -44,12 +44,12 @@ public interface CustomerOrderService {
 
         public abstract ExchangeLI getExchangeLI(Long id) throws CustomerOrderException;
         public abstract List<ExchangeLI> getAllExchangeLIs();
-        public abstract ExchangeLI createExchangeLI(ExchangeLI exchangeLI);
+        public abstract ExchangeLI createExchangeLI(Long orderId, ExchangeLI exchangeLI) throws CustomerOrderException;
         public abstract ExchangeLI updateExchangeLI(ExchangeLI exchangeLI) throws CustomerOrderException;
 
         public abstract RefundLI getRefundLI(Long id) throws CustomerOrderException;
         public abstract List<RefundLI> getAllRefundLIs();
-        public abstract RefundLI createRefundLI(RefundLI refundLI);
+        public abstract RefundLI createRefundLI(Long orderId, RefundLI refundLI) throws CustomerOrderException;
         public abstract RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
 
         public abstract OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;

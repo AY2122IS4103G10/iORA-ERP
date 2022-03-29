@@ -403,6 +403,9 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         for (ProcurementOrderLI poli : lineItems) {
             if (poli.getProduct().equals(product)) {
+                if (poli.getReceivedQty() + qty > poli.getPackedQty()) {
+                    throw new ProcurementOrderException("Received quantity of this product is more than the shipped quantity.");
+                }
                 poli.setReceivedQty(poli.getReceivedQty() + qty);
 
                 boolean picked = true;

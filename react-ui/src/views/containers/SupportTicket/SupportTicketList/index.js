@@ -69,14 +69,14 @@ export const SupportTicketTable = ({ data, handleOnClick }) => {
     );
 };
 
-export const SupportTicketList = ({ status }) => {
+export const SupportTicketList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const data = useSelector(selectAllSupportTickets);
     const supportTicketStatus = useSelector((state) => state.supportTickets.status);
     useEffect(() => {
-        supportTicketStatus === "idle" && dispatch(fetchSupportTickets(status));
-    }, [status, supportTicketStatus, dispatch]);
+        supportTicketStatus === "idle" && dispatch(fetchSupportTickets());
+    }, [supportTicketStatus, dispatch]);
     console.log(data)
 
     const handleOnClick = (row) => navigate(`/sm/support/${row.original.id}`);

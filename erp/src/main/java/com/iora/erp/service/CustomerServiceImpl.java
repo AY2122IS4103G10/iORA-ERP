@@ -3,6 +3,8 @@ package com.iora.erp.service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -280,6 +282,24 @@ public class CustomerServiceImpl implements CustomerService {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setRedeemed(true);
         return voucher;
+    }
+
+    @Override
+    public Customer redeemPoints(Long customerId, int amount) throws CustomerException {
+        Customer customer = getCustomerById(customerId);
+        if (customer.getMembershipPoints() < amount * 100) {
+            throw new CustomerException("Insufficient membership points");
+        } else {
+            customer.setMembershipPoints(customer.getMembershipPoints() - amount * 100);
+        }
+        
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, 2);
+        Voucher v = new Voucher(amount, cal.getTime());
+        em.persist(v);
+
+        issueVoucher(v.getVoucherCode(), customerId);
+        return customer;
     }
 
     @Override

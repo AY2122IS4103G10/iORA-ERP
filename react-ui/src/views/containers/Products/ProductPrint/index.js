@@ -8,6 +8,7 @@ import { useToasts } from "react-toast-notifications";
 import { productApi } from "../../../../environments/Api";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
+import { fetchModelBySku } from "../../StockTransfer/StockTransferForm";
 
 const ProductList = ({
   products,
@@ -36,6 +37,11 @@ const ProductList = ({
                       {product.sku}
                     </p>
                   </button>
+                  <div className="mt-2 flex">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <p>{product.name}</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
@@ -83,11 +89,11 @@ const ProductList = ({
 };
 
 const ProductSticker = ({ product }) => {
-  const { sku } = product;
+  const { sku, name } = product;
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 sm:px-6 sm:py-24 lg:px-8">
-      <div className="space-y-2 sm:px-0 sm:flex sm:items-baseline sm:justify-between sm:space-y-0">
-        <h1 className="tracking-tight text-base">{sku}</h1>
+      <div className="space-y-2 sm:px-0 sm:flex sm:text-center sm:justify-between sm:space-y-0">
+        <h1 className="tracking-tight text-base">{name}</h1>
       </div>
       <Barcode value={sku} width={1} height={100} margin={0} />
     </div>
@@ -111,7 +117,7 @@ const ProductStickerPrint = forwardRef(({ printQty, product }, ref) => {
 const StickerModal = ({ open, closeModal, product }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+      <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:p-6 min-w-fit">
         <div className="sm:block absolute top-0 right-0 pt-4 pr-4">
           <button
             type="button"
@@ -140,13 +146,15 @@ export const ProductPrint = () => {
   const [open, setOpen] = useState(false);
   const [productSelected, setProductSelected] = useState(null);
   const [printQty, setPrintQty] = useState(1);
+  const [boxesQty, setBoxesQty] = useState(1);
 
   const canSearch = Boolean(search);
+
   const onSearchClicked = (evt) => {
     evt.preventDefault();
     const searchProducts = async (skus) => {
       const { data } = await productApi.searchProductsBySku(skus);
-      if (data !== "") setProducts(data);
+      if (data !== "") return data;
       else
         addToast(`Error: Product(s) not found.`, {
           appearance: "error",
@@ -155,14 +163,29 @@ export const ProductPrint = () => {
     };
     if (canSearch) {
       const skus = search.split(",").map((sku) => sku.trim());
-      searchProducts(skus);
+      searchProducts(skus).then((data) => {
+        Promise.all(data.map((item) => fetchModelBySku(item.sku))).then((d) => {
+          const products = data.map((prod, index) => {
+            if (enabled) prod["sku"] = `${prod.sku}/${boxesQty}`;
+            return {
+              ...prod,
+              name: d[index].name,
+            };
+          });
+          setProducts(products);
+        });
+      });
     }
   };
 
-  const onEnabledChanged = () => setEnabled(!enabled);
+  const onEnabledChanged = () => {
+    setProducts([]);
+    setEnabled(!enabled);
+  };
   const onSearchChanged = (e) => setSearch(e.target.value);
   const onProductSelectedChanged = (e) => setProductSelected(e);
   const onPrintQtyChanged = (e) => setPrintQty(e.target.value);
+  const onBoxesQtyChanged = (e) => setBoxesQty(e.target.value);
 
   const openStickerModal = () => setOpen(true);
   const closeStickerModal = () => setOpen(false);
@@ -184,9 +207,17 @@ export const ProductPrint = () => {
                 />
               </div>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
-                <p>
-                  Scan barcodes or enter product SKUs separated by a comma ",".
-                </p>
+                {!enabled ? (
+                  <p>
+                    Scan barcodes or enter product SKUs separated by a comma
+                    ",".
+                  </p>
+                ) : (
+                  <p>
+                    Scan barcode or enter product SKU, then enter quantity of
+                    products per box.
+                  </p>
+                )}
               </div>
               <form onSubmit={onSearchClicked}>
                 <div>
@@ -224,8 +255,8 @@ export const ProductPrint = () => {
                             min="1"
                             className="col-span-1 focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-md sm:text-sm border-gray-300"
                             placeholder="Quantity"
-                            value={printQty}
-                            onChange={onPrintQtyChanged}
+                            value={boxesQty}
+                            onChange={onBoxesQtyChanged}
                           />
                         </div>
                       )}

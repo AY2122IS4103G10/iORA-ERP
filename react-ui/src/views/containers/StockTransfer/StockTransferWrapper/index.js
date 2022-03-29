@@ -270,7 +270,7 @@ export const LineItems = ({
         accessor: "requestedQty",
       },
       {
-        Header: "Sent",
+        Header: "Ful",
         accessor: "packedQty",
         disableSortBy: true,
         Cell: (e) => {
@@ -289,7 +289,7 @@ export const LineItems = ({
         },
       },
       {
-        Header: "Received",
+        Header: "Rec",
         accessor: "receivedQty",
         disableSortBy: true,
         Cell: (e) => {

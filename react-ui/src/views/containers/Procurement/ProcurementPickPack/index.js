@@ -203,24 +203,25 @@ export const ProcurementPickPack = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
+  const manufactureOrder = async () => {
+    try {
+      const { data } = await procurementApi.manufactureOrder(procurementId);
+      const { statusHistory } = data;
+      setStatus(statusHistory[statusHistory.length - 1]);
+      setStatusHistory(statusHistory);
+      addToast(`Order #${procurementId} has completed manufacturing.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+    } catch (error) {
+      addToast(`Error: ${error.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
+
   const onConfirmClicked = () => {
-    const manufactureOrder = async () => {
-      try {
-        const { data } = await procurementApi.manufactureOrder(procurementId);
-        const { statusHistory } = data;
-        setStatus(statusHistory[statusHistory.length - 1]);
-        setStatusHistory(statusHistory);
-        addToast(`Order #${procurementId} has completed manufacturing.`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-      } catch (error) {
-        addToast(`Error: ${error.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      }
-    };
     status.status === "ACCEPTED" ? manufactureOrder() : handlePickPack();
   };
 
@@ -232,28 +233,35 @@ export const ProcurementPickPack = () => {
   };
 
   const handlePickPack = async () => {
-    const { data } = await procurementApi.pickPack(procurementId);
-    const { statusHistory } = data;
-    setStatus(statusHistory[statusHistory.length - 1]);
-    setStatusHistory(statusHistory);
-    if (status.status !== "PICKING") {
-      addToast(
-        `Order #${procurementId}  ${
-          status.status === "MANUFACTURED"
-            ? "has begun picking"
-            : status.status === "PICKED"
-            ? "has begun packing"
-            : "is ready for shipping. Please print the delivery invoice"
-        }.`,
-        {
-          appearance: "success",
-          autoDismiss: true,
-        }
-      );
-    } else closeConfirmModal();
-    if (status.status === "PACKED") {
-      openInvoice();
-      navigate(`/${subsys}/procurements/${procurementId}/delivery`);
+    try {
+      const { data } = await procurementApi.pickPack(procurementId);
+      const { statusHistory } = data;
+      setStatus(statusHistory[statusHistory.length - 1]);
+      setStatusHistory(statusHistory);
+      if (status.status !== "PICKING") {
+        addToast(
+          `Order #${procurementId}  ${
+            status.status === "MANUFACTURED"
+              ? "has begun picking"
+              : status.status === "PICKED"
+              ? "has begun packing"
+              : "is ready for shipping. Please print the delivery invoice"
+          }.`,
+          {
+            appearance: "success",
+            autoDismiss: true,
+          }
+        );
+      } else closeConfirmModal();
+      if (status.status === "PACKED") {
+        openInvoice();
+        navigate(`/${subsys}/procurements/${procurementId}/delivery`);
+      }
+    } catch (error) {
+      addToast(`Error: ${error.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
     }
   };
 
@@ -271,11 +279,9 @@ export const ProcurementPickPack = () => {
         );
         setStatus(statusHistory[statusHistory.length - 1]);
         setStatusHistory(statusHistory);
-      })
-      .then(() => {
         addToast(
           `Successfully  ${
-            status.status === "PICKING" || status.status === "ACCEPTED"
+            status.status === "PICKING" || status.status === "MANUFACTURED"
               ? "picked"
               : "packed"
           } ${barcode}.`,
@@ -291,6 +297,7 @@ export const ProcurementPickPack = () => {
           appearance: "error",
           autoDismiss: true,
         });
+        setSearch("")
       });
   };
 

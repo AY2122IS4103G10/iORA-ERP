@@ -98,9 +98,9 @@ export const StockTransferPickPack = () => {
       e.target.value.length - search.length > 10 &&
       e.target.value.includes("-")
     ) {
-      if (status === "ACCEPTED") {
+      if (status === "ACCEPTED")
         handlePickPack().then(() => handleScan(e.target.value));
-      } else handleScan(e.target.value);
+      else handleScan(e.target.value);
     }
     setSearch(e.target.value);
   };

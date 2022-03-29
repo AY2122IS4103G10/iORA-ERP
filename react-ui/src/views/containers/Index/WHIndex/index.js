@@ -46,7 +46,7 @@ const navigation = [
   },
   {
     name: "Stock Transfer",
-    href: "/wh/stocktransfer",
+    href: "/wh/stocktransfer/search",
     icon: TruckIcon,
     current: true,
   },

@@ -403,7 +403,7 @@ export const ProcurementForm = () => {
   }, [warehouse]);
 
   const [selectedRows, setSelectedRows] = useState([]);
-  
+
   const onAddItemsClicked = (evt) => {
     evt.preventDefault();
     const selectedRowKeys = Object.keys(selectedRows).map((key) =>
@@ -428,63 +428,73 @@ export const ProcurementForm = () => {
     lineItems.length,
   ].every(Boolean);
 
+  const createProcurement = async (order) => {
+    try {
+      const { data } = await api.create(
+        `sam/procurementOrder/create/${hqSelected.id}`,
+        order
+      );
+      addToast("Successfully created procurement order", {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      navigate(`/sm/procurements/${data.id}`);
+    } catch (error) {
+      addToast(`Error: ${error.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
+
+  const updateProcurement = async (order) => {
+    try {
+      const { data } = await api.update(
+        `sam/procurementOrder/update/${hqSelected.id}`,
+        order
+      );
+      addToast("Successfully updated procurement order", {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      navigate(`/sm/procurements/${data.id}`);
+    } catch (error) {
+      addToast(`Error: ${error.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
+
   const onSaveOrderClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)
       if (!isEditing)
-        api
-          .create(`sam/procurementOrder/create/${hqSelected.id}`, {
-            lineItems: lineItems.map(({ product, requestedQty }) => ({
-              product: {
-                sku: product.sku,
-                productFields: product.productFields,
-              },
-              requestedQty,
-            })),
-            headquarters: { id: hqSelected.id },
-            manufacturing: { id: manufacturingSelected.id },
-            warehouse: { id: warehouseSelected.id },
-            notes: remarks,
-          })
-          .then(() => {
-            addToast("Successfully created procurement order", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            navigate("/sm/procurements");
-          })
-          .catch((err) =>
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            })
-          );
+        createProcurement({
+          lineItems: lineItems.map(({ product, requestedQty }) => ({
+            product: {
+              sku: product.sku,
+              productFields: product.productFields,
+            },
+            requestedQty,
+          })),
+          headquarters: { id: hqSelected.id },
+          manufacturing: { id: manufacturingSelected.id },
+          warehouse: { id: warehouseSelected.id },
+          notes: remarks,
+        });
       else
-        api
-          .update(`sam/procurementOrder/update/${hqSelected.id}`, {
-            id: orderId,
-            lineItems: lineItems.map(({ product, requestedQty }) => ({
-              product,
-              requestedQty,
-            })),
-            headquarters: { id: hqSelected.id },
-            manufacturing: { id: manufacturingSelected.id },
-            warehouse: { id: warehouseSelected.id },
-            notes: remarks,
-          })
-          .then(() => {
-            addToast("Successfully updated procurement order", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            navigate(`/sm/procurements/${orderId}`);
-          })
-          .catch((err) =>
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            })
-          );
+        updateProcurement({
+          id: orderId,
+          lineItems: lineItems.map(({ product, requestedQty }) => ({
+            product,
+            requestedQty,
+          })),
+          headquarters: { id: hqSelected.id },
+          manufacturing: { id: manufacturingSelected.id },
+          warehouse: { id: warehouseSelected.id },
+          notes: remarks,
+        });
   };
 
   const onCancelClicked = () =>

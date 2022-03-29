@@ -44,6 +44,7 @@ import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
+import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.stripe.exception.StripeException;
@@ -627,8 +628,26 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (onlineOrder.getVoucher() != null) {
             customerService.redeemVoucher(onlineOrder.getVoucher().getVoucherCode());
         }
+        if (onlineOrder.isDelivery()) {
+            onlineOrder.setSite(siteService.getSite(3L));
+        } else {
+            boolean pickupSiteHasStock = true;
+            Long pickupSiteId = onlineOrder.getPickupSite().getId();
 
-        onlineOrder.setSite(siteService.getSite(3L));
+            for (CustomerOrderLI coli : onlineOrder.getLineItems()) {
+                StockLevelLI stoli = siteService.getStockLevelLI(pickupSiteId, coli.getProduct().getSku());
+                if (stoli.getQty() < coli.getQty()) {
+                    pickupSiteHasStock = false;
+                }
+            }
+
+            if (pickupSiteHasStock) {
+                onlineOrder.setSite(onlineOrder.getPickupSite());
+            } else {
+                onlineOrder.setSite(siteService.getSite(3L));
+            }
+        }
+
         onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
         em.persist(onlineOrder);
         finaliseCustomerOrder(onlineOrder);

@@ -18,7 +18,7 @@ public class Model {
     @Id
     private String modelCode;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(length = 512)
@@ -26,7 +26,10 @@ public class Model {
     private String description;
 
     @Column(nullable = false, scale = 2)
-    private double price;
+    private double listPrice;
+
+    @Column(nullable = false, scale = 2)
+    private double discountPrice;
 
     @Column(nullable = false)
     private boolean onlineOnly;
@@ -49,12 +52,14 @@ public class Model {
         productFields = new HashSet<>();
     }
 
-    public Model(String modelCode, String name, String description, double price, boolean onlineOnly,
+    public Model(String modelCode, String name, String description, double listPrice, double discountPrice,
+            boolean onlineOnly,
             boolean available) {
         this(modelCode);
         this.name = name;
         this.description = description;
-        this.price = price;
+        this.listPrice = listPrice;
+        this.discountPrice = discountPrice;
         this.onlineOnly = onlineOnly;
         this.available = available;
     }
@@ -83,12 +88,24 @@ public class Model {
         this.description = description;
     }
 
-    public double getPrice() {
-        return this.price;
+    public double getListPrice() {
+        return this.listPrice;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setListPrice(double listPrice) {
+        this.listPrice = listPrice;
+    }
+
+    public double getDiscountPrice() {
+        return this.discountPrice;
+    }
+
+    public void setDiscountPrice(double discountPrice) {
+        this.discountPrice = discountPrice;
+    }
+
+    public boolean getAvailable() {
+        return this.available;
     }
 
     public boolean isOnlineOnly() {
@@ -135,7 +152,8 @@ public class Model {
             return false;
         }
         Model model = (Model) o;
-        if ((this.modelCode == null && model.modelCode == null) || (this.modelCode == null && !this.modelCode.equals(model.modelCode))) {
+        if ((this.modelCode == null && model.modelCode == null)
+                || (this.modelCode == null && !this.modelCode.equals(model.modelCode))) {
             return false;
         }
         return true;

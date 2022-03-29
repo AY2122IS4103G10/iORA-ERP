@@ -1,8 +1,10 @@
 package com.iora.erp.model.company;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +16,7 @@ import javax.persistence.OneToMany;
 public class Vendor implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private String companyName;
@@ -22,7 +24,7 @@ public class Vendor implements Serializable {
     private String description;
     private String email;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Address> address;
 
     public Vendor() {
@@ -33,6 +35,7 @@ public class Vendor implements Serializable {
         this.telephone = telephone;
         this.description = description;
         this.email = email;
+        this.address = new ArrayList<>();
     }
 
     public Long getId() {

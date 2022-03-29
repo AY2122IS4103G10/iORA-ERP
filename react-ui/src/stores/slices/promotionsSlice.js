@@ -10,7 +10,7 @@ const initialState = {
 export const fetchPromotions = createAsyncThunk(
   "promotions/fetchPromotions",
   async () => {
-    const response = await api.getAll("promotion");
+    const response = await api.getAll("sam/promotionFields");
     return response.data;
   }
 );
@@ -18,7 +18,7 @@ export const fetchPromotions = createAsyncThunk(
 export const addNewPromotion = createAsyncThunk(
   "promotions/addNewPromotion",
   async (initialProduct) => {
-    const response = await api.create("promotion", initialProduct);
+    const response = await api.create("sam/promoField", initialProduct);
     return response.data;
   }
 );
@@ -26,11 +26,7 @@ export const addNewPromotion = createAsyncThunk(
 export const updateExistingPromotion = createAsyncThunk(
   "promotions/updateExistingPromotion",
   async (existingPromotion) => {
-    const response = await api.update(
-      "promotion",
-      existingPromotion.modelCode,
-      existingPromotion
-    );
+    const response = await api.update("sam/promoField", existingPromotion);
     return response.data;
   }
 );
@@ -52,7 +48,7 @@ const promotionsSlice = createSlice({
     });
     builder.addCase(fetchPromotions.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.promotions = state.promotions.concat(action.payload);
+      state.promotions = action.payload;
     });
     builder.addCase(fetchPromotions.rejected, (state, action) => {
       state.status = "failed";
@@ -61,32 +57,11 @@ const promotionsSlice = createSlice({
       state.promotions.push(action.payload);
     });
     builder.addCase(updateExistingPromotion.fulfilled, (state, action) => {
-      const {
-        modelCode,
-        name,
-        description,
-        fashionLine,
-        price,
-        onlineOnly,
-        available,
-        productFields,
-      } = action.payload;
-      const existingProd = state.promotions.find(
-        (promo) => promo.modelCode === modelCode
-      );
-      if (existingProd) {
-        existingProd.name = name;
-        existingProd.description = description;
-        existingProd.fashionLine = fashionLine;
-        existingProd.price = price;
-        existingProd.onlineOnly = onlineOnly;
-        existingProd.available = available;
-        existingProd.productFields = productFields;
-      }
+      state.status = "idle";
     });
     builder.addCase(deleteExistingPromotion.fulfilled, (state, action) => {
       state.promotions = state.promotions.filter(
-        ({ prodCode }) => prodCode !== action.payload.prodCode
+        ({ id }) => id !== action.payload.id
       );
     });
   },
@@ -96,5 +71,5 @@ export default promotionsSlice.reducer;
 
 export const selectAllPromotions = (state) => state.promotions.promotions;
 
-export const selectProductByCode = (state, modelCode) =>
-  state.promotions.promotions.find((product) => product.modelCode === modelCode);
+export const selectPromotionById = (state, id) =>
+  state.promotions.promotions.find((promo) => promo.id === id);

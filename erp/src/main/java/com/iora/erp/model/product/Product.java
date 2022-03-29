@@ -5,52 +5,55 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.iora.erp.model.site.StockLevelLI;
+
 @Entity
 public class Product {
-    
     @Id
     private String sku;
 
-    @OneToMany
-    @JoinColumn(name = "productSKU")
-    private List<ProductItem> productItems;
+    @Column(nullable = false)
+    private int baselineQty;
 
     @ManyToMany
     private Set<ProductField> productFields;
 
+    @JsonBackReference
+    @OneToMany(mappedBy = "product")
+    private List<StockLevelLI> stockLevels;
+
     public Product() {
+        this.baselineQty = 0;
+        this.productFields = new HashSet<>();
+        this.stockLevels = new ArrayList<>();
     }
 
     public Product(String sku) {
+        this();
         this.sku = sku;
-        this.productItems = new ArrayList<>();
-        this.productFields = new HashSet<>();
     }
 
-    public String getsku() {
+    public String getSku() {
         return this.sku;
     }
 
-    public void setsku(String sku) {
+    public void setSku(String sku) {
         this.sku = sku;
     }
 
-    public List<ProductItem> getProductItems() {
-        return this.productItems;
+    public int getBaselineQty() {
+        return this.baselineQty;
     }
 
-    public void setProductItems(List<ProductItem> productItems) {
-        this.productItems = productItems;
-    }
-
-    public void addProductItem(ProductItem productItem) {
-        this.productItems.add(productItem);
+    public void setBaselineQty(int baselineQty) {
+        this.baselineQty = baselineQty;
     }
 
     public Set<ProductField> getProductFields() {
@@ -65,23 +68,22 @@ public class Product {
         this.productFields.add(productField);
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (!(object instanceof Product)) {
-            return false;
-        }
-        Product other = (Product) object;
-        if ((this.sku == null && other.sku == null) || (this.sku == null && !this.sku.equals(other.sku))) {
-            return false;
-        }
-        return true;
+    public List<StockLevelLI> getStockLevels() {
+        return this.stockLevels;
+    }
+
+    public void setStockLevels(List<StockLevelLI> stockLevels) {
+        this.stockLevels = stockLevels;
     }
 
     @Override
-    public String toString() {
-        return "entity.Field[ sku=" + sku + " ]";
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Product)) {
+            return false;
+        }
+        Product product = (Product) o;
+        return product.getSku().equals(this.sku);
     }
 }

@@ -1,32 +1,29 @@
 package com.iora.erp.model.customerOrder;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.Product;
 
 @Entity
-public class ExchangeLI implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class ExchangeLI {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(optional = false)
-    private ProductItem oldItem;
+    private Product oldItem;
 
     @OneToOne(optional = false)
-    private ProductItem newItem;
+    private Product newItem;
 
     public ExchangeLI() {
     }
 
-    public ExchangeLI(ProductItem oldItem, ProductItem newItem) {
+    public ExchangeLI(Product oldItem, Product newItem) {
         this();
         this.oldItem = oldItem;
         this.newItem = newItem;
@@ -40,19 +37,19 @@ public class ExchangeLI implements Serializable {
         this.id = id;
     }
 
-    public ProductItem getOldItem() {
+    public Product getOldItem() {
         return this.oldItem;
     }
 
-    public void setOldItem(ProductItem oldItem) {
+    public void setOldItem(Product oldItem) {
         this.oldItem = oldItem;
     }
 
-    public ProductItem getNewItem() {
+    public Product getNewItem() {
         return this.newItem;
     }
 
-    public void setNewItem(ProductItem newItem) {
+    public void setNewItem(Product newItem) {
         this.newItem = newItem;
     }
 }

@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,17 +11,17 @@ import javax.persistence.Id;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-import com.iora.erp.enumeration.Country;
+import com.iora.erp.enumeration.CountryEnum;
 
 @Entity
-public class Address implements Serializable{
+public class Address implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Country country;
+    private CountryEnum country;
     @Column(nullable = false)
     private String city;
     @Column(nullable = false)
@@ -43,15 +42,16 @@ public class Address implements Serializable{
     @Max(180)
     private double longitude;
 
-    public Address(String country, String city, String building, String state, String unit, String road, String postalCode,
+    public Address(CountryEnum country, String city, String building, String state, String unit, String road,
+            String postalCode,
             Boolean billing, double latitude, double longitude) {
-        this.country = Country.valueOf(country.toUpperCase());
-        this.city = city;
-        this.building = building;
-        this.state = state;
-        this.unit = unit;
-        this.road = road;
-        this.postalCode = postalCode;
+        this.country = country;
+        this.city = city.toUpperCase();
+        this.building = building.toUpperCase();
+        this.state = state.toUpperCase();
+        this.unit = unit.toUpperCase();
+        this.road = road.toUpperCase();
+        this.postalCode = postalCode.toUpperCase();
         this.billing = billing;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -68,11 +68,11 @@ public class Address implements Serializable{
         this.id = id;
     }
 
-    public Country getCountry() {
+    public CountryEnum getCountry() {
         return country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(CountryEnum country) {
         this.country = country;
     }
 

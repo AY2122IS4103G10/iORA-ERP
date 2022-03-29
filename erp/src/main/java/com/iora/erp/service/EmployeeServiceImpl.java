@@ -1,6 +1,5 @@
 package com.iora.erp.service;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
 
@@ -11,14 +10,16 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 
-import com.iora.erp.enumeration.AccessRights;
-import com.iora.erp.exception.DepartmentException;
+import com.iora.erp.enumeration.AccessRightsEnum;
+import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.EmployeeException;
-import com.iora.erp.exception.JobTitleException;
-import com.iora.erp.model.company.Department;
 import com.iora.erp.model.company.Employee;
-import com.iora.erp.model.company.JobTitle;
+import com.iora.erp.utils.StringGenerator;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,108 +29,149 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @PersistenceContext
     private EntityManager em;
-
+    @Autowired
+    private EmailService emailService;
+    @Autowired
     private AdminService adminService;
 
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Override
-    public void createEmployee(Employee employee) throws EmployeeException {
+    public Employee createEmployee(Employee employee) throws EmployeeException {
         try {
-            em.persist(employee);
+            if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
+                    employee.getJobTitle().getId()) == true) {
+
+                String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+                employee.setPassword(passwordEncoder().encode(tempPassword));
+                em.persist(employee);
+                emailService.sendTemporaryPassword(employee, tempPassword);
+            } else {
+                throw new EmployeeException("Job Title selected for the Employee: " + employee.getName()
+                        + " is not applicable for the choosen department");
+            }
+            return employee;
         } catch (Exception ex) {
-            throw new EmployeeException("Employee has already been created");
+            throw new EmployeeException("Employee has already been created" + ex.toString());
         }
     }
 
     @Override
-    public void updateEmployeeAccount(Employee employee) throws EmployeeException {
+    public Employee updateEmployeeAccount(Employee employee) throws EmployeeException {
         Employee old = em.find(Employee.class, employee.getId());
-
         if (old == null) {
             throw new EmployeeException("Employee not found");
         }
 
         try {
-            old.setUsername(employee.getUsername());
+            if (adminService.checkJTInDepartment(employee.getDepartment().getId(),
+                    employee.getJobTitle().getId()) == true) {
+
+                if ((!old.getUsername().equals(employee.getUsername()) &&
+                        usernameAvailability(employee.getUsername()) == true) ||
+                        old.getUsername().equals(employee.getUsername())) {
+
+                    if (old.getEmail().equals(employee.getEmail()) ||
+                            (!old.getEmail().equals(employee.getEmail())
+                                    && emailAvailability(old.getEmail()) == true)) {
+
+                        old.setUsername(employee.getUsername());
+                        old.setEmail(employee.getEmail());
+                        
+                        if (employee.getPassword() != null && employee.getPassword() != ""
+                                && !employee.getPassword().equals(old.getPassword())) {
+                            old.setPassword(passwordEncoder().encode(employee.getPassword()));
+                        }
+                        old.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
+                        old.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
+                        old.setName(employee.getName());
+                        old.setSalary(employee.getSalary());
+                        old.setPayType(employee.getPayType());
+
+                        if (!old.getCompany().getId().equals(employee.getCompany().getId())) {
+                            old.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
+                        }
+                        em.merge(old);
+                        return old;
+
+                    } else {
+                        throw new EmployeeException("Email has been taken!");
+                    }
+
+                } else {
+                    throw new EmployeeException("Username has been taken!");
+                }
+            } else {
+                throw new EmployeeException("JobTitle is not applicable for selected Department");
+            }
         } catch (Exception ex) {
-            throw new EmployeeException("Username " + employee.getUsername() + " has been used!");
+            throw new EmployeeException(ex.getMessage());
         }
 
-        // department
-        try {
-            Department d = adminService.getDepartmentById(employee.getDepartment().getId());
-            old.setDepartment(d);
-        } catch (DepartmentException e) {
-            throw new EmployeeException();
-        }
-
-        try {
-            JobTitle j = adminService.getJobTitleById(employee.getJobTitle().getId());
-            old.setJobTitle(j);
-        } catch (JobTitleException e) {
-            throw new EmployeeException();
-        }
-
-        old.setName(employee.getName());
-        old.setSalary(employee.getSalary());
     }
 
     @Override
-    public void blockEmployee(Employee employee) throws EmployeeException {
-        Employee e = em.find(Employee.class, employee.getId());
+    public Employee blockEmployee(Long id) throws EmployeeException {
+        Employee e = em.find(Employee.class, id);
 
         if (e == null) {
             throw new EmployeeException("Employee not found");
         }
         e.setAvailStatus(false);
+        return e;
     }
 
     @Override
-    public void unblockEmployee(Employee employee) throws EmployeeException {
-        Employee e = em.find(Employee.class, employee.getId());
+    public Employee unblockEmployee(Long id) throws EmployeeException {
+        Employee e = em.find(Employee.class, id);
 
         if (e == null) {
             throw new EmployeeException("Employee not found");
         }
         e.setAvailStatus(true);
+        return e;
     }
 
     @Override
-    public void removeEmployee(Employee employee) throws EmployeeException {
+    public void removeEmployee(Long id) throws EmployeeException {
         try {
-            Employee e = em.find(Employee.class, employee.getId());
+            Employee e = em.find(Employee.class, id);
 
             if (e == null) {
                 throw new EmployeeException("Employee not found");
             }
-
             em.remove(e);
             em.flush();
         } catch (IllegalArgumentException | TransactionRequiredException ex) {
-            blockEmployee(employee);
+            blockEmployee(id);
         }
     }
 
     @Override
     public List<Employee> listOfEmployee() throws EmployeeException {
         try {
-            Query q = em.createQuery("SELECT e FROM Employee e");
+            return em.createQuery("SELECT e FROM Employee e", Employee.class).getResultList();
 
-            // need run test if query exits timing for large database
-            return q.getResultList();
         } catch (Exception ex) {
             throw new EmployeeException();
         }
     }
 
     @Override
-    public List<Employee> getEmployeeByFields(String search) {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.getEmail) Like :email OR " +
-                "LOWER(e.getName) Like :name OR LOWER(c.getUsername) Like :username OR c.getSalary Like :salary");
-        q.setParameter("email", "%" + search.toLowerCase() + "%");
-        q.setParameter("username", "%" + search.toLowerCase() + "%");
-        q.setParameter("name", "%" + search.toLowerCase() + "%");
-        q.setParameter("salary", "%" + search + "%");
-        return q.getResultList();
+    public List<Employee> getEmployeeByFields(String search) throws EmployeeException {
+        if (search == "") {
+            return listOfEmployee();
+        }
+        return em.createQuery("SELECT e FROM Employee e WHERE LOWER(e.email) LIKE :email OR " +
+                "LOWER(e.name) LIKE :name OR LOWER(e.username) LIKE :username OR e.salary LIKE :salary", Employee.class)
+                .setParameter("email", "%" + search.toLowerCase() + "%")
+                .setParameter("username", "%" + search.toLowerCase() + "%")
+                .setParameter("name", "%" + search.toLowerCase() + "%")
+                .setParameter("salary", "%" + search + "%")
+                .getResultList();
     }
 
     @Override
@@ -144,7 +186,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee getEmployeeByUsername(String username) throws EmployeeException {
-        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.getUsername = :username");
+        Query q = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
         q.setParameter("username", username);
 
         try {
@@ -156,35 +198,52 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Set<AccessRights> getEmployeeAccessRights(Long id) throws EmployeeException {
-        return getEmployeeById(id).getAccessRights();
+    public Set<AccessRightsEnum> getEmployeeAccessRights(Long id) throws EmployeeException {
+        return getEmployeeById(id).getJobTitle().getResponsibility();
     }
 
     @Override
-    public Set<AccessRights> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
-        return getEmployeeByUsername(username).getAccessRights();
+    public Set<AccessRightsEnum> getEmployeeAccessRightsByUsername(String username) throws EmployeeException {
+        return getEmployeeByUsername(username).getJobTitle().getResponsibility();
     }
 
     @Override
-    public byte[] saltGeneration() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
+    public Boolean usernameAvailability(String username) {
+        return em.createQuery("SELECT e FROM Employee e WHERE e.username = :username")
+                .setParameter("username", username).getResultList().size() == 0;
     }
 
     @Override
-    public Employee loginAuthentication(Employee employee) throws EmployeeException {
+    public Boolean emailAvailability(String email) {
+        return em.createQuery("SELECT e FROM Employee e WHERE e.email = :email")
+                .setParameter("email", email).getResultList().size() == 0;
+    }
+
+    @Override
+    public Employee loginAuthentication(String username, String password) throws AuthenticationException {
         try {
-            Employee c = getEmployeeByUsername(employee.getUsername());
-            if (c.authentication(employee.getHashPass())) {
-                return c;
-            } else {
-                throw new EmployeeException();
-            }
-        } catch (Exception ex) {
-            throw new EmployeeException("Invalid Username or Password.");
-        }
+            Employee c = getEmployeeByUsername(username);
 
+            if (passwordEncoder().matches(password, c.getPassword())) {
+                if (c.getAvailStatus() == true) {
+                    return c;
+                } else {
+                    throw new AuthenticationException("Your account has been terminated.");
+                }
+            } else {
+                throw new EmployeeException("Authentication Fail. Invalid Username or Password.");
+            }
+        } catch (EmployeeException ex) {
+            throw new AuthenticationException("Authentication Fail. Invalid Username or Password.");
+        }
+    }
+
+    @Override
+    public void resetPassword(Long id) throws EmployeeException {
+        Employee e = getEmployeeById(id);
+        String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+        e.setPassword(passwordEncoder().encode(tempPassword));
+
+        emailService.sendTemporaryPassword(e, tempPassword);
     }
 }

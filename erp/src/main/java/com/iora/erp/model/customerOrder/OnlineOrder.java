@@ -1,49 +1,58 @@
 package com.iora.erp.model.customerOrder;
 
-import javax.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 
-import com.iora.erp.enumeration.Country;
-import com.iora.erp.enumeration.OnlineOrderStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iora.erp.enumeration.CountryEnum;
+import com.iora.erp.enumeration.OnlineOrderStatusEnum;
+import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
 
 @Entity
 public class OnlineOrder extends CustomerOrder {
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private OnlineOrderStatus status;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OnlineOrderStatusEnum status;
+
     private boolean delivery;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Country country;
-
-    @Column
+    @JsonBackReference(value = "pickupSite-onlineOrder")
+    @ManyToOne
     private StoreSite pickupSite;
 
-    @Column
+    @Enumerated(EnumType.STRING)
+    private CountryEnum country;
+
     private String deliveryAddress;
+
+    @ElementCollection
+    private List<OOStatus> statusHistory;
 
     public OnlineOrder() {
         super();
-        this.status = OnlineOrderStatus.PENDING;
+        this.status = OnlineOrderStatusEnum.PENDING;
+        this.statusHistory = new ArrayList<>();
     }
 
-    public OnlineOrder(boolean delivery, Country country) {
+    public OnlineOrder(boolean delivery, CountryEnum country) {
         this();
         this.delivery = delivery;
         this.country = country;
     }
 
-    public OnlineOrderStatus getStatus() {
+    public OnlineOrderStatusEnum getStatus() {
         return this.status;
     }
 
-    public void setStatus(OnlineOrderStatus status) {
+    public void setStatus(OnlineOrderStatusEnum status) {
         this.status = status;
     }
 
@@ -59,14 +68,6 @@ public class OnlineOrder extends CustomerOrder {
         this.delivery = delivery;
     }
 
-    public Country getCountry() {
-        return this.country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
-    }
-
     public StoreSite getPickupSite() {
         return this.pickupSite;
     }
@@ -75,11 +76,49 @@ public class OnlineOrder extends CustomerOrder {
         this.pickupSite = pickupSite;
     }
 
+    public CountryEnum getCountry() {
+        return this.country;
+    }
+
+    public void setCountry(CountryEnum country) {
+        this.country = country;
+    }
+
     public String getDeliveryAddress() {
         return this.deliveryAddress;
     }
 
     public void setDeliveryAddress(String deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
+    }
+
+    public List<OOStatus> getStatusHistory() {
+        return this.statusHistory;
+    }
+
+    public void setStatusHistory(List<OOStatus> statusHistory) {
+        this.statusHistory = statusHistory;
+    }
+
+    public void addStatusHistory(OOStatus statusHistory) {
+        this.statusHistory.add(statusHistory);
+    }
+
+    @JsonIgnore
+    public OnlineOrderStatusEnum getLastStatus() {
+        try {
+            return this.statusHistory.get(this.statusHistory.size() - 1).getStatus();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    @JsonIgnore
+    public Site getLastActor() {
+        try {
+            return this.statusHistory.get(this.statusHistory.size() - 1).getActionBy();
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

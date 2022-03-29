@@ -1,31 +1,33 @@
 package com.iora.erp.model.customerOrder;
 
-import java.io.Serializable;
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.Product;
 
 @Entity
-public class RefundLI implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class RefundLI {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(optional = false)
-    private ProductItem refundedItem;
+    private Product product;
+
+    @Column(nullable = false)
+    int qty;
 
     public RefundLI() {
     }
 
-    public RefundLI(ProductItem refundedItem) {
+    public RefundLI(Product product, int qty) {
         this();
-        this.refundedItem = refundedItem;
+        this.product = product;
+        this.qty = qty;
     }
 
     public Long getId() {
@@ -36,11 +38,19 @@ public class RefundLI implements Serializable {
         this.id = id;
     }
 
-    public ProductItem getRefundedItem() {
-        return this.refundedItem;
+    public Product getProduct() {
+        return this.product;
     }
 
-    public void setRefundedItem(ProductItem refundedItem) {
-        this.refundedItem = refundedItem;
-    }    
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public int getQty() {
+        return this.qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
+    }
 }

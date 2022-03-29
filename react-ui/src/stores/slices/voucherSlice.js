@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { api, voucherApi } from "../../environments/Api";
 
 const initialState = {
   vouchers: [],
@@ -10,7 +10,7 @@ const initialState = {
 export const fetchVouchers = createAsyncThunk(
   "vouchers/fetchVouchers",
   async () => {
-    const response = await api.getAll("voucher");
+    const response = await api.getAll("sam/voucher");
     return response.data;
   }
 );
@@ -18,34 +18,56 @@ export const fetchVouchers = createAsyncThunk(
 export const addNewVouchers = createAsyncThunk(
   "vouchers/addNewVouchers",
   async (initialVoucher) => {
-    const response = await api.create("voucher", initialVoucher);
-    return response.data;
+    try {
+      const response = await api.create("sam/voucher", initialVoucher);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
+export const issueVoucher = createAsyncThunk(
+  "vouchers/issueVoucher",
+  async ({ code: voucherCode, id: customerId }) => {
+    try {
+      const response = await voucherApi.issue(voucherCode, customerId);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+export const redeemVoucher = createAsyncThunk(
+  "vouchers/redeemVoucher",
+  async (voucherCode) => {
+    try {
+      const response = await voucherApi.redeem(voucherCode);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
+export const deleteExistingVoucher = createAsyncThunk(
+  "vouchers/deleteExistingVoucher",
+  async (existingVoucherCode) => {
+    try {
+      const response = await api.delete(
+        "sam/voucher/delete",
+        existingVoucherCode
+      );
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 const voucherSlice = createSlice({
   name: "vouchers",
   initialState,
-  reducers: {
-    voucherUpdated(state, action) {
-      const { id, code, value, isIssued, expDate, isRedeemed } = action.payload;
-      const existingVoucher = state.vouchers.find(
-        (voucher) => voucher.id === id
-      );
-      if (existingVoucher) {
-        existingVoucher.code = code;
-        existingVoucher.value = value;
-        existingVoucher.isIssued = isIssued;
-        existingVoucher.expDate = expDate;
-        existingVoucher.isRedeemed = isRedeemed;
-      }
-    },
-    voucherDeleted(state, action) {
-      state.vouchers = state.vouchers.filter(
-        ({ id }) => id !== action.payload.id
-      );
-    },
-  },
   extraReducers(builder) {
     builder.addCase(fetchVouchers.pending, (state, action) => {
       state.status = "loading";
@@ -60,6 +82,28 @@ const voucherSlice = createSlice({
     builder.addCase(addNewVouchers.fulfilled, (state, action) => {
       state.status = "idle";
     });
+    builder.addCase(issueVoucher.fulfilled, (state, action) => {
+      const { voucherCode, issued } = action.payload;
+      const existingVoucher = state.vouchers.find(
+        (voucher) => voucher.voucherCode === voucherCode
+      );
+      if (existingVoucher) {
+        existingVoucher.issued = issued;
+      }
+    });
+    builder.addCase(redeemVoucher.fulfilled, (state, action) => {
+      const { voucherCode, redeemed } = action.payload;
+      const existingVoucher = state.vouchers.find(
+        (voucher) => voucher.voucherCode === voucherCode
+      );
+      if (existingVoucher) {
+        existingVoucher.redeemed = redeemed;
+      }
+      state.status = "idle";
+    });
+    builder.addCase(deleteExistingVoucher.fulfilled, (state, action) => {
+      state.status = "idle";
+    });
   },
 });
 
@@ -69,5 +113,7 @@ export default voucherSlice.reducer;
 
 export const selectAllVouchers = (state) => state.vouchers.vouchers;
 
-export const selectVoucherById = (state, voucherId) =>
-  state.vouchers.vouchers.find((voucher) => voucher.id === voucherId);
+export const selectVoucherByCode = (state, voucherCode) =>
+  state.vouchers.vouchers.find(
+    (voucher) => voucher.voucherCode === voucherCode
+  );

@@ -1,6 +1,5 @@
 package com.iora.erp.model.customerOrder;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -9,11 +8,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.iora.erp.enumeration.PaymentTypeEnum;
+
+//no status?
+//payement
+
 @Entity
-public class Payment implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, scale = 2)
@@ -22,17 +25,21 @@ public class Payment implements Serializable {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime dateTime;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
+    private PaymentTypeEnum paymentType;
+
+    @Column
     private String ccTransactionId;
 
     public Payment() {
         this.dateTime = LocalDateTime.now();
     }
 
-    public Payment(double amount, String ccTransactionId) {
+    public Payment(double amount, String ccTransactionId, PaymentTypeEnum pt) {
         this();
         this.amount = amount;
         this.ccTransactionId = ccTransactionId;
+        this.paymentType = pt;
     }
 
     public Long getId() {
@@ -65,5 +72,13 @@ public class Payment implements Serializable {
 
     public void setCcTransactionId(String ccTransactionId) {
         this.ccTransactionId = ccTransactionId;
+    }
+
+    public PaymentTypeEnum getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(PaymentTypeEnum paymentType) {
+        this.paymentType = paymentType;
     }
 }

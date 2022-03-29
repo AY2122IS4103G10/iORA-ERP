@@ -2,64 +2,23 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../environments/Api";
 
 const initialState = {
-  prodFields: [
-    {
-      fieldId: 1,
-      fieldName: "Color",
-      fieldValue: "RED",
-    },
-    {
-      fieldId: 2,
-      fieldName: "Color",
-      fieldValue: "BLUE",
-    },
-    {
-      fieldId: 3,
-      fieldName: "Color",
-      fieldValue: "YELLOW",
-    },
-    {
-      fieldId: 4,
-      fieldName: "Size",
-      fieldValue: "S",
-    },
-    {
-      fieldId: 5,
-      fieldName: "Size",
-      fieldValue: "M",
-    },
-    {
-      fieldId: 6,
-      fieldName: "Size",
-      fieldValue: "L",
-    },
-    {
-      fieldId: 7,
-      fieldName: "Category",
-      fieldValue: "Dress",
-    },
-    {
-      fieldId: 8,
-      fieldName: "Category",
-      fieldValue: "Shorts",
-    },
-  ],
+  prodFields: [],
   status: "idle",
   error: null,
 };
 
 export const fetchProductFields = createAsyncThunk(
-  "vouchers/fetchProductFields",
+  "productFields/fetchProductFields",
   async () => {
-    const response = await api.getAll("productField");
+    const response = await api.getAll("sam/productField");
     return response.data;
   }
 );
 
 export const addNewProductField = createAsyncThunk(
-  "products/addNewPost",
-  async (initialVoucher) => {
-    const response = await api.create(initialVoucher);
+  "productFields/addNewProductField",
+  async (initialProductField) => {
+    const response = await api.create("sam/productField", initialProductField);
     return response.data;
   }
 );
@@ -67,15 +26,26 @@ export const addNewProductField = createAsyncThunk(
 const prodFieldSlice = createSlice({
   name: "prodFields",
   initialState,
-  reducers: {
-    prodFieldAdded(state, action) {
-      state.prodFields.push(action.payload);
-    },
+  extraReducers(builder) {
+    builder.addCase(fetchProductFields.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(fetchProductFields.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.prodFields = action.payload;
+    });
+    builder.addCase(fetchProductFields.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(addNewProductField.fulfilled, (state, action) => {
+      state.status = "idle";
+    });
   },
 });
 
-export const { prodFieldAdded } = prodFieldSlice.actions;
-
 export default prodFieldSlice.reducer;
 
-export const selectAllProdFields = (state) => state.prodFields.prodFields
+export const selectAllProdFields = (state) => state.prodFields.prodFields;
+
+export const selectProdFieldById = (state, id) =>
+  state.prodFields.prodFields.find((prodField) => prodField.id === id);

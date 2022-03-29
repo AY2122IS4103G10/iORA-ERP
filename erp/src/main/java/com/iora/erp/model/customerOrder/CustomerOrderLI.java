@@ -1,35 +1,51 @@
 package com.iora.erp.model.customerOrder;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 
-import com.iora.erp.model.product.ProductItem;
+import com.iora.erp.model.product.Product;
 
 @Entity
-public class CustomerOrderLI implements Serializable{
-    private static final long serialVersionUID = 1L;
+public class CustomerOrderLI {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private int qty;
 
-    @OneToMany
-    private List<ProductItem> productItems;
+    // Used only for onlineOrder
+    private int pickedQty;
+    private int packedQty;
 
+    @ManyToOne(optional = false)
+    private Product product;
+
+    @Column(scale = 2)
+    private double subTotal;
 
     public CustomerOrderLI() {
-        this.qty = 0;
-        productItems = new ArrayList<>();
+        this.pickedQty = 0;
+        this.packedQty = 0;
+    }
+
+    public CustomerOrderLI(int qty, Product product) {
+        this();
+        this.qty = qty;
+        this.product = product;
+    }
+
+    public CustomerOrderLI(int qty, Product product, double subTotal) {
+        this();
+        this.qty = qty;
+        this.product = product;
+        this.subTotal = subTotal;
     }
 
     public Long getId() {
@@ -44,22 +60,50 @@ public class CustomerOrderLI implements Serializable{
         return this.qty;
     }
 
-    public List<ProductItem> getProductItems() {
-        return this.productItems;
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 
-    public void setProductItems(List<ProductItem> productItems) {
-        this.productItems = productItems;
-        this.qty = this.productItems.size();
+    public int getPickedQty() {
+        return this.pickedQty;
     }
 
-    public void addProductItem(ProductItem productItem) {
-        this.productItems.add(productItem);
-        this.qty = this.productItems.size();
+    public void setPickedQty(int pickedQty) {
+        this.pickedQty = pickedQty;
     }
 
-    public void removeProductItem(ProductItem productItem) {
-        this.productItems.remove(productItem);
-        this.qty = this.productItems.size();
-    }    
+    public int getPackedQty() {
+        return this.packedQty;
+    }
+
+    public void setPackedQty(int packedQty) {
+        this.packedQty = packedQty;
+    }
+
+    public Product getProduct() {
+        return this.product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public double getSubTotal() {
+        return this.subTotal;
+    }
+
+    public void setSubTotal(double subTotal) {
+        this.subTotal = subTotal;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof CustomerOrderLI)) {
+            return false;
+        }
+        CustomerOrderLI customerOrderLI = (CustomerOrderLI) o;
+        return Objects.equals(product, customerOrderLI.product) && Objects.equals(qty, customerOrderLI.qty);
+    }
 }

@@ -1,9 +1,13 @@
 package com.iora.erp.model.site;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,16 +15,18 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
+import com.iora.erp.model.company.Notification;
+import com.iora.erp.model.customerOrder.CustomerOrder;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Site implements Serializable {
 
-    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,6 +41,9 @@ public class Site implements Serializable {
     private String siteCode;
 
     @Column(nullable = false)
+    private String phoneNumber;
+
+    @Column(nullable = false)
     private boolean active;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -43,21 +52,31 @@ public class Site implements Serializable {
     @ManyToOne
     private Company company;
 
+    @OneToMany
+    private List<CustomerOrder> customerOrders;
+
+    @ElementCollection
+    private List<Notification> notifications;
+
     protected Site() {
+        this.stockLevel = new StockLevel();
+        this.customerOrders = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
-    public Site(String name, Address address, String siteCode, Company company) {
+    public Site(String name, Address address, String siteCode, String phoneNumber, Company company) {
+        this();
         this.name = name;
         this.address = address;
         this.siteCode = siteCode;
+        this.phoneNumber = phoneNumber;
         this.company = company;
-        this.stockLevel = new StockLevel();
         this.active = true;
     }
 
     @Override
     public String toString() {
-        return String.format("Site[id=%d, name='%s'", id, name);
+        return String.format("Site[id=%d, name='%s']", id, name);
     }
 
     public Long getId() {
@@ -92,6 +111,14 @@ public class Site implements Serializable {
         this.siteCode = siteCode;
     }
 
+    public String getPhoneNumber() {
+        return this.phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -114,6 +141,41 @@ public class Site implements Serializable {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public List<CustomerOrder> getCustomerOrders() {
+        return customerOrders;
+    }
+
+    public void setCustomerOrders(List<CustomerOrder> customerOrders) {
+        this.customerOrders = customerOrders;
+    }
+
+    public void addCustomerOrder(CustomerOrder customerOrder) {
+        this.customerOrders.add(customerOrder);
+    }
+
+    public List<Notification> getNotifications() {
+        return this.notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
+    public void addNotification(Notification notification) {
+        this.notifications.add(notification);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Site)) {
+            return false;
+        }
+        Site site = (Site) o;
+        return Objects.equals(id, site.id) && Objects.equals(name, site.name);
     }
 
 }

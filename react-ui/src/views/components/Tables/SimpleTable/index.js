@@ -3,7 +3,14 @@
  * React Table Part 1: https://www.samuelliedtke.com/blog/react-table-tutorial-part-1/
  * React Table Part 2: https://www.samuelliedtke.com/blog/react-table-tutorial-part-2/
  */
-import { useState, useMemo, Fragment } from "react";
+import {
+  useState,
+  useMemo,
+  Fragment,
+  forwardRef,
+  useRef,
+  useEffect,
+} from "react";
 import {
   useTable,
   useGlobalFilter,
@@ -11,6 +18,9 @@ import {
   useFilters,
   useSortBy,
   usePagination,
+  useRowSelect,
+  useMountedLayoutEffect,
+  useFlexLayout,
 } from "react-table";
 import { Menu, Transition } from "@headlessui/react";
 import {
@@ -18,6 +28,8 @@ import {
   ChevronDoubleLeftIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
+  TrashIcon,
+  CheckIcon,
 } from "@heroicons/react/outline";
 import { DotsHorizontalIcon } from "@heroicons/react/solid";
 
@@ -31,6 +43,7 @@ const GlobalFilter = ({
   preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
+  headerButton,
 }) => {
   const count = preGlobalFilteredRows.length;
   const [value, setValue] = useState(globalFilter);
@@ -39,19 +52,22 @@ const GlobalFilter = ({
   }, 200);
 
   return (
-    <label className="flex gap-x-2 items-baseline">
-      <span className="text-gray-700">Search: </span>
-      <input
-        type="text"
-        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        value={value || ""}
-        onChange={(e) => {
-          setValue(e.target.value);
-          onChange(e.target.value);
-        }}
-        placeholder={`${count} records...`}
-      />
-    </label>
+    <>
+      <label className="flex gap-x-2 items-baseline">
+        <span className="text-gray-700">Search: </span>
+        <input
+          type="text"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
+          value={value || ""}
+          onChange={(e) => {
+            setValue(e.target.value);
+            onChange(e.target.value);
+          }}
+          placeholder={`${count} records...`}
+        />
+      </label>
+      {headerButton}
+    </>
   );
 };
 
@@ -71,7 +87,7 @@ export const SelectColumnFilter = ({
     <label className="flex gap-x-2 items-baseline">
       <span className="text-gray-700">{render("Header")}: </span>
       <select
-        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-300 focus:ring focus:ring-cyan-200 focus:ring-opacity-50"
         name={id}
         id={id}
         value={filterValue}
@@ -92,9 +108,9 @@ export const SelectColumnFilter = ({
 
 export const OptionsCell = ({ options = [] }) => {
   return (
-    <Menu as="div" className="relative inline-block text-left">
+    <Menu as="div" className="relative z-10 inline-block text-left">
       <div>
-        <Menu.Button className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500">
+        <Menu.Button className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500">
           <span className="sr-only">Open options</span>
           <DotsHorizontalIcon className="h-5 w-5" aria-hidden="true" />
         </Menu.Button>
@@ -134,7 +150,97 @@ export const OptionsCell = ({ options = [] }) => {
   );
 };
 
-export const SimpleTable = ({ columns, data }) => {
+export const DeleteCell = ({ onClick }) => {
+  return (
+    <button
+      className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+      onClick={onClick}
+    >
+      <span className="sr-only">Delete</span>
+      <TrashIcon className="h-5 w-5" aria-hidden="true" />
+    </button>
+  );
+};
+
+export const CheckCell = ({ onClick }) => {
+  return (
+    <button
+      className="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+      onClick={onClick}
+    >
+      <span className="sr-only">Delete</span>
+      <CheckIcon className="h-5 w-5" aria-hidden="true" />
+    </button>
+  );
+};
+export const EditableCell = ({
+  value: initialValue,
+  row: { index },
+  column: { id },
+  min = "1",
+  updateMyData,
+}) => {
+  const [value, setValue] = useState(initialValue);
+
+  const onChange = (e) => {
+    setValue(e.target.value);
+  };
+
+  const onBlur = () => {
+    updateMyData(index, id, value);
+  };
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  return (
+    <input
+      type="number"
+      className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+      min={min}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+    />
+  );
+};
+
+const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
+  const defaultRef = useRef();
+  const resolvedRef = ref || defaultRef;
+
+  useEffect(() => {
+    resolvedRef.current.indeterminate = indeterminate;
+  }, [resolvedRef, indeterminate]);
+
+  return (
+    <>
+      <input
+        type="checkbox"
+        ref={resolvedRef}
+        className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+        {...rest}
+      />
+    </>
+  );
+});
+
+export const SimpleTable = ({
+  columns,
+  data,
+  rowSelect = false,
+  selectedRows = [],
+  setSelectedRows,
+  skipPageReset,
+  headerButton,
+  flex = false,
+  handleOnClick,
+  hiddenColumns = [],
+  globalFilter = true,
+  sortBy = true,
+  filters = true,
+}) => {
   const {
     getTableProps,
     getTableBodyProps,
@@ -152,30 +258,68 @@ export const SimpleTable = ({ columns, data }) => {
     state,
     preGlobalFilteredRows,
     setGlobalFilter,
+    state: { selectedRowIds },
   } = useTable(
-    { columns, data },
-    useFilters,
-    useGlobalFilter,
-    useSortBy,
-    usePagination
+    {
+      columns,
+      data,
+      autoResetPage: !skipPageReset,
+      initialState: {
+        selectedRowIds: selectedRows,
+        hiddenColumns: hiddenColumns,
+      },
+    },
+    filters && useFilters,
+    globalFilter && useGlobalFilter,
+    sortBy && useSortBy,
+    usePagination,
+    useRowSelect,
+    flex && useFlexLayout,
+    (hooks) => {
+      rowSelect &&
+        hooks.visibleColumns.push((columns) => [
+          {
+            id: "selection",
+            Header: ({ getToggleAllRowsSelectedProps }) => (
+              <div>
+                <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+              </div>
+            ),
+            Cell: ({ row }) => (
+              <div>
+                <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+              </div>
+            ),
+          },
+          ...columns,
+        ]);
+    }
   );
+  useMountedLayoutEffect(() => {
+    rowSelect && setSelectedRows(selectedRowIds);
+  }, [rowSelect, setSelectedRows, selectedRowIds]);
+
   return (
     <>
-      <div className="sm:flex sm:gap-x-2">
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-        {headerGroups.map((headerGroup) =>
-          headerGroup.headers.map((column) =>
-            column.Filter ? (
-              <div className="mt-2 sm:mt-0" key={column.id}>
-                {column.render("Filter")}
-              </div>
-            ) : null
-          )
+      <div className="sm:flex justify-between sm:gap-x-2">
+        {globalFilter && (
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={state.globalFilter}
+            setGlobalFilter={setGlobalFilter}
+            headerButton={headerButton}
+          />
         )}
+        {filters &&
+          headerGroups.map((headerGroup) =>
+            headerGroup.headers.map((column) =>
+              column.Filter ? (
+                <div className="mt-2 sm:mt-0" key={column.id}>
+                  {column.render("Filter")}
+                </div>
+              ) : null
+            )
+          )}
       </div>
       <div className="mt-4 flex flex-col">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -185,15 +329,22 @@ export const SimpleTable = ({ columns, data }) => {
                 {...getTableProps()}
                 className="min-w-full divide-y divide-gray-200"
               >
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-200">
                   {headerGroups.map((headerGroup) => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                       {headerGroup.headers.map((column) => (
                         <th
                           scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
                           {...column.getHeaderProps(
-                            column.getSortByToggleProps()
+                            sortBy && column.getSortByToggleProps(),
+                            {
+                              style: {
+                                maxWidth: column.maxWidth,
+                                minWidth: column.minWidth,
+                                width: column.width,
+                              },
+                            }
                           )}
                         >
                           <div className="flex items-center justify-between">
@@ -222,7 +373,16 @@ export const SimpleTable = ({ columns, data }) => {
                     return (
                       <tr
                         {...row.getRowProps()}
-                        className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                        className={[
+                          i % 2 === 0 ? "bg-white" : "bg-gray-50",
+                          Boolean(handleOnClick) &&
+                            "cursor-pointer hover:bg-gray-100",
+                        ].join(" ")}
+                        onClick={
+                          Boolean(handleOnClick)
+                            ? () => handleOnClick(row)
+                            : undefined
+                        }
                       >
                         {row.cells.map((cell) => (
                           <td
@@ -241,6 +401,7 @@ export const SimpleTable = ({ columns, data }) => {
           </div>
         </div>
       </div>
+
       <div className="py-3 flex items-center justify-between">
         <div className="flex-1 flex justify-between sm:hidden">
           <SimpleButton

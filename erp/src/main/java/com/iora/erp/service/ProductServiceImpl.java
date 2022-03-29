@@ -2,6 +2,7 @@ package com.iora.erp.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
@@ -19,8 +20,11 @@ import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
+import com.iora.erp.utils.StringGenerator;
 
 import org.hibernate.NonUniqueResultException;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,9 +58,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductField getProductFieldByNameValue(String fieldName, String fieldValue) throws ProductFieldException {
         Query q = em.createQuery(
-                "SELECT pf FROM ProductField pf WHERE LOWER(pf.fieldName) LIKE :fieldName AND LOWER(pf.fieldValue) LIKE :fieldValue");
-        q.setParameter("fieldName", fieldName.trim().toLowerCase());
-        q.setParameter("fieldValue", fieldValue.trim().toLowerCase());
+                "SELECT pf FROM ProductField pf WHERE pf.fieldName LIKE :fieldName AND pf.fieldValue LIKE :fieldValue");
+        q.setParameter("fieldName", fieldName.trim().toUpperCase());
+        q.setParameter("fieldValue", fieldValue.trim().toUpperCase());
 
         try {
             ProductField pf = (ProductField) q.getSingleResult();
@@ -67,78 +71,144 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void createProductField(ProductField productField) throws ProductFieldException {
+    public String getProductFieldValue(Product product, String fieldName) throws ProductFieldException {
+        Set<ProductField> pFields = product.getProductFields();
+        for (ProductField pf : pFields) {
+            if (pf.getFieldName().equals(fieldName.toUpperCase())) {
+                return pf.getFieldValue();
+            }
+        }
+
+        throw new ProductFieldException("Field value cannot be found with the given Product and Field Name.");
+    }
+
+    @Override
+    public ProductField createProductField(ProductField productField) throws ProductFieldException {
         productField.setFieldName(productField.getFieldName().trim().toUpperCase());
         productField.setFieldValue(productField.getFieldValue().trim().toUpperCase());
         try {
             getProductFieldByNameValue(productField.getFieldName(), productField.getFieldValue());
         } catch (ProductFieldException ex) {
             em.persist(productField);
-            return;
+            return productField;
         }
         throw new ProductFieldException("Product Field with name " + productField.getFieldName() + " and value "
                 + productField.getFieldValue() + " already exist.");
     }
 
     @Override
-    public List<ProductField> getAllProductFields() {
-        TypedQuery<ProductField> q = em.createQuery("SELECT pf FROM ProductField pf", ProductField.class);
-        return q.getResultList();
+    public ProductField createProductField(String name, String value) {
+        try {
+            ProductField pf = getProductFieldByNameValue(name, value);
+            return pf;
+        } catch (ProductFieldException e) {
+            ProductField pf = new ProductField(name, value);
+            em.persist(pf);
+            return pf;
+        }
     }
 
     @Override
-    public PromotionField getPromoField(String fieldName, String fieldValue, double discountedPrice)
-            throws ProductFieldException {
-        Query q = em.createQuery(
-                "SELECT prf FROM PromotionField prf WHERE " +
-                        "LOWER(prf.fieldName) LIKE :fieldName AND LOWER(prf.fieldValue) LIKE :fieldValue AND prf.discountedPrice = :price");
-        q.setParameter("fieldName", fieldName.trim().toLowerCase());
-        q.setParameter("fieldValue", fieldValue.trim().toLowerCase());
-        q.setParameter("price", discountedPrice);
+    public List<ProductField> getAllProductFields() {
+        TypedQuery<ProductField> q1 = em.createQuery("SELECT pf FROM ProductField pf", ProductField.class);
+        List<ProductField> productFields = q1.getResultList();
+        productFields.removeAll(getPromotionFields());
+        return productFields;
+    }
 
+    @Override
+    public PromotionField getPromoField(String fieldName, String fieldValue)
+            throws ProductFieldException {
         try {
-            PromotionField prf = (PromotionField) q.getSingleResult();
-            return prf;
+            return em.createQuery(
+                    "SELECT prf FROM PromotionField prf WHERE LOWER(prf.fieldName) LIKE :fieldName AND "
+                            + " LOWER(prf.fieldValue) LIKE :fieldValue",
+                    PromotionField.class)
+                    .setParameter("fieldName", fieldName.trim().toLowerCase())
+                    .setParameter("fieldValue", fieldValue.trim().toLowerCase()).getSingleResult();
+
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new ProductFieldException("PromotionField does not exist.");
         }
     }
 
     @Override
-    public void addPromoCategory(String modelCode, String category, double discountedPrice)
-            throws ModelException {
+    public PromotionField getPromoFieldOfModel(Model model) throws ProductFieldException {
+        PromotionField promotionField = null;
+        for (ProductField pf : model.getProductFields()) {
+            if (pf instanceof PromotionField) {
+                promotionField = (PromotionField) pf;
+            }
+        }
+
+        if (promotionField != null) {
+            return promotionField;
+        } else {
+            throw new ProductFieldException("There is no promotion going on for this product.");
+        }
+    }
+
+    @Override
+    public PromotionField createPromoField(PromotionField promotionField) throws ProductFieldException {
+        promotionField.setFieldName(promotionField.getFieldName().trim().toUpperCase());
+        promotionField.setFieldValue(promotionField.getFieldValue().trim().toUpperCase());
+        try {
+            getProductFieldByNameValue(promotionField.getFieldName(), promotionField.getFieldValue());
+        } catch (ProductFieldException ex) {
+            if (promotionField.getQuota() > 1 && promotionField.isGlobal()) {
+                throw new ProductFieldException("Invalid Global Product Field. Needs to have quota = 1");
+            }
+            em.persist(promotionField);
+            return promotionField;
+        }
+        throw new ProductFieldException("Product Field with name " + promotionField.getFieldName() + " and value "
+                + promotionField.getFieldValue() + " already exist.");
+    }
+
+    @Override
+    public PromotionField updatePromoField(PromotionField promotionField) throws ProductFieldException {
+        PromotionField old = em.find(PromotionField.class, promotionField.getId());
+        if (old == null) {
+            throw new ProductFieldException("Promotion Field cannot be found.");
+        }
+        promotionField.setFieldName(old.getFieldName());
+        return em.merge(promotionField);
+    }
+
+    @Override
+    public Model addPromoLink(String modelCode, String category) throws ModelException {
         Model model = getModel(modelCode);
 
         try {
-            ProductField pf = getPromoField("category", category, discountedPrice);
+            PromotionField pf = getPromoField("category", category);
+            if (pf.getQuota() > 1) {
+                model.getProductFields()
+                        .removeIf(x -> (x instanceof PromotionField) && ((PromotionField) x).getQuota() > 1);
+            }
             model.addProductField(pf);
+            return model;
         } catch (ProductFieldException ex) {
-            PromotionField prf = new PromotionField();
-            prf.setFieldName("category");
-            prf.setFieldValue(category);
-            prf.setDiscountedPrice(discountedPrice);
-            em.persist(prf);
-            model.addProductField(prf);
+            return model;
         }
     }
 
     @Override
-    public void createModel(Model model) throws ModelException {
+    public Model createModel(Model model) throws ModelException {
         try {
-            em.persist(model);
-        } catch (EntityExistsException ex) {
-            throw new ModelException("Model with model code " + model.getModelCode() + " already exist.");
+            em.persist(createProduct(model));
+            return model;
+        } catch (ProductException | ProductFieldException | EntityExistsException ex) {
+            ex.printStackTrace();
+            throw new ModelException(ex.getMessage());
         }
     }
 
-    @Override
-    public void createProduct(String modelCode, List<ProductField> productFields)
-            throws ProductException, ProductFieldException {
+    private Model createProduct(Model model) throws ProductException, ProductFieldException {
         try {
             List<String> colours = new ArrayList<>();
             List<String> sizes = new ArrayList<>();
 
-            for (ProductField pf : productFields) {
+            for (ProductField pf : model.getProductFields()) {
                 if (pf.getFieldName().equals("COLOUR")) {
                     colours.add(pf.getFieldValue());
                 } else if (pf.getFieldName().equals("SIZE")) {
@@ -146,14 +216,13 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
 
-            Model model = getModel(modelCode);
             List<Product> products = new ArrayList<>();
             int count = 1;
 
             // Loop for each combination of size and colour
             for (int i = 0; i < colours.size(); i++) {
                 for (int j = 0; j < sizes.size(); j++) {
-                    Product p = new Product(modelCode + "-" + count);
+                    Product p = new Product(model.getModelCode() + "-" + count);
 
                     ProductField colourField = getProductFieldByNameValue("colour", colours.get(i));
                     p.addProductField(colourField);
@@ -168,9 +237,8 @@ public class ProductServiceImpl implements ProductService {
             }
 
             model.setProducts(products);
+            return model;
 
-        } catch (ModelException ex) {
-            throw new ProductException("Model with model code " + modelCode + " does not exist.");
         } catch (EntityExistsException ex) {
             throw new ProductException("Product was already created.");
         }
@@ -184,6 +252,18 @@ public class ProductServiceImpl implements ProductService {
             throw new ModelException("Model with model code " + modelCode + " does not exist.");
         } else {
             return model;
+        }
+    }
+
+    @Override
+    public Model getModelByProduct(Product product) throws ModelException {
+        TypedQuery<Model> q = em.createQuery("SELECT m FROM Model m WHERE :product MEMBER OF m.products", Model.class);
+        q.setParameter("product", product);
+        try {
+            return q.getSingleResult();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new ModelException(ex.getMessage());
         }
     }
 
@@ -269,6 +349,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
     public List<Model> getModelsByTag(String tag) {
         try {
             TypedQuery<Model> q;
@@ -283,6 +364,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
     public List<Model> getModelsByCategory(String category) {
         try {
             TypedQuery<Model> q;
@@ -298,7 +380,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateModel(Model model) throws ModelException {
+    public Model updateModel(Model model) throws ModelException {
         Model old = em.find(Model.class, model.getModelCode());
 
         if (old == null) {
@@ -309,26 +391,42 @@ public class ProductServiceImpl implements ProductService {
         old.setAvailable(model.isAvailable());
         old.setName(model.getName());
         old.setOnlineOnly(model.isOnlineOnly());
-        old.setPrice(model.getPrice());
+        old.setListPrice(model.getListPrice());
+        old.setDiscountPrice(model.getDiscountPrice());
         old.setProductFields(model.getProductFields());
+        return old;
     }
 
     @Override
-    public Product getProduct(String sku) throws ProductException {
-        Product product = em.find(Product.class, sku);
+    public Product getProduct(String rfidsku) throws ProductException {
+        Product product = em.find(Product.class, rfidsku);
+        ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
-        if (product == null) {
-            throw new ProductException("Product with the SKU " + sku + " cannot be found.");
-        } else {
-            return product;
+        if (product == null && productItem == null) {
+            throw new ProductException("Product cannot be found.");
+        } else if (product == null) {
+            product = productItem.getProduct();
         }
+
+        return product;
+    }
+
+    @Override
+    public List<Product> getProducts(List<String> rfidskus) throws ProductException {
+        List<Product> products = new ArrayList<>();
+
+        for (String rfidsku : rfidskus) {
+            products.add(getProduct(rfidsku));
+        }
+
+        return products;
     }
 
     @Override
     public List<Product> searchProductsBySKU(String sku) {
         TypedQuery<Product> q;
-        sku = sku.trim();
         if (sku != null) {
+            sku = sku.trim();
             q = em.createQuery("SELECT p FROM Product p WHERE LOWER(p.sku) LIKE :sku", Product.class);
             q.setParameter("sku", "%" + sku.toLowerCase() + "%");
         } else {
@@ -371,30 +469,41 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateProduct(Product product) throws ProductException {
-        Product old = em.find(Product.class, product.getsku());
+    public Product updateProduct(Product product) throws ProductException {
+        Product old = em.find(Product.class, product.getSku());
 
         if (old == null) {
             throw new ProductException("Product not found");
         }
 
-        old.setProductItems(product.getProductItems());
+        old.setProductFields(product.getProductFields());
+        return em.merge(old);
     }
 
     @Override
-    public void createProductItem(String rfid, String sku) throws ProductItemException {
+    public ProductItem createProductItem(String rfid, String sku) throws ProductItemException {
         try {
             Product p = getProduct(sku);
             ProductItem pi = new ProductItem(rfid);
-            pi.setProductSKU(sku);
+            pi.setProduct(p);
             em.persist(pi);
-
-            p.addProductItem(pi);
+            return pi;
         } catch (EntityExistsException ex) {
             throw new ProductItemException("ProductItem with rfid " + rfid + " already exist.");
         } catch (ProductException ex) {
             throw new ProductItemException("Product with sku " + sku + " does not exist.");
         }
+    }
+
+    @Override
+    public List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException {
+        List<ProductItem> piList = new ArrayList<>();
+        for (int i = 0; i < qty; i++) {
+            String rfid = StringGenerator.generateRFID(sku);
+            ProductItem pi = createProductItem(rfid, sku);
+            piList.add(pi);
+        }
+        return piList;
     }
 
     @Override
@@ -408,37 +517,60 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    @Override
-    public List<ProductItem> getProductItemsBySKU(String sku) throws ProductException {
-        Product p = getProduct(sku);
-        return p.getProductItems();
-    }
+    /*
+     * Depracated
+     * 
+     * @Override
+     * public List<ProductItem> getProductItemsBySKU(String sku) throws
+     * ProductException {
+     * Product p = getProduct(sku);
+     * return p.getProductItems();
+     * }
+     * 
+     * @Override
+     * public List<ProductItem> searchProductItems(String rfid) {
+     * TypedQuery<ProductItem> q;
+     * 
+     * if (rfid != null) {
+     * q = em.
+     * createQuery("SELECT pi FROM ProductItem pi WHERE LOWER(pi.rfid) LIKE :rfid",
+     * ProductItem.class);
+     * q.setParameter("rfid", "%" + rfid.toLowerCase() + "%");
+     * } else {
+     * q = em.createQuery("SELECT pi FROM ProductItem pi", ProductItem.class);
+     * }
+     * 
+     * return q.getResultList();
+     * }
+     * 
+     * @Override
+     * public void sellProductItem(String rfid) throws ProductItemException {
+     * rfid = rfid.trim();
+     * ProductItem pi = getProductItem(rfid);
+     * pi.setAvailable(false);
+     * }
+     * 
+     * @Override
+     * public void returnProductItem(String rfid) throws ProductItemException {
+     * rfid = rfid.trim();
+     * ProductItem pi = getProductItem(rfid);
+     * pi.setAvailable(true);
+     * }
+     */
 
     @Override
-    public List<ProductItem> searchProductItems(String rfid) {
-        TypedQuery<ProductItem> q;
+    public JSONObject getProductCartDetails(String rfidsku)
+            throws ProductException, ModelException, JSONException,
+            ProductFieldException {
+        JSONObject jo = new JSONObject();
+        Product p = getProduct(rfidsku);
 
-        if (rfid != null) {
-            q = em.createQuery("SELECT pi FROM ProductItem pi WHERE LOWER(pi.rfid) LIKE :rfid", ProductItem.class);
-            q.setParameter("rfid", "%" + rfid.toLowerCase() + "%");
-        } else {
-            q = em.createQuery("SELECT pi FROM ProductItem pi", ProductItem.class);
-        }
-
-        return q.getResultList();
-    }
-
-    @Override
-    public void sellProductItem(String rfid) throws ProductItemException {
-        rfid = rfid.trim();
-        ProductItem pi = getProductItem(rfid);
-        pi.setAvailable(false);
-    }
-
-    @Override
-    public void returnProductItem(String rfid) throws ProductItemException {
-        rfid = rfid.trim();
-        ProductItem pi = getProductItem(rfid);
-        pi.setAvailable(true);
+        Model m = getModelByProduct(p);
+        jo.put("name", m.getName());
+        jo.put("listPrice", m.getListPrice());
+        jo.put("discountedPrice", m.getDiscountPrice());
+        jo.put("colour", getProductFieldValue(p, "COLOUR"));
+        jo.put("size", getProductFieldValue(p, "SIZE"));
+        return jo;
     }
 }

@@ -3,15 +3,18 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
+import { ToastProvider } from "react-toast-notifications";
 import store from "./stores/store";
 
 ReactDOM.render(
   <Provider store={store}>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <ToastProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ToastProvider>
   </Provider>,
   document.getElementById("root")
 );

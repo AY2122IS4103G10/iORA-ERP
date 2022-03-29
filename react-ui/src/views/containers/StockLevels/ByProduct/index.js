@@ -1,57 +1,65 @@
-import { useMemo } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts, selectAllProducts } from "../../../../stores/slices/productSlice";
+import { SectionHeading } from "../../../components/HeadingWithTabs";
 import { SelectableTable } from "../../../components/Tables/SelectableTable";
-import { SelectColumnFilter } from "../../../components/Tables/SelectableTable";
+
+const columns = [
+  {
+    Header: "SKU Code",
+    accessor: "sku"
+  },
+  {
+    Header: "Name",
+    accessor: "name"
+  },
+  // {
+  //   Header: "Total Qty"
+  // }
+]
 
 
-const getData = () => {
-    const data = [
-        {
-            id: 1,
-            productCode: "SKU1231",
-            name: "Sky Blue V-neck Top",
-            qty: 100,
-        },
-        {
-            id: 0, 
-            productCode: "SKU4321",
-            name: "Black Blue V-neck Top",
-            qty: 100,
-        }
-    ];
-    return data;
-}
+export const ProductTable = (subsys) => {
+  const dispatch = useDispatch();
+  const data = useSelector(selectAllProducts);
 
-export const ProductTable = () => {
-    const columns = useMemo(
-        () => [
-            {
-                Header: "Product Code", 
-                accessor: "productCode"
-            }, 
-            {
-                Header: "Name", 
-                accessor: "name"
-            },
-            {
-                Header: "Quantity", 
-                accessor: "qty",
-            },
-        ],
-        []
-    );
-    const data = useMemo(() => getData(), []);
+  const products = data.flatMap((model) =>
+    model.products.map((product) => ({
+      ...product,
+      name: model.name,
+    })));
 
-    return (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <div className="mt-4">
-          <SelectableTable columns={columns} data={data} path="/sm/stocklevels/products" />
-        </div>
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  const path = "/" + subsys.subsys.subsys + "/stocklevels/products";
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+      <div className="mt-4">
+        <SelectableTable columns={columns} data={products} path={path} />
       </div>
-    );
+    </div>
+  );
 }
 
-export const ProductStocks = () => {
-    return (
-        <ProductTable />
-    );
+export const ProductStocks = (subsys) => {
+
+  let tabs = [
+    { name: 'My Site', href: `/${subsys.subsys}/stocklevels/my`, current: false },
+    { name: 'By Sites', href: `/${subsys.subsys}/stocklevels/sites`, current: false },
+    { name: 'By Products', href: `/${subsys.subsys}/stocklevels/products`, current: true },
+  ]
+
+
+  if (subsys.subsys === "sm") {
+    tabs = tabs.slice(1);
+  }
+
+  return (
+    <>
+      <SectionHeading header="Stock Levels" tabs={tabs} />
+      <ProductTable subsys={subsys} />
+    </>
+  );
 };

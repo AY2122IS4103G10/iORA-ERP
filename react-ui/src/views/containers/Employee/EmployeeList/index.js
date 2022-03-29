@@ -1,55 +1,62 @@
-import { useMemo } from "react";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import moment from "moment";
-import { CogIcon } from "@heroicons/react/outline";
-
+import { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
-  SimpleTable,
+  fetchEmployees,
+  selectAllEmployee
+} from "../../../../stores/slices/employeeSlice";
+import {
+  SelectColumnFilter,
+  SimpleTable
 } from "../../../components/Tables/SimpleTable";
-import { selectAllEmployee } from "../../../../stores/slices/employeeSlice";
 
-export const EmployeeTable = () => {
+
+export const EmployeeTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
+        Header: "#",
         accessor: "id",
-        // Cell: (e) => (
-        //   <Link
-        //     to={`/admin/employee/${e.value}`}
-        //     className="hover:text-gray-700 hover:underline"
-        //   >
-        //     {e.value}
-        //   </Link>
-        // ),name, department, companyCode, status, email
       },
       {
-        Header: "Employee Name",
+        Header: "Name",
         accessor: "name",
-        
-      },
-      {
-        Header: "Department",
-        accessor: "department",
-        //Cell: (e) => `$${e.value}`,
-      },
-      {
-        Header: "Company Code",
-        accessor: "companyCode",
-        //Cell: (e) => moment(e.value).format("lll"),
-      },
-      {
-        Header: "Status",
-        accessor: "status",
-        //Cell: (e) => moment(e.value).format("lll"),
       },
       {
         Header: "Email",
         accessor: "email",
-        // Cell: (e) => (e.value ? "Yes" : "No"),
-        // Filter: SelectColumnFilter,
-        // filter: "includes",
+      },
+      {
+        Header: "Department",
+        accessor: (row) => row.department.deptName,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Job Title",
+        accessor: (row) => row.jobTitle.title,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Company",
+        accessor: (row) => row.company.name,
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Status",
+        accessor: "availStatus",
+        Cell: (e) =>
+          e.value ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              Active
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Disabled
+            </span>
+          ),
       },
       // {
       //   Header: CogIcon,
@@ -58,7 +65,7 @@ export const EmployeeTable = () => {
       //     options: [
       //       {
       //         name: "Delete",
-      //         navigate: "/products",
+      //         navigate: "/employee",
       //       },
       //     ],
       //   }),
@@ -66,16 +73,34 @@ export const EmployeeTable = () => {
     ],
     []
   );
-  const data = useSelector(selectAllEmployee);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
-        <SimpleTable columns={columns} data={data} />
+        <SimpleTable
+          columns={columns}
+          data={data}
+          handleOnClick={handleOnClick}
+        />
       </div>
     </div>
   );
 };
 
 export const EmployeeList = () => {
-  return <EmployeeTable />;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const data = useSelector(selectAllEmployee);
+  const employeeStatus = useSelector((state) => state.employee.status);
+  useEffect(() => {
+    employeeStatus === "idle" && dispatch(fetchEmployees());
+  }, [employeeStatus, dispatch]);
+
+  const handleOnClick = (row) => navigate(`/ad/employees/${row.original.id}`);
+
+  return (
+    Boolean(data.length) && (
+      <EmployeeTable data={data} handleOnClick={handleOnClick} />
+    )
+  );
 };

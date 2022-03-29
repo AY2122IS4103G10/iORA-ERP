@@ -314,6 +314,9 @@ export const orderApi = {
 };
 
 export const posApi = {
+  getOrder(orderId) {
+    return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder/view/${orderId}`);
+  },
   getOrders(siteId) {
     return axiosPrivate.get(`${REST_ENDPOINT}store/customerOrder/${siteId}?orderId=`);
   },
@@ -335,6 +338,12 @@ export const posApi = {
   getVoucherByCode(voucher) {
     return axiosPrivate.get(`${REST_ENDPOINT}store/voucher/${voucher}`);
   },
+  addRefundLineItem(orderId, refundLI) {
+    return axiosPrivate.post(`${REST_ENDPOINT}store/customerOrder/refund/${orderId}}`, refundLI);
+  },
+  addExchangeLineItem(orderId, exchangeLI) {
+    return axiosPrivate.post(`${REST_ENDPOINT}store/customerOrder/refund/${orderId}}`, exchangeLI);
+  }
 };
 
 export const logisticsApi = {

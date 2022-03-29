@@ -468,7 +468,7 @@ public class DataLoader implements CommandLineRunner {
 		Customer c4 = new Customer("Louis", "Misson");
 		c4.setContactNumber("98550432");
 		c4.setDob(LocalDate.of(2000, 1, 1));
-		c4.setEmail(passwordEncoder.encode("louismisson8@gmail.com"));
+		c4.setEmail("louismisson8@gmail.com");
 		c4.setPassword("password");
 		c4.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		customerService.createCustomerAccount(c4);

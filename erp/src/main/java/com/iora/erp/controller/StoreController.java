@@ -7,7 +7,9 @@ import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
+import com.iora.erp.model.customerOrder.RefundLI;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
@@ -380,6 +382,18 @@ public class StoreController {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    @PostMapping(path = "/customerOrder/refund/{orderId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addRefundLineItem(@PathVariable Long orderId, @RequestBody RefundLI refundLineItem) {
+        // TODO
+        return null;
+    }
+
+    @PostMapping(path = "/customerOrder/exchange/{orderId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addRefundLineItem(@PathVariable Long orderId, @RequestBody ExchangeLI exchangeLineItem) {
+        // TODO
+        return null;
     }
 
     @GetMapping(path = "/productDetails/{rfid}", produces = "application/json")

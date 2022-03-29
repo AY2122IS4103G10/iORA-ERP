@@ -5,6 +5,7 @@ import { SectionHeading } from "../../../components/HeadingWithTabs";
 const tabs = [
   { name: "Order", href: "orderPurchase", current: true },
   { name: "History", href: "orderHistory", current: false },
+  { name: "Search Order", href: "orderHistory/search", current: false },
 ];
 
 export const ManagePOS = (subsys) => {

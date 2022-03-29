@@ -12,7 +12,8 @@ public enum AccessRightsEnum {
     WAREHOUSE_BASIC("Can access and use the Warehouse subsystem"),
     WAREHOUSE_ORDER("Can manage procurement and stock transfer orders/requests"),
     STORE_BASIC("Can access and use the Store subsystem"),
-    STORE_INVENTORY("Can manage stock levels and online order pickup");
+    STORE_INVENTORY("Can manage stock levels and online order pickup"),
+    LOGISTICS_BASIC("Can manage deliveries");
 
     private String description;
 

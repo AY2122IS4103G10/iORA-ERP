@@ -7,7 +7,9 @@ import com.iora.erp.exception.StockTransferException;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
+import com.iora.erp.model.customerOrder.RefundLI;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
@@ -376,6 +378,26 @@ public class StoreController {
             @RequestBody List<CustomerOrderLI> lineItems) {
         try {
             return ResponseEntity.ok(stripeService.createPaymentIntent(lineItems, (amt == null) ? 0L : amt * 100));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/refund/{orderId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addRefundLineItem(@PathVariable Long orderId, @RequestBody RefundLI refundLineItem) {
+        try {
+            return ResponseEntity.ok(customerOrderService.createRefundLI(orderId, refundLineItem));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/customerOrder/exchange/{orderId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addExchangeLineItem(@PathVariable Long orderId, @RequestBody ExchangeLI exchangeLineItem) {
+        try {
+            return ResponseEntity.ok(customerOrderService.createExchangeLI(orderId, exchangeLineItem));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());

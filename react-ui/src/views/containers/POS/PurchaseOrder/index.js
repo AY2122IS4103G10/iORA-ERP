@@ -25,7 +25,7 @@ const OrderList = ({
   openSureModal,
 }) => (
   <main>
-    <div className="max-w-5xl mx-auto py-2 px-4 sm:py-2 sm:px-4">
+    <div className="max-w-6xl mx-auto py-2 px-4 sm:py-2 sm:px-6">
       <form>
         <div>
           <label

@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import {
+  addRefundLineItem,
   fetchSiteOrders,
   selectOrderById,
 } from "../../../../stores/slices/posSlice";
@@ -12,15 +13,49 @@ import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { useState } from "react";
 import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 import { TailSpin } from "react-loader-spinner";
+import { useToasts } from "react-toast-notifications";
+import {
+  InformationCircleIcon,
+  ReceiptRefundIcon,
+  ReceiptTaxIcon,
+  XIcon,
+} from "@heroicons/react/solid";
+import { Dialog, Listbox, Transition } from "@headlessui/react";
+import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 
-const Header = ({ order }) => {
+const Header = ({ order, openRefundModal, openExchangeModal }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
-      <div className="flex items-center space-x-3">
-        <div>
+      <div className="flex items-center space-x-3 w-full">
+        <div className="grow">
           <h1 className="text-2xl font-bold text-gray-900">
             Order #{order.id}
           </h1>
+        </div>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            className="inline-flex items-center px-3 py-3 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+            onClick={openRefundModal}
+          >
+            <ReceiptRefundIcon
+              className="-ml-0.5 mr-2 h-4 w-4"
+              aria-hidden="true"
+            />
+            Refund Item
+          </button>
+          <button
+            type="button"
+            className="inline-flex items-center px-3 py-3 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+            onClick={openExchangeModal}
+          >
+            <ReceiptTaxIcon
+              className="-ml-0.5 mr-2 h-4 w-4"
+              aria-hidden="true"
+            />
+            Exchange Item
+          </button>
         </div>
       </div>
     </div>
@@ -109,20 +144,58 @@ const PromoTable = ({ data }) => {
 
 export const OrderDetails = () => {
   const { orderId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { addToast } = useToasts();
   const order = useSelector((state) =>
     selectOrderById(state, parseInt(orderId))
   );
-  const [lineItems, setLineItems] = useState([]);
   const siteId = useSelector(selectUserSite);
-  const dispatch = useDispatch();
   const orderStatus = useSelector((state) => state.pos.status);
+
+  const [lineItems, setLineItems] = useState([]);
+  const [openRefund, setOpenRefund] = useState(false);
+  const [openExchange, setOpenExchange] = useState(false);
+  const [refundSku, setRefundSku] = useState({
+    id: -1,
+    name: "Choose One",
+    qty: 0,
+  });
+  const [refundQty, setRefundQty] = useState("0");
+  const [exchangedSku, setExchangedSku] = useState({
+    id: -1,
+    name: "Choose One",
+    qty: 0,
+  });
+  const [exchangeSku, setExchangeSku] = useState(null);
+
+  const mapRefundQty = (e) => {
+    const maxQty =
+      order.lineItems?.find(
+        (lineItem) => lineItem.product.sku === refundSku.name
+      )?.qty || 0;
+    let q =
+      e.target.value < 0
+        ? 0
+        : e.target.value > maxQty
+        ? maxQty
+        : e.target.value;
+    setRefundQty(q);
+  };
 
   useEffect(() => {
     orderStatus === "idle" && dispatch(fetchSiteOrders(siteId));
   }, [orderStatus, dispatch, siteId]);
 
   useEffect(() => {
-    const orderLineItems = Boolean(order) ? order.lineItems : [];
+    if (!order) {
+      addToast(`Error: You cannot view Customer Order ${orderId}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+      navigate("/str/pos/orderHistory");
+    }
+    const orderLineItems = order?.lineItems || [];
     fetchAllModelsBySkus(orderLineItems).then((data) =>
       setLineItems(
         orderLineItems.map((item, index) => {
@@ -141,7 +214,25 @@ export const OrderDetails = () => {
         })
       )
     );
-  }, [order]);
+  }, [order, addToast, navigate, orderId]);
+
+  const openRefundModal = () => setOpenRefund(true);
+  const closeRefundModal = () => setOpenRefund(false);
+  const openExchangeModal = () => setOpenExchange(true);
+  const closeExchangeModal = () => setOpenExchange(false);
+  const updateOrder = async (event) => {
+    if (event === "refund") {
+      const product = lineItems
+        .map((lineItem) => lineItem.product)
+        .find((prod) => prod.sku === refundSku);
+      dispatch(addRefundLineItem(orderId, { product, qty: refundQty }));
+      closeRefundModal();
+    }
+    if (event === "exchange") {
+      console.log("exchange");
+      closeExchangeModal();
+    }
+  };
 
   return orderStatus === "loading" ? (
     <div className="flex mt-5 items-center justify-center">
@@ -149,9 +240,37 @@ export const OrderDetails = () => {
     </div>
   ) : (
     orderStatus === "succeeded" && (
-      <div className="py-4 xl:py-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <NavigatePrev />
-        <Header order={order} />
+        <Header
+          order={order}
+          openRefundModal={openRefundModal}
+          openExchangeModal={openExchangeModal}
+        />
+        <RefundModal
+          open={openRefund}
+          closeModal={closeRefundModal}
+          onConfirm={() => updateOrder("refund")}
+          lineItems={order?.lineItems.map((lineItem) => {
+            return { index: lineItem.id, name: lineItem.product.sku };
+          })}
+          refundSku={refundSku}
+          refundQty={refundQty}
+          setRefundSku={setRefundSku}
+          setRefundQty={mapRefundQty}
+        />
+        <ExchangeModal
+          open={openExchange}
+          closeModal={closeExchangeModal}
+          onConfirm={() => updateOrder("exchange")}
+          lineItems={order?.lineItems.map((lineItem) => {
+            return { index: lineItem.id, name: lineItem.product.sku };
+          })}
+          exchangedSku={exchangedSku}
+          exchangeSku={exchangeSku}
+          setExchangedSku={setExchangedSku}
+          setExchangeSku={setExchangeSku}
+        />
         <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
           <div className="space-y-6 lg:col-start-1 lg:col-span-2">
             {/* Site Information list*/}
@@ -238,5 +357,215 @@ export const OrderDetails = () => {
         </div>
       </div>
     )
+  );
+};
+
+const RefundModal = ({
+  open,
+  closeModal,
+  onConfirm,
+  lineItems,
+  refundSku,
+  refundQty,
+  setRefundSku,
+  setRefundQty,
+}) => {
+  return (
+    <Transition.Root show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        className="fixed z-10 inset-0 overflow-y-auto"
+        onClose={closeModal}
+      >
+        <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </Transition.Child>
+
+          {/* This element is to trick the browser into centering the modal contents. */}
+          <span
+            className="hidden sm:inline-block sm:align-middle sm:h-screen"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            enterTo="opacity-100 translate-y-0 sm:scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          >
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+              <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
+                <button
+                  type="button"
+                  className="bg-white rounded-md text-gray-400 hover:text-gray-500"
+                  onClick={closeModal}
+                >
+                  <span className="sr-only">Close</span>
+                  <XIcon className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </div>
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <InformationCircleIcon
+                    className="h-6 w-6 text-blue-600"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left grow">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg leading-6 font-medium text-gray-900 mb-3"
+                  >
+                    Refund Item
+                  </Dialog.Title>
+                  <SimpleSelectMenu
+                    className="m-3 p-3"
+                    label="SKU Code"
+                    options={lineItems}
+                    selected={refundSku}
+                    setSelected={setRefundSku}
+                  />
+                  <p className="block text-sm font-medium text-gray-700 mt-2 mb-1">
+                    Refund Quantity
+                  </p>
+                  <SimpleInputBox
+                    type="number"
+                    name="qty"
+                    id="qty"
+                    placeholder={0}
+                    value={refundQty}
+                    onChange={setRefundQty}
+                  />
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={onConfirm}
+                >
+                  Confirm
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:w-auto sm:text-sm"
+                  onClick={closeModal}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </Transition.Child>
+        </div>
+      </Dialog>
+    </Transition.Root>
+  );
+};
+
+const ExchangeModal = ({ open, closeModal, onConfirm, lineItems, exchangedSku, exchangeSku, setExchangedSku, setExchangeSku }) => {
+  return (
+    <Transition.Root show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        className="fixed z-10 inset-0 overflow-y-auto"
+        onClose={closeModal}
+      >
+        <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </Transition.Child>
+
+          {/* This element is to trick the browser into centering the modal contents. */}
+          <span
+            className="hidden sm:inline-block sm:align-middle sm:h-screen"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            enterTo="opacity-100 translate-y-0 sm:scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          >
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+              <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
+                <button
+                  type="button"
+                  className="bg-white rounded-md text-gray-400 hover:text-gray-500"
+                  onClick={closeModal}
+                >
+                  <span className="sr-only">Close</span>
+                  <XIcon className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </div>
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <InformationCircleIcon
+                    className="h-6 w-6 text-blue-600"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left grow">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg leading-6 font-medium text-gray-900 mb-3"
+                  >
+                    Exchange Item
+                  </Dialog.Title>
+                  <SimpleSelectMenu
+                    className="m-3 p-3"
+                    label="SKU Code of Exchanged Item"
+                    options={lineItems}
+                    selected={exchangedSku}
+                    setSelected={setExchangedSku}
+                  />
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={onConfirm}
+                >
+                  Confirm
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:w-auto sm:text-sm"
+                  onClick={closeModal}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </Transition.Child>
+        </div>
+      </Dialog>
+    </Transition.Root>
   );
 };

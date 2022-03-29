@@ -3,6 +3,7 @@ import { posApi } from "../../environments/Api";
 
 const initialState = {
   posOrders: [],
+  searchedOrder: {},
   status: "idle",
   error: null,
 };
@@ -31,6 +32,30 @@ export const getVoucherByCode = createAsyncThunk(
   }
 );
 
+export const fetchAnOrder = createAsyncThunk(
+  "store/getCustomerOrder",
+  async (orderId) => {
+    const response = await posApi.getOrder(orderId);
+    return response.data;
+  }
+);
+
+export const addRefundLineItem = createAsyncThunk(
+  "store/addRefundLI",
+  async (orderId, refundLI) => {
+    const response = await posApi.addRefundLineItem(orderId, refundLI);
+    return response.data;
+  }
+);
+
+export const addExchangeLineItem = createAsyncThunk(
+  "store/addExchangeLI",
+  async (orderId, refundLI) => {
+    const response = await posApi.addExchangeLineItem(orderId, refundLI);
+    return response.data;
+  }
+);
+
 const posSlice = createSlice({
   name: "pos",
   initialState,
@@ -47,6 +72,18 @@ const posSlice = createSlice({
       state.status = "loading";
       state.error = action.error.message;
     });
+    builder.addCase(fetchAnOrder.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.searchedOrder = action.payload;
+    });
+    builder.addCase(addRefundLineItem.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.searchedOrder = action.payload;
+    });
+    builder.addCase(addExchangeLineItem.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.searchedOrder = action.payload;
+    });
   },
 });
 
@@ -54,4 +91,6 @@ export default posSlice.reducer;
 
 export const selectAllOrder = (state) => state.pos.posOrders;
 export const selectOrderById = (state, id) =>
-  state.pos.posOrders.find((order) => order.id === id);
+  state.pos.searchedOrder.id === id
+    ? state.pos.searchedOrder
+    : state.pos.posOrders.find((order) => order.id === id);

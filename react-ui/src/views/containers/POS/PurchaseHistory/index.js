@@ -57,8 +57,8 @@ export const PosPurchaseHistory = () => {
     </div>
   ) : (
     <div className="min-h-full">
-      <main className="py-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="max-w-6xl md:flex md:items-center md:justify-between md:space-x-5 px-3 pt-4">
           <div className="flex items-center space-x-3">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
@@ -67,7 +67,7 @@ export const PosPurchaseHistory = () => {
             </div>
           </div>
         </div>
-        <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+        <div className="mt-8 max-w-6xl grid grid-cols-1 gap-6 lg:grid-flow-col-dense lg:grid-cols-1">
           <div className="space-y-6 lg:col-start-1 lg:col-span-2">
             <section aria-labelledby="stocks-level">
               <div className="ml-2 mr-2">

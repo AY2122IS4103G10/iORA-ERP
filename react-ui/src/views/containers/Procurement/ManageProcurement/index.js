@@ -61,7 +61,7 @@ export const ManageProcurement = ({ subsys, children }) => {
   
   return (
     <>
-      {<Header subsys={subsys} />}
+      <Header subsys={subsys} />
       {children}
     </>
   );

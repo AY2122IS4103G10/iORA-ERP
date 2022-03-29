@@ -4,23 +4,36 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
-
-const convertData = (data) =>
-  data.products.map((product) => ({
-    sku: product.sku,
-    qty: product.qty,
-    reserve: product.reserveQty,
-  }));
+import {
+  fetchAllModelsBySkus,
+} from "../../StockTransfer/StockTransferForm";
+import { useState } from "react";
 
 const columns = [
   {
     Header: "SKU Code",
     accessor: "sku",
+  },{
+    Header: "Name",
+    accessor: "name",
+  },
+  {
+    Header: "Color",
+    accessor: (row) =>
+      row.product.productFields.find(
+        (field) => field.fieldName === "COLOUR"
+      ).fieldValue,
+  },
+  {
+    Header: "Size",
+    accessor: (row) =>
+      row.product.productFields.find((field) => field.fieldName === "SIZE")
+        .fieldValue,
   },
   {
     Header: "Qty",
     accessor: "qty",
-  }
+  },
 ];
 
 const processAddress = (addressObj) => {
@@ -40,11 +53,29 @@ export const AsiteStock = () => {
   const dispatch = useDispatch();
   const site = useSelector(selectSite);
   const status = useSelector((state) => state.sites.status);
+  const [lineItems, setLineItems] = useState([]);
 
   useEffect(() => {
     dispatch(getASite(id));
   }, [dispatch, id]);
 
+  useEffect(() => {
+    const { stockLevel } = site && site;
+    if (stockLevel !== undefined) {
+      const products = stockLevel.products;
+      fetchAllModelsBySkus(products).then(
+        (data) => {
+          setLineItems(
+            products.map((stock, index) => ({
+              ...stock,
+              modelCode: data[index].modelCode,
+              name: data[index].name,
+            }))
+          );
+        }
+      );
+    }
+  }, [site]);
   return status === "succeeded" ? (
     <>
       <div className="min-h-full">
@@ -132,13 +163,13 @@ export const AsiteStock = () => {
                   Stock Levels
                 </h2>
                 <div className="ml-2 mr-2">
-                  {site?.stockLevel === null ||
-                  site?.stockLevel === undefined ? (
+                  {lineItems === null ||
+                  lineItems === undefined ? (
                     <p>loading</p>
                   ) : (
                     <SimpleTable
                       columns={columns}
-                      data={convertData(site.stockLevel)}
+                      data={lineItems}
                     />
                   )}
                 </div>

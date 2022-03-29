@@ -292,7 +292,7 @@ public class CustomerServiceImpl implements CustomerService {
         } else {
             customer.setMembershipPoints(customer.getMembershipPoints() - amount * 100);
         }
-        
+
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, 2);
         Voucher v = new Voucher(amount, cal.getTime());
@@ -325,6 +325,16 @@ public class CustomerServiceImpl implements CustomerService {
     public void deleteMembershipTier(String name) {
         MembershipTier membershipTier = em.find(MembershipTier.class, name);
         if (membershipTier != null) {
+            TypedQuery<Customer> q = em.createQuery("SELECT c FROM Customer c WHERE c.membershipTier = :tier",
+                    Customer.class);
+            q.setParameter("tier", membershipTier);
+
+            for (Customer c : q.getResultList()) {
+                c.setMembershipTier(em
+                        .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
+                        .getResultList().get(0));
+            }
+
             em.remove(membershipTier);
         }
     }

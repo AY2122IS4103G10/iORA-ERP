@@ -217,6 +217,7 @@ public class OnlineCustomerController {
     public ResponseEntity<Object> createOnlineOrder(@RequestBody OnlineOrder onlineOrder,
             @RequestParam(required = false) String paymentIntentId) {
         try {
+            System.out.println("CONTROLLER: " + onlineOrder.getTotalAmount());
             return ResponseEntity.ok(
                     customerOrderService.createOnlineOrder(onlineOrder,
                             (paymentIntentId == "") ? null : paymentIntentId));

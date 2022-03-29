@@ -116,9 +116,9 @@ public class CustomerOrder {
 
     public void setPayments(List<Payment> payments) {
         this.payments = payments;
-        for (Payment p : payments) {
-            this.totalAmount += p.getAmount();
-        }
+        // for (Payment p : payments) {
+        //     this.totalAmount += p.getAmount();
+        // }
     }
 
     public void addPayment(Payment payment) {

@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { checkoutApi } from "../../../../environments/Api";
+import { useNavigate } from "react-router-dom";
 
 
-export default function PaymentForm({ clientSecret, order }) {
+export default function PaymentForm({ clientSecret, order, setConfirmedOrder }) {
     const stripe = useStripe();
+    const navigate = useNavigate();
     const elements = useElements();
-    const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState("");
     const [paymentIntentId, setPaymentIntentId] = useState("");
@@ -37,7 +38,6 @@ export default function PaymentForm({ clientSecret, order }) {
                     setMessage("Your payment was not successful, please try again.");
                     break;
                 case "requires_capture":
-                    console.log("yesss")
                     createOnlineOrder();
                 default:
                     setMessage("Something went wrong.");
@@ -56,7 +56,6 @@ export default function PaymentForm({ clientSecret, order }) {
         }
         setLoading(true);
 
-        //confirm payment
         const error = await stripe.confirmPayment({
             elements,
             redirect: "if_required"
@@ -71,6 +70,7 @@ export default function PaymentForm({ clientSecret, order }) {
         setLoading(false);
     }
 
+  
     const createOnlineOrder = () => {
         let newOrder = {
             ...order,
@@ -82,10 +82,12 @@ export default function PaymentForm({ clientSecret, order }) {
                 },
             ]
         }
-        console.log(newOrder);
         checkoutApi.createOnlineOrder(newOrder, paymentIntentId)
-            .then((response) => console.log(response.data))
-            .catch((err) => setMessage(err))
+            .then((response) => {
+                console.log(response.data)
+                setConfirmedOrder(response.data);
+            })
+            .catch((err) => setMessage(err));
     }
 
 

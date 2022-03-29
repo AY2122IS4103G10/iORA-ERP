@@ -6,10 +6,11 @@ import { selectCart } from "../../../../stores/slices/cartSlice";
 import { selectUserId } from "../../../../stores/slices/userSlice";
 
 import { checkoutApi } from "../../../../environments/Api";
-import { OrderSummary } from "../OrderSummary";
 import { countries } from "../../../../utilities/Util";
+import { OrderSummary } from "../OrderSummary";
 import { CheckoutForm } from "../CheckoutForm";
 import { ManagePayment } from "../ManagePayment";
+import { CheckoutSuccessful } from "../CheckoutSuccessful";
 
 const deliveryMethods = [
     { id: 1, title: 'Standard Shipping', description: '4–10 business days', footer: '$2.50' },
@@ -36,6 +37,8 @@ export const ManageCheckout = () => {
     const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(deliveryMethods[0]);
     const [store, setStore] = useState({ name: "Select Store" });
     const [storeList, setStoreList] = useState();
+
+    const [confirmedOrder, setConfirmedOrder] = useState(null);
 
     const cart = useSelector(selectCart);
     const customerId = useSelector(selectUserId);
@@ -97,8 +100,8 @@ export const ManageCheckout = () => {
 
     return (
         <div className="bg-white">
-            <h1 className="align-middle text-center sm:px-8 sm:py-6 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 ">
-                Checkout
+            <h1 className="align-middle text-center sm:px-8 sm:py-7 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 ">
+                {confirmedOrder !== null ? "Checkout" : "Thank you for Shopping with iORA! Your order is placed."}
             </h1>
 
             <p className="text-gray-900 text-center">
@@ -119,10 +122,13 @@ export const ManageCheckout = () => {
                     selectedDeliveryMethod={selectedDeliveryMethod}
                 />
                 {enterPayment ?
-                    <ManagePayment
-                        order={order}
-                        isDelivery={selectedDeliveryMethod.id === 1 ? true : false}
-                    />
+                    confirmedOrder !== null ?
+                        <ManagePayment
+                            order={order}
+                            isDelivery={selectedDeliveryMethod.id === 1 ? true : false}
+                            setConfirmedOrder={setConfirmedOrder}
+                        />
+                    : <CheckoutSuccessful confirmedOrder={confirmedOrder} />
                     : <CheckoutForm
                         setEmail={setEmail}
                         setPhoneNumber={setPhoneNumber}

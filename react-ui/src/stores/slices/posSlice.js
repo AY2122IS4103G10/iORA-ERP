@@ -42,16 +42,19 @@ export const fetchAnOrder = createAsyncThunk(
 
 export const addRefundLineItem = createAsyncThunk(
   "store/addRefundLI",
-  async (orderId, refundLI) => {
-    const response = await posApi.addRefundLineItem(orderId, refundLI);
+  async ({ orderId, product, qty }) => {
+    const response = await posApi.addRefundLineItem(orderId, { product, qty });
     return response.data;
   }
 );
 
 export const addExchangeLineItem = createAsyncThunk(
   "store/addExchangeLI",
-  async (orderId, refundLI) => {
-    const response = await posApi.addExchangeLineItem(orderId, refundLI);
+  async ({ orderId, oldItem, newItem }) => {
+    const response = await posApi.addExchangeLineItem(orderId, {
+      oldItem,
+      newItem,
+    });
     return response.data;
   }
 );
@@ -78,11 +81,13 @@ const posSlice = createSlice({
     });
     builder.addCase(addRefundLineItem.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.searchedOrder = action.payload;
+      const orderUpdate = state.posOrders.find((order) => order.id === action.payload.id) || state.searchedOrder
+      orderUpdate.refundedLIs = action.payload.refundedLIs;
     });
     builder.addCase(addExchangeLineItem.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.searchedOrder = action.payload;
+      const orderUpdate = state.posOrders.find((order) => order.id === action.payload.id) || state.searchedOrder
+      orderUpdate.exchangedLIs = action.payload.exchangedLIs;
     });
   },
 });

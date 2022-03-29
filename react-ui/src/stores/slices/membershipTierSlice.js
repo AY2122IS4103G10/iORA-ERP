@@ -37,6 +37,25 @@ export const updateExistingMembershipTier = createAsyncThunk(
   }
 );
 
+export const deleteExistingMembershipTier = createAsyncThunk(
+  "membershipTiers/deleteExistingMembershipTier",
+  async (existingMembershipTier) => {
+    const response = await api.delete(
+      "sam/membershipTier/delete",
+      existingMembershipTier
+    );
+    return response.data;
+  }
+  // async (existingMembershipTier) => {
+  //   try {
+  //     const response = await api.delete(existingMembershipTier);
+  //     return response.data;
+  //   } catch (error) {
+  //     return Promise.reject(error.response.data);
+  //   }
+  // }
+);
+
 const membershipTierSlice = createSlice({
   name: "membershipTiers",
   initialState,
@@ -56,6 +75,9 @@ const membershipTierSlice = createSlice({
       state.membershipTiers.sort((x, y) => x.multiplier - y.multiplier);
     });
     builder.addCase(updateExistingMembershipTier.fulfilled, (state, action) => {
+      state.status = "idle";
+    });
+    builder.addCase(deleteExistingMembershipTier.fulfilled, (state, action) => {
       state.status = "idle";
     });
   },

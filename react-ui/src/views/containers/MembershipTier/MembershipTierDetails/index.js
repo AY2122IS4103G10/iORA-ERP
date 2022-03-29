@@ -1,15 +1,16 @@
 import { PencilIcon } from "@heroicons/react/outline";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import {
   fetchMembershipTiers,
   selectMembershipTierByName,
+  deleteExistingMembershipTier
 } from "../../../../stores/slices/membershipTierSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 
-const Header = ({ name }) => {
+const Header = ({ name, openModal }) => {
   const navigate = useNavigate();
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
@@ -29,6 +30,17 @@ const Header = ({ name }) => {
             aria-hidden="true"
           />
           <span>Edit</span>
+        </button>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+          onClick={openModal}
+        >
+          <TrashIcon
+            className="-ml-1 mr-2 h-5 w-5 text-white"
+            aria-hidden="true"
+          />
+          <span>Delete</span>
         </button>
       </div>
     </div>
@@ -117,11 +129,33 @@ export const MembershipTierDetails = () => {
     selectMembershipTierByName(state, name)
   );
   const dispatch = useDispatch();
+  const [openDelete, setOpenDelete] = useState(false);
   const memStatus = useSelector((state) => state.membershipTiers.status);
 
   useEffect(() => {
     memStatus === "idle" && dispatch(fetchMembershipTiers());
   }, [memStatus, dispatch]);
+
+  const openModal = () => setOpenDelete(true);
+  const closeModal = () => setOpenDelete(false);
+
+  const onDeleteMembershipTierClicked = () => {
+    dispatch(deleteExistingMembershipTier(name))
+      .then(() => {
+        closeModal();
+        addToast("Successfully deleted Membership Tier", {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        navigate("/sam/membershipTier");
+      })
+      .catch((err) =>
+        addToast(`Error: ${err.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        })
+      );
+  };
 
   return (
     Boolean(membershipTier) && (
@@ -131,7 +165,10 @@ export const MembershipTierDetails = () => {
             page="Membership Tiers"
             path="/sm/rewards-loyalty/tiers"
           />
-          <Header name={membershipTier.name} />
+          <Header 
+          name={membershipTier.name} 
+          openModal={openModal}
+          />
           <MembershipTierDetailsBody
             minSpend={membershipTier.minSpend}
             // currency={membershipTier.currency}
@@ -139,6 +176,12 @@ export const MembershipTierDetails = () => {
             birthday={membershipTier.birthday}
           />
         </div>
+        <ConfirmDelete
+          item={membershipTier.name}
+          open={openDelete}
+          closeModal={closeModal}
+          onConfirm={onDeleteMembershipTierClicked}
+        />
       </>
     )
   );

@@ -80,12 +80,12 @@ const posSlice = createSlice({
       state.searchedOrder = action.payload;
     });
     builder.addCase(addRefundLineItem.fulfilled, (state, action) => {
-      state.status = "reload";
+      state.status = "succeeded";
       const orderUpdate = state.posOrders.find((order) => order.id === action.payload.id) || state.searchedOrder
       orderUpdate.refundedLIs = action.payload.refundedLIs;
     });
     builder.addCase(addExchangeLineItem.fulfilled, (state, action) => {
-      state.status = "reload";
+      state.status = "succeeded";
       const orderUpdate = state.posOrders.find((order) => order.id === action.payload.id) || state.searchedOrder
       orderUpdate.exchangedLIs = action.payload.exchangedLIs;
     });

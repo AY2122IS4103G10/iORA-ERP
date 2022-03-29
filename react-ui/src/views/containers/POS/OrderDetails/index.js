@@ -124,17 +124,113 @@ const PromoTable = ({ data }) => {
       {
         Header: "Discount",
         accessor: "subTotal",
-        Cell: (e) => e.value.toFixed(2),
+        Cell: (e) => `-$${Number.parseFloat(-e.value).toFixed(2)}`,
       },
     ],
     []
   );
 
   return (
-    <div className="pt-8">
+    <div className="pt-6">
       <div className="md:flex md:items-center md:justify-between">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           Promotions Applied
+        </h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
+const VoucherTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Voucher Code",
+        accessor: "voucherCode",
+      },
+      {
+        Header: "Discount",
+        accessor: "amount",
+        Cell: (e) => `-$${Number.parseFloat(e.value).toFixed(2)}`,
+      },
+      {
+        Header: "Expiry",
+        accessor: "expiry",
+        Cell: (e) => moment(e.value).format("DD/MM/YY"),
+      },
+    ],
+    []
+  );
+  
+  return (
+    <div className="pt-6">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Vouchers Claimed
+        </h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
+const RefundTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Item SKU",
+        accessor: "product.sku",
+      },
+      {
+        Header: "Quantity Refunded",
+        accessor: "qty",
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-6">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Refunded Items
+        </h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
+const ExchangeTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Returned Item SKU",
+        accessor: "oldItem.sku",
+      },
+      {
+        Header: "Exchanged Item SKU",
+        accessor: "newItem.sku",
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-6">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Exchanged Items
         </h3>
       </div>
 
@@ -371,16 +467,19 @@ export const OrderDetails = () => {
                 </div>
               </div>
             </section>
-            {Boolean(lineItems.length) && (
-              <section aria-labelledby="line-items">
-                <ItemTable data={lineItems} />
-              </section>
-            )}
-            {Boolean(order.promotions.length) && (
-              <section aria-labelledby="line-items">
-                <PromoTable data={order.promotions} />
-              </section>
-            )}
+            <section aria-labelledby="line-items">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="md:col-span-2">
+                  {Boolean(lineItems?.length) && <ItemTable data={lineItems} />}
+                </div>
+                {Boolean(order.promotions?.length) && (
+                  <PromoTable data={order.promotions} />
+                )}
+                {order?.voucher && <VoucherTable data={[order?.voucher]} />}
+                {Boolean(order.refundedLIs?.length) && <RefundTable data={order?.refundedLIs} />}
+                {Boolean(order.exchangedLIs?.length) && <ExchangeTable data={order?.exchangedLIs} />}
+              </div>
+            </section>
           </div>
         </div>
       </div>

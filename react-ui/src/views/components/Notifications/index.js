@@ -5,7 +5,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { api } from "../../../environments/Api";
+import { api, updateAccessToken } from "../../../environments/Api";
 import { refreshTokenJwt } from "../../../stores/slices/userSlice";
 
 export function Notifications({ open, setOpen, setNewNoti }) {
@@ -32,7 +32,12 @@ export function Notifications({ open, setOpen, setNewNoti }) {
         setNotifications(data);
       }
     } catch (err) {
-      refreshToken && dispatch(refreshTokenJwt(refreshToken));
+      if (refreshToken) {
+        const { accessToken } = await dispatch(
+          refreshTokenJwt(refreshToken)
+        ).unwrap();
+        updateAccessToken(accessToken);
+      }
     }
   };
 

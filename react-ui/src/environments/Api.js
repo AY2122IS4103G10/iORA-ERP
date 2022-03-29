@@ -11,6 +11,10 @@ if (localStorage.getItem("accessToken")) {
     "Bearer " + localStorage.getItem("accessToken");
 }
 
+export const updateAccessToken = (accessToken) => {
+  axiosPrivate.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+}
+
 let axiosPublic = axios.create();
 
 export const api = {

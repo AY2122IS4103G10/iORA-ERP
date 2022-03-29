@@ -510,10 +510,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         for (CustomerOrderLI coli : colis) {
             if (coli.getProduct().equals(exchangeLI.getOldItem())) {
                 exchangeable = true;
-                coli.setQty(coli.getQty() - 1);
-                if (coli.getQty() == 0) {
-                    colis.remove(coli);
-                }
+                // coli.setQty(coli.getQty() - 1);
+                // if (coli.getQty() == 0) {
+                //     colis.remove(coli);
+                // }
             }
         }
 

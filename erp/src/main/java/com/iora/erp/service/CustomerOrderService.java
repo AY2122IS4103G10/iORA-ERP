@@ -20,82 +20,44 @@ import com.stripe.exception.StripeException;
 
 public interface CustomerOrderService {
         public abstract CustomerOrder getCustomerOrder(Long id) throws CustomerOrderException;
-
         public abstract List<CustomerOrder> searchCustomerOrders(Long siteId, Long orderId);
-
         public abstract List<CustomerOrder> searchStoreOrders(Long siteId, Long orderId);
-
         public abstract List<OnlineOrder> searchOnlineOrders(Long siteId, Long orderId);
-
         public abstract List<OnlineOrder> getPickupOrdersBySite(Long siteId);
 
-        public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret)
-                        throws StripeException, InsufficientPaymentException, CustomerException;
-
+        public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;
         public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
-
-        public abstract CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder)
-                        throws CustomerOrderException, InsufficientPaymentException, CustomerException;
+        public abstract CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException, InsufficientPaymentException, CustomerException;
 
         public abstract CustomerOrderLI getCustomerOrderLI(Long id) throws CustomerOrderException;
-
         public abstract List<CustomerOrderLI> getCustomerOrderLIs(CustomerOrder customerOrder);
-
         public abstract CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI);
-
-        public abstract CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI)
-                        throws CustomerOrderException;
-
-        public abstract List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku)
-                        throws CustomerOrderException;
-
-        public abstract List<CustomerOrderLI> removeFromCustomerOrderLIs(List<CustomerOrderLI> lineItems,
-                        String rfidsku)
-                        throws CustomerOrderException;
+        public abstract CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException;
+        public abstract List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException;
+        public abstract List<CustomerOrderLI> removeFromCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException;
 
         public abstract List<List<CustomerOrderLI>> calculatePromotions(List<CustomerOrderLI> lineItems);
-
         public abstract Payment getPayment(Long id) throws CustomerOrderException;
-
         public abstract List<Payment> getAllPayments();
-
         public abstract Payment createPayment(Payment payment);
-
         public abstract Payment updatePayment(Payment payment) throws CustomerOrderException;
 
         public abstract ExchangeLI getExchangeLI(Long id) throws CustomerOrderException;
-
         public abstract List<ExchangeLI> getAllExchangeLIs();
-
         public abstract ExchangeLI createExchangeLI(ExchangeLI exchangeLI);
-
         public abstract ExchangeLI updateExchangeLI(ExchangeLI exchangeLI) throws CustomerOrderException;
 
         public abstract RefundLI getRefundLI(Long id) throws CustomerOrderException;
-
         public abstract List<RefundLI> getAllRefundLIs();
-
         public abstract RefundLI createRefundLI(RefundLI refundLI);
-
         public abstract RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
 
-        public abstract OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret)
-                        throws StripeException, InsufficientPaymentException, CustomerException;
-
+        public abstract OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;
         public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
-
         public abstract OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
-
-        public abstract OnlineOrder scanProduct(Long orderId, String rfidsku, int qty)
-                        throws CustomerOrderException, NoStockLevelException, IllegalTransferException,
-                        ProductException;
-
+        public abstract OnlineOrder scanProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException;
         public abstract OnlineOrder deliverOnlineOrder(Long orderId) throws CustomerOrderException;
-
         public abstract OnlineOrder deliverMultipleOnlineOrder(Long orderId) throws CustomerOrderException;
-
         public abstract OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
-
         public abstract OnlineOrder collectOnlineOrder(Long orderId) throws CustomerOrderException;
-
 }

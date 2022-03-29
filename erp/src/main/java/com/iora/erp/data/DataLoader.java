@@ -699,7 +699,6 @@ public class DataLoader implements CommandLineRunner {
 		oo1.addLineItem(coli7);
 		oo1.setPaid(true);
 		oo1.addPayment(payment2);
-		oo1.setSite(siteService.getSite(4L));
 		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
 				"189554", "", "60981335");
 		oo1.setDeliveryAddress(da);

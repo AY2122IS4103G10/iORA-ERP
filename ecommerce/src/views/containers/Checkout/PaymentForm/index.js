@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { checkoutApi } from "../../../../environments/Api";
 import { useNavigate } from "react-router-dom";
+import { orderSuccess } from "../../../../stores/slices/purchasesSlice";
 
 
-export default function PaymentForm({ clientSecret, order, setConfirmedOrder }) {
+export default function PaymentForm({ clientSecret, order }) {
     const stripe = useStripe();
     const navigate = useNavigate();
     const elements = useElements();
@@ -85,7 +86,8 @@ export default function PaymentForm({ clientSecret, order, setConfirmedOrder }) 
         checkoutApi.createOnlineOrder(newOrder, paymentIntentId)
             .then((response) => {
                 console.log(response.data)
-                setConfirmedOrder(response.data);
+                orderSuccess(response.data);
+                navigate(`/checkout/success/${response.data.id}`)
             })
             .catch((err) => setMessage(err));
     }

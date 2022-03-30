@@ -9,7 +9,7 @@ const PUBLIC_KEY = "pk_test_51KctAyIg5oaI7BMzEzTNnU7xnLmOYawYBDbGziHVJJhlyGZ1Y86
 
 const stripePromise = loadStripe(PUBLIC_KEY)
 
-export const ManagePayment = ({ order, isDelivery, setConfirmedOrder }) => {
+export const ManagePayment = ({ order, isDelivery }) => {
   const [clientSecret, setClientSecret] = useState(null);
 
   
@@ -33,7 +33,7 @@ export const ManagePayment = ({ order, isDelivery, setConfirmedOrder }) => {
       {clientSecret !== null ? (
         <div className="m-10">
           <Elements options={options} stripe={stripePromise}>
-            <PaymentForm clientSecret={clientSecret} order={order} setConfirmedOrder={setConfirmedOrder}/>
+            <PaymentForm clientSecret={clientSecret} order={order} />
           </Elements>
         </div>)
         : (

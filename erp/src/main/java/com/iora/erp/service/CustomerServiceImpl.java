@@ -394,7 +394,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Long deleteSupportTicket(Long id) throws SupportTicketException {
-        em.remove(getSupportTicket(id));
+        SupportTicket st = getSupportTicket(id);
+        Customer c = st.getCustomer();
+        c.removeSupportTicket(st);
+
+        em.remove(st);
         return id;
     }
 }

@@ -1,7 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
+function getCart() { 
+    if (localStorage.getItem("cart")) {
+        try {
+            return JSON.parse(localStorage.getItem("cart"));
+        } catch {
+            return [];
+        }
+    } else {
+        return [];
+    }
+}
+
+const initialCart = getCart();
+
+
+
 const initialState = {
-    cart: [],
+    cart: initialCart,
     delivery: true,
     status: "idle",
     error: null,
@@ -29,6 +46,7 @@ const cartSlice = createSlice({
             } else {
                 state.cart = state.cart.concat({model: model, product: product, qty: 1});
             }
+            localStorage.setItem("cart", state.cart);
         },
         addCartItemQty(state, action) {
             const product = action.payload;
@@ -42,6 +60,7 @@ const cartSlice = createSlice({
                     return {...item};
                 }
             })
+            localStorage.setItem("cart", state.cart);
         },
         minusCartItemQty(state, action) {
             const product = action.payload;
@@ -55,10 +74,12 @@ const cartSlice = createSlice({
                     return {...item};
                 }
             })
+            localStorage.setItem("cart", state.cart);
         },
         removeItemFromCart(state, action) {
             const product = action.payload;
             state.cart = state.cart.filter((item) => item.product.sku !== product.sku);
+            localStorage.setItem("cart", state.cart);
         }, 
         setDeliveryChoice(state, action) {
             state.delivery = action.payload;

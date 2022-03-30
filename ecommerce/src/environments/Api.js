@@ -77,6 +77,13 @@ export const listingApi = {
       `${REST_ENDPOINT}online/public/viewStock/product/${sku}`
     );
   },
+
+  getModelsBySKUList(skuList) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}online/public/model/skulist`,
+      skuList
+    );
+  }
 }
 
 export const checkoutApi = {
@@ -103,5 +110,12 @@ export const checkoutApi = {
       onlineOrder
     )
   }
+}
 
+export const purchasesApi = {
+  getOrder(id) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}online/order/${id}`,
+    )
+  }
 }

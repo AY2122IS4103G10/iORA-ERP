@@ -32,6 +32,7 @@ public interface ProductService {
 
     public abstract Model createModel(Model model) throws ModelException;
     public abstract Model getModel(String modelCode) throws ModelException;
+    public abstract List<Model> getModelsBySKUList(List<String> skuList) throws ModelException;
     public abstract Model getModelByProduct(Product product) throws ModelException;
     public abstract List<Model> searchModelsByModelCode(String modelCode);
     public abstract List<Model> searchModelsByName(String name);

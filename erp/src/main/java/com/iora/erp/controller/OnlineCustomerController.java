@@ -348,6 +348,15 @@ public class OnlineCustomerController {
         }
     }
 
+    @PostMapping(path = "/public/model/skulist", produces = "application/json")
+    public ResponseEntity<Object> getModelsBySKUList(@RequestBody List<String> skuList) {
+        try {
+            return ResponseEntity.ok(productService.getModelsBySKUList(skuList));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/public/model/modelCode/{modelCode}", produces = "application/json")
     public ResponseEntity<Object> getModelsNameByModelCode(@PathVariable String modelCode) {
         try {
@@ -391,4 +400,5 @@ public class OnlineCustomerController {
     public List<? extends Site> viewStores(@PathVariable String country) {
         return siteService.searchStores(country, "");
     }
+
 }

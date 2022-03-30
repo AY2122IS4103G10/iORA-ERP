@@ -11,6 +11,7 @@ import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
 import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
 import { CustomerForm } from "./views/containers/Customer/CustomerForm";
 import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
+import { ManageDashboard } from "./views/containers/Dashboard/ManageDashboard/index.js";
 import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails";
 import { DepartmentForm } from "./views/containers/Department/DepartmentForm";
 import { ManageDepartment } from "./views/containers/Department/ManageDepartment";
@@ -296,6 +297,11 @@ function App() {
                 <Route path="create" element={<MembershipTierForm />} />
               </Route>
             </Route>
+
+            {/* Analytics */}
+            <Route path="analytics" element={<Outlet />}>
+              <Route index element={<ManageDashboard />} />
+            </Route>
           </Route>
 
           {/* Store Management Subsystem */}
@@ -434,6 +440,9 @@ function App() {
               <Route path=":vendorId" element={<VendorDetails />} />
               <Route path="create" element={<VendorForm />} />
               <Route path="edit/:vendorId" element={<VendorForm />} />
+            </Route>
+            <Route path="analytics" element={<Outlet />}>
+              <Route index element={<ManageDashboard />} />
             </Route>
           </Route>
 

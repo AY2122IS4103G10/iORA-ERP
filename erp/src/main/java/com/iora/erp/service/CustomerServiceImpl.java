@@ -55,6 +55,7 @@ public class CustomerServiceImpl implements CustomerService {
             getCustomerByEmail(customer.getEmail());
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
+            customer.setMembershipTier(findMembershipTierById("BASIC"));
             customer.setPassword(passwordEncoder.encode(customer.getPassword()));
             em.persist(customer);
 
@@ -285,20 +286,20 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer redeemPoints(Long customerId, int amount) throws CustomerException {
-        Customer customer = getCustomerById(customerId);
-        if (customer.getMembershipPoints() < amount * 100) {
+    public Customer redeemPoints(String email, int amount) throws CustomerException {
+        Customer customer = getCustomerByEmail(email);
+        if (customer.getMembershipPoints() < amount) {
             throw new CustomerException("Insufficient membership points");
         } else {
-            customer.setMembershipPoints(customer.getMembershipPoints() - amount * 100);
+            customer.setMembershipPoints(customer.getMembershipPoints() - amount);
         }
-        
+
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, 2);
         Voucher v = new Voucher(amount, cal.getTime());
         em.persist(v);
 
-        issueVoucher(v.getVoucherCode(), customerId);
+        issueVoucher(v.getVoucherCode(), customer.getId());
         return customer;
     }
 
@@ -325,6 +326,16 @@ public class CustomerServiceImpl implements CustomerService {
     public void deleteMembershipTier(String name) {
         MembershipTier membershipTier = em.find(MembershipTier.class, name);
         if (membershipTier != null) {
+            TypedQuery<Customer> q = em.createQuery("SELECT c FROM Customer c WHERE c.membershipTier = :tier",
+                    Customer.class);
+            q.setParameter("tier", membershipTier);
+
+            for (Customer c : q.getResultList()) {
+                c.setMembershipTier(em
+                        .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
+                        .getResultList().get(0));
+            }
+
             em.remove(membershipTier);
         }
     }

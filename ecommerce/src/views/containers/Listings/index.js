@@ -36,7 +36,7 @@ export const Listings = () => {
                                 <Link key={model.modelCode} to={`/products/view/${model.modelCode}`} className="group">
                                     <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
                                         <img
-                                            src="https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-02.jpg"
+                                            src={model.imageLinks[0]}
                                             alt="image"
                                             className="w-full h-full object-center object-cover group-hover:opacity-75"
                                         />

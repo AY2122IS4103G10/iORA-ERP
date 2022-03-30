@@ -1,6 +1,7 @@
 import {
   CogIcon,
-  DocumentReportIcon, LibraryIcon,
+  DocumentReportIcon,
+  LibraryIcon,
   LogoutIcon,
   OfficeBuildingIcon,
   QuestionMarkCircleIcon,
@@ -8,7 +9,7 @@ import {
   TruckIcon,
   UserGroupIcon,
   UserIcon,
-  UsersIcon
+  UsersIcon,
 } from "@heroicons/react/outline";
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
@@ -20,19 +21,24 @@ export const tabs = [
   { name: "Employees", href: "/ad/employees", icon: UsersIcon, index: 0 },
   { name: "Sites", href: "/ad/sites", icon: OfficeBuildingIcon, index: 1 },
   { name: "Companies", href: "/ad/companies", icon: LibraryIcon, index: 2 },
-  { name: "Departments", href: "/ad/departments", icon: UserGroupIcon, index: 3 },
+  {
+    name: "Departments",
+    href: "/ad/departments",
+    icon: UserGroupIcon,
+    index: 3,
+  },
   { name: "Job Titles", href: "/ad/jobTitles", icon: UserIcon, index: 4 },
   { name: "Vendors", href: "/ad/vendors", icon: TruckIcon, index: 5 },
   {
     name: "Reports & Analytics",
-    href: "#",
+    href: "/ad/analytics",
     icon: DocumentReportIcon,
     index: 6,
   },
-]
+];
 const navigation = [
   { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
-  ...tabs
+  ...tabs,
 ];
 
 const secondaryNavigation = [
@@ -43,7 +49,9 @@ const secondaryNavigation = [
 
 export const Header = ({ button, title }) => {
   const location = useLocation();
-  const [currTab, setCurrTab] = useState(tabs.filter(x => x.href === location.pathname)[0].index);
+  const [currTab, setCurrTab] = useState(
+    tabs.filter((x) => x.href === location.pathname)[0].index
+  );
 
   const changeTab = (tabnumber) => setCurrTab(tabnumber);
   return (
@@ -66,14 +74,12 @@ export const Header = ({ button, title }) => {
               </div>
             </div>
           </div>
-          <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-            {button}
-          </div>
+          <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">{button}</div>
         </div>
         <div className="ml-3">
           <div className="sm:block">
             <nav className="-mb-px flex space-x-8">
-              {tabs.map(tab =>
+              {tabs.map((tab) => (
                 <Link
                   key={tab.name}
                   to={tab.href}
@@ -87,7 +93,8 @@ export const Header = ({ button, title }) => {
                   onClick={() => changeTab(tab.index)}
                 >
                   {tab.name}
-                </Link>)}
+                </Link>
+              ))}
             </nav>
           </div>
         </div>

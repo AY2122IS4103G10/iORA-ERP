@@ -1,16 +1,15 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 import {
-  fetchMembershipTiers,
-  selectMembershipTierByName,
-  deleteExistingMembershipTier,
+  deleteExistingMembershipTier, fetchMembershipTiers,
+  selectMembershipTierByName
 } from "../../../../stores/slices/membershipTierSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
+
 
 const Header = ({ name, openModal }) => {
   const navigate = useNavigate();
@@ -33,7 +32,7 @@ const Header = ({ name, openModal }) => {
           />
           <span>Edit</span>
         </button>
-        <button
+        {name !== "BASIC" && <button
           type="button"
           className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
           onClick={openModal}
@@ -43,7 +42,7 @@ const Header = ({ name, openModal }) => {
             aria-hidden="true"
           />
           <span>Delete</span>
-        </button>
+        </button>}
       </div>
     </div>
   );
@@ -151,7 +150,7 @@ export const MembershipTierDetails = () => {
           appearance: "success",
           autoDismiss: true,
         });
-        navigate("/sam/membershipTier");
+        navigate("/sm/rewards-loyalty/tiers");
       })
       .catch((err) =>
         addToast(`Error: ${err.message}`, {
@@ -169,7 +168,10 @@ export const MembershipTierDetails = () => {
             page="Membership Tiers"
             path="/sm/rewards-loyalty/tiers"
           />
-          <Header name={membershipTier.name} openModal={openModal} />
+          <Header
+            name={membershipTier.name}
+            openModal={openModal}
+          />
           <MembershipTierDetailsBody
             minSpend={membershipTier.minSpend}
             // currency={membershipTier.currency}

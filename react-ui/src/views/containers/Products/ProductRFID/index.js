@@ -235,7 +235,8 @@ export const ProductRFID = () => {
     const generateRFIDs = async (map) => {
       const { data } = await productApi.generateRFIDs(map);
       if (data !== "") {
-        setProducts(data);
+        const prods = products
+        setProducts(prods.concat(data));
         setSearch("");
       } else
         addToast(`Error: Product(s) not found.`, {

@@ -691,7 +691,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
         em.persist(onlineOrder);
-        System.out.println("CREATE ONLINE ORDER: " + onlineOrder.getTotalAmount());
         finaliseCustomerOrder(onlineOrder);
 
         onlineOrder.getSite().addNotification(new Notification("NEW Online Order # " + onlineOrder.getId(),

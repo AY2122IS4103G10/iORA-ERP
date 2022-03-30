@@ -296,33 +296,39 @@ const AddProductFormBody = ({
                         <SimpleInputGroup
                           label="Discount Price"
                           inputField="discountPrice"
-                          className="relative rounded-md sm:mt-0 sm:col-span-2"
+                          className="rounded-md sm:mt-0 sm:col-span-2"
                         >
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span className="text-gray-500 sm:text-sm">$</span>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">
+                                $
+                              </span>
+                            </div>
+                            <input
+                              type="number"
+                              name="discountPrice"
+                              id="discountPrice"
+                              autoComplete="discountPrice"
+                              className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                              placeholder="0.00"
+                              min="0"
+                              value={discountPrice}
+                              onChange={onDiscountPriceChanged}
+                              step="0.01"
+                              aria-describedby="discountPrice-currency"
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                              <span
+                                className="text-gray-500 sm:text-sm"
+                                id="discountPrice-currency"
+                              >
+                                SGD
+                              </span>
+                            </div>
                           </div>
-                          <input
-                            type="number"
-                            name="discountPrice"
-                            id="discountPrice"
-                            autoComplete="discountPrice"
-                            className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                            placeholder="0.00"
-                            min="0"
-                            value={discountPrice}
-                            onChange={onDiscountPriceChanged}
-                            required
-                            step="0.01"
-                            aria-describedby="discountPrice-currency"
-                          />
-                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <span
-                              className="text-gray-500 sm:text-sm"
-                              id="discountPrice-currency"
-                            >
-                              SGD
-                            </span>
-                          </div>
+                          <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
+                            Leave blank if there is no discount.
+                          </p>
                         </SimpleInputGroup>
                         <SimpleInputGroup
                           label="Online Only"
@@ -479,7 +485,6 @@ export const ProductForm = () => {
   const [listPrice, setListPrice] = useState("");
   const [discountPrice, setDiscountPrice] = useState("");
   const [onlineOnly, setOnlineOnly] = useState(false);
-  const [products, setProducts] = useState([]);
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [tags, setTags] = useState([]);
@@ -569,20 +574,19 @@ export const ProductForm = () => {
     fields = fields.concat(prepareFields(promotions, promoCheckedState));
 
     if (canAdd) {
+      const product = {
+        modelCode: prodCode,
+        name,
+        description,
+        listPrice,
+        onlineOnly,
+        available: true,
+        products: [],
+        productFields: fields,
+      };
+      if (discountPrice !== "") product["discountPrice"] = discountPrice;
       if (!isEditing) {
-        dispatch(
-          addNewProduct({
-            modelCode: prodCode,
-            name,
-            description,
-            listPrice,
-            discountPrice,
-            onlineOnly,
-            available: true,
-            products: [],
-            productFields: fields,
-          })
-        )
+        dispatch(addNewProduct(product))
           .unwrap()
           .then((data) => {
             addToast("Successfully added product.", {
@@ -598,19 +602,7 @@ export const ProductForm = () => {
             })
           );
       } else {
-        dispatch(
-          updateExistingProduct({
-            modelCode: prodCode,
-            name,
-            description,
-            listPrice,
-            discountPrice,
-            onlineOnly,
-            available: true,
-            products,
-            productFields: fields,
-          })
-        )
+        dispatch(updateExistingProduct(product))
           .unwrap()
           .then((data) => {
             addToast("Successfully updated product", {
@@ -642,7 +634,6 @@ export const ProductForm = () => {
           discountPrice,
           onlineOnly,
           productFields,
-          products,
         } = response.data;
         setIsEditing(true);
         setProdCode(modelCode);
@@ -713,7 +704,6 @@ export const ProductForm = () => {
                 .includes(promo)
             )
         );
-        setProducts(products);
       });
   }, [prodId, colors, sizes, tags, categories, promotions]);
 
@@ -724,7 +714,7 @@ export const ProductForm = () => {
   const onFieldValueChanged = (e) => setFieldValue(e.target.value);
 
   const canAddField = fieldNameSelected && fieldValue;
-  
+
   const onAddFieldClicked = (evt) => {
     evt.preventDefault();
     if (canAddField)

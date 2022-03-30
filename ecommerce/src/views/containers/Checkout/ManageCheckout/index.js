@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { selectCart } from "../../../../stores/slices/cartSlice";
@@ -17,6 +17,7 @@ const deliveryMethods = [
 ]
 
 export const ManageCheckout = () => {
+    const navigate = useNavigate();
     const [enterPayment, setEnterPayment] = useState(false);
 
     const [subTotal, setSubTotal] = useState(0);

@@ -210,7 +210,11 @@ public class Customer implements Serializable {
         this.supportTickets = supportTickets;
     }
 
-    public void addSupportTicke(SupportTicket supportTicket) {
+    public void addSupportTicket(SupportTicket supportTicket) {
         this.supportTickets.add(supportTicket);
+    }
+
+    public void removeSupportTicket(SupportTicket supportTicket) {
+        this.supportTickets.remove(supportTicket);
     }
 }

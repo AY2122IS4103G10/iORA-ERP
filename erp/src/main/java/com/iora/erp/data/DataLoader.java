@@ -720,7 +720,7 @@ public class DataLoader implements CommandLineRunner {
 		st.setCustomerOrder(co1);
 		customerService.createSupportTicket(st);
 
-		cust.addSupportTicke(st);
+		cust.addSupportTicket(st);
 		customerService.updateCustomerAccount(cust);
 	}
 

@@ -342,7 +342,6 @@ export const SupportTicketDetails = () => {
     }
 
     const onInputChanged = (e) => setInput(e.target.value);
-    const [url, setUrl] = useState("");
     const onReplyClicked = (evt) => {
         evt.preventDefault();
         if (Boolean(input)) {
@@ -350,6 +349,7 @@ export const SupportTicketDetails = () => {
             image.append('image', file)
 
             const name = JSON.parse(localStorage.getItem("user")).name
+            var url;
 
             Boolean(file.name) && fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
                 {
@@ -357,33 +357,35 @@ export const SupportTicketDetails = () => {
                     body: image,
                 }
             ).then((response) => response.json())
-                .then((data) => { setUrl(data.data.url) });
+                .then((data) => {
+                    console.log(data);
+                    url = data.data.url;
 
-            dispatch(replySupportTicket(
-                {
-                    ticketId,
-                    name,
-                    body: { input, url }
-                }
-            ))
-                .unwrap()
-                .then(() => {
-                    setFile([]);
-                    setInput("");
-                    setUrl("");
-                })
-                .then(() => {
-                    addToast("Successfully replied to ticket", {
-                        appearance: "success",
-                        autoDismiss: true,
-                    });
+                    dispatch(replySupportTicket(
+                        {
+                            ticketId,
+                            name,
+                            body: { input, url }
+                        }
+                    ))
+                        .unwrap()
+                        .then(() => {
+                            setFile([]);
+                            setInput("");
+                        })
+                        .then(() => {
+                            addToast("Successfully replied to ticket", {
+                                appearance: "success",
+                                autoDismiss: true,
+                            });
 
-                })
-                .catch((err) => {
-                    addToast(`Error: ${err.message}`, {
-                        appearance: "error",
-                        autoDismiss: true,
-                    });
+                        })
+                        .catch((err) => {
+                            addToast(`Error: ${err.message}`, {
+                                appearance: "error",
+                                autoDismiss: true,
+                            });
+                        });
                 });
         }
     }

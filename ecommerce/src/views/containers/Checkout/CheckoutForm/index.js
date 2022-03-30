@@ -172,7 +172,8 @@ export const CheckoutForm = ({
   store,
   setStore,
   storeList,
-  handleMakePayment }) => {
+  handleMakePayment,
+  onCancelClicked, }) => {
 
 
   return (
@@ -266,6 +267,13 @@ export const CheckoutForm = ({
             }
 
             <div className="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
+              <button
+                type="button"
+                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                onClick={onCancelClicked}
+              >
+                Cancel
+              </button>
               <button
                 type="submit"
                 className="w-full bg-gray-900 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500 sm:ml-6 sm:order-last sm:w-auto"

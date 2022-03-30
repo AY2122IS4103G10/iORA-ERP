@@ -600,8 +600,7 @@ const RefundModal = ({
       </Dialog>
     </Transition.Root>
   );
-};
-
+}
 const ExchangeModal = ({
   open,
   closeModal,

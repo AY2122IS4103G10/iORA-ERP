@@ -8,7 +8,7 @@ import { useToasts } from "react-toast-notifications";
 import { productApi } from "../../../../environments/Api";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 
-const ProductList = ({
+export const ProductList = ({
   products,
   handlePrint,
   openModal,
@@ -20,7 +20,7 @@ const ProductList = ({
     <div className="bg-white shadow overflow-hidden sm:rounded-md">
       <ul className="divide-y divide-gray-200">
         {products.map((product) => (
-          <li key={product.sku}>
+          <li key={product.rfid}>
             <div className="px-4 py-4 flex items-center sm:px-6">
               <div className="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
                 <div className="truncate">
@@ -32,9 +32,14 @@ const ProductList = ({
                     }}
                   >
                     <p className="text-base font-medium text-cyan-600 truncate">
-                      {product.sku}
+                      {product.rfid}
                     </p>
                   </button>
+                  <div className="mt-2 flex">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <p>{product.product.sku}</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
@@ -57,7 +62,11 @@ const ProductList = ({
                       <button
                         type="button"
                         className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
-                        onClick={handlePrint}
+                        onClick={() =>
+                          Promise.resolve(
+                            onProductSelectedChanged(product)
+                          ).then(() => handlePrint())
+                        }
                       >
                         <PrinterIcon
                           className="h-5 w-5 text-gray-400"
@@ -78,13 +87,13 @@ const ProductList = ({
 };
 
 const ProductSticker = ({ product }) => {
-  const { sku } = product;
+  const { rfid, product: prod } = product;
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 sm:px-6 sm:py-24 lg:px-8">
       <div className="space-y-2 sm:px-0 sm:flex sm:items-baseline sm:justify-between sm:space-y-0">
-        <h1 className="tracking-tight text-base">{sku}</h1>
+        <h1 className="tracking-tight text-base">SKU: {prod.sku}</h1>
       </div>
-      <Barcode value={sku} width={1} height={100} margin={0} />
+      <Barcode value={rfid} width={1} height={100} margin={0} />
     </div>
   );
 };
@@ -94,7 +103,7 @@ const ProductStickerPrint = forwardRef(({ printQty, product }, ref) => {
     <div ref={ref} className="py-4 overflow-auto">
       <ul className="grid grid-cols-3 gap-6">
         {new Array(parseInt(printQty)).fill(product).map((product, index) => (
-          <li key={index} className="ml-3 col-span-1">
+          <li key={index} className="ml-6 col-span-3">
             <ProductSticker product={product} />
           </li>
         ))}
@@ -124,11 +133,11 @@ const StickerModal = ({ open, closeModal, product }) => {
 };
 
 const ProductRFIDBody = ({
-  enabled,
-  onEnabledChanged,
   onSearchClicked,
   search,
   onSearchChanged,
+  rfidQty,
+  onRfidQtyChanged,
   printQty,
   onPrintQtyChanged,
   products,
@@ -175,8 +184,8 @@ const ProductRFIDBody = ({
                         min="1"
                         className="col-span-1 focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-md sm:text-sm border-gray-300"
                         placeholder="Quantity"
-                        value={printQty}
-                        onChange={onPrintQtyChanged}
+                        value={rfidQty}
+                        onChange={onRfidQtyChanged}
                       />
                     </div>
                   </div>
@@ -185,7 +194,7 @@ const ProductRFIDBody = ({
                   type="submit"
                   className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-3 sm:w-auto sm:text-sm"
                 >
-                  Search
+                  Generate
                 </button>
               </div>
             </form>
@@ -211,39 +220,36 @@ export const ProductRFID = () => {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
-    onBeforeGetContent: (product) => {
-      onProductSelectedChanged(product);
-      return Promise.resolve();
-    },
   });
   const [enabled, setEnabled] = useState(false);
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [productSelected, setProductSelected] = useState(null);
+  const [rfidQty, setRfidQty] = useState(1);
   const [printQty, setPrintQty] = useState(1);
 
   const canSearch = Boolean(search);
   const onSearchClicked = (evt) => {
     evt.preventDefault();
-    if (canSearch) {
-      const skus = search.split(",").map((sku) => sku.trim());
-      productApi.searchProductsBySku(skus).then((response) => {
-        const products = response.data;
-        if (response.data !== "") {
-          setProducts(products);
-        } else
-          addToast(`Error: Product(s) not found.`, {
-            appearance: "error",
-            autoDismiss: true,
-          });
-      });
-    }
+    const generateRFIDs = async (map) => {
+      const { data } = await productApi.generateRFIDs(map);
+      if (data !== "") {
+        setProducts(data);
+        setSearch("");
+      } else
+        addToast(`Error: Product(s) not found.`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+    };
+    if (canSearch) generateRFIDs({ sku: search, qty: rfidQty });
   };
 
   const onEnabledChanged = () => setEnabled(!enabled);
   const onSearchChanged = (e) => setSearch(e.target.value);
   const onProductSelectedChanged = (e) => setProductSelected(e);
+  const onRfidQtyChanged = (e) => setRfidQty(e.target.value);
   const onPrintQtyChanged = (e) => setPrintQty(e.target.value);
 
   const openStickerModal = () => setOpen(true);
@@ -257,6 +263,8 @@ export const ProductRFID = () => {
         onSearchClicked={onSearchClicked}
         search={search}
         onSearchChanged={onSearchChanged}
+        rfidQty={rfidQty}
+        onRfidQtyChanged={onRfidQtyChanged}
         printQty={printQty}
         onPrintQtyChanged={onPrintQtyChanged}
         products={products}

@@ -258,6 +258,9 @@ export const productApi = {
   getModelBySku(sku) {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/model/name/${sku}`);
   },
+  generateRFIDs(map) {
+    return axiosPrivate.post(`${REST_ENDPOINT}warehouse/generateRFID`, map)
+  }
 };
 
 export const onlineOrderApi = {

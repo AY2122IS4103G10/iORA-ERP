@@ -4,9 +4,13 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import com.iora.erp.enumeration.CountryEnum;
 
 @Entity
 public class DeliveryAddress implements Serializable {
@@ -21,25 +25,16 @@ public class DeliveryAddress implements Serializable {
     private String city;
     private String zip;
     private String state;
+    @Enumerated(EnumType.STRING)
+    private CountryEnum country;
     private String phone;
 
     public DeliveryAddress() {
     }
 
-    public DeliveryAddress(String street1, String street2, String city, String zip, String state,
-            String phone) {
-        this.name = "home";
-        this.street1 = street1;
-        this.street2 = street2;
-        this.city = city;
-        this.zip = zip;
-        this.state = state;
-        this.phone = phone;
-    }
-
     public DeliveryAddress(String name, String street1, String street2, String city, String zip, String state,
+            CountryEnum country,
             String phone) {
-        this.name = name;
         this.street1 = street1;
         this.street2 = street2;
         this.city = city;
@@ -110,6 +105,14 @@ public class DeliveryAddress implements Serializable {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public CountryEnum getCountry() {
+        return country;
+    }
+
+    public void setCountry(CountryEnum country) {
+        this.country = country;
     }
 
 }

@@ -13,10 +13,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.iora.erp.model.customerOrder.CustomerOrder;
+import com.iora.erp.model.customerOrder.DeliveryAddress;
 
 @Entity
 public class Customer implements Serializable {
@@ -35,6 +37,8 @@ public class Customer implements Serializable {
     @Column(nullable = false, unique = true)
     private String contactNumber;
     private Integer membershipPoints;
+    @OneToOne
+    private DeliveryAddress address;
     @ManyToOne
     private MembershipTier membershipTier;
     private Double storeCredit;
@@ -216,5 +220,13 @@ public class Customer implements Serializable {
 
     public void removeSupportTicket(SupportTicket supportTicket) {
         this.supportTickets.remove(supportTicket);
+    }
+
+    public DeliveryAddress getAddress() {
+        return address;
+    }
+
+    public void setAddress(DeliveryAddress address) {
+        this.address = address;
     }
 }

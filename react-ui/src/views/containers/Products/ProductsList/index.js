@@ -98,7 +98,7 @@ export const ProductsList = () => {
   const data = useSelector(selectAllProducts);
   const prodStatus = useSelector((state) => state.products.status);
   const error = useSelector((state) => state.products.error);
-
+  console.log(data)
   const handleOnClick = (row) =>
     navigate(`${pathname}/${row.original.modelCode}`);
 

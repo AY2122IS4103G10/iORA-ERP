@@ -589,11 +589,11 @@ export const StockTransferForm = ({ subsys }) => {
         });
       });
       setTo({});
-      setLineItems([])
+      setLineItems([]);
     } else if (e.id === 2) {
       setTo(site);
       setFrom({});
-      setLineItems([])
+      setLineItems([]);
     }
     setSelectedOrderType(e);
   };
@@ -700,11 +700,13 @@ export const StockTransferForm = ({ subsys }) => {
                       <h3 className="text-lg leading-6 font-medium text-gray-900">
                         {isEditing ? "Edit" : "Create"} Stock Transfer Order
                       </h3>
-                      <SimpleInlineRG
-                        options={orderTypes}
-                        selected={selectedOrderType}
-                        onSelectedChanged={onSelectedOrderTypeChanged}
-                      />
+                      {subsys !== "sm" && (
+                        <SimpleInlineRG
+                          options={orderTypes}
+                          selected={selectedOrderType}
+                          onSelectedChanged={onSelectedOrderTypeChanged}
+                        />
+                      )}
                     </div>
                     <div className="grid grid-cols-2">
                       <div className="col-span-1 mt-6 sm:mt-5 space-y-6 sm:space-y-5">

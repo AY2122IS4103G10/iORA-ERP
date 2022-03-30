@@ -727,7 +727,7 @@ public class DataLoader implements CommandLineRunner {
 		co1.setCustomerId(2L);
 		customerOrderService.createCustomerOrder(co1, null);
 
-		OnlineOrder oo1 = new OnlineOrder(false, CountryEnum.Singapore);
+		OnlineOrder oo1 = new OnlineOrder(false);
 		oo1.setCustomerId(2L);
 		oo1.setPickupSite((StoreSite) siteService.getSite(4L));
 		oo1.addLineItem(coli6);
@@ -739,7 +739,7 @@ public class DataLoader implements CommandLineRunner {
 		oo1.setDeliveryAddress(da);
 		customerOrderService.createOnlineOrder(oo1, null);
 
-		OnlineOrder oo2 = new OnlineOrder(true, CountryEnum.Singapore);
+		OnlineOrder oo2 = new OnlineOrder(true);
 		oo2.setCustomerId(2L);
 		oo2.addLineItem(coli1);
 		oo2.addLineItem(coli2);

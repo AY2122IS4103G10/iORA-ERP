@@ -95,7 +95,7 @@ public class EasyPostServiceImpl implements EasyPostService {
             toAddressMap.put("state", onlineOrder.getDeliveryAddress().getState());
             toAddressMap.put("zip", onlineOrder.getDeliveryAddress().getZip());
             toAddressMap.put("phone", onlineOrder.getDeliveryAddress().getPhone());
-            toAddressMap.put("country", onlineOrder.getCountry());
+            // toAddressMap.put("country", onlineOrder.getCountry());
             toAddressMap.put("email", cust.getEmail());
             Address toAddress = Address.create(toAddressMap);
 

@@ -200,12 +200,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             throws InsufficientPaymentException, CustomerException {
         List<Payment> payments = customerOrder.getPayments();
 
-        System.out.println("Finalise: " + customerOrder.getTotalAmount());
-        
-        for (Payment payment : payments) {
-            System.out.println("Paid" + payment.getAmount());
-        }
-
         if (payments.stream().mapToDouble(x -> x.getAmount()).sum() < customerOrder.getTotalAmount()) {
             throw new InsufficientPaymentException("Insufficient Payment");
         }

@@ -38,7 +38,7 @@ export const ManageCheckout = () => {
     const [store, setStore] = useState({ name: "Select Store" });
     const [storeList, setStoreList] = useState();
 
-    const [confirmedOrder, setConfirmedOrder] = useState(null);
+    const [confirmedOrder, setConfirmedOrder] = useState("");
 
     const cart = useSelector(selectCart);
     const customerId = useSelector(selectUserId);
@@ -82,75 +82,79 @@ export const ManageCheckout = () => {
             country: country.name,
             delivery,
             deliveryAddress: {
-                name: name, 
+                name: name,
                 street1: address,
                 city: city,
                 zip: postalCode,
-                state : state,
+                state: state,
                 phone: phoneNumber
             },
             pickupSite: selectedDeliveryMethod.id === 1 ? null : store,
 
         }
         setOrder(order);
-    
+
         setEnterPayment(true);
     }
     console.log(order)
 
     return (
-        <div className="bg-white">
-            <h1 className="align-middle text-center sm:px-8 sm:py-7 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 ">
-                {confirmedOrder !== null ? "Checkout" : "Thank you for Shopping with iORA! Your order is placed."}
-            </h1>
+        <>
+            {confirmedOrder === null ?
+                <div className="bg-white">
+                    <h1 className="align-middle text-center mt-3 sm:px-8 sm:py-6 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 ">
+                        Checkout
+                    </h1>
 
-            <p className="text-gray-900 text-center">
-                Returning customer? {' '}
-                <Link to="/login" className="underline underline-offset-1">
-                    Click here to login
-                </Link>
-            </p>
+                    {/* <p className="text-gray-900 text-center">
+                        Returning customer? {' '}
+                        <Link to="/login" className="underline underline-offset-1">
+                            Click here to login
+                        </Link>
+                    </p> */}
 
-            <div className="hidden lg:block h-full bg-white" aria-hidden="true" />
-            <div className="hidden lg:block h-full bg-gray-50" aria-hidden="true" />
-            <div className="relative grid grid-cols-1 gap-x-16 max-w-full mx-auto lg:px-8 lg:grid-cols-2 xl:gap-x-40">
-                <OrderSummary
-                    cart={cart}
-                    subTotal={subTotal}
-                    afterDiscount={afterDiscount}
-                    promotions={promotions}
-                    selectedDeliveryMethod={selectedDeliveryMethod}
-                />
-                {enterPayment ?
-                    confirmedOrder !== null ?
-                        <ManagePayment
-                            order={order}
-                            isDelivery={selectedDeliveryMethod.id === 1 ? true : false}
-                            setConfirmedOrder={setConfirmedOrder}
+                    <div className="hidden lg:block h-full bg-white" aria-hidden="true" />
+                    <div className="hidden lg:block h-full bg-gray-50" aria-hidden="true" />
+                    <div className="relative grid grid-cols-1 gap-x-16 max-w-full mx-auto lg:px-8 lg:grid-cols-2 xl:gap-x-40">
+                        <OrderSummary
+                            cart={cart}
+                            subTotal={subTotal}
+                            afterDiscount={afterDiscount}
+                            promotions={promotions}
+                            selectedDeliveryMethod={selectedDeliveryMethod}
                         />
-                    : <CheckoutSuccessful confirmedOrder={confirmedOrder} />
-                    : <CheckoutForm
-                        setEmail={setEmail}
-                        setPhoneNumber={setPhoneNumber}
-                        setName={setName}
-                        country={country}
-                        setCountry={setCountry}
-                        address={address}
-                        setAddress={setAddress}
-                        setPostalCode={setPostalCode}
-                        setCity={setCity}
-                        setState={setState}
-                        sameAddress={sameAddress}
-                        setSameAddress={setSameAddress}
-                        selectedDeliveryMethod={selectedDeliveryMethod}
-                        setSelectedDeliveryMethod={setSelectedDeliveryMethod}
-                        store={store}
-                        setStore={setStore}
-                        storeList={storeList}
-                        handleMakePayment={handleMakePayment}
-                    />}
-            </div>
-        </div>
+                        {enterPayment ?
+                            <ManagePayment
+                                order={order}
+                                isDelivery={selectedDeliveryMethod.id === 1 ? true : false}
+                                setConfirmedOrder={setConfirmedOrder}
+                            />
+                            : <CheckoutForm
+                                setEmail={setEmail}
+                                setPhoneNumber={setPhoneNumber}
+                                setName={setName}
+                                country={country}
+                                setCountry={setCountry}
+                                address={address}
+                                setAddress={setAddress}
+                                setPostalCode={setPostalCode}
+                                setCity={setCity}
+                                setState={setState}
+                                sameAddress={sameAddress}
+                                setSameAddress={setSameAddress}
+                                selectedDeliveryMethod={selectedDeliveryMethod}
+                                setSelectedDeliveryMethod={setSelectedDeliveryMethod}
+                                store={store}
+                                setStore={setStore}
+                                storeList={storeList}
+                                handleMakePayment={handleMakePayment}
+                            />}
+                    </div>
+                </div>
+
+                : <CheckoutSuccessful confirmedOrder={confirmedOrder} cart={cart} />
+            }
+        </>
 
     );
 

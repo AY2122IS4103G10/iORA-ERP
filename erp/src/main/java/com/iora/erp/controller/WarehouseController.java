@@ -126,7 +126,6 @@ public class WarehouseController {
     }
 
     // Online Delivery
-
     @PostMapping(path = "/onlineDelivery/create/{orderId}/{siteId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
             @RequestBody Delivery deliveryParcel) {
@@ -160,6 +159,16 @@ public class WarehouseController {
         try {
             return ResponseEntity
                     .ok(productService.generateProductItems(body.get("sku"), Integer.parseInt(body.get("qty"))));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/productItems/{sku}", produces = "application/json")
+    public ResponseEntity<Object> getProductItems(@PathVariable String sku) {
+        try {
+            return ResponseEntity
+                    .ok(productService.getProductItems(sku));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

@@ -540,6 +540,15 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public List<ProductItem> getProductItems(String sku) {
+        TypedQuery<ProductItem> q = em.createQuery("SELECT pi FROM ProductItem pi WHERE pi.product.sku = :sku",
+                ProductItem.class);
+        q.setParameter("sku", sku);
+
+        return q.getResultList();
+    }
+
     /*
      * Depracated
      * 

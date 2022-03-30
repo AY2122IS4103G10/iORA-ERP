@@ -38,7 +38,7 @@ export const ManageCheckout = () => {
     const [store, setStore] = useState({ name: "Select Store" });
     const [storeList, setStoreList] = useState();
 
-    const [confirmedOrder, setConfirmedOrder] = useState("");
+    const [confirmedOrder, setConfirmedOrder] = useState(null);
 
     const cart = useSelector(selectCart);
     const customerId = useSelector(selectUserId);
@@ -81,6 +81,7 @@ export const ManageCheckout = () => {
             totalAmount: totalAmount,
             country: country.name,
             delivery,
+            promotions: promotions,
             deliveryAddress: {
                 name: name,
                 street1: address,
@@ -152,7 +153,7 @@ export const ManageCheckout = () => {
                     </div>
                 </div>
 
-                : <CheckoutSuccessful confirmedOrder={confirmedOrder} cart={cart} />
+                : <CheckoutSuccessful confirmedOrder={confirmedOrder} />
             }
         </>
 

@@ -77,6 +77,13 @@ export const listingApi = {
       `${REST_ENDPOINT}online/public/viewStock/product/${sku}`
     );
   },
+
+  getModelsBySKUList(skuList) {
+    return axiosPublic.post(
+      `${REST_ENDPOINT}online/public/model/skulist`,
+      skuList
+    );
+  }
 }
 
 export const checkoutApi = {

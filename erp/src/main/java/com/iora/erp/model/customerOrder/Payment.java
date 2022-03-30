@@ -1,6 +1,6 @@
 package com.iora.erp.model.customerOrder;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +23,7 @@ public class Payment {
     private double amount;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime dateTime;
+    private Date dateTime;
 
     @Column(nullable = false)
     private PaymentTypeEnum paymentType;
@@ -32,7 +32,7 @@ public class Payment {
     private String ccTransactionId;
 
     public Payment() {
-        this.dateTime = LocalDateTime.now();
+        this.dateTime = new Date();
     }
 
     public Payment(double amount, String ccTransactionId, PaymentTypeEnum pt) {
@@ -58,11 +58,11 @@ public class Payment {
         this.amount = amount;
     }
 
-    public LocalDateTime getDateTime() {
+    public Date getDateTime() {
         return this.dateTime;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
+    public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
     }
 

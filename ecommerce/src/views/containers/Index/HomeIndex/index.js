@@ -19,7 +19,7 @@ export const HomeIndex = () => {
                 Quality basic wear with a tweak in updated styles that suits a modern woman's lifestyle
             </p>
             <Link
-                to="#"
+                to="/products/iora"
                 className="mt-8 inline-block bg-white border border-transparent rounded-md py-3 px-8 text-base font-medium text-gray-900 hover:bg-gray-100"
             >
                 Shop Now

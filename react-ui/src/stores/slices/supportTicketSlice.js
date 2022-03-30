@@ -31,6 +31,14 @@ export const resolveSupportTicket = createAsyncThunk(
   }
 );
 
+export const deleteSupportTicket = createAsyncThunk(
+  "supportTickets/deleteSupportTicket",
+  async (ticketId) => {
+    const response = await api.delete("sam/ticket/delete", ticketId);
+    return response.data;
+  }
+);
+
 const supportTicketSlice = createSlice({
   name: "supportTickets",
   initialState,
@@ -57,6 +65,9 @@ const supportTicketSlice = createSlice({
       if (supportTicket) {
         supportTicket.status = status;
       }
+    });
+    builder.addCase(deleteSupportTicket.fulfilled, (state, action) => {
+      state.status = "idle";
     });
   },
 });

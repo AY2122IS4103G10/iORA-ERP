@@ -1,17 +1,19 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { ExclamationIcon, PaperClipIcon, XIcon } from '@heroicons/react/outline';
+import { ExclamationIcon, PaperClipIcon, TrashIcon, XIcon } from '@heroicons/react/outline';
 import moment from "moment";
-import { Fragment, useEffect, useState, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { fetchSupportTickets, replySupportTicket, resolveSupportTicket, selectTicketById } from "../../../../stores/slices/supportTicketSlice";
+import { deleteSupportTicket, fetchSupportTickets, replySupportTicket, resolveSupportTicket, selectTicketById } from "../../../../stores/slices/supportTicketSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 
 const Header = ({
     ticketId,
     status,
-    setOpen
+    setOpen,
+    setOpenDelete
 }) => {
     return (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
@@ -30,6 +32,19 @@ const Header = ({
                         onClick={() => setOpen(true)}
                     >
                         <span>Resolve Ticket</span>
+                    </button>
+                }
+                {status === "RESOLVED" &&
+                    <button
+                        type="button"
+                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+                        onClick={() => setOpenDelete(true)}
+                    >
+                        <TrashIcon
+                            className="-ml-1 mr-2 h-5 w-5 text-white"
+                            aria-hidden="true"
+                        />
+                        <span>Delete</span>
                     </button>
                 }
             </div>
@@ -316,6 +331,7 @@ export const SupportTicketDetails = () => {
     const ticketStatus = useSelector((state) => state.supportTickets.status);
 
     const [open, setOpen] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
     const [input, setInput] = useState("");
     const [file, setFile] = useState({});
 
@@ -351,7 +367,7 @@ export const SupportTicketDetails = () => {
             const name = JSON.parse(localStorage.getItem("user")).name
             var url;
 
-            Boolean(file.name) && fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
+            Boolean(file.name) ? fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
                 {
                     method: 'POST',
                     body: image,
@@ -360,7 +376,6 @@ export const SupportTicketDetails = () => {
                 .then((data) => {
                     console.log(data);
                     url = data.data.url;
-
                     dispatch(replySupportTicket(
                         {
                             ticketId,
@@ -386,8 +401,50 @@ export const SupportTicketDetails = () => {
                                 autoDismiss: true,
                             });
                         });
-                });
+                }) : dispatch(replySupportTicket(
+                    {
+                        ticketId,
+                        name,
+                        body: { input, url }
+                    }
+                ))
+                    .unwrap()
+                    .then(() => {
+                        setFile([]);
+                        setInput("");
+                    })
+                    .then(() => {
+                        addToast("Successfully replied to ticket", {
+                            appearance: "success",
+                            autoDismiss: true,
+                        });
+
+                    })
+                    .catch((err) => {
+                        addToast(`Error: ${err.message}`, {
+                            appearance: "error",
+                            autoDismiss: true,
+                        });
+                    });
         }
+    }
+
+    const onDeleteClicked = () => {
+        dispatch(deleteSupportTicket(ticketId))
+            .unwrap()
+            .then(() => {
+                addToast("Successfully deleted support ticket", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                setOpenDelete(false);
+                navigate("/sm/support");
+            })
+            .catch((err) =>
+                addToast(`Error: Job Title cannot be deleted as it is being used.`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                }))
     }
 
     return (
@@ -397,7 +454,8 @@ export const SupportTicketDetails = () => {
                 <Header
                     ticketId={ticketId}
                     status={ticket.status}
-                    setOpen={setOpen} />
+                    setOpen={setOpen}
+                    setOpenDelete={setOpenDelete} />
                 <SupportTicketBody
                     messages={ticket.messages}
                     customer={ticket.customer}
@@ -415,6 +473,12 @@ export const SupportTicketDetails = () => {
                     setOpen={setOpen}
                     ticketId={ticketId}
                     onResolveClicked={onResolveClicked} />
+                <ConfirmDelete
+                    item={ticket.subject}
+                    open={openDelete}
+                    closeModal={() => setOpenDelete(false)}
+                    onConfirm={onDeleteClicked}
+                />
             </div>
         )
     );

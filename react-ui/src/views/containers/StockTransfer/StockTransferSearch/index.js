@@ -26,12 +26,12 @@ export const StockTransferSearch = ({ subsys }) => {
           )
             throw new Error("Not authorised to view order.");
         } else if (subsys === "str" || subsys === "wh") {
-          if (currSiteId === fromSite.id)
+          if (currSiteId !== fromSite.id)
             throw new Error("Not authorised to view order.");
         }
         navigate(pathname.replace("search", id));
       } catch (error) {
-        addToast(`Error: ${error.response.data}`, {
+        addToast(`Error: ${error.message}`, {
           appearance: "error",
           autoDismiss: true,
         });

@@ -448,7 +448,9 @@ public class DataLoader implements CommandLineRunner {
 		c1.setEmail("hongpeiisrandom@gmail.com");
 		c1.setPassword("password");
 		Customer cc1 = customerService.createCustomerAccount(c1);
-		DeliveryAddress da1 = new DeliveryAddress("313 Sembawang Drive", "#12-220", "Singapore", "750313", "",
+		DeliveryAddress da1 = new DeliveryAddress("HongPei", "313 Sembawang Drive", "#12-220", "Singapore", "750313",
+				"",
+				CountryEnum.Singapore,
 				"83940775");
 		em.persist(da1);
 		cc1.setAddress(da1);
@@ -460,7 +462,9 @@ public class DataLoader implements CommandLineRunner {
 		c2.setPassword("password");
 		c2.setMembershipPoints(200);
 		Customer cc2 = customerService.createCustomerAccount(c2);
-		DeliveryAddress da2 = new DeliveryAddress("252 Jurong East Street 24", "#02-120", "Singapore", "600252", "",
+		DeliveryAddress da2 = new DeliveryAddress("Remus", "252 Jurong East Street 24", "#02-120", "Singapore",
+				"600252", "",
+				CountryEnum.Singapore,
 				"92711363");
 		em.persist(da2);
 		cc2.setAddress(da2);
@@ -471,7 +475,8 @@ public class DataLoader implements CommandLineRunner {
 		c3.setEmail("tan.adelinejy@gmail.com");
 		c3.setPassword("password");
 		Customer cc3 = customerService.createCustomerAccount(c3);
-		DeliveryAddress da3 = new DeliveryAddress("413 Serangoon Central", "#06-260", "Singapore", "550413", "",
+		DeliveryAddress da3 = new DeliveryAddress("Ade", "413 Serangoon Central", "#06-260", "Singapore", "550413", "",
+				CountryEnum.Singapore,
 				"93834898");
 		em.persist(da3);
 		cc3.setAddress(da3);
@@ -482,7 +487,9 @@ public class DataLoader implements CommandLineRunner {
 		c4.setEmail("louismisson8@gmail.com");
 		c4.setPassword("password");
 		Customer cc4 = customerService.createCustomerAccount(c4);
-		DeliveryAddress da4 = new DeliveryAddress("307 Clementi Avenue 4", "#10-180", "Singapore", "120307", "",
+		DeliveryAddress da4 = new DeliveryAddress("Louis", "307 Clementi Avenue 4", "#10-180", "Singapore", "120307",
+				"",
+				CountryEnum.Singapore,
 				"98550432");
 		em.persist(da4);
 		cc4.setAddress(da4);
@@ -493,7 +500,9 @@ public class DataLoader implements CommandLineRunner {
 		c5.setEmail("remuskwan23@gmail.com");
 		c5.setPassword("password");
 		Customer cc5 = customerService.createCustomerAccount(c5);
-		DeliveryAddress da5 = new DeliveryAddress("75A Redhill Rd, Block 75A", "#15-210", "Singapore", "151075", "",
+		DeliveryAddress da5 = new DeliveryAddress("Remus", "75A Redhill Rd, Block 75A", "#15-210", "Singapore",
+				"151075", "",
+				CountryEnum.Singapore,
 				"90556630");
 		em.persist(da5);
 		cc5.setAddress(da5);
@@ -504,7 +513,9 @@ public class DataLoader implements CommandLineRunner {
 		c6.setEmail("ruth.cjn@gmail.com");
 		c6.setPassword("password");
 		Customer cc6 = customerService.createCustomerAccount(c6);
-		DeliveryAddress da6 = new DeliveryAddress("503 Hougang Ave 8, Block 503", "#16-320", "Singapore", "530503", "",
+		DeliveryAddress da6 = new DeliveryAddress("Ruth", "503 Hougang Ave 8, Block 503", "#16-320", "Singapore",
+				"530503", "",
+				CountryEnum.Singapore,
 				"86065278");
 		em.persist(da6);
 		cc6.setAddress(da6);
@@ -515,7 +526,8 @@ public class DataLoader implements CommandLineRunner {
 		c7.setEmail("stevenlim@gmail.com");
 		c7.setPassword("password");
 		Customer cc7 = customerService.createCustomerAccount(c7);
-		DeliveryAddress da7 = new DeliveryAddress("349 Yishun Ave 11", "#09-520", "Singapore", "760349", "",
+		DeliveryAddress da7 = new DeliveryAddress("Lim", "349 Yishun Ave 11", "#09-520", "Singapore", "760349", "",
+				CountryEnum.Singapore,
 				"91234567");
 		em.persist(da7);
 		cc7.setAddress(da7);
@@ -723,7 +735,7 @@ public class DataLoader implements CommandLineRunner {
 		oo1.setPaid(true);
 		oo1.addPayment(payment2);
 		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
-				"189554", "", "60981335");
+				"189554", "", CountryEnum.Singapore, "60981335");
 		oo1.setDeliveryAddress(da);
 		customerOrderService.createOnlineOrder(oo1, null);
 
@@ -735,7 +747,7 @@ public class DataLoader implements CommandLineRunner {
 		oo2.setSite(siteService.getSite(10L));
 		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
 				"Singapore",
-				"117417", "", "65162727");
+				"117417", "", CountryEnum.Singapore, "65162727");
 		oo2.setDeliveryAddress(da1);
 		customerOrderService.createOnlineOrder(oo2, null);
 

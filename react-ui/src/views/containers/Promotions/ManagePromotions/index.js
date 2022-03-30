@@ -90,9 +90,9 @@ const PromoModal = ({
                     <SimpleInputGroup
                       label="Discount Type"
                       inputField="global-stackable"
-                      // className="relative rounded-md sm:mt-0"
+                      className="rounded-md sm:mt-0 sm:col-span-2"
                     >
-                      <fieldset className="space y-5">
+                      <fieldset className="space-y-2">
                         <legend className="sr-only">Discount Type</legend>
                         <div className="relative flex items-start">
                           <div className="flex items-center h-5">
@@ -206,9 +206,9 @@ const PromoModal = ({
                     <SimpleInputGroup
                       label="Options"
                       inputField="global-stackable"
-                      className="relative rounded-md sm:mt-0"
+                      className="rounded-md sm:mt-0 sm:col-span-2"
                     >
-                      <fieldset className="space y-5">
+                      <fieldset className="space-y-2">
                         <legend className="sr-only">Discount Type</legend>
                         <div className="relative flex items-start">
                           <div className="flex items-center h-5">

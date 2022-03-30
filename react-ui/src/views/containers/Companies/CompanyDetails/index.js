@@ -212,8 +212,21 @@ export const CompanyDetails = () => {
                           Address
                         </dt>
                         <dd className="mt-1 text-sm text-gray-900">
-                          {company.address &&
-                            `${company.address.road}, ${company.address.postalCode}`}
+                          {company.address && (
+                            <address className="not-italic">
+                              <span className="block">
+                                {company.address.road}
+                              </span>
+                              <span className="block">
+                                {company.address.city}{" "}
+                                {company.address.postalCode}
+                              </span>
+                              <span className="block">
+                                {company.address.state},{" "}
+                                {company.address.country}
+                              </span>
+                            </address>
+                          )}
                         </dd>
                       </div>
                       <div className="sm:col-span-1">

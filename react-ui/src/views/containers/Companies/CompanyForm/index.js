@@ -5,7 +5,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { api, companyApi } from "../../../../environments/Api";
-import { AddressField } from "../../Sites/SiteForm";
+import { AddressField, fetchCountries } from "../../Sites/SiteForm";
 import {
   addNewCompany,
   updateExistingCompany,
@@ -60,6 +60,7 @@ const CompanyFormBody = ({
   building,
   unit,
   onUnitChanged,
+  countries,
   country,
   onCountryChanged,
   city,
@@ -151,6 +152,7 @@ const CompanyFormBody = ({
                         onBuildingChanged={onBuildingChanged}
                         unit={unit}
                         onUnitChanged={onUnitChanged}
+                        countries={countries}
                         country={country}
                         onCountryChanged={onCountryChanged}
                         city={city}
@@ -231,12 +233,13 @@ export const CompanyForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { companyId } = useParams();
+  const { addToast } = useToasts();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
   const [address1, setAddress1] = useState("");
   const [building, setBuilding] = useState("");
   const [unit, setUnit] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("Singapore");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
@@ -249,8 +252,12 @@ export const CompanyForm = () => {
   const [deptCheckedState, setDeptCheckedState] = useState([]);
   const [vends, setVendors] = useState([]);
   const [vendorCheckedState, setVendorCheckedState] = useState([]);
-  const [addressId, setAddressId] = useState(null)
-  const { addToast } = useToasts();
+  const [addressId, setAddressId] = useState(null);
+  const [countries, setCountries] = useState([]);
+
+  useEffect(() => {
+    fetchCountries().then((data) => setCountries(data));
+  }, []);
 
   useEffect(() => {
     api.getAll("admin/viewDepartments?search=").then((response) => {
@@ -299,20 +306,7 @@ export const CompanyForm = () => {
     );
     setVendorCheckedState(updateCheckedState);
   };
-  const canAdd = [
-    name,
-    // country,
-    // city,
-    // building,
-    // state,
-    // unit,
-    // address1,
-    // postalCode,
-    // latitude,
-    // longitude,
-    registerNo,
-    phone,
-  ].every(Boolean);
+  const canAdd = [name, registerNo, phone].every(Boolean);
   const onAddCompanyClicked = (evt) => {
     evt.preventDefault();
     const d = [],
@@ -419,7 +413,7 @@ export const CompanyForm = () => {
         setIsEditing(true);
         setName(name);
         setRegisterNo(registerNumber);
-        setAddressId(address.id)
+        setAddressId(address.id);
         setAddress1(address.road);
         setBuilding(address.building);
         setUnit(address.unit);
@@ -454,6 +448,7 @@ export const CompanyForm = () => {
       onBuildingChanged={onBuildingChanged}
       unit={unit}
       onUnitChanged={onUnitChanged}
+      countries={countries}
       country={country}
       onCountryChanged={onCountryChanged}
       city={city}

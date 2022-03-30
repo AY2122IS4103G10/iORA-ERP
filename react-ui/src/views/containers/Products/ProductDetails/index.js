@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { CurrencyDollarIcon } from "@heroicons/react/outline";
+import { CurrencyDollarIcon, StatusOnlineIcon } from "@heroicons/react/outline";
 import {
   CurrencyDollarIcon as CurrencyDollarSolid,
   PencilIcon,
@@ -342,13 +342,14 @@ const ProductDetailsBody = ({
   tags,
   categories,
   available,
+  onlineOnly,
   products,
   onToggleEnableClicked,
   onDeleteSkuClicked,
 }) => (
   <div className="py-8 xl:py-10">
     <div className="max-w-3xl mx-auto xl:max-w-5xl">
-      <NavigatePrev page="Products" path="/sm/products" />
+      <NavigatePrev />
       <div className="px-4 sm:px-6 lg:px-8 xl:grid xl:grid-cols-3">
         <div className="xl:col-span-2 xl:pr-8 xl:border-r xl:border-gray-200">
           <div>
@@ -408,6 +409,17 @@ const ProductDetailsBody = ({
                     {`Discount Price: $${discountPrice}`}
                   </span>
                 </div>
+                {onlineOnly && (
+                  <div className="flex items-center space-x-2">
+                    <StatusOnlineIcon
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                    <span className="text-gray-900 text-sm font-medium">
+                      Online only
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
                 {Boolean(colors.length) && (
@@ -480,6 +492,17 @@ const ProductDetailsBody = ({
                 {`Discount Price: $${discountPrice}`}
               </span>
             </div>
+            {onlineOnly && (
+              <div className="flex items-center space-x-2">
+                <StatusOnlineIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+                <span className="text-gray-900 text-sm font-medium">
+                  Online only
+                </span>
+              </div>
+            )}
           </div>
           <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
             {Boolean(colors.length) && (
@@ -633,6 +656,7 @@ export const ProductDetails = () => {
                 : 0
             )}
           available={product.available}
+          onlineOnly={product.onlineOnly}
           products={product.products}
           onToggleEnableClicked={onToggleEnableClicked}
           // onDeleteSkuClicked={onDeleteSkuClicked}

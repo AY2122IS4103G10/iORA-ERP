@@ -14,11 +14,26 @@ import {
   fetchCompanies,
   selectAllCompanies,
 } from "../../../../stores/slices/companySlice";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { TailSpin } from "react-loader-spinner";
 
 const payTypes = [
   { id: 1, name: "Monthly", value: "MONTHLY" },
   { id: 2, name: "Hourly", value: "HOURLY" },
 ];
+
+const ProcessingModal = ({ open, closeModal }) => {
+  return (
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        <div className="flex items-center justify-center">
+          <h3 className="text-sm text-gray-900 mr-4">Processing</h3>
+          <TailSpin color="#00BFFF" height={20} width={20} />
+        </div>
+      </div>
+    </SimpleModal>
+  );
+};
 
 const EmployeeFormBody = ({
   isEditing,
@@ -33,8 +48,6 @@ const EmployeeFormBody = ({
   onEmailChanged,
   username,
   onUsernameChanged,
-  password,
-  onPasswordChanged,
   onAddEmployeeClicked,
   onCancelClicked,
   departmentSelected,
@@ -169,24 +182,6 @@ const EmployeeFormBody = ({
                           />
                         </SimpleInputGroup>
                         <SimpleInputGroup
-                          label="Password"
-                          inputField="password"
-                          className="sm:mt-0 sm:col-span-2"
-                        >
-                          <SimpleInputBox
-                            type="password"
-                            name="password"
-                            id="password"
-                            autoComplete="password"
-                            placeholder={
-                              isEditing ? "Leave blank if unchanged." : ""
-                            }
-                            value={password}
-                            onChange={onPasswordChanged}
-                            required={!isEditing ? true : false}
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
                           label="Pay Type"
                           inputField="payType"
                           className="sm:mt-0 sm:col-span-2"
@@ -270,6 +265,7 @@ const EmployeeFormBody = ({
 export const EmployeeForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useToasts();
   const { employeeId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
@@ -283,7 +279,7 @@ export const EmployeeForm = () => {
   const [departments, setDepartments] = useState([]);
   const [departmentSelected, setDepartmentSelected] = useState(null);
   const [companySelected, setCompanySelected] = useState(null);
-  const { addToast } = useToasts();
+  const [openProcessing, setOpenProcessing] = useState(false);
 
   const onNameChanged = (e) => setName(e.target.value);
   const onEmailChanged = (e) => setEmail(e.target.value);
@@ -356,75 +352,50 @@ export const EmployeeForm = () => {
 
   const onAddEmployeeClicked = (evt) => {
     evt.preventDefault();
-    if (canAdd)
-      if (!isEditing) {
-        dispatch(
-          addNewEmployee({
-            name,
-            availStatus: true,
-            email,
-            username: Boolean(username.length) ? username : email,
-            password,
-            payType: payTypeSelected.value,
-            salary,
-            department: {
-              id: departmentSelected.id,
-            },
-            jobTitle: {
-              id: jobTitleSelected.id,
-            },
-            company: { id: companySelected.id },
-          })
-        )
-          .unwrap()
-          .then(() => {
-            addToast("Successfully added employee", {
+    if (canAdd) {
+      const employee = {
+        name,
+        availStatus: true,
+        email,
+        username: Boolean(username.length) ? username : email,
+        payType: payTypeSelected.value,
+        salary,
+        department: {
+          id: departmentSelected.id,
+        },
+        jobTitle: {
+          id: jobTitleSelected.id,
+        },
+        company: { id: companySelected.id },
+      };
+      if (isEditing) employee["id"] = employeeId;
+      openProcessingModal();
+      dispatch(
+        !isEditing ? addNewEmployee(employee) : updateExistingEmployee(employee)
+      )
+        .unwrap()
+        .then((data) => {
+          closeProcessingModal();
+          addToast(
+            `Successfully ${!isEditing ? "added" : "updated"} employee`,
+            {
               appearance: "success",
               autoDismiss: true,
-            });
-            navigate("/ad/employees");
-          })
-          .catch((err) =>
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            })
+            }
           );
-      } else {
-        const employee = {
-          id: employeeId,
-          name,
-          availStatus: true,
-          email,
-          username: Boolean(username.length) ? username : email,
-          payType: payTypeSelected.value,
-          salary,
-          department: {
-            id: departmentSelected.id,
-          },
-          jobTitle: {
-            id: jobTitleSelected.id,
-          },
-          company: { id: companySelected.id },
-        };
-        if (Boolean(password.length)) employee[password] = password;
-        dispatch(updateExistingEmployee(employee))
-          .unwrap()
-          .then(() => {
-            addToast("Successfully update employee", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            navigate(`/ad/employees/${employeeId}`);
+          navigate(`/ad/employees/${data.id}`);
+        })
+        .catch((err) =>
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
           })
-          .catch((err) =>
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            })
-          );
-      }
+        );
+    }
   };
+
+  const openProcessingModal = () => setOpenProcessing(true);
+  const closeProcessingModal = () => setOpenProcessing(false);
 
   const onCancelClicked = () =>
     navigate(!isEditing ? "/ad/employees" : `/ad/employees/${employeeId}`);
@@ -462,32 +433,38 @@ export const EmployeeForm = () => {
   }, [employeeId]);
 
   return (
-    <EmployeeFormBody
-      isEditing={isEditing}
-      payTypes={payTypes}
-      payTypeSelected={payTypeSelected}
-      setPayTypeSelected={setPayTypeSelected}
-      salary={salary}
-      onSalaryChanged={onSalaryChanged}
-      name={name}
-      onNameChanged={onNameChanged}
-      departmentSelected={departmentSelected}
-      setDepartmentSelected={onDeptChanged}
-      departments={departments}
-      jobTitleSelected={jobTitleSelected}
-      setJobTitleSelected={onJobTitleChanged}
-      jobTitles={jobTitles}
-      companies={companies}
-      companySelected={companySelected}
-      setCompanySelected={onCompanyChanged}
-      email={email}
-      onEmailChanged={onEmailChanged}
-      username={username}
-      onUsernameChanged={onUsernameChanged}
-      password={password}
-      onPasswordChanged={onPasswordChanged}
-      onAddEmployeeClicked={onAddEmployeeClicked}
-      onCancelClicked={onCancelClicked}
-    />
+    <>
+      <EmployeeFormBody
+        isEditing={isEditing}
+        payTypes={payTypes}
+        payTypeSelected={payTypeSelected}
+        setPayTypeSelected={setPayTypeSelected}
+        salary={salary}
+        onSalaryChanged={onSalaryChanged}
+        name={name}
+        onNameChanged={onNameChanged}
+        departmentSelected={departmentSelected}
+        setDepartmentSelected={onDeptChanged}
+        departments={departments}
+        jobTitleSelected={jobTitleSelected}
+        setJobTitleSelected={onJobTitleChanged}
+        jobTitles={jobTitles}
+        companies={companies}
+        companySelected={companySelected}
+        setCompanySelected={onCompanyChanged}
+        email={email}
+        onEmailChanged={onEmailChanged}
+        username={username}
+        onUsernameChanged={onUsernameChanged}
+        password={password}
+        onPasswordChanged={onPasswordChanged}
+        onAddEmployeeClicked={onAddEmployeeClicked}
+        onCancelClicked={onCancelClicked}
+      />
+      <ProcessingModal
+        open={openProcessing}
+        closeModal={closeProcessingModal}
+      />
+    </>
   );
 };

@@ -41,7 +41,6 @@ export const AProductStock = (subsys) => {
     dispatch(getProductStockLevel(id));
   }, [dispatch, id]);
 
-
   return (
     <div className="min-h-full">
       <main className="py-10">

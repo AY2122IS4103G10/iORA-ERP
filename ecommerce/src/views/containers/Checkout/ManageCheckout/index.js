@@ -70,6 +70,8 @@ export const ManageCheckout = () => {
 
     }, [])
 
+    const onCancelClicked = () => navigate(-1);
+
     const handleMakePayment = () => {
         let delivery = selectedDeliveryMethod.id === 1 ? true : false
         let totalAmount = afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0)

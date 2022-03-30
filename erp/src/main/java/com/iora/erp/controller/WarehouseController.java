@@ -1,6 +1,7 @@
 package com.iora.erp.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import com.easypost.exception.EasyPostException;
 import com.easypost.model.ShipmentCollection;
@@ -11,6 +12,7 @@ import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.service.EasyPostService;
 import com.iora.erp.service.ProcurementService;
+import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ public class WarehouseController {
     private SiteService siteService;
     @Autowired
     private ProcurementService procurementService;
+    @Autowired
+    private ProductService productService;
     @Autowired
     private EasyPostService easyPostService;
 
@@ -122,7 +126,6 @@ public class WarehouseController {
     }
 
     // Online Delivery
-
     @PostMapping(path = "/onlineDelivery/create/{orderId}/{siteId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
             @RequestBody Delivery deliveryParcel) {
@@ -149,6 +152,25 @@ public class WarehouseController {
         } catch (EasyPostException e) {
             return null;
         }
+    }
 
+    @PostMapping(path = "/generateRFID", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> generateRFIDs(@RequestBody Map<String, String> body) {
+        try {
+            return ResponseEntity
+                    .ok(productService.generateProductItems(body.get("sku"), Integer.parseInt(body.get("qty"))));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/productItems/{sku}", produces = "application/json")
+    public ResponseEntity<Object> getProductItems(@PathVariable String sku) {
+        try {
+            return ResponseEntity
+                    .ok(productService.getProductItems(sku));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 }

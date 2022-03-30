@@ -55,6 +55,7 @@ public interface ProductService {
     public abstract ProductItem createProductItem(String rfid, String sku) throws ProductItemException;
     public abstract List<ProductItem> generateProductItems(String sku, int qty) throws ProductItemException;
     public abstract ProductItem getProductItem(String rfid) throws ProductItemException;
+    public abstract List<ProductItem> getProductItems(String sku) throws ProductItemException;
     /* Deprecated
     public abstract List<ProductItem> getProductItemsBySKU(String sku) throws ProductException;
     public abstract List<ProductItem> searchProductItems(String rfid);

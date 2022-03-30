@@ -102,6 +102,28 @@ export const updateAccount = createAsyncThunk(
   }
 );
 
+export const fetchUserOrders = createAsyncThunk(
+  "user/userOrders",
+  async (id) => {
+    const response = await api.get("/online/history", id);
+    if (response.data === "") {
+      return Promise.reject(response.error);
+    }
+    return response.data;
+  }
+);
+
+export const fetchAnOrder = createAsyncThunk(
+  "user/getUserOrder",
+  async (orderId) => {
+    const response = await api.get("/online/history", orderId);
+    if (response.data === "") {
+      return Promise.reject(response.error);
+    }
+    return response.data;
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -158,6 +180,21 @@ const userSlice = createSlice({
     builder.addCase(updateAccount.rejected, (state, action) => {
       state.error = "Update failed";
     });
+    builder.addCase(fetchUserOrders.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(fetchUserOrders.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.user = action.payload;
+    });
+    builder.addCase(fetchUserOrders.rejected, (state, action) => {
+      state.status = "loading";
+      state.error = action.error.message;
+    });
+    builder.addCase(fetchAnOrder.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.searchedOrder = action.payload;
+    });
   },
 });
 
@@ -172,3 +209,9 @@ export const selectUserId = (state) => state.user.user.id;
 export const selectUserStore = (state) => state.user.currStore;
 
 export default userSlice.reducer;
+
+export const selectAllOrder = (state) => state.user.userOrders;
+export const selectOrderById = (state, id) =>
+  state.user.searchedOrder.id === id
+    ? state.user.searchedOrder
+    : state.user.userOrders.find((order) => order.id === id);

@@ -11,9 +11,10 @@ const smTabs = [
 ];
 
 const whTabs = [
-  { name: "Print Label", href: "/wh/products/print", current: true },
+  { name: "Search Product", href: "/wh/products/search", current: true },
+  { name: "Print Label", href: "/wh/products/print", current: false },
   {
-    name: "RFID",
+    name: "Generate RFID",
     href: "/wh/products/rfid",
     current: false,
   },

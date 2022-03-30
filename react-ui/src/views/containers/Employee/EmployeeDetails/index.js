@@ -198,7 +198,7 @@ export const EmployeeDetails = () => {
         })
       );
   };
-
+console.log(employee)
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
 

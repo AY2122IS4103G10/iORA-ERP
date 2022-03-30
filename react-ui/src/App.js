@@ -11,6 +11,7 @@ import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
 import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
 import { CustomerForm } from "./views/containers/Customer/CustomerForm";
 import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
+import { ManageDashboard } from "./views/containers/Dashboard/ManageDashboard/index.js";
 import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails";
 import { DepartmentForm } from "./views/containers/Department/DepartmentForm";
 import { ManageDepartment } from "./views/containers/Department/ManageDepartment";
@@ -58,6 +59,7 @@ import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductPrint } from "./views/containers/Products/ProductPrint";
 import { ProductRFID } from "./views/containers/Products/ProductRFID/index.js";
+import { ProductSearch } from "./views/containers/Products/ProductSearch/index.js";
 import { ProductsList } from "./views/containers/Products/ProductsList";
 import { ManageProfile } from "./views/containers/Profile/ManageProfile/index.js";
 import { PasswordForm } from "./views/containers/Profile/PasswordForm/index.js";
@@ -296,6 +298,11 @@ function App() {
                 <Route path="create" element={<MembershipTierForm />} />
               </Route>
             </Route>
+
+            {/* Analytics */}
+            <Route path="analytics" element={<Outlet />}>
+              <Route index element={<ManageDashboard />} />
+            </Route>
           </Route>
 
           {/* Store Management Subsystem */}
@@ -435,6 +442,9 @@ function App() {
               <Route path="create" element={<VendorForm />} />
               <Route path="edit/:vendorId" element={<VendorForm />} />
             </Route>
+            <Route path="analytics" element={<Outlet />}>
+              <Route index element={<ManageDashboard />} />
+            </Route>
           </Route>
 
           {/* Manufacturing Subsystem*/}
@@ -485,6 +495,14 @@ function App() {
             }
           >
             <Route path="products" element={<Outlet />}>
+              <Route
+                path="search"
+                element={
+                  <ManageProducts subsys="wh">
+                    <ProductSearch subsys="wh" />
+                  </ManageProducts>
+                }
+              />
               <Route
                 path="print"
                 element={

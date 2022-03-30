@@ -163,7 +163,8 @@ export const CheckoutForm = ({
   store,
   setStore,
   storeList,
-  handleMakePayment }) => {
+  handleMakePayment,
+  onCancelClicked, }) => {
 
 
   return (

@@ -67,7 +67,7 @@ const navigation = [
   },
   {
     name: "Reports & Analytics",
-    href: "#",
+    href: "/sm/analytics",
     icon: DocumentReportIcon,
     current: false,
   },

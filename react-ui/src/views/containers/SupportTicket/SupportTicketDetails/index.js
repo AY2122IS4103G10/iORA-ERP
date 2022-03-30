@@ -367,7 +367,7 @@ export const SupportTicketDetails = () => {
             const name = JSON.parse(localStorage.getItem("user")).name
             var url;
 
-            Boolean(file.name) && fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
+            Boolean(file.name) ? fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
                 {
                     method: 'POST',
                     body: image,
@@ -376,7 +376,6 @@ export const SupportTicketDetails = () => {
                 .then((data) => {
                     console.log(data);
                     url = data.data.url;
-
                     dispatch(replySupportTicket(
                         {
                             ticketId,
@@ -402,27 +401,51 @@ export const SupportTicketDetails = () => {
                                 autoDismiss: true,
                             });
                         });
-                });
+                }) : dispatch(replySupportTicket(
+                    {
+                        ticketId,
+                        name,
+                        body: { input, url }
+                    }
+                ))
+                    .unwrap()
+                    .then(() => {
+                        setFile([]);
+                        setInput("");
+                    })
+                    .then(() => {
+                        addToast("Successfully replied to ticket", {
+                            appearance: "success",
+                            autoDismiss: true,
+                        });
+
+                    })
+                    .catch((err) => {
+                        addToast(`Error: ${err.message}`, {
+                            appearance: "error",
+                            autoDismiss: true,
+                        });
+                    });
         }
     }
 
     const onDeleteClicked = () => {
         dispatch(deleteSupportTicket(ticketId))
-          .unwrap()
-          .then(() => {
-            addToast("Successfully deleted support ticket", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            setOpenDelete(false);
-            navigate("/sm/support");
-          })
-          .catch((err) =>
-            addToast(`Error: Job Title cannot be deleted as it is being used.`, {
-              appearance: "error",
-              autoDismiss: true,
-            }))
-      }
+            .unwrap()
+            .then(() => {
+                addToast("Successfully deleted support ticket", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                setOpenDelete(false);
+                navigate("/sm/support");
+            })
+            .catch((err) =>
+                addToast(`Error: Job Title cannot be deleted as it is being used.`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                }))
+    }
 
     return (
         Boolean(ticket) && (

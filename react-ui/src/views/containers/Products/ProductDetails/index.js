@@ -346,62 +346,149 @@ const ProductDetailsBody = ({
   products,
   onToggleEnableClicked,
   onDeleteSkuClicked,
-}) => (
-  <div className="py-8 xl:py-10">
-    <div className="max-w-3xl mx-auto xl:max-w-5xl">
-      <NavigatePrev />
-      <div className="px-4 sm:px-6 lg:px-8 xl:grid xl:grid-cols-3">
-        <div className="xl:col-span-2 xl:pr-8 xl:border-r xl:border-gray-200">
-          <div>
-            <div className="md:flex md:items-center md:justify-between md:space-x-4 xl:border-b xl:pb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
-                <p className="mt-2 text-sm text-gray-500">{prodCode}</p>
+}) => {
+  return (
+    <div className="py-8 xl:py-10">
+      <div className="max-w-3xl mx-auto xl:max-w-5xl">
+        <NavigatePrev />
+        <div className="px-4 sm:px-6 lg:px-8 xl:grid xl:grid-cols-3">
+          <div className="xl:col-span-2 xl:pr-8 xl:border-r xl:border-gray-200">
+            <div>
+              <div className="md:flex md:items-center md:justify-between md:space-x-4 xl:border-b xl:pb-6">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
+                  <p className="mt-2 text-sm text-gray-500">{prodCode}</p>
+                </div>
+                <div className="mt-4 flex space-x-3 md:mt-0">
+                  <ToggleLeftLabel
+                    enabled={available}
+                    onEnabledChanged={onToggleEnableClicked}
+                    label={!available ? "Enable" : "Disable"}
+                    toggleColor="red"
+                  />
+                  <Link to={`/sm/products/edit/${prodCode}`}>
+                    <button
+                      type="button"
+                      className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
+                    >
+                      <PencilIcon
+                        className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                      <span>Edit</span>
+                    </button>
+                  </Link>
+                </div>
               </div>
-              <div className="mt-4 flex space-x-3 md:mt-0">
-                <ToggleLeftLabel
-                  enabled={available}
-                  onEnabledChanged={onToggleEnableClicked}
-                  label={!available ? "Enable" : "Disable"}
-                  toggleColor="red"
-                />
-                <Link to={`/sm/products/edit/${prodCode}`}>
-                  <button
-                    type="button"
-                    className="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700"
-                  >
-                    <PencilIcon
-                      className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+              <aside className="mt-8 xl:hidden">
+                <h2 className="sr-only">Details</h2>
+                <div className="space-y-5">
+                  {available ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Available
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      Unavailable
+                    </span>
+                  )}
+                  <div className="flex items-center space-x-2">
+                    <CurrencyDollarIcon
+                      className="h-5 w-5 text-gray-400"
                       aria-hidden="true"
                     />
-                    <span>Edit</span>
-                  </button>
-                </Link>
+                    <span className="text-gray-900 text-sm font-medium">
+                      {`List Price: $${listPrice}`}
+                    </span>
+                  </div>
+                  {discountPrice !== 0 && (
+                    <div className="flex items-center space-x-2">
+                      <CurrencyDollarIcon
+                        className="h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                      <span className="text-gray-900 text-sm font-medium">
+                        {`Discount Price: $${discountPrice}`}
+                      </span>
+                    </div>
+                  )}
+                  {onlineOnly && (
+                    <div className="flex items-center space-x-2">
+                      <StatusOnlineIcon
+                        className="h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                      <span className="text-gray-900 text-sm font-medium">
+                        Online only
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
+                  {Boolean(colors.length) && (
+                    <FieldSection fieldName="Colors" fields={colors} />
+                  )}
+                  {Boolean(sizes.length) && (
+                    <FieldSection fieldName="Sizes" fields={sizes} />
+                  )}
+                  {Boolean(categories.length) && (
+                    <FieldSection fieldName="Categories" fields={categories} />
+                  )}
+                  {Boolean(tags.length) && (
+                    <FieldSection fieldName="Tags" fields={tags} />
+                  )}
+                </div>
+              </aside>
+              <div className="py-3 xl:pt-6 xl:pb-0">
+                <h2 className="sr-only">Description</h2>
+                <div className="prose max-w-none">
+                  <p>{description}</p>
+                </div>
               </div>
             </div>
-            <aside className="mt-8 xl:hidden">
-              <h2 className="sr-only">Details</h2>
-              <div className="space-y-5">
-                {available ? (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Available
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    Unavailable
-                  </span>
-                )}
-                <div className="flex items-center space-x-2">
-                  <CurrencyDollarIcon
-                    className="h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                  <span className="text-gray-900 text-sm font-medium">
-                    {`List Price: $${listPrice}`}
-                  </span>
+            <section aria-labelledby="activity-title" className="mt-8 xl:mt-10">
+              <div className="divide-y divide-gray-200">
+                <div className="pb-4 md:flex md:items-center md:justify-between">
+                  <h2
+                    id="activity-title"
+                    className="text-lg font-medium text-gray-900"
+                  >
+                    SKUs
+                  </h2>
                 </div>
+                <div className="pt-6">
+                  <SKUTable
+                    data={products}
+                    onDeleteSkuClicked={onDeleteSkuClicked}
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+          <aside className="hidden xl:block xl:pl-8">
+            <h2 className="sr-only">Details</h2>
+            <div className="space-y-5">
+              {available ? (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  Available
+                </span>
+              ) : (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                  Unavailable
+                </span>
+              )}
+              <div className="flex items-center space-x-2">
+                <CurrencyDollarIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+                <span className="text-gray-900 text-sm font-medium">
+                  {`List Price: $${listPrice}`}
+                </span>
+              </div>
+              {discountPrice !== 0 && (
                 <div className="flex items-center space-x-2">
-                  <CurrencyDollarIcon
+                  <CurrencyDollarSolid
                     className="h-5 w-5 text-gray-400"
                     aria-hidden="true"
                   />
@@ -409,121 +496,39 @@ const ProductDetailsBody = ({
                     {`Discount Price: $${discountPrice}`}
                   </span>
                 </div>
-                {onlineOnly && (
-                  <div className="flex items-center space-x-2">
-                    <StatusOnlineIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                    <span className="text-gray-900 text-sm font-medium">
-                      Online only
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
-                {Boolean(colors.length) && (
-                  <FieldSection fieldName="Colors" fields={colors} />
-                )}
-                {Boolean(sizes.length) && (
-                  <FieldSection fieldName="Sizes" fields={sizes} />
-                )}
-                {Boolean(categories.length) && (
-                  <FieldSection fieldName="Categories" fields={categories} />
-                )}
-                {Boolean(tags.length) && (
-                  <FieldSection fieldName="Tags" fields={tags} />
-                )}
-              </div>
-            </aside>
-            <div className="py-3 xl:pt-6 xl:pb-0">
-              <h2 className="sr-only">Description</h2>
-              <div className="prose max-w-none">
-                <p>{description}</p>
-              </div>
+              )}
+              {onlineOnly && (
+                <div className="flex items-center space-x-2">
+                  <StatusOnlineIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  <span className="text-gray-900 text-sm font-medium">
+                    Online only
+                  </span>
+                </div>
+              )}
             </div>
-          </div>
-          <section aria-labelledby="activity-title" className="mt-8 xl:mt-10">
-            <div className="divide-y divide-gray-200">
-              <div className="pb-4 md:flex md:items-center md:justify-between">
-                <h2
-                  id="activity-title"
-                  className="text-lg font-medium text-gray-900"
-                >
-                  SKUs
-                </h2>
-              </div>
-              <div className="pt-6">
-                <SKUTable
-                  data={products}
-                  onDeleteSkuClicked={onDeleteSkuClicked}
-                />
-              </div>
+            <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
+              {Boolean(colors.length) && (
+                <FieldSection fieldName="Colors" fields={colors} />
+              )}
+              {Boolean(sizes.length) && (
+                <FieldSection fieldName="Sizes" fields={sizes} />
+              )}
+              {Boolean(categories.length) && (
+                <FieldSection fieldName="Categories" fields={categories} />
+              )}
+              {Boolean(tags.length) && (
+                <FieldSection fieldName="Tags" fields={tags} />
+              )}
             </div>
-          </section>
+          </aside>
         </div>
-        <aside className="hidden xl:block xl:pl-8">
-          <h2 className="sr-only">Details</h2>
-          <div className="space-y-5">
-            {available ? (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                Available
-              </span>
-            ) : (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                Unavailable
-              </span>
-            )}
-            <div className="flex items-center space-x-2">
-              <CurrencyDollarIcon
-                className="h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              <span className="text-gray-900 text-sm font-medium">
-                {`List Price: $${listPrice}`}
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CurrencyDollarSolid
-                className="h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              <span className="text-gray-900 text-sm font-medium">
-                {`Discount Price: $${discountPrice}`}
-              </span>
-            </div>
-            {onlineOnly && (
-              <div className="flex items-center space-x-2">
-                <StatusOnlineIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-                <span className="text-gray-900 text-sm font-medium">
-                  Online only
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
-            {Boolean(colors.length) && (
-              <FieldSection fieldName="Colors" fields={colors} />
-            )}
-            {Boolean(sizes.length) && (
-              <FieldSection fieldName="Sizes" fields={sizes} />
-            )}
-            {Boolean(categories.length) && (
-              <FieldSection fieldName="Categories" fields={categories} />
-            )}
-            {Boolean(tags.length) && (
-              <FieldSection fieldName="Tags" fields={tags} />
-            )}
-          </div>
-        </aside>
       </div>
     </div>
-  </div>
-);
-
+  );
+};
 export const ProductDetails = () => {
   const { prodCode } = useParams();
   const { addToast } = useToasts();

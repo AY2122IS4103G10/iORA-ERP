@@ -112,6 +112,7 @@ public class DataLoader implements CommandLineRunner {
 		ar1.add(AccessRightsEnum.WAREHOUSE_ORDER);
 		ar1.add(AccessRightsEnum.STORE_BASIC);
 		ar1.add(AccessRightsEnum.STORE_INVENTORY);
+		ar1.add(AccessRightsEnum.LOGISTICS_BASIC);
 		JobTitle jobTitle1 = new JobTitle("IT Admin", "Superuser", ar1);
 		em.persist(jobTitle1);
 

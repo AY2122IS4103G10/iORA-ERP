@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react"
-import { listingApi } from "../../../../environments/Api"
+import { useSelector } from "react-redux";
+import { listingApi, purchasesApi } from "../../../../environments/Api"
 
 import moment from "moment";
+import { useParams } from "react-router-dom";
+import { fetchPurchase, selectPurchase } from "../../../../stores/slices/purchasesSlice";
+import { useDispatch } from "react-redux";
 
 
 function calculateSubTotal(lineItems) {
@@ -11,20 +15,32 @@ function calculateSubTotal(lineItems) {
 }
 
 
-export const CheckoutSuccessful = ({ confirmedOrder}) => {
+export const CheckoutSuccessful = () => {
+    const dispatch = useDispatch();
+
+    const { id } = useParams();
     const [models, setModels] = useState(null);
+    const confirmedOrder = useSelector(selectPurchase);
 
     useEffect(() => {
-        let skuList = confirmedOrder.lineItems.map((item) => item.product.sku)
-        listingApi.getModelsBySKUList(skuList)
-            .then((response) => {
-                setModels(response.data);
-            })
+        if (confirmedOrder === null || confirmedOrder === undefined) {
+            dispatch(fetchPurchase(id));
+        }
+        if (confirmedOrder !== null) {
+            let skuList = confirmedOrder.lineItems.map((item) => item.product.sku);
+            listingApi.getModelsBySKUList(skuList)
+                .then((response) => {
+                    setModels(response.data);
+                })
+        }
+    }, [confirmedOrder])
 
-    }, [])
+    console.log(confirmedOrder);
+
     return (
         <main className="bg-white px-4 pt-16 pb-24 sm:px-6 sm:pt-18 lg:px-8">
-            <div className="max-w-3xl mx-auto">
+           { confirmedOrder !== null ? 
+           <div className="max-w-3xl mx-auto">
                 <div className="max-w-2xl">
                     <h1 className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Thank you!</h1>
                     <p className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">Your order has been placed!</p>
@@ -45,7 +61,7 @@ export const CheckoutSuccessful = ({ confirmedOrder}) => {
                     </h2>
 
                     <h3 className="sr-only">Items</h3>
-                    {confirmedOrder.lineItems.map((item, id) => (
+                    {confirmedOrder?.lineItems.map((item, id) => (
                         <div key={id} className="py-10 border-b border-gray-200 flex space-x-6">
                             {models !== null ?
                                 <>
@@ -127,7 +143,7 @@ export const CheckoutSuccessful = ({ confirmedOrder}) => {
                                     </dd>))}
                             </div>
                             <div>
-                                <dt className="font-medium text-gray-900">Shipping method</dt>
+                                <dt className="font-medium text-gray-900">Delivery method</dt>
                                 <dd className="mt-2 text-gray-700">
                                     <p>{confirmedOrder.delivery === true ? "Doorstep Delivery" : "Store Pickup"}</p>
                                     <p>
@@ -149,7 +165,7 @@ export const CheckoutSuccessful = ({ confirmedOrder}) => {
                                     Discount
                                     {/* <span className="rounded-full bg-gray-200 text-xs text-gray-600 py-0.5 px-2 ml-2">STUDENT50</span> */}
                                 </dt>
-                                <dd className="text-gray-700">{confirmedOrder.promotions === null ? "-$0" : confirmedOrder.promotions}</dd>
+                                <dd className="text-gray-700">{confirmedOrder.promotions === null ? "-$0" : "yes"}</dd>
                             </div>
                             <div className="flex justify-between">
                                 <dt className="font-medium text-gray-900">Shipping</dt>
@@ -160,9 +176,9 @@ export const CheckoutSuccessful = ({ confirmedOrder}) => {
                                 <dd className="text-base text-gray-900 font-bold">${confirmedOrder.totalAmount}</dd>
                             </div>
                         </dl>
-                    </div> 
+                    </div>
                 </section>
             </div>
-        </main>
-    )
+            : <p>loading</p>}
+        </main>)
 }

@@ -1,15 +1,6 @@
-import { useEffect, useState, Fragment } from "react";
-import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch, useSelector } from "react-redux";
-
-
-import { selectCart } from "../../../../stores/slices/cartSlice";
-import { checkoutApi } from "../../../../environments/Api";
 import { countries } from "../../../../utilities/Util";
 import { RadioGroupComponent } from "../../../components/RadioGroup";
 import { SimpleComboBox } from "../../../components/ComboBoxes/SimpleComboBox";
-import { OrderSummary } from "../OrderSummary";
-import { selectUserId } from "../../../../stores/slices/userSlice";
 
 
 const deliveryMethods = [
@@ -176,108 +167,108 @@ export const CheckoutForm = ({
 
 
   return (
-        <div className="m-8 pt-4 pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-1">
-          <div className="max-w-lg mx-auto lg:max-w-none">
-            <section aria-labelledby="contact-info-heading">
-              <h2 id="contact-info-heading" className="text-lg font-medium text-gray-900">
-                Contact information
-              </h2>
+    <div className="m-8 pt-4 pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-1">
+      <div className="max-w-lg mx-auto lg:max-w-none">
+        <section aria-labelledby="contact-info-heading">
+          <h2 id="contact-info-heading" className="text-lg font-medium text-gray-900">
+            Contact information
+          </h2>
 
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700">
-                  Email address
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="email"
-                    id="email-address"
-                    autoComplete="email"
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label htmlFor="contact-number" className="block text-sm font-medium text-gray-700">
-                  Name
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="name"
-                    onChange={(e) => setName(e.target.value)}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label htmlFor="contact-number" className="block text-sm font-medium text-gray-700">
-                  Contact Number
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="number"
-                    id="phone-number"
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-            </section>
-
-            <section aria-labelledby="billing-heading" className="mt-10">
-              <h2 id="billing-heading" className="text-lg font-medium text-gray-900">
-                Billing Information
-              </h2>
-              <AddressForm
-                country={country}
-                setCountry={setCountry}
-                setAddress={setAddress}
-                setPostalCode={setPostalCode}
-                setCity={setCity}
-                setState={setState}
+          <div className="mt-6">
+            <label className="block text-sm font-medium text-gray-700">
+              Email address
+            </label>
+            <div className="mt-1">
+              <input
+                type="email"
+                id="email-address"
+                autoComplete="email"
+                onChange={(e) => setEmail(e.target.value)}
+                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               />
-            </section>
-
-            <div className="mt-10 border-t border-gray-200 pt-10">
-              <RadioGroupComponent
-                label="Delivery Method"
-                options={deliveryMethods}
-                value={selectedDeliveryMethod}
-                onChange={setSelectedDeliveryMethod}
-              />
-            </div>
-
-            {selectedDeliveryMethod.id === 1 ?
-              <DeliveryForm
-                sameAddress={sameAddress}
-                setSameAddress={setSameAddress}
-                country={country}
-                address={address}
-                setAddress={setAddress}
-              /> :
-              <StorePickupForm
-                store={store}
-                setStore={setStore}
-                storeList={storeList}
-              />
-            }
-
-            <div className="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
-              <button
-                type="submit"
-                className="w-full bg-gray-900 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500 sm:ml-6 sm:order-last sm:w-auto"
-                onClick={handleMakePayment}
-              >
-                Make Payment
-              </button>
-              <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
-                You won't be charged until the next step.
-              </p>
             </div>
           </div>
+
+          <div className="mt-6">
+            <label htmlFor="contact-number" className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
+            <div className="mt-1">
+              <input
+                type="text"
+                id="name"
+                onChange={(e) => setName(e.target.value)}
+                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <label htmlFor="contact-number" className="block text-sm font-medium text-gray-700">
+              Contact Number
+            </label>
+            <div className="mt-1">
+              <input
+                type="number"
+                id="phone-number"
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="billing-heading" className="mt-10">
+          <h2 id="billing-heading" className="text-lg font-medium text-gray-900">
+            Billing Information
+          </h2>
+          <AddressForm
+            country={country}
+            setCountry={setCountry}
+            setAddress={setAddress}
+            setPostalCode={setPostalCode}
+            setCity={setCity}
+            setState={setState}
+          />
+        </section>
+
+        <div className="mt-10 border-t border-gray-200 pt-10">
+          <RadioGroupComponent
+            label="Delivery Method"
+            options={deliveryMethods}
+            value={selectedDeliveryMethod}
+            onChange={setSelectedDeliveryMethod}
+          />
         </div>
+
+        {selectedDeliveryMethod.id === 1 ?
+          <DeliveryForm
+            sameAddress={sameAddress}
+            setSameAddress={setSameAddress}
+            country={country}
+            address={address}
+            setAddress={setAddress}
+          /> :
+          <StorePickupForm
+            store={store}
+            setStore={setStore}
+            storeList={storeList}
+          />
+        }
+
+        <div className="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between">
+          <button
+            type="submit"
+            className="w-full bg-gray-900 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500 sm:ml-6 sm:order-last sm:w-auto"
+            onClick={handleMakePayment}
+          >
+            Make Payment
+          </button>
+          <p className="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left">
+            You won't be charged until the next step.
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }

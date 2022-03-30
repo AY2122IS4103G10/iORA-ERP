@@ -110,5 +110,12 @@ export const checkoutApi = {
       onlineOrder
     )
   }
+}
 
+export const purchasesApi = {
+  getOrder(id) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}online/order/${id}`,
+    )
+  }
 }

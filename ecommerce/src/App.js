@@ -12,6 +12,7 @@ import { Listings } from "./views/containers/Listings";
 import ViewModel from "./views/containers/ViewModel";
 import { ManageCheckout } from "./views/containers/Checkout/ManageCheckout";
 import { ManageMembership } from "./views/containers/Membership/ManageMembership";
+import { CheckoutSuccessful } from "./views/containers/Checkout/CheckoutSuccessful";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
 
           <Route path="cart" element={<Cart />} />
           <Route path="cart/checkout" element={<ManageCheckout />} />
+          <Route path="checkout/success/:id" element={<CheckoutSuccessful/>}/>
 
           <Route path="membership" element={<ManageMembership />} />
 

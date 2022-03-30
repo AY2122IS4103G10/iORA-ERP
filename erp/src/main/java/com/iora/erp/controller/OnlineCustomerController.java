@@ -110,7 +110,7 @@ public class OnlineCustomerController {
             String username = decodedJWT.getSubject();
             Customer customer = customerService.getCustomerByEmail(username);
             Customer out = new Customer(customer.getFirstName(), customer.getLastName(), customer.getEmail(),
-                    customer.getDob(), customer.getContactNumber(), customer.getMembershipTier(), "");
+                    customer.getDob(), customer.getContactNumber(), customer.getMembershipTier(), customer.getMembershipPoints(), "");
             return ResponseEntity.ok(out);
         } catch (AuthenticationException e) {
             throw new RuntimeException("Refresh token is missing");
@@ -160,10 +160,10 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/redeemPoints/{customerId}/{amount}", produces = "application/json")
-    public ResponseEntity<Object> redeemPoints(@PathVariable Long customerId, @PathVariable int amount) {
+    @GetMapping(path = "/redeemPoints/{email}/{amount}", produces = "application/json")
+    public ResponseEntity<Object> redeemPoints(@PathVariable String email, @PathVariable int amount) {
         try {
-            return ResponseEntity.ok(customerService.redeemPoints(customerId, amount));
+            return ResponseEntity.ok(customerService.redeemPoints(email, amount));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

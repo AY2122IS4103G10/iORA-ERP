@@ -183,7 +183,7 @@ const SKUTable = ({ data, onDeleteSkuClicked }) => {
           const [open, setOpen] = useState(false);
           const cancelButtonRef = useRef(null);
           const [qty, setQty] = useState(e.row.original.baselineQty);
-          const onQtyChange = (e) => setQty(e.target.value);
+          const onQtyChange = (e) => e.target.value >= 0 && setQty(e.target.value)
           const { addToast } = useToasts();
           const dispatch = useDispatch();
           const onEditClicked = (evt) => {

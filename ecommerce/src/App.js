@@ -11,6 +11,7 @@ import { HomeIndex } from "./views/containers/Index/HomeIndex";
 import { Listings } from "./views/containers/Listings";
 import ViewModel from "./views/containers/ViewModel";
 import { ManageCheckout } from "./views/containers/Checkout/ManageCheckout";
+import { ManageMembership } from "./views/containers/Membership/ManageMembership";
 
 function App() {
   return (
@@ -27,14 +28,19 @@ function App() {
             </Auth>
           }
         >
-          <Route index element={<HomeIndex/>} />
-          <Route path="products/view/:modelCode" element={<ViewModel/>} />
+          <Route index element={<HomeIndex />} />
+
+          <Route path="products/view/:modelCode" element={<ViewModel />} />
           <Route path="products/:line">
-            <Route path=":tag" element={<Listings/>}/>
-            <Route path="" element={<Listings/>}/>
+            <Route path=":tag" element={<Listings />} />
+            <Route path="" element={<Listings />} />
           </Route>
-          <Route path="cart" element={<Cart/>}/>
-          <Route path="cart/checkout" element={<ManageCheckout/>}/>
+
+          <Route path="cart" element={<Cart />} />
+          <Route path="cart/checkout" element={<ManageCheckout />} />
+
+          <Route path="membership" element={<ManageMembership />} />
+
           <Route path="settings" element={<SettingsIndex />}>
             <Route path="profile" element={<Profile />} />
             <Route path="account" element={<Account />} />

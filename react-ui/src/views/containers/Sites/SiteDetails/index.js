@@ -77,7 +77,15 @@ const SiteDetailsBody = ({ address, siteCode, phone, company }) => (
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Address</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {address && `${address.road}, ${address.postalCode}`}
+                  <address className="not-italic">
+                    <span className="block">{address.road}</span>
+                    <span className="block">
+                      {address.city} {address.postalCode}
+                    </span>
+                    <span className="block">
+                      {address.country}, {address.state}
+                    </span>
+                  </address>
                 </dd>
               </div>
               <div className="sm:col-span-1">

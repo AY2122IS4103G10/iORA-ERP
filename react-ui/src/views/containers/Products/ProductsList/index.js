@@ -16,6 +16,7 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       {
         Header: "Product Code",
         accessor: "modelCode",
+        width: 170,
         Cell: (e) => (
           <div className="text-ellipsis overflow-hidden">{e.value}</div>
         ),
@@ -23,14 +24,14 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       {
         Header: "Name",
         accessor: "name",
-        width: 300,
+        width: 270,
         Cell: (e) => (
           <div className="text-ellipsis overflow-hidden">{e.value}</div>
         ),
       },
       {
         Header: "Color",
-        width: 268,
+        width: 240,
         accessor: (row) =>
           row.productFields
             .filter((field) => field.fieldName === "COLOUR")
@@ -55,7 +56,7 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       {
         Header: "List Price",
         accessor: "listPrice",
-        width: 120,
+        width: 90,
         Cell: (e) => `$${e.value}`,
       },
       {

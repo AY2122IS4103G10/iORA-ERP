@@ -46,6 +46,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                     employee.getJobTitle().getId()) == true) {
 
                 String tempPassword = StringGenerator.generateRandom(48, 122, 8);
+                employee.setCompany(adminService.getCompanyById(employee.getCompany().getId()));
+                employee.setDepartment(adminService.getDepartmentById(employee.getDepartment().getId()));
+                employee.setJobTitle(adminService.getJobTitleById(employee.getJobTitle().getId()));
                 employee.setPassword(passwordEncoder().encode(tempPassword));
                 em.persist(employee);
                 emailService.sendTemporaryPassword(employee, tempPassword);

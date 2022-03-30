@@ -59,6 +59,7 @@ import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductPrint } from "./views/containers/Products/ProductPrint";
 import { ProductRFID } from "./views/containers/Products/ProductRFID/index.js";
+import { ProductSearch } from "./views/containers/Products/ProductSearch/index.js";
 import { ProductsList } from "./views/containers/Products/ProductsList";
 import { ManageProfile } from "./views/containers/Profile/ManageProfile/index.js";
 import { PasswordForm } from "./views/containers/Profile/PasswordForm/index.js";
@@ -494,6 +495,14 @@ function App() {
             }
           >
             <Route path="products" element={<Outlet />}>
+              <Route
+                path="search"
+                element={
+                  <ManageProducts subsys="wh">
+                    <ProductSearch subsys="wh" />
+                  </ManageProducts>
+                }
+              />
               <Route
                 path="print"
                 element={

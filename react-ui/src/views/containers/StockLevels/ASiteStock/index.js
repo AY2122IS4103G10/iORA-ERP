@@ -1,28 +1,26 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
+import { TailSpin } from "react-loader-spinner";
 import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
-import {
-  fetchAllModelsBySkus,
-} from "../../StockTransfer/StockTransferForm";
+import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 import { useState } from "react";
 
 const columns = [
   {
     Header: "SKU Code",
     accessor: "sku",
-  },{
+  },
+  {
     Header: "Name",
     accessor: "name",
   },
   {
     Header: "Color",
     accessor: (row) =>
-      row.product.productFields.find(
-        (field) => field.fieldName === "COLOUR"
-      ).fieldValue,
+      row.product.productFields.find((field) => field.fieldName === "COLOUR")
+        .fieldValue,
   },
   {
     Header: "Size",
@@ -63,17 +61,15 @@ export const AsiteStock = () => {
     const { stockLevel } = site && site;
     if (stockLevel !== undefined) {
       const products = stockLevel.products;
-      fetchAllModelsBySkus(products).then(
-        (data) => {
-          setLineItems(
-            products.map((stock, index) => ({
-              ...stock,
-              modelCode: data[index].modelCode,
-              name: data[index].name,
-            }))
-          );
-        }
-      );
+      fetchAllModelsBySkus(products).then((data) => {
+        setLineItems(
+          products.map((stock, index) => ({
+            ...stock,
+            modelCode: data[index].modelCode,
+            name: data[index].name,
+          }))
+        );
+      });
     }
   }, [site]);
   return status === "succeeded" ? (
@@ -163,14 +159,12 @@ export const AsiteStock = () => {
                   Stock Levels
                 </h2>
                 <div className="ml-2 mr-2">
-                  {lineItems === null ||
-                  lineItems === undefined ? (
-                    <p>loading</p>
+                  {lineItems === null || lineItems === undefined ? (
+                    <div className="flex mt-5 items-center justify-center">
+                      <TailSpin color="#00BCD4" height={20} width={20} />
+                    </div>
                   ) : (
-                    <SimpleTable
-                      columns={columns}
-                      data={lineItems}
-                    />
+                    <SimpleTable columns={columns} data={lineItems} />
                   )}
                 </div>
               </section>
@@ -180,6 +174,8 @@ export const AsiteStock = () => {
       </div>
     </>
   ) : (
-    <p>loading</p>
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BCD4" height={20} width={20} />
+    </div>
   );
 };

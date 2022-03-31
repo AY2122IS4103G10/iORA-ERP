@@ -699,7 +699,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         em.persist(onlineOrder);
         finaliseCustomerOrder(onlineOrder);
 
-        onlineOrder.getSite().addNotification(new Notification("NEW Online Order # " + onlineOrder.getId(),
+        onlineOrder.getSite().addNotification(new Notification("Online Order (NEW) # " + onlineOrder.getId(),
                 "Status is " + onlineOrder.getLastStatus().name() + ": "
                         + onlineOrder.getLastStatus().getDescription()));
 

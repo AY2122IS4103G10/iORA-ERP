@@ -10,7 +10,7 @@ import {
   ScanItemsSection,
 } from "../../Procurement/ProcurementPickPack";
 
-const PickPackList = ({ data }) => {
+const PickPackList = ({ data, status }) => {
   const columns = useMemo(() => {
     return [
       {
@@ -47,12 +47,13 @@ const PickPackList = ({ data }) => {
         accessor: "",
         Cell: (row) => {
           const lineItem = row.row.original;
-          return lineItem.pickedQty !== lineItem.requestedQty
+          return lineItem.pickedQty === 0
+            ? "READY"
+            : lineItem.pickedQty !== lineItem.qty
             ? "PICKING"
-            : lineItem.pickedQty === lineItem.requestedQty &&
-              lineItem.packedQty === 0
+            : lineItem.pickedQty === lineItem.qty && lineItem.packedQty === 0
             ? "PICKED"
-            : lineItem.packedQty !== lineItem.requestedQty
+            : lineItem.packedQty !== lineItem.qty
             ? "PACKING"
             : "PACKED";
         },
@@ -121,7 +122,7 @@ export const OnlineOrderPickPack = () => {
     );
     if (status === "PACKED") {
       openInvoice();
-      navigate(`/${subsys}/orders/${orderId}/delivery`);
+      navigate(`/${subsys}/orders/${orderId}`);
     }
   };
 
@@ -147,12 +148,13 @@ export const OnlineOrderPickPack = () => {
           autoDismiss: true,
         }
       );
-      setSearch("");
     } catch (error) {
-      addToast(`Error: ${error.message}`, {
+      addToast(`Error: ${error.response.data}`, {
         appearance: "error",
         autoDismiss: true,
       });
+    } finally {
+      setSearch("");
     }
   };
 
@@ -160,14 +162,14 @@ export const OnlineOrderPickPack = () => {
     if (
       e.target.value.length - search.length > 10 &&
       e.target.value.includes("-")
-    ) { 
+    ) {
       if (status === "PENDING")
         handlePickPack().then(() => handleScan(e.target.value));
       else handleScan(e.target.value);
     }
     setSearch(e.target.value);
   };
-
+  console.log(lineItems);
   return (
     <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -230,7 +232,7 @@ export const OnlineOrderPickPack = () => {
             ) &&
               ["sm", "wh", "str"].some((s) => s === subsys) && (
                 <section aria-labelledby="order-summary">
-                  <PickPackList data={lineItems} setData={setLineItems} />
+                  <PickPackList data={lineItems} status={status} />
                 </section>
               )}
           </div>

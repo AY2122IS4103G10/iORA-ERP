@@ -454,6 +454,32 @@ function App() {
               </PrivateRoute>
             }
           >
+            <Route path="products" element={<Outlet />}>
+              <Route
+                path="search"
+                element={
+                  <ManageProducts subsys="mf">
+                    <ProductSearch subsys="mf" />
+                  </ManageProducts>
+                }
+              />
+              <Route
+                path="print"
+                element={
+                  <ManageProducts subsys="mf">
+                    <ProductPrint subsys="mf" />
+                  </ManageProducts>
+                }
+              />
+              <Route
+                path="rfid"
+                element={
+                  <ManageProducts subsys="mf">
+                    <ProductRFID subsys="mf" />
+                  </ManageProducts>
+                }
+              />
+            </Route>
             <Route path="procurements" element={<Outlet />}>
               <Route
                 index

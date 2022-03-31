@@ -20,6 +20,16 @@ const whTabs = [
   },
 ];
 
+const mfTabs = [
+  { name: "Search Product", href: "/mf/products/search", current: true },
+  { name: "Print Label", href: "/mf/products/print", current: false },
+  {
+    name: "Generate RFID",
+    href: "/mf/products/rfid",
+    current: false,
+  },
+];
+
 const Header = ({ subsys }) => {
   return (
     <div className="bg-white shadow">
@@ -47,7 +57,9 @@ const Header = ({ subsys }) => {
         </div>
 
         <div className="ml-3">
-          <Tabs tabs={subsys === "sm" ? smTabs : whTabs} />
+          <Tabs
+            tabs={subsys === "sm" ? smTabs : subsys === "wh" ? whTabs : mfTabs}
+          />
         </div>
       </div>
     </div>

@@ -62,39 +62,48 @@ export const Listings = () => {
                   </h2>
 
                   <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-                    {currentListings.map((model) => (
-                      <Link
-                        key={model.modelCode}
-                        to={`/products/view/${model.modelCode}`}
-                        className="group"
-                      >
-                        <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
-                          <img
-                            src={model.imageLinks[0]}
-                            alt="image"
-                            className="w-full h-full object-center object-cover group-hover:opacity-75"
-                          />
-                        </div>
-                        <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
-                          <h3>{model.name}</h3>
-                          <div>
-                            {model.listPrice !== model.discountPrice ? (
-                              <>
-                                <span className="line-through text-sm mr-2 text-gray-500">
-                                  ${model.listPrice}
-                                </span>
-                                <span>${model.discountPrice}</span>
-                              </>
-                            ) : (
-                              <span>${model.listPrice}</span>
-                            )}
+                    {currentListings.length ? (
+                      currentListings.map((model) => (
+                        <Link
+                          key={model.modelCode}
+                          to={`/products/view/${model.modelCode}`}
+                          className="group"
+                        >
+                          <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
+                            <img
+                              src={model.imageLinks[0]}
+                              alt="image"
+                              className="w-full h-full object-center object-cover group-hover:opacity-75"
+                            />
                           </div>
-                        </div>
-                        <p className="mt-1 text-sm italic text-gray-500">
-                          {model.description}
-                        </p>
-                      </Link>
-                    ))}
+                          <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
+                            <h3>{model.name}</h3>
+                            <div>
+                              {model.listPrice !== model.discountPrice ? (
+                                <>
+                                  <span className="line-through text-sm mr-2 text-gray-500">
+                                    ${model.listPrice}
+                                  </span>
+                                  <span>${model.discountPrice}</span>
+                                </>
+                              ) : (
+                                <span>${model.listPrice}</span>
+                              )}
+                            </div>
+                          </div>
+                          <p className="mt-1 text-sm italic text-gray-500">
+                            {model.description}
+                          </p>
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="flex justify-between text-center">
+                        {/* <ShoppingCartIcon className="mx-auto h-12 w-12 text-gray-400"/> */}
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">
+                          No listings.
+                        </h3>
+                      </div>
+                    )}
                   </div>
                 </section>
                 <SimplePaginator

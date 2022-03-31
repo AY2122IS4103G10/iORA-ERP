@@ -610,7 +610,7 @@ public class DataLoader implements CommandLineRunner {
 			productService.createModel(model);
 		}
 
- 		Random r = new Random();
+		Random r = new Random();
 		for (Product p : productService.searchProductsBySKU(null)) {
 			siteService.addProducts((long) r.nextInt(20) + 2, p.getSku(), r.nextInt(5) + 10);
 		}
@@ -715,6 +715,9 @@ public class DataLoader implements CommandLineRunner {
 		Payment payment2 = new Payment(78, "546130", PaymentTypeEnum.MASTERCARD);
 		customerOrderService.createPayment(payment2);
 
+		Payment payment3 = new Payment(77, "981651", PaymentTypeEnum.NETS);
+		customerOrderService.createPayment(payment3);
+
 		CustomerOrder co1 = new CustomerOrder();
 		co1.setDateTime(new Date());
 		co1.addLineItem(coli4);
@@ -743,7 +746,7 @@ public class DataLoader implements CommandLineRunner {
 		oo2.setCustomerId(5L);
 		oo2.addLineItem(coli1);
 		oo2.addLineItem(coli2);
-		oo2.setPaid(false);
+		oo2.addPayment(payment3);
 		oo2.setSite(siteService.getSite(10L));
 		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
 				"Singapore",

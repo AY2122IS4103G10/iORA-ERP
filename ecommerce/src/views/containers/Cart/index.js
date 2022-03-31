@@ -1,9 +1,6 @@
 import {
-  CheckIcon,
-  ClockIcon,
   PlusSmIcon,
   MinusSmIcon,
-  QuestionMarkCircleIcon,
   XIcon as XIconSolid,
   ShoppingCartIcon,
 } from "@heroicons/react/solid";
@@ -48,7 +45,7 @@ export const CartItems = ({
               <div className="flex-shrink-0">
                 <img
                   src={item.model.imageLinks[0]}
-                  // alt={product.imageAlt}
+                  alt=""
                   className="w-24 h-24 rounded-md object-center object-cover sm:w-48 sm:h-48"
                 />
               </div>
@@ -154,7 +151,7 @@ export const CartItems = ({
         </ul>
       ) : (
         <div className="text-center">
-          <ShoppingCartIcon className="mx-auto h-12 w-12 text-gray-400"/>
+          <ShoppingCartIcon className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
             Your cart is empty.
           </h3>
@@ -243,8 +240,12 @@ export const CartSummary = ({
       <div className="mt-6">
         <button
           type="submit"
-          className="w-full bg-gray-800 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+          className={classNames(
+            !cart.length ? "bg-gray-500" : "bg-gray-800 hover:bg-gray-500",
+            "w-full  border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500"
+          )}
           onClick={onCheckoutClicked}
+          disabled={!cart.length}
         >
           Checkout
         </button>

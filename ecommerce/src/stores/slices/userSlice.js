@@ -163,6 +163,11 @@ const userSlice = createSlice({
     builder.addCase(loginJwt.rejected, (state, action) => {
       state.error = "Login failed";
     });
+    builder.addCase(postLoginJwt.fulfilled, (state, action) => {
+      console.log(action.payload)
+      state.user = { ...action.payload };
+      state.loggedIn = true;
+    });
     builder.addCase(register.fulfilled, (state, action) => {
       action.payload.password !== undefined && delete action.payload.password;
       state.user = action.payload;

@@ -3,6 +3,7 @@ import { CurrencyDollarIcon, GlobeIcon } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import { addToCart } from "../../../stores/slices/cartSlice";
 import {
   fetchModel,
@@ -154,6 +155,7 @@ const findProduct = (model, selectedColor, selectedSize) => {
 
 export default function ViewModel() {
   const dispatch = useDispatch();
+  const { addToast } = useToasts();
   const { modelCode } = useParams();
   const model = useSelector(selectModel);
   const [selectedColor, setSelectedColor] = useState(0);
@@ -186,6 +188,10 @@ export default function ViewModel() {
       dispatch(
         addToCart({ model: model, product: product, stock: productStock.qty })
       );
+      addToast(`Added ${model.name} to cart.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
     }
   };
 
@@ -255,6 +261,7 @@ export default function ViewModel() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
                   {model.imageLinks.map((image) => (
                     <img
+                      alt={model.name}
                       key={image}
                       src={image}
                       className={classNames(
@@ -288,7 +295,7 @@ export default function ViewModel() {
                   ) : null}
                   <button
                     type="submit"
-                    className={`mt-8 w-full bg-gray-800 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500`}
+                    className="mt-8 w-full bg-gray-800 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                     onClick={onAddCartClicked}
                     disabled={
                       productStock === null || productStock?.qty === 0
@@ -312,7 +319,7 @@ export default function ViewModel() {
                   </h2>
 
                   <div className="mt-4 text-sm text-gray-900">
-                    <ul role="list">
+                    <ul>
                       {model.description.split(".").map((item) => (
                         <li key={item}>{item}</li>
                       ))}

@@ -72,7 +72,7 @@ export const Listings = () => {
                           <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-w-2 sm:aspect-h-3">
                             <img
                               src={model.imageLinks[0]}
-                              alt="image"
+                              alt=""
                               className="w-full h-full object-center object-cover group-hover:opacity-75"
                             />
                           </div>

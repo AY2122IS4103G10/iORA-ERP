@@ -7,9 +7,12 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip
+  Tooltip,
 } from "chart.js";
+import { useEffect } from "react";
 import { Doughnut, Line } from "react-chartjs-2";
+import { useDispatch, useSelector } from "react-redux";
+import { getStockLevelSites } from "../../../../stores/slices/dashboardSlice";
 import { Header } from "../../../components/Header";
 import SharedStats from "../components/Stats";
 
@@ -122,6 +125,17 @@ const stats = [
 ];
 
 export const ManageDashboard = () => {
+  const dispatch = useDispatch();
+  const status = useSelector(({ dashboard }) => dashboard.status);
+  const stockLevelSites = useSelector(
+    ({ dashboard }) => dashboard.stockLevelSites
+  );
+
+  useEffect(() => {
+    status === "idle" && dispatch(getStockLevelSites());
+    Boolean(stockLevelSites) && console.log(stockLevelSites);
+  }, [status, dispatch]);
+
   return (
     <>
       <Header title={"Dashboard"} />

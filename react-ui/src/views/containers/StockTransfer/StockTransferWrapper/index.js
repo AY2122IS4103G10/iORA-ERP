@@ -112,6 +112,7 @@ export const StockTransferHeader = ({
   openRejectModal,
   handleConfirmOrder,
   openInvoiceModal,
+  fromSiteId
 }) => {
   let status = order.statusHistory[order.statusHistory.length - 1].status;
   let orderMadeBy = order.statusHistory[0].actionBy.id;
@@ -152,7 +153,7 @@ export const StockTransferHeader = ({
               ""
             )}
 
-            {userSiteId === orderMadeBy && status === "PENDING" ? (
+            {(userSiteId === orderMadeBy  && status === "PENDING") || (userSiteId === fromSiteId && (status === "PENDING" || status === "ACCEPTED"))  ? (
               <button
                 type="button"
                 className="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
@@ -561,6 +562,7 @@ export const StockTransferWrapper = ({ subsys }) => {
             openRejectModal={openRejectModal}
             handleConfirmOrder={handleConfirmOrder}
             openInvoiceModal={openInvoiceModal}
+            fromSiteId={order.fromSite.id}
           />
           <Outlet
             context={{

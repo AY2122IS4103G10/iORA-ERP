@@ -241,7 +241,7 @@ export const PosPurchaseOrder = () => {
   const openModal = () => {
     setModalState(true);
     setOrder({
-      totalAmount: 0.0,
+      totalAmount: amount,
       lineItems: lineItems,
       promotions: promotions,
       payments: [],

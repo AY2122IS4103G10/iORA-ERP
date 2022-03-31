@@ -42,7 +42,7 @@ export function Notifications({ open, setOpen, setNewNoti }) {
   };
 
   useEffect(() => {
-    const timer = setInterval(getNotifications, 10000);
+    const timer = setInterval(getNotifications, 2000);
     return () => clearInterval(timer);
   });
 

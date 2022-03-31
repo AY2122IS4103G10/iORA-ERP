@@ -507,13 +507,13 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         CustomerOrder co = getCustomerOrder(orderId);
         Boolean exchangeable = false;
 
-        List <CustomerOrderLI> colis = co.getLineItems();
+        List<CustomerOrderLI> colis = co.getLineItems();
         for (CustomerOrderLI coli : colis) {
             if (coli.getProduct().equals(exchangeLI.getOldItem())) {
                 exchangeable = true;
                 // coli.setQty(coli.getQty() - 1);
                 // if (coli.getQty() == 0) {
-                //     colis.remove(coli);
+                // colis.remove(coli);
                 // }
             }
         }
@@ -558,7 +558,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         CustomerOrder co = getCustomerOrder(orderId);
         Boolean refundable = false;
 
-        List <CustomerOrderLI> colis = co.getLineItems();
+        List<CustomerOrderLI> colis = co.getLineItems();
         for (CustomerOrderLI coli : colis) {
             if (coli.getProduct().equals(refundLI.getProduct()) && coli.getQty() >= refundLI.getQty()) {
                 refundable = true;
@@ -671,6 +671,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
         if (onlineOrder.isDelivery()) {
             onlineOrder.setSite(siteService.getSite(3L));
+            onlineOrder
+                    .addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
         } else {
             boolean pickupSiteHasStock = true;
             Long pickupSiteId = onlineOrder.getPickupSite().getId();
@@ -687,9 +689,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             } else {
                 onlineOrder.setSite(siteService.getSite(3L));
             }
+            onlineOrder.addStatusHistory(
+                    new OOStatus(onlineOrder.getPickupSite(), new Date(), OnlineOrderStatusEnum.PENDING));
         }
 
-        onlineOrder.addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
         em.persist(onlineOrder);
         finaliseCustomerOrder(onlineOrder);
 

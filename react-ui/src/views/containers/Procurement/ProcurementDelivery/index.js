@@ -281,7 +281,7 @@ export const ProcurementDelivery = () => {
         {["READY_FOR_SHIPPING", "SHIPPING", "SHIPPING_MULTIPLE"].some(
           (s) => s === status.status
         ) &&
-          ["sm", "mf", "wh"].some((s) => s === subsys) && (
+          ["sm", "mf", "wh", "lg"].some((s) => s === subsys) && (
             <section aria-labelledby="order-summary">
               <DeliveryList
                 data={lineItems}

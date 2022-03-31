@@ -610,11 +610,9 @@ public class DataLoader implements CommandLineRunner {
 			productService.createModel(model);
 		}
 
-		List<Product> products = productService.searchProductsBySKU(null);
-		for (Product p : products) {
-			Random r = new Random();
-			int stockLevel = r.nextInt(7) + 3;
-			siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), stockLevel);
+		Random r = new Random();
+		for (Product p : productService.searchProductsBySKU(null)) {
+			siteService.addProducts((long) r.nextInt(20) + 2, p.getSku(), r.nextInt(5) + 10);
 		}
 
 		// ProcurementOrders
@@ -717,6 +715,9 @@ public class DataLoader implements CommandLineRunner {
 		Payment payment2 = new Payment(78, "546130", PaymentTypeEnum.MASTERCARD);
 		customerOrderService.createPayment(payment2);
 
+		Payment payment3 = new Payment(77, "981651", PaymentTypeEnum.NETS);
+		customerOrderService.createPayment(payment3);
+
 		CustomerOrder co1 = new CustomerOrder();
 		co1.setDateTime(new Date());
 		co1.addLineItem(coli4);
@@ -727,8 +728,10 @@ public class DataLoader implements CommandLineRunner {
 		co1.setCustomerId(2L);
 		customerOrderService.createCustomerOrder(co1, null);
 
+		siteService.addProducts(4L, "ASK0010155H-1", 8);
+		siteService.addProducts(4L, "AB0010059H-1", 9);
 		OnlineOrder oo1 = new OnlineOrder(false);
-		oo1.setCustomerId(2L);
+		oo1.setCustomerId(5L);
 		oo1.setPickupSite((StoreSite) siteService.getSite(4L));
 		oo1.addLineItem(coli6);
 		oo1.addLineItem(coli7);
@@ -740,10 +743,10 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createOnlineOrder(oo1, null);
 
 		OnlineOrder oo2 = new OnlineOrder(true);
-		oo2.setCustomerId(2L);
+		oo2.setCustomerId(5L);
 		oo2.addLineItem(coli1);
 		oo2.addLineItem(coli2);
-		oo2.setPaid(false);
+		oo2.addPayment(payment3);
 		oo2.setSite(siteService.getSite(10L));
 		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
 				"Singapore",
@@ -763,5 +766,4 @@ public class DataLoader implements CommandLineRunner {
 		cust.addSupportTicket(st);
 		customerService.updateCustomerAccount(cust);
 	}
-
 }

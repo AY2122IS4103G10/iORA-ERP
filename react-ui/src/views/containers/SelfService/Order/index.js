@@ -485,7 +485,7 @@ export function Order() {
     setOpenCheckout(true);
     setCheckoutItems(lineItems.concat(promotions));
     setOrder({
-      totalAmount: 0.0,
+      totalAmount: Math.max(amount - voucherDiscount, 0),
       lineItems: lineItems,
       promotions: promotions,
       payments: [],

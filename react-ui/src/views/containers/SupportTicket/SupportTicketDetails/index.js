@@ -17,6 +17,7 @@ const Header = ({
 }) => {
     return (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+            <NavigatePrev page="Support Tickets" path="/sm/support" />
             <div className="flex items-center space-x-3">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">
@@ -450,7 +451,6 @@ export const SupportTicketDetails = () => {
     return (
         Boolean(ticket) && (
             <div className="py-8 xl:py-10">
-                <NavigatePrev page="Support Tickets" path="/sm/support" />
                 <Header
                     ticketId={ticketId}
                     status={ticket.status}

@@ -8,7 +8,17 @@ const deliveryMethods = [
   { id: 2, title: 'Store Pickup', description: '5-7 business days', footer: 'Free' },
 ]
 
-export const AddressForm = ({ country, setCountry, setAddress, setCity, setState, setPostalCode }) => {
+export const AddressForm = ({ 
+  country, 
+  setCountry, 
+  address, 
+  setAddress, 
+  city,
+  setCity, 
+  state,
+  setState, 
+  postalCode,
+  setPostalCode }) => {
   let convertCountries = countries.map((country) => ({ name: country }));
 
   return (
@@ -32,6 +42,7 @@ export const AddressForm = ({ country, setCountry, setAddress, setCity, setState
             type="text"
             id="address"
             autoComplete="street-address"
+            value={address}
             onChange={(e) => setAddress(e.target.value)}
             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
           />
@@ -47,6 +58,7 @@ export const AddressForm = ({ country, setCountry, setAddress, setCity, setState
             type="text"
             id="city"
             autoComplete="address-level2"
+            value={city}
             onChange={(e) => setCity(e.target.value)}
             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
           />
@@ -62,6 +74,7 @@ export const AddressForm = ({ country, setCountry, setAddress, setCity, setState
             type="text"
             id="region"
             autoComplete="address-level1"
+            value={state}
             onChange={(e) => setState(e.target.value)}
             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
           />
@@ -77,6 +90,7 @@ export const AddressForm = ({ country, setCountry, setAddress, setCity, setState
             type="number"
             id="postal-code"
             autoComplete="postal-code"
+            value={postalCode}
             onChange={(e) => setPostalCode(e.target.value)}
             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
           />
@@ -146,15 +160,21 @@ export const StorePickupForm = ({ store, setStore, storeList }) => {
 
 
 export const CheckoutForm = ({
+  email,
   setEmail,
+  name,
   setName,
+  phoneNumber,
   setPhoneNumber,
   country,
   setCountry,
   address,
   setAddress,
+  postalCode,
   setPostalCode,
+  city,
   setCity,
+  state,
   setState,
   sameAddress,
   setSameAddress,
@@ -184,6 +204,7 @@ export const CheckoutForm = ({
                 type="email"
                 id="email-address"
                 autoComplete="email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               />
@@ -198,6 +219,7 @@ export const CheckoutForm = ({
               <input
                 type="text"
                 id="name"
+                value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               />
@@ -212,6 +234,7 @@ export const CheckoutForm = ({
               <input
                 type="number"
                 id="phone-number"
+                value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               />
@@ -236,9 +259,13 @@ export const CheckoutForm = ({
             <AddressForm
               country={country}
               setCountry={setCountry}
+              address={address}
               setAddress={setAddress}
+              postalCode={postalCode}
               setPostalCode={setPostalCode}
+              city={city}
               setCity={setCity}
+              state={state}
               setState={setState}
             />
           </section>

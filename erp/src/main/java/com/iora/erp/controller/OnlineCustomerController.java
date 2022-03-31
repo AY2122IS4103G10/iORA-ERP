@@ -110,7 +110,7 @@ public class OnlineCustomerController {
             String username = decodedJWT.getSubject();
             Customer customer = customerService.getCustomerByEmail(username);
             Customer out = new Customer(customer.getFirstName(), customer.getLastName(), customer.getEmail(),
-                    customer.getDob(), customer.getContactNumber(), customer.getMembershipTier(), customer.getMembershipPoints(), "");
+                    customer.getDob(), customer.getContactNumber(), customer.getMembershipTier(), customer.getMembershipPoints(), customer.getAddress());
             return ResponseEntity.ok(out);
         } catch (AuthenticationException e) {
             throw new RuntimeException("Refresh token is missing");

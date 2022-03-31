@@ -39,8 +39,10 @@ public class DeliveryAddress implements Serializable {
         this.street2 = street2;
         this.city = city;
         this.zip = zip;
+        this.country = country;
         this.state = state;
         this.phone = phone;
+        this.name = name;
     }
 
     public Long getId() {

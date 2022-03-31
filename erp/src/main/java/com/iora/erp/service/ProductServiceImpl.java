@@ -270,9 +270,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Model> getModelsBySKUList(List<String> SKUList) throws ModelException {
         List<Model> models = new ArrayList<>();
-
         for (String sku : SKUList) {
-            String modelCode = sku.substring(0, sku.length() - 2);
+            String modelCode = sku.substring(0, sku.lastIndexOf("-"));
             models.add(getModel(modelCode));
         }
         return models;

@@ -32,7 +32,7 @@ export const CartItems = ({ cart, onAddQtyClicked, onMinusQtyClicked, onRemoveIt
           <li key={id} className="flex py-6 sm:py-10">
             <div className="flex-shrink-0">
               <img
-                // src={product.imageSrc}
+                src={item.model.imageLinks[0]}
                 // alt={product.imageAlt}
                 className="w-24 h-24 rounded-md object-center object-cover sm:w-48 sm:h-48"
               />

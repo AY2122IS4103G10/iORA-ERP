@@ -17,7 +17,7 @@ export const Listings = () => {
 
     return (
         <main>
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+            <div className="max-w-3xl mx-auto mb-10 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                 <div className="py-8 text-center">
                     <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">{line.toUpperCase() + ' ' + (tag === undefined ? '' : tag?.toUpperCase())}</h1>
                     <p className="mt-4 max-w-3xl mx-auto text-base text-gray-500">

@@ -37,7 +37,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                             Discounts/Promotions
                         </p>
                         {promotions.map((promo) => (
-                            <div className="flex items-center justify-between">
+                            <div key={promo.id} className="flex items-center justify-between">
                                 <dt className="text-gray-600">{promo.promotion.fieldValue}</dt>
                                 <dd>-${Math.abs(promo.subTotal)}</dd>
                             </div>
@@ -67,11 +67,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                             <dd className="text-base">${afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0.00)}</dd>
                         </div>
                     </dl>
-                    {/* {  
-            order !== null > 0 ? 
-            <ManagePayment order={order} isDelivery={selectedDeliveryMethod.id === 1 ? true : false}  />  
-            : <p className="text-center text-gray-600">No items in cart</p>
-          } */}
+                  
                     <Popover className="fixed bottom-0 inset-x-0 flex flex-col-reverse text-sm font-medium text-gray-900 lg:hidden">
                         <div className="relative z-10 bg-white border-t border-gray-200 px-4 sm:px-6">
                             <div className="max-w-lg mx-auto">

@@ -1,6 +1,6 @@
-import { Fragment } from "react"
-import { Popover, Transition } from '@headlessui/react'
-import { ChevronUpIcon } from '@heroicons/react/solid'
+// import { Fragment } from "react"
+// import { Popover, Transition } from '@headlessui/react'
+// import { ChevronUpIcon } from '@heroicons/react/solid'
 
 export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, selectedDeliveryMethod }) => {
     return (
@@ -15,7 +15,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                         Order summary
                     </h2>
 
-                    <ul role="list" className="text-sm font-medium text-gray-900 divide-y divide-gray-200">
+                    <ul className="text-sm font-medium text-gray-900 divide-y divide-gray-200">
                         {cart.map((item, id) => (
                             <li key={id} className="flex items-start py-6 space-x-4">
                                 <div className="flex-auto space-y-1">
@@ -68,7 +68,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                         </div>
                     </dl>
                   
-                    <Popover className="fixed bottom-0 inset-x-0 flex flex-col-reverse text-sm font-medium text-gray-900 lg:hidden">
+                    {/* <Popover className="fixed bottom-0 inset-x-0 flex flex-col-reverse text-sm font-medium text-gray-900 lg:hidden">
                         <div className="relative z-10 bg-white border-t border-gray-200 px-4 sm:px-6">
                             <div className="max-w-lg mx-auto">
                                 <Popover.Button className="w-full flex items-center py-6 font-medium">
@@ -123,7 +123,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                                 </Transition.Child>
                             </div>
                         </Transition.Root>
-                    </Popover>
+                    </Popover> */}
                 </div>
             </section>
         </>

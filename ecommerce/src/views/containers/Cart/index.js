@@ -282,8 +282,10 @@ export const Cart = () => {
     let isDelivery = delivery === 1 ? true : false;
     dispatch(setDeliveryChoice(isDelivery));
 
-    if (cart.length > 0) {
+    if (cart.length > 0 && Boolean(localStorage.getItem("user"))) {
       navigate("checkout");
+    } else {
+      navigate("/login");
     }
   };
 

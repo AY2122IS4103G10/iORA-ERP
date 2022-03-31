@@ -108,7 +108,7 @@ export const Listings = () => {
                 </section>
                 <SimplePaginator
                   itemsPerPage={listingsPerPage}
-                  totalItems={listings.length}
+                  totalItems={listings?.length}
                   paginateBack={paginateBack}
                   paginateFront={paginateFront}
                   paginate={paginate}

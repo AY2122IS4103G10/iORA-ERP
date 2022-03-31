@@ -60,7 +60,7 @@ const ProfileDropdown = ({ handleLogout }) => {
           <Menu.Item>
             {({ active }) => (
               <a
-                href="#"
+                href="/"
                 className={classNames(
                   active ? "bg-gray-100" : "",
                   "block px-4 py-2 text-sm text-gray-700"
@@ -246,8 +246,8 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
               <Link to="/">
                 <span className="sr-only">iORA</span>
                 <img
-                  className="mx-auto h-14 w-auto"
-                  src="android-chrome-512x512.png"
+                  className="mx-auto h-14 w-14"
+                  src="/logo192.png"
                   alt="iORA"
                 />
               </Link>
@@ -340,7 +340,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
 
               {/* Search */}
               <div className="flex lg:ml-6">
-                <a href="#" className="p-2 text-gray-400 hover:text-gray-500">
+                <a href="/" className="p-2 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">Search</span>
                   <SearchIcon className="w-6 h-6" aria-hidden="true" />
                 </a>

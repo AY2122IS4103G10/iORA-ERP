@@ -19,7 +19,6 @@ const deliveryMethods = [
 export const ManageCheckout = () => {
     const navigate = useNavigate();
     const [enterPayment, setEnterPayment] = useState(false);
-
     const [subTotal, setSubTotal] = useState(0);
     const [afterDiscount, setAfterDiscount] = useState(0);
     const [promotions, setPromotions] = useState([]);
@@ -29,15 +28,20 @@ export const ManageCheckout = () => {
     const [name, setName] = useState(JSON.parse(localStorage.getItem("user")).firstName + " " + JSON.parse(localStorage.getItem("user")).lastName);
     const [phoneNumber, setPhoneNumber] = useState(JSON.parse(localStorage.getItem("user")).contactNumber);
     const [country, setCountry] = useState({ name: countries[197] });
-    const [address, setAddress] = useState(JSON.parse(localStorage.getItem("user")).address.street1 + " " + JSON.parse(localStorage.getItem("user")).address.street2);
-    const [city, setCity] = useState(JSON.parse(localStorage.getItem("user")).address.city);
-    const [state, setState] = useState(JSON.parse(localStorage.getItem("user")).address.state);
-    const [postalCode, setPostalCode] = useState(JSON.parse(localStorage.getItem("user")).address.zip);
+    const [address, setAddress] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("");
+    const [postalCode, setPostalCode] = useState("");
+    if (Boolean(localStorage.getItem("user")).address) {
+        setAddress(JSON.parse(localStorage.getItem("user")).address.street1 + " " + JSON.parse(localStorage.getItem("user")).address.street2);
+        setCity(JSON.parse(localStorage.getItem("user")).address.city);
+        setState(JSON.parse(localStorage.getItem("user")).address.state);
+        setPostalCode(JSON.parse(localStorage.getItem("user")).address.zip);
+    }
     const [sameAddress, setSameAddress] = useState(true);
     const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(deliveryMethods[0]);
     const [store, setStore] = useState({ name: "Select Store" });
     const [storeList, setStoreList] = useState();
-
 
     const cart = useSelector(selectCart);
     const customerId = useSelector(selectUserId);

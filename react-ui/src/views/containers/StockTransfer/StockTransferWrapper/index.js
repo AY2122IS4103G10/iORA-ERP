@@ -499,7 +499,7 @@ export const StockTransferWrapper = ({ subsys }) => {
         dispatch(getStockTransfer(id));
       })
       .catch((error) => {
-        addToast(`${error.message}`, {
+        addToast(`Error: ${error.message}`, {
           appearance: "error",
           autoDismiss: true,
         });

@@ -168,7 +168,8 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         if (actionBy == null) {
             throw new SiteConfirmationException("Site with id " + siteId + " does not exist.");
-        } else if (stOrder.getLastStatus() != StockTransferStatusEnum.PENDING) {
+        } else if (stOrder.getLastStatus() != StockTransferStatusEnum.PENDING
+                && stOrder.getLastStatus() != StockTransferStatusEnum.ACCEPTED) {
             throw new StockTransferException(
                     "Stock Transfer Order has been accepted and cannot be deleted.");
         } else if (!actionBy.equals(stOrder.getLastActor())) {
@@ -351,7 +352,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                 e.printStackTrace();
             }
         }
-        
+
         return updateStockTransferOrder(stOrder);
     }
 

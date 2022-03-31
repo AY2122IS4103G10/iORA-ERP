@@ -1,6 +1,7 @@
 import {
   CogIcon,
   CreditCardIcon, LogoutIcon, QuestionMarkCircleIcon,
+  ServerIcon,
   ShieldCheckIcon
 } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
@@ -15,6 +16,12 @@ import { SideBar } from "../../../components/SideBar";
 
 const navigation = [
   { name: "Exit Subsystem", href: "/home", icon: LogoutIcon, current: true },
+  {
+    name: "Products",
+    href: "/mf/products/print",
+    icon: ServerIcon,
+    current: false,
+  },
   {
     name: "Procurement",
     href: "/mf/procurements/search",

@@ -82,6 +82,7 @@ export default function CheckoutForm({
       const { data } = await orderApi.createOrder(
         {
           ...order,
+          amount: amount,
           paid: true,
           payments: [
             {

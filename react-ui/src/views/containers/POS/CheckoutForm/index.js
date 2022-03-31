@@ -89,6 +89,7 @@ export const CheckoutForm = ({
       const response = await orderApi.createOrder(
         {
           ...order,
+          amount: Math.max(amount - voucherDiscount, 0),
           customerId: customerId,
           paid: true,
           voucher,

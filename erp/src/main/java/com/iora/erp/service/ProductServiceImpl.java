@@ -395,6 +395,8 @@ public class ProductServiceImpl implements ProductService {
 
         if (old == null) {
             throw new ModelException("Model not found");
+        } else if (model.getProductFields().size() < old.getProductFields().size()) {
+            throw new ModelException("Sizes and Colours cannot be deleted.");
         }
 
         old.setDescription(model.getDescription());

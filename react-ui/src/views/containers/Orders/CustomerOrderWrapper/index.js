@@ -27,7 +27,6 @@ const deliveryStatuses = [
 ];
 
 const Header = ({
-  subsys,
   disableTabs,
   tabs,
   orderId,
@@ -36,7 +35,7 @@ const Header = ({
 }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
-      <NavigatePrev page="Orders" path={`/${subsys}/orders/search`} />
+      <NavigatePrev page="Orders" path={-1} />
       <div className="relative pb-5 border-b border-gray-200 sm:pb-0">
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${orderId}`}</h1>
@@ -244,7 +243,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     <>
       <div className="py-8 xl:py-10">
         <Header
-          subsys={subsys}
           disableTabs={delivery === null || delivery === undefined}
           tabs={tabs}
           orderId={orderId}

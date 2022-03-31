@@ -398,7 +398,7 @@ const ProductDetailsBody = ({
                       aria-hidden="true"
                     />
                     <span className="text-gray-900 text-sm font-medium">
-                      {`List Price: $${listPrice}`}
+                      {`Original Price: $${listPrice}`}
                     </span>
                   </div>
                   {discountPrice !== 0 && (
@@ -483,7 +483,7 @@ const ProductDetailsBody = ({
                   aria-hidden="true"
                 />
                 <span className="text-gray-900 text-sm font-medium">
-                  {`List Price: $${listPrice}`}
+                  {`Original Price: $${listPrice}`}
                 </span>
               </div>
               {discountPrice !== 0 && (

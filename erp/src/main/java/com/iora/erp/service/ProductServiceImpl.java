@@ -272,7 +272,7 @@ public class ProductServiceImpl implements ProductService {
         List<Model> models = new ArrayList<>();
         for (String sku : SKUList) {
             String modelCode = sku.substring(0, sku.lastIndexOf("-"));
-            models.add(getModel(modelCode));
+            models.add(getModel(modelCode.trim()));
         }
         return models;
     }

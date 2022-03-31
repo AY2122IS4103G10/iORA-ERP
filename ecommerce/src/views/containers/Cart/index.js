@@ -57,9 +57,15 @@ export const CartItems = ({ cart, onAddQtyClicked, onMinusQtyClicked, onRemoveIt
                       {item.product?.productFields.find((field) => field.fieldName === "SIZE").fieldValue}
                     </p>
                   </div>
-                  <p className="mt-1 text-sm font-medium text-gray-900">
-                    ${item.model.listPrice}
-                  </p>
+
+                  <div>
+                    {item.model.listPrice !== item.model.discountPrice ?
+                      <>
+                        <span className="line-through text-xs mr-2 text-gray-500">${item.model.listPrice}</span>
+                        <span className="mt-1 text-sm font-medium text-gray-900">${item.model.discountPrice}</span>
+                      </>
+                      : <span className="mt-1 text-sm font-medium text-gray-900">${item.model.listPrice}</span>}
+                  </div>
                 </div>
 
                 <div className="mt-4 sm:mt-0 sm:pr-9">
@@ -110,7 +116,7 @@ export const CartItems = ({ cart, onAddQtyClicked, onMinusQtyClicked, onRemoveIt
               </div>
 
               <p className="mt-4 flex flex-row-reverse font-bold text-sm text-gray-700 space-x-2">
-                Subtotal: ${parseInt(item.model.listPrice) * item.qty}
+                Subtotal: ${parseInt(item.model.discountPrice) * item.qty}
               </p>
             </div>
           </li>
@@ -120,7 +126,7 @@ export const CartItems = ({ cart, onAddQtyClicked, onMinusQtyClicked, onRemoveIt
   )
 }
 
-export const CartSummary = ({cart, delivery, setDelivery, subTotal, totalDiscount, onCheckoutClicked}) => {
+export const CartSummary = ({ cart, delivery, setDelivery, subTotal, totalDiscount, onCheckoutClicked }) => {
 
   return (
     <section
@@ -222,7 +228,7 @@ export const Cart = () => {
 
   const onCheckoutClicked = (e) => {
     e.preventDefault();
-    let isDelivery = delivery === 1 ? true: false;
+    let isDelivery = delivery === 1 ? true : false;
     dispatch(setDeliveryChoice(isDelivery));
 
     if (cart.length > 0) {
@@ -236,7 +242,7 @@ export const Cart = () => {
       let subTotal = 0;
       let lineItems = cart.map((item) => {
         const { model, ...lineItem } = item;
-        subTotal = subTotal + item.qty * model.listPrice;
+        subTotal = subTotal + item.qty * model.discountPrice;
         return lineItem;
       });
       setSubTotal(subTotal);
@@ -271,7 +277,7 @@ export const Cart = () => {
           onMinusQtyClicked={onMinusQtyClicked}
           onRemoveItemClicked={onRemoveItemClicked}
         />
-        
+
         <CartSummary
           cart={cart}
           delivery={delivery}

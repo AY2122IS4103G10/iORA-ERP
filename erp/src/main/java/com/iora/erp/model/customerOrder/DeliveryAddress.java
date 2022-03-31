@@ -2,7 +2,6 @@ package com.iora.erp.model.customerOrder;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -39,8 +38,10 @@ public class DeliveryAddress implements Serializable {
         this.street2 = street2;
         this.city = city;
         this.zip = zip;
+        this.country = country;
         this.state = state;
         this.phone = phone;
+        this.name = name;
     }
 
     public Long getId() {

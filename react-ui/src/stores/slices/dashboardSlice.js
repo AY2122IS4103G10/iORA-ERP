@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { dashboardApi, sitesApi } from "../../environments/Api";
+import { sitesApi } from "../../environments/Api";
 
 const initialState = {
   stockLevelSites: [],

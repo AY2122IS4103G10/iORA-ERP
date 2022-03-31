@@ -127,13 +127,13 @@ const stats = [
 export const ManageDashboard = () => {
   const dispatch = useDispatch();
   const status = useSelector(({ dashboard }) => dashboard.status);
-  const stockLevelSites = useSelector(
-    ({ dashboard }) => dashboard.stockLevelSites
-  );
+  // const stockLevelSites = useSelector(
+  //   ({ dashboard }) => dashboard.stockLevelSites
+  // );
 
   useEffect(() => {
     status === "idle" && dispatch(getStockLevelSites());
-    Boolean(stockLevelSites) && console.log(stockLevelSites);
+    // Boolean(stockLevelSites) && console.log(stockLevelSites);
   }, [status, dispatch]);
 
   return (

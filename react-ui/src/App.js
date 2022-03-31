@@ -4,14 +4,13 @@ import { Auth } from "./views/containers/Auth/Auth";
 import Error from "./views/containers/Auth/Error";
 import { Home } from "./views/containers/Auth/Home";
 import { Login } from "./views/containers/Auth/Login";
-import { ResetPassword } from "./views/containers/Auth/ResetPassword/index.js";
 import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
 import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
 import { CustomerDetails } from "./views/containers/Customer/CustomerDetails";
 import { CustomerForm } from "./views/containers/Customer/CustomerForm";
 import { ManageCustomer } from "./views/containers/Customer/ManageCustomer";
-import { ManageDashboard } from "./views/containers/Dashboard/ManageDashboard/index.js";
+import { ManageDashboard } from "./views/containers/Dashboard/ManageDashboard";
 import { DepartmentDetails } from "./views/containers/Department/DepartmentDetails";
 import { DepartmentForm } from "./views/containers/Department/DepartmentForm";
 import { ManageDepartment } from "./views/containers/Department/ManageDepartment";
@@ -32,9 +31,9 @@ import { MembershipTierDetails } from "./views/containers/MembershipTier/Members
 import { MembershipTierForm } from "./views/containers/MembershipTier/MembershipTierForm";
 import { MembershipTierList } from "./views/containers/MembershipTier/MembershipTierList";
 import { ManageOnlineOrders } from "./views/containers/OnlineOrder/ManageOnlineOrders";
-import { OnlineOrderCollection } from "./views/containers/OnlineOrder/OnlineOrderCollection/index.js";
+import { OnlineOrderCollection } from "./views/containers/OnlineOrder/OnlineOrderCollection";
 import { OnlineOrderList } from "./views/containers/OnlineOrder/OnlineOrderList";
-import { OnlineOrderPickPack } from "./views/containers/OnlineOrder/OnlineOrderPickPack/index.js";
+import { OnlineOrderPickPack } from "./views/containers/OnlineOrder/OnlineOrderPickPack";
 import { OnlineOrderSearch } from "./views/containers/OnlineOrder/OnlineOrderSearch";
 import { CustomerOrderDetails } from "./views/containers/Orders/CustomerOrderDetails";
 import { CustomerOrderWrapper } from "./views/containers/Orders/CustomerOrderWrapper";
@@ -43,7 +42,7 @@ import { OrderList } from "./views/containers/Orders/OrderList";
 import { OrderSearch } from "./views/containers/Orders/OrderSearch";
 import { ManagePOS } from "./views/containers/POS/ManagePOS";
 import { OrderDetails } from "./views/containers/POS/OrderDetails";
-import { PosSearch } from "./views/containers/POS/PosSearch/index.js";
+import { PosSearch } from "./views/containers/POS/PosSearch";
 import { PosPurchaseHistory } from "./views/containers/POS/PurchaseHistory";
 import { PosPurchaseOrder } from "./views/containers/POS/PurchaseOrder";
 import { ManageProcurement } from "./views/containers/Procurement/ManageProcurement";
@@ -58,14 +57,14 @@ import { ManageProducts } from "./views/containers/Products/ManageProducts";
 import { ProductDetails } from "./views/containers/Products/ProductDetails";
 import { ProductForm } from "./views/containers/Products/ProductForm";
 import { ProductPrint } from "./views/containers/Products/ProductPrint";
-import { ProductRFID } from "./views/containers/Products/ProductRFID/index.js";
-import { ProductSearch } from "./views/containers/Products/ProductSearch/index.js";
+import { ProductRFID } from "./views/containers/Products/ProductRFID";
+import { ProductSearch } from "./views/containers/Products/ProductSearch";
 import { ProductsList } from "./views/containers/Products/ProductsList";
-import { ManageProfile } from "./views/containers/Profile/ManageProfile/index.js";
-import { PasswordForm } from "./views/containers/Profile/PasswordForm/index.js";
-import { Profile } from "./views/containers/Profile/Profile/index.js";
-import { ProfileForm } from "./views/containers/Profile/ProfileForm/index.js";
-import { Settings } from "./views/containers/Profile/Settings/index.js";
+import { ManageProfile } from "./views/containers/Profile/ManageProfile";
+import { PasswordForm } from "./views/containers/Profile/PasswordForm";
+import { Profile } from "./views/containers/Profile/Profile";
+import { ProfileForm } from "./views/containers/Profile/ProfileForm";
+import { Settings } from "./views/containers/Profile/Settings";
 // import { SMRoute } from "./routes/SMRoute";
 import { ManagePromotions } from "./views/containers/Promotions/ManagePromotions";
 import { FrontPage } from "./views/containers/SelfService/FrontPage";
@@ -82,7 +81,7 @@ import { EditStockLevel } from "./views/containers/StockLevels/EditStockLevel";
 import { StockLevelForm } from "./views/containers/StockLevels/ProdStockLevelForm";
 import { MyStoreStock } from "./views/containers/StockLevels/StoreStockList";
 import { ManageStockTransfer } from "./views/containers/StockTransfer/ManageStockTransfer";
-import { StockTransferDelivery } from "./views/containers/StockTransfer/StockTransferDelivery/index.js";
+import { StockTransferDelivery } from "./views/containers/StockTransfer/StockTransferDelivery";
 import { StockTransferForm } from "./views/containers/StockTransfer/StockTransferForm";
 import { StockTransferList } from "./views/containers/StockTransfer/StockTransferList";
 import { StockTransferPickPack } from "./views/containers/StockTransfer/StockTransferPickPack";
@@ -90,7 +89,7 @@ import { StockTransferSearch } from "./views/containers/StockTransfer/StockTrans
 import { StockTransferWrapper } from "./views/containers/StockTransfer/StockTransferWrapper";
 import { ViewStockTransfer } from "./views/containers/StockTransfer/ViewStockTransfer";
 import { ManageSupportTicket } from "./views/containers/SupportTicket/ManageSupportTicket";
-import { SupportTicketDetails } from "./views/containers/SupportTicket/SupportTicketDetails/index.js";
+import { SupportTicketDetails } from "./views/containers/SupportTicket/SupportTicketDetails";
 import { ManageVendors } from "./views/containers/Vendor/ManageVendors";
 import { VendorDetails } from "./views/containers/Vendor/VendorDetails";
 import { VendorForm } from "./views/containers/Vendor/VendorForm";
@@ -104,7 +103,6 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="resetPassword" element={<ResetPassword />} />
         <Route path="/" element={<Auth />}>
           {/* Common Infrastructure */}
           <Route index element={<Login />} />

@@ -33,7 +33,7 @@ export const Listings = () => {
   const paginateFront = () => setCurrentPage(currentPage - 1);
   const paginateBack = () => setCurrentPage(currentPage + 1);
   const paginate = (page) => setCurrentPage(page);
-  
+
   return (
     <main>
       <div>
@@ -77,7 +77,18 @@ export const Listings = () => {
                         </div>
                         <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
                           <h3>{model.name}</h3>
-                          <p>${model.listPrice}</p>
+                          <div>
+                            {model.listPrice !== model.discountPrice ? (
+                              <>
+                                <span className="line-through text-sm mr-2 text-gray-500">
+                                  ${model.listPrice}
+                                </span>
+                                <span>${model.discountPrice}</span>
+                              </>
+                            ) : (
+                              <span>${model.listPrice}</span>
+                            )}
+                          </div>
                         </div>
                         <p className="mt-1 text-sm italic text-gray-500">
                           {model.description}

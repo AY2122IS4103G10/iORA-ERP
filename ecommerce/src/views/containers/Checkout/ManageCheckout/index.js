@@ -51,7 +51,7 @@ export const ManageCheckout = () => {
         async function calculate() {
             let subTotal = 0;
             let lineItems = cart.map((item) => {
-                const { model, ...lineItem } = item;
+                const { model, stock, ...lineItem } = item;
                 subTotal = subTotal + item.qty * model.discountPrice;
                 return { ...lineItem, subTotal: model.discountPrice * item.qty };
             });

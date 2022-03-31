@@ -2,7 +2,6 @@ package com.iora.erp;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.TimerTask;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +33,7 @@ public class ErpApplication {
 			ObjectMapper mapper = new ObjectMapper();
 			TypeReference<List<Object>> typeReference = new TypeReference<List<Object>>() {
 			};
-			Resource resource = resourceLoader.getResource("classpath:com/iora/erp/data/products_test.json");
+			Resource resource = resourceLoader.getResource("classpath:com/iora/erp/data/products.json");
 			InputStream inputStream = resource.getInputStream();
 			try {
 				List<Object> productsJSON = mapper.readValue(inputStream, typeReference);

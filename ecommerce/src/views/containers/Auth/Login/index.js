@@ -145,12 +145,12 @@ export const Login = () => {
             <div className="mt-6"></div>
           </div>
           <div className="mt-6 text-center">
-            <Link
-              to="/"
+            <button
               className="text-base font-medium text-indigo-600 hover:text-indigo-500"
+              onClick={() => navigate(-1)}
             >
               <span aria-hidden="true"> &larr;</span> Back to store
-            </Link>
+            </button>
           </div>
         </div>
       </div>

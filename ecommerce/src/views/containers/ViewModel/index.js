@@ -146,6 +146,7 @@ export default function ViewModel() {
 
     useEffect(() => {
         dispatch(fetchModel(modelCode));
+        window.scrollTo(0,0);
     }, [dispatch])
 
     //fetch the stock availability
@@ -165,7 +166,7 @@ export default function ViewModel() {
         e.preventDefault();
         if (selectedColor !== 0 && selectedSize !== 0) {
             const product = findProduct(model, selectedColor, selectedSize);
-            dispatch(addToCart({ model: model, product: product }))
+            dispatch(addToCart({ model: model, product: product, stock: productStock.qty}))
         }
 
     }
@@ -175,7 +176,7 @@ export default function ViewModel() {
         <div className="bg-white">
             <div className="pt-6 pb-16 sm:pb-24">
                 <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <ol role="list" className="flex items-center space-x-4">
+                    {/* <ol role="list" className="flex items-center space-x-4">
                         {product.breadcrumbs.map((breadcrumb) => (
                             <li key={breadcrumb.id}>
                                 <div className="flex items-center">
@@ -198,7 +199,7 @@ export default function ViewModel() {
                                 {model.name}
                             </a>
                         </li>
-                    </ol>
+                    </ol> */}
                 </nav>
                 <div className="mt-8 max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                     <div className="lg:grid lg:grid-cols-12 lg:auto-rows-min lg:gap-x-8">

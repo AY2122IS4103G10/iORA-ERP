@@ -29,7 +29,7 @@ const cartSlice = createSlice({
     initialState,
     reducers: {
         addToCart(state, action) {
-            const {model, product} = action.payload;
+            const {model, product, stock} = action.payload;
             //check if product has been added
             if (state.cart.some((item) => item?.product.sku === product.sku )) {
                 state.cart = state.cart.map((item) => {
@@ -37,14 +37,14 @@ const cartSlice = createSlice({
                     if (item.product.sku === product.sku) {
                         return {
                             ...item,
-                            qty: item.qty + 1
+                            qty: (item.qty + 1) <= stock ? (item.qty + 1) : item.qty
                         }
                     } else {
                         return {...item};
                     }
                 })
             } else {
-                state.cart = state.cart.concat({model: model, product: product, qty: 1});
+                state.cart = state.cart.concat({model: model, product: product, qty: 1, stock: stock});
             }
             localStorage.setItem("cart", state.cart);
         },
@@ -54,7 +54,7 @@ const cartSlice = createSlice({
                 if (item.product.sku === product.sku) {
                     return {
                         ...item,
-                        qty: item.qty + 1
+                        qty: (item.qty + 1) <= item.stock ? (item.qty + 1) : item.qty
                     }
                 } else {
                     return {...item};

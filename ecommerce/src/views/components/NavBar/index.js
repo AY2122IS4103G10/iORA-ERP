@@ -60,7 +60,7 @@ const ProfileDropdown = ({ handleLogout }) => {
           <Menu.Item>
             {({ active }) => (
               <a
-                href="#"
+                href="/"
                 className={classNames(
                   active ? "bg-gray-100" : "",
                   "block px-4 py-2 text-sm text-gray-700"
@@ -172,7 +172,6 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                             {item.name}
                           </p>
                           <ul
-                            role="list"
                             aria-labelledby={`${category.id}-${item.id}-heading-mobile`}
                             className="mt-6 flex flex-col space-y-6"
                           >
@@ -341,7 +340,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
 
               {/* Search */}
               <div className="flex lg:ml-6">
-                <a href="#" className="p-2 text-gray-400 hover:text-gray-500">
+                <a href="/" className="p-2 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">Search</span>
                   <SearchIcon className="w-6 h-6" aria-hidden="true" />
                 </a>

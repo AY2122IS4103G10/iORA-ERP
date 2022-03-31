@@ -171,7 +171,7 @@ const SupportTicketBody = ({ messages, customer, order }) => {
                             {messages.map((msg, index) => (
                                 <li key={index} className="px-6 py-4">
                                     <p className="font-bold text-lg align-top mb-5">{msg.name}</p>
-                                    {Boolean(msg.imageUrl) && <img src={msg.imageUrl} width="500" />}
+                                    {Boolean(msg.imageUrl) && <img alt="attachment" src={msg.imageUrl} width="500" />}
                                     <p className="text-m align-bottom mb-5">{msg.message}</p>
                                     <p className="text-xs italic align-bottom mb-5">{moment.unix(msg.timeStamp / 1000).format("H:mm:ss, DD/MM/YYYY")}</p>
                                 </li>

@@ -4,7 +4,6 @@ import { Auth } from "./views/containers/Auth/Auth";
 import Error from "./views/containers/Auth/Error";
 import { Home } from "./views/containers/Auth/Home";
 import { Login } from "./views/containers/Auth/Login";
-import { ResetPassword } from "./views/containers/Auth/ResetPassword/index.js";
 import { CompanyDetails } from "./views/containers/Companies/CompanyDetails";
 import { CompanyForm } from "./views/containers/Companies/CompanyForm";
 import { ManageCompanies } from "./views/containers/Companies/ManageCompanies";
@@ -104,7 +103,6 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="resetPassword" element={<ResetPassword />} />
         <Route path="/" element={<Auth />}>
           {/* Common Infrastructure */}
           <Route index element={<Login />} />

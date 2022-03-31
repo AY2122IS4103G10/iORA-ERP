@@ -247,8 +247,8 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
               <Link to="/">
                 <span className="sr-only">iORA</span>
                 <img
-                  className="mx-auto h-14 w-auto"
-                  src="android-chrome-512x512.png"
+                  className="mx-auto h-14 w-14"
+                  src="/logo192.png"
                   alt="iORA"
                 />
               </Link>

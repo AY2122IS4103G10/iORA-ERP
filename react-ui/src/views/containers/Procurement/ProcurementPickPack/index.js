@@ -53,7 +53,9 @@ export const PickPackList = ({
         accessor: "",
         Cell: (row) => {
           const lineItem = row.row.original;
-          return lineItem.pickedQty !== lineItem.requestedQty
+          return lineItem.pickedQty === 0
+            ? "READY"
+            : lineItem.pickedQty !== lineItem.requestedQty
             ? "PICKING"
             : lineItem.pickedQty === lineItem.requestedQty &&
               lineItem.packedQty === 0
@@ -297,7 +299,7 @@ export const ProcurementPickPack = () => {
           appearance: "error",
           autoDismiss: true,
         });
-        setSearch("")
+        setSearch("");
       });
   };
 

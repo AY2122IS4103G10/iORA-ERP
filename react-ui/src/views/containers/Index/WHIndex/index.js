@@ -3,6 +3,7 @@ import {
   CollectionIcon,
   DocumentTextIcon, LogoutIcon,
   QuestionMarkCircleIcon,
+  ServerIcon,
   ShieldCheckIcon,
   ShoppingBagIcon,
   TruckIcon
@@ -23,7 +24,7 @@ const navigation = [
   {
     name: "Products",
     href: "/wh/products/print",
-    icon: CollectionIcon,
+    icon: ServerIcon,
     current: false,
   },
   {

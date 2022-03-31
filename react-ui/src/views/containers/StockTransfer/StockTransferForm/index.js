@@ -27,6 +27,7 @@ import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useToasts } from "react-toast-notifications";
 import { fetchSite } from "../../Procurement/ProcurementWrapper";
 import { SimpleInlineRG } from "../../../components/RadioGroups/SimpleInlineRG";
+import { TailSpin } from "react-loader-spinner";
 
 const orderTypes = [
   { id: 1, title: "Send" },
@@ -71,6 +72,7 @@ export const SelectSiteModal = ({
   fetchStockLevel,
   fetchAllModelsBySkus,
   selectedOrderType,
+  setLoading,
 }) => {
   const columns = useMemo(() => cols, []);
   const fromRef = useRef(null);
@@ -104,6 +106,7 @@ export const SelectSiteModal = ({
                 name: data[index].name,
               })),
             });
+            setLoading(false);
           });
         });
         setLineItems([]);
@@ -282,6 +285,7 @@ const AddItemsModal = ({
   selectedRows,
   setRowSelect,
   onAddItemsClicked,
+  loading,
 }) => {
   const itemCols = useMemo(() => {
     return [
@@ -326,13 +330,19 @@ const AddItemsModal = ({
             </Dialog.Title>
           </div>
           <div className="border-b border-gray-200 m-5">
-            <ItemsList
-              cols={itemCols}
-              data={data}
-              rowSelect={true}
-              selectedRows={selectedRows}
-              setRowSelect={setRowSelect}
-            />
+            {loading ? (
+              <div className="flex py-5 items-center justify-center">
+                <TailSpin color="#00BCD4" height={20} width={20} />
+              </div>
+            ) : (
+              <ItemsList
+                cols={itemCols}
+                data={data}
+                rowSelect={true}
+                selectedRows={selectedRows}
+                setRowSelect={setRowSelect}
+              />
+            )}
           </div>
         </div>
         <div>
@@ -460,12 +470,13 @@ export const StockTransferForm = ({ subsys }) => {
   const currSite = useSelector(selectUserSite);
   //get stock level and product information
   const [prodTableData, setProdTableData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchStockLevel = async (id) => {
+    setLoading(true);
     const { data } = await api.get(`store/viewStock/sites`, id);
     return { data };
   };
-
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getAllSites());
@@ -488,6 +499,7 @@ export const StockTransferForm = ({ subsys }) => {
                   name: data[index].name,
                 })),
               });
+              setLoading(false);
             });
           });
         })
@@ -586,6 +598,7 @@ export const StockTransferForm = ({ subsys }) => {
               name: data[index].name,
             })),
           });
+          setLoading(false);
         });
       });
       setTo({});
@@ -853,6 +866,7 @@ export const StockTransferForm = ({ subsys }) => {
           fetchStockLevel={fetchStockLevel}
           fetchAllModelsBySkus={fetchAllModelsBySkus}
           selectedOrderType={selectedOrderType}
+          setLoading={setLoading}
         />
 
         <AddItemsModal
@@ -863,6 +877,7 @@ export const StockTransferForm = ({ subsys }) => {
           selectedRows={selectedRows}
           setRowSelect={setSelectedRows}
           onAddItemsClicked={onAddItemsClicked}
+          loading={loading}
         />
 
         <ErrorModal

@@ -235,6 +235,7 @@ export const ProductPrint = () => {
                           placeholder="XXXXXXXXXX-X, XXXXXXXXXX-X, ..."
                           value={search}
                           onChange={onSearchChanged}
+                          autoFocus
                         />
                       ) : (
                         <div className="sm:grid sm:grid-cols-3 sm:gap-3 sm:grid-flow-row-dense">

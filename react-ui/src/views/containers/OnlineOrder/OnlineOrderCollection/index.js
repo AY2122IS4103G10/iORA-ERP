@@ -1,6 +1,8 @@
 import { CheckIcon } from "@heroicons/react/solid";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
+import { onlineOrderApi } from "../../../../environments/Api";
 
 const ConfirmCollection = ({
   title,
@@ -27,16 +29,16 @@ const ConfirmCollection = ({
         <button
           type="button"
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:col-start-2 sm:text-sm"
-          onClick={onCancelClicked}
+          onClick={onConfirmClicked}
         >
-          Cancel
+          Confirm
         </button>
         <button
           type="button"
           className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-          onClick={onConfirmClicked}
+          onClick={onCancelClicked}
         >
-          Confirm
+          Cancel
         </button>
       </div>
     </div>
@@ -44,13 +46,41 @@ const ConfirmCollection = ({
 };
 
 export const OnlineOrderCollection = () => {
-  const { orderId, subsys, status, pickupSite, currSiteId } =
-    useOutletContext();
+  const { addToast } = useToasts();
+  const {
+    orderId,
+    subsys,
+    status,
+    setStatus,
+    setStatusHistory,
+    pickupSite,
+    currSiteId,
+  } = useOutletContext();
   const navigate = useNavigate();
 
-  const onConfirmClicked = () => {};
+  const onConfirmClicked = () => {
+    const collectOrder = async () => {
+      try {
+        const { data } = await onlineOrderApi.collect(orderId);
+        const { statusHistory } = data;
+        setStatus(statusHistory[statusHistory.length - 1]);
+        setStatusHistory(statusHistory);
+        addToast(`Order #${orderId} collected.`, {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        navigate(`/${subsys}/orders/${orderId}`);
+      } catch (error) {
+        addToast(`Error: ${error.response.data}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      }
+    };
+    collectOrder()
+  };
   const onCancelClicked = () => navigate(-1);
-  
+
   return (
     <div className="space-y-6 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-12 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">

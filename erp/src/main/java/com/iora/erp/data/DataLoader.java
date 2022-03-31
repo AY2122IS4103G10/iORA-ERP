@@ -613,7 +613,7 @@ public class DataLoader implements CommandLineRunner {
 
 		Random r = new Random();
 		for (Product p : productService.searchProductsBySKU(null)) {
-			// siteService.addProducts(3L, p.getSku(), 5);
+			siteService.addProducts(3L, p.getSku(), 5);
 			siteService.addProducts((long) r.nextInt(20) + 2, p.getSku(), r.nextInt(5) + 10);
 		}
 

@@ -71,7 +71,7 @@ export const ManageCheckout = () => {
 
     }, [])
 
-    const onCancelClicked = () => navigate(-1);
+    const onCancelClicked = () => setEnterPayment(false);
 
     const handleMakePayment = () => {
         let delivery = selectedDeliveryMethod.id === 1 ? true : false
@@ -125,6 +125,7 @@ export const ManageCheckout = () => {
                     <ManagePayment
                         order={order}
                         isDelivery={selectedDeliveryMethod.id === 1 ? true : false}
+                        onCancelClicked={onCancelClicked}
                     />
                     : <CheckoutForm
                         setEmail={setEmail}

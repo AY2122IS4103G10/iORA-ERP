@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-
+import { TailSpin } from "react-loader-spinner";
 import PaymentForm from "../PaymentForm";
 import { checkoutApi } from "../../../../environments/Api";
 
@@ -37,7 +37,9 @@ export const ManagePayment = ({ order, isDelivery, onCancelClicked }) => {
           </Elements>
         </div>)
         : (
-          <p className="text-center">loading</p>
+          <div className="flex mt-5 items-center justify-center">
+              <TailSpin color="#111827" height={20} width={20} />
+            </div>
         )}
     </div>
   );

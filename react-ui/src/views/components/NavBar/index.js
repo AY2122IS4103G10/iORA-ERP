@@ -53,7 +53,7 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
             <BellIcon className="h-6 w-6" aria-hidden="true" />
             {newNoti && (
               <ExclamationIcon
-                className="h-6 w-6 w-5 text-red-500"
+                className="h-6 w-6 text-red-500"
                 aria-hidden="true"
               />
             )}

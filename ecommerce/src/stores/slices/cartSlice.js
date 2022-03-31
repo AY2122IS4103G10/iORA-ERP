@@ -46,7 +46,8 @@ const cartSlice = createSlice({
             } else {
                 state.cart = state.cart.concat({model: model, product: product, qty: 1, stock: stock});
             }
-            localStorage.setItem("cart", state.cart);
+            console.log(state.cart)
+            localStorage.setItem("cart", JSON.stringify(state.cart));
         },
         addCartItemQty(state, action) {
             const product = action.payload;
@@ -60,7 +61,7 @@ const cartSlice = createSlice({
                     return {...item};
                 }
             })
-            localStorage.setItem("cart", state.cart);
+            localStorage.setItem("cart", JSON.stringify(state.cart));
         },
         minusCartItemQty(state, action) {
             const product = action.payload;
@@ -74,12 +75,12 @@ const cartSlice = createSlice({
                     return {...item};
                 }
             })
-            localStorage.setItem("cart", state.cart);
+            localStorage.setItem("cart", JSON.stringify(state.cart));
         },
         removeItemFromCart(state, action) {
             const product = action.payload;
             state.cart = state.cart.filter((item) => item.product.sku !== product.sku);
-            localStorage.setItem("cart", state.cart);
+            localStorage.setItem("cart", JSON.stringify(state.cart));
         }, 
         setDeliveryChoice(state, action) {
             state.delivery = action.payload;

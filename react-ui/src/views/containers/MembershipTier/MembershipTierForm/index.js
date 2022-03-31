@@ -60,7 +60,8 @@ const MembershipTierFormBody = ({
                         autoComplete="name"
                         value={name}
                         onChange={onNameChanged}
-                        required
+                        disabled={isEditing}
+                        className={isEditing && "bg-gray-50 text-gray-400"}
                       />
                     </SimpleInputGroup>
                     <SimpleInputGroup
@@ -257,33 +258,34 @@ export const MembershipTierForm = () => {
   const onAddMembershipTierClicked = (evt) => {
     evt.preventDefault();
     if (!isEditing) {
-      dispatch(
-        addNewMembershipTier({
-          name,
-          multiplier,
-          minSpend,
-          birthday: {
-            name: birthdayName.length ? birthdayName : "STANDARD",
-            birthdaySpend: birthdaySpend.length ? birthdaySpend : 200,
-            quota: birthdayQuota.length ? birthdayQuota : 1,
-            multiplier: birthdayMultiplier.length ? birthdayMultiplier : 2,
-          },
-        })
-      )
-        .unwrap()
-        .then(() => {
-          addToast("Successfully added membership tier", {
-            appearance: "success",
-            autoDismiss: true,
+      name &&
+        dispatch(
+          addNewMembershipTier({
+            name,
+            multiplier,
+            minSpend,
+            birthday: {
+              name: birthdayName.length ? birthdayName : "STANDARD",
+              birthdaySpend: birthdaySpend.length ? birthdaySpend : 200,
+              quota: birthdayQuota.length ? birthdayQuota : 1,
+              multiplier: birthdayMultiplier.length ? birthdayMultiplier : 2,
+            },
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully added membership tier", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            navigate("/sm/rewards-loyalty/tiers");
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
           });
-          navigate("/sm/rewards-loyalty/tiers");
-        })
-        .catch((err) => {
-          addToast(`Error: ${err.message}`, {
-            appearance: "error",
-            autoDismiss: true,
-          });
-        });
     } else {
       dispatch(
         updateExistingMembershipTier({

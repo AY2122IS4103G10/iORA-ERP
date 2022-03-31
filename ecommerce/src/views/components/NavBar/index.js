@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 
 const ProfileDropdown = ({ handleLogout }) => {
   return (
-    <Menu as="div" className="ml-3 relative">
+    <Menu as="div" className="z-10 ml-3 relative">
       <div>
         <Menu.Button className="p-2 text-gray-400 hover:text-gray-500 lg:ml-4">
           <span className="sr-only">Account</span>
@@ -172,7 +172,6 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                             {item.name}
                           </p>
                           <ul
-                            role="list"
                             aria-labelledby={`${category.id}-${item.id}-heading-mobile`}
                             className="mt-6 flex flex-col space-y-6"
                           >

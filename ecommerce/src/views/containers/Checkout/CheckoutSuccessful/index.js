@@ -164,7 +164,7 @@ export const CheckoutSuccessful = () => {
                                         Discount
                                         {/* <span className="rounded-full bg-gray-200 text-xs text-gray-600 py-0.5 px-2 ml-2">STUDENT50</span> */}
                                     </dt>
-                                    <dd className="text-gray-700">-${confirmedOrder.promotions === null ? "0" : calculateDiscounts(confirmedOrder.promotions)}</dd>
+                                    <dd className="text-gray-700">-${confirmedOrder.promotions === null || confirmedOrder.promotions.length === 0 ? "0" : calculateDiscounts(confirmedOrder.promotions)}</dd>
                                 </div>
                                 <div className="flex justify-between">
                                     <dt className="font-medium text-gray-900">Shipping</dt>

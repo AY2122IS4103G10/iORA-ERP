@@ -205,7 +205,14 @@ export default function ViewModel() {
                         <div className="lg:col-start-8 lg:col-span-5">
                             <div className="flex justify-between">
                                 <h1 className="text-xl font-medium text-gray-900">{model.name}</h1>
-                                <p className="text-xl font-medium text-gray-900">${model.listPrice}</p>
+                                <div>
+                                    {model.listPrice !== model.discountPrice ?
+                                        <>
+                                            <span className="line-through text-md mr-2 text-gray-500">${model.listPrice}</span>
+                                            <span className="text-xl font-medium text-gray-900">${model.discountPrice}</span>
+                                        </>
+                                        : <span className="text-xl font-medium text-gray-900">${model.listPrice}</span>}
+                                </div>
                             </div>
                         </div>
 

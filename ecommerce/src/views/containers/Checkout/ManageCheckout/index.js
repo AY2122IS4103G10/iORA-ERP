@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { selectCart } from "../../../../stores/slices/cartSlice";
@@ -52,8 +52,8 @@ export const ManageCheckout = () => {
             let subTotal = 0;
             let lineItems = cart.map((item) => {
                 const { model, ...lineItem } = item;
-                subTotal = subTotal + item.qty * model.listPrice;
-                return { ...lineItem, subTotal: model.listPrice * item.qty };
+                subTotal = subTotal + item.qty * model.discountPrice;
+                return { ...lineItem, subTotal: model.discountPrice * item.qty };
             });
             setLineItems(lineItems);
             setSubTotal(subTotal);

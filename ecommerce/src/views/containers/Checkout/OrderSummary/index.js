@@ -27,7 +27,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                                         Size: {item.product?.productFields.find((field) => field.fieldName === "SIZE").fieldValue}
                                     </p>
                                 </div>
-                                <p className="flex-none text-base font-medium">${parseInt(item.model.listPrice) * item.qty}</p>
+                                <p className="flex-none text-base font-medium">${parseInt(item.model.discountPrice) * item.qty}</p>
                             </li>
                         ))}
                     </ul>

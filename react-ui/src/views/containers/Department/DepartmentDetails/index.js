@@ -16,6 +16,7 @@ import { SimpleTable } from "../../../components/Tables/SimpleTable";
 const Header = ({ departmentId, name, openModal }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+      <NavigatePrev page="Departments" path="/ad/departments" />
       <div className="flex items-center space-x-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
@@ -140,7 +141,6 @@ export const DepartmentDetails = () => {
     Boolean(department) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="Departments" path="/ad/departments" />
           <Header
             departmentId={department.id}
             name={department.deptName}

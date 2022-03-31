@@ -270,9 +270,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Model> getModelsBySKUList(List<String> SKUList) throws ModelException {
         List<Model> models = new ArrayList<>();
-
         for (String sku : SKUList) {
-            String modelCode = sku.substring(0, sku.length() - 2);
+            String modelCode = sku.substring(0, sku.lastIndexOf("-"));
             models.add(getModel(modelCode));
         }
         return models;
@@ -396,6 +395,8 @@ public class ProductServiceImpl implements ProductService {
 
         if (old == null) {
             throw new ModelException("Model not found");
+        } else if (model.getProductFields().size() < old.getProductFields().size()) {
+            throw new ModelException("Sizes and Colours cannot be deleted.");
         }
 
         old.setDescription(model.getDescription());

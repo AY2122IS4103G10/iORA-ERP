@@ -17,6 +17,7 @@ import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 const Header = ({ jobTitlesId, name, openModal }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+      <NavigatePrev page="Job Titles" path="/ad/jobTitles" />
       <div className="flex items-center space-x-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
@@ -135,9 +136,9 @@ export const JobTitleDetails = () => {
     Boolean(jobTitle) && (
       <>
         <div className="py-8 xl:py-10">
-          <NavigatePrev page="Job Titles" path="/ad/jobTitles" />
           <Header
             jobTitlesId={jobTitle.id}
+            name={jobTitle.title}
             openModal={openModal}
           />
           <JobTitleDetailsBody

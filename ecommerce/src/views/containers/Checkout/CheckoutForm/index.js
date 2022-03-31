@@ -219,20 +219,6 @@ export const CheckoutForm = ({
           </div>
         </section>
 
-        <section aria-labelledby="billing-heading" className="mt-10">
-          <h2 id="billing-heading" className="text-lg font-medium text-gray-900">
-            Billing Information
-          </h2>
-          <AddressForm
-            country={country}
-            setCountry={setCountry}
-            setAddress={setAddress}
-            setPostalCode={setPostalCode}
-            setCity={setCity}
-            setState={setState}
-          />
-        </section>
-
         <div className="mt-10 border-t border-gray-200 pt-10">
           <RadioGroupComponent
             label="Delivery Method"
@@ -243,13 +229,20 @@ export const CheckoutForm = ({
         </div>
 
         {selectedDeliveryMethod.id === 1 ?
-          <DeliveryForm
-            sameAddress={sameAddress}
-            setSameAddress={setSameAddress}
-            country={country}
-            address={address}
-            setAddress={setAddress}
-          /> :
+          <section aria-labelledby="billing-heading" className="mt-10">
+            <h2 id="billing-heading" className="text-lg font-medium text-gray-900">
+              Shipping Information
+            </h2>
+            <AddressForm
+              country={country}
+              setCountry={setCountry}
+              setAddress={setAddress}
+              setPostalCode={setPostalCode}
+              setCity={setCity}
+              setState={setState}
+            />
+          </section>
+          :
           <StorePickupForm
             store={store}
             setStore={setStore}

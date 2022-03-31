@@ -62,7 +62,7 @@ export default function ManageCheckout({
           paid: true,
           payments: [
             {
-              amount: Math.max(amount - voucherAmt, 0),
+              amount: amount,
               paymentType: "MASTERCARD",
               ccTransactionId: paymentIntentId,
             },

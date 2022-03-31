@@ -447,7 +447,13 @@ public class DataLoader implements CommandLineRunner {
 		c1.setDob(LocalDate.of(2000, 1, 1));
 		c1.setEmail("hongpeiisrandom@gmail.com");
 		c1.setPassword("password");
-		customerService.createCustomerAccount(c1);
+		Customer cc1 = customerService.createCustomerAccount(c1);
+		DeliveryAddress da1 = new DeliveryAddress("HongPei", "313 Sembawang Drive", "#12-220", "Singapore", "750313",
+				"",
+				CountryEnum.Singapore,
+				"83940775");
+		em.persist(da1);
+		cc1.setAddress(da1);
 
 		Customer c2 = new Customer("Delven", "Wong");
 		c2.setContactNumber("92711363");
@@ -455,42 +461,76 @@ public class DataLoader implements CommandLineRunner {
 		c2.setEmail("pengyu_33@msn.com");
 		c2.setPassword("password");
 		c2.setMembershipPoints(200);
-		customerService.createCustomerAccount(c2);
+		Customer cc2 = customerService.createCustomerAccount(c2);
+		DeliveryAddress da2 = new DeliveryAddress("Remus", "252 Jurong East Street 24", "#02-120", "Singapore",
+				"600252", "",
+				CountryEnum.Singapore,
+				"92711363");
+		em.persist(da2);
+		cc2.setAddress(da2);
 
 		Customer c3 = new Customer("Adeline", "Tan");
 		c3.setContactNumber("93834898");
 		c3.setDob(LocalDate.of(2000, 1, 1));
 		c3.setEmail("tan.adelinejy@gmail.com");
 		c3.setPassword("password");
-		customerService.createCustomerAccount(c3);
+		Customer cc3 = customerService.createCustomerAccount(c3);
+		DeliveryAddress da3 = new DeliveryAddress("Ade", "413 Serangoon Central", "#06-260", "Singapore", "550413", "",
+				CountryEnum.Singapore,
+				"93834898");
+		em.persist(da3);
+		cc3.setAddress(da3);
 
 		Customer c4 = new Customer("Louis", "Misson");
 		c4.setContactNumber("98550432");
 		c4.setDob(LocalDate.of(2000, 1, 1));
 		c4.setEmail("louismisson8@gmail.com");
 		c4.setPassword("password");
-		customerService.createCustomerAccount(c4);
+		Customer cc4 = customerService.createCustomerAccount(c4);
+		DeliveryAddress da4 = new DeliveryAddress("Louis", "307 Clementi Avenue 4", "#10-180", "Singapore", "120307",
+				"",
+				CountryEnum.Singapore,
+				"98550432");
+		em.persist(da4);
+		cc4.setAddress(da4);
 
 		Customer c5 = new Customer("Remus", "Kwan");
 		c5.setContactNumber("90556630");
 		c5.setDob(LocalDate.of(2000, 1, 1));
 		c5.setEmail("remuskwan23@gmail.com");
 		c5.setPassword("password");
-		customerService.createCustomerAccount(c5);
+		Customer cc5 = customerService.createCustomerAccount(c5);
+		DeliveryAddress da5 = new DeliveryAddress("Remus", "75A Redhill Rd, Block 75A", "#15-210", "Singapore",
+				"151075", "",
+				CountryEnum.Singapore,
+				"90556630");
+		em.persist(da5);
+		cc5.setAddress(da5);
 
 		Customer c6 = new Customer("Ruth", "Chong");
 		c6.setContactNumber("86065278");
 		c6.setDob(LocalDate.of(2000, 1, 1));
 		c6.setEmail("ruth.cjn@gmail.com");
 		c6.setPassword("password");
-		customerService.createCustomerAccount(c6);
+		Customer cc6 = customerService.createCustomerAccount(c6);
+		DeliveryAddress da6 = new DeliveryAddress("Ruth", "503 Hougang Ave 8, Block 503", "#16-320", "Singapore",
+				"530503", "",
+				CountryEnum.Singapore,
+				"86065278");
+		em.persist(da6);
+		cc6.setAddress(da6);
 
 		Customer c7 = new Customer("Steven", "Lim");
 		c7.setContactNumber("91234567");
 		c7.setDob(LocalDate.of(2000, 1, 1));
 		c7.setEmail("stevenlim@gmail.com");
 		c7.setPassword("password");
-		customerService.createCustomerAccount(c7);
+		Customer cc7 = customerService.createCustomerAccount(c7);
+		DeliveryAddress da7 = new DeliveryAddress("Lim", "349 Yishun Ave 11", "#09-520", "Singapore", "760349", "",
+				CountryEnum.Singapore,
+				"91234567");
+		em.persist(da7);
+		cc7.setAddress(da7);
 
 		// Generate 10 $10 vouchers
 		customerService.generateVouchers(10, 10, "2024-02-16");
@@ -570,11 +610,9 @@ public class DataLoader implements CommandLineRunner {
 			productService.createModel(model);
 		}
 
-		List<Product> products = productService.searchProductsBySKU(null);
-		for (Product p : products) {
-			Random r = new Random();
-			int stockLevel = r.nextInt(7) + 3;
-			siteService.addProducts(Long.valueOf(r.nextInt(21)) + 1, p.getSku(), stockLevel);
+		Random r = new Random();
+		for (Product p : productService.searchProductsBySKU(null)) {
+			siteService.addProducts((long) r.nextInt(20) + 2, p.getSku(), r.nextInt(5) + 10);
 		}
 
 		// ProcurementOrders
@@ -677,6 +715,9 @@ public class DataLoader implements CommandLineRunner {
 		Payment payment2 = new Payment(78, "546130", PaymentTypeEnum.MASTERCARD);
 		customerOrderService.createPayment(payment2);
 
+		Payment payment3 = new Payment(77, "981651", PaymentTypeEnum.NETS);
+		customerOrderService.createPayment(payment3);
+
 		CustomerOrder co1 = new CustomerOrder();
 		co1.setDateTime(new Date());
 		co1.addLineItem(coli4);
@@ -687,27 +728,29 @@ public class DataLoader implements CommandLineRunner {
 		co1.setCustomerId(2L);
 		customerOrderService.createCustomerOrder(co1, null);
 
-		OnlineOrder oo1 = new OnlineOrder(false, CountryEnum.Singapore);
-		oo1.setCustomerId(2L);
+		siteService.addProducts(4L, "ASK0010155H-1", 8);
+		siteService.addProducts(4L, "AB0010059H-1", 9);
+		OnlineOrder oo1 = new OnlineOrder(false);
+		oo1.setCustomerId(5L);
 		oo1.setPickupSite((StoreSite) siteService.getSite(4L));
 		oo1.addLineItem(coli6);
 		oo1.addLineItem(coli7);
 		oo1.setPaid(true);
 		oo1.addPayment(payment2);
 		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
-				"189554", "", "60981335");
+				"189554", "", CountryEnum.Singapore, "60981335");
 		oo1.setDeliveryAddress(da);
 		customerOrderService.createOnlineOrder(oo1, null);
 
-		OnlineOrder oo2 = new OnlineOrder(true, CountryEnum.Singapore);
-		oo2.setCustomerId(2L);
+		OnlineOrder oo2 = new OnlineOrder(true);
+		oo2.setCustomerId(5L);
 		oo2.addLineItem(coli1);
 		oo2.addLineItem(coli2);
-		oo2.setPaid(false);
+		oo2.addPayment(payment3);
 		oo2.setSite(siteService.getSite(10L));
 		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
 				"Singapore",
-				"117417", "", "65162727");
+				"117417", "", CountryEnum.Singapore, "65162727");
 		oo2.setDeliveryAddress(da1);
 		customerOrderService.createOnlineOrder(oo2, null);
 
@@ -723,5 +766,4 @@ public class DataLoader implements CommandLineRunner {
 		cust.addSupportTicket(st);
 		customerService.updateCustomerAccount(cust);
 	}
-
 }

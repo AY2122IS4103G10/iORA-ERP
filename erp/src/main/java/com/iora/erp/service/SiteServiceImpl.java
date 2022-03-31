@@ -7,6 +7,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.exception.IllegalTransferException;
@@ -79,7 +80,7 @@ public class SiteServiceImpl implements SiteService {
         q.setParameter("name", name);
 
         try {
-            Site s = (Site) q.getSingleResult();
+            q.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
             return true;
         }
@@ -119,11 +120,11 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public List<? extends Site> searchStores(String country, String company) {
-        Query query = em
+        TypedQuery<StoreSite> query = em
                 .createQuery(siteQuery("SELECT s FROM StoreSite s", country, company),
                         StoreSite.class);
 
-        if (!country.equals("")){
+        if (!country.equals("")) {
             query.setParameter("country", CountryEnum.Singapore);
         }
         return query.getResultList();
@@ -261,7 +262,7 @@ public class SiteServiceImpl implements SiteService {
             if (lineItem.getQty() < product.getBaselineQty()) {
                 site.addNotification(new Notification("Low Quantity!",
                         "The quantity of product " + product.getSku()
-                                + " is below the baseline! Click here to perform a Stock Transfer."));
+                                + " is below the baseline! Click here to request for stocks."));
             }
 
             return site.getStockLevel();

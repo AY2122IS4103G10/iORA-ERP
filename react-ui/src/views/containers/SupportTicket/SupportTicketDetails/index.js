@@ -17,6 +17,7 @@ const Header = ({
 }) => {
     return (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+            <NavigatePrev page="Support Tickets" path="/sm/support" />
             <div className="flex items-center space-x-3">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">
@@ -367,7 +368,7 @@ export const SupportTicketDetails = () => {
             const name = JSON.parse(localStorage.getItem("user")).name
             var url;
 
-            Boolean(file.name) && fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
+            Boolean(file.name) ? fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
                 {
                     method: 'POST',
                     body: image,
@@ -376,7 +377,6 @@ export const SupportTicketDetails = () => {
                 .then((data) => {
                     console.log(data);
                     url = data.data.url;
-
                     dispatch(replySupportTicket(
                         {
                             ticketId,
@@ -402,32 +402,55 @@ export const SupportTicketDetails = () => {
                                 autoDismiss: true,
                             });
                         });
-                });
+                }) : dispatch(replySupportTicket(
+                    {
+                        ticketId,
+                        name,
+                        body: { input, url }
+                    }
+                ))
+                    .unwrap()
+                    .then(() => {
+                        setFile([]);
+                        setInput("");
+                    })
+                    .then(() => {
+                        addToast("Successfully replied to ticket", {
+                            appearance: "success",
+                            autoDismiss: true,
+                        });
+
+                    })
+                    .catch((err) => {
+                        addToast(`Error: ${err.message}`, {
+                            appearance: "error",
+                            autoDismiss: true,
+                        });
+                    });
         }
     }
 
     const onDeleteClicked = () => {
         dispatch(deleteSupportTicket(ticketId))
-          .unwrap()
-          .then(() => {
-            addToast("Successfully deleted support ticket", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            setOpenDelete(false);
-            navigate("/sm/support");
-          })
-          .catch((err) =>
-            addToast(`Error: Job Title cannot be deleted as it is being used.`, {
-              appearance: "error",
-              autoDismiss: true,
-            }))
-      }
+            .unwrap()
+            .then(() => {
+                addToast("Successfully deleted support ticket", {
+                    appearance: "success",
+                    autoDismiss: true,
+                });
+                setOpenDelete(false);
+                navigate("/sm/support");
+            })
+            .catch((err) =>
+                addToast(`Error: Job Title cannot be deleted as it is being used.`, {
+                    appearance: "error",
+                    autoDismiss: true,
+                }))
+    }
 
     return (
         Boolean(ticket) && (
             <div className="py-8 xl:py-10">
-                <NavigatePrev page="Support Tickets" path="/sm/support" />
                 <Header
                     ticketId={ticketId}
                     status={ticket.status}

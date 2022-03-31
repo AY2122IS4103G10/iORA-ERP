@@ -29,9 +29,6 @@ public class OnlineOrder extends CustomerOrder {
     @ManyToOne
     private StoreSite pickupSite;
 
-    @Enumerated(EnumType.STRING)
-    private CountryEnum country;
-
     @OneToOne(cascade = CascadeType.ALL)
     private DeliveryAddress deliveryAddress;
 
@@ -47,10 +44,9 @@ public class OnlineOrder extends CustomerOrder {
         this.statusHistory = new ArrayList<>();
     }
 
-    public OnlineOrder(boolean delivery, CountryEnum country) {
+    public OnlineOrder(boolean delivery) {
         this();
         this.delivery = delivery;
-        this.country = country;
     }
 
     public OnlineOrderStatusEnum getStatus() {
@@ -79,14 +75,6 @@ public class OnlineOrder extends CustomerOrder {
 
     public void setPickupSite(StoreSite pickupSite) {
         this.pickupSite = pickupSite;
-    }
-
-    public CountryEnum getCountry() {
-        return this.country;
-    }
-
-    public void setCountry(CountryEnum country) {
-        this.country = country;
     }
 
     public List<OOStatus> getStatusHistory() {

@@ -73,7 +73,7 @@ public class Customer implements Serializable {
     }
 
     public Customer(String firstName, String lastName, String email, LocalDate dob, String contactNumber,
-            MembershipTier membershipTier, int membershipPoints, String password) {
+            MembershipTier membershipTier, int membershipPoints, DeliveryAddress address) {
         this();
         this.firstName = firstName;
         this.lastName = lastName;
@@ -82,7 +82,7 @@ public class Customer implements Serializable {
         this.contactNumber = contactNumber;
         this.membershipTier = membershipTier;
         this.membershipPoints = membershipPoints;
-        this.password = password;
+        this.address = address;
     }
 
     public Customer(String firstName, String lastName) {

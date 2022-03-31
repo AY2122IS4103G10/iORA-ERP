@@ -30,7 +30,7 @@ public class Product {
     private List<StockLevelLI> stockLevels;
 
     public Product() {
-        this.baselineQty = 0;
+        this.baselineQty = 5;
         this.productFields = new HashSet<>();
         this.stockLevels = new ArrayList<>();
     }

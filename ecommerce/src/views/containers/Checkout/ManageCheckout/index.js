@@ -25,14 +25,14 @@ export const ManageCheckout = () => {
     const [promotions, setPromotions] = useState([]);
     const [lineItems, setLineItems] = useState(null);
     const [order, setOrder] = useState(null);
-    const [email, setEmail] = useState("");
-    const [name, setName] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
+    const [email, setEmail] = useState(JSON.parse(localStorage.getItem("user")).email);
+    const [name, setName] = useState(JSON.parse(localStorage.getItem("user")).firstName + " " + JSON.parse(localStorage.getItem("user")).lastName);
+    const [phoneNumber, setPhoneNumber] = useState(JSON.parse(localStorage.getItem("user")).contactNumber);
     const [country, setCountry] = useState({ name: countries[197] });
-    const [address, setAddress] = useState("");
-    const [city, setCity] = useState("");
-    const [state, setState] = useState("");
-    const [postalCode, setPostalCode] = useState("");
+    const [address, setAddress] = useState(JSON.parse(localStorage.getItem("user")).address.street1 + " " + JSON.parse(localStorage.getItem("user")).address.street2);
+    const [city, setCity] = useState(JSON.parse(localStorage.getItem("user")).address.city);
+    const [state, setState] = useState(JSON.parse(localStorage.getItem("user")).address.state);
+    const [postalCode, setPostalCode] = useState(JSON.parse(localStorage.getItem("user")).address.zip);
     const [sameAddress, setSameAddress] = useState(true);
     const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(deliveryMethods[0]);
     const [store, setStore] = useState({ name: "Select Store" });
@@ -128,15 +128,21 @@ export const ManageCheckout = () => {
                         onCancelClicked={onCancelClicked}
                     />
                     : <CheckoutForm
+                        email={email}
                         setEmail={setEmail}
+                        phoneNumber={phoneNumber}
                         setPhoneNumber={setPhoneNumber}
+                        name={name}
                         setName={setName}
                         country={country}
                         setCountry={setCountry}
                         address={address}
                         setAddress={setAddress}
+                        postalCode={postalCode}
                         setPostalCode={setPostalCode}
+                        city={city}
                         setCity={setCity}
+                        state={state}
                         setState={setState}
                         sameAddress={sameAddress}
                         setSameAddress={setSameAddress}

@@ -526,11 +526,6 @@ public class DataLoader implements CommandLineRunner {
 		c7.setEmail("stevenlim@gmail.com");
 		c7.setPassword("password");
 		Customer cc7 = customerService.createCustomerAccount(c7);
-		DeliveryAddress da7 = new DeliveryAddress("Lim", "349 Yishun Ave 11", "#09-520", "Singapore", "760349", "",
-				CountryEnum.Singapore,
-				"91234567");
-		em.persist(da7);
-		cc7.setAddress(da7);
 
 		// Generate 10 $10 vouchers
 		customerService.generateVouchers(10, 10, "2024-02-16");

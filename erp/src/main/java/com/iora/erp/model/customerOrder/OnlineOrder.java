@@ -13,7 +13,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;

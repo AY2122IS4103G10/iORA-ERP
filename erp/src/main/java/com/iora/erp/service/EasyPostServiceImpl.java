@@ -10,26 +10,22 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import com.easypost.EasyPost;
 import com.easypost.exception.EasyPostException;
 import com.easypost.model.Address;
 import com.easypost.model.Batch;
-import com.easypost.model.CustomsInfo;
 import com.easypost.model.Parcel;
-import com.easypost.model.ScanForm;
+//import com.easypost.model.ScanForm;
 import com.easypost.model.Shipment;
 import com.easypost.model.ShipmentCollection;
-import com.easypost.model.Webhook;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.site.Site;
-import com.stripe.model.Mandate.CustomerAcceptance.Online;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -147,7 +143,7 @@ public class EasyPostServiceImpl implements EasyPostService {
         calendar.set(Calendar.HOUR_OF_DAY, 14);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
-        Date today = calendar.getTime();
+        // Date today = calendar.getTime();
         calendar.set(Calendar.DATE, -1);
         Date previous = calendar.getTime();
         System.out.println(previous);
@@ -170,7 +166,7 @@ public class EasyPostServiceImpl implements EasyPostService {
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("shipments", sList);
-        ScanForm scanForm = ScanForm.create(paramMap);
+        // ScanForm scanForm = ScanForm.create(paramMap);
 
         return batch;
 
@@ -178,10 +174,12 @@ public class EasyPostServiceImpl implements EasyPostService {
 
     @Override
     public List<Delivery> onlineParcelAvailDeliveryBySite(Long siteId, Date dayBefore) {
-        Query q = em.createQuery("SELECT o FROM Delivery o WHERE o.dateTime >= :dayBefore AND o.siteId = :siteId");
-        q.setParameter("dayBefore", dayBefore);
-        q.setParameter("siteId", siteId);
-        return q.getResultList();
+        return em
+                .createQuery("SELECT o FROM Delivery o WHERE o.dateTime >= :dayBefore AND o.siteId = :siteId",
+                        Delivery.class)
+                .setParameter("dayBefore", dayBefore)
+                .setParameter("siteId", siteId)
+                .getResultList();
     }
 
     @Override

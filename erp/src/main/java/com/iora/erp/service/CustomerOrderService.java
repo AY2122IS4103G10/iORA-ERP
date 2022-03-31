@@ -3,7 +3,7 @@ package com.iora.erp.service;
 import java.util.List;
 
 import com.iora.erp.exception.CustomerException;
-import com.easypost.exception.EasyPostException;
+// import com.easypost.exception.EasyPostException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
@@ -11,7 +11,7 @@ import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
-import com.iora.erp.model.customerOrder.Delivery;
+// import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;

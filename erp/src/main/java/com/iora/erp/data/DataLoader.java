@@ -525,6 +525,12 @@ public class DataLoader implements CommandLineRunner {
 		c7.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c7.setEmail("stevenlim@gmail.com");
 		c7.setPassword("password");
+		DeliveryAddress da7 = new DeliveryAddress("Steven ", "YIshun Ave 8, Block 203", "#14-320", "Singapore",
+				"530203", "",
+				CountryEnum.Singapore,
+				"91234567");
+		em.persist(da7);
+		c7.setAddress(da7);
 		customerService.createCustomerAccount(c7);
 
 		// Generate 10 $10 vouchers
@@ -607,7 +613,7 @@ public class DataLoader implements CommandLineRunner {
 
 		Random r = new Random();
 		for (Product p : productService.searchProductsBySKU(null)) {
-			//siteService.addProducts(3L, p.getSku(), 5);
+			// siteService.addProducts(3L, p.getSku(), 5);
 			siteService.addProducts((long) r.nextInt(20) + 2, p.getSku(), r.nextInt(5) + 10);
 		}
 

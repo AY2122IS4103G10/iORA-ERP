@@ -24,14 +24,14 @@ export const ProductSearch = () => {
     const fetchOrder = async () => {
       try {
         if (isNaN(parseInt(search.charAt(0)))) {
-          const { data } = await productApi.searchProductBySku(search.trim());
-          console.log(data)
+          const { data } = await api.get("warehouse/productItem", search.trim());
+          setProducts(data)
         } else {
           const { data } = await api.get("sam/productItem", search.trim());
           setProducts([data]);
         }
       } catch (error) {
-        addToast(`Error: ${error.response.data}`, {
+        addToast(`Error: ${error.message}`, {
           appearance: "error",
           autoDismiss: true,
         });

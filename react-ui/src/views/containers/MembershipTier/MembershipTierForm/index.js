@@ -10,18 +10,6 @@ import {
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 
-// const currencies = [
-//   { id: 1, code: "SGD", name: "Singapore Dollar", country: "Singapore" },
-//   { id: 2, code: "RM", name: "Malaysian Ringgit", country: "Malaysia" },
-//   { id: 3, code: "RMB", name: "Chinese Yuan", country: "China" },
-//   {
-//     id: 4,
-//     code: "USD",
-//     name: "United States Dollar",
-//     country: "United States",
-//   },
-// ];
-
 const MembershipTierFormBody = ({
   isEditing,
   name,
@@ -30,14 +18,10 @@ const MembershipTierFormBody = ({
   onMultiplierChanged,
   minSpend,
   onMinSpendChanged,
-  currencySelected,
-  onCurrencyChanged,
   birthdayName,
   onBirthdayNameChanged,
   birthdaySpend,
   onBirthdaySpendChanged,
-  birthdayCurrencySelected,
-  onBirthdayCurrencyChanged,
   birthdayQuota,
   onBirthdayQuotaChanged,
   birthdayMultiplier,
@@ -113,24 +97,6 @@ const MembershipTierFormBody = ({
                           onChange={onMinSpendChanged}
                           required
                         />
-                        {/* <div className="absolute inset-y-0 right-0 flex items-center">
-                          <label htmlFor="currency" className="sr-only">
-                            Currency
-                          </label>
-                          <select
-                            id="currency"
-                            name="currency"
-                            className="focus:ring-cyan-500 focus:border-cyan-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
-                            value={currencySelected}
-                            onChange={onCurrencyChanged}
-                          >
-                            {currencies.map((currency) => (
-                              <option key={currency.id}>
-                                {currency.name} ({currency.code})
-                              </option>
-                            ))}
-                          </select>
-                        </div> */}
                       </div>
                     </SimpleInputGroup>
                     <SimpleInputGroup
@@ -153,10 +119,13 @@ const MembershipTierFormBody = ({
                               id="birthdayName"
                               className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
                               autoComplete="birthdayName"
+                              placeholder="STANDARD"
                               value={birthdayName}
                               onChange={onBirthdayNameChanged}
-                              required
                             />
+                            <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
+                              Leave blank if not applicable.
+                            </p>
                           </div>
                         </div>
                         <div className="sm:col-span-1">
@@ -172,33 +141,14 @@ const MembershipTierFormBody = ({
                               name="birthdaySpend"
                               id="birthdaySpend"
                               className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-                              placeholder="0.00"
+                              placeholder="200.00"
                               value={birthdaySpend}
                               onChange={onBirthdaySpendChanged}
-                              required
                             />
-                            {/* <div className="absolute inset-y-0 right-0 flex items-center">
-                              <label
-                                htmlFor="birthday-currency"
-                                className="sr-only"
-                              >
-                                Currency
-                              </label>
-                              <select
-                                id="birthday-currency"
-                                name="birthday-currency"
-                                className="focus:ring-cyan-500 focus:border-cyan-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
-                                value={birthdayCurrencySelected}
-                                onChange={onBirthdayCurrencyChanged}
-                              >
-                                {currencies.map((currency) => (
-                                  <option key={currency.id}>
-                                    {currency.code}
-                                  </option>
-                                ))}
-                              </select>
-                            </div> */}
                           </div>
+                          <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
+                            Leave blank if not applicable.
+                          </p>
                         </div>
                       </div>
                       <div className="py-2 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
@@ -217,12 +167,14 @@ const MembershipTierFormBody = ({
                               className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
                               step="0.01"
                               min="0"
-                              placeholder="0.00"
+                              placeholder="2.00"
                               value={birthdayMultiplier}
                               onChange={onBirthdayMultiplierChanged}
-                              required
                             />
                           </div>
+                          <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
+                            Leave blank if not applicable.
+                          </p>
                         </div>
                         <div className="sm:col-span-1">
                           <label
@@ -238,12 +190,14 @@ const MembershipTierFormBody = ({
                               id="quota"
                               className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
                               min="0"
-                              placeholder="0"
+                              placeholder="1"
                               value={birthdayQuota}
                               onChange={onBirthdayQuotaChanged}
-                              required
                             />
                           </div>
+                          <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
+                            Leave blank if not applicable.
+                          </p>
                         </div>
                       </div>
                     </SimpleInputGroup>
@@ -282,10 +236,8 @@ export const MembershipTierForm = () => {
   const [name, setName] = useState(tierName);
   const [multiplier, setMultiplier] = useState("");
   const [minSpend, setMinSpend] = useState("");
-  // const [currencySelected, setCurrencySelected] = useState(currencies[0]);
   const [birthdayName, setBirthdayName] = useState("");
   const [birthdaySpend, setBirthdaySpend] = useState("");
-  const [birthdayCurrencySelected, setBirthdayCurrencySelected] = useState("");
   const [birthdayQuota, setBirthdayQuota] = useState("");
   const [birthdayMultiplier, setBirthdayMultiplier] = useState("");
 
@@ -296,11 +248,8 @@ export const MembershipTierForm = () => {
   const onNameChanged = (e) => setName(e.target.value);
   const onMultiplierChanged = (e) => setMultiplier(e.target.value);
   const onMinSpendChanged = (e) => setMinSpend(e.target.value);
-  // const onCurrencyChanged = (e) => setCurrencySelected(e.target.value);
   const onBirthdayNameChanged = (e) => setBirthdayName(e.target.value);
   const onBirthdaySpendChanged = (e) => setBirthdaySpend(e.target.value);
-  const onBirthdayCurrencyChanged = (e) =>
-    setBirthdayCurrencySelected(e.target.value);
   const onBirthdayQuotaChanged = (e) => setBirthdayQuota(e.target.value);
   const onBirthdayMultiplierChanged = (e) =>
     setBirthdayMultiplier(e.target.value);
@@ -312,14 +261,12 @@ export const MembershipTierForm = () => {
         addNewMembershipTier({
           name,
           multiplier,
-          // currency: currencySelected,
           minSpend,
           birthday: {
-            name: birthdayName,
-            currency: birthdayCurrencySelected,
-            birthdaySpend,
-            quota: birthdayQuota,
-            multiplier: birthdayMultiplier,
+            name: birthdayName.length ? birthdayName : "STANDARD",
+            birthdaySpend: birthdaySpend.length ? birthdaySpend : 200,
+            quota: birthdayQuota.length ? birthdayQuota : 1,
+            multiplier: birthdayMultiplier.length ? birthdayMultiplier : 2,
           },
         })
       )
@@ -342,14 +289,12 @@ export const MembershipTierForm = () => {
         updateExistingMembershipTier({
           name,
           multiplier,
-          // currency: currencySelected,
           minSpend,
           birthday: {
-            name: birthdayName,
-            currency: birthdayCurrencySelected,
-            birthdaySpend,
-            quota: birthdayQuota,
-            multiplier: birthdayMultiplier,
+            name: birthdayName.length ? birthdayName : "STANDARD",
+            birthdaySpend: birthdaySpend.length ? birthdaySpend : 200,
+            quota: birthdayQuota.length ? birthdayQuota : 1,
+            multiplier: birthdayMultiplier.length ? birthdayMultiplier : 2,
           },
         })
       )
@@ -376,14 +321,11 @@ export const MembershipTierForm = () => {
     Boolean(tierName) &&
       api.get("sam/membershipTier", `?name=${tierName}`).then((response) => {
         const { name, multiplier, minSpend, birthday } = response.data;
-        console.log(response.data);
         setIsEditing(true);
         setName(name);
         setMultiplier(multiplier);
-        // setCurrencySelected(currency);
         setMinSpend(minSpend);
         setBirthdayName(birthday.name);
-        setBirthdayCurrencySelected(birthday.currency);
         setBirthdaySpend(birthday.birthdaySpend);
         setBirthdayQuota(birthday.quota);
         setBirthdayMultiplier(birthday.multiplier);
@@ -399,14 +341,10 @@ export const MembershipTierForm = () => {
       onNameChanged={onNameChanged}
       minSpend={minSpend}
       onMinSpendChanged={onMinSpendChanged}
-      // currencySelected={currencySelected}
-      // onCurrencyChanged={onCurrencyChanged}
       birthdayName={birthdayName}
       onBirthdayNameChanged={onBirthdayNameChanged}
       birthdaySpend={birthdaySpend}
       onBirthdaySpendChanged={onBirthdaySpendChanged}
-      birthdayCurrencySelected={birthdayCurrencySelected}
-      onBirthdayCurrencyChanged={onBirthdayCurrencyChanged}
       birthdayQuota={birthdayQuota}
       onBirthdayQuotaChanged={onBirthdayQuotaChanged}
       birthdayMultiplier={birthdayMultiplier}

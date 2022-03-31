@@ -59,11 +59,10 @@ export default function ManageCheckout({
       const { data } = await orderApi.createOrder(
         {
           ...order,
-          amount: Math.max(amount - voucherAmt, 0),
           paid: true,
           payments: [
             {
-              amount: Math.max(amount - voucherAmt, 0),
+              amount: amount,
               paymentType: "MASTERCARD",
               ccTransactionId: paymentIntentId,
             },

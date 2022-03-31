@@ -83,6 +83,10 @@ const cartSlice = createSlice({
         }, 
         setDeliveryChoice(state, action) {
             state.delivery = action.payload;
+        },
+        clearCart(state, action) {
+            state.cart = [];
+            localStorage.setItem("cart", state.cart);
         }
     },
 })
@@ -92,7 +96,8 @@ export const {
     minusCartItemQty, 
     addToCart, 
     removeItemFromCart, 
-    setDeliveryChoice } = cartSlice.actions;
+    setDeliveryChoice,
+    clearCart } = cartSlice.actions;
 
 export default cartSlice.reducer;
 

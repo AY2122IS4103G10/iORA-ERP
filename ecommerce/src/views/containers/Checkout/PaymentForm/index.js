@@ -3,10 +3,13 @@ import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { checkoutApi } from "../../../../environments/Api";
 import { useNavigate } from "react-router-dom";
 import { orderSuccess } from "../../../../stores/slices/purchasesSlice";
+import { clearCart } from "../../../../stores/slices/cartSlice";
+import { useDispatch } from "react-redux";
 
 
-export default function PaymentForm({ clientSecret, order }) {
+export default function PaymentForm({ clientSecret, order, onCancelClicked }) {
     const stripe = useStripe();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const elements = useElements();
     const [message, setMessage] = useState("");
@@ -22,7 +25,7 @@ export default function PaymentForm({ clientSecret, order }) {
         getPaymentStatus();
 
     }, [stripe, clientSecret, loading]);
-    
+
     const getPaymentStatus = () => {
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
             setPaymentIntentId(paymentIntent.id);
@@ -53,7 +56,7 @@ export default function PaymentForm({ clientSecret, order }) {
         e.preventDefault();
 
         if (!stripe || !elements || !paymentIntentId) {
-            return; 
+            return;
         }
         setLoading(true);
 
@@ -67,11 +70,11 @@ export default function PaymentForm({ clientSecret, order }) {
         } else {
             setMessage("An unexpected error occured.");
         }
-        
+
         setLoading(false);
     }
 
-  
+
     const createOnlineOrder = () => {
         let newOrder = {
             ...order,
@@ -86,7 +89,8 @@ export default function PaymentForm({ clientSecret, order }) {
         checkoutApi.createOnlineOrder(newOrder, paymentIntentId)
             .then((response) => {
                 console.log(response.data)
-                orderSuccess(response.data);
+                dispatch(orderSuccess(response.data));
+                dispatch(clearCart());
                 navigate(`/checkout/success/${response.data.id}`)
             })
             .catch((err) => setMessage(err));
@@ -94,15 +98,30 @@ export default function PaymentForm({ clientSecret, order }) {
 
 
     return (
-        <form id="payment-form" onSubmit={handleSubmit}>
-            <PaymentElement id="payment-element" />
-            {message && <div id="payment-message">{message}</div>}
-            <button
-                type="submit"
-                className="w-full bg-gray-900 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500 sm:ml-6 sm:order-last sm:w-auto"
-            >
-                Make Payment
-            </button>
-        </form>
+        <>
+            <div id="payment-form" className="m-4 pl-4">
+                <h2 id="summary-heading" className="text-lg font-medium text-gray-900 mb-5">
+                    Make Payment
+                </h2>
+                <PaymentElement id="payment-element" />
+                {/* {message && <div id="payment-message">{message}</div>} */}
+               
+            </div>
+            <div className="mt-4 mr-4 flex justify-end">
+                <button
+                    className="w-fit bg-white text-black border border-black rounded-md shadow-sm py-2 px-4 text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500 sm:ml-6 sm:order-last sm:w-auto"
+                    onClick={onCancelClicked}
+                >
+                    Go back
+                </button>
+                <button
+                    type="submit"
+                    className="w-full bg-gray-900 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500 sm:ml-6 sm:order-last sm:w-auto"
+                    onClick={handleSubmit}
+                >
+                    Make Payment
+                </button>
+            </div>
+        </>
     )
 }

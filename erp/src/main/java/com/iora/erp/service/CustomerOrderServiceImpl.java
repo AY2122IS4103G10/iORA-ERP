@@ -219,6 +219,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     e.printStackTrace();
                 }
             }
+        } else {
+            // update customer delivery address
+            em.merge(customerService.getCustomerById(customerOrder.getCustomerId()));
         }
 
         return em.merge(customerOrder);

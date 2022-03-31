@@ -1,18 +1,18 @@
-import {useDispatch, useSelector} from "react-redux";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import {useToasts} from "react-toast-notifications";
-import {PencilIcon} from "@heroicons/react/solid";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
+import { PencilIcon } from "@heroicons/react/solid";
 import {
   fetchCustomers,
   blockExistingCustomer,
   selectCustomerById,
   unblockExistingCustomer,
 } from "../../../../stores/slices/customerSlice";
-import {NavigatePrev} from "../../../components/Breadcrumbs/NavigatePrev";
-import {useEffect} from "react";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import { useEffect } from "react";
 import moment from "moment";
 
-const Header = ({customerId, firstName, lastName, availStatus, toggleBlock}) => {
+const Header = ({ customerId, firstName, lastName, availStatus, toggleBlock }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev page="Customers" path={-1} />
@@ -34,13 +34,10 @@ const Header = ({customerId, firstName, lastName, availStatus, toggleBlock}) => 
         </Link>
         <button
           type="button"
-          className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-${
-            availStatus ? "red" : "cyan"
-          }-600 hover:bg-${
-            availStatus ? "red" : "cyan"
-          }-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-${
-            availStatus ? "red" : "cyan"
-          }-500`}
+          className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-${availStatus ? "red" : "cyan"
+            }-600 hover:bg-${availStatus ? "red" : "cyan"
+            }-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-${availStatus ? "red" : "cyan"
+            }-500`}
           onClick={toggleBlock}>
           <span>{availStatus ? "Block" : "Unblock"}</span>
         </button>
@@ -58,15 +55,7 @@ const CustomerDetailsBody = ({
   membershipPoints,
   membershipTier,
   storeCredit,
-  availStatus,
-  mainName,
-  street1,
-  street2,
-  zip,
-  city,
-  state,
-  deliveryContact,
-  country,
+  availStatus
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -135,65 +124,79 @@ const CustomerDetailsBody = ({
             </dl>
           </div>
         </div>
-        <div className="bg-white shadow sm:rounded-lg mt-6">
-          <div className="px-4 py-5 sm:px-6">
-            <h2
-              id="customer delivery-information-title"
-              className="text-lg leading-6 font-medium text-gray-900">
-              Main Delivery Address
-            </h2>
-          </div>
-          <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-            <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-3">
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Person</dt>
-                <dd className="mt-1 text-sm text-gray-900">{mainName ? mainName : "-"}</dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Contact Number</dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {deliveryContact ? deliveryContact : "-"}
-                </dd>
-              </div>
-            </dl>
-          </div>
-          <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-            <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-3">
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Street/ Road/ Building</dt>
-                <dd className="mt-1 text-sm text-gray-900">{street1 ? street1 : "-"}</dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Unit Number</dt>
-                <dd className="mt-1 text-sm text-gray-900">{street2 ? street2 : "-"}</dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Zip</dt>
-                <dd className="mt-1 text-sm text-gray-900">{zip ? zip : "-"}</dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Country</dt>
-                <dd className="mt-1 text-sm text-gray-900">{country ? country : "-"}</dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">State</dt>
-                <dd className="mt-1 text-sm text-gray-900">{state ? state : "-"}</dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">City</dt>
-                <dd className="mt-1 text-sm text-gray-900">{city ? city : "-"}</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
       </section>
     </div>
   </div>
 );
 
+const AddressDetails = ({ mainName,
+  street1,
+  street2,
+  zip,
+  city,
+  state,
+  deliveryContact,
+  country }) => {
+  return (
+    <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+      {/* Customer Information*/}
+      <div className="bg-white shadow sm:rounded-lg mt-6">
+        <div className="px-4 py-5 sm:px-6">
+          <h2
+            id="customer delivery-information-title"
+            className="text-lg leading-6 font-medium text-gray-900">
+            Main Delivery Address
+          </h2>
+        </div>
+        <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+          <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-3">
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Person</dt>
+              <dd className="mt-1 text-sm text-gray-900">{mainName ? mainName : "-"}</dd>
+            </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Contact Number</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                {deliveryContact ? deliveryContact : "-"}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+          <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-3">
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Street/ Road/ Building</dt>
+              <dd className="mt-1 text-sm text-gray-900">{street1 ? street1 : "-"}</dd>
+            </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Unit Number</dt>
+              <dd className="mt-1 text-sm text-gray-900">{street2 ? street2 : "-"}</dd>
+            </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Zip</dt>
+              <dd className="mt-1 text-sm text-gray-900">{zip ? zip : "-"}</dd>
+            </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Country</dt>
+              <dd className="mt-1 text-sm text-gray-900">{country ? country : "-"}</dd>
+            </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">State</dt>
+              <dd className="mt-1 text-sm text-gray-900">{state ? state : "-"}</dd>
+            </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">City</dt>
+              <dd className="mt-1 text-sm text-gray-900">{city ? city : "-"}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>)
+}
+
 export const CustomerDetails = () => {
-  const {addToast} = useToasts();
-  const {customerId} = useParams();
+  const { addToast } = useToasts();
+  const { customerId } = useParams();
   const customer = useSelector((state) => selectCustomerById(state, parseInt(customerId)));
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -239,26 +242,28 @@ export const CustomerDetails = () => {
 
   return (
     Boolean(customer) && (
-      <>
-        <div className="py-8 xl:py-10">
-          <Header
-            customerId={customer.id}
-            firstName={customer.firstName}
-            lastName={customer.lastName}
-            availStatus={customer.availStatus}
-            toggleBlock={onBlockCustomerClicked}
-          />
-          <CustomerDetailsBody
-            firstName={customer.firstName}
-            lastName={customer.lastName}
-            email={customer.email}
-            dob={customer.dob}
-            username={customer.username}
-            availStatus={customer.availStatus}
-            contactNumber={customer.contactNumber}
-            membershipPoints={customer.membershipPoints}
-            membershipTier={customer.membershipTier}
-            storeCredit={customer.storeCredit}
+      <div className="py-8 xl:py-10">
+        <Header
+          customerId={customer.id}
+          firstName={customer.firstName}
+          lastName={customer.lastName}
+          availStatus={customer.availStatus}
+          toggleBlock={onBlockCustomerClicked}
+        />
+        <CustomerDetailsBody
+          firstName={customer.firstName}
+          lastName={customer.lastName}
+          email={customer.email}
+          dob={customer.dob}
+          username={customer.username}
+          availStatus={customer.availStatus}
+          contactNumber={customer.contactNumber}
+          membershipPoints={customer.membershipPoints}
+          membershipTier={customer.membershipTier}
+          storeCredit={customer.storeCredit}
+        />
+        {Boolean(customer.address) &&
+          <AddressDetails
             mainName={customer.address.name}
             street1={customer.address.street1}
             street2={customer.address.street2}
@@ -267,9 +272,8 @@ export const CustomerDetails = () => {
             state={customer.address.state}
             deliveryContact={customer.address.phone}
             country={customer.address.country}
-          />
-        </div>
-      </>
+          />}
+      </div>
     )
   );
 };

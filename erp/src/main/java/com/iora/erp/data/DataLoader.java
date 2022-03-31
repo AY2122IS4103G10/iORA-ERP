@@ -1,6 +1,6 @@
 package com.iora.erp.data;
 
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -444,7 +444,7 @@ public class DataLoader implements CommandLineRunner {
 		// Customer
 		Customer c1 = new Customer("Goh", "Hong Pei");
 		c1.setContactNumber("83940775");
-		c1.setDob(LocalDate.of(2000, 1, 1));
+		c1.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c1.setEmail("hongpeiisrandom@gmail.com");
 		c1.setPassword("password");
 		Customer cc1 = customerService.createCustomerAccount(c1);
@@ -457,7 +457,7 @@ public class DataLoader implements CommandLineRunner {
 
 		Customer c2 = new Customer("Delven", "Wong");
 		c2.setContactNumber("92711363");
-		c2.setDob(LocalDate.of(2000, 1, 1));
+		c2.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c2.setEmail("pengyu_33@msn.com");
 		c2.setPassword("password");
 		c2.setMembershipPoints(200);
@@ -471,7 +471,7 @@ public class DataLoader implements CommandLineRunner {
 
 		Customer c3 = new Customer("Adeline", "Tan");
 		c3.setContactNumber("93834898");
-		c3.setDob(LocalDate.of(2000, 1, 1));
+		c3.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c3.setEmail("tan.adelinejy@gmail.com");
 		c3.setPassword("password");
 		Customer cc3 = customerService.createCustomerAccount(c3);
@@ -483,7 +483,7 @@ public class DataLoader implements CommandLineRunner {
 
 		Customer c4 = new Customer("Louis", "Misson");
 		c4.setContactNumber("98550432");
-		c4.setDob(LocalDate.of(2000, 1, 1));
+		c4.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c4.setEmail("louismisson8@gmail.com");
 		c4.setPassword("password");
 		Customer cc4 = customerService.createCustomerAccount(c4);
@@ -496,7 +496,7 @@ public class DataLoader implements CommandLineRunner {
 
 		Customer c5 = new Customer("Remus", "Kwan");
 		c5.setContactNumber("90556630");
-		c5.setDob(LocalDate.of(2000, 1, 1));
+		c5.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c5.setEmail("remuskwan23@gmail.com");
 		c5.setPassword("password");
 		Customer cc5 = customerService.createCustomerAccount(c5);
@@ -509,7 +509,7 @@ public class DataLoader implements CommandLineRunner {
 
 		Customer c6 = new Customer("Ruth", "Chong");
 		c6.setContactNumber("86065278");
-		c6.setDob(LocalDate.of(2000, 1, 1));
+		c6.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c6.setEmail("ruth.cjn@gmail.com");
 		c6.setPassword("password");
 		Customer cc6 = customerService.createCustomerAccount(c6);
@@ -522,10 +522,10 @@ public class DataLoader implements CommandLineRunner {
 
 		Customer c7 = new Customer("Steven", "Lim");
 		c7.setContactNumber("91234567");
-		c7.setDob(LocalDate.of(2000, 1, 1));
+		c7.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c7.setEmail("stevenlim@gmail.com");
 		c7.setPassword("password");
-		Customer cc7 = customerService.createCustomerAccount(c7);
+		customerService.createCustomerAccount(c7);
 
 		// Generate 10 $10 vouchers
 		customerService.generateVouchers(10, 10, "2024-02-16");
@@ -607,6 +607,7 @@ public class DataLoader implements CommandLineRunner {
 
 		Random r = new Random();
 		for (Product p : productService.searchProductsBySKU(null)) {
+			//siteService.addProducts(3L, p.getSku(), 5);
 			siteService.addProducts((long) r.nextInt(20) + 2, p.getSku(), r.nextInt(5) + 10);
 		}
 

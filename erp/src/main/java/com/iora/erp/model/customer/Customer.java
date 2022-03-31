@@ -1,8 +1,8 @@
 package com.iora.erp.model.customer;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -33,7 +33,7 @@ public class Customer implements Serializable {
     @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDate dob;
+    private Date dob;
     @Column(nullable = false, unique = true)
     private String contactNumber;
     private Integer membershipPoints;
@@ -60,7 +60,7 @@ public class Customer implements Serializable {
         this.supportTickets = new ArrayList<>();
     }
 
-    public Customer(String firstName, String lastName, String email, LocalDate dob, String contactNumber,
+    public Customer(String firstName, String lastName, String email, Date dob, String contactNumber,
             MembershipTier membershipTier, String password) {
         this();
         this.firstName = firstName;
@@ -72,7 +72,7 @@ public class Customer implements Serializable {
         this.password = password;
     }
 
-    public Customer(String firstName, String lastName, String email, LocalDate dob, String contactNumber,
+    public Customer(String firstName, String lastName, String email, Date dob, String contactNumber,
             MembershipTier membershipTier, int membershipPoints, DeliveryAddress address) {
         this();
         this.firstName = firstName;
@@ -135,11 +135,11 @@ public class Customer implements Serializable {
         this.email = email;
     }
 
-    public LocalDate getDob() {
+    public Date getDob() {
         return this.dob;
     }
 
-    public void setDob(LocalDate dob) {
+    public void setDob(Date dob) {
         this.dob = dob;
     }
 

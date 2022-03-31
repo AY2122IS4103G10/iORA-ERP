@@ -100,7 +100,6 @@ export const ECIndex = () => {
     dispatch(logout());
     navigate("/");
   };
-
   return (
     <div className="bg-white">
       <header className="relative bg-white">

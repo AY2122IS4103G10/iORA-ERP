@@ -47,7 +47,7 @@ export const ColourPicker = ({ model, selectedColor, setSelectedColor }) => {
                                 }
                             >
                                 {/* className="sr-only" */}
-                                <RadioGroup.Label as="p">
+                                <RadioGroup.Label as="p" className="text-sm">
                                     {colour.fieldValue}
                                 </RadioGroup.Label>
 
@@ -146,12 +146,11 @@ export default function ViewModel() {
 
     useEffect(() => {
         dispatch(fetchModel(modelCode));
-        window.scrollTo(0,0);
+        window.scrollTo(0, 0);
     }, [dispatch])
 
     //fetch the stock availability
     useEffect(() => {
-        console.log(model);
         if (model !== null && model !== undefined) {
             const product = findProduct(model, selectedColor, selectedSize);
             if (product !== undefined) {
@@ -159,18 +158,16 @@ export default function ViewModel() {
             }
         }
     }, [selectedColor, selectedSize])
-    console.log("QTY", productStock);
 
 
     const onAddCartClicked = (e) => {
         e.preventDefault();
         if (selectedColor !== 0 && selectedSize !== 0) {
             const product = findProduct(model, selectedColor, selectedSize);
-            dispatch(addToCart({ model: model, product: product, stock: productStock.qty}))
+            dispatch(addToCart({ model: model, product: product, stock: productStock.qty }))
         }
 
     }
-
 
     return (Boolean(model) && (
         <div className="bg-white">
@@ -224,6 +221,7 @@ export default function ViewModel() {
                             <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
                                 {model.imageLinks.map((image) => (
                                     <img
+                                        key={image}
                                         src={image}
                                         className={classNames(
                                             image.primary ? 'lg:col-span-2 lg:row-span-2' : 'hidden lg:block',
@@ -263,9 +261,9 @@ export default function ViewModel() {
 
                             {/* Product details */}
                             <div className="mt-10">
-                                <h2 className="text-sm font-medium text-gray-900">Description</h2>
+                                <h2 className="text-md font-semibold text-gray-900">Description</h2>
 
-                                <div className="mt-4 prose prose-sm text-gray-500">
+                                <div className="mt-4 text-sm text-gray-900">
                                     <ul role="list">
                                         {model.description.split('.').map((item) => (
                                             <li key={item}>{item}</li>
@@ -275,15 +273,29 @@ export default function ViewModel() {
                             </div>
 
                             <div className="mt-8 border-t border-gray-200 pt-8">
-                                {/* <h2 className="text-sm font-medium text-gray-900">Description</h2>
+                                <span className="text-sm font-medium text-gray-900">SKU: </span>
+                                <span className="text-sm text-gray-900">{" " + model.modelCode}</span>
+                                <div className="mt-4 text-sm text-gray-900">
+                                    <span className='font-medium'>CATEGORIES: </span>
+                                    {model.productFields.filter((field) => field.fieldName === "CATEGORY").map((item, id) => (
+                                        <span key={id}>
+                                            {id !== 0 ? ", " : ""}
+                                            {item.fieldValue}
+                                        </span>
+                                    ))}
+                                </div>
+                                <div className="mt-4 text-sm text-gray-900">
+                                    <span className="font-medium">TAGS: </span>
+                                    {model.productFields.filter((field) => field.fieldName === "TAG").map((item, id) => (
+                                        <span key={id}>
+                                            {id !== 0 ? ", " : ""}
+                                            {item.fieldValue}
 
-                                <div className="mt-4 prose prose-sm text-gray-500">
-                                    <ul role="list">
-                                        {model.description.split('.').map((item) => (
-                                            <li key={item}>{item}</li>
-                                        ))}
-                                    </ul>
-                                </div> */}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                
                             </div>
 
                             {/* Policies */}

@@ -2,7 +2,6 @@ package com.iora.erp.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -219,10 +218,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     e.printStackTrace();
                 }
             }
-        } else {
+        } /* else {
             // update customer delivery address
             em.merge(customerService.getCustomerById(customerOrder.getCustomerId()));
-        }
+        } */
 
         return em.merge(customerOrder);
     }
@@ -620,9 +619,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         double bdayMultiplier = 1;
         int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
         Calendar cal = Calendar.getInstance();
-        cal.setTime(Date.from(customer.getDob().atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant()));
+        cal.setTime(customer.getDob());
         if (currentMonth == cal.get(Calendar.MONTH)) {
             Integer ordersThisMonth = em
                     .createQuery("SELECT o FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",

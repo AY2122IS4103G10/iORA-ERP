@@ -12,7 +12,7 @@ import { CheckoutForm } from "../CheckoutForm";
 import { ManagePayment } from "../ManagePayment";
 
 const deliveryMethods = [
-    { id: 1, title: 'Standard Shipping', description: '4–10 business days', footer: '$2.50' },
+    { id: 1, title: 'Standard Shipping', description: '4-10 business days', footer: '$2.50' },
     { id: 2, title: 'Store Pickup', description: '5-7 business days', footer: 'Free' },
 ]
 
@@ -32,12 +32,6 @@ export const ManageCheckout = () => {
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
     const [postalCode, setPostalCode] = useState("");
-    if (Boolean(localStorage.getItem("user")).address) {
-        setAddress(JSON.parse(localStorage.getItem("user")).address.street1 + " " + JSON.parse(localStorage.getItem("user")).address.street2);
-        setCity(JSON.parse(localStorage.getItem("user")).address.city);
-        setState(JSON.parse(localStorage.getItem("user")).address.state);
-        setPostalCode(JSON.parse(localStorage.getItem("user")).address.zip);
-    }
     const [sameAddress, setSameAddress] = useState(true);
     const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(deliveryMethods[0]);
     const [store, setStore] = useState({ name: "Select Store" });
@@ -46,11 +40,19 @@ export const ManageCheckout = () => {
     const cart = useSelector(selectCart);
     const customerId = useSelector(selectUserId);
 
-    useEffect(() => {
+    const loadAddress = () => {
+        setAddress(JSON.parse(localStorage.getItem("user")).address.street1 + " " + JSON.parse(localStorage.getItem("user")).address.street2);
+        setCity(JSON.parse(localStorage.getItem("user")).address.city);
+        setState(JSON.parse(localStorage.getItem("user")).address.state);
+        setPostalCode(JSON.parse(localStorage.getItem("user")).address.zip);
+    }
+
+    useEffect(() => {     
+        Boolean(JSON.parse(localStorage.getItem("user")).address) && loadAddress();
+        
         checkoutApi.getStores()
             .then((response) => setStoreList(response.data))
             .catch((err) => console.log(err))
-
 
         async function calculate() {
             let subTotal = 0;

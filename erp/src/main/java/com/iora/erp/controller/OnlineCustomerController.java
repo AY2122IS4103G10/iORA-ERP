@@ -109,9 +109,8 @@ public class OnlineCustomerController {
             DecodedJWT decodedJWT = JWTUtil.decodeHeader(authHeader);
             String username = decodedJWT.getSubject();
             Customer customer = customerService.getCustomerByEmail(username);
-            Customer out = new Customer(customer.getFirstName(), customer.getLastName(), customer.getEmail(),
-                    customer.getDob(), customer.getContactNumber(), customer.getMembershipTier(), customer.getMembershipPoints(), customer.getAddress());
-            return ResponseEntity.ok(out);
+            customer.setPassword("");
+            return ResponseEntity.ok(customer);
         } catch (AuthenticationException e) {
             throw new RuntimeException("Refresh token is missing");
         } catch (CustomerException | JWTVerificationException e) {

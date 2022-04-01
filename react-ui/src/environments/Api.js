@@ -109,6 +109,11 @@ export const procurementApi = {
       `${REST_ENDPOINT}warehouse/procurementOrder/scan/${orderId}?barcode=${barcode}`
     );
   },
+  pickPackAtFactory(orderId, sku, qty) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}manufacturing/procurementOrder/${orderId}/${sku}/${qty}`
+    );
+  }
 };
 
 export const vendorApi = {

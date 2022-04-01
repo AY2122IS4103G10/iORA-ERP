@@ -178,12 +178,14 @@ export const EditableCell = ({
   row: { index },
   column: { id },
   min = "1",
+  max,
   updateMyData,
 }) => {
   const [value, setValue] = useState(initialValue);
 
   const onChange = (e) => {
     setValue(e.target.value);
+    // updateMyData(index, id, e.target.value);
   };
 
   const onBlur = () => {
@@ -199,6 +201,7 @@ export const EditableCell = ({
       type="number"
       className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
       min={min}
+      max={max && max}
       value={value}
       onChange={onChange}
       onBlur={onBlur}

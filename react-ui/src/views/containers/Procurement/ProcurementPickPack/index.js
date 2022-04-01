@@ -7,7 +7,10 @@ import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { procurementApi } from "../../../../environments/Api";
 import { scanItem } from "../../../../stores/slices/procurementSlice";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import {
+  EditableCell,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 
 export const PickPackList = ({
   data,
@@ -16,8 +19,37 @@ export const PickPackList = ({
   openConfirmModal,
   handlePickPack,
   setAction,
+  setData,
 }) => {
+  const [skipPageReset, setSkipPageReset] = useState(false);
+
   const columns = useMemo(() => {
+    const handleEditRow = (rowIndex) =>
+      setData((item) =>
+        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+      );
+    const handleSaveRow = (rowIndex) =>
+      setData((item) =>
+        item.map((row, index) => ({
+          ...row,
+          isEditing: rowIndex === index && false,
+        }))
+      );
+
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
     return [
       {
         Header: "SKU",
@@ -43,6 +75,18 @@ export const PickPackList = ({
       {
         Header: "Picked",
         accessor: "pickedQty",
+        Cell: (e) => {
+          return !e.row.original.isEditing ? (
+            e.value
+          ) : (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+            />
+          );
+        },
       },
       {
         Header: "Packed",
@@ -50,7 +94,7 @@ export const PickPackList = ({
       },
       {
         Header: "Status",
-        accessor: "",
+        accessor: "[status]",
         Cell: (row) => {
           const lineItem = row.row.original;
           return lineItem.pickedQty === 0
@@ -65,8 +109,26 @@ export const PickPackList = ({
             : "PACKED";
         },
       },
+      {
+        Header: "",
+        accessor: "[editButton]",
+        Cell: (e) => {
+          return (
+            <button
+              className="text-cyan-600 hover:text-cyan-900"
+              onClick={() =>
+                !e.row.original.isEditing
+                  ? handleEditRow(e.row.index)
+                  : handleSaveRow(e.row.index)
+              }
+            >
+              {!e.row.original.isEditing ? "Edit" : "Save"}
+            </button>
+          );
+        },
+      },
     ];
-  }, []);
+  }, [setData]);
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -94,7 +156,11 @@ export const PickPackList = ({
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable columns={columns} data={data} />
+          <SimpleTable
+            columns={columns}
+            data={data}
+            skipPageReset={skipPageReset}
+          />
         </div>
       )}
     </div>
@@ -404,6 +470,7 @@ export const ProcurementPickPack = () => {
                 openConfirmModal={openConfirmModal}
                 handlePickPack={handlePickPack}
                 procurementId={procurementId}
+                setData={setLineItems}
               />
             </section>
           )}

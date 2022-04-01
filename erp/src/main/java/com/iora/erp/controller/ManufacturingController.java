@@ -110,6 +110,17 @@ public class ManufacturingController {
         }
     }
 
+    @PutMapping(path = "/procurementOrder/{orderId}/{sku}/{qty}", produces = "application/json")
+    public ResponseEntity<Object> pickpackProductAtFactory(@PathVariable Long orderId, @PathVariable String sku,
+            @PathVariable int qty) {
+        try {
+            return ResponseEntity.ok(procurementService.scanProductAtFactory(orderId, sku, qty));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/procurementOrder/ship/{orderId}", produces = "application/json")
     public ResponseEntity<Object> shipProcurementOrder(@PathVariable Long orderId) {
         try {

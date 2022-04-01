@@ -357,6 +357,66 @@ public class ProcurementServiceImpl implements ProcurementService {
     }
 
     @Override
+    public ProcurementOrder pickpackAtFactory(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException {
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
+
+        Product product = productService.getProduct(rfidsku);
+        List<ProcurementOrderLI> lineItems = procurementOrder.getLineItems();
+
+        if (procurementOrder.getLastStatus() == ProcurementOrderStatusEnum.PICKING) {
+            for (ProcurementOrderLI poli : lineItems) {
+                if (poli.getProduct().equals(product)) {
+                    if (qty > poli.getRequestedQty()) {
+                        throw new ProcurementOrderException(
+                                "The quantity of this product has exceeded the requested quantity by "
+                                        + (qty - poli.getRequestedQty())
+                                        + " and cannot be picked.");
+                    }
+                    poli.setPickedQty(qty);
+                    boolean picked = true;
+                    for (ProcurementOrderLI poli2 : lineItems) {
+                        if (poli2.getPickedQty() < poli2.getRequestedQty()) {
+                            picked = false;
+                        }
+                    }
+                    if (picked) {
+                        procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                                ProcurementOrderStatusEnum.PICKED));
+                    }
+                    return em.merge(procurementOrder);
+                }
+            }
+            throw new ProcurementOrderException(
+                    "The product scanned is not required in the order that you are picking");
+        } else if (procurementOrder.getLastStatus() == ProcurementOrderStatusEnum.PACKING) {
+            for (ProcurementOrderLI poli : lineItems) {
+                if (poli.getProduct().equals(product)) {
+                    if (qty > poli.getPickedQty()) {
+                        throw new ProcurementOrderException("You are packing items that are not meant for this order.");
+                    } else {
+                        poli.setPackedQty(qty);
+                        boolean packed = true;
+                        for (ProcurementOrderLI poli2 : lineItems) {
+                            if (poli2.getPackedQty() < poli2.getPickedQty()) {
+                                packed = false;
+                            }
+                        }
+                        if (packed) {
+                            procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                                    ProcurementOrderStatusEnum.PACKED));
+                        }
+                        return em.merge(procurementOrder);
+                    }
+                }
+            }
+            throw new ProcurementOrderException(
+                    "The product scanned is not required in the order that you are picking");
+        } else {
+            throw new ProcurementOrderException("The order is not due for picking / packing.");
+        }
+    }
+
+    @Override
     public ProcurementOrder shipProcurementOrder(Long id)
             throws IllegalPOModificationException, ProcurementOrderException {
         ProcurementOrder procurementOrder = getProcurementOrder(id);

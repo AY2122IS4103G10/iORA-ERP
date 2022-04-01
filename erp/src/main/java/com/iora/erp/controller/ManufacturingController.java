@@ -114,7 +114,7 @@ public class ManufacturingController {
     public ResponseEntity<Object> pickpackProductAtFactory(@PathVariable Long orderId, @PathVariable String sku,
             @PathVariable int qty) {
         try {
-            return ResponseEntity.ok(procurementService.scanProductAtFactory(orderId, sku, qty));
+            return ResponseEntity.ok(procurementService.pickpackAtFactory(orderId, sku, qty));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

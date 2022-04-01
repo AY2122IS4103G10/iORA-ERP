@@ -188,10 +188,6 @@ export default function ViewModel() {
       dispatch(
         addToCart({ model: model, product: product, stock: productStock.qty })
       );
-      addToast(`Added ${model.name} to cart.`, {
-        appearance: "success",
-        autoDismiss: true,
-      });
     }
   };
 

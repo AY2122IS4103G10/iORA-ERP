@@ -49,14 +49,9 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
             className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
           >
             <span className="sr-only">View notifications</span>
-
-            <BellIcon className="h-6 w-6" aria-hidden="true" />
-            {newNoti && (
-              <ExclamationIcon
-                className="h-6 w-6 text-red-500"
-                aria-hidden="true"
-              />
-            )}
+            {newNoti ?
+              <BellIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+            : <BellIcon className="h-6 w-6" aria-hidden="true" />}
           </button>
           {/* Profile dropdown */}
           <Menu as="div" className="ml-3 relative">
@@ -64,9 +59,8 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
               <Menu.Button className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
                 <img
                   className="h-8 w-8 rounded-full"
-                  src={`https://randomuser.me/api/portraits/${
-                    user?.id % 2 === 0 ? "wo" : ""
-                  }men/${user?.id}.jpg`}
+                  src={`https://randomuser.me/api/portraits/${user?.id % 2 === 0 ? "wo" : ""
+                    }men/${user?.id}.jpg`}
                   alt=""
                 />
                 <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">

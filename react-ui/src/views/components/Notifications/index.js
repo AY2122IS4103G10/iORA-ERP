@@ -4,12 +4,10 @@ import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useToasts } from "react-toast-notifications";
 import { api, updateAccessToken } from "../../../environments/Api";
 import { refreshTokenJwt } from "../../../stores/slices/userSlice";
 
 export function Notifications({ open, setOpen, setNewNoti }) {
-  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const [notifications, setNotifications] = useState([]);
   const refreshToken =
@@ -24,10 +22,6 @@ export function Notifications({ open, setOpen, setNewNoti }) {
       );
 
       if (notifications.length !== data.length) {
-        addToast("New Notifications!", {
-          appearance: "info",
-          autoDismiss: true,
-        });
         setNewNoti(true);
         setNotifications(data);
       }
@@ -42,7 +36,7 @@ export function Notifications({ open, setOpen, setNewNoti }) {
   };
 
   useEffect(() => {
-    const timer = setInterval(getNotifications, 2000);
+    const timer = setInterval(getNotifications, 10000);
     return () => clearInterval(timer);
   });
 

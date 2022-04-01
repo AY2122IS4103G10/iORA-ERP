@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react";
-import { StarIcon } from "@heroicons/react/solid";
 import { RadioGroup } from "@headlessui/react";
 import { CurrencyDollarIcon, GlobeIcon } from "@heroicons/react/outline";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+import { addToCart } from "../../../stores/slices/cartSlice";
 import {
   fetchModel,
   fetchProductStock,
   selectModel,
-  selectProductStock,
+  selectProductStock
 } from "../../../stores/slices/listingSlice";
-import { addToCart } from "../../../stores/slices/cartSlice";
 
 const product = {
   breadcrumbs: [
@@ -52,7 +51,7 @@ export const ColourPicker = ({ model, selectedColor, setSelectedColor }) => {
         className="mt-2"
       >
         <RadioGroup.Label className="sr-only">Choose a color</RadioGroup.Label>
-        <div className="flex items-center space-x-3">
+        <div className="grid grid-cols-3 items-center gap-2">
           {colours.map((colour) => {
             return (
               <RadioGroup.Option
@@ -61,23 +60,15 @@ export const ColourPicker = ({ model, selectedColor, setSelectedColor }) => {
                 className={({ active, checked }) =>
                   classNames(
                     // color.selectedColor,
-                    checked ? "ring-2 ring-gray-700" : "",
-                    "-m-0.5 relative p-0.5 rounded-full flex items-center justify-center cursor-pointer focus:outline-none"
+                    checked ? "ring-2 ring-gray-700 bg-gray-100" : "",
+                    "-m-0.5 relative p-2 rounded-full flex items-center justify-center cursor-pointer focus:outline-none"
                   )
                 }
               >
                 {/* className="sr-only" */}
-                <RadioGroup.Label as="p" className="text-sm">
+                <RadioGroup.Label as="p" className="text-sm px-3 py-1">
                   {colour.fieldValue}
                 </RadioGroup.Label>
-
-                <span
-                  aria-hidden="true"
-                  className={classNames(
-                    // color.bgColor,
-                    "h-8 w-8 border border-black border-opacity-10 rounded-full"
-                  )}
-                />
               </RadioGroup.Option>
             );
           })}
@@ -169,6 +160,7 @@ export default function ViewModel() {
   const model = useSelector(selectModel);
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedSize, setSelectedSize] = useState(0);
+  const [clicked, setClicked] = useState(false);
 
   const productStock = useSelector(selectProductStock);
 
@@ -189,6 +181,8 @@ export default function ViewModel() {
 
   const onAddCartClicked = (e) => {
     e.preventDefault();
+    setClicked(true);
+    setTimeout(() => setClicked(false), 500);
     if (selectedColor !== 0 && selectedSize !== 0) {
       const product = findProduct(model, selectedColor, selectedSize);
       dispatch(
@@ -267,6 +261,7 @@ export default function ViewModel() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
                   {model.imageLinks.map((image) => (
                     <img
+                      alt={model.name}
                       key={image}
                       src={image}
                       className={classNames(
@@ -310,6 +305,11 @@ export default function ViewModel() {
                   >
                     Add to cart
                   </button>
+                  <span
+                    className={`${
+                      clicked ? "" : "hidden "
+                    }animate-ping absolute -top-4 -right-4 inline-flex h-24 w-24 rounded-full bg-green-600 opacity-75`}
+                  ></span>
                 </form>
 
                 {/* Product details */}
@@ -319,7 +319,7 @@ export default function ViewModel() {
                   </h2>
 
                   <div className="mt-4 text-sm text-gray-900">
-                    <ul role="list">
+                    <ul>
                       {model.description.split(".").map((item) => (
                         <li key={item}>{item}</li>
                       ))}

@@ -218,10 +218,13 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     e.printStackTrace();
                 }
             }
-        } /* else {
+        } else {
             // update customer delivery address
-            em.merge(customerService.getCustomerById(customerOrder.getCustomerId()));
-        } */
+            OnlineOrder oo = (OnlineOrder) customerOrder;
+            Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
+            c.setAddress(oo.getDeliveryAddress());
+            em.merge(c);
+        }
 
         return em.merge(customerOrder);
     }

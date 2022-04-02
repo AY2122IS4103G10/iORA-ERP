@@ -7,7 +7,10 @@ import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { procurementApi } from "../../../../environments/Api";
 import { scanItem } from "../../../../stores/slices/procurementSlice";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import {
+  EditableCell,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 
 export const PickPackList = ({
   data,
@@ -16,8 +19,50 @@ export const PickPackList = ({
   openConfirmModal,
   handlePickPack,
   setAction,
+  setData,
+  onSaveQuanityClicked,
+  manufacturing,
+  currSiteId,
 }) => {
+  const [skipPageReset, setSkipPageReset] = useState(false);
+
   const columns = useMemo(() => {
+    const handleEditRow = (rowIndex) => {
+      setData((item) =>
+        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+      );
+    };
+
+    const onSaveClicked = (rowIndex, obj) => {
+      if (status === "MANUFACTURED" || status === "ACCEPTED")
+        handlePickPack().then(() => handleSaveRow(rowIndex, obj));
+      else handleSaveRow(rowIndex, obj);
+    };
+
+    const handleSaveRow = (rowIndex, obj) => {
+      onSaveQuanityClicked(
+        rowIndex,
+        obj.product.sku,
+        ["MANUFACTURED", "PICKING"].some((s) => s === status)
+          ? obj.pickedQty
+          : obj.packedQty
+      );
+    };
+
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
     return [
       {
         Header: "SKU",
@@ -43,14 +88,44 @@ export const PickPackList = ({
       {
         Header: "Picked",
         accessor: "pickedQty",
+        Cell: (e) => {
+          return e.row.original.isEditing &&
+            ["MANUFACTURED", "PICKING", "ACCEPTED"].some((s) => s === status) ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+              max={e.row.original.requestedQty}
+            />
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Packed",
         accessor: "packedQty",
+        Cell: (e) => {
+          return e.row.original.isEditing &&
+            ["PACKING", "PICKED"].some((s) => s === status) ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+              max={e.row.original.pickedQty}
+            />
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Status",
-        accessor: "",
+        accessor: "[status]",
         Cell: (row) => {
           const lineItem = row.row.original;
           return lineItem.pickedQty === 0
@@ -65,8 +140,31 @@ export const PickPackList = ({
             : "PACKED";
         },
       },
+      {
+        Header: "",
+        accessor: "[editButton]",
+        Cell: (e) => {
+          return (
+            <button
+              className="text-cyan-600 hover:text-cyan-900"
+              onClick={() =>
+                !e.row.original.isEditing
+                  ? handleEditRow(e.row.index)
+                  : onSaveClicked(e.row.index, e.row.original)
+              }
+            >
+              {!e.row.original.isEditing ? "Edit" : "Save"}
+            </button>
+          );
+        },
+      },
     ];
-  }, []);
+  }, [setData, status, onSaveQuanityClicked, handlePickPack]);
+  const hiddenColumns =
+    manufacturing.id !== currSiteId ||
+    ["MANUFACTURED", "PICKING", "PICKED", "PACKING", "ACCEPTED"].every((s) => s !== status)
+      ? ["[editButton]"]
+      : [];
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -94,7 +192,12 @@ export const PickPackList = ({
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable columns={columns} data={data} />
+          <SimpleTable
+            columns={columns}
+            data={data}
+            skipPageReset={skipPageReset}
+            hiddenColumns={hiddenColumns}
+          />
         </div>
       )}
     </div>
@@ -200,6 +303,8 @@ export const ProcurementPickPack = () => {
     setAction,
     openConfirmModal,
     closeConfirmModal,
+    manufacturing,
+    currSiteId,
   } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -315,6 +420,36 @@ export const ProcurementPickPack = () => {
     setSearch(e.target.value);
   };
 
+  const onSaveQuanityClicked = async (rowIndex, sku, qty) => {
+    try {
+      const { data } = await procurementApi.pickPackAtFactory(
+        procurementId,
+        sku,
+        qty
+      );
+      const { lineItems: lIs, statusHistory } = data;
+      setStatus(statusHistory[statusHistory.length - 1]);
+      setStatusHistory(statusHistory);
+      setLineItems(
+        lineItems.map((row, index) => ({
+          ...row,
+          pickedQty: lIs[index].pickedQty,
+          packedQty: lIs[index].packedQty,
+          isEditing: rowIndex === index && false,
+        }))
+      );
+      addToast(`Success: Updated quantity.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+    } catch (error) {
+      addToast(`Error: ${error.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-12 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -404,6 +539,10 @@ export const ProcurementPickPack = () => {
                 openConfirmModal={openConfirmModal}
                 handlePickPack={handlePickPack}
                 procurementId={procurementId}
+                setData={setLineItems}
+                manufacturing={manufacturing}
+                currSiteId={currSiteId}
+                onSaveQuanityClicked={onSaveQuanityClicked}
               />
             </section>
           )}

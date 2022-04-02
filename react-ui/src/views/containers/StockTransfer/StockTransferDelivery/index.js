@@ -4,25 +4,55 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import {
+  adjustAtTo,
   completeStockTransfer,
   deliverMultipleStockTransfer,
   deliverStockTransfer,
   scanReceiveStockTransfer,
 } from "../../../../stores/slices/stocktransferSlice";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import {
+  EditableCell,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 import { NumDeliveriesSection } from "../../Procurement/ProcurementDelivery";
 import { ScanItemsSection } from "../../Procurement/ProcurementPickPack";
 
 const DeliveryList = ({
   data,
+  setData,
   status,
   setAction,
   openConfirmModal,
   onCompleteClicked,
   order,
   userSiteId,
+  onSaveQuanityClicked,
 }) => {
+  const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
+    const handleEditRow = (rowIndex) => {
+      setData((item) =>
+        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+      );
+    };
+
+    const handleSaveRow = (rowIndex, obj) => {
+      onSaveQuanityClicked(rowIndex, obj.product.sku, obj.receivedQty);
+    };
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
     return [
       {
         Header: "SKU",
@@ -48,6 +78,21 @@ const DeliveryList = ({
       {
         Header: "Received",
         accessor: "receivedQty",
+        Cell: (e) => {
+          return e.row.original.isEditing &&
+            ["DELIVERING", "DELIVERING_MULTIPLE"].some((s) => s === status) ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+              max={e.row.original.requestedQty}
+            />
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Status",
@@ -61,8 +106,31 @@ const DeliveryList = ({
             : "RECEIVED";
         },
       },
+      {
+        Header: "",
+        accessor: "[editButton]",
+        Cell: (e) => {
+          return (
+            <button
+              className="text-cyan-600 hover:text-cyan-900"
+              onClick={() =>
+                !e.row.original.isEditing
+                  ? handleEditRow(e.row.index)
+                  : handleSaveRow(e.row.index, e.row.original)
+              }
+            >
+              {!e.row.original.isEditing ? "Edit" : "Save"}
+            </button>
+          );
+        },
+      },
     ];
-  }, [status]);
+  }, [status, onSaveQuanityClicked, setData]);
+  const hiddenColumns =
+    order.toSite.id !== userSiteId ||
+    ["DELIVERING", "DELIVERING_MULTIPLE"].every((s) => s !== status)
+      ? ["[editButton]"]
+      : [];
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -91,7 +159,12 @@ const DeliveryList = ({
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable columns={columns} data={data} />
+          <SimpleTable
+            columns={columns}
+            data={data}
+            skipPageReset={skipPageReset}
+            hiddenColumns={hiddenColumns}
+          />
         </div>
       )}
     </div>
@@ -187,6 +260,29 @@ export const StockTransferDelivery = () => {
     }
     setSearch(e.target.value);
   };
+  const onSaveQuanityClicked = async (_, sku, qty) => {
+    await dispatch(adjustAtTo({ orderId: order.id, sku, qty }))
+      .unwrap()
+      .then(() => {
+        addToast(`Success: Updated quantity.`, {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        if (status.status === "COMPLETED") {
+          addToast(`Order ${order.id} completed.`, {
+            appearance: "success",
+            autoDismiss: true,
+          });
+          navigate(`/${subsys}/procurements/${order.id}`);
+        }
+      })
+      .catch((error) => {
+        addToast(`Error: ${error.response.data}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
+  };
   return (
     <div className="space-y-6 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-12 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -247,6 +343,7 @@ export const StockTransferDelivery = () => {
                 openConfirmModal={openConfirmModal}
                 order={order}
                 userSiteId={userSiteId}
+                onSaveQuanityClicked={onSaveQuanityClicked}
               />
             </section>
           )}

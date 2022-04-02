@@ -355,7 +355,6 @@ export const ProcurementForm = () => {
   const [warehouseSelected, setWarehouseSelected] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [openProducts, setOpenProducts] = useState(false);
-
   const skus = useSelector(selectAllProducts).flatMap((model) =>
     model.products.map((product) => ({
       ...product,

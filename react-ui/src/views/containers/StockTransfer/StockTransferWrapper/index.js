@@ -600,7 +600,6 @@ export const StockTransferWrapper = ({ subsys }) => {
           toSiteId={order.toSite.id}
           open={openVerifyItems}
           closeModal={closeVerifyItemsModal}
-          // handleReadyOrder={handleReadyOrder}
           handleCompleteOrder={handleCompleteOrder}
           lineItems={lineItems}
           setLineItems={setLineItems}

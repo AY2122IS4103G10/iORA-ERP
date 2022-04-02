@@ -427,12 +427,14 @@ export const ProcurementPickPack = () => {
         sku,
         qty
       );
-      const { lineItems, statusHistory } = data;
+      const { lineItems: lIs, statusHistory } = data;
       setStatus(statusHistory[statusHistory.length - 1]);
       setStatusHistory(statusHistory);
       setLineItems(
         lineItems.map((row, index) => ({
           ...row,
+          pickedQty: lIs[index].pickedQty,
+          packedQty: lIs[index].packedQty,
           isEditing: rowIndex === index && false,
         }))
       );

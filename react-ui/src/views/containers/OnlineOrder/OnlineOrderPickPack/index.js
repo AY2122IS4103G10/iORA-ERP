@@ -4,14 +4,62 @@ import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { onlineOrderApi } from "../../../../environments/Api";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import {
+  EditableCell,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 import {
   ConfirmSection,
   ScanItemsSection,
 } from "../../Procurement/ProcurementPickPack";
 
-const PickPackList = ({ data, status }) => {
+const PickPackList = ({
+  data,
+  status,
+  setData,
+  handlePickPack,
+  onSaveQuanityClicked,
+  site,
+  currSiteId,
+}) => {
+  const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
+    const handleEditRow = (rowIndex) => {
+      setData((item) =>
+        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+      );
+    };
+
+    const onSaveClicked = (rowIndex, obj) => {
+      if (status === "PENDING")
+        handlePickPack().then(() => handleSaveRow(rowIndex, obj));
+      else handleSaveRow(rowIndex, obj);
+    };
+
+    const handleSaveRow = (rowIndex, obj) => {
+      onSaveQuanityClicked(
+        rowIndex,
+        obj.product.sku,
+        ["PENDING", "PICKING"].some((s) => s === status)
+          ? obj.pickedQty
+          : obj.packedQty
+      );
+    };
+
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
     return [
       {
         Header: "SKU",
@@ -37,10 +85,40 @@ const PickPackList = ({ data, status }) => {
       {
         Header: "Picked",
         accessor: "pickedQty",
+        Cell: (e) => {
+          return e.row.original.isEditing &&
+            ["PICKING", "PENDING"].some((s) => s === status) ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+              max={e.row.original.requestedQty}
+            />
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Packed",
         accessor: "packedQty",
+        Cell: (e) => {
+          return e.row.original.isEditing &&
+            ["PACKING"].some((s) => s === status) ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+              max={e.row.original.pickedQty}
+            />
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Status",
@@ -58,8 +136,31 @@ const PickPackList = ({ data, status }) => {
             : "PACKED";
         },
       },
+      {
+        Header: "",
+        accessor: "[editButton]",
+        Cell: (e) => {
+          return (
+            <button
+              className="text-cyan-600 hover:text-cyan-900"
+              onClick={() =>
+                !e.row.original.isEditing
+                  ? handleEditRow(e.row.index)
+                  : onSaveClicked(e.row.index, e.row.original)
+              }
+            >
+              {!e.row.original.isEditing ? "Edit" : "Save"}
+            </button>
+          );
+        },
+      },
     ];
-  }, []);
+  }, [handlePickPack, setData, status, onSaveQuanityClicked]);
+  const hiddenColumns =
+    site.id !== currSiteId ||
+    ["PENDING", "PICKING", "PACKING"].every((s) => s !== status)
+      ? ["[editButton]"]
+      : [];
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -69,7 +170,12 @@ const PickPackList = ({ data, status }) => {
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable columns={columns} data={data} />
+          <SimpleTable
+            columns={columns}
+            data={data}
+            skipPageReset={skipPageReset}
+            hiddenColumns={hiddenColumns}
+          />
         </div>
       )}
     </div>
@@ -90,6 +196,7 @@ export const OnlineOrderPickPack = () => {
     setLineItems,
     openInvoice,
     pickupSite,
+    site,
   } = useOutletContext();
 
   const status = st.status;
@@ -169,7 +276,31 @@ export const OnlineOrderPickPack = () => {
     }
     setSearch(e.target.value);
   };
-  console.log(lineItems);
+  const onSaveQuanityClicked = async (rowIndex, sku, qty) => {
+    try {
+      const { data } = await onlineOrderApi.adjustProduct(orderId, sku, qty);
+      const { lineItems: lIs, statusHistory } = data;
+      setStatus(statusHistory[statusHistory.length - 1]);
+      setStatusHistory(statusHistory);
+      setLineItems(
+        lineItems.map((row, index) => ({
+          ...row,
+          pickedQty: lIs[index].pickedQty,
+          packedQty: lIs[index].packedQty,
+          isEditing: rowIndex === index && false,
+        }))
+      );
+      addToast(`Success: Updated quantity.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+    } catch (error) {
+      addToast(`Error: ${error.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
   return (
     <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -232,7 +363,15 @@ export const OnlineOrderPickPack = () => {
             ) &&
               ["sm", "wh", "str"].some((s) => s === subsys) && (
                 <section aria-labelledby="order-summary">
-                  <PickPackList data={lineItems} status={status} />
+                  <PickPackList
+                    data={lineItems}
+                    status={status}
+                    setData={setLineItems}
+                    handlePickPack={handlePickPack}
+                    onSaveQuanityClicked={onSaveQuanityClicked}
+                    site={site}
+                    currSiteId={currSiteId}
+                  />
                 </section>
               )}
           </div>

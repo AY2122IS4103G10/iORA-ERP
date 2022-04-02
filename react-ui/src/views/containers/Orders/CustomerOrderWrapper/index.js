@@ -139,6 +139,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [totalAmount, setTotalAmount] = useState(-1);
   const [payments, setPayments] = useState([]);
   const [paid, setPaid] = useState(false);
+  const [site, setSite] = useState(false)
   const [pickupSite, setPickupSite] = useState(null);
   const [country, setCountry] = useState(null);
   const [qrValue, setQrValue] = useState("");
@@ -169,6 +170,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           payments,
           paid,
           pickupSite,
+          site,
           country,
           statusHistory,
         } = data;
@@ -196,6 +198,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         setPayments(payments);
         setPaid(paid);
         setPickupSite(pickupSite);
+        setSite(site)
         setCountry(country);
         setQrValue(
           `http://localhost:3000/${subsys}/orders/${orderId}/pick-pack`
@@ -260,6 +263,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             totalAmount,
             payments,
             paid,
+            site,
             pickupSite,
             country,
             status,

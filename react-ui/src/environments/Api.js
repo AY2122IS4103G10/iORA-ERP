@@ -384,6 +384,9 @@ export const onlineOrderApi = {
   collect(orderId) {
     return axiosPrivate.put(`${REST_ENDPOINT}online/collect/${orderId}`);
   },
+  adjustProduct(orderId, sku, qty) {
+    return axiosPrivate.put(`${REST_ENDPOINT}online/order/${orderId}/${sku}/${qty}`);
+  },
 };
 
 export const orderApi = {

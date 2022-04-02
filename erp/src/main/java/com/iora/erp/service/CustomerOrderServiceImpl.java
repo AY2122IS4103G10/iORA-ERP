@@ -796,7 +796,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         }
                         if (packed) {
                             onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
+                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
                         }
                         return em.merge(onlineOrder);
                     }
@@ -807,7 +807,63 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             throw new CustomerOrderException("The order is not due for picking / packing.");
         }
     }
+    
+        @Override
+        public OnlineOrder adjustProduct(Long orderId, String rfidsku, int qty)
+                throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException {
 
+                    OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
+            
+                    Product product = productService.getProduct(rfidsku);
+                    List<CustomerOrderLI> lineItems = onlineOrder.getLineItems();
+            
+                    if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PICKING) {
+                        for (CustomerOrderLI coli : lineItems) {
+                            if (coli.getProduct().equals(product)) {
+                                coli.setPickedQty(qty);
+                                boolean picked = true;
+                                for (CustomerOrderLI coli2 : lineItems) {
+                                    if (coli2.getPickedQty() < coli2.getQty()) {
+                                        picked = false;
+                                    }
+                                }
+                                if (picked) {
+                                    onlineOrder.addStatusHistory(
+                                            new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
+                                }
+                                return em.merge(onlineOrder);
+                            }
+                        }
+                        throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
+            
+                    } else if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PACKING) {
+                        for (CustomerOrderLI coli : lineItems) {
+                            if (coli.getProduct().equals(product)) {
+                                if (qty > coli.getPickedQty()) {
+                                    throw new CustomerOrderException("You are packing items that are not meant for this order.");
+                                } else {
+                                    coli.setPackedQty(qty);
+            
+                                    boolean packed = true;
+                                    for (CustomerOrderLI coli2 : lineItems) {
+                                        if (coli2.getPackedQty() < coli2.getPickedQty()) {
+                                            packed = false;
+                                        }
+                                    }
+                                    if (packed) {
+                                        onlineOrder.addStatusHistory(
+                                            new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
+                                    }
+                                    return em.merge(onlineOrder);
+                                }
+                            }
+                        }
+                        throw new CustomerOrderException("The product scanned is not required in the order that you are picking");
+                    } else {
+                        throw new CustomerOrderException("The order is not due for picking / packing.");
+                    }
+                }
+    
     @Override
     public OnlineOrder deliverOnlineOrder(Long orderId) throws CustomerOrderException {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
@@ -831,7 +887,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 e.printStackTrace();
             }
         }
-
+        
         return updateOnlineOrder(onlineOrder);
     }
 

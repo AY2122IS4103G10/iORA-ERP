@@ -116,6 +116,17 @@ public class WarehouseController {
         }
     }
 
+    @PutMapping(path = "/procurementOrder/{orderId}/{sku}/{qty}", produces = "application/json")
+    public ResponseEntity<Object> adjustProductAtWarehouse(@PathVariable Long orderId, @PathVariable String sku,
+            @PathVariable int qty) {
+        try {
+            return ResponseEntity.ok(procurementService.adjustProductsAtWarehouse(orderId, sku, qty));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/procurementOrder/complete/{orderId}", produces = "application/json")
     public ResponseEntity<Object> verifyProcurementOrder(@PathVariable Long orderId) {
         try {

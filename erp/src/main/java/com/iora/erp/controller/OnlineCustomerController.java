@@ -260,6 +260,15 @@ public class OnlineCustomerController {
         }
     }
 
+    @PutMapping(path = "/order/{orderId}/{sku}/{qty}", produces = "application/json")
+    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku, @PathVariable int qty) {
+        try {
+            return ResponseEntity.ok(customerOrderService.adjustProduct(orderId, sku, qty));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/deliver/{orderId}", produces = "application/json")
     public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId) {
         try {

@@ -56,6 +56,7 @@ public interface CustomerOrderService {
         public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
         public abstract OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
         public abstract OnlineOrder scanProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException;
+        public abstract OnlineOrder adjustProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException;
         public abstract OnlineOrder deliverOnlineOrder(Long orderId) throws CustomerOrderException;
         public abstract OnlineOrder deliverMultipleOnlineOrder(Long orderId) throws CustomerOrderException;
         public abstract OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;

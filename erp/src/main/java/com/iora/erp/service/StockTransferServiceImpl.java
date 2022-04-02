@@ -307,6 +307,68 @@ public class StockTransferServiceImpl implements StockTransferService {
     }
 
     @Override
+    public StockTransferOrder adjustProductsAtFromSite(Long id, String rfidsku, int qty)
+            throws StockTransferException, ProductException {
+        StockTransferOrder stOrder = getStockTransferOrder(id);
+
+        Product product = productService.getProduct(rfidsku);
+        List<StockTransferOrderLI> lineItems = stOrder.getLineItems();
+
+        if (stOrder.getLastStatus() == StockTransferStatusEnum.PICKING) {
+            for (StockTransferOrderLI stoli : lineItems) {
+                if (stoli.getProduct().equals(product)) {
+                    if (qty > stoli.getRequestedQty()) {
+                        throw new StockTransferException(
+                                "The quantity of this product has exceeded the requested quantity by "
+                                        + (qty - stoli.getRequestedQty())
+                                        + " and cannot be picked.");
+                    }
+                    stoli.setPickedQty(qty);
+
+                    boolean picked = true;
+                    for (StockTransferOrderLI stoli2 : lineItems) {
+                        if (stoli2.getPickedQty() < stoli2.getRequestedQty()) {
+                            picked = false;
+                        }
+                    }
+                    if (picked) {
+                        stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                                StockTransferStatusEnum.PICKED));
+                    }
+
+                    return em.merge(stOrder);
+
+                }
+            }
+            throw new StockTransferException("The product scanned is not required in the order that you are picking");
+        } else if (stOrder.getLastStatus() == StockTransferStatusEnum.PACKING) {
+            for (StockTransferOrderLI stoli : lineItems) {
+                if (stoli.getProduct().equals(product)) {
+                    if (qty > stoli.getPickedQty()) {
+                        throw new StockTransferException("You are packing items that are not meant for this order.");
+                    } else {
+                        stoli.setPackedQty(qty);
+                        boolean packed = true;
+                        for (StockTransferOrderLI stoli2 : lineItems) {
+                            if (stoli2.getPackedQty() < stoli2.getPickedQty()) {
+                                packed = false;
+                            }
+                        }
+                        if (packed) {
+                            stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                                    StockTransferStatusEnum.PACKED));
+                        }
+                        return em.merge(stOrder);
+                    }
+                }
+            }
+            throw new StockTransferException("The product scanned is not required in the order that you are packing");
+        } else {
+            throw new StockTransferException("The order is not due for picking / packing.");
+        }
+    }
+
+    @Override
     public StockTransferOrder deliverStockTransferOrder(Long id) throws StockTransferException {
 
         StockTransferOrder stOrder = getStockTransferOrder(id);
@@ -392,6 +454,43 @@ public class StockTransferServiceImpl implements StockTransferService {
         }
         throw new StockTransferException("The product scanned is not related to the Stock Transfer Order");
     }
+
+    @Override
+    public StockTransferOrder adjustProductsAtToSite(Long id, String rfidsku, int qty)
+            throws StockTransferException, ProductException {
+                StockTransferOrder stOrder = getStockTransferOrder(id);
+        
+                if (stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING_MULTIPLE
+                        && stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING) {
+                    throw new StockTransferException("Order cannot be verified yet.");
+                }
+        
+                Product product = productService.getProduct(rfidsku);
+                List<StockTransferOrderLI> lineItems = stOrder.getLineItems();
+        
+                for (StockTransferOrderLI stoli : lineItems) {
+                    if (stoli.getProduct().equals(product)) {
+                        stoli.setReceivedQty(qty);
+                        boolean picked = true;
+                        for (StockTransferOrderLI stoli2 : lineItems) {
+                            if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
+                                picked = false;
+                            }
+                        }
+                        if (picked) {
+                            stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                                    StockTransferStatusEnum.COMPLETED));
+                        }
+                        try {
+                            siteService.addProducts(stOrder.getToSite().getId(), product.getSku(), qty);
+                        } catch (NoStockLevelException e) {
+                            e.printStackTrace();
+                        }
+                        return em.merge(stOrder);
+                    }
+                }
+                throw new StockTransferException("The product scanned is not related to the Stock Transfer Order");
+            }
 
     @Override
     public StockTransferOrder completeStockTransferOrder(Long orderId)

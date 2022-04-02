@@ -221,6 +221,17 @@ public class StoreController {
         }
     }
 
+    @PutMapping(path = "/stockTransfer/from/{orderId}/{sku}/{qty}", produces = "application/json")
+    public ResponseEntity<Object> adjustProductsAtFromSite(@PathVariable Long orderId, @PathVariable String sku,
+            @PathVariable int qty) {
+        try {
+            return ResponseEntity.ok(stockTransferService.adjustProductsAtFromSite(orderId, sku, qty));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/stockTransfer/deliver/{orderId}", produces = "application/json")
     public ResponseEntity<Object> deliverStockTransferOrder(@PathVariable Long orderId) {
         try {
@@ -251,6 +262,17 @@ public class StoreController {
             }
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/stockTransfer/to/{orderId}/{sku}/{qty}", produces = "application/json")
+    public ResponseEntity<Object> adjustProductsAtToSite(@PathVariable Long orderId, @PathVariable String sku,
+            @PathVariable int qty) {
+        try {
+            return ResponseEntity.ok(stockTransferService.adjustProductsAtToSite(orderId, sku, qty));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 

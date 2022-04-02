@@ -357,7 +357,8 @@ public class ProcurementServiceImpl implements ProcurementService {
     }
 
     @Override
-    public ProcurementOrder pickpackAtFactory(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException {
+    public ProcurementOrder adjustProductsAtFactory(Long id, String rfidsku, int qty)
+            throws ProductException, ProcurementOrderException {
         ProcurementOrder procurementOrder = getProcurementOrder(id);
 
         Product product = productService.getProduct(rfidsku);
@@ -458,15 +459,60 @@ public class ProcurementServiceImpl implements ProcurementService {
         }
 
         Product product = productService.getProduct(rfidsku);
-
         List<ProcurementOrderLI> lineItems = procurementOrder.getLineItems();
 
         for (ProcurementOrderLI poli : lineItems) {
             if (poli.getProduct().equals(product)) {
                 if (poli.getReceivedQty() + qty > poli.getPackedQty()) {
-                    throw new ProcurementOrderException("Received quantity of this product is more than the shipped quantity.");
+                    throw new ProcurementOrderException(
+                            "Received quantity of this product is more than the shipped quantity.");
                 }
                 poli.setReceivedQty(poli.getReceivedQty() + qty);
+
+                boolean picked = true;
+                for (ProcurementOrderLI poli2 : lineItems) {
+                    if (poli2.getReceivedQty() != poli2.getPickedQty()) {
+                        picked = false;
+                    }
+                }
+                if (picked) {
+                    procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                            ProcurementOrderStatusEnum.COMPLETED));
+                }
+
+                try {
+                    siteService.addProducts(procurementOrder.getWarehouse().getId(), poli.getProduct().getSku(), qty);
+                } catch (NoStockLevelException e) {
+                    e.printStackTrace();
+                }
+                return em.merge(procurementOrder);
+
+            }
+        }
+        throw new ProcurementOrderException("The product scanned is not relevant to the Procurement Order");
+    }
+
+    @Override
+    public ProcurementOrder adjustProductsAtWarehouse(Long id, String rfidsku, int qty)
+            throws ProductException, ProcurementOrderException {
+
+        ProcurementOrder procurementOrder = getProcurementOrder(id);
+
+        if (procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.SHIPPING
+                && procurementOrder.getLastStatus() != ProcurementOrderStatusEnum.SHIPPING_MULTIPLE) {
+            throw new ProcurementOrderException("Order does not need inventory checking.");
+        }
+
+        Product product = productService.getProduct(rfidsku);
+        List<ProcurementOrderLI> lineItems = procurementOrder.getLineItems();
+
+        for (ProcurementOrderLI poli : lineItems) {
+            if (poli.getProduct().equals(product)) {
+                if (qty > poli.getPackedQty()) {
+                    throw new ProcurementOrderException(
+                            "Received quantity of this product is more than the shipped quantity.");
+                }
+                poli.setReceivedQty(qty);
 
                 boolean picked = true;
                 for (ProcurementOrderLI poli2 : lineItems) {

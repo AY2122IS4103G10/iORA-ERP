@@ -24,8 +24,10 @@ public interface StockTransferService {
     public abstract StockTransferOrder confirmStockTransferOrder(Long id, Long siteId) throws SiteConfirmationException, StockTransferException;
     public abstract StockTransferOrder pickPackTransferOrder(Long id, Long siteId) throws StockTransferException, SiteConfirmationException;
     public abstract StockTransferOrder scanProductAtFromSite(Long id, String rfidsku, int qty) throws StockTransferException, ProductException;
+    public abstract StockTransferOrder adjustProductsAtFromSite(Long id, String rfidsku, int qty) throws StockTransferException, ProductException;
     public abstract StockTransferOrder deliverStockTransferOrder(Long id) throws StockTransferException;
     public abstract StockTransferOrder deliverMultipleStockTransferOrder(Long id) throws StockTransferException;
     public abstract StockTransferOrder scanProductAtToSite(Long id, String rfidsku, int qty) throws StockTransferException, ProductException;
+    public abstract StockTransferOrder adjustProductsAtToSite(Long id, String rfidsku, int qty) throws StockTransferException, ProductException;
     public abstract StockTransferOrder completeStockTransferOrder(Long orderId) throws StockTransferException, SiteConfirmationException;
 }

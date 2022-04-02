@@ -25,9 +25,10 @@ public interface ProcurementService {
     public abstract ProcurementOrder manufactureProcurementOrder(Long id) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException, IllegalTransferException;
     public abstract ProcurementOrder pickPackProcurementOrder(Long id) throws ProcurementOrderException;
     public abstract ProcurementOrder scanProductAtFactory(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
-    public abstract ProcurementOrder pickpackAtFactory(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
+    public abstract ProcurementOrder adjustProductsAtFactory(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
     public abstract ProcurementOrder shipProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException;
     public abstract ProcurementOrder shipMultipleProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException;
     public abstract ProcurementOrder scanProductAtWarehouse(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
+    public abstract ProcurementOrder adjustProductsAtWarehouse(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
     public abstract ProcurementOrder completeProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException;
 }

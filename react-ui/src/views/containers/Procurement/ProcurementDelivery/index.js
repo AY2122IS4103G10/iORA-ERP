@@ -4,11 +4,46 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { procurementApi } from "../../../../environments/Api";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import {
+  EditableCell,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
 import { ScanItemsSection } from "../ProcurementPickPack";
 
-const DeliveryList = ({ data, status }) => {
+const DeliveryList = ({
+  data,
+  setData,
+  status,
+  onSaveQuanityClicked,
+  warehouse,
+  currSiteId,
+}) => {
+  const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
+    const handleEditRow = (rowIndex) => {
+      setData((item) =>
+        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+      );
+    };
+
+    const handleSaveRow = (rowIndex, obj) => {
+      onSaveQuanityClicked(rowIndex, obj.product.sku, obj.receivedQty);
+    };
+
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
     return [
       {
         Header: "SKU",
@@ -34,10 +69,25 @@ const DeliveryList = ({ data, status }) => {
       {
         Header: "Received",
         accessor: "receivedQty",
+        Cell: (e) => {
+          return e.row.original.isEditing &&
+            ["SHIPPING", "SHIPPING_MULTIPLE"].some((s) => s === status) ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+              max={e.row.original.requestedQty}
+            />
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Status",
-        accessor: "",
+        accessor: "[status]",
         Cell: (row) => {
           const lineItem = row.row.original;
           return status === "READY_FOR_SHIPPING"
@@ -47,8 +97,31 @@ const DeliveryList = ({ data, status }) => {
             : "RECEIVED";
         },
       },
+      {
+        Header: "",
+        accessor: "[editButton]",
+        Cell: (e) => {
+          return (
+            <button
+              className="text-cyan-600 hover:text-cyan-900"
+              onClick={() =>
+                !e.row.original.isEditing
+                  ? handleEditRow(e.row.index)
+                  : handleSaveRow(e.row.index, e.row.original)
+              }
+            >
+              {!e.row.original.isEditing ? "Edit" : "Save"}
+            </button>
+          );
+        },
+      },
     ];
-  }, [status]);
+  }, [status, onSaveQuanityClicked, setData]);
+  const hiddenColumns =
+    warehouse.id !== currSiteId ||
+    ["SHIPPING", "SHIPPING_MULTIPLE"].every((s) => s !== status)
+      ? ["[editButton]"]
+      : [];
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -58,7 +131,12 @@ const DeliveryList = ({ data, status }) => {
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable columns={columns} data={data} />
+          <SimpleTable
+            columns={columns}
+            data={data}
+            skipPageReset={skipPageReset}
+            hiddenColumns={hiddenColumns}
+          />
         </div>
       )}
     </div>
@@ -145,7 +223,7 @@ export const ProcurementDelivery = () => {
         appearance: "success",
         autoDismiss: true,
       });
-      navigate("/lg/procurements")
+      navigate("/lg/procurements");
     } catch (error) {
       addToast(`Error: ${error.response.data}`, {
         appearance: "error",
@@ -176,7 +254,7 @@ export const ProcurementDelivery = () => {
         appearance: "success",
         autoDismiss: true,
       });
-      navigate("/lg/procurements")
+      navigate("/lg/procurements");
     } catch (error) {
       addToast(`Error: ${error.response.data}`, {
         appearance: "error",
@@ -231,7 +309,42 @@ export const ProcurementDelivery = () => {
     }
     setSearch(e.target.value);
   };
-
+  const onSaveQuanityClicked = async (rowIndex, sku, qty) => {
+    try {
+      const { data } = await procurementApi.adjustAtWarehouse(
+        procurementId,
+        sku,
+        qty
+      );
+      const { lineItems: lIs, statusHistory } = data;
+      setStatus(statusHistory[statusHistory.length - 1]);
+      setStatusHistory(statusHistory);
+      setLineItems(
+        lineItems.map((row, index) => ({
+          ...row,
+          pickedQty: lIs[index].pickedQty,
+          packedQty: lIs[index].packedQty,
+          isEditing: rowIndex === index && false,
+        }))
+      );
+      addToast(`Success: Updated quantity.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      if (status.status === "COMPLETED") {
+        addToast(`Order ${procurementId} completed.`, {
+          appearance: "success",
+          autoDismiss: true,
+        });
+        navigate(`/${subsys}/procurements/${procurementId}`);
+      }
+    } catch (error) {
+      addToast(`Error: ${error.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
   return (
     <div className="space-y-6 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-12 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -287,6 +400,9 @@ export const ProcurementDelivery = () => {
                 data={lineItems}
                 setData={setLineItems}
                 status={status.status}
+                onSaveQuanityClicked={onSaveQuanityClicked}
+                warehouse={warehouse}
+                currSiteId={currSiteId}
               />
             </section>
           )}

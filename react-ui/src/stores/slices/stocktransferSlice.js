@@ -27,7 +27,10 @@ export const getAllStockTransfer = createAsyncThunk(
 export const getLogisticsSTOBySite = createAsyncThunk(
   "stocktransfer/getAllOrders",
   async (data) => {
-    const response = await logisticsApi.getSTOBySiteStatus(data, "READY_FOR_DELIVERY");
+    const response = await logisticsApi.getSTOBySiteStatus(
+      data,
+      "READY_FOR_DELIVERY"
+    );
     return response.data;
   }
 );
@@ -136,6 +139,22 @@ export const completeStockTransfer = createAsyncThunk(
   "stocktransfer/complete",
   async (data) => {
     const response = await stockTransferApi.completeOrder(data);
+    return response.data;
+  }
+);
+
+export const adjustAtFrom = createAsyncThunk(
+  "stocktransfer/adjustAtFrom",
+  async ({ orderId, sku, qty }) => {
+    const response = await stockTransferApi.adjustAtFrom(orderId, sku, qty);
+    return response.data;
+  }
+);
+
+export const adjustAtTo = createAsyncThunk(
+  "stocktransfer/adjustAtTo",
+  async ({ orderId, sku, qty }) => {
+    const response = await stockTransferApi.adjustAtTo(orderId, sku, qty);
     return response.data;
   }
 );
@@ -287,6 +306,34 @@ const stocktransferSlice = createSlice({
       state.status = "succeeded";
     });
     builder.addCase(completeStockTransfer.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(adjustAtFrom.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(adjustAtFrom.fulfilled, (state, action) => {
+      const { statusHistory, lineItems } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+        state.currOrder.lineItems = lineItems;
+      }
+      state.status = "succeeded";
+    });
+    builder.addCase(adjustAtFrom.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(adjustAtTo.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(adjustAtTo.fulfilled, (state, action) => {
+      const { statusHistory, lineItems } = action.payload;
+      if (state.currOrder) {
+        state.currOrder.statusHistory = statusHistory;
+        state.currOrder.lineItems = lineItems;
+      }
+      state.status = "succeeded";
+    });
+    builder.addCase(adjustAtTo.rejected, (state, action) => {
       state.status = "failed";
     });
   },

@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import {
+  adjustAtFrom,
   pickPackStockTransfer,
   scanItemStockTransfer,
 } from "../../../../stores/slices/stocktransferSlice";
@@ -104,6 +105,23 @@ export const StockTransferPickPack = () => {
     }
     setSearch(e.target.value);
   };
+
+  const onSaveQuanityClicked = async (_, sku, qty) => {
+    await dispatch(adjustAtFrom({ orderId: order.id, sku, qty }))
+      .unwrap()
+      .then(() => {
+        addToast(`Success: Updated quantity.`, {
+          appearance: "success",
+          autoDismiss: true,
+        });
+      })
+      .catch((error) => {
+        addToast(`Error: ${error.response.data}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      });
+  };
   return (
     <>
       <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
@@ -174,6 +192,9 @@ export const StockTransferPickPack = () => {
                     openConfirmModal={openConfirmModal}
                     handlePickPack={handlePickPack}
                     procurementId={order.id}
+                    manufacturing={order.fromSite}
+                    currSiteId={userSiteId}
+                    onSaveQuanityClicked={onSaveQuanityClicked}
                   />
                 </section>
               )}

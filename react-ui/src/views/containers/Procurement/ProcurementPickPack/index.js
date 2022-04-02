@@ -34,7 +34,7 @@ export const PickPackList = ({
     };
 
     const onSaveClicked = (rowIndex, obj) => {
-      if (status === "MANUFACTURED")
+      if (status === "MANUFACTURED" || status === "ACCEPTED")
         handlePickPack().then(() => handleSaveRow(rowIndex, obj));
       else handleSaveRow(rowIndex, obj);
     };
@@ -90,7 +90,7 @@ export const PickPackList = ({
         accessor: "pickedQty",
         Cell: (e) => {
           return e.row.original.isEditing &&
-            ["MANUFACTURED", "PICKING"].some((s) => s === status) ? (
+            ["MANUFACTURED", "PICKING", "ACCEPTED"].some((s) => s === status) ? (
             <EditableCell
               value={e.value}
               row={e.row}
@@ -161,8 +161,8 @@ export const PickPackList = ({
     ];
   }, [setData, status, onSaveQuanityClicked, handlePickPack]);
   const hiddenColumns =
-    manufacturing.id !== currSiteId &&
-    ["MANUFACTURED", "PICKING", "PICKED", "PACKING"].some((s) => s !== status)
+    manufacturing.id !== currSiteId ||
+    ["MANUFACTURED", "PICKING", "PICKED", "PACKING", "ACCEPTED"].every((s) => s !== status)
       ? ["[editButton]"]
       : [];
   return (

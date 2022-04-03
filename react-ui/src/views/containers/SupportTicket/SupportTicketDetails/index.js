@@ -5,6 +5,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+import { IMGBB_SECRET } from '../../../../config';
 import { deleteSupportTicket, fetchSupportTickets, replySupportTicket, resolveSupportTicket, selectTicketById } from "../../../../stores/slices/supportTicketSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
@@ -368,7 +369,7 @@ export const SupportTicketDetails = () => {
             const name = JSON.parse(localStorage.getItem("user")).name
             var url;
 
-            Boolean(file.name) ? fetch('https://api.imgbb.com/1/upload?key=5bebc95d7fa1ad22476614eab8d4d1a9',
+            Boolean(file.name) ? fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`,
                 {
                     method: 'POST',
                     body: image,

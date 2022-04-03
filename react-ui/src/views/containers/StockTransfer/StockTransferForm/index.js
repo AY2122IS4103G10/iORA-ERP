@@ -104,6 +104,7 @@ export const SelectSiteModal = ({
                 ...product,
                 modelCode: data[index].modelCode,
                 name: data[index].name,
+                imageLinks: data[index].imageLinks,
               })),
             });
             setLoading(false);
@@ -394,6 +395,20 @@ const LineItemsTable = ({ data, setLineItems }) => {
       {
         Header: "Name",
         accessor: "name",
+        Cell: (e) => {
+          return e.row.original.imageLinks.length ? (
+            <a
+              href={e.row.original.imageLinks[0]}
+              className="hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {e.value}
+            </a>
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Color",
@@ -497,6 +512,7 @@ export const StockTransferForm = ({ subsys }) => {
                   ...product,
                   modelCode: data[index].modelCode,
                   name: data[index].name,
+                  imageLinks: data[index].imageLinks,
                 })),
               });
               setLoading(false);
@@ -532,6 +548,7 @@ export const StockTransferForm = ({ subsys }) => {
                   ...product,
                   modelCode: data[index].modelCode,
                   name: data[index].name,
+                  imageLinks: data[index].imageLinks,
                 })),
               });
             });
@@ -596,6 +613,7 @@ export const StockTransferForm = ({ subsys }) => {
               ...product,
               modelCode: data[index].modelCode,
               name: data[index].name,
+              imageLinks: data[index].imageLinks,
             })),
           });
           setLoading(false);

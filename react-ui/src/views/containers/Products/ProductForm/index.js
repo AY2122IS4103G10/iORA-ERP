@@ -11,9 +11,13 @@ import {
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
-import { api } from "../../../../environments/Api";
+import { api, utilApi } from "../../../../environments/Api";
 
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { useRef } from "react";
+import { PaperClipIcon, XIcon } from "@heroicons/react/outline";
+import axios from "axios";
+import { TailSpin } from "react-loader-spinner";
 
 const prepareFields = (fields, checkedState) => {
   const f = [];
@@ -90,6 +94,7 @@ export const FormCheckboxes = ({
   inputField,
   onFieldsChanged,
   fieldValues = [],
+  isEditing,
   ...rest
 }) => {
   return (
@@ -109,6 +114,7 @@ export const FormCheckboxes = ({
                   Boolean(fieldValues.length) ? fieldValues[index] : false
                 }
                 onChange={() => onFieldsChanged(index)}
+                disabled={isEditing && fieldValues[index]}
                 {...rest}
               />
             </div>
@@ -186,9 +192,6 @@ const AddProductFormBody = ({
   tags,
   onTagsChanged,
   tagCheckedState,
-  categories,
-  onCatsChanged,
-  catCheckedState,
   promotions,
   onPromosChanged,
   promoCheckedState,
@@ -196,7 +199,12 @@ const AddProductFormBody = ({
   onCancelClicked,
   openModal,
   setFieldNameSelected,
+  images,
+  setImages,
+  onImagesChanged,
+  loading,
 }) => {
+  const fileRef = useRef();
   return (
     <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
       <h1 className="sr-only">{!isEditing ? "Add New" : "Edit"} Product</h1>
@@ -347,6 +355,82 @@ const AddProductFormBody = ({
                             />
                           </div>
                         </SimpleInputGroup>
+                        <SimpleInputGroup
+                          label="Photos"
+                          inputField="onlineOnly"
+                          className="relative sm:mt-0 sm:col-span-2"
+                        >
+                          {images.map((image, index) => {
+                            return (
+                              <div key={index} className="flex">
+                                <div className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group">
+                                  <PaperClipIcon
+                                    className="-ml-1 h-5 w-5 mr-2"
+                                    aria-hidden="true"
+                                  />
+                                  <span className="text-sm text-gray-500 italic">
+                                    {image.name}
+                                  </span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
+                                  onClick={() =>
+                                    setImages(images.splice(index, 1))
+                                  }
+                                >
+                                  <XIcon
+                                    className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                              </div>
+                            );
+                          })}
+                          <div className="flex">
+                            <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                              <div className="space-y-1 text-center">
+                                <svg
+                                  className="mx-auto h-12 w-12 text-gray-400"
+                                  stroke="currentColor"
+                                  fill="none"
+                                  viewBox="0 0 48 48"
+                                  aria-hidden="true"
+                                >
+                                  <path
+                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                    strokeWidth={2}
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                <div className="flex text-sm text-gray-600">
+                                  <label
+                                    htmlFor="file-upload"
+                                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                                  >
+                                    <span>Upload a file</span>
+                                    <input
+                                      ref={fileRef}
+                                      id="file-upload"
+                                      name="file-upload"
+                                      type="file"
+                                      className="sr-only"
+                                      accept="image/*"
+                                      multiple
+                                      onChange={onImagesChanged}
+                                    />
+                                  </label>
+                                  <p className="pl-1">or drag and drop</p>
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                  PNG, JPG, GIF up to 10MB
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </SimpleInputGroup>
                       </div>
                     </div>
                   </div>
@@ -364,7 +448,12 @@ const AddProductFormBody = ({
                         type="submit"
                         className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                       >
-                        {!isEditing ? "Add" : "Save"} product
+                        <span>{!isEditing ? "Add" : "Save"} product</span>
+                        {loading && (
+                          <div className="flex ml-2 justify-center">
+                            <TailSpin color="#FFFFFF" height={15} width={15} />
+                          </div>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -389,6 +478,7 @@ const AddProductFormBody = ({
                 inputField="Colour"
                 onFieldsChanged={onColorsChanged}
                 fieldValues={colorCheckedState}
+                isEditing={isEditing}
               />
             ) : (
               "No colours found"
@@ -407,6 +497,7 @@ const AddProductFormBody = ({
                 inputField="Size"
                 onFieldsChanged={onSizesChanged}
                 fieldValues={sizeCheckedState}
+                isEditing={isEditing}
               />
             ) : (
               "No sizes found"
@@ -426,30 +517,12 @@ const AddProductFormBody = ({
                 inputField="Promotion"
                 onFieldsChanged={onPromosChanged}
                 fieldValues={promoCheckedState}
+                isEditing={isEditing}
               />
             ) : (
               "No promotions found"
             )}
           </RightColSection>
-          {/* Categories */}
-          {/* <RightColSection
-            fieldName="Category"
-            openModal={openModal}
-            setFieldNameSelected={setFieldNameSelected}
-          >
-            {categories.length ? (
-              <FormCheckboxes
-                legend="Category"
-                options={categories}
-                inputField="Category"
-                onFieldsChanged={onCatsChanged}
-                fieldValues={catCheckedState}
-              />
-            ) : (
-              "No categories found"
-            )}
-          </RightColSection> */}
-          {/* Tags */}
           <RightColSection
             fieldName="Tag"
             openModal={openModal}
@@ -462,6 +535,7 @@ const AddProductFormBody = ({
                 inputField="Tag"
                 onFieldsChanged={onTagsChanged}
                 fieldValues={tagCheckedState}
+                isEditing={isEditing}
               />
             ) : (
               "No tag found."
@@ -475,9 +549,9 @@ const AddProductFormBody = ({
 
 export const ProductForm = () => {
   const { addToast } = useToasts();
+  const { prodId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { prodId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [prodCode, setProdCode] = useState("");
   const [name, setName] = useState("");
@@ -490,6 +564,8 @@ export const ProductForm = () => {
   const [tags, setTags] = useState([]);
   const [categories, setCategories] = useState([]);
   const [promotions, setPromotions] = useState([]);
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     api.getAll("sam/productField").then((response) => {
@@ -508,7 +584,6 @@ export const ProductForm = () => {
       setSizeCheckedState(new Array(sizes.length).fill(false));
       setTagCheckedState(new Array(tags.length).fill(false));
       setCatCheckedState(new Array(categories.length).fill(false));
-      // setCompanySelected(companies[0]);
     });
   }, []);
 
@@ -518,7 +593,6 @@ export const ProductForm = () => {
       setPromoCheckedState(new Array(response.data.length).fill(false));
     });
   }, []);
-
   const [colorCheckedState, setColorCheckedState] = useState([]);
   const [sizeCheckedState, setSizeCheckedState] = useState([]);
   const [tagCheckedState, setTagCheckedState] = useState([]);
@@ -564,8 +638,24 @@ export const ProductForm = () => {
 
   const canAdd = [prodCode, name, description, listPrice].every(Boolean);
 
-  const onSaveClicked = (evt) => {
+  const onSaveClicked = async (evt) => {
     evt.preventDefault();
+    const uploadImage = async (image) => {
+      try {
+        const img = new FormData();
+        img.append("image", image);
+        const { data } = await utilApi.uploadImage(img);
+        return data.data.url;
+      } catch (error) {
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      }
+    };
+    const uploadAllImages = async () => {
+      return Promise.all(images.map((image) => uploadImage(image)));
+    };
     var fields = [];
     fields = fields.concat(prepareFields(colors, colorCheckedState));
     fields = fields.concat(prepareFields(sizes, sizeCheckedState));
@@ -574,6 +664,8 @@ export const ProductForm = () => {
     fields = fields.concat(prepareFields(promotions, promoCheckedState));
 
     if (canAdd) {
+      setLoading(true);
+      const urls = images.length ? await uploadAllImages() : [];
       const product = {
         modelCode: prodCode,
         name,
@@ -583,12 +675,14 @@ export const ProductForm = () => {
         available: true,
         products: [],
         productFields: fields,
+        imageLinks: urls,
       };
       if (discountPrice !== "") product["discountPrice"] = discountPrice;
       if (!isEditing) {
         dispatch(addNewProduct(product))
           .unwrap()
           .then((data) => {
+            setLoading(false);
             addToast("Successfully added product.", {
               appearance: "success",
               autoDismiss: true,
@@ -605,6 +699,7 @@ export const ProductForm = () => {
         dispatch(updateExistingProduct(product))
           .unwrap()
           .then((data) => {
+            setLoading(false);
             addToast("Successfully updated product", {
               appearance: "success",
               autoDismiss: true,
@@ -634,6 +729,7 @@ export const ProductForm = () => {
           discountPrice,
           onlineOnly,
           productFields,
+          imageLinks,
         } = response.data;
         setIsEditing(true);
         setProdCode(modelCode);
@@ -642,6 +738,7 @@ export const ProductForm = () => {
         setListPrice(listPrice);
         setDiscountPrice(discountPrice);
         setOnlineOnly(onlineOnly);
+        setImages(imageLinks);
         setColorCheckedState(
           colors
             .map((field) => field.fieldValue)
@@ -739,6 +836,10 @@ export const ProductForm = () => {
           })
         );
   };
+
+  const onImagesChanged = (e) =>
+    setImages(images.concat(Array.from(e.target.files)));
+
   const openModal = () => setOpenAddField(true);
   const closeModal = () => setOpenAddField(false);
 
@@ -777,6 +878,10 @@ export const ProductForm = () => {
         onCancelClicked={onCancelClicked}
         openModal={openModal}
         setFieldNameSelected={setFieldNameSelected}
+        images={images}
+        setImages={setImages}
+        onImagesChanged={onImagesChanged}
+        loading={loading}
       />
       <FieldModal
         open={openAddField}

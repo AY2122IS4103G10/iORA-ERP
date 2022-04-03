@@ -2,6 +2,7 @@
  * REST API connections
  */
 import axios from "axios";
+import { IMGBB_SECRET } from "../config";
 import { REST_ENDPOINT } from "../constants/restEndpoint";
 
 let axiosPrivate = axios.create();
@@ -384,6 +385,9 @@ export const onlineOrderApi = {
   collect(orderId) {
     return axiosPrivate.put(`${REST_ENDPOINT}online/collect/${orderId}`);
   },
+  adjustProduct(orderId, sku, qty) {
+    return axiosPrivate.put(`${REST_ENDPOINT}online/order/${orderId}/${sku}/${qty}`);
+  },
 };
 
 export const orderApi = {
@@ -481,6 +485,11 @@ export const logisticsApi = {
   },
 };
 
+export const utilApi = {
+  uploadImage(image) {
+    return axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`, image)
+  }
+}
 export const dashboardApi = {
   getStockLevelSites() {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSites/all`);

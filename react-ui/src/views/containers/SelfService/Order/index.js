@@ -497,7 +497,7 @@ export function Order() {
         id: siteId,
       },
       customerId:
-        localStorage.getItem("customer") === null
+        localStorage.getItem("customer") !== null
           ? JSON.parse(localStorage.getItem("customer"))?.id
           : null,
     });

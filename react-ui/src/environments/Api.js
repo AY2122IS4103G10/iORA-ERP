@@ -478,3 +478,9 @@ export const logisticsApi = {
     );
   },
 };
+
+export const dashboardApi = {
+  getStockLevelSites() {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSites/all`);
+  },
+}

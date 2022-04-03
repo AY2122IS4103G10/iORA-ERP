@@ -1,6 +1,7 @@
 package com.iora.erp.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
@@ -16,6 +18,7 @@ import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevelLI;
+import com.iora.erp.model.stockTransfer.StockTransferOrder;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
@@ -527,7 +530,77 @@ public class SAMController {
 
     /*
      * ---------------------------------------------------------
-     * B.2 Inventory Management
+     * B.3 Report and Analytics
+     * ---------------------------------------------------------
+     */
+
+    @GetMapping(path = "/dashboard/customerOrders", produces = "application/json")
+    public ResponseEntity<Object> getCustomerOrdersInDateRange(@RequestParam Date start, @RequestParam Date end) {
+        try {
+            Map<Site,Long> result = null;
+            return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/dashboard/storeOrders", produces = "application/json")
+    public ResponseEntity<Object> getStoreOrdersInDateRange(@RequestParam Date start, @RequestParam Date end) {
+        try {
+            Map<Site,Long> result = null;
+            return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/dashboard/onlineOrders", produces = "application/json")
+    public ResponseEntity<Object> getOnlineOrdersInDateRange(@RequestParam Date start, @RequestParam Date end) {
+        try {
+            Map<Site,Long> result = null;
+            return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/dashboard/customerOrders/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> getDailyCustomerOrders(@RequestParam Date date, @PathVariable Long siteId) {
+        try {
+            date = date == null ? new Date() : date;
+            List<CustomerOrder> result = null;
+            return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/dashboard/procurementOrders/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> getDailyProcurementOrders(@RequestParam Date date, @PathVariable Long siteId) {
+        try {
+            date = date == null ? new Date() : date;
+            List<ProcurementOrder> result = null;
+            return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/dashboard/stockTransferOrders/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> getDailyStockTransferOrders(@RequestParam Date date, @PathVariable Long siteId) {
+        try {
+            date = date == null ? new Date() : date;
+            List<StockTransferOrder> result = null;
+            return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * B.4 CRM
      * ---------------------------------------------------------
      */
 
@@ -596,7 +669,7 @@ public class SAMController {
 
     /*
      * ---------------------------------------------------------
-     * B.5 CRM
+     * B.5 Rewards and Loyalty
      * ---------------------------------------------------------
      */
 

@@ -2,6 +2,7 @@
  * REST API connections
  */
 import axios from "axios";
+import { IMGBB_SECRET } from "../config";
 import { REST_ENDPOINT } from "../constants/restEndpoint";
 
 let axiosPrivate = axios.create();
@@ -481,3 +482,9 @@ export const logisticsApi = {
     );
   },
 };
+
+export const utilApi = {
+  uploadImage(image) {
+    return axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`, image)
+  }
+}

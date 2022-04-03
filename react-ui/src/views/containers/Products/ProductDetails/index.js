@@ -25,6 +25,7 @@ import {
 } from "../../../components/Tables/SimpleTable";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { classNames } from "../../../../utilities/Util";
 
 export const SKUModal = ({
   open,
@@ -183,7 +184,8 @@ const SKUTable = ({ data, onDeleteSkuClicked }) => {
           const [open, setOpen] = useState(false);
           const cancelButtonRef = useRef(null);
           const [qty, setQty] = useState(e.row.original.baselineQty);
-          const onQtyChange = (e) => e.target.value >= 0 && setQty(e.target.value)
+          const onQtyChange = (e) =>
+            e.target.value >= 0 && setQty(e.target.value);
           const { addToast } = useToasts();
           const dispatch = useDispatch();
           const onEditClicked = (evt) => {
@@ -346,11 +348,12 @@ const ProductDetailsBody = ({
   products,
   onToggleEnableClicked,
   onDeleteSkuClicked,
+  imageLinks,
 }) => {
   return (
     <div className="py-8 xl:py-10">
       <div className="max-w-3xl mx-auto xl:max-w-5xl">
-        <NavigatePrev page="Products" path="/sm/products"/>
+        <NavigatePrev page="Products" path="/sm/products" />
         <div className="px-4 sm:px-6 lg:px-8 xl:grid xl:grid-cols-3">
           <div className="xl:col-span-2 xl:pr-8 xl:border-r xl:border-gray-200">
             <div>
@@ -446,6 +449,29 @@ const ProductDetailsBody = ({
                 </div>
               </div>
             </div>
+            <section className="mt-8 pb-8" aria-labelledby="gallery-heading">
+              <h2 id="gallery-heading" className="sr-only">
+                Product Images
+              </h2>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+                {Boolean(imageLinks.length) && imageLinks.map((file, index) => (
+                  <li key={index} className="relative">
+                    <div
+                      className={classNames(
+                        "focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500",
+                        "group block w-full rounded-lg bg-gray-100 overflow-hidden"
+                      )}
+                    >
+                      <img
+                        src={file}
+                        alt=""
+                        className="object-cover pointer-events-none"
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
             <section aria-labelledby="activity-title" className="mt-8 xl:mt-10">
               <div className="divide-y divide-gray-200">
                 <div className="pb-4 md:flex md:items-center md:justify-between">
@@ -457,10 +483,10 @@ const ProductDetailsBody = ({
                   </h2>
                 </div>
                 <div className="pt-6">
-                  <SKUTable
+                  {products.length ? <SKUTable
                     data={products}
                     onDeleteSkuClicked={onDeleteSkuClicked}
-                  />
+                   /> : "No SKUs"}
                 </div>
               </div>
             </section>
@@ -584,7 +610,6 @@ export const ProductDetails = () => {
   //   setSku("");
   //   closeSkuModal();
   // };
-
   const onToggleEnableClicked = () => {
     dispatch(
       updateExistingProduct({
@@ -662,6 +687,7 @@ export const ProductDetails = () => {
             )}
           available={product.available}
           onlineOnly={product.onlineOnly}
+          imageLinks={product.imageLinks}
           products={product.products}
           onToggleEnableClicked={onToggleEnableClicked}
           // onDeleteSkuClicked={onDeleteSkuClicked}

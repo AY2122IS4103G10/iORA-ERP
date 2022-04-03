@@ -97,7 +97,25 @@ const ProcurementItemsList = ({ data, setData, isEditing }) => {
     return [
       {
         Header: "SKU",
-        accessor: (row) => row.product.sku,
+        accessor: "product.sku",
+      },
+      {
+        Header: "SKU",
+        accessor: "product.name",
+        Cell: (e) => {
+          return e.row.original.product.imageLinks.length ? (
+            <a
+              href={e.row.original.product.imageLinks[0]}
+              className="hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {e.value}
+            </a>
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Color",
@@ -360,9 +378,9 @@ export const ProcurementForm = () => {
       ...product,
       modelCode: model.modelCode,
       name: model.name,
+      imageLinks: model.imageLinks,
     }))
   );
-
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
@@ -495,7 +513,6 @@ export const ProcurementForm = () => {
           notes: remarks,
         });
   };
-
   const onCancelClicked = () =>
     navigate(!isEditing ? "/sm/procurements" : `/sm/procurements/${orderId}`);
 

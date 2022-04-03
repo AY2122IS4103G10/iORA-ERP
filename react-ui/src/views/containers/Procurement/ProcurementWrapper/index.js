@@ -281,6 +281,7 @@ export const ProcurementWrapper = ({ subsys }) => {
                 ...item.product,
                 modelCode: data[index].modelCode,
                 name: data[index].name,
+                imageLinks: data[index].imageLinks,
               },
             }))
           );

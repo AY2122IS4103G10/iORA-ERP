@@ -382,6 +382,8 @@ public class CustomerServiceImpl implements CustomerService {
             throw new SupportTicketException("Ticket has already been resolved.");
         } else if (st.getStatus() == SupportTicket.Status.PENDING) {
             st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
+            emailService.sendSimpleMessage(st.getCustomer().getEmail(), "Support Ticket #" + id,
+                    "You have a new reply: " + message);
         } else {
             st.setStatus(SupportTicket.Status.PENDING);
         }

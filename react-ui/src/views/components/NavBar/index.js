@@ -1,9 +1,7 @@
 import { Menu, Transition } from "@headlessui/react";
 import {
-  BellIcon,
-  ExclamationIcon,
-  ChevronDownIcon,
-  MenuAlt1Icon,
+  BellIcon, ChevronDownIcon,
+  MenuAlt1Icon
 } from "@heroicons/react/outline";
 import { Fragment, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

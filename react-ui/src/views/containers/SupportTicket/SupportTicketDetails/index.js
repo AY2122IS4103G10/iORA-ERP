@@ -368,14 +368,13 @@ export const SupportTicketDetails = () => {
             const name = JSON.parse(localStorage.getItem("user")).name
             var url;
 
-            Boolean(file.name) ? fetch('https://api.imgbb.com/1/upload?key=72971cfd7358a13d6543e5aa7e187e5e',
+            Boolean(file.name) ? fetch('https://api.imgbb.com/1/upload?key=5bebc95d7fa1ad22476614eab8d4d1a9',
                 {
                     method: 'POST',
                     body: image,
                 }
             ).then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
                     url = data.data.url;
                     dispatch(replySupportTicket(
                         {
@@ -411,7 +410,6 @@ export const SupportTicketDetails = () => {
                 ))
                     .unwrap()
                     .then(() => {
-                        setFile([]);
                         setInput("");
                     })
                     .then(() => {

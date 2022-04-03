@@ -255,6 +255,7 @@ export const OrderDetails = () => {
   const [lineItems, setLineItems] = useState([]);
   const [openRefund, setOpenRefund] = useState(false);
   const [openExchange, setOpenExchange] = useState(false);
+  const [refundAmount, setRefundAmount] = useState(0);
   const [refundSku, setRefundSku] = useState({
     id: -1,
     name: "Choose One",
@@ -375,8 +376,10 @@ export const OrderDetails = () => {
           lineItems={order?.lineItems.map((lineItem) => {
             return { index: lineItem.id, name: lineItem.product.sku };
           })}
+          refundAmount={refundAmount}
           refundSku={refundSku}
           refundQty={refundQty}
+          setRefundAmount={setRefundAmount}
           setRefundSku={setRefundSku}
           setRefundQty={mapRefundQty}
         />
@@ -492,8 +495,10 @@ const RefundModal = ({
   closeModal,
   onConfirm,
   lineItems,
+  refundAmount,
   refundSku,
   refundQty,
+  setRefundAmount,
   setRefundSku,
   setRefundQty,
 }) => {
@@ -575,6 +580,17 @@ const RefundModal = ({
                     placeholder={0}
                     value={refundQty}
                     onChange={setRefundQty}
+                  />
+                  <p className="block text-sm font-medium text-gray-700 mt-2 mb-1">
+                    Store Credit to Refund
+                  </p>
+                  <SimpleInputBox
+                    type="number"
+                    name="refundAmt"
+                    id="refundAmt"
+                    placeholder={null}
+                    value={refundAmount}
+                    onChange={setRefundAmount}
                   />
                 </div>
               </div>

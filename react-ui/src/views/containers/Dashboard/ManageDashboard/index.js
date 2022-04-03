@@ -8,9 +8,9 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip,
+  Tooltip
 } from "chart.js";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
 import { getStockLevelSites } from "../../../../stores/slices/dashboardSlice";

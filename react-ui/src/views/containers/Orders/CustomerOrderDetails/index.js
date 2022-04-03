@@ -227,7 +227,7 @@ const OrderDetailsBody = ({
       {Boolean(history.length) && <ActivitySection history={history} />}
       {Boolean(lineItems.length) && (
         <div className="lg:col-start-1 lg:col-span-3">
-          <section aria-labelledby="departments">
+          <section aria-labelledby="lineItems">
             <ItemTable data={lineItems} />
           </section>
         </div>

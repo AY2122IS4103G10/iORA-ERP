@@ -42,8 +42,8 @@ export const fetchAnOrder = createAsyncThunk(
 
 export const addRefundLineItem = createAsyncThunk(
   "store/addRefundLI",
-  async ({ orderId, product, qty }) => {
-    const response = await posApi.addRefundLineItem(orderId, { product, qty });
+  async ({ orderId, product, qty, refundAmount }) => {
+    const response = await posApi.addRefundLineItem(orderId, { product, qty }, refundAmount);
     return response.data;
   }
 );

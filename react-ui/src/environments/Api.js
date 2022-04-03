@@ -452,9 +452,11 @@ export const posApi = {
   getVoucherByCode(voucher) {
     return axiosPrivate.get(`${REST_ENDPOINT}store/voucher/${voucher}`);
   },
-  addRefundLineItem(orderId, refundLI) {
+  addRefundLineItem(orderId, refundLI, refundAmount) {
     return axiosPrivate.post(
-      `${REST_ENDPOINT}store/customerOrder/refund/${orderId}`,
+      `${REST_ENDPOINT}store/customerOrder/refund/${orderId}${
+        refundAmount && `?refundAmount=${refundAmount}`
+      }`,
       refundLI
     );
   },
@@ -483,4 +485,4 @@ export const dashboardApi = {
   getStockLevelSites() {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSites/all`);
   },
-}
+};

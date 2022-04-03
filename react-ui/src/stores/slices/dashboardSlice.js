@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { sitesApi } from "../../environments/Api";
+import { dashboardApi } from "../../environments/Api";
 
 const initialState = {
   stockLevelSites: [],
@@ -31,7 +31,7 @@ export default dashboardSlice.reducer;
 export const getStockLevelSites = createAsyncThunk(
   "dashboard/getStockLevelSites",
   async () => {
-    const response = await sitesApi.getAll();
+    const response = await dashboardApi.getStockLevelSites();
     return response.data;
   }
 );

@@ -376,7 +376,6 @@ export const SupportTicketDetails = () => {
                 }
             ).then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
                     url = data.data.url;
                     dispatch(replySupportTicket(
                         {
@@ -412,7 +411,6 @@ export const SupportTicketDetails = () => {
                 ))
                     .unwrap()
                     .then(() => {
-                        setFile([]);
                         setInput("");
                     })
                     .then(() => {

@@ -144,6 +144,10 @@ public class Model {
         this.products = products;
     }
 
+    public void addProduct(Product product) {
+        this.products.add(product);
+    }
+
     public Set<ProductField> getProductFields() {
         return this.productFields;
     }

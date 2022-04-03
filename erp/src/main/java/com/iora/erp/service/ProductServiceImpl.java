@@ -216,7 +216,6 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
 
-            List<Product> products = new ArrayList<>();
             int count = 1;
 
             // Loop for each combination of size and colour
@@ -231,12 +230,11 @@ public class ProductServiceImpl implements ProductService {
                     p.addProductField(sizeField);
 
                     em.persist(p);
-                    products.add(p);
+                    model.addProduct(p);
                     count++;
                 }
             }
 
-            model.setProducts(products);
             return model;
 
         } catch (EntityExistsException ex) {
@@ -362,13 +360,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Model> getModelsByTag(String tag) {
         try {
-            TypedQuery<Model> q;
-            ProductField pf = getProductFieldByNameValue("tag", tag);
+            ProductField pf = getProductFieldByNameValue("TAG", tag.toUpperCase());
 
-            q = em.createQuery("SELECT m FROM Model m WHERE :pf MEMBER OF m.productFields", Model.class);
-            q.setParameter("pf", pf);
-
-            return q.getResultList();
+            return em
+                    .createQuery("SELECT m FROM Model m WHERE :pf MEMBER OF m.productFields", Model.class)
+                    .setParameter("pf", pf)
+                    .getResultList();
         } catch (ProductFieldException ex) {
             return new ArrayList<Model>();
         }
@@ -377,13 +374,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Model> getModelsByCategory(String category) {
         try {
-            TypedQuery<Model> q;
-            ProductField pf = getProductFieldByNameValue("category", category);
+            ProductField pf = getProductFieldByNameValue("CATEOGRY", category.toUpperCase());
 
-            q = em.createQuery("SELECT m FROM Model m WHERE :pf MEMBER OF m.productFields", Model.class);
-            q.setParameter("pf", pf);
-
-            return q.getResultList();
+            return em.createQuery("SELECT m FROM Model m WHERE :pf MEMBER OF m.productFields", Model.class)
+                    .setParameter("pf", pf)
+                    .getResultList();
         } catch (ProductFieldException ex) {
             return new ArrayList<Model>();
         }
@@ -405,8 +400,67 @@ public class ProductServiceImpl implements ProductService {
         old.setOnlineOnly(model.isOnlineOnly());
         old.setListPrice(model.getListPrice());
         old.setDiscountPrice(model.getDiscountPrice());
+        // start
+       /*  List<String> coloursNew = new ArrayList<>();
+        List<String> sizesNew = new ArrayList<>();
+
+        for (ProductField pf : model.getProductFields()) {
+            if (pf.getFieldName().equals("COLOUR")) {
+                coloursNew.add(pf.getFieldValue());
+            } else if (pf.getFieldName().equals("SIZE")) {
+                coloursNew.add(pf.getFieldValue());
+            }
+        }
+
+        List<String> coloursOld = new ArrayList<>();
+        List<String> sizesOld = new ArrayList<>();
+
+        for (ProductField pf : old.getProductFields()) {
+            if (pf.getFieldName().equals("COLOUR")) {
+                coloursOld.add(pf.getFieldValue());
+            } else if (pf.getFieldName().equals("SIZE")) {
+                sizesOld.add(pf.getFieldValue());
+            }
+        }
+
+        if (!coloursNew.containsAll(coloursOld) || !sizesNew.containsAll(sizesOld)) {
+            throw new ModelException("Sizes and Colours can only be added, not removed.");
+        }
+
+        List<String> coloursDiff = coloursNew;
+        coloursDiff.removeAll(coloursOld);
+        List<String> sizesDiff = sizesNew;
+        sizesDiff.removeAll(sizesOld);
+
+        int count = old.getProducts().size() + 1;
+
+        if (sizesDiff.size() != 0) {
+            // Loop for each combination of new sizes and all colours
+            for (int i = 0; i < sizesDiff.size(); i++) {
+                for (int j = 0; j < coloursNew.size(); j++) {
+                    Product p = new Product(model.getModelCode() + "-" + count);
+
+                    ProductField colourField = getProductFieldByNameValue("colour", colours.get(i));
+                    p.addProductField(colourField);
+
+                    ProductField sizeField = getProductFieldByNameValue("size", sizes.get(j));
+                    p.addProductField(sizeField);
+
+                    em.persist(p);
+                    model.addProduct(p);
+                    count++;
+                }
+            }
+        } */
+
+        // end
         old.setProductFields(model.getProductFields());
+
         return old;
+    }
+
+    private Model updateProduct(Model model) throws ProductException, ProductFieldException {
+        return null;
     }
 
     @Override

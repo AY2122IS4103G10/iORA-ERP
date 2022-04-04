@@ -519,16 +519,6 @@ export const dashboardApi = {
       `${REST_ENDPOINT}sam/dashboard/customerOrders/${siteId}?date=${date}`
     );
   },
-  getStoreOrdersOfSite(siteId, date = "") {
-    return axiosPrivate.get(
-      `${REST_ENDPOINT}sam/dashboard/storeOrders/${siteId}?date=${date}`
-    );
-  },
-  getOnlineOrdersOfSite(siteId, date = "") {
-    return axiosPrivate.get(
-      `${REST_ENDPOINT}sam/dashboard/onlineOrders/${siteId}?date=${date}`
-    );
-  },
   geProcurementOrdersOfSite(siteId, date = "") {
     return axiosPrivate.get(
       `${REST_ENDPOINT}sam/dashboard/procurementOrders/${siteId}?date=${date}`

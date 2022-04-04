@@ -566,7 +566,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/dashboard/customerOrders/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> getDailyCustomerOrders(@RequestParam Date date, @PathVariable Long siteId) {
+    public ResponseEntity<Object> getDailyCustomerOrders(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date date, @PathVariable Long siteId) {
         try {
             date = date == null ? new Date() : date;
             List<CustomerOrder> result = null;
@@ -577,7 +577,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/dashboard/procurementOrders/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> getDailyProcurementOrders(@RequestParam Date date, @PathVariable Long siteId) {
+    public ResponseEntity<Object> getDailyProcurementOrders(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date date, @PathVariable Long siteId) {
         try {
             date = date == null ? new Date() : date;
             List<ProcurementOrder> result = null;
@@ -588,7 +588,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/dashboard/stockTransferOrders/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> getDailyStockTransferOrders(@RequestParam Date date, @PathVariable Long siteId) {
+    public ResponseEntity<Object> getDailyStockTransferOrders(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date date, @PathVariable Long siteId) {
         try {
             date = date == null ? new Date() : date;
             List<StockTransferOrder> result = null;

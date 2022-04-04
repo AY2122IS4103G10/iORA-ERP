@@ -77,32 +77,6 @@ const dashboardSlice = createSlice({
       state.status = "failed";
       state.error = action.error.message;
     });
-    builder.addCase(getStoreOrdersOfSite.pending, (state, action) => {
-      state.status = "loading";
-    });
-    builder.addCase(getStoreOrdersOfSite.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      const { payload } = action;
-      // TODO: Something here
-      state.storeOrders = { ...state.storeOrders};
-    });
-    builder.addCase(getStoreOrdersOfSite.rejected, (state, action) => {
-      state.status = "failed";
-      state.error = action.error.message;
-    });
-    builder.addCase(getOnlineOrdersOfSite.pending, (state, action) => {
-      state.status = "loading";
-    });
-    builder.addCase(getOnlineOrdersOfSite.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      const { payload } = action;
-      // TODO: Something here
-      state.onlineOrders = { ...state.onlineOrders};
-    });
-    builder.addCase(getOnlineOrdersOfSite.rejected, (state, action) => {
-      state.status = "failed";
-      state.error = action.error.message;
-    });
     builder.addCase(getProcurementOrdersOfSite.pending, (state, action) => {
       state.status = "loading";
     });

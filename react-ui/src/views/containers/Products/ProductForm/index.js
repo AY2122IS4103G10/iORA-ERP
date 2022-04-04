@@ -15,7 +15,7 @@ import { api, utilApi } from "../../../../environments/Api";
 
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { useRef } from "react";
-import { PaperClipIcon, XIcon } from "@heroicons/react/outline";
+import { PaperClipIcon } from "@heroicons/react/outline";
 import { TailSpin } from "react-loader-spinner";
 
 const prepareFields = (fields, checkedState) => {

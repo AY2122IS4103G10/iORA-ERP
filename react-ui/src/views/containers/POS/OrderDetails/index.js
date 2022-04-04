@@ -110,7 +110,7 @@ const ItemTable = ({ data }) => {
   );
 };
 
-const PromoTable = ({ data }) => {
+export const PromoTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
@@ -145,7 +145,7 @@ const PromoTable = ({ data }) => {
   );
 };
 
-const VoucherTable = ({ data }) => {
+export const VoucherTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
@@ -181,7 +181,7 @@ const VoucherTable = ({ data }) => {
   );
 };
 
-const RefundTable = ({ data }) => {
+export const RefundTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
@@ -211,7 +211,7 @@ const RefundTable = ({ data }) => {
   );
 };
 
-const ExchangeTable = ({ data }) => {
+export const ExchangeTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {

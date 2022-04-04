@@ -86,7 +86,6 @@ export const CustomerList = () => {
   useEffect(() => {
     customerStatus === "idle" && dispatch(fetchCustomers());
   }, [customerStatus, dispatch]);
-  console.log(data)
   const handleOnClick = (row) => navigate(`/sm/customers/${row.original.id}`);
 
   return <CustomerTable data={data} handleOnClick={handleOnClick} />;

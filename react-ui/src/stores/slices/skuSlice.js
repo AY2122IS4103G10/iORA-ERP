@@ -67,7 +67,6 @@ const productSlice = createSlice({
         products,
         productFields,
       } = action.payload;
-      console.log(action.payload)
       const existingProd = state.products.find(
         (prod) => prod.modelCode === modelCode
       );

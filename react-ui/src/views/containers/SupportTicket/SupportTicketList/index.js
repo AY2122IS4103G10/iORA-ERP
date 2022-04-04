@@ -77,7 +77,6 @@ export const SupportTicketList = () => {
     useEffect(() => {
         supportTicketStatus === "idle" && dispatch(fetchSupportTickets());
     }, [supportTicketStatus, dispatch]);
-    console.log(data)
 
     const handleOnClick = (row) => navigate(`/sm/support/${row.original.id}`);
 

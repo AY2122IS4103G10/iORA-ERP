@@ -167,7 +167,6 @@ export const EditStockLevel = () => {
         e.preventDefault();
         let toUpdate = {};
         const rfidArr = rfid.trim().split(" ");
-        // console.log(rfidArr);
         // add 
         if (selected.id === 1) {
             Object.entries(rfidArr).forEach(([key, value]) => {
@@ -180,7 +179,6 @@ export const EditStockLevel = () => {
                 toUpdate[value] = 0;
             });
         }
-        // console.log(toUpdate);
 
         dispatch(editStock({ toUpdate: toUpdate, siteId: siteId }))
             .unwrap()

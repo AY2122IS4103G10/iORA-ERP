@@ -317,7 +317,6 @@ export function Home() {
   const availablePaths = accessRightsMap(user.jobTitle.responsibility).map(
     (x) => paths[x]
   );
-console.log(availablePaths)
   return (
     <>
       <Header

@@ -386,7 +386,9 @@ export const onlineOrderApi = {
     return axiosPrivate.put(`${REST_ENDPOINT}online/collect/${orderId}`);
   },
   adjustProduct(orderId, sku, qty) {
-    return axiosPrivate.put(`${REST_ENDPOINT}online/order/${orderId}/${sku}/${qty}`);
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/order/${orderId}/${sku}/${qty}`
+    );
   },
 };
 
@@ -459,7 +461,7 @@ export const posApi = {
   addRefundLineItem(orderId, refundLI, refundAmount) {
     return axiosPrivate.post(
       `${REST_ENDPOINT}store/customerOrder/refund/${orderId}${
-        refundAmount && `?refundAmount=${refundAmount}`
+        `?refundAmount=${refundAmount}` || ""
       }`,
       refundLI
     );
@@ -487,9 +489,12 @@ export const logisticsApi = {
 
 export const utilApi = {
   uploadImage(image) {
-    return axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`, image)
-  }
-}
+    return axios.post(
+      `https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`,
+      image
+    );
+  },
+};
 export const dashboardApi = {
   getStockLevelSites() {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSites/all`);

@@ -133,7 +133,6 @@ export const DepartmentForm = () => {
     jobTs.forEach(
       (dept, index) => jobTitleCheckedState[index] && jt.push(dept)
     );
-    console.log(jt.map((title) => ({ id: title.id })));
     if (canAdd)
       if (!isEditing) {
         dispatch(

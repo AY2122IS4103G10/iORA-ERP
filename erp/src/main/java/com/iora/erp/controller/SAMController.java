@@ -25,6 +25,7 @@ import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -535,7 +536,7 @@ public class SAMController {
      */
 
     @GetMapping(path = "/dashboard/customerOrders", produces = "application/json")
-    public ResponseEntity<Object> getCustomerOrdersInDateRange(@RequestParam Date start, @RequestParam Date end) {
+    public ResponseEntity<Object> getCustomerOrdersInDateRange(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date start, @RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date end) {
         try {
             Map<Site,Long> result = null;
             return ResponseEntity.ok(result);
@@ -545,7 +546,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/dashboard/storeOrders", produces = "application/json")
-    public ResponseEntity<Object> getStoreOrdersInDateRange(@RequestParam Date start, @RequestParam Date end) {
+    public ResponseEntity<Object> getStoreOrdersInDateRange(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date start, @RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date end) {
         try {
             Map<Site,Long> result = null;
             return ResponseEntity.ok(result);
@@ -555,7 +556,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/dashboard/onlineOrders", produces = "application/json")
-    public ResponseEntity<Object> getOnlineOrdersInDateRange(@RequestParam Date start, @RequestParam Date end) {
+    public ResponseEntity<Object> getOnlineOrdersInDateRange(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date start, @RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date end) {
         try {
             Map<Site,Long> result = null;
             return ResponseEntity.ok(result);

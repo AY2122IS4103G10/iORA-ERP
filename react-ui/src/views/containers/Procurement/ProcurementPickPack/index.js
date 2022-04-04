@@ -90,7 +90,9 @@ export const PickPackList = ({
         accessor: "pickedQty",
         Cell: (e) => {
           return e.row.original.isEditing &&
-            ["MANUFACTURED", "PICKING", "ACCEPTED"].some((s) => s === status) ? (
+            ["MANUFACTURED", "PICKING", "ACCEPTED"].some(
+              (s) => s === status
+            ) ? (
             <EditableCell
               value={e.value}
               row={e.row}
@@ -162,7 +164,9 @@ export const PickPackList = ({
   }, [setData, status, onSaveQuanityClicked, handlePickPack]);
   const hiddenColumns =
     manufacturing.id !== currSiteId ||
-    ["MANUFACTURED", "PICKING", "PACKING", "ACCEPTED"].every((s) => s !== status)
+    ["MANUFACTURED", "PICKING", "PACKING", "ACCEPTED"].every(
+      (s) => s !== status
+    )
       ? ["[editButton]"]
       : [];
   return (
@@ -171,7 +175,7 @@ export const PickPackList = ({
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           Picking / Packing List
         </h3>
-        {status === "PICKING" && (
+        {status === "PICKING" && manufacturing.id === currSiteId && (
           <button
             type="button"
             className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"

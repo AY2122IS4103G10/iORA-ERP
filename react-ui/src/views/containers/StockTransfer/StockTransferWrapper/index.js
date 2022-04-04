@@ -252,6 +252,20 @@ export const LineItems = ({
       {
         Header: "Name",
         accessor: "product.name",
+        Cell: (e) => {
+          return e.row.original.product.imageLinks.length ? (
+            <a
+              href={e.row.original.product.imageLinks[0]}
+              className="hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {e.value}
+            </a>
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Color",

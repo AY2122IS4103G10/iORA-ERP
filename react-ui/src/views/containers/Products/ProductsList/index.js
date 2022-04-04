@@ -8,8 +8,6 @@ import {
   selectAllProducts,
 } from "../../../../stores/slices/productSlice";
 
-import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-
 export const ProductsTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
@@ -24,7 +22,7 @@ export const ProductsTable = ({ data, handleOnClick }) => {
       {
         Header: "Name",
         accessor: "name",
-        width: 270,
+        width: 338,
         Cell: (e) => (
           <div className="text-ellipsis overflow-hidden">{e.value}</div>
         ),

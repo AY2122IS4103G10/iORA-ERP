@@ -16,7 +16,6 @@ import { api, utilApi } from "../../../../environments/Api";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { useRef } from "react";
 import { PaperClipIcon, XIcon } from "@heroicons/react/outline";
-import axios from "axios";
 import { TailSpin } from "react-loader-spinner";
 
 const prepareFields = (fields, checkedState) => {
@@ -360,34 +359,38 @@ const AddProductFormBody = ({
                           inputField="onlineOnly"
                           className="relative sm:mt-0 sm:col-span-2"
                         >
-                          {images.map((image, index) => {
-                            return (
-                              <div key={index} className="flex">
-                                <div className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group">
-                                  <PaperClipIcon
-                                    className="-ml-1 h-5 w-5 mr-2"
-                                    aria-hidden="true"
-                                  />
-                                  <span className="text-sm text-gray-500 italic">
-                                    {image.name}
-                                  </span>
-                                </div>
-
-                                <button
-                                  type="button"
-                                  className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
-                                  onClick={() =>
-                                    setImages(images.splice(index, 1))
-                                  }
-                                >
-                                  <XIcon
-                                    className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500"
-                                    aria-hidden="true"
-                                  />
-                                </button>
-                              </div>
-                            );
-                          })}
+                          {Boolean(images.length) && (
+                            <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+                                {images.map((image, index) => {
+                                  return (
+                                    <li key={index} className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                                      <div className="w-0 flex-1 flex items-center">
+                                        <PaperClipIcon
+                                          className="flex-shrink-0 h-5 w-5 text-gray-400"
+                                          aria-hidden="true"
+                                        />
+                                        <span className="ml-2 flex-1 w-0 truncate">
+                                          {image.name ? image.name : image}
+                                        </span>
+                                      </div>
+                                      <div className="ml-4 flex-shrink-0 flex space-x-4">
+                                        <button
+                                          type="button"
+                                          className="bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                          onClick={() =>
+                                            setImages(index !== 0 ? images.splice(index) : [])
+                                          }
+                                        >
+                                          Remove
+                                        </button>
+                                      </div>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          )}
                           <div className="flex">
                             <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                               <div className="space-y-1 text-center">
@@ -408,7 +411,7 @@ const AddProductFormBody = ({
                                 <div className="flex text-sm text-gray-600">
                                   <label
                                     htmlFor="file-upload"
-                                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                                    className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500"
                                   >
                                     <span>Upload a file</span>
                                     <input

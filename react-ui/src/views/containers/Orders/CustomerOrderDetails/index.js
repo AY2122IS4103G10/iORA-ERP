@@ -10,6 +10,12 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { eventTypes } from "../../../../constants/eventTypes";
 import { classNames } from "../../../../utilities/Util";
+import {
+  ExchangeTable,
+  PromoTable,
+  RefundTable,
+  VoucherTable,
+} from "../../POS/OrderDetails";
 
 const ItemTable = ({ data }) => {
   const columns = useMemo(
@@ -73,13 +79,17 @@ const OrderDetailsBody = ({
   country,
   lineItems,
   status,
+  promotions,
+  refundedLIs,
+  exchangedLIs,
+  voucher,
 }) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
       <div
         className={classNames(
-          "space-y-6 lg:col-start-1 ",
-          Boolean(history.length) ? "lg:col-span-2" : "lg:col-span-3"
+          "space-y-6 lg:col-start-1",
+          history.length ? "lg:col-span-2" : "lg:col-span-3"
         )}
       >
         {/* Site Information list*/}
@@ -139,47 +149,47 @@ const OrderDetailsBody = ({
                   </div>
                 )}
                 {delivery !== undefined &&
-                  (delivery ? (
-                    deliveryAddress && (
-                      <div className="sm:col-span-1">
-                        <dt className="text-sm font-medium text-gray-500">
-                          Delivery Address
-                        </dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          <address className="not-italic">
-                            <span className="block">
-                              {deliveryAddress.street1},{" "}
-                              {deliveryAddress.street2}
-                            </span>
-                            <span className="block">
-                              {deliveryAddress.city}, {deliveryAddress.zip}
-                            </span>
-                          </address>
-                        </dd>
-                      </div>
-                    )
-                  ) : (
-                    pickupSite && <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Pickup At
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        <address className="not-italic">
-                          <span className="block">{pickupSite.name}</span>
-                          <span className="block">
-                            {pickupSite.address.road}
-                          </span>
-                          <span className="block">
-                            {pickupSite.address.city},{" "}
-                            {pickupSite.address.postalCode}
-                          </span>
-                          <span className="block">
-                            {pickupSite.phoneNumber}
-                          </span>
-                        </address>
-                      </dd>
-                    </div>
-                  ))}
+                  (delivery
+                    ? deliveryAddress && (
+                        <div className="sm:col-span-1">
+                          <dt className="text-sm font-medium text-gray-500">
+                            Delivery Address
+                          </dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            <address className="not-italic">
+                              <span className="block">
+                                {deliveryAddress.street1},{" "}
+                                {deliveryAddress.street2}
+                              </span>
+                              <span className="block">
+                                {deliveryAddress.city}, {deliveryAddress.zip}
+                              </span>
+                            </address>
+                          </dd>
+                        </div>
+                      )
+                    : pickupSite && (
+                        <div className="sm:col-span-1">
+                          <dt className="text-sm font-medium text-gray-500">
+                            Pickup At
+                          </dt>
+                          <dd className="mt-1 text-sm text-gray-900">
+                            <address className="not-italic">
+                              <span className="block">{pickupSite.name}</span>
+                              <span className="block">
+                                {pickupSite.address.road}
+                              </span>
+                              <span className="block">
+                                {pickupSite.address.city},{" "}
+                                {pickupSite.address.postalCode}
+                              </span>
+                              <span className="block">
+                                {pickupSite.phoneNumber}
+                              </span>
+                            </address>
+                          </dd>
+                        </div>
+                      ))}
 
                 {country && (
                   <div className="sm:col-span-1">
@@ -225,13 +235,21 @@ const OrderDetailsBody = ({
         </section>
       </div>
       {Boolean(history.length) && <ActivitySection history={history} />}
-      {Boolean(lineItems.length) && (
-        <div className="lg:col-start-1 lg:col-span-3">
-          <section aria-labelledby="lineItems">
-            <ItemTable data={lineItems} />
-          </section>
-        </div>
-      )}
+      <div className="lg:col-start-1 lg:col-span-3">
+        <section aria-labelledby="line-items">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="md:col-span-2">
+              {Boolean(lineItems?.length) && <ItemTable data={lineItems} />}
+            </div>
+            {Boolean(promotions?.length) && <PromoTable data={promotions} />}
+            {voucher && <VoucherTable data={[voucher]} />}
+            {Boolean(refundedLIs?.length) && <RefundTable data={refundedLIs} />}
+            {Boolean(exchangedLIs?.length) && (
+              <ExchangeTable data={exchangedLIs} />
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 };
@@ -250,6 +268,10 @@ export const CustomerOrderDetails = () => {
     status,
     lineItems,
     statusHistory,
+    promotions,
+    refundedLIs,
+    exchangedLIs,
+    voucher,
   } = useOutletContext();
   const [history, setHistory] = useState([]);
 
@@ -297,6 +319,10 @@ export const CustomerOrderDetails = () => {
       status={status.status}
       lineItems={lineItems}
       history={history}
+      promotions={promotions}
+      refundedLIs={refundedLIs}
+      exchangedLIs={exchangedLIs}
+      voucher={voucher}
     />
   );
 };

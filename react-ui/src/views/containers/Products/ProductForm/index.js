@@ -15,7 +15,7 @@ import { api, utilApi } from "../../../../environments/Api";
 
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { useRef } from "react";
-import { PaperClipIcon, XIcon } from "@heroicons/react/outline";
+import { PaperClipIcon } from "@heroicons/react/outline";
 import { TailSpin } from "react-loader-spinner";
 
 const prepareFields = (fields, checkedState) => {
@@ -363,8 +363,12 @@ const AddProductFormBody = ({
                             <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                               <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
                                 {images.map((image, index) => {
+                                  const idx = index;
                                   return (
-                                    <li key={index} className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                                    <li
+                                      key={index}
+                                      className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+                                    >
                                       <div className="w-0 flex-1 flex items-center">
                                         <PaperClipIcon
                                           className="flex-shrink-0 h-5 w-5 text-gray-400"
@@ -378,9 +382,10 @@ const AddProductFormBody = ({
                                         <button
                                           type="button"
                                           className="bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                                          onClick={() =>
-                                            setImages(index !== 0 ? images.splice(index) : [])
-                                          }
+                                          onClick={() => {
+                                            
+                                            setImages(images.filter((_, index) => index !== idx));
+                                          }}
                                         >
                                           Remove
                                         </button>
@@ -657,7 +662,11 @@ export const ProductForm = () => {
       }
     };
     const uploadAllImages = async () => {
-      return Promise.all(images.map((image) => uploadImage(image)));
+      return Promise.all(
+        images.map((image) =>
+          typeof image === "string" ? image : uploadImage(image)
+        )
+      );
     };
     var fields = [];
     fields = fields.concat(prepareFields(colors, colorCheckedState));

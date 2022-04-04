@@ -130,6 +130,10 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({ content: () => componentRef.current });
   const [lineItems, setLineItems] = useState([]);
+  const [promotions, setPromotions] = useState([]);
+  const [refundedLIs, setRefundedLIs] = useState([]);
+  const [exchangedLIs, setExchangedLIs] = useState([]);
+  const [voucher, setVoucher] = useState(null);
   const [status, setStatus] = useState("");
   const [statusHistory, setStatusHistory] = useState([]);
   const [delivery, setDelivery] = useState(null);
@@ -139,7 +143,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [totalAmount, setTotalAmount] = useState(-1);
   const [payments, setPayments] = useState([]);
   const [paid, setPaid] = useState(false);
-  const [site, setSite] = useState(false)
+  const [site, setSite] = useState(false);
   const [pickupSite, setPickupSite] = useState(null);
   const [country, setCountry] = useState(null);
   const [qrValue, setQrValue] = useState("");
@@ -172,6 +176,10 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           site,
           country,
           statusHistory,
+          promotions,
+          refundedLIs,
+          exchangedLIs,
+          voucher,
         } = data;
 
         fetchAllModelsBySkus(lineItems).then((data) => {
@@ -186,6 +194,10 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             }))
           );
         });
+        setPromotions(promotions);
+        setRefundedLIs(refundedLIs);
+        setExchangedLIs(exchangedLIs);
+        setVoucher(voucher);
         Boolean(statusHistory) &&
           setStatus(statusHistory[statusHistory.length - 1]);
         setStatusHistory(statusHistory);
@@ -197,7 +209,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         setPayments(payments);
         setPaid(paid);
         setPickupSite(pickupSite);
-        setSite(site)
+        setSite(site);
         setCountry(country);
         setQrValue(
           `http://localhost:3000/${subsys}/orders/${orderId}/pick-pack`
@@ -234,7 +246,11 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     },
     status !== "" && delivery
       ? { name: "Delivery", href: "#", current: false }
-      : { name: "Collection", href: `/${subsys}/orders/${orderId}/collect`, current: false },
+      : {
+          name: "Collection",
+          href: `/${subsys}/orders/${orderId}/collect`,
+          current: false,
+        },
   ];
 
   return loading ? (
@@ -272,6 +288,10 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             statusHistory,
             setStatusHistory,
             currSiteId,
+            promotions,
+            refundedLIs,
+            exchangedLIs,
+            voucher,
           }}
         />
       </div>

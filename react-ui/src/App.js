@@ -98,6 +98,8 @@ import { VoucherDetails } from "./views/containers/Vouchers/VoucherDetails";
 import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VouchersList } from "./views/containers/Vouchers/VouchersList";
 
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+
 function App() {
   const { pathname } = useLocation();
   return (

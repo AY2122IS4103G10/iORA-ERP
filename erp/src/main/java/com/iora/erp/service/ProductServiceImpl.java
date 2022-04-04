@@ -400,6 +400,7 @@ public class ProductServiceImpl implements ProductService {
         old.setOnlineOnly(model.isOnlineOnly());
         old.setListPrice(model.getListPrice());
         old.setDiscountPrice(model.getDiscountPrice());
+        old.setImageLinks(model.getImageLinks());
         // start
        /*  List<String> coloursNew = new ArrayList<>();
         List<String> sizesNew = new ArrayList<>();

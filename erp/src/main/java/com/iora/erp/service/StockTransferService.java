@@ -1,5 +1,6 @@
 package com.iora.erp.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.naming.directory.InvalidAttributesException;
@@ -30,4 +31,6 @@ public interface StockTransferService {
     public abstract StockTransferOrder scanProductAtToSite(Long id, String rfidsku, int qty) throws StockTransferException, ProductException;
     public abstract StockTransferOrder adjustProductsAtToSite(Long id, String rfidsku, int qty) throws StockTransferException, ProductException;
     public abstract StockTransferOrder completeStockTransferOrder(Long orderId) throws StockTransferException, SiteConfirmationException;
+
+    public abstract List<StockTransferOrder> getDailyStockTransferOrders(Long siteId, Date date);
 }

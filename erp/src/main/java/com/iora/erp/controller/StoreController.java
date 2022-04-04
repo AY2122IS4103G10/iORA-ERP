@@ -412,8 +412,7 @@ public class StoreController {
     public ResponseEntity<Object> addRefundLineItem(@PathVariable Long orderId, @RequestBody RefundLI refundLineItem,
             @RequestParam(required = false) Double refundAmount) {
         try {
-            // TODO: refundAmount
-            customerOrderService.createRefundLI(orderId, refundLineItem);
+            customerOrderService.createRefundLI(orderId, refundLineItem, refundAmount);
             return ResponseEntity.ok(customerOrderService.getCustomerOrder(orderId));
         } catch (Exception ex) {
             ex.printStackTrace();

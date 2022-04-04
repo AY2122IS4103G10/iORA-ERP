@@ -499,4 +499,34 @@ export const dashboardApi = {
   getStockLevelSites() {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/viewSites/all`);
   },
+  getCustomerOrders({ startDate, endDate }) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/dashboard/customerOrders?start=${startDate}&end=${endDate}`
+    );
+  },
+  getStoreOrders({ startDate, endDate }) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/dashboard/storeOrders?start=${startDate}&end=${endDate}`
+    );
+  },
+  getOnlineOrders({ startDate, endDate }) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/dashboard/onlineOrders?start=${startDate}&end=${endDate}`
+    );
+  },
+  getCustomerOrdersOfSite(siteId, date = "") {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/dashboard/customerOrders/${siteId}?date=${date}`
+    );
+  },
+  geProcurementOrdersOfSite(siteId, date = "") {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/dashboard/procurementOrders/${siteId}?date=${date}`
+    );
+  },
+  getStockTransferOrdersOfSite(siteId, date = "") {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/dashboard/stockTransferOrders/${siteId}?date=${date}`
+    );
+  },
 };

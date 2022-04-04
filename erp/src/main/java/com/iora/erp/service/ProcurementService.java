@@ -1,5 +1,6 @@
 package com.iora.erp.service;
 
+import java.util.Date;
 import java.util.List;
 
 import com.iora.erp.exception.IllegalPOModificationException;
@@ -31,4 +32,6 @@ public interface ProcurementService {
     public abstract ProcurementOrder scanProductAtWarehouse(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
     public abstract ProcurementOrder adjustProductsAtWarehouse(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
     public abstract ProcurementOrder completeProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException;
+
+    public abstract List<ProcurementOrder> getDailyProcurementOrders(Long siteId, Date date);
 }

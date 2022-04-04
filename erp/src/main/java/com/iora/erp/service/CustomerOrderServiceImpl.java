@@ -6,6 +6,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -556,7 +557,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public RefundLI createRefundLI(Long orderId, RefundLI refundLI) throws CustomerOrderException {
+    public RefundLI createRefundLI(Long orderId, RefundLI refundLI, Double refundAmount) throws CustomerOrderException {
         CustomerOrder co = getCustomerOrder(orderId);
         Boolean refundable = false;
 
@@ -570,6 +571,22 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         if (!refundable) {
             throw new CustomerOrderException("Item to be refunded is not in the customer order.");
+        }
+
+        try {
+            if (refundAmount == null) {
+                Customer c = customerService.getCustomerById(co.getCustomerId());
+                c.setStoreCredit(c.getStoreCredit()
+                        + productService.getModelByProduct(refundLI.getProduct()).getDiscountPrice());
+                em.merge(c);
+            } else {
+                Customer c = customerService.getCustomerById(co.getCustomerId());
+                c.setStoreCredit(c.getStoreCredit() + refundAmount);
+                em.merge(c);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println(ex);
         }
 
         em.persist(refundLI);
@@ -954,5 +971,137 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         return updateOnlineOrder(onlineOrder);
+    }
+
+    @Override
+    public Map<Long, Long> getCustomerOrdersInDateRange(Date start, Date end) {
+        Map<Long, Long> map = new HashMap<Long, Long>();
+        List<Site> sites = siteService.getAllSites();
+
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(start);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        start = cal.getTime();
+
+        cal.setTime(end);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        end = cal.getTime();
+
+        for (Site site : sites) {
+            TypedQuery<Long> q = em
+                    .createQuery(
+                            "SELECT COUNT(co) FROM CustomerOrder co WHERE co.site.id = :siteId AND co.dateTime BETWEEN :start AND :end",
+                            Long.class)
+                    .setParameter("siteId", site.getId())
+                    .setParameter("start", start)
+                    .setParameter("end", end);
+
+            map.put(site.getId(), q.getSingleResult());
+        }
+        return map;
+    }
+
+    @Override
+    public Map<Long, Long> getStoreOrdersInDateRange(Date start, Date end) {
+        Map<Long, Long> map = new HashMap<Long, Long>();
+        List<Site> sites = siteService.getAllSites();
+
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(start);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        start = cal.getTime();
+
+        cal.setTime(end);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        end = cal.getTime();
+
+        for (Site site : sites) {
+            TypedQuery<Long> q1 = em
+                    .createQuery(
+                            "SELECT co.id FROM CustomerOrder co WHERE co.site.id = :siteId AND co.dateTime BETWEEN :start AND :end",
+                            Long.class)
+                    .setParameter("siteId", site.getId())
+                    .setParameter("start", start)
+                    .setParameter("end", end);
+
+            TypedQuery<Long> q2 = em
+                    .createQuery(
+                            "SELECT oo.id FROM OnlineOrder oo WHERE oo.site.id = :siteId AND oo.dateTime BETWEEN :start AND :end",
+                            Long.class)
+                    .setParameter("siteId", site.getId())
+                    .setParameter("start", start)
+                    .setParameter("end", end);
+
+            List<Long> resultList = q1.getResultList();
+            resultList.removeAll(q2.getResultList());
+
+            map.put(site.getId(), Long.valueOf(resultList.size()));
+        }
+        return map;
+    }
+
+    @Override
+    public Map<Long, Long> getOnlineOrdersInDateRange(Date start, Date end) {
+        Map<Long, Long> map = new HashMap<Long, Long>();
+        List<Site> sites = siteService.getAllSites();
+
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(start);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        start = cal.getTime();
+
+        cal.setTime(end);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        end = cal.getTime();
+
+        for (Site site : sites) {
+            TypedQuery<Long> q = em
+                    .createQuery(
+                            "SELECT COUNT(oo) FROM OnlineOrder oo WHERE oo.site.id = :siteId AND oo.dateTime BETWEEN :start AND :end",
+                            Long.class)
+                    .setParameter("siteId", site.getId())
+                    .setParameter("start", start)
+                    .setParameter("end", end);
+
+            map.put(site.getId(), q.getSingleResult());
+        }
+        return map;
+    }
+
+    @Override
+    public List<CustomerOrder> getDailyCustomerOrders(Long siteId, Date date) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date dateStart = cal.getTime();
+
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        Date dateEnd = cal.getTime();
+
+        TypedQuery<CustomerOrder> q = em
+                .createQuery(
+                        "SELECT co FROM CustomerOrder co WHERE co.site.id = :siteId AND co.dateTime BETWEEN :start AND :end",
+                        CustomerOrder.class)
+                .setParameter("siteId", siteId)
+                .setParameter("start", dateStart)
+                .setParameter("end", dateEnd);
+
+        return q.getResultList();
     }
 }

@@ -170,7 +170,6 @@ export const ManageDashboard = () => {
 
   useEffect(() => {
     status === "idle" && dispatch(getStockLevelSites());
-    console.log(stockLevelSites);
     stockLevelSites.length > 0 &&
       setSiteData(
         stockLevelSites.map((site) => {

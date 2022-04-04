@@ -1,9 +1,10 @@
 package com.iora.erp.service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.iora.erp.exception.CustomerException;
-// import com.easypost.exception.EasyPostException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
@@ -11,7 +12,6 @@ import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
-// import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
@@ -49,7 +49,7 @@ public interface CustomerOrderService {
 
         public abstract RefundLI getRefundLI(Long id) throws CustomerOrderException;
         public abstract List<RefundLI> getAllRefundLIs();
-        public abstract RefundLI createRefundLI(Long orderId, RefundLI refundLI) throws CustomerOrderException;
+        public abstract RefundLI createRefundLI(Long orderId, RefundLI refundLI, Double refundAmount) throws CustomerOrderException;
         public abstract RefundLI updateRefundLI(RefundLI refundLI) throws CustomerOrderException;
 
         public abstract OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;
@@ -61,4 +61,9 @@ public interface CustomerOrderService {
         public abstract OnlineOrder deliverMultipleOnlineOrder(Long orderId) throws CustomerOrderException;
         public abstract OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
         public abstract OnlineOrder collectOnlineOrder(Long orderId) throws CustomerOrderException;
+
+        public abstract Map<Long, Long> getCustomerOrdersInDateRange(Date start, Date end);
+        public abstract Map<Long, Long> getStoreOrdersInDateRange(Date start, Date end);
+        public abstract Map<Long, Long> getOnlineOrdersInDateRange(Date start, Date end);
+        public abstract List<CustomerOrder> getDailyCustomerOrders(Long siteId, Date date);
 }

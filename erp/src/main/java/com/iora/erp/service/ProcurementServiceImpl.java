@@ -1,11 +1,14 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.ProcurementOrderStatusEnum;
 import com.iora.erp.exception.IllegalPOModificationException;
@@ -551,5 +554,30 @@ public class ProcurementServiceImpl implements ProcurementService {
                         ProcurementOrderStatusEnum.COMPLETED));
 
         return updateProcurementOrder(procurementOrder);
+    }
+
+    @Override
+    public List<ProcurementOrder> getDailyProcurementOrders(Long siteId, Date date) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date dateStart = cal.getTime();
+
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        Date dateEnd = cal.getTime();
+
+        TypedQuery<ProcurementOrder> q = em
+                .createQuery(
+                        "SELECT DISTINCT po FROM ProcurementOrder po left join po.statusHistory sh WHERE (po.manufacturing.id = :siteId OR po.headquarters.id = :siteId OR po.warehouse.id = :siteId) AND sh.timeStamp BETWEEN :start AND :end",
+                        ProcurementOrder.class)
+                .setParameter("siteId", siteId)
+                .setParameter("start", dateStart)
+                .setParameter("end", dateEnd);
+
+        return q.getResultList();
     }
 }

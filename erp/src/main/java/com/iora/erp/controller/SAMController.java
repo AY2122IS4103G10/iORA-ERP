@@ -19,10 +19,12 @@ import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.model.stockTransfer.StockTransferOrder;
+import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
+import com.iora.erp.service.StockTransferService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -50,6 +52,10 @@ public class SAMController {
     private SiteService siteService;
     @Autowired
     private ProcurementService procurementService;
+    @Autowired
+    private CustomerOrderService customerOrderService;
+    @Autowired
+    private StockTransferService stockTransferService;
 
     /*
      * ---------------------------------------------------------
@@ -536,68 +542,73 @@ public class SAMController {
      */
 
     @GetMapping(path = "/dashboard/customerOrders", produces = "application/json")
-    public ResponseEntity<Object> getCustomerOrdersInDateRange(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date start, @RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date end) {
+    public ResponseEntity<Object> getCustomerOrdersInDateRange(
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date start,
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date end) {
         try {
-            Map<Site,Long> result = null;
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(customerOrderService.getCustomerOrdersInDateRange(start, end));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @GetMapping(path = "/dashboard/storeOrders", produces = "application/json")
-    public ResponseEntity<Object> getStoreOrdersInDateRange(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date start, @RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date end) {
+    public ResponseEntity<Object> getStoreOrdersInDateRange(
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date start,
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date end) {
         try {
-            Map<Site,Long> result = null;
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(customerOrderService.getStoreOrdersInDateRange(start, end));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @GetMapping(path = "/dashboard/onlineOrders", produces = "application/json")
-    public ResponseEntity<Object> getOnlineOrdersInDateRange(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date start, @RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date end) {
+    public ResponseEntity<Object> getOnlineOrdersInDateRange(
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date start,
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date end) {
         try {
-            Map<Site,Long> result = null;
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(customerOrderService.getOnlineOrdersInDateRange(start, end));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @GetMapping(path = "/dashboard/customerOrders/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> getDailyCustomerOrders(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date date, @PathVariable Long siteId) {
+    public ResponseEntity<Object> getDailyCustomerOrders(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "ddMMyyyy") Date date,
+            @PathVariable Long siteId) {
         try {
-            date = date == null ? new Date() : date;
-            List<CustomerOrder> result = null;
-            return ResponseEntity.ok(result);
+            return ResponseEntity
+                    .ok(customerOrderService.getDailyCustomerOrders(siteId, date == null ? new Date() : date));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @GetMapping(path = "/dashboard/procurementOrders/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> getDailyProcurementOrders(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date date, @PathVariable Long siteId) {
+    public ResponseEntity<Object> getDailyProcurementOrders(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "ddMMyyyy") Date date,
+            @PathVariable Long siteId) {
         try {
-            date = date == null ? new Date() : date;
-            List<ProcurementOrder> result = null;
-            return ResponseEntity.ok(result);
+            return ResponseEntity
+                    .ok(procurementService.getDailyProcurementOrders(siteId, date == null ? new Date() : date));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @GetMapping(path = "/dashboard/stockTransferOrders/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> getDailyStockTransferOrders(@RequestParam @DateTimeFormat(pattern="ddMMyyyy") Date date, @PathVariable Long siteId) {
+    public ResponseEntity<Object> getDailyStockTransferOrders(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "ddMMyyyy") Date date,
+            @PathVariable Long siteId) {
         try {
-            date = date == null ? new Date() : date;
-            List<StockTransferOrder> result = null;
-            return ResponseEntity.ok(result);
+            return ResponseEntity
+                    .ok(stockTransferService.getDailyStockTransferOrders(siteId, date == null ? new Date() : date));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
 
     /*
      * ---------------------------------------------------------

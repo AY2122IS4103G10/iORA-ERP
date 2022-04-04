@@ -1,7 +1,9 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.naming.directory.InvalidAttributesException;
@@ -458,39 +460,39 @@ public class StockTransferServiceImpl implements StockTransferService {
     @Override
     public StockTransferOrder adjustProductsAtToSite(Long id, String rfidsku, int qty)
             throws StockTransferException, ProductException {
-                StockTransferOrder stOrder = getStockTransferOrder(id);
-        
-                if (stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING_MULTIPLE
-                        && stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING) {
-                    throw new StockTransferException("Order cannot be verified yet.");
-                }
-        
-                Product product = productService.getProduct(rfidsku);
-                List<StockTransferOrderLI> lineItems = stOrder.getLineItems();
-        
-                for (StockTransferOrderLI stoli : lineItems) {
-                    if (stoli.getProduct().equals(product)) {
-                        stoli.setReceivedQty(qty);
-                        boolean picked = true;
-                        for (StockTransferOrderLI stoli2 : lineItems) {
-                            if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
-                                picked = false;
-                            }
-                        }
-                        if (picked) {
-                            stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                                    StockTransferStatusEnum.COMPLETED));
-                        }
-                        try {
-                            siteService.addProducts(stOrder.getToSite().getId(), product.getSku(), qty);
-                        } catch (NoStockLevelException e) {
-                            e.printStackTrace();
-                        }
-                        return em.merge(stOrder);
+        StockTransferOrder stOrder = getStockTransferOrder(id);
+
+        if (stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING_MULTIPLE
+                && stOrder.getLastStatus() != StockTransferStatusEnum.DELIVERING) {
+            throw new StockTransferException("Order cannot be verified yet.");
+        }
+
+        Product product = productService.getProduct(rfidsku);
+        List<StockTransferOrderLI> lineItems = stOrder.getLineItems();
+
+        for (StockTransferOrderLI stoli : lineItems) {
+            if (stoli.getProduct().equals(product)) {
+                stoli.setReceivedQty(qty);
+                boolean picked = true;
+                for (StockTransferOrderLI stoli2 : lineItems) {
+                    if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
+                        picked = false;
                     }
                 }
-                throw new StockTransferException("The product scanned is not related to the Stock Transfer Order");
+                if (picked) {
+                    stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                            StockTransferStatusEnum.COMPLETED));
+                }
+                try {
+                    siteService.addProducts(stOrder.getToSite().getId(), product.getSku(), qty);
+                } catch (NoStockLevelException e) {
+                    e.printStackTrace();
+                }
+                return em.merge(stOrder);
             }
+        }
+        throw new StockTransferException("The product scanned is not related to the Stock Transfer Order");
+    }
 
     @Override
     public StockTransferOrder completeStockTransferOrder(Long orderId)
@@ -506,5 +508,30 @@ public class StockTransferServiceImpl implements StockTransferService {
         stOrder.addStatusHistory(
                 new STOStatus(stOrder.getLastActor(), new Date(), StockTransferStatusEnum.COMPLETED));
         return updateStockTransferOrder(stOrder);
+    }
+
+    @Override
+    public List<StockTransferOrder> getDailyStockTransferOrders(Long siteId, Date date) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date dateStart = cal.getTime();
+
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        Date dateEnd = cal.getTime();
+
+        TypedQuery<StockTransferOrder> q = em
+                .createQuery(
+                        "SELECT DISTINCT sto FROM StockTransferOrder sto left join sto.statusHistory sh WHERE (sto.fromSite.id = :siteId OR sto.toSite.id = :siteId) AND sh.timeStamp BETWEEN :start AND :end",
+                        StockTransferOrder.class)
+                .setParameter("siteId", siteId)
+                .setParameter("start", dateStart)
+                .setParameter("end", dateEnd);
+
+        return q.getResultList();
     }
 }

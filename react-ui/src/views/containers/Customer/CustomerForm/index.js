@@ -39,188 +39,187 @@ const CustomerFormBody = ({
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">{!isEditing ? "Add New" : "Edit"} Customer</h1>
-      {/* Left column */}
-      <div className="grid grid-cols-1 gap-4 lg:col-span-2">
-        {/* Form */}
-        <section aria-labelledby="profile-overview-title">
-          <div className="rounded-lg bg-white overflow-hidden shadow">
-            <form onSubmit={onAddCustomerClicked}>
-              <div className="p-8 space-y-8 divide-y divide-gray-200">
-                <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+    {/* Left column */}
+    <div className="grid grid-cols-1 gap-4 lg:col-span-2">
+      {/* Form */}
+      <section aria-labelledby="profile-overview-title">
+        <div className="rounded-lg bg-white overflow-hidden shadow">
+          <form onSubmit={onAddCustomerClicked}>
+            <div className="p-8 space-y-8 divide-y divide-gray-200">
+              <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+                <div>
                   <div>
-                    <div>
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        {!isEditing ? "Create New" : "Edit"} Customer
-                      </h3>
-                    </div>
-                    <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                      <SimpleInputGroup
-                        label="First name"
-                        inputField="firstName"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="firstName"
-                          id="firstName"
-                          autoComplete="firstName"
-                          value={firstName}
-                          onChange={onFirstNameChanged}
-                          required
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
-                        label="Last name"
-                        inputField="lastName"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="lastName"
-                          id="lastName"
-                          autoComplete="lastName"
-                          value={lastName}
-                          onChange={onLastNameChanged}
-                          required
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
-                        label="Email"
-                        inputField="email"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="email"
-                          id="email"
-                          autoComplete="email"
-                          value={email}
-                          onChange={onEmailChanged}
-                          required
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
-                        label="Password"
-                        inputField="password"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="password"
-                          name="password"
-                          id="password"
-                          autoComplete="password"
-                          value={password}
-                          onChange={onPasswordChanged}
-                          disabled={isEditing}
-                          className={isEditing ? "bg-gray-200" : ""}
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
-                        label="Date of birth"
-                        inputField="dob"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <DatePicker
-                          className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                          selected={dob}
-                          onChange={onDobChanged}
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
-                        label="Contact number"
-                        inputField="contactNumber"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="contactNumber"
-                          id="contactNumber"
-                          autoComplete="contactNumber"
-                          value={contactNumber}
-                          onChange={onContactNumberChanged}
-                          required
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
-                        label="Membership Tier"
-                        inputField="membershipTier"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="membershipTier"
-                          id="membershipTier"
-                          autoComplete="membershipTier"
-                          value={membershipTier.name}
-                          onChange={onMembershipTierChanged}
-                          className="bg-gray-200"
-                          disabled
-                          required
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
-                        label="Membership Points"
-                        inputField="membershipPoints"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="membershipPoints"
-                          id="membershipPoints"
-                          autoComplete="membershipPoints"
-                          value={membershipPoints}
-                          onChange={onMembershipPointsChanged}
-                          className="bg-gray-200"
-                          disabled
-                        />
-                      </SimpleInputGroup>
-                      <SimpleInputGroup
-                        label="Store Credit"
-                        inputField="storeCredit"
-                        className="sm:mt-0 sm:col-span-2"
-                      >
-                        <SimpleInputBox
-                          type="text"
-                          name="storeCredit"
-                          id="storeCredit"
-                          autoComplete="storeCredit"
-                          value={storeCredit}
-                          onChange={onStoreCreditChanged}
-                          className="bg-gray-200"
-                          disabled
-                        />
-                      </SimpleInputGroup>
-                    </div>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                      {!isEditing ? "Create New" : "Edit"} Customer
+                    </h3>
                   </div>
-                </div>
-
-                <div className="pt-5">
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                      onClick={onCancelClicked}
+                  <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                    <SimpleInputGroup
+                      label="First name"
+                      inputField="firstName"
+                      className="sm:mt-0 sm:col-span-2"
                     >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                      <SimpleInputBox
+                        type="text"
+                        name="firstName"
+                        id="firstName"
+                        autoComplete="firstName"
+                        value={firstName}
+                        onChange={onFirstNameChanged}
+                        required
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Last name"
+                      inputField="lastName"
+                      className="sm:mt-0 sm:col-span-2"
                     >
-                      {!isEditing ? "Add" : "Save"} Customer
-                    </button>
+                      <SimpleInputBox
+                        type="text"
+                        name="lastName"
+                        id="lastName"
+                        autoComplete="lastName"
+                        value={lastName}
+                        onChange={onLastNameChanged}
+                        required
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Email"
+                      inputField="email"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="email"
+                        id="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={onEmailChanged}
+                        required
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Password"
+                      inputField="password"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="password"
+                        name="password"
+                        id="password"
+                        autoComplete="password"
+                        value={password}
+                        onChange={onPasswordChanged}
+                        disabled={isEditing}
+                        className={isEditing ? "bg-gray-200" : ""}
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Date of birth"
+                      inputField="dob"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <DatePicker
+                        className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                        selected={dob}
+                        onChange={onDobChanged}
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Contact number"
+                      inputField="contactNumber"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="contactNumber"
+                        id="contactNumber"
+                        autoComplete="contactNumber"
+                        value={contactNumber}
+                        onChange={onContactNumberChanged}
+                        required
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Membership Tier"
+                      inputField="membershipTier"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="membershipTier"
+                        id="membershipTier"
+                        autoComplete="membershipTier"
+                        value={membershipTier.name}
+                        onChange={onMembershipTierChanged}
+                        className="bg-gray-200"
+                        disabled
+                        required
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Membership Points"
+                      inputField="membershipPoints"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="membershipPoints"
+                        id="membershipPoints"
+                        autoComplete="membershipPoints"
+                        value={membershipPoints}
+                        onChange={onMembershipPointsChanged}
+                        className="bg-gray-200"
+                        disabled
+                      />
+                    </SimpleInputGroup>
+                    <SimpleInputGroup
+                      label="Store Credit"
+                      inputField="storeCredit"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="text"
+                        name="storeCredit"
+                        id="storeCredit"
+                        autoComplete="storeCredit"
+                        value={storeCredit}
+                        onChange={onStoreCreditChanged}
+                        className="bg-gray-200"
+                        disabled
+                      />
+                    </SimpleInputGroup>
                   </div>
                 </div>
               </div>
-            </form>
-          </div>
-        </section>
-      </div>
-    
+
+              <div className="pt-5">
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                    onClick={onCancelClicked}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
+                    {!isEditing ? "Add" : "Save"} Customer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
   </div>
 );
 
-export const CustomerForm = () => {
+export const CustomerForm = ({ subsys }) => {
   const { customerId } = useParams();
   const { addToast } = useToasts();
   const [isEditing, setIsEditing] = useState(false);
@@ -230,7 +229,7 @@ export const CustomerForm = () => {
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [membershipTier, setMembershipTier] = useState({name: "BASIC"});
+  const [membershipTier, setMembershipTier] = useState({ name: "BASIC" });
   const [membershipPoints, setMembershipPoints] = useState("0");
   const [storeCredit, setStoreCredit] = useState("0");
 
@@ -272,7 +271,9 @@ export const CustomerForm = () => {
               appearance: "success",
               autoDismiss: true,
             });
-            navigate("/sm/customers");
+            navigate(
+              subsys === "str" ? `/str/pos/orderPurchase` : "/sm/customers"
+            );
           })
           .catch((err) => {
             addToast(`Error: ${err.message}`, {

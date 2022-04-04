@@ -148,7 +148,6 @@ export const ViewStockTransfer = () => {
       );
     });
   }, [order]);
-
   useEffect(() => {
     fetchAllModelsBySkus(order.lineItems).then((data) => {
       setLItems(
@@ -158,6 +157,7 @@ export const ViewStockTransfer = () => {
             ...item.product,
             modelCode: data[index].modelCode,
             name: data[index].name,
+            imageLinks: data[index].imageLinks,
           },
         }))
       );

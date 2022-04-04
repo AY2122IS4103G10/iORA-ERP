@@ -98,7 +98,7 @@ const ProductSticker = ({ product }) => {
   );
 };
 
-const ProductStickerPrint = forwardRef(({ printQty, product }, ref) => {
+export const ProductStickerPrint = forwardRef(({ printQty, product }, ref) => {
   return (
     <div ref={ref} className="py-4 overflow-auto">
       <ul className="grid grid-cols-3 gap-6">

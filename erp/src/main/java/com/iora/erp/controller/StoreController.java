@@ -410,7 +410,7 @@ public class StoreController {
 
     @PostMapping(path = "/customerOrder/refund/{orderId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> addRefundLineItem(@PathVariable Long orderId, @RequestBody RefundLI refundLineItem,
-            @RequestParam Double refundAmount) {
+            @RequestParam(required = false) Double refundAmount) {
         try {
             // TODO: refundAmount
             customerOrderService.createRefundLI(orderId, refundLineItem);

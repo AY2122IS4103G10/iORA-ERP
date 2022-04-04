@@ -159,7 +159,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       setLoading(true);
       try {
         const { data } = await orderApi.get(orderId);
-        console.log(data);
         const {
           lineItems,
           delivery,

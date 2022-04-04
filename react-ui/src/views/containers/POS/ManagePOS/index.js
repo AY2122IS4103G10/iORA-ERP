@@ -6,6 +6,7 @@ const tabs = [
   { name: "Order", href: "orderPurchase", current: true },
   { name: "History", href: "orderHistory", current: false },
   { name: "Search Order", href: "orderHistory/search", current: false },
+  { name: "Add Customer", href: "addCustomer", current: false },
 ];
 
 export const ManagePOS = (subsys) => {

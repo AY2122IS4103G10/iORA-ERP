@@ -165,7 +165,7 @@ const VoucherTable = ({ data }) => {
     ],
     []
   );
-  
+
   return (
     <div className="pt-6">
       <div className="md:flex md:items-center md:justify-between">
@@ -261,7 +261,7 @@ export const OrderDetails = () => {
     name: "Choose One",
     qty: 0,
   });
-  const [refundQty, setRefundQty] = useState("0");
+  const [refundQty, setRefundQty] = useState(1);
   const [exchangedSku, setExchangedSku] = useState({
     id: -1,
     name: "Choose One",
@@ -280,8 +280,8 @@ export const OrderDetails = () => {
         (lineItem) => lineItem.product.sku === refundSku.name
       )?.qty || 0;
     let q =
-      e.target.value < 0
-        ? 0
+      e.target.value < 1
+        ? 1
         : e.target.value > maxQty
         ? maxQty
         : e.target.value;
@@ -332,6 +332,14 @@ export const OrderDetails = () => {
       });
   }, [exchangedSku]);
 
+  useEffect(() => {
+    const refundProduct = order?.lineItems?.find((x) => x.product.sku === refundSku?.name);
+    refundSku.id !== -1 && order.lineItems.length > 0 &&
+      setRefundAmount(
+        refundProduct.subTotal * refundQty / refundProduct.qty
+      );
+  }, [refundSku, order?.lineItems, refundQty]);
+
   const openRefundModal = () => setOpenRefund(true);
   const closeRefundModal = () => setOpenRefund(false);
   const openExchangeModal = () => setOpenExchange(true);
@@ -341,7 +349,9 @@ export const OrderDetails = () => {
       const product = order.lineItems
         .map((lineItem) => lineItem.product)
         .find((prod) => prod.sku === refundSku.name);
-      dispatch(addRefundLineItem({ orderId, product, qty: refundQty }));
+      dispatch(
+        addRefundLineItem({ orderId, product, qty: refundQty, refundAmount })
+      );
       closeRefundModal();
     }
     if (event === "exchange") {
@@ -363,7 +373,7 @@ export const OrderDetails = () => {
   ) : (
     orderStatus === "succeeded" && (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <NavigatePrev page="Orders" path="/str/pos/orderHistory"/>
+        <NavigatePrev page="Orders" path="/str/pos/orderHistory" />
         <Header
           order={order}
           openRefundModal={openRefundModal}
@@ -379,7 +389,7 @@ export const OrderDetails = () => {
           refundAmount={refundAmount}
           refundSku={refundSku}
           refundQty={refundQty}
-          setRefundAmount={setRefundAmount}
+          setRefundAmount={(e) => setRefundAmount(e.target.value)}
           setRefundSku={setRefundSku}
           setRefundQty={mapRefundQty}
         />
@@ -479,8 +489,12 @@ export const OrderDetails = () => {
                   <PromoTable data={order.promotions} />
                 )}
                 {order?.voucher && <VoucherTable data={[order?.voucher]} />}
-                {Boolean(order.refundedLIs?.length) && <RefundTable data={order?.refundedLIs} />}
-                {Boolean(order.exchangedLIs?.length) && <ExchangeTable data={order?.exchangedLIs} />}
+                {Boolean(order.refundedLIs?.length) && (
+                  <RefundTable data={order?.refundedLIs} />
+                )}
+                {Boolean(order.exchangedLIs?.length) && (
+                  <ExchangeTable data={order?.exchangedLIs} />
+                )}
               </div>
             </section>
           </div>
@@ -616,7 +630,7 @@ const RefundModal = ({
       </Dialog>
     </Transition.Root>
   );
-}
+};
 const ExchangeModal = ({
   open,
   closeModal,

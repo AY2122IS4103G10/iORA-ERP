@@ -68,7 +68,6 @@ const jobTitleSlice = createSlice({
         description,
         responsibility,
       } = action.payload;
-      console.log(action.payload);
       const existingJobTitle = state.jobTitle.find((job) => job.jobTitleId === jobTitleId);
       if (existingJobTitle) {
         existingJobTitle.title = title;

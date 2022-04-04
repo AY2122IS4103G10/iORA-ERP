@@ -605,7 +605,6 @@ export const Card = ({
       });
       handleSubmit(result2.paymentIntent.id);
     } catch (err) {
-      console.log(err);
       addToast(`Error: ${err}`, {
         appearance: "error",
         autoDismiss: true,

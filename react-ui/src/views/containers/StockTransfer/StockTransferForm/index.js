@@ -659,7 +659,7 @@ export const StockTransferForm = ({ subsys }) => {
       fromSite: from,
       toSite: to,
     };
-    console.log("Order created: ", stockTransferOrder);
+    // console.log("Order created: ", stockTransferOrder);
     dispatch(
       createStockTransfer({ order: stockTransferOrder, siteId: currSite })
     )
@@ -669,7 +669,6 @@ export const StockTransferForm = ({ subsys }) => {
           appearance: "success",
           autoDismiss: true,
         });
-        console.log(response);
         navigate(`/${subsys}/stocktransfer/${response.id}`);
       })
       .catch((error) => {

@@ -53,7 +53,6 @@ export const MembershipTierList = () => {
   useEffect(() => {
     membershipTierStatus === "idle" && dispatch(fetchMembershipTiers());
   }, [membershipTierStatus, dispatch]);
-  console.log(data)
   const handleOnClick = (row) => navigate(`/sm/rewards-loyalty/tiers/${row.original.name}`);
 
   return <MembershipTierTable data={data} handleOnClick={handleOnClick} />;

@@ -2,6 +2,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationIcon, PaperClipIcon, TrashIcon, XIcon } from '@heroicons/react/outline';
 import moment from "moment";
 import { Fragment, useEffect, useRef, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
@@ -186,7 +187,7 @@ const SupportTicketBody = ({ messages, customer, order }) => {
     )
 }
 
-const InputArea = ({ input, onInputChanged, onReplyClicked, file, setFile }) => {
+const InputArea = ({ input, onInputChanged, onReplyClicked, file, setFile, loading }) => {
     const fileRef = useRef();
 
     const handleChange = (e) => {
@@ -238,13 +239,20 @@ const InputArea = ({ input, onInputChanged, onReplyClicked, file, setFile }) => 
                             </button>}
                     </div>
                     <div className="flex-shrink-0">
-                        <button
-                            type="submit"
+                        {loading ? <button
+                            type="button"
                             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                            onClick={onReplyClicked}
+                            disabled
                         >
-                            Reply
-                        </button>
+                            <TailSpin color="#00BFFF" height={20} width={20} />
+                        </button> :
+                            <button
+                                type="submit"
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                onClick={onReplyClicked}
+                            >
+                                Reply
+                            </button>}
                     </div>
                 </div>
             </form>
@@ -332,6 +340,7 @@ export const SupportTicketDetails = () => {
     const navigate = useNavigate();
     const ticketStatus = useSelector((state) => state.supportTickets.status);
 
+    const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [input, setInput] = useState("");
@@ -362,6 +371,7 @@ export const SupportTicketDetails = () => {
     const onInputChanged = (e) => setInput(e.target.value);
     const onReplyClicked = (evt) => {
         evt.preventDefault();
+        setLoading(true);
         if (Boolean(input)) {
             const image = new FormData();
             image.append('image', file)
@@ -394,13 +404,15 @@ export const SupportTicketDetails = () => {
                                 appearance: "success",
                                 autoDismiss: true,
                             });
-
                         })
                         .catch((err) => {
                             addToast(`Error: ${err.message}`, {
                                 appearance: "error",
                                 autoDismiss: true,
                             });
+                        })
+                        .finally(() => {
+                            setLoading(false);
                         });
                 }) : dispatch(replySupportTicket(
                     {
@@ -425,6 +437,9 @@ export const SupportTicketDetails = () => {
                             appearance: "error",
                             autoDismiss: true,
                         });
+                    })
+                    .finally(() => {
+                        setLoading(false);
                     });
         }
     }
@@ -466,7 +481,8 @@ export const SupportTicketDetails = () => {
                         onInputChanged={onInputChanged}
                         onReplyClicked={onReplyClicked}
                         file={file}
-                        setFile={setFile} />}
+                        setFile={setFile}
+                        loading={loading} />}
                 <ResolveModal
                     open={open}
                     setOpen={setOpen}

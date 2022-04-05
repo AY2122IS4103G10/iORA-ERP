@@ -32,7 +32,7 @@ export default function SharedStats({ stats }) {
                     prefix={prefix}
                     suffix={suffix}
                   />
-                  {previousStat && (
+                  {previousStat !==undefined && (
                     <span className="ml-2 text-sm font-medium text-gray-500">
                       from{" "}
                       <CountUp

@@ -5,8 +5,11 @@ const initialState = {
   stockLevelSites: [],
   stockLevelProducts: [],
   customerOrdersByDate: [],
+  customerOrdersByDatePrev: [],
   storeOrdersByDate: [],
+  storeOrdersByDatePrev: [],
   onlineOrdersByDate: [],
+  onlineOrdersByDatePrev: [],
   customerOrders: [],
   procurementOrders: [],
   stockTransferOrders: [],
@@ -40,6 +43,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getCustomerOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
+      state.customerOrdersByDatePrev = state.customerOrdersByDate;
       state.customerOrdersByDate = action.payload;
     });
     builder.addCase(getCustomerOrders.rejected, (state, action) => {
@@ -51,6 +55,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getStoreOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
+      state.storeOrdersByDatePrev = state.storeOrdersByDate;
       state.storeOrdersByDate = action.payload;
     });
     builder.addCase(getStoreOrders.rejected, (state, action) => {
@@ -62,6 +67,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getOnlineOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
+      state.onlineOrdersByDatePrev = state.onlineOrdersByDate;
       state.onlineOrdersByDate = action.payload;
     });
     builder.addCase(getOnlineOrders.rejected, (state, action) => {

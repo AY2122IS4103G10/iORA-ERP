@@ -10,10 +10,12 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useEffect, useState } from "react";
+import moment from "moment";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getCustomerOrders,
   getCustomerOrdersOfSite,
   getProcurementOrdersOfSite,
   getStockLevelSites,
@@ -137,52 +139,37 @@ const data2 = {
   ],
 };
 
-const stats = [
-  {
-    name: "Total Customers",
-    stat: 71897,
-    previousStat: 70946,
-    change: 12,
-    changeType: "increase",
-  },
-  {
-    name: "Orders with >2 Items",
-    stat: 58.16,
-    previousStat: 56.14,
-    suffix: "%",
-    decimals: 2,
-    change: 2.02,
-    changeType: "increase",
-  },
-  {
-    name: "Percentage of Customers with the 'Tan' surname",
-    stat: 24.57,
-    previousStat: 28.62,
-    suffix: "%",
-    decimals: 2,
-    change: 4.05,
-    changeType: "decrease",
-  },
-];
-
 export const ManageDashboard = () => {
   const dispatch = useDispatch();
   const [siteData, setSiteData] = useState([]);
   const [siteChosen, setSiteChosen] = useState({ id: 0, name: "Choose one" });
+  const options = [
+    { id: 0, name: "Daily", unit: "day" },
+    { id: 1, name: "Weekly", unit: "week" },
+    { id: 2, name: "Monthly", unit: "month" },
+    { id: 3, name: "Annually", unit: "year" },
+  ];
+  const [range, setRange] = useState(options[0]);
 
   const status = useSelector(({ dashboard }) => dashboard.status);
   const stockLevelSites = useSelector(
     ({ dashboard }) => dashboard.stockLevelSites
   );
-  const customerOrdersDateRange = useSelector(
+  const currStats = useSelector(
     ({ dashboard }) => dashboard.customerOrdersByDate
   );
-  const storeOrdersDateRange = useSelector(
-    ({ dashboard }) => dashboard.storeOrdersByDate
+  const prevStats = useSelector(
+    ({ dashboard }) => dashboard.customerOrdersByDatePrev
   );
-  const onlineOrdersDateRange = useSelector(
-    ({ dashboard }) => dashboard.onlineOrdersByDate
-  );
+  const getRevenueTotal = (obj) =>
+    Object.values(obj).reduce((sum, site) => sum + site?.revenue / 100, 0);
+  const getOrderTotal = (obj) =>
+    Object.values(obj).reduce((sum, site) => sum + site, 0);
+  const getProductTotal = (obj) =>
+    Object.values(obj).reduce((sum, site) => sum + site?.products, 0);
+  const delta = (curr, prev) =>
+    Number.parseFloat(Math.abs(curr - prev) / prev).toFixed(2);
+  const deltaType = (curr, prev) => (curr > prev ? "increase" : "decrease");
   const siteCustomerOrders = useSelector(
     (state) => state.dashboard.customerOrders
   );
@@ -209,18 +196,42 @@ export const ManageDashboard = () => {
       );
   }, [status, dispatch, stockLevelSites]);
 
+  useLayoutEffect(() => {
+    range &&
+      dispatch(
+        getCustomerOrders({
+          startDate: moment()
+            .add(1, "day")
+            .subtract(2, range.unit)
+            .format("DDMMyyyy")
+            .toString(),
+          endDate: moment()
+            .subtract(1, range.unit)
+            .format("DDMMyyyy")
+            .toString(),
+        })
+      );
+    range &&
+      dispatch(
+        getCustomerOrders({
+          startDate: moment()
+            .add(1, "day")
+            .subtract(1, range.unit)
+            .format("DDMMyyyy")
+            .toString(),
+          endDate: moment().format("DDMMyyyy").toString(),
+        })
+      )
+        .unwrap()
+        .then((x) => console.log(getOrderTotal(x)));
+  }, [dispatch, range]);
+
   useEffect(() => {
     if (siteChosen.id === 0) return;
     dispatch(setSiteId(siteChosen.id));
-    dispatch(getCustomerOrdersOfSite({ siteId: siteChosen.id }))
-      .unwrap()
-      .then((x) => console.log(x.length));
-    dispatch(getProcurementOrdersOfSite({ siteId: siteChosen.id }))
-      .unwrap()
-      .then((x) => console.log(x.length));
-    dispatch(getStockTransferOrdersOfSite({ siteId: siteChosen.id }))
-      .unwrap()
-      .then((x) => console.log(x.length));
+    dispatch(getCustomerOrdersOfSite({ siteId: siteChosen.id }));
+    dispatch(getProcurementOrdersOfSite({ siteId: siteChosen.id }));
+    dispatch(getStockTransferOrdersOfSite({ siteId: siteChosen.id }));
   }, [siteChosen, dispatch]);
 
   return (
@@ -228,6 +239,44 @@ export const ManageDashboard = () => {
       <Header title={"Dashboard"} />
       <div className="flex justify-center min-w-fit">
         <div className="flex grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 w-screen lg:w-full 2xl:max-w-7xl items-start justify-start">
+          <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
+            <h3 className="text-lg font-medium">Finances</h3>
+            <SimpleSelectMenu
+              label="Select Date Range"
+              options={options}
+              selected={range}
+              setSelected={setRange}
+            />
+            <SharedStats
+              stats={[
+                {
+                  name: "Revenue",
+                  stat: 42310,
+                  previousStat: 39280,
+                  prefix: "$",
+                },
+                {
+                  name: "Total Customer Orders",
+                  stat: getOrderTotal(currStats),
+                  previousStat: getOrderTotal(prevStats),
+                  change: delta(
+                    getOrderTotal(currStats),
+                    getOrderTotal(prevStats)
+                  ),
+                  changeType: deltaType(
+                    getOrderTotal(currStats),
+                    getOrderTotal(prevStats)
+                  ),
+                },
+                {
+                  name: "Products Sold",
+                  stat: 1000,
+                  previousStat: 800,
+                  suffix: " items",
+                },
+              ]}
+            />
+          </div>
           <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6 md:col-span-2">
             <h3 className="text-lg font-medium">Product Levels</h3>
             <Bar
@@ -330,14 +379,6 @@ export const ManageDashboard = () => {
           <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
             <h3 className="text-lg font-medium">LALU</h3>
             <Doughnut data={data2} />
-          </div>
-          <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
-            <h3 className="text-lg font-medium">SORA</h3>
-            <Doughnut data={data} />
-          </div>
-          <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
-            <h3 className="text-lg font-medium">Customer Figures</h3>
-            <SharedStats stats={stats} />
           </div>
           <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6 md:col-span-2">
             <h3 className="text-lg font-medium">Sales</h3>

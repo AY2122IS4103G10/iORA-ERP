@@ -1,8 +1,11 @@
 package com.iora.erp.model.customer;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -19,8 +22,13 @@ public class Voucher {
     @Column(nullable = false, scale = 2)
     private double amount;
 
+    private String campaign;
+
     @Column(nullable = false)
     private Date expiry;
+
+    @ElementCollection
+    private List<Long> customerIds;
 
     @Column(nullable = false)
     private boolean issued;
@@ -34,14 +42,32 @@ public class Voucher {
 
     public Voucher() {
         this.voucherCode = StringGenerator.generateRandom(48, 122, 10);
+        this.campaign = "None";
+        customerIds = new ArrayList<>();
         this.issued = false;
         this.redeemed = false;
     }
 
-    public Voucher(double amount, Date expiry) {
+    public Voucher(String campaign, double amount, Date expiry) {
+        this();
+        this.campaign = campaign;
+        this.amount = amount;
+        this.expiry = expiry;
+    }
+
+    public Voucher(double amount, Date expiry, List<Long> customerIds) {
         this();
         this.amount = amount;
         this.expiry = expiry;
+        this.customerIds = customerIds;
+    }
+
+    public Voucher(String campaign, double amount, Date expiry, List<Long> customerIds) {
+        this();
+        this.campaign = campaign;
+        this.amount = amount;
+        this.expiry = expiry;
+        this.customerIds = customerIds;
     }
 
     public String getVoucherCode() {
@@ -50,6 +76,14 @@ public class Voucher {
 
     public void setVoucherCode(String voucherCode) {
         this.voucherCode = voucherCode;
+    }
+
+    public String getCampaign() {
+        return this.campaign;
+    }
+
+    public void setCampaign(String campaign) {
+        this.campaign = campaign;
     }
 
     public double getAmount() {
@@ -66,6 +100,14 @@ public class Voucher {
 
     public void setExpiry(Date expiry) {
         this.expiry = expiry;
+    }
+
+    public List<Long> getCustomerIds() {
+        return this.customerIds;
+    }
+
+    public void setCustomerIds(List<Long> customerIds) {
+        this.customerIds = customerIds;
     }
 
     public boolean isIssued() {

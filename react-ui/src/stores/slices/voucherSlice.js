@@ -17,9 +17,10 @@ export const fetchVouchers = createAsyncThunk(
 
 export const addNewVouchers = createAsyncThunk(
   "vouchers/addNewVouchers",
-  async (initialVoucher) => {
+  async ({initialVoucher, quantity}) => {
     try {
-      const response = await api.create("sam/voucher", initialVoucher);
+      console.log(initialVoucher);
+      const response = await api.create(`sam/voucher?qty=${quantity}`, initialVoucher);
       return response.data;
     } catch (error) {
       return Promise.reject(error.response.data);

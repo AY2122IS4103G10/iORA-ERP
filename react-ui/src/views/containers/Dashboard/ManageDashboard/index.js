@@ -8,12 +8,18 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip
+  Tooltip,
 } from "chart.js";
 import { useEffect, useState } from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
-import { getStockLevelSites } from "../../../../stores/slices/dashboardSlice";
+import {
+  getCustomerOrdersOfSite,
+  getProcurementOrdersOfSite,
+  getStockLevelSites,
+  getStockTransferOrdersOfSite,
+  setSiteId,
+} from "../../../../stores/slices/dashboardSlice";
 import { Header } from "../../../components/Header";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import SharedStats from "../components/Stats";
@@ -161,12 +167,31 @@ const stats = [
 
 export const ManageDashboard = () => {
   const dispatch = useDispatch();
+  const [siteData, setSiteData] = useState([]);
+  const [siteChosen, setSiteChosen] = useState({ id: 0, name: "Choose one" });
+
   const status = useSelector(({ dashboard }) => dashboard.status);
   const stockLevelSites = useSelector(
     ({ dashboard }) => dashboard.stockLevelSites
   );
-  const [siteData, setSiteData] = useState([]);
-  const [siteChosen, setSiteChosen] = useState({ id: 0, name: "Choose one" });
+  const customerOrdersDateRange = useSelector(
+    ({ dashboard }) => dashboard.customerOrdersByDate
+  );
+  const storeOrdersDateRange = useSelector(
+    ({ dashboard }) => dashboard.storeOrdersByDate
+  );
+  const onlineOrdersDateRange = useSelector(
+    ({ dashboard }) => dashboard.onlineOrdersByDate
+  );
+  const siteCustomerOrders = useSelector(
+    (state) => state.dashboard.customerOrders
+  );
+  const siteProcurementOrders = useSelector(
+    (state) => state.dashboard.procurementOrders
+  );
+  const siteStockTransferOrders = useSelector(
+    (state) => state.dashboard.stockTransferOrders
+  );
 
   useEffect(() => {
     status === "idle" && dispatch(getStockLevelSites());
@@ -183,6 +208,20 @@ export const ManageDashboard = () => {
         })
       );
   }, [status, dispatch, stockLevelSites]);
+
+  useEffect(() => {
+    if (siteChosen.id === 0) return;
+    dispatch(setSiteId(siteChosen.id));
+    dispatch(getCustomerOrdersOfSite({ siteId: siteChosen.id }))
+      .unwrap()
+      .then((x) => console.log(x.length));
+    dispatch(getProcurementOrdersOfSite({ siteId: siteChosen.id }))
+      .unwrap()
+      .then((x) => console.log(x.length));
+    dispatch(getStockTransferOrdersOfSite({ siteId: siteChosen.id }))
+      .unwrap()
+      .then((x) => console.log(x.length));
+  }, [siteChosen, dispatch]);
 
   return (
     <>
@@ -223,39 +262,67 @@ export const ManageDashboard = () => {
               selected={siteChosen}
               setSelected={setSiteChosen}
             />
-            {siteChosen.id !== 0 && (
-              <Doughnut
-                className="mt-3"
-                data={{
-                  labels: stockLevelSites
-                    ?.find((x) => x.id === siteChosen.id)
-                    ?.stockLevel.products.map((y) => y.sku),
-                  datasets: [
-                    {
-                      label: "Stock Level of Selected Site",
-                      data: stockLevelSites
-                        ?.find((x) => x.id === siteChosen.id)
-                        ?.stockLevel.products.map((y) => y.qty),
-                      backgroundColor: colourPicker(
-                        cyans,
-                        siteData.length,
-                        0.6
-                      ),
-                      borderColor: colourPicker(cyans, siteData.length, 1),
-                      borderWidth: 0,
-                    },
-                  ],
-                }}
-                options={{
-                  plugins: {
-                    legend: {
-                      display: false,
-                    },
-                  },
-                }}
-              />
-            )}
+            <SharedStats
+              stats={[
+                {
+                  name: "Total Customer Orders",
+                  stat: siteCustomerOrders?.find((x) => x.id === siteChosen.id)
+                    ?.orders?.length,
+                },
+                {
+                  name: "Total Procurement Orders",
+                  stat: siteProcurementOrders?.find(
+                    (x) => x.id === siteChosen.id
+                  )?.orders?.length,
+                },
+                {
+                  name: "Total Stock Transfer Orders",
+                  stat: siteStockTransferOrders?.find(
+                    (x) => x.id === siteChosen.id
+                  )?.orders?.length,
+                },
+              ]}
+            />
           </div>
+          {siteChosen.id !== 0 && (
+            <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
+              <h3 className="text-lg font-medium">
+                Stock Level of {siteChosen?.name}
+              </h3>
+              {siteChosen.id !== 0 && (
+                <Doughnut
+                  className="mt-3"
+                  data={{
+                    labels: stockLevelSites
+                      ?.find((x) => x.id === siteChosen.id)
+                      ?.stockLevel.products.map((y) => y.sku),
+                    datasets: [
+                      {
+                        label: "Stock Level of Selected Site",
+                        data: stockLevelSites
+                          ?.find((x) => x.id === siteChosen.id)
+                          ?.stockLevel.products.map((y) => y.qty),
+                        backgroundColor: colourPicker(
+                          cyans,
+                          siteData.length,
+                          0.6
+                        ),
+                        borderColor: colourPicker(cyans, siteData.length, 1),
+                        borderWidth: 0,
+                      },
+                    ],
+                  }}
+                  options={{
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                    },
+                  }}
+                />
+              )}
+            </div>
+          )}
           <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
             <h3 className="text-lg font-medium">iORA</h3>
             <Doughnut data={data} />

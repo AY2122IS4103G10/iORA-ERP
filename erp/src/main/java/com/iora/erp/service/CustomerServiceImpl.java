@@ -252,6 +252,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public List<Voucher> getVouchersOfCustomer(Long customerId) throws CustomerException {
+        return em
+                .createQuery("SELECT DISTINCT v FROM Voucher v WHERE :customerId MEMBER OF v.customerIds",
+                        Voucher.class)
+                .setParameter("customerId", customerId)
+                .getResultList();
+    }
+
+    @Override
     public List<Voucher> getAvailableVouchersByAmount(double amount) {
         TypedQuery<Voucher> q;
         q = em.createQuery("SELECT v FROM Voucher v WHERE :amount = v.amount AND v.issued = false", Voucher.class);
@@ -272,6 +281,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Voucher issueVoucher(String voucherCode, Long customerId) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
+        voucher.addCustomerId(customerId);
         Customer customer = getCustomerById(customerId);
 
         emailService.sendSimpleMessage(customer.getEmail(), "iORA S$" + voucher.getAmount() + " Voucher",

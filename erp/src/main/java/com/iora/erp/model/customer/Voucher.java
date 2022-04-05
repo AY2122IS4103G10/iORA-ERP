@@ -110,6 +110,10 @@ public class Voucher {
         this.customerIds = customerIds;
     }
 
+    public void addCustomerId(Long customerId) {
+        this.customerIds.add(customerId);
+    }
+
     public boolean isIssued() {
         return this.issued;
     }

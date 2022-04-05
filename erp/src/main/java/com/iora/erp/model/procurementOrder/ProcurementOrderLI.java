@@ -1,7 +1,9 @@
 package com.iora.erp.model.procurementOrder;
 
+import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,10 +21,15 @@ public class ProcurementOrderLI {
     @ManyToOne
     private Product product;
 
+    private Double costPrice;
+
     private int requestedQty;
     private int pickedQty;
     private int packedQty;
     private int receivedQty;
+
+    @ElementCollection
+    private List<String> imageLinks;
 
     public ProcurementOrderLI() {
         this.requestedQty = 0;
@@ -30,7 +37,6 @@ public class ProcurementOrderLI {
         this.packedQty = 0;
         this.receivedQty = 0;
     }
-
 
     public ProcurementOrderLI(Product product, int requestedQty) {
         this();
@@ -53,6 +59,14 @@ public class ProcurementOrderLI {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Double getCostPrice() {
+        return this.costPrice;
+    }
+
+    public void setCostPrice(Double costPrice) {
+        this.costPrice = costPrice;
     }
 
     public int getRequestedQty() {
@@ -85,6 +99,14 @@ public class ProcurementOrderLI {
 
     public void setReceivedQty(int receivedQty) {
         this.receivedQty = receivedQty;
+    }
+
+    public List<String> getImageLinks() {
+        return this.imageLinks;
+    }
+
+    public void setImageLinks(List<String> imageLinks) {
+        this.imageLinks = imageLinks;
     }
     
     @Override

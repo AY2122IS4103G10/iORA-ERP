@@ -472,6 +472,11 @@ export const posApi = {
       exchangeLI
     );
   },
+  searchSku(sku) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/customerOrder/product?sku=${sku}`
+    );
+  },
 };
 
 export const logisticsApi = {

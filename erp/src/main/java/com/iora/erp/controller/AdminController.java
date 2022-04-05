@@ -480,4 +480,13 @@ public class AdminController {
         }
         return siteService.getNotifications(Long.valueOf(siteId));
     }
+
+    @PutMapping(path = "/noti/{siteId}", produces = "application/json")
+    public List<Notification> updateNotifications(@RequestBody List<Notification> notifications,
+            @PathVariable String siteId) {
+        if (siteId.equals("0") || siteId.equals("null")) {
+            return new ArrayList<>();
+        }
+        return siteService.updateNotifications(notifications, Long.valueOf(siteId));
+    }
 }

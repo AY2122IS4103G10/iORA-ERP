@@ -383,8 +383,11 @@ const AddProductFormBody = ({
                                           type="button"
                                           className="bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                                           onClick={() => {
-                                            
-                                            setImages(images.filter((_, index) => index !== idx));
+                                            setImages(
+                                              images.filter(
+                                                (_, index) => index !== idx
+                                              )
+                                            );
                                           }}
                                         >
                                           Remove

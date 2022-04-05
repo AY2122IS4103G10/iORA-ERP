@@ -88,21 +88,41 @@ const ProductList = ({
   );
 };
 
-const ProductSticker = ({ product }) => {
-  const { sku, name } = product;
+export const ProductSticker = ({ product }) => {
+  const { sku, name, productFields } = product;
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 sm:px-6 sm:py-24 lg:px-8">
-      <div className="space-y-2 sm:px-0 sm:flex sm:text-center sm:justify-between sm:space-y-0">
-        <h1 className="tracking-tight text-base">{name}</h1>
+    <div className="max-w-3xl mx-2 px-4 py-2 sm:px-6 sm:py-24">
+      <div className="sm:px-0 flex justify-between">
+        <h1 className="tracking-tight text-xs">{sku.toUpperCase()}</h1>
+        <h1 className="tracking-tight text-xs">{name.toUpperCase()}</h1>
       </div>
-      <Barcode value={sku} width={1} height={100} margin={0} />
+      <Barcode
+        value={sku}
+        width={1.1}
+        height={30}
+        margin={0}
+        displayValue={false}
+      />
+      <div className="sm:px-0 flex justify-between">
+        <h1 className="tracking-tight text-xs">
+          COL:{" "}
+          {
+            productFields.find((field) => field.fieldName === "COLOUR")
+              .fieldValue
+          }
+        </h1>
+        <h1 className="tracking-tight text-xs">
+          SIZE:{" "}
+          {productFields.find((field) => field.fieldName === "SIZE").fieldValue}
+        </h1>
+      </div>
     </div>
   );
 };
 
 const ProductStickerPrint = forwardRef(({ printQty, product }, ref) => {
   return (
-    <div ref={ref} className="py-4 overflow-auto">
+    <div ref={ref} className="my-2 py-2 overflow-visible">
       <ul className="grid grid-cols-3 gap-6">
         {new Array(parseInt(printQty)).fill(product).map((product, index) => (
           <li key={index} className="ml-3 col-span-1">

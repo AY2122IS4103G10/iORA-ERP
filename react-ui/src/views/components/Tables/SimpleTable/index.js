@@ -209,6 +209,41 @@ export const EditableCell = ({
   );
 };
 
+export const UploadFileCell = forwardRef(
+  (
+    { value: initialValue, row: { index }, column: { id }, updateMyData },
+    ref
+  ) => {
+    const [value, setValue] = useState(initialValue);
+
+    const onChange = (e) => {
+      setValue(value.concat(Array.from(e.target.files)));
+    };
+
+    const onBlur = () => {
+      updateMyData(index, id, value);
+    };
+
+    useEffect(() => {
+      setValue(initialValue);
+    }, [initialValue]);
+
+    return (
+      <input
+        ref={ref}
+        id="file-upload"
+        name="file-upload"
+        type="file"
+        className="sr-only"
+        accept="image/*"
+        multiple
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+    );
+  }
+);
+
 const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
   const defaultRef = useRef();
   const resolvedRef = ref || defaultRef;

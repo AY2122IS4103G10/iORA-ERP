@@ -147,7 +147,7 @@ export const Login = () => {
           <div className="mt-6 text-center">
             <button
               className="text-base font-medium text-indigo-600 hover:text-indigo-500"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/')}
             >
               <span aria-hidden="true"> &larr;</span> Back to store
             </button>

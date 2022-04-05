@@ -381,12 +381,10 @@ public class SAMController {
     }
 
     @PostMapping(path = "/voucher", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> generateVouchers(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Object> generateVouchers(@RequestBody Voucher voucher, @RequestParam int qty) {
         try {
-            double amount = Double.parseDouble(body.get("amount"));
-            int qty = Integer.parseInt(body.get("quantity"));
             return ResponseEntity
-                    .ok(customerService.generateVouchers(amount, qty, body.get("expDate").substring(0, 10)));
+                    .ok(customerService.generateVouchers(voucher, qty));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./slices/userSlice";
-import listingReducer from "./slices/listingSlice";
 import cartReducer from "./slices/cartSlice";
+import listingReducer from "./slices/listingSlice";
 import purchasesReducer from "./slices/purchasesSlice";
+import supportTicketReducer from "./slices/supportTicketSlice";
+import userReducer from "./slices/userSlice";
 
 export default configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export default configureStore({
     listing: listingReducer,
     cart: cartReducer,
     purchases: purchasesReducer,
+    supportTickets: supportTicketReducer,
   },
 });

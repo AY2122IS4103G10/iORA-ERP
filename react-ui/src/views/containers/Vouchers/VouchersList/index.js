@@ -16,6 +16,12 @@ export const VouchersTable = ({ data, handleOnClick }) => {
   const columns = useMemo(
     () => [
       {
+        Header: "Campaign",
+        accessor: "campaign",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
         Header: "Voucher Code",
         accessor: "voucherCode",
       },
@@ -34,16 +40,12 @@ export const VouchersTable = ({ data, handleOnClick }) => {
         accessor: "issued",
         Cell: (e) => (e.value ? "Yes" : "No"),
       },
-
       {
         Header: "Redeemed",
         accessor: "redeemed",
         Cell: (e) => (e.value ? "Yes" : "No"),
-        Filter: SelectColumnFilter,
-        filter: "includes",
       },
     ],
-    []
   );
 
   return (

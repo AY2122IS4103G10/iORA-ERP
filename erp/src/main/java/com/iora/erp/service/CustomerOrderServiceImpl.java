@@ -170,7 +170,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             stripeService.capturePayment(clientSecret);
         }
         if (customerOrder.getVoucher() != null) {
-            customerService.redeemVoucher(customerOrder.getVoucher().getVoucherCode());
+            if (!customerOrder.getVoucher().getCustomerIds().contains(customerOrder.getCustomerId())) {
+                throw new CustomerException("Customer is not entitled to this voucher.");
+            } else {
+                customerService.redeemVoucher(customerOrder.getVoucher().getVoucherCode());
+            }
         }
 
         if (customerOrder instanceof OnlineOrder) {

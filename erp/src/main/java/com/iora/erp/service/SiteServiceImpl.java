@@ -301,6 +301,16 @@ public class SiteServiceImpl implements SiteService {
         return null;
     }
 
+    @Override
+    public List<Notification> updateNotifications(List<Notification> notifications, Long siteId) {
+        Site old = em.find(Site.class, siteId);
+        if (old != null) {
+            old.setNotifications(notifications);
+            return old.getNotifications();
+        }
+        return null;
+    }
+
     /*
      * @Override
      * public Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId, Long

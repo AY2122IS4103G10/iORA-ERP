@@ -15,6 +15,20 @@ const columns = [
   {
     Header: "Name",
     accessor: "name",
+    Cell: (e) => {
+      return e.row.original.imageLinks?.length ? (
+        <a
+          href={e.row.original.imageLinks[0]}
+          className="hover:underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {e.value}
+        </a>
+      ) : (
+        e.value
+      );
+    },
   },
   {
     Header: "Color",
@@ -67,6 +81,7 @@ export const AsiteStock = () => {
             ...stock,
             modelCode: data[index].modelCode,
             name: data[index].name,
+            imageLinks: data[index].imageLinks,
           }))
         );
       });

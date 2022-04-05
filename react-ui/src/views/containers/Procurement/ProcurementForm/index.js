@@ -10,6 +10,7 @@ import {
   EditableCell,
   SelectColumnFilter,
   SimpleTable,
+  UploadFileCell,
 } from "../../../components/Tables/SimpleTable";
 import {
   fetchProducts,
@@ -24,6 +25,8 @@ import {
   selectAllWarehouse,
 } from "../../../../stores/slices/siteSlice";
 import { classNames } from "../../../../utilities/Util";
+import { PaperClipIcon } from "@heroicons/react/solid";
+import { useRef } from "react";
 
 const addModalColumns = [
   {
@@ -100,8 +103,9 @@ const ProcurementItemsList = ({ data, setData, isEditing }) => {
         accessor: "product.sku",
       },
       {
-        Header: "SKU",
+        Header: "Name",
         accessor: "product.name",
+        enableRowSpan: true,
         Cell: (e) => {
           return e.row.original.product.imageLinks.length ? (
             <a
@@ -145,6 +149,19 @@ const ProcurementItemsList = ({ data, setData, isEditing }) => {
           );
         },
       },
+      // {
+      //   Header: "Sites",
+      //   columns: [
+      //     {
+      //       Header: "Site A",
+      //       accessor: "[siteA]",
+      //     },
+      //     {
+      //       Header: "Site B",
+      //       accessor: "[siteB]",
+      //     },
+      //   ],
+      // },
     ];
   }, [setData, isEditing]);
 
@@ -210,6 +227,133 @@ const AddProductItemModal = ({
   );
 };
 
+const UploadFileList = ({ data, setData }) => {
+  const fileRef = useRef();
+  const [skipPageReset, setSkipPageReset] = useState(false);
+  const columns = useMemo(() => {
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
+    return [
+      {
+        Header: "Product Code",
+        accessor: "modelCode",
+      },
+      {
+        Header: "Name",
+        accessor: "name",
+        Cell: (e) => {
+          return e.row.original.imageLinks.length ? (
+            <a
+              href={e.row.original.imageLinks[0]}
+              className="hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {e.value}
+            </a>
+          ) : (
+            e.value
+          );
+        },
+      },
+      {
+        Header: "",
+        accessor: "files",
+        Cell: (e) => {
+          return (
+            <div>
+              {e.value && Boolean(e.value.length) && (
+                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+                    {e.value.map((file, index) => {
+                      const idx = index;
+                      return (
+                        <li
+                          key={index}
+                          className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+                        >
+                          <div className="w-0 flex-1 flex items-center">
+                            <PaperClipIcon
+                              className="flex-shrink-0 h-5 w-5 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            <span className="ml-2 flex-1 w-0 truncate">
+                              {file.name ? file.name : file}
+                            </span>
+                          </div>
+                          <div className="ml-4 flex-shrink-0 flex space-x-4">
+                            <button
+                              type="button"
+                              className="bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                              onClick={() => {
+                                setData((old) =>
+                                  old.map((row, index) => {
+                                    if (index === e.row.index) {
+                                      return {
+                                        ...old[e.row.index],
+                                        files: e.value.filter(
+                                          (_, index) => index !== idx
+                                        ),
+                                      };
+                                    }
+                                    return row;
+                                  })
+                                );
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+              <div className="relative cursor-pointer rounded-md font-medium">
+                <label
+                  htmlFor="file-upload"
+                  className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500"
+                >
+                  <span>Upload</span>
+                  <UploadFileCell
+                    ref={fileRef}
+                    value={e.value}
+                    row={e.row}
+                    column={e.column}
+                    updateMyData={updateMyData}
+                  />
+                </label>
+              </div>
+            </div>
+          );
+        },
+      },
+    ];
+  }, [setData]);
+  return (
+    <div className="mt-4">
+      <SimpleTable
+        columns={columns}
+        data={data}
+        skipPageReset={skipPageReset}
+      />
+    </div>
+  );
+};
+
 const ProcurementFormBody = ({
   isEditing,
   headquarters,
@@ -223,6 +367,8 @@ const ProcurementFormBody = ({
   warehouseSelected,
   items,
   setItems,
+  models,
+  setModels,
   openProducts,
   remarks,
   onRemarksChanged,
@@ -316,6 +462,16 @@ const ProcurementFormBody = ({
                 />
               )}
             </div>
+            {Boolean(models.length) && (
+              <div className="pt-8">
+                <div className="md:flex md:items-center md:justify-between">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Upload Files
+                  </h3>
+                </div>
+                <UploadFileList data={models} setData={setModels} />
+              </div>
+            )}
             <div className="pt-8">
               <div className="md:flex md:items-center md:justify-between">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -368,6 +524,8 @@ export const ProcurementForm = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [lineItems, setLineItems] = useState([]);
+  const [models, setModels] = useState([]);
+  const [files, setFiles] = useState([]);
   const [hqSelected, setHqSelected] = useState(null);
   const [manufacturingSelected, setManufacturingSelected] = useState(null);
   const [warehouseSelected, setWarehouseSelected] = useState(null);
@@ -433,6 +591,17 @@ export const ProcurementForm = () => {
         modelCode,
         product: { ...item },
         requestedQty: 1,
+      }))
+    );
+    const set = Array.from(
+      new Set(lineItems.map((item) => item.modelCode))
+    ).map((prod) => lineItems.find((i) => i.modelCode === prod));
+    setModels(
+      set.map(({ modelCode, name, imageLinks }) => ({
+        modelCode,
+        name,
+        imageLinks,
+        files: [],
       }))
     );
     closeModal();
@@ -516,6 +685,9 @@ export const ProcurementForm = () => {
   const onCancelClicked = () =>
     navigate(!isEditing ? "/sm/procurements" : `/sm/procurements/${orderId}`);
 
+  const onFilesChanged = (e) =>
+    setFiles(files.concat(Array.from(e.target.files)));
+
   const onRemarksChanged = (e) => setRemarks(e.target.value);
 
   useEffect(() => {
@@ -566,12 +738,16 @@ export const ProcurementForm = () => {
         setWarehouseSelected={setWarehouseSelected}
         items={lineItems}
         setItems={setLineItems}
+        models={models}
+        setModels={setModels}
         openProducts={openModal}
         remarks={remarks}
         onRemarksChanged={onRemarksChanged}
         onSaveOrderClicked={onSaveOrderClicked}
         onCancelClicked={onCancelClicked}
         canAdd={canAdd}
+        files={files}
+        onFilesChanged={onFilesChanged}
       />
       <AddProductItemModal
         items={skus}

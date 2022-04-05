@@ -1,15 +1,16 @@
+import { useMemo, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useMemo } from "react";
+import { useReactToPrint } from "react-to-print";
+import moment from "moment";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useOutletContext } from "react-router-dom";
 import { classNames } from "../../../../utilities/Util";
-import moment from "moment";
 import { sitesApi } from "../../../../environments/Api";
-import { useEffect } from "react";
-import { useState } from "react";
 import { eventTypes } from "../../../../constants/eventTypes";
+import { ProductSticker } from "../../Products/ProductPrint";
+import { forwardRef } from "react";
 
-const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
+const ItemsSummary = ({ data, handlePrint }) => {
   const columns = useMemo(() => {
     return [
       {
@@ -20,7 +21,7 @@ const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
         Header: "Name",
         accessor: "product.name",
         Cell: (e) => {
-          return e.row.original.product.imageLinks.length ? (
+          return e.row.original.product.imageLinks?.length ? (
             <a
               href={e.row.original.product.imageLinks[0]}
               className="hover:underline"
@@ -66,17 +67,13 @@ const ItemsSummary = ({ data, status, pathname, onVerifyReceivedClicked }) => {
       <div className="md:flex md:items-center md:justify-between">
         <h3 className="text-lg leading-6 font-medium text-gray-900">Summary</h3>
         <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-          {status === "SHIPPED" && pathname.includes("wh") ? (
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              onClick={onVerifyReceivedClicked}
-            >
-              Verify items
-            </button>
-          ) : (
-            <div></div>
-          )}
+          <button
+            type="button"
+            className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+            onClick={handlePrint}
+          >
+            <span>Print Labels</span>
+          </button>
         </div>
       </div>
       {Boolean(data.length) && (
@@ -160,6 +157,7 @@ const ProcurementDetailsBody = ({
   notes,
   onFulfilClicked,
   onVerifyReceivedClicked,
+  handlePrint,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -180,49 +178,57 @@ const ProcurementDetailsBody = ({
                 <dt className="text-sm font-medium text-gray-500">Status</dt>
                 <dd className="mt-1 text-sm text-gray-900">{status}</dd>
               </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Created by
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  <address className="not-italic">
-                    <span className="block">{headquarters.name}</span>
-                    <span className="block">{headquarters.address.road}</span>
-                    <span className="block">
-                      {headquarters.address.city},{" "}
-                      {headquarters.address.postalCode}
-                    </span>
-                    <span className="block">{headquarters.phoneNumber}</span>
-                  </address>
-                </dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">From</dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  <address className="not-italic">
-                    <span className="block">{manufacturing.name}</span>
-                    <span className="block">{manufacturing.address.road}</span>
-                    <span className="block">
-                      {manufacturing.address.city},{" "}
-                      {manufacturing.address.postalCode}
-                    </span>
-                    <span className="block">{manufacturing.phoneNumber}</span>
-                  </address>
-                </dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">To</dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  <address className="not-italic">
-                    <span className="block">{warehouse.name}</span>
-                    <span className="block">{warehouse.address.road}</span>
-                    <span className="block">
-                      {warehouse.address.city}, {warehouse.address.postalCode}
-                    </span>
-                    <span className="block">{warehouse.phoneNumber}</span>
-                  </address>
-                </dd>
-              </div>
+              {headquarters && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Created by
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    <address className="not-italic">
+                      <span className="block">{headquarters.name}</span>
+                      <span className="block">{headquarters.address.road}</span>
+                      <span className="block">
+                        {headquarters.address.city},{" "}
+                        {headquarters.address.postalCode}
+                      </span>
+                      <span className="block">{headquarters.phoneNumber}</span>
+                    </address>
+                  </dd>
+                </div>
+              )}
+              {manufacturing && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">From</dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    <address className="not-italic">
+                      <span className="block">{manufacturing.name}</span>
+                      <span className="block">
+                        {manufacturing.address.road}
+                      </span>
+                      <span className="block">
+                        {manufacturing.address.city},{" "}
+                        {manufacturing.address.postalCode}
+                      </span>
+                      <span className="block">{manufacturing.phoneNumber}</span>
+                    </address>
+                  </dd>
+                </div>
+              )}
+              {warehouse && (
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">To</dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    <address className="not-italic">
+                      <span className="block">{warehouse.name}</span>
+                      <span className="block">{warehouse.address.road}</span>
+                      <span className="block">
+                        {warehouse.address.city}, {warehouse.address.postalCode}
+                      </span>
+                      <span className="block">{warehouse.phoneNumber}</span>
+                    </address>
+                  </dd>
+                </div>
+              )}
               {notes && (
                 <div className="sm:col-span-2">
                   <dt className="text-sm font-medium text-gray-500">Remarks</dt>
@@ -234,20 +240,34 @@ const ProcurementDetailsBody = ({
         </div>
       </section>
     </div>
-    {history && <ActivitySection history={history} />}
+    {history && Boolean(history.length) && (
+      <ActivitySection history={history} />
+    )}
     <div className="lg:col-start-1 lg:col-span-3">
       <section aria-labelledby="order-summary">
-        <ItemsSummary
-          data={lineItems}
-          status={status}
-          pathname={pathname}
-          onFulfilClicked={onFulfilClicked}
-          onVerifyReceivedClicked={onVerifyReceivedClicked}
-        />
+        <ItemsSummary data={lineItems} handlePrint={handlePrint} />
       </section>
     </div>
   </div>
 );
+
+const ProductStickerPrint = forwardRef(({ products }, ref) => {
+  return (
+    <div ref={ref} className="py-4 overflow-auto">
+      <ul className="grid grid-cols-3 gap-6">
+        {products.map((product, index) =>
+          new Array(parseInt(product.requestedQty))
+            .fill(product)
+            .map((product, index) => (
+              <li key={index} className="ml-3 col-span-1">
+                <ProductSticker product={product.product} />
+              </li>
+            ))
+        )}
+      </ul>
+    </div>
+  );
+});
 
 export const fetchActionBy = async (actionBy) => {
   const { data } = await sitesApi.getSiteSAM(
@@ -262,7 +282,6 @@ export const fetchAllActionBy = async (statusHistory) => {
 };
 export const ProcurementDetails = () => {
   const {
-    procurementId,
     subsys,
     status,
     statusHistory,
@@ -275,6 +294,10 @@ export const ProcurementDetails = () => {
   } = useOutletContext();
   const { pathname } = useLocation();
   const [history, setHistory] = useState([]);
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
 
   useEffect(() => {
     fetchAllActionBy(statusHistory).then((data) => {
@@ -305,18 +328,10 @@ export const ProcurementDetails = () => {
       );
     });
   }, [statusHistory]);
-
   return (
-    [
-      procurementId,
-      headquarters,
-      manufacturing,
-      warehouse,
-      history.length,
-    ].every(Boolean) && (
+    <>
       <ProcurementDetailsBody
         subsys={subsys}
-        procurementId={procurementId}
         status={status.status}
         statusHistory={statusHistory}
         manufacturing={manufacturing}
@@ -327,7 +342,17 @@ export const ProcurementDetails = () => {
         setLineItems={setLineItems}
         pathname={pathname}
         history={history}
+        handlePrint={handlePrint}
       />
-    )
+      <div className="hidden">
+        <ProductStickerPrint
+          ref={componentRef}
+          products={lineItems.map(({ product, requestedQty }) => ({
+            product,
+            requestedQty,
+          }))}
+        />
+      </div>
+    </>
   );
 };

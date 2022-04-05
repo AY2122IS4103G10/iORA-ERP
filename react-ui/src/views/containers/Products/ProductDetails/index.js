@@ -427,51 +427,63 @@ const ProductDetailsBody = ({
                     </div>
                   )}
                 </div>
-                <div className="mt-6 border-t border-b border-gray-200 py-6 space-y-8">
-                  {Boolean(colors.length) && (
-                    <FieldSection fieldName="Colors" fields={colors} />
-                  )}
-                  {Boolean(sizes.length) && (
-                    <FieldSection fieldName="Sizes" fields={sizes} />
-                  )}
-                  {Boolean(categories.length) && (
-                    <FieldSection fieldName="Categories" fields={categories} />
-                  )}
-                  {Boolean(tags.length) && (
-                    <FieldSection fieldName="Tags" fields={tags} />
-                  )}
-                </div>
+                {[
+                  colors.length,
+                  sizes.length,
+                  categories.length,
+                  tags.length,
+                ].some(Boolean) && (
+                  <div className="mt-6 border-t border-gray-200 py-6 space-y-8">
+                    {Boolean(colors.length) && (
+                      <FieldSection fieldName="Colors" fields={colors} />
+                    )}
+                    {Boolean(sizes.length) && (
+                      <FieldSection fieldName="Sizes" fields={sizes} />
+                    )}
+                    {Boolean(categories.length) && (
+                      <FieldSection
+                        fieldName="Categories"
+                        fields={categories}
+                      />
+                    )}
+                    {Boolean(tags.length) && (
+                      <FieldSection fieldName="Tags" fields={tags} />
+                    )}
+                  </div>
+                )}
               </aside>
-              <div className="py-3 xl:pt-6 xl:pb-0">
+              <div className="mt-6 xl:border-none border-t py-3 xl:pt-6 xl:pb-0">
                 <h2 className="sr-only">Description</h2>
                 <div className="prose max-w-none">
                   <p>{description}</p>
                 </div>
               </div>
             </div>
-            <section className="mt-8 pb-8" aria-labelledby="gallery-heading">
-              <h2 id="gallery-heading" className="sr-only">
-                Product Images
-              </h2>
-              <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-                {Boolean(imageLinks.length) && imageLinks.map((file, index) => (
-                  <li key={index} className="relative">
-                    <div
-                      className={classNames(
-                        "focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500",
-                        "group block w-full rounded-lg bg-gray-100 overflow-hidden"
-                      )}
-                    >
-                      <img
-                        src={file}
-                        alt=""
-                        className="object-cover pointer-events-none"
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
+            {Boolean(imageLinks.length) && (
+              <section className="mt-8 pb-8" aria-labelledby="gallery-heading">
+                <h2 id="gallery-heading" className="sr-only">
+                  Product Images
+                </h2>
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+                  {imageLinks.map((file, index) => (
+                    <li key={index} className="relative">
+                      <div
+                        className={classNames(
+                          "focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500",
+                          "group block w-full rounded-lg bg-gray-100 overflow-hidden"
+                        )}
+                      >
+                        <img
+                          src={file}
+                          alt=""
+                          className="object-cover pointer-events-none"
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
             <section aria-labelledby="activity-title" className="mt-8 xl:mt-10">
               <div className="divide-y divide-gray-200">
                 <div className="pb-4 md:flex md:items-center md:justify-between">
@@ -483,10 +495,14 @@ const ProductDetailsBody = ({
                   </h2>
                 </div>
                 <div className="pt-6">
-                  {products.length ? <SKUTable
-                    data={products}
-                    onDeleteSkuClicked={onDeleteSkuClicked}
-                   /> : "No SKUs"}
+                  {products.length ? (
+                    <SKUTable
+                      data={products}
+                      onDeleteSkuClicked={onDeleteSkuClicked}
+                    />
+                  ) : (
+                    "No SKUs"
+                  )}
                 </div>
               </div>
             </section>
@@ -565,7 +581,6 @@ export const ProductDetails = () => {
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
-
   // const [openAddSku, setOpenAddSku] = useState(false);
   // const [skus, setSkus] = useState([]);
   // const [sku, setSku] = useState("");

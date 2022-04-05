@@ -3,9 +3,9 @@ import { ExclamationIcon, XIcon } from '@heroicons/react/outline';
 import { Fragment, useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { useToasts } from "react-toast-notifications";
-import { api } from '../../../../environments/Api';
+import { api } from '../../../environments/Api';
 
-export const ManageMembership = () => {
+export const Membership = () => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [amount, setAmount] = useState(5);
     const handleChange = (e) => {

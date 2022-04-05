@@ -409,4 +409,13 @@ public class OnlineCustomerController {
         return siteService.searchStores(country, "");
     }
 
+    @GetMapping(path = "/customer/vouchers/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> getVouchersOfCustomer(@PathVariable Long customerId) {
+        try {
+            return ResponseEntity.ok(customerService.getVouchersOfCustomer(customerId));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }

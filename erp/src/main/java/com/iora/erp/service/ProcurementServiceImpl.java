@@ -309,12 +309,6 @@ public class ProcurementServiceImpl implements ProcurementService {
         if (procurementOrder.getLastStatus() == ProcurementOrderStatusEnum.PICKING) {
             for (ProcurementOrderLI poli : lineItems) {
                 if (poli.getProduct().equals(product)) {
-                    if (poli.getPickedQty() + qty > poli.getRequestedQty()) {
-                        throw new ProcurementOrderException(
-                                "The quantity of this product has exceeded the requested quantity by "
-                                        + (poli.getPickedQty() + qty - poli.getRequestedQty())
-                                        + " and cannot be picked.");
-                    }
                     poli.setPickedQty(poli.getPickedQty() + qty);
                     boolean picked = true;
                     for (ProcurementOrderLI poli2 : lineItems) {
@@ -370,12 +364,6 @@ public class ProcurementServiceImpl implements ProcurementService {
         if (procurementOrder.getLastStatus() == ProcurementOrderStatusEnum.PICKING) {
             for (ProcurementOrderLI poli : lineItems) {
                 if (poli.getProduct().equals(product)) {
-                    if (qty > poli.getRequestedQty()) {
-                        throw new ProcurementOrderException(
-                                "The quantity of this product has exceeded the requested quantity by "
-                                        + (qty - poli.getRequestedQty())
-                                        + " and cannot be picked.");
-                    }
                     poli.setPickedQty(qty);
                     boolean picked = true;
                     for (ProcurementOrderLI poli2 : lineItems) {
@@ -391,7 +379,7 @@ public class ProcurementServiceImpl implements ProcurementService {
                 }
             }
             throw new ProcurementOrderException(
-                    "The product scanned is not required in the order that you are picking");
+                    "The product is not required in the order that you are picking");
         } else if (procurementOrder.getLastStatus() == ProcurementOrderStatusEnum.PACKING) {
             for (ProcurementOrderLI poli : lineItems) {
                 if (poli.getProduct().equals(product)) {
@@ -414,7 +402,7 @@ public class ProcurementServiceImpl implements ProcurementService {
                 }
             }
             throw new ProcurementOrderException(
-                    "The product scanned is not required in the order that you are picking");
+                    "The product is not required in the order that you are picking");
         } else {
             throw new ProcurementOrderException("The order is not due for picking / packing.");
         }
@@ -466,10 +454,6 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         for (ProcurementOrderLI poli : lineItems) {
             if (poli.getProduct().equals(product)) {
-                if (poli.getReceivedQty() + qty > poli.getPackedQty()) {
-                    throw new ProcurementOrderException(
-                            "Received quantity of this product is more than the shipped quantity.");
-                }
                 poli.setReceivedQty(poli.getReceivedQty() + qty);
 
                 boolean picked = true;
@@ -511,10 +495,6 @@ public class ProcurementServiceImpl implements ProcurementService {
 
         for (ProcurementOrderLI poli : lineItems) {
             if (poli.getProduct().equals(product)) {
-                if (qty > poli.getPackedQty()) {
-                    throw new ProcurementOrderException(
-                            "Received quantity of this product is more than the shipped quantity.");
-                }
                 poli.setReceivedQty(qty);
 
                 boolean picked = true;
@@ -537,7 +517,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
             }
         }
-        throw new ProcurementOrderException("The product scanned is not relevant to the Procurement Order");
+        throw new ProcurementOrderException("The product is not relevant to the Procurement Order");
     }
 
     @Override

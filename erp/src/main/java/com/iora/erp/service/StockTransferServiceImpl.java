@@ -257,14 +257,7 @@ public class StockTransferServiceImpl implements StockTransferService {
         if (stOrder.getLastStatus() == StockTransferStatusEnum.PICKING) {
             for (StockTransferOrderLI stoli : lineItems) {
                 if (stoli.getProduct().equals(product)) {
-                    if (stoli.getPickedQty() + qty > stoli.getRequestedQty()) {
-                        throw new StockTransferException(
-                                "The quantity of this product has exceeded the requested quantity by "
-                                        + (stoli.getPickedQty() + qty - stoli.getRequestedQty())
-                                        + " and cannot be picked.");
-                    }
                     stoli.setPickedQty(stoli.getPickedQty() + qty);
-
                     boolean picked = true;
                     for (StockTransferOrderLI stoli2 : lineItems) {
                         if (stoli2.getPickedQty() < stoli2.getRequestedQty()) {
@@ -319,12 +312,6 @@ public class StockTransferServiceImpl implements StockTransferService {
         if (stOrder.getLastStatus() == StockTransferStatusEnum.PICKING) {
             for (StockTransferOrderLI stoli : lineItems) {
                 if (stoli.getProduct().equals(product)) {
-                    if (qty > stoli.getRequestedQty()) {
-                        throw new StockTransferException(
-                                "The quantity of this product has exceeded the requested quantity by "
-                                        + (qty - stoli.getRequestedQty())
-                                        + " and cannot be picked.");
-                    }
                     stoli.setPickedQty(qty);
 
                     boolean picked = true;
@@ -342,7 +329,7 @@ public class StockTransferServiceImpl implements StockTransferService {
 
                 }
             }
-            throw new StockTransferException("The product scanned is not required in the order that you are picking");
+            throw new StockTransferException("The product is not required in the order that you are picking");
         } else if (stOrder.getLastStatus() == StockTransferStatusEnum.PACKING) {
             for (StockTransferOrderLI stoli : lineItems) {
                 if (stoli.getProduct().equals(product)) {
@@ -364,7 +351,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                     }
                 }
             }
-            throw new StockTransferException("The product scanned is not required in the order that you are packing");
+            throw new StockTransferException("The product is not required in the order that you are packing");
         } else {
             throw new StockTransferException("The order is not due for picking / packing.");
         }
@@ -491,7 +478,7 @@ public class StockTransferServiceImpl implements StockTransferService {
                 return em.merge(stOrder);
             }
         }
-        throw new StockTransferException("The product scanned is not related to the Stock Transfer Order");
+        throw new StockTransferException("The product is not related to the Stock Transfer Order");
     }
 
     @Override

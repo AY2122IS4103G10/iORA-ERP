@@ -211,7 +211,7 @@ public class DataLoader implements CommandLineRunner {
 
 		// Employee
 		Employee e1 = new Employee("Darth Vader", "darthV", "password");
-		e1.setEmail("darth.vader@gmail.com");
+		e1.setEmail("iorasalesmail@gmail.com");
 		e1.setSalary(5678.90);
 		e1.setPayType(PayTypeEnum.MONTHLY);
 		e1.setJobTitle(adminService.getJobTitleById(Long.valueOf(1)));
@@ -221,7 +221,7 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(e1);
 
 		Employee e2 = new Employee("Sharon KS", "sharonE", "password");
-		e2.setEmail("sharonMS.12@gmail.com");
+		e2.setEmail("iorasalesmail@gmail.com");
 		e2.setSalary(4100.0);
 		e2.setPayType(PayTypeEnum.MONTHLY);
 		e2.setJobTitle(adminService.getJobTitleById(Long.valueOf(2)));
@@ -231,7 +231,7 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(e2);
 
 		Employee e3 = new Employee("Manuel Manny", "manu", "password");
-		e3.setEmail("MannyManuel@gmail.com");
+		e3.setEmail("iorasalesmail@gmail.com");
 		e3.setSalary(4300.0);
 		e3.setPayType(PayTypeEnum.MONTHLY);
 		e3.setJobTitle(adminService.getJobTitleById(Long.valueOf(3)));
@@ -241,7 +241,7 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(e3);
 
 		Employee e4 = new Employee("Warren Ho", "warren", "password");
-		e4.setEmail("WarrenHoHoHo@gmail.com");
+		e4.setEmail("iorasalesmail@gmail.com");
 		e4.setSalary(4288.0);
 		e4.setPayType(PayTypeEnum.MONTHLY);
 		e4.setJobTitle(adminService.getJobTitleById(Long.valueOf(4)));
@@ -251,7 +251,7 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(e4);
 
 		Employee e5 = new Employee("Storm", "storm", "password");
-		e5.setEmail("storm@gmail.com");
+		e5.setEmail("iorasalesmail@gmail.com");
 		e5.setSalary(4444.44);
 		e5.setPayType(PayTypeEnum.MONTHLY);
 		e5.setJobTitle(adminService.getJobTitleById(Long.valueOf(5)));
@@ -524,7 +524,7 @@ public class DataLoader implements CommandLineRunner {
 		Customer c7 = new Customer("Steven", "Lim");
 		c7.setContactNumber("91234567");
 		c7.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
-		c7.setEmail("stevenlim@gmail.com");
+		c7.setEmail("iorasalesmail@gmail.com");
 		c7.setPassword("password");
 		customerService.createCustomerAccount(c7);
 

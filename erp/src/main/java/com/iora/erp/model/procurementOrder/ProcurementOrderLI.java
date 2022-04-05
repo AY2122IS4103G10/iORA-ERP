@@ -29,7 +29,7 @@ public class ProcurementOrderLI {
     private int receivedQty;
 
     @ElementCollection
-    private List<String> imageLinks;
+    private List<String> files;
 
     public ProcurementOrderLI() {
         this.requestedQty = 0;
@@ -101,12 +101,12 @@ public class ProcurementOrderLI {
         this.receivedQty = receivedQty;
     }
 
-    public List<String> getImageLinks() {
-        return this.imageLinks;
+    public List<String> getFiles() {
+        return this.files;
     }
 
-    public void setImageLinks(List<String> imageLinks) {
-        this.imageLinks = imageLinks;
+    public void setFiles(List<String> files) {
+        this.files = files;
     }
     
     @Override

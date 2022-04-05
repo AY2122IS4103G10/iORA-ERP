@@ -17,6 +17,12 @@ const Header = ({ subsys }) => {
       href: `/${subsys}/orders`,
       current: true,
     },
+    {
+      id: 3,
+      name: "Picking",
+      href: `/${subsys}/orders/picking`,
+      current: false,
+    },
   ];
   return (
     <div className="bg-white shadow">

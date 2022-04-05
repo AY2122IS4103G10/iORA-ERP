@@ -367,7 +367,10 @@ function App() {
                 <Route path=":orderId" element={<OrderDetails />} />
               </Route>
               <Route path="orderPurchase" element={<PosPurchaseOrder />} />
-              <Route path="addCustomer" element={<CustomerForm subsys="str" />} />
+              <Route
+                path="addCustomer"
+                element={<CustomerForm subsys="str" />}
+              />
             </Route>
 
             <Route path="orders" element={<Outlet />}>
@@ -601,6 +604,15 @@ function App() {
 
               <Route
                 path="search"
+                element={
+                  <ManageOnlineOrders subsys="wh">
+                    <OnlineOrderSearch subsys="wh" />
+                  </ManageOnlineOrders>
+                }
+              />
+
+              <Route
+                path="picking"
                 element={
                   <ManageOnlineOrders subsys="wh">
                     <OnlineOrderSearch subsys="wh" />

@@ -12,7 +12,7 @@ import {
 import moment from "moment";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { XIcon } from "@heroicons/react/outline";
+import { PaperClipIcon, XIcon } from "@heroicons/react/outline";
 import { useState } from "react";
 
 const SupportTicketModal = ({ open, setOpen, closeNewTicketModal }) => {
@@ -120,8 +120,54 @@ const SupportTicketModal = ({ open, setOpen, closeNewTicketModal }) => {
 
                               <div className="col-span-3">
                                 <label className="block text-sm font-medium text-gray-700">
-                                  Cover photo
+                                  Attachments
                                 </label>
+                                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                  {/* <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+                    {e.value.map((file, index) => {
+                      const idx = index;
+                      return (
+                        <li
+                          key={index}
+                          className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+                        >
+                          <div className="w-0 flex-1 flex items-center">
+                            <PaperClipIcon
+                              className="flex-shrink-0 h-5 w-5 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            <span className="ml-2 flex-1 w-0 truncate">
+                              {file.name ? file.name : file}
+                            </span>
+                          </div>
+                          <div className="ml-4 flex-shrink-0 flex space-x-4">
+                            <button
+                              type="button"
+                              className="bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                              onClick={() => {
+                                setData((old) =>
+                                  old.map((row, index) => {
+                                    if (index === e.row.index) {
+                                      return {
+                                        ...old[e.row.index],
+                                        files: e.value.filter(
+                                          (_, index) => index !== idx
+                                        ),
+                                      };
+                                    }
+                                    return row;
+                                  })
+                                );
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul> */}
+                                </div>
                                 <div className="mt-1 border-2 border-gray-300 border-dashed rounded-md px-6 pt-5 pb-6 flex justify-center">
                                   <div className="space-y-1 text-center">
                                     <svg

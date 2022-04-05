@@ -57,8 +57,8 @@ const ItemsSummary = ({ data, handlePrint }) => {
         accessor: "packedQty",
       },
       {
-        Header: "Rec",
-        accessor: "receivedQty",
+        Header: "Cost",
+        accessor: "costPrice",
       },
     ];
   }, []);

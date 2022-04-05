@@ -472,6 +472,11 @@ export const posApi = {
       exchangeLI
     );
   },
+  searchSku(sku) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/customerOrder/product?sku=${sku}`
+    );
+  },
 };
 
 export const logisticsApi = {
@@ -519,7 +524,7 @@ export const dashboardApi = {
       `${REST_ENDPOINT}sam/dashboard/customerOrders/${siteId}?date=${date}`
     );
   },
-  geProcurementOrdersOfSite(siteId, date = "") {
+  getProcurementOrdersOfSite(siteId, date = "") {
     return axiosPrivate.get(
       `${REST_ENDPOINT}sam/dashboard/procurementOrders/${siteId}?date=${date}`
     );

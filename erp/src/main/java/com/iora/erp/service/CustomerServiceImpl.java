@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -222,19 +223,24 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Voucher> generateVouchers(double amount, int qty, String date) {
+    public List<Voucher> generateVouchers(Voucher voucher, int qty) throws CustomerException {
         List<Voucher> vouchers = new ArrayList<>();
 
-        IntStream.range(0, qty)
-                .forEach(i -> {
-                    try {
-                        Voucher voucher1 = new Voucher(amount, new SimpleDateFormat("yyyy-MM-dd").parse(date));
-                        em.persist(voucher1);
-                        vouchers.add(voucher1);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                });
+        String campaign = voucher.getCampaign();
+        double amount = voucher.getAmount();
+        Date expDate = voucher.getExpiry();
+        List<Long> customerIds = voucher.getCustomerIds();
+        qty = qty < customerIds.size() ? customerIds.size() : qty;
+
+        for (int i = 0; i < qty; i++) {
+            Voucher v = new Voucher(campaign, amount, expDate, customerIds);
+            em.persist(v);
+            if (i < customerIds.size()) {
+                issueVoucher(v.getVoucherCode(), customerIds.get(i));
+            }
+            vouchers.add(v);
+        }
+
         return vouchers;
     }
 
@@ -295,7 +301,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, 2);
-        Voucher v = new Voucher(amount, cal.getTime());
+        Voucher v = new Voucher("Redemption", amount, cal.getTime());
         em.persist(v);
 
         issueVoucher(v.getVoucherCode(), customer.getId());

@@ -32,48 +32,51 @@ export default function SharedStats({ stats }) {
                     prefix={prefix}
                     suffix={suffix}
                   />
-                  <span className="ml-2 text-sm font-medium text-gray-500">
-                    from{" "}
+                  {previousStat !==undefined && (
+                    <span className="ml-2 text-sm font-medium text-gray-500">
+                      from{" "}
+                      <CountUp
+                        end={previousStat}
+                        duration={1}
+                        decimals={decimals}
+                        prefix={prefix}
+                        suffix={suffix}
+                      />
+                    </span>
+                  )}
+                </div>
+                {change && (
+                  <div
+                    className={classNames(
+                      changeType === "increase"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800",
+                      "inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium md:mt-2 lg:mt-0"
+                    )}
+                  >
+                    {changeType === "increase" ? (
+                      <ArrowSmUpIcon
+                        className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-green-500"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <ArrowSmDownIcon
+                        className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-red-500"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span className="sr-only">
+                      {changeType === "increase" ? "Increased" : "Decreased"} by
+                    </span>
                     <CountUp
-                      end={previousStat}
+                      start={0.0}
+                      end={change}
                       duration={1}
-                      decimals={decimals}
-                      prefix={prefix}
-                      suffix={suffix}
+                      decimals={2}
+                      suffix="%"
                     />
-                  </span>
-                </div>
-
-                <div
-                  className={classNames(
-                    changeType === "increase"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800",
-                    "inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium md:mt-2 lg:mt-0"
-                  )}
-                >
-                  {changeType === "increase" ? (
-                    <ArrowSmUpIcon
-                      className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-green-500"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <ArrowSmDownIcon
-                      className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-red-500"
-                      aria-hidden="true"
-                    />
-                  )}
-                  <span className="sr-only">
-                    {changeType === "increase" ? "Increased" : "Decreased"} by
-                  </span>
-                  <CountUp
-                    start={0.0}
-                    end={change}
-                    duration={1}
-                    decimals={2}
-                    suffix="%"
-                  />
-                </div>
+                  </div>
+                )}
               </dd>
             </div>
           )

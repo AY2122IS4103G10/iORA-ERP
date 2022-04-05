@@ -1,18 +1,19 @@
-import { Routes, Route } from "react-router-dom";
-import { Login } from "./views/containers/Auth/Login";
-import { Profile } from "./views/containers/Auth/Settings/Profile";
-import { Register } from "./views/containers/Auth/Register";
-import { Cart } from "./views/containers/Cart";
-import { ECIndex } from "./views/containers/Index/ECIndex";
-import { SettingsIndex } from "./views/containers/Index/SettingsIndex";
-import { Account } from "./views/containers/Auth/Settings/Account";
+import { Route, Routes } from "react-router-dom";
 import { Auth } from "./views/containers/Auth/Auth";
-import { HomeIndex } from "./views/containers/Index/HomeIndex";
-import { Listings } from "./views/containers/Listings";
-import ViewModel from "./views/containers/ViewModel";
-import { ManageCheckout } from "./views/containers/Checkout/ManageCheckout";
-import { ManageMembership } from "./views/containers/Membership/ManageMembership";
+import { Login } from "./views/containers/Auth/Login";
+import { Register } from "./views/containers/Auth/Register";
+import { Account } from "./views/containers/Auth/Settings/Account";
+import { Profile } from "./views/containers/Auth/Settings/Profile";
+import { Cart } from "./views/containers/Cart";
 import { CheckoutSuccessful } from "./views/containers/Checkout/CheckoutSuccessful";
+import { ManageCheckout } from "./views/containers/Checkout/ManageCheckout";
+import { ECIndex } from "./views/containers/Index/ECIndex";
+import { HomeIndex } from "./views/containers/Index/HomeIndex";
+import { SettingsIndex } from "./views/containers/Index/SettingsIndex";
+import { Listings } from "./views/containers/Listings";
+import { Membership } from "./views/containers/Membership";
+import { SupportList } from "./views/containers/Support/SupportList";
+import ViewModel from "./views/containers/ViewModel";
 
 function App() {
   return (
@@ -39,9 +40,11 @@ function App() {
 
           <Route path="cart" element={<Cart />} />
           <Route path="cart/checkout" element={<ManageCheckout />} />
-          <Route path="checkout/success/:id" element={<CheckoutSuccessful/>}/>
+          <Route path="checkout/success/:id" element={<CheckoutSuccessful />} />
 
-          <Route path="membership" element={<ManageMembership />} />
+          <Route path="membership" element={<Membership />} />
+
+          <Route path="support" element={<SupportList />} />
 
           <Route path="settings" element={<SettingsIndex />}>
             <Route path="profile" element={<Profile />} />

@@ -119,3 +119,9 @@ export const purchasesApi = {
     )
   }
 }
+
+export const ticketApi = {
+  resolveTicket(ticketId) {
+    return axiosPrivate.put(`${REST_ENDPOINT}sam/ticket/resolve/${ticketId}`);
+  }
+}

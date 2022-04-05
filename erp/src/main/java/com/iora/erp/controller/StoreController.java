@@ -10,6 +10,7 @@ import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.RefundLI;
+import com.iora.erp.model.product.Product;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.model.site.StockLevelLI;
@@ -334,6 +335,11 @@ public class StoreController {
     @GetMapping(path = "/onlineOrder/pickup/{siteId}", produces = "application/json")
     public List<OnlineOrder> getPickupOrdersOfSite(@PathVariable Long siteId) {
         return customerOrderService.getPickupOrdersBySite(siteId);
+    }
+
+    @GetMapping(path = "/customerOrder/product", produces = "application/json")
+    public List<Product> searchProductsBySKU(@RequestParam String sku) {
+        return productService.searchProductsBySKU(sku);
     }
 
     @PostMapping(path = "/customerOrder/add/{rfidsku}", consumes = "application/json", produces = "application/json")

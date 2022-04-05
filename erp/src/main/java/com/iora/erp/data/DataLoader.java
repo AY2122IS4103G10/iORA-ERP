@@ -28,6 +28,7 @@ import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
+import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
@@ -527,11 +528,13 @@ public class DataLoader implements CommandLineRunner {
 		c7.setPassword("password");
 		customerService.createCustomerAccount(c7);
 
+		Voucher voucher1 = new Voucher("dataLoader", 10, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"));
 		// Generate 10 $10 vouchers
-		customerService.generateVouchers(10, 10, "2024-02-16");
+		customerService.generateVouchers(voucher1, 10);
 
+		Voucher voucher2 = new Voucher("dataLoader", 5, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"));
 		// Generate 10 $5 vouchers
-		customerService.generateVouchers(5, 10, "2024-02-16");
+		customerService.generateVouchers(voucher2, 10);
 
 		// Adding Promotions
 		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5),

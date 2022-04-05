@@ -5,13 +5,15 @@ const initialState = {
   stockLevelSites: [],
   stockLevelProducts: [],
   customerOrdersByDate: [],
+  customerOrdersByDatePrev: [],
   storeOrdersByDate: [],
+  storeOrdersByDatePrev: [],
   onlineOrdersByDate: [],
-  customerOrders: {},
-  storeOrders: {},
-  onlineOrders: {},
-  procurementOrders: {},
-  stockTransferOrders: {},
+  onlineOrdersByDatePrev: [],
+  customerOrders: [],
+  procurementOrders: [],
+  stockTransferOrders: [],
+  siteId: -1,
   status: "idle",
   error: null,
 };
@@ -19,6 +21,11 @@ const initialState = {
 const dashboardSlice = createSlice({
   name: "customers",
   initialState,
+  reducers: {
+    setSiteId(state, action) {
+      state.siteId = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder.addCase(getStockLevelSites.pending, (state, action) => {
       state.status = "loading";
@@ -36,6 +43,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getCustomerOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
+      state.customerOrdersByDatePrev = state.customerOrdersByDate;
       state.customerOrdersByDate = action.payload;
     });
     builder.addCase(getCustomerOrders.rejected, (state, action) => {
@@ -47,6 +55,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getStoreOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
+      state.storeOrdersByDatePrev = state.storeOrdersByDate;
       state.storeOrdersByDate = action.payload;
     });
     builder.addCase(getStoreOrders.rejected, (state, action) => {
@@ -58,6 +67,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getOnlineOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
+      state.onlineOrdersByDatePrev = state.onlineOrdersByDate;
       state.onlineOrdersByDate = action.payload;
     });
     builder.addCase(getOnlineOrders.rejected, (state, action) => {
@@ -70,8 +80,13 @@ const dashboardSlice = createSlice({
     builder.addCase(getCustomerOrdersOfSite.fulfilled, (state, action) => {
       state.status = "succeeded";
       const { payload } = action;
-      // TODO: Something here
-      state.customerOrders = { ...state.customerOrders};
+      if (payload.length > 0) {
+        const toUpdate = state.customerOrders.find(
+          (x) => x.id === state.siteId
+        );
+        if (toUpdate) toUpdate.orders = payload;
+        else state.customerOrders.push({ id: state.siteId, orders: payload });
+      }
     });
     builder.addCase(getCustomerOrdersOfSite.rejected, (state, action) => {
       state.status = "failed";
@@ -83,8 +98,14 @@ const dashboardSlice = createSlice({
     builder.addCase(getProcurementOrdersOfSite.fulfilled, (state, action) => {
       state.status = "succeeded";
       const { payload } = action;
-      // TODO: Something here
-      state.procurementOrders = { ...state.procurementOrders};
+      if (payload.length > 0) {
+        const toUpdate = state.procurementOrders.find(
+          (x) => x.id === state.siteId
+        );
+        if (toUpdate) toUpdate.orders = payload;
+        else
+          state.procurementOrders.push({ id: state.siteId, orders: payload });
+      }
     });
     builder.addCase(getProcurementOrdersOfSite.rejected, (state, action) => {
       state.status = "failed";
@@ -96,15 +117,23 @@ const dashboardSlice = createSlice({
     builder.addCase(getStockTransferOrdersOfSite.fulfilled, (state, action) => {
       state.status = "succeeded";
       const { payload } = action;
-      // TODO: Something here
-      state.stockTransferOrders = { ...state.stockTransferOrders};
+      if (payload.length > 0) {
+        const toUpdate = state.stockTransferOrders.find(
+          (x) => x.id === state.siteId
+        );
+        if (toUpdate) toUpdate.orders = payload;
+        else
+          state.stockTransferOrders.push({ id: state.siteId, orders: payload });
+      }
     });
     builder.addCase(getStockTransferOrdersOfSite.rejected, (state, action) => {
       state.status = "failed";
-      state.error = action.error.messagStore
+      state.error = action.error.messagStore;
     });
   },
 });
+
+export const { setSiteId } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;
 
@@ -150,22 +179,6 @@ export const getCustomerOrdersOfSite = createAsyncThunk(
       siteId,
       (date = "")
     );
-    return response.data;
-  }
-);
-
-export const getStoreOrdersOfSite = createAsyncThunk(
-  "dashboard/getStoreOrdersOfSite",
-  async ({ siteId, date = "" }) => {
-    const response = await dashboardApi.getStoreOrdersOfSite(siteId, date);
-    return response.data;
-  }
-);
-
-export const getOnlineOrdersOfSite = createAsyncThunk(
-  "dashboard/getOnlineOrdersOfSite",
-  async ({ siteId, date = "" }) => {
-    const response = await dashboardApi.getOnlineOrdersOfSite(siteId, date);
     return response.data;
   }
 );

@@ -1,16 +1,17 @@
-import { Fragment, useState } from "react";
-import { selectCartQty } from "../../../stores/slices/cartSlice";
+import { Dialog, Menu, Popover, Tab, Transition } from "@headlessui/react";
 import {
   MenuIcon,
   SearchIcon,
   ShoppingBagIcon,
+  SupportIcon,
   UserIcon,
-  XIcon as XIconOutline,
+  XIcon as XIconOutline
 } from "@heroicons/react/outline";
-import { Transition, Popover, Dialog, Tab, Menu } from "@headlessui/react";
-import { classNames } from "../../../../../ecommerce/src/utilities/Util";
-import { Link } from "react-router-dom";
+import { Fragment, useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { classNames } from "../../../../../ecommerce/src/utilities/Util";
+import { selectCartQty } from "../../../stores/slices/cartSlice";
 
 const ProfileDropdown = ({ handleLogout }) => {
   return (
@@ -46,15 +47,15 @@ const ProfileDropdown = ({ handleLogout }) => {
           </Menu.Item>
           <Menu.Item>
             {({ active }) => (
-              <a
-                href="/membership"
+              <Link
+                to="/membership"
                 className={classNames(
                   active ? "bg-gray-100" : "",
                   "block px-4 py-2 text-sm text-gray-700"
                 )}
               >
                 Membership
-              </a>
+              </Link>
             )}
           </Menu.Item>
           <Menu.Item>
@@ -339,7 +340,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
               </div> */}
 
               {/* Search */}
-              <div className="flex lg:ml-6">
+              <div className="ml-4 flow-root lg:ml-6">
                 <a href="/" className="p-2 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">Search</span>
                   <SearchIcon className="w-6 h-6" aria-hidden="true" />
@@ -347,7 +348,13 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
               </div>
               {/* Account */}
               {loggedIn && <ProfileDropdown handleLogout={handleLogout} />}
-
+              {/* Support */}
+              <div className="ml-4 flow-root lg:ml-6">
+                <Link to="/support" className="p-2 text-gray-400 hover:text-gray-500">
+                  <span className="sr-only">Support</span>
+                  <SupportIcon className="w-6 h-6" aria-hidden="true" />
+                </Link>
+              </div>
               {/* Cart */}
               <div className="ml-4 flow-root lg:ml-6">
                 <Link to="cart" className="group -m-2 p-2 flex items-center">

@@ -9,6 +9,7 @@ import {
   DeviceTabletIcon,
   ExclamationIcon,
   InformationCircleIcon,
+  SearchIcon,
 } from "@heroicons/react/solid";
 import { loadStripeTerminal } from "@stripe/terminal-js";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ import { orderApi, posApi } from "../../../../environments/Api";
 import { getCustomerByPhone } from "../../../../stores/slices/customerSlice";
 import { getVoucherByCode } from "../../../../stores/slices/posSlice";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 
 const paymentTypes = [
   {
@@ -68,6 +70,13 @@ export const CheckoutForm = ({
   const [mode, setMode] = useState(0);
   const [customerId, setCustomerId] = useState(null);
   const [customerName, setCustomerName] = useState("");
+  const [customer, setCustomer] = useState({});
+  const [voucherCodes, setVoucherCodes] = useState([]);
+  const [selectedVoucherCode, setSelectedVoucherCode] = useState({
+    id: 0,
+    name: "Choose One",
+  });
+  const [progress, setProgress] = useState({ current: 0.0, next: 200.0 });
   const [phone, setPhone] = useState("");
   const [voucherCode, setVoucherCode] = useState("");
   const [voucher, setVoucher] = useState(null);
@@ -96,7 +105,7 @@ export const CheckoutForm = ({
           payments: [
             {
               amount: Math.max(amount - voucherDiscount, 0),
-              paymentType: paymentTypes[mode-1]?.name.toUpperCase(),
+              paymentType: paymentTypes[mode - 1]?.name.toUpperCase(),
               ccTransactionId: paymentIntentId,
             },
           ],
@@ -118,7 +127,10 @@ export const CheckoutForm = ({
   };
 
   const getCustomerId = async () => {
+    if (customer.contactNumber === phone) return;
     if (phone === "") {
+      setCustomerId(null);
+      setCustomer({});
       addToast(`Info: You did not key in a phone number`, {
         appearance: "info",
         autoDismiss: true,
@@ -127,12 +139,15 @@ export const CheckoutForm = ({
       const data = await dispatch(getCustomerByPhone(phone)).unwrap();
       if (data.length === 0) {
         setCustomerId(null);
+        setCustomer({});
         addToast(`Error: No Customer found`, {
           appearance: "error",
           autoDismiss: true,
         });
       } else {
         setCustomerId(data[0]?.id);
+        setCustomer(data[0]);
+        console.log(data[0]);
         setCustomerName(data[0]?.firstName + " " + data[0]?.lastName);
         addToast(
           `Success: Customer ${data[0]?.firstName} ${data[0]?.lastName} was found`,
@@ -173,6 +188,10 @@ export const CheckoutForm = ({
     }
   };
 
+  useEffect(() => {
+    selectedVoucherCode.id !== 0 && setVoucherCode(selectedVoucherCode.name);
+  }, [selectedVoucherCode]);
+
   const handleConfirm = () => {
     getCustomerId();
     getVoucherDetails();
@@ -181,7 +200,7 @@ export const CheckoutForm = ({
 
   return (
     <SimpleModal open={open} closeModal={closeModalComplex}>
-      <div className="inline-block align-top my-32 bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:w-fit sm:max-w-4xl sm:p-6">
+      <div className="inline-block align-top my-20 bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:w-fit sm:max-w-4xl sm:p-6">
         <div className="flex justify-between">
           <Dialog.Title
             as="h3"
@@ -213,10 +232,88 @@ export const CheckoutForm = ({
                   <div className="ml-3 flex-1 md:flex md:justify-between">
                     <p className="text-sm text-blue-700">
                       Please enter the customer's phone number if they are a
-                      iORA member, and the voucher code if they are using one.
+                      iORA member to retrieve their details, and apply the
+                      voucher code if they are using one.
                     </p>
                   </div>
                 </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Phone Number
+                </label>
+                <div className="mt-1 flex rounded-md shadow-sm">
+                  <div className="relative flex items-stretch flex-grow focus-within:z-10">
+                    <input
+                      type="text"
+                      name="phone"
+                      id="phone"
+                      value={phone}
+                      placeholder="91234567"
+                      onChange={(e) => setPhone(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && getCustomerId()}
+                      className="focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-none rounded-l-md pl-3 text-md border-gray-300"
+                      aria-describedby="price-currency"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-r-md text-gray-50 bg-cyan-600 hover:bg-gray-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
+                    onClick={getCustomerId}
+                  >
+                    <SearchIcon
+                      className="h-5 w-5 text-gray-50"
+                      aria-hidden="true"
+                    />
+                    <span>Find</span>
+                  </button>
+                </div>
+                {customerName === "" ? (
+                  <h3 className="mt-1 block text-md text-gray-700">
+                    Customer is not a member
+                  </h3>
+                ) : (
+                  <div className="bg-white shadow sm:rounded-md my-3 p-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6">
+                    <h3 className="block text-md font-medium text-gray-700 col-span-1 sm:col-span-2">
+                      {customerName}
+                    </h3>
+                    <p className="flex text-sm text-gray-700 pr-10">
+                      <span className="flex grow">Mem. Points:</span>
+                      {customer?.membershipPoints}
+                    </p>
+                    <p className="flex text-sm text-gray-700 pr-10">
+                      <span className="flex grow">Mem. Tier:</span>
+                      {customer?.membershipTier.name}
+                    </p>
+                    <p className="flex text-sm text-gray-700 pr-10">
+                      <span className="flex grow">No. of Orders:</span>
+                      {customer?.customerOrders?.length}
+                    </p>
+                    {customer?.customerOrders?.length > 0 && (
+                      <p className="flex text-sm text-gray-700 pr-10">
+                        <span className="flex grow">Avg Spend:</span> $
+                        {Number.parseFloat(
+                          customer?.customerOrders.reduce(
+                            (sum, order) => sum + order.totalAmount,
+                            0
+                          ) / customer?.customerOrders?.length
+                        ).toFixed(2)}
+                      </p>
+                    )}
+                    <div className="col-span-1 sm:col-span-2">
+                      <SimpleSelectMenu
+                        label="Customer's Available Vouchers"
+                        options={voucherCodes}
+                        selected={selectedVoucherCode}
+                        setSelected={setSelectedVoucherCode}
+                        disabled={voucherCodes.length === 0}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               <div>
                 <label
@@ -245,35 +342,6 @@ export const CheckoutForm = ({
                   {voucherDiscount === 0
                     ? "No voucher used"
                     : `Voucher used has $${voucherDiscount} value`}
-                </p>
-              </div>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Phone Number
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    name="phone"
-                    id="phone"
-                    value={phone}
-                    placeholder="91234567"
-                    onChange={(e) => setPhone(e.target.value)}
-                    onBlur={getCustomerId}
-                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-3 sm:text-lg border-gray-300 rounded-md"
-                    aria-describedby="price-currency"
-                  />
-                </div>
-                <p
-                  className="mt-2 text-sm text-gray-500"
-                  id="email-description"
-                >
-                  {customerName === ""
-                    ? "Customer is not a member"
-                    : `Customer is ${customerName}`}
                 </p>
               </div>
               <div className="mt-3 flex flex-row-reverse space-x-4 space-x-reverse justify-center">

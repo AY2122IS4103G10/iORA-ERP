@@ -482,6 +482,11 @@ export const posApi = {
       `${REST_ENDPOINT}store/member/vouchers/${customerId}`
     );
   },
+  getCurrentSpending(customerId) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/member/spending/${customerId}`
+    );
+  },
 };
 
 export const logisticsApi = {

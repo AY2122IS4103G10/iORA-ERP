@@ -11,13 +11,18 @@ import {
   InformationCircleIcon,
   SearchIcon,
 } from "@heroicons/react/solid";
+import ProgressBar from "@ramonak/react-progress-bar";
 import { loadStripeTerminal } from "@stripe/terminal-js";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { orderApi, posApi } from "../../../../environments/Api";
 import { getCustomerByPhone } from "../../../../stores/slices/customerSlice";
+import {
+  fetchMembershipTiers,
+  selectAllMembershipTiers,
+} from "../../../../stores/slices/membershipTierSlice";
 import { getVoucherByCode } from "../../../../stores/slices/posSlice";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
@@ -77,7 +82,11 @@ export const CheckoutForm = ({
     id: 0,
     name: "Choose One",
   });
-  const [progress, setProgress] = useState({ current: 0.0, next: 200.0 });
+  const [progress, setProgress] = useState({
+    current: 0.0,
+    next: 200.0,
+    tier: "N.A.",
+  });
   const [phone, setPhone] = useState("");
   const [voucherCode, setVoucherCode] = useState("");
   const [voucher, setVoucher] = useState(null);
@@ -85,6 +94,13 @@ export const CheckoutForm = ({
   const [showChoice, setShowChoice] = useState(false);
   const { addToast } = useToasts();
   const dispatch = useDispatch();
+  const membershipTiers = useSelector((state) =>
+    selectAllMembershipTiers(state)
+  );
+
+  useEffect(() => {
+    dispatch(fetchMembershipTiers());
+  }, [dispatch]);
 
   const closeModalComplex = () => {
     closeModal();
@@ -145,43 +161,48 @@ export const CheckoutForm = ({
         appearance: "info",
         autoDismiss: true,
       });
-    } else {
-      const data = await dispatch(getCustomerByPhone(phone)).unwrap();
-      if (data.length === 0) {
-        setCustomerId(null);
-        setCustomer({});
-        addToast(`Error: No Customer found`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      } else {
-        const res = await posApi.getVoucherCodes(data[0]?.id);
-        setVoucherCodes([
-          { id: 0, name: "Choose One" },
-          ...res.data.map((voucher, index) => {
-            return {
-              id: index + 1,
-              name: `${voucher.campaign}: $${
-                voucher.amount
-              } voucher (expiring ${moment(voucher.expiry).format(
-                "DD/MM/yyyy"
-              )})`,
-              ...voucher,
-            };
-          }),
-        ]);
-        setCustomerId(data[0]?.id);
-        setCustomer(data[0]);
-        setCustomerName(data[0]?.firstName + " " + data[0]?.lastName);
-        addToast(
-          `Success: Customer ${data[0]?.firstName} ${data[0]?.lastName} was found`,
-          {
-            appearance: "success",
-            autoDismiss: true,
-          }
-        );
-      }
+      return;
     }
+    const data = await dispatch(getCustomerByPhone(phone)).unwrap();
+    if (data.length === 0) {
+      setCustomerId(null);
+      setCustomer({});
+      addToast(`Error: No Customer found`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+      return;
+    }
+    const res = await posApi.getVoucherCodes(data[0]?.id);
+    setVoucherCodes([
+      { id: 0, name: "Choose One" },
+      ...res.data.map((voucher, index) => {
+        return {
+          id: index + 1,
+          name: `${voucher.campaign}: $${
+            voucher.amount
+          } voucher (expiring ${moment(voucher.expiry).format("DD/MM/yyyy")})`,
+          ...voucher,
+        };
+      }),
+    ]);
+    setCustomerId(data[0]?.id);
+    setCustomer(data[0]);
+    setCustomerName(data[0]?.firstName + " " + data[0]?.lastName);
+    const { data: spend } = await posApi.getCurrentSpending(data[0]?.id);
+    const nextTier = membershipTiers.find((tier) => tier.minSpend > spend);
+    setProgress({
+      current: spend,
+      next: nextTier.minSpend,
+      tier: nextTier.name,
+    });
+    addToast(
+      `Success: Customer ${data[0]?.firstName} ${data[0]?.lastName} was found`,
+      {
+        appearance: "success",
+        autoDismiss: true,
+      }
+    );
   };
 
   const getVoucherDetails = async () => {
@@ -304,9 +325,9 @@ export const CheckoutForm = ({
                     Customer is not a member
                   </h3>
                 ) : (
-                  <div className="bg-white shadow sm:rounded-md my-3 p-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6">
+                  <div className="bg-white border border-gray-300 sm:rounded-md my-3 p-6 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6">
                     <h3 className="block text-md font-medium text-gray-700 col-span-1 sm:col-span-2">
-                      {customerName}
+                      {customerName} (Contact: {customer?.contactNumber})
                     </h3>
                     <p className="flex text-sm text-gray-700 pr-10">
                       <span className="flex grow">Mem. Points:</span>
@@ -331,6 +352,14 @@ export const CheckoutForm = ({
                         ).toFixed(2)}
                       </p>
                     )}
+                    <div className="block text-md font-medium text-gray-700 col-span-1 sm:col-span-2 mt-2">
+                      <ProgressBar
+                        bgColor="#0891b2"
+                        completed={`${progress.current + 150}`}
+                        maxCompleted={progress.next + 150}
+                        customLabel={`$${progress.next - progress.current} more to ${progress.tier}`}
+                      />
+                    </div>
                     <div className="col-span-1 sm:col-span-2">
                       <SimpleSelectMenu
                         label="Customer's Available Vouchers"
@@ -356,7 +385,7 @@ export const CheckoutForm = ({
                     name="voucher"
                     id="voucher"
                     value={voucherCode}
-                    placeholder="XXXXXXXX"
+                    placeholder="XXXXXXXXXX"
                     onChange={(e) => setVoucherCode(e.target.value)}
                     onBlur={getVoucherDetails}
                     className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-3 pr-3 sm:text-lg border-gray-300 rounded-md"

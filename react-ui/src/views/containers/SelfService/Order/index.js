@@ -1,13 +1,26 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
 import { MinusSmIcon, PlusSmIcon, XCircleIcon } from "@heroicons/react/solid";
+import ProgressBar from "@ramonak/react-progress-bar";
 import { Fragment, useEffect, useState } from "react";
 import { TailSpin } from "react-loader-spinner";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api, orderApi, posApi } from "../../../../environments/Api";
+import {
+  removeSSCustomer,
+  selectSSCustomer,
+} from "../../../../stores/slices/customerSlice";
+import {
+  fetchMembershipTiers,
+  selectAllMembershipTiers,
+} from "../../../../stores/slices/membershipTierSlice";
 import ManageCheckout from "../ManageCheckout";
 
 const OrderList = ({
+  customer,
+  currTier,
+  nextTier,
   lineItems,
   promotions,
   productDetails,
@@ -299,23 +312,42 @@ const OrderList = ({
         </div>
         {/* Order summary */}
         <section aria-labelledby="summary-heading" className="mt-10">
-          <div className="mt-12 grid grid-cols-2 gap-x-12">
+          <div className="grid grid-cols-2 gap-x-12">
+            {currTier && nextTier && (
+              <>
+                <div className="col-span-2 my-3">
+                  <p className="block text-md text-gray-700 my-4">
+                    Upgrade from a {currTier.name} member to a {nextTier.name}{" "}
+                    member simply by spending ${nextTier.minSpend}!
+                  </p>
+                  <ProgressBar
+                    animateOnRender
+                    initCompletedOnAnimation={`${customer.currSpend + 75}`}
+                    bgColor="#4f46e5"
+                    completed={`${customer.currSpend + 150}`}
+                    maxCompleted={nextTier.minSpend + 150}
+                    customLabel={`$${
+                      nextTier.minSpend - customer.currSpend
+                    } more to ${nextTier.name}`}
+                  />
+                </div>
+              </>
+            )}
             <label
               htmlFor="rfid"
               className="block text-lg font-medium mb-2 text-gray-700 col-span-2"
             >
               Thank you for shopping with us
-              {localStorage.getItem("customer") === null
-                ? ""
-                : `, ${JSON.parse(localStorage.customer).firstName} ${
-                    JSON.parse(localStorage.customer).lastName
-                  }`}! How would you like to checkout?
+              {customer ? `, ${customer?.firstName} ${customer?.lastName}` : ""}
+              ! How would you like to checkout?
             </label>
             <button
               type="button"
               className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
               onClick={
-                amount > 0 ? () => openCheckoutModal(false) : handleZeroDollarCheckout
+                amount > 0
+                  ? () => openCheckoutModal(false)
+                  : handleZeroDollarCheckout
               }
               disabled={lineItems.length === 0}
             >
@@ -325,17 +357,19 @@ const OrderList = ({
               type="button"
               className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
               onClick={
-                amount > 0 ? () => openCheckoutModal(true) : handleZeroDollarCheckout
+                amount > 0
+                  ? () => openCheckoutModal(true)
+                  : handleZeroDollarCheckout
               }
               disabled={lineItems.length === 0}
             >
               Card Reader
             </button>
             {isLoading ? (
-          <div className="flex mt-5 items-center justify-center">
-            <TailSpin color="#00BFFF" height={20} width={20} />
-          </div>
-        ) : (
+              <div className="flex mt-5 items-center justify-center">
+                <TailSpin color="#00BFFF" height={20} width={20} />
+              </div>
+            ) : (
               <button
                 type="button"
                 className="col-span-2 mt-3 bg-red-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
@@ -471,7 +505,23 @@ export function Order() {
   const [order, setOrder] = useState({});
   const [useReader, setUseReader] = useState(true);
   const siteId = localStorage?.getItem("siteId");
+  const customer = useSelector((state) => selectSSCustomer(state));
+  const membershipTiers = useSelector((state) =>
+    selectAllMembershipTiers(state)
+  );
+  const nextTier =
+    customer &&
+    (membershipTiers.find((tier) => tier.minSpend > customer.currSpend) || {
+      name: "DIAMOND",
+      minSpend: customer.currSpend,
+    });
+  const currTier =
+    customer &&
+    membershipTiers
+      .filter((tier) => tier.minSpend <= customer.currSpend)
+      .slice(-1)[0];
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const renderSummary =
     new URLSearchParams(useLocation()?.search).get("redirect_status") ===
@@ -496,10 +546,7 @@ export function Order() {
       site: {
         id: siteId,
       },
-      customerId:
-        localStorage.getItem("customer") !== null
-          ? JSON.parse(localStorage.getItem("customer"))?.id
-          : null,
+      customerId: customer?.id,
     });
   };
 
@@ -523,10 +570,7 @@ export function Order() {
         site: {
           id: siteId,
         },
-        customerId:
-          localStorage.getItem("customer") === null
-            ? JSON.parse(localStorage.getItem("customer"))?.id
-            : null,
+        customerId: customer?.id,
       },
       ""
     );
@@ -583,7 +627,7 @@ export function Order() {
   };
 
   const onCancel = () => {
-    localStorage.removeItem("customer");
+    dispatch(removeSSCustomer());
     clear();
     navigate("/ss");
   };
@@ -659,6 +703,10 @@ export function Order() {
     setAmount(0);
   };
 
+  useEffect(() => {
+    dispatch(fetchMembershipTiers());
+  }, [dispatch]);
+
   return (
     <>
       {!renderSummary && (
@@ -682,6 +730,9 @@ export function Order() {
       />
       {!renderSummary && (
         <OrderList
+          customer={customer}
+          currTier={currTier}
+          nextTier={nextTier}
           rfid={rfid}
           voucher={voucher}
           voucherCode={voucherCode}

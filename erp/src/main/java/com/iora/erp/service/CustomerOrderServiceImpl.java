@@ -172,7 +172,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             stripeService.capturePayment(clientSecret);
         }
         if (customerOrder.getVoucher() != null) {
-            if (!customerOrder.getVoucher().getCustomerIds().contains(customerOrder.getCustomerId())) {
+            if (customerOrder.getVoucher().getCustomerId() != customerOrder.getCustomerId()) {
                 throw new CustomerException("Customer is not entitled to this voucher.");
             } else {
                 customerService.redeemVoucher(customerOrder.getVoucher().getVoucherCode());
@@ -609,26 +609,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     // Helper methods
-
-    // amount added to payments
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
-        TypedQuery<CustomerOrder> q = em.createQuery(
-                "SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date", CustomerOrder.class);
-        q.setParameter("id", customer.getId());
-        q.setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP);
-
-        double spending = q.getResultList()
-                .stream()
-                .map(x -> x.getPayments())
-                .map(x -> x.stream().mapToDouble(y -> y.getAmount()).sum())
-                .collect(Collectors.summingDouble(Double::doubleValue));
+        double spending = getCurrentSpending(customer.getId());
 
         List<MembershipTier> tiers = em
                 .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
                 .getResultList();
         MembershipTier membershipTier = tiers.get(0);
+
         for (MembershipTier tier : tiers) {
             if (spending > tier.getMinSpend()) {
                 membershipTier = tier;
@@ -658,6 +648,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         membershipPoints = membershipPoints
                 + (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier());
         customer.setMembershipPoints(membershipPoints);
+    }
+
+    public double getCurrentSpending(Long customerId) {
+        TypedQuery<CustomerOrder> q = em.createQuery(
+                "SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date", CustomerOrder.class);
+        q.setParameter("id", customerId);
+        q.setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP);
+
+        return q.getResultList()
+                .stream()
+                .map(x -> x.getPayments())
+                .map(x -> x.stream().mapToDouble(y -> y.getAmount()).sum())
+                .collect(Collectors.summingDouble(Double::doubleValue));
     }
 
     /*

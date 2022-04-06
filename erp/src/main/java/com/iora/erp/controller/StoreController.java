@@ -470,6 +470,16 @@ public class StoreController {
         }
     }
 
+    @GetMapping(path = "/member/spending/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> getCurrentSpending(@PathVariable Long customerId) {
+        try {
+            return ResponseEntity.ok(customerOrderService.getCurrentSpending(customerId));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/voucher/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> getVoucher(@PathVariable String voucherCode) {
         try {

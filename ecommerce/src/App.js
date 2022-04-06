@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 import { Auth } from "./views/containers/Auth/Auth";
 import { Login } from "./views/containers/Auth/Login";
 import { Register } from "./views/containers/Auth/Register";
@@ -12,9 +12,8 @@ import { HomeIndex } from "./views/containers/Index/HomeIndex";
 import { SettingsIndex } from "./views/containers/Index/SettingsIndex";
 import { Listings } from "./views/containers/Listings";
 import { Membership } from "./views/containers/Membership";
-import { ManagePurchaseHistory } from "./views/containers/Auth/PurchaseHistory/ManagePurchaseHistory";
-import { PurchaseHistory } from "./views/containers/Auth/PurchaseHistory/PurchaseHistoryList";
-import { PurchaseHistoryDetails } from "./views/containers/Auth/PurchaseHistory/ViewAPurchaseHistory";
+import { PurchaseHistoryList } from "./views/containers/PurchaseHistory/PurchaseHistoryList";
+import { PurchaseHistoryDetails } from "./views/containers/PurchaseHistory/ViewAPurchaseHistory";
 import { SupportList } from "./views/containers/Support/SupportList";
 import ViewModel from "./views/containers/ViewModel";
 
@@ -49,12 +48,14 @@ function App() {
 
           <Route path="support" element={<SupportList />} />
 
+          <Route path="orders" element={<Outlet />}>
+            <Route index element={<PurchaseHistoryList />} />
+            <Route path=":orderId" element={<PurchaseHistoryDetails />} />
+          </Route>
+
           <Route path="settings" element={<SettingsIndex />}>
             <Route path="profile" element={<Profile />} />
             <Route path="account" element={<Account />} />
-            <Route path="purchaseHistory" element={<Outlet />}>
-                <Route index element={<PurchaseHistory />} />
-                <Route path=":orderId" element={<PurchaseHistoryDetails />} />
           </Route>
         </Route>
         <Route
@@ -66,7 +67,7 @@ function App() {
           }
         />
       </Routes>
-    </div>
+    </div >
   );
 }
 

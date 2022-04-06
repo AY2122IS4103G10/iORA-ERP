@@ -613,6 +613,15 @@ function App() {
                   </ManageOnlineOrders>
                 }
               />
+
+              <Route
+                path="picking"
+                element={
+                  <ManageOnlineOrders subsys="wh">
+                    <OnlineOrderSearch subsys="wh" />
+                  </ManageOnlineOrders>
+                }
+              />
               <Route
                 path=":orderId"
                 element={<CustomerOrderWrapper subsys="wh" />}

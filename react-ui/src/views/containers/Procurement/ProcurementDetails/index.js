@@ -57,8 +57,8 @@ const ItemsSummary = ({ data, handlePrint }) => {
         accessor: "packedQty",
       },
       {
-        Header: "Rec",
-        accessor: "receivedQty",
+        Header: "Cost",
+        accessor: "costPrice",
       },
     ];
   }, []);
@@ -328,6 +328,7 @@ export const ProcurementDetails = () => {
       );
     });
   }, [statusHistory]);
+  console.log(lineItems)
   return (
     <>
       <ProcurementDetailsBody

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+import { uploadFile } from "react-s3";
 import { Dialog } from "@headlessui/react";
 import { api } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
@@ -27,6 +28,8 @@ import {
 import { classNames } from "../../../../utilities/Util";
 import { PaperClipIcon } from "@heroicons/react/solid";
 import { useRef } from "react";
+import { awsConfig } from "../../../../config";
+import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 
 const addModalColumns = [
   {
@@ -133,6 +136,23 @@ const ProcurementItemsList = ({ data, setData, isEditing }) => {
         accessor: (row) =>
           row.product.productFields.find((field) => field.fieldName === "SIZE")
             .fieldValue,
+      },
+      {
+        Header: "Cost Price",
+        accessor: "costPrice",
+        disableSortBy: true,
+        Cell: (row) => {
+          return (
+            <EditableCell
+              value={isEditing ? row.row.original.costPrice : 0}
+              step="0.01"
+              min="0"
+              row={row.row}
+              column={row.column}
+              updateMyData={updateMyData}
+            />
+          );
+        },
       },
       {
         Header: "Quantity",
@@ -322,7 +342,7 @@ const UploadFileList = ({ data, setData }) => {
                   </ul>
                 </div>
               )}
-              <div className="relative cursor-pointer rounded-md font-medium">
+              <div className="mt-2 rounded-md font-medium">
                 <label
                   htmlFor="file-upload"
                   className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500"
@@ -542,7 +562,6 @@ export const ProcurementForm = () => {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
-
   const headquarters = useSelector(selectAllHeadquarters);
   const hq = headquarters[0];
   const hqStatus = useSelector((state) => state.sites.hqStatus);
@@ -591,6 +610,7 @@ export const ProcurementForm = () => {
         modelCode,
         product: { ...item },
         requestedQty: 1,
+        costPrice: 0,
       }))
     );
     const set = Array.from(
@@ -614,8 +634,32 @@ export const ProcurementForm = () => {
     lineItems.length,
   ].every(Boolean);
 
+  const handleUpload = async (file) => {
+    try {
+      const { location } = await uploadFile(file, awsConfig);
+      return location;
+    } catch (error) {
+      addToast(`Error: ${error.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
+
+  const handleAllUpload = async () => {
+    return Promise.all(
+      models.map((item) => ({
+        ...item,
+        files: item.files.map((file) => handleUpload(file)),
+      }))
+    );
+  };
+
   const createProcurement = async (order) => {
     try {
+      const models = await handleAllUpload(order.lineItems);
+      // console.log(models);
+      // order.lineItems = lineItems;
       const { data } = await api.create(
         `sam/procurementOrder/create/${hqSelected.id}`,
         order
@@ -657,12 +701,13 @@ export const ProcurementForm = () => {
     if (canAdd)
       if (!isEditing)
         createProcurement({
-          lineItems: lineItems.map(({ product, requestedQty }) => ({
+          lineItems: lineItems.map(({ product, requestedQty, costPrice }) => ({
             product: {
               sku: product.sku,
               productFields: product.productFields,
             },
             requestedQty,
+            costPrice,
           })),
           headquarters: { id: hqSelected.id },
           manufacturing: { id: manufacturingSelected.id },
@@ -672,9 +717,10 @@ export const ProcurementForm = () => {
       else
         updateProcurement({
           id: orderId,
-          lineItems: lineItems.map(({ product, requestedQty }) => ({
+          lineItems: lineItems.map(({ product, requestedQty, costPrice }) => ({
             product,
             requestedQty,
+            costPrice,
           })),
           headquarters: { id: hqSelected.id },
           manufacturing: { id: manufacturingSelected.id },
@@ -697,9 +743,37 @@ export const ProcurementForm = () => {
     };
     const fetchProcurement = async () => {
       const { data } = await api.get("sam/procurementOrder", orderId);
-      const { lineItems, headquarters, manufacturing, warehouse, notes } = data;
+      const {
+        lineItems: lIs,
+        headquarters,
+        manufacturing,
+        warehouse,
+        notes,
+      } = data;
       setIsEditing(true);
-      setLineItems(lineItems);
+      fetchAllModelsBySkus(lIs).then((data) => {
+        const arr = lIs.map((item, index) => ({
+          ...item,
+          product: {
+            ...item.product,
+            modelCode: data[index].modelCode,
+            name: data[index].name,
+            imageLinks: data[index].imageLinks,
+          },
+        }));
+        setLineItems(arr);
+        const set = Array.from(
+          new Set(arr.map((item) => item.product.modelCode))
+        ).map((prod) => arr.find((i) => i.product.modelCode === prod));
+        setModels(
+          set.map(({ product, files }) => ({
+            modelCode: product.modelCode,
+            name: product.name,
+            imageLinks: product.imageLinks,
+            files,
+          }))
+        );
+      });
       setRemarks(notes);
       fetchSite(headquarters).then((data) => data && setHqSelected(data));
       fetchSite(manufacturing).then(
@@ -707,7 +781,7 @@ export const ProcurementForm = () => {
       );
       fetchSite(warehouse).then((data) => data && setWarehouseSelected(data));
       let selectedRows = {};
-      lineItems.forEach((_, index) => (selectedRows[index] = true));
+      lIs.forEach((_, index) => (selectedRows[index] = true));
       setSelectedRows(selectedRows);
     };
 

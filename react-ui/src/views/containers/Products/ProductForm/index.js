@@ -113,7 +113,6 @@ export const FormCheckboxes = ({
                   Boolean(fieldValues.length) ? fieldValues[index] : false
                 }
                 onChange={() => onFieldsChanged(index)}
-                disabled={isEditing && fieldValues[index]}
                 {...rest}
               />
             </div>

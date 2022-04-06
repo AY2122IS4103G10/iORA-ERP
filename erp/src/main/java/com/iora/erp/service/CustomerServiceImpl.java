@@ -22,6 +22,8 @@ import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.model.customerOrder.Delivery;
+import com.iora.erp.model.customerOrder.DeliveryAddress;
 import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +55,13 @@ public class CustomerServiceImpl implements CustomerService {
             getCustomerByEmail(customer.getEmail());
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
+            // DeliveryAddress da = customer.getAddress();
             customer.setMembershipTier(findMembershipTierById("BASIC"));
             customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+            // customer.setAddress(new DeliveryAddress());
             em.persist(customer);
+            // em.persist(da);
+            // customer.setAddress(da);
 
             return customer;
         }
@@ -80,6 +86,17 @@ public class CustomerServiceImpl implements CustomerService {
         old.setFirstName(customer.getFirstName());
         old.setLastName(customer.getLastName());
 
+        DeliveryAddress da = em.find(DeliveryAddress.class, customer.getAddress().getId());
+        da.setName(customer.getAddress().getName());
+        da.setStreet1(customer.getAddress().getStreet1());
+        da.setStreet2(customer.getAddress().getStreet2());
+        da.setCountry(customer.getAddress().getCountry());
+        da.setState(customer.getAddress().getState());
+        da.setCity(customer.getAddress().getCity());
+        da.setZip(customer.getAddress().getZip());
+        da.setPhone(customer.getAddress().getPhone());
+        System.out.println(da.getStreet1());
+        old.setAddress(da);
         return old;
     }
 

@@ -48,7 +48,6 @@ public class Site implements Serializable {
     @Column(nullable = false)
     private boolean active;
 
-    @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL)
     private StockLevel stockLevel;
 

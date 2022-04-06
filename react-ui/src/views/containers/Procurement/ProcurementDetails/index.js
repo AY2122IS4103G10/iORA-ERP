@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
+import AWS from "aws-sdk";
 import moment from "moment";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useOutletContext } from "react-router-dom";
@@ -9,8 +10,14 @@ import { sitesApi } from "../../../../environments/Api";
 import { eventTypes } from "../../../../constants/eventTypes";
 import { ProductSticker } from "../../Products/ProductPrint";
 import { forwardRef } from "react";
+import { awsConfig } from "../../../../config";
+import {
+  DownloadIcon,
+} from "@heroicons/react/solid";
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
-const ItemsSummary = ({ data, handlePrint }) => {
+const ItemsSummary = ({ data, handlePrint, onDownloadClicked }) => {
   const columns = useMemo(() => {
     return [
       {
@@ -49,6 +56,11 @@ const ItemsSummary = ({ data, handlePrint }) => {
             .fieldValue,
       },
       {
+        Header: "Cost",
+        accessor: "costPrice",
+        Cell: (e) => `$${e.value}`,
+      },
+      {
         Header: "Req",
         accessor: "requestedQty",
       },
@@ -57,11 +69,62 @@ const ItemsSummary = ({ data, handlePrint }) => {
         accessor: "packedQty",
       },
       {
-        Header: "Cost",
-        accessor: "costPrice",
+        Header: "",
+        accessor: "files",
+        disableSortBy: true,
+        Cell: (e) => {
+          return (
+            <Menu as="div" className="relative inline-block text-left">
+              <div>
+                <Menu.Button className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500" disabled={!e.value.length}>
+                  Files
+                </Menu.Button>
+              </div>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="z-10 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="py-1">
+                    {e.value.map((file, index) => {
+                      return (
+                        <Menu.Item key={index}>
+                          <div className="pr-4 flex items-center justify-between text-sm">
+                            <div className="overflow-hidden truncate block px-4 py-2 text-sm text-gray-700">
+                              <span className="flex-1 w-0 truncate">
+                                {file}
+                              </span>
+                            </div>
+                            <div className="ml-4 flex-shrink-0 flex space-x-4">
+                              <button
+                                type="button"
+                                className="bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                onClick={() => onDownloadClicked(file)}
+                              >
+                                <DownloadIcon
+                                  className="flex-shrink-0 h-4 w-4"
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        </Menu.Item>
+                      );
+                    })}
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          );
+        },
       },
     ];
-  }, []);
+  }, [onDownloadClicked]);
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -147,7 +210,6 @@ export const ActivitySection = ({ history }) => {
 };
 
 const ProcurementDetailsBody = ({
-  pathname,
   history,
   status,
   lineItems,
@@ -155,9 +217,8 @@ const ProcurementDetailsBody = ({
   headquarters,
   warehouse,
   notes,
-  onFulfilClicked,
-  onVerifyReceivedClicked,
   handlePrint,
+  onDownloadClicked,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -245,7 +306,11 @@ const ProcurementDetailsBody = ({
     )}
     <div className="lg:col-start-1 lg:col-span-3">
       <section aria-labelledby="order-summary">
-        <ItemsSummary data={lineItems} handlePrint={handlePrint} />
+        <ItemsSummary
+          data={lineItems}
+          handlePrint={handlePrint}
+          onDownloadClicked={onDownloadClicked}
+        />
       </section>
     </div>
   </div>
@@ -299,6 +364,33 @@ export const ProcurementDetails = () => {
     content: () => componentRef.current,
   });
 
+  const onDownloadClicked = (file) => {
+    AWS.config.update({
+      accessKeyId: awsConfig.accessKeyId,
+      secretAccessKey: awsConfig.secretAccessKey,
+    });
+    const handleDownload = () => {
+      const s3 = new AWS.S3({ region: awsConfig.region });
+      const bucketParams = {
+        Bucket: awsConfig.bucketName,
+        Key: file,
+      };
+
+      s3.getObject(bucketParams, (err, data) => {
+        if (err) {
+          console.log(err, err.stack);
+        } else {
+          let blob = new Blob([data.Body], { type: data.ContentType });
+          let link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = `/${file}`;
+          link.click();
+        }
+      });
+    };
+    return handleDownload();
+  };
+
   useEffect(() => {
     fetchAllActionBy(statusHistory).then((data) => {
       setHistory(
@@ -328,7 +420,7 @@ export const ProcurementDetails = () => {
       );
     });
   }, [statusHistory]);
-  console.log(lineItems)
+  console.log(lineItems);
   return (
     <>
       <ProcurementDetailsBody
@@ -344,6 +436,7 @@ export const ProcurementDetails = () => {
         pathname={pathname}
         history={history}
         handlePrint={handlePrint}
+        onDownloadClicked={onDownloadClicked}
       />
       <div className="hidden">
         <ProductStickerPrint

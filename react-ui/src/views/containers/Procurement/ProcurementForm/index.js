@@ -26,10 +26,12 @@ import {
   selectAllWarehouse,
 } from "../../../../stores/slices/siteSlice";
 import { classNames } from "../../../../utilities/Util";
-import { PaperClipIcon } from "@heroicons/react/solid";
+import { PaperClipIcon, XIcon } from "@heroicons/react/solid";
 import { useRef } from "react";
 import { awsConfig } from "../../../../config";
 import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
+import { TailSpin } from "react-loader-spinner";
+window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const addModalColumns = [
   {
@@ -248,7 +250,6 @@ const AddProductItemModal = ({
 };
 
 const UploadFileList = ({ data, setData }) => {
-  const fileRef = useRef();
   const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
     const updateMyData = (rowIndex, columnId, value) => {
@@ -292,10 +293,11 @@ const UploadFileList = ({ data, setData }) => {
         Header: "",
         accessor: "files",
         Cell: (e) => {
+          const fileRef = useRef();
           return (
             <div>
               {e.value && Boolean(e.value.length) && (
-                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <div className="mt-1 mb-2 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
                     {e.value.map((file, index) => {
                       const idx = index;
@@ -333,7 +335,10 @@ const UploadFileList = ({ data, setData }) => {
                                 );
                               }}
                             >
-                              Remove
+                              <XIcon
+                                className="flex-shrink-0 h-4 w-4"
+                                aria-hidden="true"
+                              />
                             </button>
                           </div>
                         </li>
@@ -342,7 +347,7 @@ const UploadFileList = ({ data, setData }) => {
                   </ul>
                 </div>
               )}
-              <div className="mt-2 rounded-md font-medium">
+              <div className="rounded-md font-medium">
                 <label
                   htmlFor="file-upload"
                   className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500"
@@ -395,6 +400,7 @@ const ProcurementFormBody = ({
   onSaveOrderClicked,
   onCancelClicked,
   canAdd,
+  loading,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <div className="rounded-lg bg-white overflow-hidden shadow">
@@ -528,6 +534,11 @@ const ProcurementFormBody = ({
                 disabled={!canAdd}
               >
                 {!isEditing ? "Create" : "Save"} order
+                {loading && (
+                  <div className="flex ml-2 items-center">
+                    <TailSpin color="#FFFFFF" height={15} width={15} />
+                  </div>
+                )}
               </button>
             </div>
           </div>
@@ -551,6 +562,8 @@ export const ProcurementForm = () => {
   const [warehouseSelected, setWarehouseSelected] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [openProducts, setOpenProducts] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const skus = useSelector(selectAllProducts).flatMap((model) =>
     model.products.map((product) => ({
       ...product,
@@ -606,8 +619,7 @@ export const ProcurementForm = () => {
     const lineItems = [];
     selectedRowKeys.map((key) => lineItems.push(skus[key]));
     setLineItems(
-      lineItems.map(({ modelCode, ...item }) => ({
-        modelCode,
+      lineItems.map(({ ...item }) => ({
         product: { ...item },
         requestedQty: 1,
         costPrice: 0,
@@ -636,8 +648,8 @@ export const ProcurementForm = () => {
 
   const handleUpload = async (file) => {
     try {
-      const { location } = await uploadFile(file, awsConfig);
-      return location;
+      const data = await uploadFile(file, awsConfig);
+      return data.key;
     } catch (error) {
       addToast(`Error: ${error.message}`, {
         appearance: "error",
@@ -647,19 +659,25 @@ export const ProcurementForm = () => {
   };
 
   const handleAllUpload = async () => {
-    return Promise.all(
-      models.map((item) => ({
-        ...item,
-        files: item.files.map((file) => handleUpload(file)),
-      }))
+    const data = await Promise.all(
+      models.map(async (item) => {
+        return {
+          ...item,
+          files: await Promise.all(
+            item.files.map(async (file) => {
+              const data =
+                typeof file === "string" ? file : await handleUpload(file);
+              return data;
+            })
+          ),
+        };
+      })
     );
+    return data;
   };
 
   const createProcurement = async (order) => {
     try {
-      const models = await handleAllUpload(order.lineItems);
-      // console.log(models);
-      // order.lineItems = lineItems;
       const { data } = await api.create(
         `sam/procurementOrder/create/${hqSelected.id}`,
         order
@@ -695,39 +713,51 @@ export const ProcurementForm = () => {
       });
     }
   };
-
-  const onSaveOrderClicked = (evt) => {
+  
+  const onSaveOrderClicked = async (evt) => {
     evt.preventDefault();
-    if (canAdd)
-      if (!isEditing)
-        createProcurement({
-          lineItems: lineItems.map(({ product, requestedQty, costPrice }) => ({
+    if (canAdd) {
+      setLoading(true);
+      try {
+        const uploaded = await handleAllUpload();
+        const lIs = lineItems.map((item) => {
+          const model = uploaded.find(
+            (model) => model.modelCode === item.product.modelCode
+          );
+          const lineItem = {
             product: {
-              sku: product.sku,
-              productFields: product.productFields,
+              sku: item.product.sku,
+              productFields: item.product.productFields,
             },
-            requestedQty,
-            costPrice,
-          })),
+            requestedQty: item.requestedQty,
+            costPrice: item.costPrice,
+          };
+          if (model !== undefined) {
+            lineItem.files = model.files;
+          }
+          return lineItem;
+        });
+        const order = {
+          lineItems: lIs,
           headquarters: { id: hqSelected.id },
           manufacturing: { id: manufacturingSelected.id },
           warehouse: { id: warehouseSelected.id },
           notes: remarks,
+        };
+        if (isEditing) order["id"] = orderId;
+        if (!isEditing) createProcurement(order);
+        else updateProcurement(order);
+      } catch (error) {
+        addToast(`Error: ${error.message}`, {
+          appearance: "error",
+          autoDismiss: true,
         });
-      else
-        updateProcurement({
-          id: orderId,
-          lineItems: lineItems.map(({ product, requestedQty, costPrice }) => ({
-            product,
-            requestedQty,
-            costPrice,
-          })),
-          headquarters: { id: hqSelected.id },
-          manufacturing: { id: manufacturingSelected.id },
-          warehouse: { id: warehouseSelected.id },
-          notes: remarks,
-        });
+      } finally {
+        setLoading(false);
+      }
+    }
   };
+
   const onCancelClicked = () =>
     navigate(!isEditing ? "/sm/procurements" : `/sm/procurements/${orderId}`);
 
@@ -822,6 +852,7 @@ export const ProcurementForm = () => {
         canAdd={canAdd}
         files={files}
         onFilesChanged={onFilesChanged}
+        loading={loading}
       />
       <AddProductItemModal
         items={skus}

@@ -37,9 +37,9 @@ const CustomerFormBody = ({
   receiverName,
   onReceiverName,
   street1,
-  onstreet1,
+  onStreet1,
   street2,
-  onstreet2,
+  onStreet2,
   zip,
   onZip,
   city,
@@ -50,7 +50,6 @@ const CustomerFormBody = ({
   onDeliveryContact,
   country,
   onCountry,
-  countries,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">{!isEditing ? "Add New" : "Edit"} Customer</h1>
@@ -209,8 +208,8 @@ const CustomerFormBody = ({
                           className="sm:mt-0 sm:col-span-2">
                           <SimpleInputBox
                             type="text"
-                            name="receiverName"
-                            id="receiverName"
+                            name="name"
+                            id="name"
                             autoComplete="receiverName"
                             value={receiverName}
                             onChange={onReceiverName}
@@ -223,8 +222,8 @@ const CustomerFormBody = ({
                           className="sm:mt-0 sm:col-span-2">
                           <SimpleInputBox
                             type="text"
-                            name="deliveryContract"
-                            id="deliveryContract"
+                            name="phone"
+                            id="phone"
                             autoComplete="deliveryContract"
                             value={deliveryContact}
                             onChange={onDeliveryContact}
@@ -241,7 +240,7 @@ const CustomerFormBody = ({
                             id="street1"
                             autoComplete="street1"
                             value={street1}
-                            onChange={onstreet1}
+                            onChange={onStreet1}
                             required
                           />
                         </SimpleInputGroup>
@@ -255,7 +254,7 @@ const CustomerFormBody = ({
                             id="street2"
                             autoComplete="street2"
                             value={street2}
-                            onChange={onstreet2}
+                            onChange={onStreet2}
                             required
                           />
                         </SimpleInputGroup>

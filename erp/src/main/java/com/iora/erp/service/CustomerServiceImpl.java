@@ -101,30 +101,6 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer editCustomerAccount(Customer customer) throws CustomerException {
-        Customer old = em.find(Customer.class, customer.getId());
-
-        if (old == null) {
-            throw new CustomerException("Customer not found");
-        }
-
-        try {
-            old.setEmail(customer.getEmail());
-        } catch (Exception ex) {
-            throw new CustomerException("Email " + customer.getEmail() + " has been used!");
-        }
-
-        old.setContactNumber(customer.getContactNumber());
-        old.setDob(customer.getDob());
-        old.setFirstName(customer.getFirstName());
-        old.setLastName(customer.getLastName());
-        old.setMembershipPoints(customer.getMembershipPoints());
-        old.setStoreCredit(customer.getStoreCredit());
-
-        return old;
-    }
-
-    @Override
     public void blockCustomer(Customer customer) throws CustomerException {
         Customer c = em.find(Customer.class, customer.getId());
 

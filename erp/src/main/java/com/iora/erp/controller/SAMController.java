@@ -792,9 +792,9 @@ public class SAMController {
     }
 
     @PutMapping(path = "/customer/edit", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> completeProcurementOrder(@RequestBody Customer customer) {
+    public ResponseEntity<Object> editCustomer(@RequestBody Customer customer) {
         try {
-            return ResponseEntity.ok(customerService.editCustomerAccount(customer));
+            return ResponseEntity.ok(customerService.updateCustomerAccount(customer));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

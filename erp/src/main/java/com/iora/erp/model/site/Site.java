@@ -19,6 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Company;
 import com.iora.erp.model.company.Notification;
@@ -47,6 +48,7 @@ public class Site implements Serializable {
     @Column(nullable = false)
     private boolean active;
 
+    @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL)
     private StockLevel stockLevel;
 
@@ -57,6 +59,7 @@ public class Site implements Serializable {
     @OneToMany
     private List<CustomerOrder> customerOrders;
 
+    @JsonIgnore
     @ElementCollection
     private List<Notification> notifications;
 

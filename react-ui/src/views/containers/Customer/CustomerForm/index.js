@@ -520,9 +520,9 @@ export const CustomerForm = ({subsys}) => {
       receiverName={receiverName}
       onReceiverName={onReceiverName}
       street1={street1}
-      onstreet1={onStreet1}
+      onStreet1={onStreet1}
       street2={street2}
-      onstreet2={onStreet2}
+      onStreet2={onStreet2}
       zip={zip}
       onZip={onZip}
       city={city}

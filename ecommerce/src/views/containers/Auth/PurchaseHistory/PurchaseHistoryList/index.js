@@ -31,7 +31,7 @@ const columns = [
   },
 ];
 
-export const PosPurchaseHistory = () => {
+export const PurchaseHistory = () => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();

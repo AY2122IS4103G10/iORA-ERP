@@ -12,6 +12,9 @@ import { HomeIndex } from "./views/containers/Index/HomeIndex";
 import { SettingsIndex } from "./views/containers/Index/SettingsIndex";
 import { Listings } from "./views/containers/Listings";
 import { Membership } from "./views/containers/Membership";
+import { ManagePurchaseHistory } from "./views/containers/Auth/PurchaseHistory/ManagePurchaseHistory";
+import { PurchaseHistory } from "./views/containers/Auth/PurchaseHistory/PurchaseHistoryList";
+import { PurchaseHistoryDetails } from "./views/containers/Auth/PurchaseHistory/ViewAPurchaseHistory";
 import { SupportList } from "./views/containers/Support/SupportList";
 import ViewModel from "./views/containers/ViewModel";
 
@@ -49,6 +52,9 @@ function App() {
           <Route path="settings" element={<SettingsIndex />}>
             <Route path="profile" element={<Profile />} />
             <Route path="account" element={<Account />} />
+            <Route path="purchaseHistory" element={<Outlet />}>
+                <Route index element={<PurchaseHistory />} />
+                <Route path=":orderId" element={<PurchaseHistoryDetails />} />
           </Route>
         </Route>
         <Route

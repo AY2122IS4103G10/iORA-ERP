@@ -67,6 +67,13 @@ export const listingApi = {
       `${REST_ENDPOINT}online/public/model/tag/${line}`
     );
   },
+
+  getListingByCategory(cat) {
+    return axiosPublic.get(
+      `${REST_ENDPOINT}online/public/model/category/${cat}`
+    );
+  },
+
   getModel(modelCode) {
     return axiosPublic.get(
       `${REST_ENDPOINT}online/public/model/${modelCode}`

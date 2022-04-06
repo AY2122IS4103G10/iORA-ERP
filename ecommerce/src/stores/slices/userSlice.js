@@ -11,7 +11,7 @@ const guest = {
   email: "NA",
   username: "guest",
   salt: "",
-  password: "",
+  password: ""
 };
 
 const initialUser = localStorage.getItem("user")
@@ -25,14 +25,6 @@ const initialState = {
   status: "idle",
   error: "null",
 };
-
-export const fetchUser = createAsyncThunk("user/fetchUser", async ({ id }) => {
-  const response = await api.get("sam/customer/view", id);
-  if (response.data === "") {
-    return Promise.reject(response.error);
-  }
-  return response.data;
-});
 
 export const login = createAsyncThunk(
   "auth/login",
@@ -102,17 +94,6 @@ export const updateAccount = createAsyncThunk(
   }
 );
 
-export const fetchUserOrders = createAsyncThunk(
-  "user/userOrders",
-  async (id) => {
-    const response = await api.get("/online/history", id);
-    if (response.data === "") {
-      return Promise.reject(response.error);
-    }
-    return response.data;
-  }
-);
-
 export const fetchAnOrder = createAsyncThunk(
   "user/getUserOrder",
   async (orderId) => {
@@ -135,13 +116,6 @@ const userSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(fetchUser.fulfilled, (state, action) => {
-      state.user = action.payload;
-      state.status = "succeeded";
-    });
-    builder.addCase(fetchUser.rejected, (state, action) => {
-      state.error = "Fetch user failed";
-    });
     builder.addCase(login.fulfilled, (state, action) => {
       action.payload.salt !== undefined && delete action.payload.salt;
       action.payload.hashPass !== undefined && delete action.payload.hashPass;
@@ -185,21 +159,6 @@ const userSlice = createSlice({
     builder.addCase(updateAccount.rejected, (state, action) => {
       state.error = "Update failed";
     });
-    builder.addCase(fetchUserOrders.pending, (state, action) => {
-      state.status = "loading";
-    });
-    builder.addCase(fetchUserOrders.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.user = action.payload;
-    });
-    builder.addCase(fetchUserOrders.rejected, (state, action) => {
-      state.status = "loading";
-      state.error = action.error.message;
-    });
-    builder.addCase(fetchAnOrder.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.searchedOrder = action.payload;
-    });
   },
 });
 
@@ -214,9 +173,3 @@ export const selectUserId = (state) => state.user.user.id;
 export const selectUserStore = (state) => state.user.currStore;
 
 export default userSlice.reducer;
-
-export const selectAllOrder = (state) => state.user.userOrders;
-export const selectOrderById = (state, id) =>
-  state.user.searchedOrder.id === id
-    ? state.user.searchedOrder
-    : state.user.userOrders.find((order) => order.id === id);

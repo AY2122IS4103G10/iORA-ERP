@@ -84,10 +84,17 @@ export const ItemsList = ({
   );
 };
 
-const ProcurementItemsList = ({ data, setData, isEditing }) => {
+const ProcurementItemsList = ({
+  data,
+  setData,
+  isEditing,
+  setSelectedProduct,
+  openInfoModal,
+}) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
 
   const columns = useMemo(() => {
+    console.log(data);
     const updateMyData = (rowIndex, columnId, value) => {
       setSkipPageReset(true);
       setData((old) =>
@@ -106,23 +113,17 @@ const ProcurementItemsList = ({ data, setData, isEditing }) => {
       {
         Header: "SKU",
         accessor: "product.sku",
-      },
-      {
-        Header: "Name",
-        accessor: "product.name",
-        enableRowSpan: true,
         Cell: (e) => {
-          return e.row.original.product.imageLinks.length ? (
-            <a
-              href={e.row.original.product.imageLinks[0]}
-              className="hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
+          return (
+            <button
+              className="font-medium hover:underline"
+              onClick={() => {
+                setSelectedProduct(e.row.original.product);
+                openInfoModal();
+              }}
             >
               {e.value}
-            </a>
-          ) : (
-            e.value
+            </button>
           );
         },
       },
@@ -146,7 +147,7 @@ const ProcurementItemsList = ({ data, setData, isEditing }) => {
         Cell: (row) => {
           return (
             <EditableCell
-              value={isEditing ? row.row.original.costPrice : 0}
+              value={row.row.original.costPrice}
               step="0.01"
               min="0"
               row={row.row}
@@ -163,7 +164,7 @@ const ProcurementItemsList = ({ data, setData, isEditing }) => {
         Cell: (row) => {
           return (
             <EditableCell
-              value={isEditing ? row.row.original.requestedQty : 1}
+              value={row.row.original.requestedQty}
               row={row.row}
               column={row.column}
               updateMyData={updateMyData}
@@ -185,7 +186,7 @@ const ProcurementItemsList = ({ data, setData, isEditing }) => {
       //   ],
       // },
     ];
-  }, [setData, isEditing]);
+  }, [setData, isEditing, setSelectedProduct, openInfoModal]);
 
   return (
     <div className="mt-4">
@@ -379,6 +380,94 @@ const UploadFileList = ({ data, setData }) => {
   );
 };
 
+const ProductModal = ({ open, closeModal, product }) => {
+  return (
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        <div className="sm:block absolute top-0 right-0 pt-4 pr-4">
+          <button
+            type="button"
+            className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+            onClick={closeModal}
+          >
+            <span className="sr-only">Close</span>
+            <XIcon className="h-6 w-6" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="px-4 py-5 sm:px-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900">
+            {product.name}
+          </h3>
+        </div>
+        <div className="border-t border-gray-200">
+          <dl>
+            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">
+                Product Code
+              </dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                {product.modelCode}
+              </dd>
+            </div>
+            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">SKU</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                {product.sku}
+              </dd>
+            </div>
+            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Colour</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                {
+                  product.productFields.find(
+                    (field) => field.fieldName === "COLOUR"
+                  ).fieldValue
+                }
+              </dd>
+            </div>
+            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Size</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                {
+                  product.productFields.find(
+                    (field) => field.fieldName === "SIZE"
+                  ).fieldValue
+                }
+              </dd>
+            </div>
+            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Description</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                {product.description}
+              </dd>
+            </div>
+            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt className="text-sm font-medium text-gray-500">Images</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+                  {Boolean(product.imageLinks.length)
+                    ? product.imageLinks.map((file, index) => (
+                        <li key={index} className="relative">
+                          <div className="group block w-full rounded-lg bg-gray-100 overflow-hidden">
+                            <img
+                              src={file}
+                              alt=""
+                              className="object-cover pointer-events-none"
+                            />
+                          </div>
+                        </li>
+                      ))
+                    : "No images"}
+                </ul>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </SimpleModal>
+  );
+};
+
 const ProcurementFormBody = ({
   isEditing,
   headquarters,
@@ -401,6 +490,8 @@ const ProcurementFormBody = ({
   onCancelClicked,
   canAdd,
   loading,
+  setSelectedProduct,
+  openInfoModal,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <div className="rounded-lg bg-white overflow-hidden shadow">
@@ -485,6 +576,8 @@ const ProcurementFormBody = ({
                   data={items}
                   setData={setItems}
                   isEditing={isEditing}
+                  setSelectedProduct={setSelectedProduct}
+                  openInfoModal={openInfoModal}
                 />
               )}
             </div>
@@ -562,14 +655,14 @@ export const ProcurementForm = () => {
   const [warehouseSelected, setWarehouseSelected] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [openProducts, setOpenProducts] = useState(false);
+  const [openInfo, setOpenInfo] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const skus = useSelector(selectAllProducts).flatMap((model) =>
     model.products.map((product) => ({
       ...product,
-      modelCode: model.modelCode,
-      name: model.name,
-      imageLinks: model.imageLinks,
+      ...model,
     }))
   );
   useEffect(() => {
@@ -713,7 +806,7 @@ export const ProcurementForm = () => {
       });
     }
   };
-  
+
   const onSaveOrderClicked = async (evt) => {
     evt.preventDefault();
     if (canAdd) {
@@ -786,9 +879,7 @@ export const ProcurementForm = () => {
           ...item,
           product: {
             ...item.product,
-            modelCode: data[index].modelCode,
-            name: data[index].name,
-            imageLinks: data[index].imageLinks,
+            ...data[index],
           },
         }));
         setLineItems(arr);
@@ -827,6 +918,9 @@ export const ProcurementForm = () => {
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);
 
+  const openInfoModal = () => setOpenInfo(true);
+  const closeInfoModal = () => setOpenInfo(false);
+
   return (
     <>
       <ProcurementFormBody
@@ -853,6 +947,8 @@ export const ProcurementForm = () => {
         files={files}
         onFilesChanged={onFilesChanged}
         loading={loading}
+        setSelectedProduct={setSelectedProduct}
+        openInfoModal={openInfoModal}
       />
       <AddProductItemModal
         items={skus}
@@ -862,6 +958,13 @@ export const ProcurementForm = () => {
         setRowSelect={setSelectedRows}
         onAddItemsClicked={onAddItemsClicked}
       />
+      {selectedProduct && (
+        <ProductModal
+          open={openInfo}
+          closeModal={closeInfoModal}
+          product={selectedProduct}
+        />
+      )}
     </>
   );
 };

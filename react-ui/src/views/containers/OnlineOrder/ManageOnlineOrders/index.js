@@ -4,26 +4,43 @@ import { updateCurrSite } from "../../../../stores/slices/userSlice";
 import { Tabs } from "../../../components/Tabs";
 
 const Header = ({ subsys }) => {
-  const tabs = [
-    {
-      id: 1,
-      name: "Search Order",
-      href: `/${subsys}/orders/search`,
-      current: false,
-    },
-    {
-      id: 2,
-      name: "All Orders",
-      href: `/${subsys}/orders`,
-      current: true,
-    },
-    {
-      id: 3,
-      name: "Picking",
-      href: `/${subsys}/orders/picking`,
-      current: false,
-    },
-  ];
+  const tabs =
+    subsys === "wh"
+      ? [
+          {
+            id: 1,
+            name: "Search Order",
+            href: `/${subsys}/orders/search`,
+            current: false,
+          },
+          {
+            id: 2,
+            name: "All Orders",
+            href: `/${subsys}/orders`,
+            current: true,
+          },
+          {
+            id: 3,
+            name: "Picking",
+            href: `/${subsys}/orders/picking`,
+            current: false,
+          },
+        ]
+      : [
+          {
+            id: 1,
+            name: "Search Order",
+            href: `/${subsys}/orders/search`,
+            current: false,
+          },
+          {
+            id: 2,
+            name: "All Orders",
+            href: `/${subsys}/orders`,
+            current: true,
+          },
+        ];
+
   return (
     <div className="bg-white shadow">
       <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">

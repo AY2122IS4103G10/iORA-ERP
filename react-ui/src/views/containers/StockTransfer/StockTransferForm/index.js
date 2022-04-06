@@ -486,7 +486,7 @@ export const StockTransferForm = ({ subsys }) => {
   //get stock level and product information
   const [prodTableData, setProdTableData] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  console.log(lineItems);
   const fetchStockLevel = async (id) => {
     setLoading(true);
     const { data } = await api.get(`store/viewStock/sites`, id);
@@ -560,11 +560,9 @@ export const StockTransferForm = ({ subsys }) => {
                   );
                   return {
                     ...item,
-                    product: {
-                      ...item.product,
-                      modelCode: data[index].modelCode,
-                      name: data[index].name,
-                    },
+                    name: data[index].name,
+                    modelCode: data[index].modelCode,
+                    imageLinks: data[index].imageLinks,
                     qty: prod ? prod.qty : 0,
                   };
                 })

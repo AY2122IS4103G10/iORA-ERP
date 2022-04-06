@@ -11,13 +11,11 @@ import { eventTypes } from "../../../../constants/eventTypes";
 import { ProductSticker } from "../../Products/ProductPrint";
 import { forwardRef } from "react";
 import { awsConfig } from "../../../../config";
-import {
-  DownloadIcon,
-} from "@heroicons/react/solid";
+import { DownloadIcon } from "@heroicons/react/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
-const ItemsSummary = ({ data, handlePrint, onDownloadClicked }) => {
+const ItemsSummary = ({ subsys, data, handlePrint, onDownloadClicked }) => {
   const columns = useMemo(() => {
     return [
       {
@@ -76,7 +74,10 @@ const ItemsSummary = ({ data, handlePrint, onDownloadClicked }) => {
           return (
             <Menu as="div" className="relative inline-block text-left">
               <div>
-                <Menu.Button className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500" disabled={!e.value.length}>
+                <Menu.Button
+                  className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+                  disabled={!e.value.length}
+                >
                   Files
                 </Menu.Button>
               </div>
@@ -125,6 +126,7 @@ const ItemsSummary = ({ data, handlePrint, onDownloadClicked }) => {
       },
     ];
   }, [onDownloadClicked]);
+  const hiddenColumns = subsys === "lg" ? ["files"] : [];
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -141,7 +143,11 @@ const ItemsSummary = ({ data, handlePrint, onDownloadClicked }) => {
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable columns={columns} data={data} />
+          <SimpleTable
+            columns={columns}
+            data={data}
+            hiddenColumns={hiddenColumns}
+          />
         </div>
       )}
     </div>
@@ -210,6 +216,7 @@ export const ActivitySection = ({ history }) => {
 };
 
 const ProcurementDetailsBody = ({
+  subsys,
   history,
   status,
   lineItems,
@@ -307,6 +314,7 @@ const ProcurementDetailsBody = ({
     <div className="lg:col-start-1 lg:col-span-3">
       <section aria-labelledby="order-summary">
         <ItemsSummary
+          subsys={subsys}
           data={lineItems}
           handlePrint={handlePrint}
           onDownloadClicked={onDownloadClicked}

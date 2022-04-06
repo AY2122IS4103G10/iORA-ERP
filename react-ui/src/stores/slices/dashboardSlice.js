@@ -28,7 +28,7 @@ const dashboardSlice = createSlice({
       state.status = "loading";
     });
     builder.addCase(getStockLevelSites.fulfilled, (state, action) => {
-      state.status = "succeeded";
+      state.status = "succeeded-1";
       state.stockLevelSites = action.payload;
     });
     builder.addCase(getStockLevelSites.rejected, (state, action) => {

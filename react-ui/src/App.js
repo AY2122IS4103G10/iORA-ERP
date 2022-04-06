@@ -360,6 +360,7 @@ function App() {
               />
             </Route>
 
+            {/* POS */}
             <Route path="pos" element={<ManagePOS />}>
               <Route path="orderHistory" element={<Outlet />}>
                 <Route index element={<PosPurchaseHistory />} />
@@ -367,7 +368,10 @@ function App() {
                 <Route path=":orderId" element={<OrderDetails />} />
               </Route>
               <Route path="orderPurchase" element={<PosPurchaseOrder />} />
-              <Route path="addCustomer" element={<CustomerForm subsys="str" />} />
+              <Route
+                path="addCustomer"
+                element={<CustomerForm subsys="str" />}
+              />
             </Route>
 
             <Route path="orders" element={<Outlet />}>
@@ -396,6 +400,8 @@ function App() {
                 <Route path="collect" element={<OnlineOrderCollection />} />
               </Route>
             </Route>
+
+            <Route path="analytics" element={<ManageDashboard />} />
           </Route>
 
           {/* Admin Subsystem */}

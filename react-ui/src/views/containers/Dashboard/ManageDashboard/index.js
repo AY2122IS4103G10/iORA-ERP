@@ -141,10 +141,9 @@ const data2 = {
 
 export const ManageDashboard = () => {
   const dispatch = useDispatch();
-  const siteId = localStorage.getItem("siteId");
-  const initSite = (siteId && siteId !== "1") ? {id: siteId, name: "My Site"} : { id: 0, name: "Choose one" }
+  const siteId = Number(localStorage.getItem("siteId"));
   const [siteData, setSiteData] = useState([]);
-  const [siteChosen, setSiteChosen] = useState(initSite);
+  const [siteChosen, setSiteChosen] = useState({ id: 0, name: "Choose One" });
   const options = [
     { id: 0, name: "Daily", unit: "day" },
     { id: 1, name: "Weekly", unit: "week" },
@@ -187,7 +186,7 @@ export const ManageDashboard = () => {
 
   useEffect(() => {
     status === "idle" && dispatch(getStockLevelSites());
-    stockLevelSites.length > 0 &&
+    status === "succeeded-1" && stockLevelSites.length > 0 &&
       setSiteData(
         stockLevelSites.map((site) => {
           return {
@@ -199,7 +198,13 @@ export const ManageDashboard = () => {
           };
         })
       );
-  }, [status, dispatch, stockLevelSites]);
+    if (status === "succeeded-1" && siteId && stockLevelSites.length > 0) {
+      const chosenSite = stockLevelSites.find(
+        (site) => site.id === siteId
+      );
+      setSiteChosen({ id: siteId, name: chosenSite.name });
+    }
+  }, [status, dispatch, stockLevelSites, siteId]);
 
   useLayoutEffect(() => {
     range &&
@@ -262,78 +267,86 @@ export const ManageDashboard = () => {
               />
             </div>
           </div>
-          <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
-            <h3 className="text-lg font-medium">Finances</h3>
-            <SharedStats
-              stats={[
-                {
-                  name: "Revenue",
-                  stat: getRevenue(currStats, true),
-                  previousStat: getRevenue(prevStats, true),
-                  prefix: "$",
-                  change: delta(
-                    getRevenue(currStats, true),
-                    getRevenue(prevStats, true)
-                  ),
-                  changeType: deltaType(
-                    getRevenue(currStats, true),
-                    getRevenue(prevStats, true)
-                  ),
-                },
-                {
-                  name: "Total Customer Orders",
-                  stat: getOrder(currStats, true),
-                  previousStat: getOrder(prevStats, true),
-                  change: delta(
-                    getOrder(currStats, true),
-                    getOrder(prevStats, true)
-                  ),
-                  changeType: deltaType(
-                    getOrder(currStats, true),
-                    getOrder(prevStats, true)
-                  ),
-                },
-                {
-                  name: "Products Sold",
-                  stat: getProduct(currStats, true),
-                  previousStat: getProduct(prevStats, true),
-                  suffix: " items",
-                  change: delta(
-                    getProduct(currStats, true),
-                    getProduct(prevStats, true)
-                  ),
-                  changeType: deltaType(
-                    getProduct(currStats, true),
-                    getProduct(prevStats, true)
-                  ),
-                },
-              ]}
-            />
-          </div>
-          <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6 md:col-span-2">
-            <h3 className="text-lg font-medium">Product Levels</h3>
-            <Bar
-              data={{
-                labels: siteData.map((x) => x.name),
-                datasets: [
-                  {
-                    label: "Total Stock Level of Sites",
-                    data: siteData.map((x) => x.productLevel),
-                    backgroundColor: colourPicker(multi, siteData.length, 0.6),
-                    borderColor: colourPicker(multi, siteData.length, 1),
-                    borderWidth: 0,
-                  },
-                ],
-              }}
-              options={{
-                plugins: {
-                  legend: {
-                    display: false,
-                  },
-                },
-              }}
-            />
-          </div>
+          {siteChosen.id === 0 && (
+            <>
+              <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
+                <h3 className="text-lg font-medium">Finances</h3>
+                <SharedStats
+                  stats={[
+                    {
+                      name: "Revenue",
+                      stat: getRevenue(currStats, true),
+                      previousStat: getRevenue(prevStats, true),
+                      prefix: "$",
+                      change: delta(
+                        getRevenue(currStats, true),
+                        getRevenue(prevStats, true)
+                      ),
+                      changeType: deltaType(
+                        getRevenue(currStats, true),
+                        getRevenue(prevStats, true)
+                      ),
+                    },
+                    {
+                      name: "Total Customer Orders",
+                      stat: getOrder(currStats, true),
+                      previousStat: getOrder(prevStats, true),
+                      change: delta(
+                        getOrder(currStats, true),
+                        getOrder(prevStats, true)
+                      ),
+                      changeType: deltaType(
+                        getOrder(currStats, true),
+                        getOrder(prevStats, true)
+                      ),
+                    },
+                    {
+                      name: "Products Sold",
+                      stat: getProduct(currStats, true),
+                      previousStat: getProduct(prevStats, true),
+                      suffix: " items",
+                      change: delta(
+                        getProduct(currStats, true),
+                        getProduct(prevStats, true)
+                      ),
+                      changeType: deltaType(
+                        getProduct(currStats, true),
+                        getProduct(prevStats, true)
+                      ),
+                    },
+                  ]}
+                />
+              </div>
+              <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6 md:col-span-2">
+                <h3 className="text-lg font-medium">Product Levels</h3>
+                <Bar
+                  data={{
+                    labels: siteData.map((x) => x.name),
+                    datasets: [
+                      {
+                        label: "Total Stock Level of Sites",
+                        data: siteData.map((x) => x.productLevel),
+                        backgroundColor: colourPicker(
+                          multi,
+                          siteData.length,
+                          0.6
+                        ),
+                        borderColor: colourPicker(multi, siteData.length, 1),
+                        borderWidth: 0,
+                      },
+                    ],
+                  }}
+                  options={{
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </>
+          )}
           {siteChosen.id !== 0 && (
             <>
               <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">

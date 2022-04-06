@@ -41,7 +41,7 @@ public interface ProductService {
     public abstract List<Model> getModelsByCompanyAndTag(String company, String tag);
     public abstract List<Model> getModelsByTag(String tag);
     public abstract List<Model> getModelsByCategory(String category);
-    public abstract Model updateModel(Model model) throws ModelException;
+    public abstract Model updateModel(Model model) throws ModelException, ProductFieldException;
 
     public abstract Product getProduct(String rfidsku) throws ProductException;
     public abstract List<Product> getProducts(List<String> rfidskus) throws ProductException;

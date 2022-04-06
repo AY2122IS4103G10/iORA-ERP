@@ -22,6 +22,8 @@ import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.model.customerOrder.Delivery;
+import com.iora.erp.model.customerOrder.DeliveryAddress;
 import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +55,13 @@ public class CustomerServiceImpl implements CustomerService {
             getCustomerByEmail(customer.getEmail());
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
+            // DeliveryAddress da = customer.getAddress();
             customer.setMembershipTier(findMembershipTierById("BASIC"));
             customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+            // customer.setAddress(new DeliveryAddress());
             em.persist(customer);
+            // em.persist(da);
+            // customer.setAddress(da);
 
             return customer;
         }
@@ -80,30 +86,17 @@ public class CustomerServiceImpl implements CustomerService {
         old.setFirstName(customer.getFirstName());
         old.setLastName(customer.getLastName());
 
-        return old;
-    }
-
-    @Override
-    public Customer editCustomerAccount(Customer customer) throws CustomerException {
-        Customer old = em.find(Customer.class, customer.getId());
-
-        if (old == null) {
-            throw new CustomerException("Customer not found");
-        }
-
-        try {
-            old.setEmail(customer.getEmail());
-        } catch (Exception ex) {
-            throw new CustomerException("Email " + customer.getEmail() + " has been used!");
-        }
-
-        old.setContactNumber(customer.getContactNumber());
-        old.setDob(customer.getDob());
-        old.setFirstName(customer.getFirstName());
-        old.setLastName(customer.getLastName());
-        old.setMembershipPoints(customer.getMembershipPoints());
-        old.setStoreCredit(customer.getStoreCredit());
-
+        DeliveryAddress da = em.find(DeliveryAddress.class, customer.getAddress().getId());
+        da.setName(customer.getAddress().getName());
+        da.setStreet1(customer.getAddress().getStreet1());
+        da.setStreet2(customer.getAddress().getStreet2());
+        da.setCountry(customer.getAddress().getCountry());
+        da.setState(customer.getAddress().getState());
+        da.setCity(customer.getAddress().getCity());
+        da.setZip(customer.getAddress().getZip());
+        da.setPhone(customer.getAddress().getPhone());
+        System.out.println(da.getStreet1());
+        old.setAddress(da);
         return old;
     }
 

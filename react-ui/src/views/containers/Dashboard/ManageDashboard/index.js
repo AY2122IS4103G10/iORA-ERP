@@ -141,8 +141,10 @@ const data2 = {
 
 export const ManageDashboard = () => {
   const dispatch = useDispatch();
+  const siteId = localStorage.getItem("siteId");
+  const initSite = (siteId && siteId !== "1") ? {id: siteId, name: "My Site"} : { id: 0, name: "Choose one" }
   const [siteData, setSiteData] = useState([]);
-  const [siteChosen, setSiteChosen] = useState({ id: 0, name: "Choose one" });
+  const [siteChosen, setSiteChosen] = useState(initSite);
   const options = [
     { id: 0, name: "Daily", unit: "day" },
     { id: 1, name: "Weekly", unit: "week" },
@@ -156,11 +158,11 @@ export const ManageDashboard = () => {
     ({ dashboard }) => dashboard.stockLevelSites
   );
   const currStats = useSelector(
-    ({ dashboard }) => dashboard.customerOrdersByDate?.slice(-1)[0]
-  ) || {};
+    ({ dashboard }) => dashboard.customerOrdersByDate.slice(-1)[0]
+  );
   const prevStats = useSelector(
-    ({ dashboard }) => dashboard.customerOrdersByDatePrev?.slice(-2)[0]
-  ) || {};
+    ({ dashboard }) => dashboard.customerOrdersByDate.slice(-2)[0]
+  );
   const getStats = (obj, type, coeff, total) =>
     total
       ? Object.values(obj).reduce((sum, site) => sum + site[type] * coeff, 0)

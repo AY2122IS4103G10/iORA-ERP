@@ -4,12 +4,9 @@ import { dashboardApi } from "../../environments/Api";
 const initialState = {
   stockLevelSites: [],
   stockLevelProducts: [],
-  customerOrdersByDate: [],
-  customerOrdersByDatePrev: [],
+  customerOrdersByDate: [[],[]],
   storeOrdersByDate: [],
-  storeOrdersByDatePrev: [],
   onlineOrdersByDate: [],
-  onlineOrdersByDatePrev: [],
   customerOrders: [],
   procurementOrders: [],
   stockTransferOrders: [],
@@ -43,8 +40,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getCustomerOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.customerOrdersByDatePrev = state.customerOrdersByDate;
-      state.customerOrdersByDate = action.payload;
+      state.customerOrdersByDate.push(action.payload);
     });
     builder.addCase(getCustomerOrders.rejected, (state, action) => {
       state.status = "failed";
@@ -55,8 +51,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getStoreOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.storeOrdersByDatePrev = state.storeOrdersByDate;
-      state.storeOrdersByDate = action.payload;
+      state.storeOrdersByDate.push(action.payload);
     });
     builder.addCase(getStoreOrders.rejected, (state, action) => {
       state.status = "failed";
@@ -67,8 +62,7 @@ const dashboardSlice = createSlice({
     });
     builder.addCase(getOnlineOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.onlineOrdersByDatePrev = state.onlineOrdersByDate;
-      state.onlineOrdersByDate = action.payload;
+      state.onlineOrdersByDate.push(action.payload);
     });
     builder.addCase(getOnlineOrders.rejected, (state, action) => {
       state.status = "failed";

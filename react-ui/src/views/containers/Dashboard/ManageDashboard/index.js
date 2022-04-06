@@ -156,11 +156,11 @@ export const ManageDashboard = () => {
     ({ dashboard }) => dashboard.stockLevelSites
   );
   const currStats = useSelector(
-    ({ dashboard }) => dashboard.customerOrdersByDate
-  );
+    ({ dashboard }) => dashboard.customerOrdersByDate?.slice(-1)[0]
+  ) || {};
   const prevStats = useSelector(
-    ({ dashboard }) => dashboard.customerOrdersByDatePrev
-  );
+    ({ dashboard }) => dashboard.customerOrdersByDatePrev?.slice(-2)[0]
+  ) || {};
   const getStats = (obj, type, coeff, total) =>
     total
       ? Object.values(obj).reduce((sum, site) => sum + site[type] * coeff, 0)

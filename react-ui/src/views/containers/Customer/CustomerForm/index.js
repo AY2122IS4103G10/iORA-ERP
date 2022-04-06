@@ -111,21 +111,6 @@ const CustomerFormBody = ({
                       />
                     </SimpleInputGroup>
                     <SimpleInputGroup
-                      label="Password"
-                      inputField="password"
-                      className="sm:mt-0 sm:col-span-2">
-                      <SimpleInputBox
-                        type="password"
-                        name="password"
-                        id="password"
-                        autoComplete="password"
-                        value={password}
-                        onChange={onPasswordChanged}
-                        disabled={isEditing}
-                        className={isEditing ? "bg-gray-200" : ""}
-                      />
-                    </SimpleInputGroup>
-                    <SimpleInputGroup
                       label="Date of birth"
                       inputField="dob"
                       className="sm:mt-0 sm:col-span-2">

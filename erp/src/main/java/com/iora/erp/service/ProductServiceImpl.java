@@ -385,7 +385,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Model updateModel(Model model) throws ModelException {
+    public Model updateModel(Model model) throws ModelException, ProductFieldException {
         Model old = em.find(Model.class, model.getModelCode());
 
         if (old == null) {
@@ -401,21 +401,25 @@ public class ProductServiceImpl implements ProductService {
         old.setListPrice(model.getListPrice());
         old.setDiscountPrice(model.getDiscountPrice());
         old.setImageLinks(model.getImageLinks());
-        // start
-       /*  List<String> coloursNew = new ArrayList<>();
-        List<String> sizesNew = new ArrayList<>();
+        old = updateProduct(model, old);
+        old.setProductFields(model.getProductFields());
 
+        return em.merge(old);
+    }
+
+    private Model updateProduct(Model model, Model old) throws ModelException, ProductFieldException {
+        List<String> coloursNew = new ArrayList<>();
+        List<String> sizesNew = new ArrayList<>();
         for (ProductField pf : model.getProductFields()) {
             if (pf.getFieldName().equals("COLOUR")) {
                 coloursNew.add(pf.getFieldValue());
             } else if (pf.getFieldName().equals("SIZE")) {
-                coloursNew.add(pf.getFieldValue());
+                sizesNew.add(pf.getFieldValue());
             }
         }
 
         List<String> coloursOld = new ArrayList<>();
         List<String> sizesOld = new ArrayList<>();
-
         for (ProductField pf : old.getProductFields()) {
             if (pf.getFieldName().equals("COLOUR")) {
                 coloursOld.add(pf.getFieldValue());
@@ -428,40 +432,50 @@ public class ProductServiceImpl implements ProductService {
             throw new ModelException("Sizes and Colours can only be added, not removed.");
         }
 
-        List<String> coloursDiff = coloursNew;
+        List<String> coloursDiff = new ArrayList<>(coloursNew);
         coloursDiff.removeAll(coloursOld);
-        List<String> sizesDiff = sizesNew;
+        List<String> sizesDiff = new ArrayList<>(sizesNew);
         sizesDiff.removeAll(sizesOld);
-
         int count = old.getProducts().size() + 1;
 
-        if (sizesDiff.size() != 0) {
-            // Loop for each combination of new sizes and all colours
-            for (int i = 0; i < sizesDiff.size(); i++) {
-                for (int j = 0; j < coloursNew.size(); j++) {
+        if (coloursDiff.size() > 0) {
+            // Loop for each combination of new colours and all sizes
+            for (int i = 0; i < coloursDiff.size(); i++) {
+                for (int j = 0; j < sizesNew.size(); j++) {
                     Product p = new Product(model.getModelCode() + "-" + count);
 
-                    ProductField colourField = getProductFieldByNameValue("colour", colours.get(i));
+                    ProductField colourField = getProductFieldByNameValue("colour", coloursDiff.get(i));
                     p.addProductField(colourField);
 
-                    ProductField sizeField = getProductFieldByNameValue("size", sizes.get(j));
+                    ProductField sizeField = getProductFieldByNameValue("size", sizesNew.get(j));
                     p.addProductField(sizeField);
 
                     em.persist(p);
-                    model.addProduct(p);
+                    old.addProduct(p);
                     count++;
                 }
             }
-        } */
+        }
 
-        // end
-        old.setProductFields(model.getProductFields());
+        if (sizesDiff.size() > 0) {
+            // Loop for each combination of new sizes and all colours
+            for (int i = 0; i < sizesDiff.size(); i++) {
+                for (int j = 0; j < coloursOld.size(); j++) {
+                    Product p = new Product(model.getModelCode() + "-" + count);
 
+                    ProductField sizeField = getProductFieldByNameValue("size", sizesDiff.get(i));
+                    p.addProductField(sizeField);
+
+                    ProductField colourField = getProductFieldByNameValue("colour", coloursOld.get(j));
+                    p.addProductField(colourField);
+
+                    em.persist(p);
+                    old.addProduct(p);
+                    count++;
+                }
+            }
+        }
         return old;
-    }
-
-    private Model updateProduct(Model model) throws ProductException, ProductFieldException {
-        return null;
     }
 
     @Override

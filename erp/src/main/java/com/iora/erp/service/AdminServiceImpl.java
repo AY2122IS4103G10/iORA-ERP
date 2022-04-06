@@ -212,7 +212,7 @@ public class AdminServiceImpl implements AdminService {
                 throw new DepartmentException("Failure: Department is currently being used.");
             } else {
                 List<Company> listC = em.createQuery("SELECT c FROM Company c", Company.class).getResultList();
-                System.out.println(listC);
+
                 if (listC.size() > 0) {
                     for (Company c : listC) {
                         Company cc = getCompanyById(c.getId());

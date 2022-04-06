@@ -1,5 +1,6 @@
 package com.iora.erp.service;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
@@ -978,8 +980,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public Map<Long, Long> getCustomerOrdersInDateRange(Date start, Date end) {
-        Map<Long, Long> map = new HashMap<Long, Long>();
+    public Map<Long, Map<String, Long>> getCustomerOrdersInDateRange(Date start, Date end) {
+        Map<Long, Map<String, Long>> map = new HashMap<Long, Map<String, Long>>();
         List<Site> sites = siteService.getAllSites();
 
         Calendar cal = new GregorianCalendar();
@@ -996,15 +998,38 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         end = cal.getTime();
 
         for (Site site : sites) {
-            TypedQuery<Long> q = em
+            Map<String, Long> valueMap = new HashMap<String, Long>();
+
+            Query productCountQuery = em
+                    .createNativeQuery(
+                            "SELECT sum(qty) FROM customer_order co, CUSTOMER_ORDER_LINE_ITEMS coli, customer_Orderli li WHERE coli.line_items_id = li.id AND coli.customer_order_id = co.id AND co.site_id = :siteId AND co.date_Time BETWEEN :start AND :end")
+                    .setParameter("siteId", site.getId())
+                    .setParameter("start", start)
+                    .setParameter("end", end);
+            BigInteger productCount = productCountQuery.getSingleResult() == null ? BigInteger.valueOf(0)
+                    : (BigInteger) productCountQuery.getSingleResult();
+            valueMap.put("products", productCount.longValue());
+
+            Query revenueQuery = em.createNativeQuery(
+                    "SELECT SUM(total_amount) FROM CUSTOMER_ORDER WHERE site_id = :siteId AND date_time BETWEEN :start AND :end")
+                    .setParameter("siteId", site.getId())
+                    .setParameter("start", start)
+                    .setParameter("end", end);
+
+            Double revenue = revenueQuery.getSingleResult() == null ? 0d
+                    : (Double) revenueQuery.getSingleResult() * 100;
+            valueMap.put("revenue", revenue.longValue());
+
+            TypedQuery<Long> orderCountQuery = em
                     .createQuery(
                             "SELECT COUNT(co) FROM CustomerOrder co WHERE co.site.id = :siteId AND co.dateTime BETWEEN :start AND :end",
                             Long.class)
                     .setParameter("siteId", site.getId())
                     .setParameter("start", start)
                     .setParameter("end", end);
+            valueMap.put("orders", orderCountQuery.getSingleResult());
 
-            map.put(site.getId(), q.getSingleResult());
+            map.put(site.getId(), valueMap);
         }
         return map;
     }

@@ -328,6 +328,7 @@ export const ProcurementDetails = () => {
       );
     });
   }, [statusHistory]);
+  console.log(lineItems)
   return (
     <>
       <ProcurementDetailsBody

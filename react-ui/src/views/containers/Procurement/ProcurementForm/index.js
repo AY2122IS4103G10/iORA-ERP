@@ -290,7 +290,7 @@ const UploadFileList = ({ data, setData }) => {
       },
       {
         Header: "",
-        accessor: "imageLinks",
+        accessor: "files",
         Cell: (e) => {
           return (
             <div>
@@ -562,7 +562,6 @@ export const ProcurementForm = () => {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
-
   const headquarters = useSelector(selectAllHeadquarters);
   const hq = headquarters[0];
   const hqStatus = useSelector((state) => state.sites.hqStatus);
@@ -622,6 +621,7 @@ export const ProcurementForm = () => {
         modelCode,
         name,
         imageLinks,
+        files: [],
       }))
     );
     closeModal();
@@ -754,20 +754,23 @@ export const ProcurementForm = () => {
       fetchAllModelsBySkus(lIs).then((data) => {
         const arr = lIs.map((item, index) => ({
           ...item,
-          modelCode: data[index].modelCode,
-          name: data[index].name,
-          imageLinks: data[index].imageLinks,
+          product: {
+            ...item.product,
+            modelCode: data[index].modelCode,
+            name: data[index].name,
+            imageLinks: data[index].imageLinks,
+          },
         }));
         setLineItems(arr);
-        console.log(arr);
-        const set = Array.from(new Set(arr.map((item) => item.modelCode))).map(
-          (prod) => arr.find((i) => i.modelCode === prod)
-        );
+        const set = Array.from(
+          new Set(arr.map((item) => item.product.modelCode))
+        ).map((prod) => arr.find((i) => i.product.modelCode === prod));
         setModels(
-          set.map(({ modelCode, name, imageLinks }) => ({
-            modelCode,
-            name,
-            imageLinks,
+          set.map(({ product, files }) => ({
+            modelCode: product.modelCode,
+            name: product.name,
+            imageLinks: product.imageLinks,
+            files,
           }))
         );
       });
@@ -778,7 +781,7 @@ export const ProcurementForm = () => {
       );
       fetchSite(warehouse).then((data) => data && setWarehouseSelected(data));
       let selectedRows = {};
-      lineItems.forEach((_, index) => (selectedRows[index] = true));
+      lIs.forEach((_, index) => (selectedRows[index] = true));
       setSelectedRows(selectedRows);
     };
 
@@ -789,7 +792,7 @@ export const ProcurementForm = () => {
           autoDismiss: true,
         })
       );
-  }, [orderId, addToast, lineItems]);
+  }, [orderId, addToast]);
 
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);

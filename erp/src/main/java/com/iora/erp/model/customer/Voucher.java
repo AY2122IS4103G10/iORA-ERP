@@ -27,8 +27,7 @@ public class Voucher {
     @Column(nullable = false)
     private Date expiry;
 
-    @ElementCollection
-    private List<Long> customerIds;
+    private Long customerId;
 
     @Column(nullable = false)
     private boolean issued;
@@ -43,7 +42,6 @@ public class Voucher {
     public Voucher() {
         this.voucherCode = StringGenerator.generateRandom(48, 122, 10);
         this.campaign = "None";
-        customerIds = new ArrayList<>();
         this.issued = false;
         this.redeemed = false;
     }
@@ -53,21 +51,6 @@ public class Voucher {
         this.campaign = campaign;
         this.amount = amount;
         this.expiry = expiry;
-    }
-
-    public Voucher(double amount, Date expiry, List<Long> customerIds) {
-        this();
-        this.amount = amount;
-        this.expiry = expiry;
-        this.customerIds = customerIds;
-    }
-
-    public Voucher(String campaign, double amount, Date expiry, List<Long> customerIds) {
-        this();
-        this.campaign = campaign;
-        this.amount = amount;
-        this.expiry = expiry;
-        this.customerIds = customerIds;
     }
 
     public String getVoucherCode() {
@@ -102,18 +85,14 @@ public class Voucher {
         this.expiry = expiry;
     }
 
-    public List<Long> getCustomerIds() {
-        return this.customerIds;
+    public Long getCustomerId() {
+        return this.customerId;
     }
 
-    public void setCustomerIds(List<Long> customerIds) {
-        this.customerIds = customerIds;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
-
-    public void addCustomerId(Long customerId) {
-        this.customerIds.add(customerId);
-    }
-
+  
     public boolean isIssued() {
         return this.issued;
     }

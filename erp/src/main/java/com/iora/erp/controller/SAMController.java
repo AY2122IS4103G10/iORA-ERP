@@ -378,11 +378,14 @@ public class SAMController {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @PostMapping(path = "/voucher", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> generateVouchers(@RequestBody Voucher voucher, @RequestParam int qty) {
+    public ResponseEntity<Object> generateVouchers(@RequestBody Map<String, Object> body, @RequestParam int qty) {
         try {
             return ResponseEntity
-                    .ok(customerService.generateVouchers(voucher, qty));
+                    .ok(customerService.generateVouchers((String) body.get("campaign"),
+                            Double.parseDouble((String) body.get("amount")), new Date((Long) body.get("expiry")),
+                            (List<Integer>) body.get("customerIds"), qty));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -606,6 +609,18 @@ public class SAMController {
         }
     }
 
+    @GetMapping(path = "/dashboard/voucher/{campaign}", produces = "application/json")
+    public ResponseEntity<Object> getVouchersPerformance(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "ddMMyyyy") Date date,
+            @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.getDailyStockTransferOrders(siteId, date == null ? new Date() : date));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     /*
      * ---------------------------------------------------------
      * B.4 CRM
@@ -792,9 +807,9 @@ public class SAMController {
     }
 
     @PutMapping(path = "/customer/edit", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> completeProcurementOrder(@RequestBody Customer customer) {
+    public ResponseEntity<Object> editCustomer(@RequestBody Customer customer) {
         try {
-            return ResponseEntity.ok(customerService.editCustomerAccount(customer));
+            return ResponseEntity.ok(customerService.updateCustomerAccount(customer));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

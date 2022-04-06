@@ -27,6 +27,7 @@ public interface CustomerOrderService {
 
         public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;
         public abstract CustomerOrder updateCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException;
+        public abstract double getCurrentSpending(Long customerId);
         public abstract CustomerOrder finaliseCustomerOrder(CustomerOrder customerOrder) throws CustomerOrderException, InsufficientPaymentException, CustomerException;
 
         public abstract CustomerOrderLI getCustomerOrderLI(Long id) throws CustomerOrderException;

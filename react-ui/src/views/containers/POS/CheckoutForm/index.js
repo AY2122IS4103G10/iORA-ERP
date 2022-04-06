@@ -12,6 +12,7 @@ import {
   SearchIcon,
 } from "@heroicons/react/solid";
 import { loadStripeTerminal } from "@stripe/terminal-js";
+import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
@@ -90,7 +91,16 @@ export const CheckoutForm = ({
     setShowChoice(false);
     setMode(0);
     setPhone("");
+    setCustomerId(null);
     setCustomerName("");
+    setCustomer({});
+    setVoucherCodes([]);
+    setVoucherCode("");
+    setVoucherDiscount(0);
+    setSelectedVoucherCode({
+      id: 0,
+      name: "Choose One",
+    });
   };
 
   const handleSubmit = async (paymentIntentId) => {
@@ -98,7 +108,7 @@ export const CheckoutForm = ({
       const response = await orderApi.createOrder(
         {
           ...order,
-          amount: Math.max(amount - voucherDiscount, 0),
+          totalAmount: Math.max(amount - voucherDiscount, 0),
           customerId: customerId,
           paid: true,
           voucher,
@@ -145,9 +155,23 @@ export const CheckoutForm = ({
           autoDismiss: true,
         });
       } else {
+        const res = await posApi.getVoucherCodes(data[0]?.id);
+        setVoucherCodes([
+          { id: 0, name: "Choose One" },
+          ...res.data.map((voucher, index) => {
+            return {
+              id: index + 1,
+              name: `${voucher.campaign}: $${
+                voucher.amount
+              } voucher (expiring ${moment(voucher.expiry).format(
+                "DD/MM/yyyy"
+              )})`,
+              ...voucher,
+            };
+          }),
+        ]);
         setCustomerId(data[0]?.id);
         setCustomer(data[0]);
-        console.log(data[0]);
         setCustomerName(data[0]?.firstName + " " + data[0]?.lastName);
         addToast(
           `Success: Customer ${data[0]?.firstName} ${data[0]?.lastName} was found`,
@@ -162,6 +186,7 @@ export const CheckoutForm = ({
 
   const getVoucherDetails = async () => {
     if (voucherCode === "") {
+      setVoucherDiscount(0);
       addToast(`Info: You did not key in a voucher code`, {
         appearance: "info",
         autoDismiss: true,
@@ -170,6 +195,7 @@ export const CheckoutForm = ({
       const data = await dispatch(getVoucherByCode(voucherCode)).unwrap();
       if (data.length === 0) {
         setVoucherCode("");
+        setVoucherDiscount(0);
         addToast(`Error: No Voucher found`, {
           appearance: "error",
           autoDismiss: true,
@@ -178,7 +204,7 @@ export const CheckoutForm = ({
         setVoucher(data);
         setVoucherDiscount(data?.amount);
         addToast(
-          `Success: Voucher with code: ${voucher} of $${data?.amount} was found`,
+          `Success: Voucher with code: ${voucherCode} of $${data?.amount} was found`,
           {
             appearance: "success",
             autoDismiss: true,
@@ -189,7 +215,9 @@ export const CheckoutForm = ({
   };
 
   useEffect(() => {
-    selectedVoucherCode.id !== 0 && setVoucherCode(selectedVoucherCode.name);
+    selectedVoucherCode?.voucherCode
+      ? setVoucherCode(selectedVoucherCode.voucherCode)
+      : setVoucherCode("");
   }, [selectedVoucherCode]);
 
   const handleConfirm = () => {
@@ -331,7 +359,7 @@ export const CheckoutForm = ({
                     placeholder="XXXXXXXX"
                     onChange={(e) => setVoucherCode(e.target.value)}
                     onBlur={getVoucherDetails}
-                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-3 sm:text-lg border-gray-300 rounded-md"
+                    className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-3 pr-3 sm:text-lg border-gray-300 rounded-md"
                     aria-describedby="price-currency"
                   />
                 </div>

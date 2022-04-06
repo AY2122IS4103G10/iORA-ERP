@@ -165,7 +165,7 @@ export const ManageDashboard = () => {
   const getStats = (obj, type, coeff, total) =>
     total
       ? Object.values(obj).reduce((sum, site) => sum + site[type] * coeff, 0)
-      : obj[siteChosen?.id];
+      : obj[siteChosen?.id][type] * coeff;
   const getRevenue = (obj, total = false) =>
     getStats(obj, "revenue", 0.01, total);
   const getOrder = (obj, total = false) => getStats(obj, "orders", 1, total);
@@ -186,7 +186,8 @@ export const ManageDashboard = () => {
 
   useEffect(() => {
     status === "idle" && dispatch(getStockLevelSites());
-    status === "succeeded-1" && stockLevelSites.length > 0 &&
+    status === "succeeded-1" &&
+      stockLevelSites.length > 0 &&
       setSiteData(
         stockLevelSites.map((site) => {
           return {
@@ -199,9 +200,7 @@ export const ManageDashboard = () => {
         })
       );
     if (status === "succeeded-1" && siteId && stockLevelSites.length > 0) {
-      const chosenSite = stockLevelSites.find(
-        (site) => site.id === siteId
-      );
+      const chosenSite = stockLevelSites.find((site) => site.id === siteId);
       setSiteChosen({ id: siteId, name: chosenSite.name });
     }
   }, [status, dispatch, stockLevelSites, siteId]);
@@ -267,7 +266,7 @@ export const ManageDashboard = () => {
               />
             </div>
           </div>
-          {siteChosen.id === 0 && (
+          {siteChosen.id < 3 && (
             <>
               <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
                 <h3 className="text-lg font-medium">Finances</h3>
@@ -355,6 +354,16 @@ export const ManageDashboard = () => {
                 </h3>
                 <SharedStats
                   stats={[
+                    {
+                      name: "Total Revenue",
+                      prefix: "$",
+                      stat: siteCustomerOrders
+                        ?.find((x) => x.id === siteChosen.id)
+                        ?.orders?.reduce(
+                          (sum, order) => sum + order.totalAmount,
+                          0
+                        ),
+                    },
                     {
                       name: "Total Customer Orders",
                       stat: siteCustomerOrders?.find(

@@ -22,6 +22,8 @@ import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customer.Voucher;
+import com.iora.erp.model.customerOrder.Delivery;
+import com.iora.erp.model.customerOrder.DeliveryAddress;
 import com.iora.erp.utils.StringGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +55,13 @@ public class CustomerServiceImpl implements CustomerService {
             getCustomerByEmail(customer.getEmail());
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
+            // DeliveryAddress da = customer.getAddress();
             customer.setMembershipTier(findMembershipTierById("BASIC"));
             customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+            // customer.setAddress(new DeliveryAddress());
             em.persist(customer);
+            // em.persist(da);
+            // customer.setAddress(da);
 
             return customer;
         }
@@ -80,30 +86,17 @@ public class CustomerServiceImpl implements CustomerService {
         old.setFirstName(customer.getFirstName());
         old.setLastName(customer.getLastName());
 
-        return old;
-    }
-
-    @Override
-    public Customer editCustomerAccount(Customer customer) throws CustomerException {
-        Customer old = em.find(Customer.class, customer.getId());
-
-        if (old == null) {
-            throw new CustomerException("Customer not found");
-        }
-
-        try {
-            old.setEmail(customer.getEmail());
-        } catch (Exception ex) {
-            throw new CustomerException("Email " + customer.getEmail() + " has been used!");
-        }
-
-        old.setContactNumber(customer.getContactNumber());
-        old.setDob(customer.getDob());
-        old.setFirstName(customer.getFirstName());
-        old.setLastName(customer.getLastName());
-        old.setMembershipPoints(customer.getMembershipPoints());
-        old.setStoreCredit(customer.getStoreCredit());
-
+        DeliveryAddress da = em.find(DeliveryAddress.class, customer.getAddress().getId());
+        da.setName(customer.getAddress().getName());
+        da.setStreet1(customer.getAddress().getStreet1());
+        da.setStreet2(customer.getAddress().getStreet2());
+        da.setCountry(customer.getAddress().getCountry());
+        da.setState(customer.getAddress().getState());
+        da.setCity(customer.getAddress().getCity());
+        da.setZip(customer.getAddress().getZip());
+        da.setPhone(customer.getAddress().getPhone());
+        System.out.println(da.getStreet1());
+        old.setAddress(da);
         return old;
     }
 
@@ -221,20 +214,20 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Voucher> generateVouchers(Voucher voucher, int qty) throws CustomerException {
+    public List<Voucher> generateVouchers(String campaign, double amount, Date expiry, List<Integer> customerIds,
+            int qty) throws CustomerException {
         List<Voucher> vouchers = new ArrayList<>();
+        if (customerIds == null) {
+            customerIds = new ArrayList<>();
+        }
 
-        String campaign = voucher.getCampaign();
-        double amount = voucher.getAmount();
-        Date expDate = voucher.getExpiry();
-        List<Long> customerIds = voucher.getCustomerIds();
         qty = qty < customerIds.size() ? customerIds.size() : qty;
 
         for (int i = 0; i < qty; i++) {
-            Voucher v = new Voucher(campaign, amount, expDate, customerIds);
+            Voucher v = new Voucher(campaign, amount, expiry);
             em.persist(v);
             if (i < customerIds.size()) {
-                issueVoucher(v.getVoucherCode(), customerIds.get(i));
+                issueVoucher(v.getVoucherCode(), Long.valueOf(customerIds.get(i)));
             }
             vouchers.add(v);
         }
@@ -252,7 +245,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<Voucher> getVouchersOfCustomer(Long customerId) throws CustomerException {
         return em
-                .createQuery("SELECT DISTINCT v FROM Voucher v WHERE :customerId MEMBER OF v.customerIds",
+                .createQuery("SELECT v FROM Voucher v WHERE v.customerId = :customerId",
                         Voucher.class)
                 .setParameter("customerId", customerId)
                 .getResultList();
@@ -279,7 +272,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Voucher issueVoucher(String voucherCode, Long customerId) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
-        voucher.addCustomerId(customerId);
+        voucher.setCustomerId(customerId);
         Customer customer = getCustomerById(customerId);
 
         emailService.sendSimpleMessage(customer.getEmail(), "iORA S$" + voucher.getAmount() + " Voucher",

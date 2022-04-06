@@ -477,6 +477,11 @@ export const posApi = {
       `${REST_ENDPOINT}store/customerOrder/product?sku=${sku}`
     );
   },
+  getVoucherCodes(customerId) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/member/vouchers/${customerId}`
+    );
+  },
 };
 
 export const logisticsApi = {

@@ -16,6 +16,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.site.Site;
 
@@ -32,6 +33,7 @@ public class CustomerOrder {
     private Double totalAmount;
 
     // This site will be supplying the inventory for the order
+    @JsonIgnoreProperties({"stockLevel"})
     @ManyToOne
     private Site site;
 

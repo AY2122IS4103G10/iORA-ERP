@@ -360,6 +360,7 @@ function App() {
               />
             </Route>
 
+            {/* POS */}
             <Route path="pos" element={<ManagePOS />}>
               <Route path="orderHistory" element={<Outlet />}>
                 <Route index element={<PosPurchaseHistory />} />
@@ -399,6 +400,8 @@ function App() {
                 <Route path="collect" element={<OnlineOrderCollection />} />
               </Route>
             </Route>
+
+            <Route path="analytics" element={<ManageDashboard />} />
           </Route>
 
           {/* Admin Subsystem */}

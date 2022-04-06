@@ -62,7 +62,7 @@ public interface CustomerOrderService {
         public abstract OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
         public abstract OnlineOrder collectOnlineOrder(Long orderId) throws CustomerOrderException;
 
-        public abstract Map<Long, Long> getCustomerOrdersInDateRange(Date start, Date end);
+        public abstract Map<Long, Map<String,Long>> getCustomerOrdersInDateRange(Date start, Date end);
         public abstract Map<Long, Long> getStoreOrdersInDateRange(Date start, Date end);
         public abstract Map<Long, Long> getOnlineOrdersInDateRange(Date start, Date end);
         public abstract List<CustomerOrder> getDailyCustomerOrders(Long siteId, Date date);

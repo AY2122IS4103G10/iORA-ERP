@@ -619,8 +619,7 @@ export const ProcurementForm = () => {
     const lineItems = [];
     selectedRowKeys.map((key) => lineItems.push(skus[key]));
     setLineItems(
-      lineItems.map(({ modelCode, ...item }) => ({
-        modelCode,
+      lineItems.map(({ ...item }) => ({
         product: { ...item },
         requestedQty: 1,
         costPrice: 0,
@@ -714,7 +713,7 @@ export const ProcurementForm = () => {
       });
     }
   };
-
+  
   const onSaveOrderClicked = async (evt) => {
     evt.preventDefault();
     if (canAdd) {
@@ -746,7 +745,6 @@ export const ProcurementForm = () => {
           notes: remarks,
         };
         if (isEditing) order["id"] = orderId;
-        console.log(order);
         if (!isEditing) createProcurement(order);
         else updateProcurement(order);
       } catch (error) {

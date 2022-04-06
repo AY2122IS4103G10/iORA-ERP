@@ -214,20 +214,20 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Voucher> generateVouchers(Voucher voucher, int qty) throws CustomerException {
+    public List<Voucher> generateVouchers(String campaign, double amount, Date expiry, List<Integer> customerIds,
+            int qty) throws CustomerException {
         List<Voucher> vouchers = new ArrayList<>();
+        if (customerIds == null) {
+            customerIds = new ArrayList<>();
+        }
 
-        String campaign = voucher.getCampaign();
-        double amount = voucher.getAmount();
-        Date expDate = voucher.getExpiry();
-        List<Long> customerIds = voucher.getCustomerIds();
         qty = qty < customerIds.size() ? customerIds.size() : qty;
 
         for (int i = 0; i < qty; i++) {
-            Voucher v = new Voucher(campaign, amount, expDate, customerIds);
+            Voucher v = new Voucher(campaign, amount, expiry);
             em.persist(v);
             if (i < customerIds.size()) {
-                issueVoucher(v.getVoucherCode(), customerIds.get(i));
+                issueVoucher(v.getVoucherCode(), Long.valueOf(customerIds.get(i)));
             }
             vouchers.add(v);
         }
@@ -245,7 +245,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<Voucher> getVouchersOfCustomer(Long customerId) throws CustomerException {
         return em
-                .createQuery("SELECT DISTINCT v FROM Voucher v WHERE :customerId MEMBER OF v.customerIds",
+                .createQuery("SELECT v FROM Voucher v WHERE v.customerId = :customerId",
                         Voucher.class)
                 .setParameter("customerId", customerId)
                 .getResultList();
@@ -272,7 +272,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Voucher issueVoucher(String voucherCode, Long customerId) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
-        voucher.addCustomerId(customerId);
+        voucher.setCustomerId(customerId);
         Customer customer = getCustomerById(customerId);
 
         emailService.sendSimpleMessage(customer.getEmail(), "iORA S$" + voucher.getAmount() + " Voucher",

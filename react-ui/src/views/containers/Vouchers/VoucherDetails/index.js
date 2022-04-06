@@ -1,7 +1,7 @@
 import { CodeIcon, TrashIcon } from "@heroicons/react/outline";
 import {
   CalendarIcon as CalendarIconSolid,
-  CheckCircleIcon,
+  CheckCircleIcon, CashIcon, UserIcon
 } from "@heroicons/react/solid";
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -28,6 +28,8 @@ const VoucherDetailsBody = ({
   issued,
   expiry,
   redeemed,
+  campaign,
+  customerId,
   openModal,
   openIssueModal,
 }) => (
@@ -100,6 +102,26 @@ const VoucherDetailsBody = ({
                   {`Expiry Date: ${moment(expiry).format("DD/MM/YYYY")}`}
                 </span>
               </div>
+              <div className="flex items-center space-x-2">
+                <CashIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+                <span className="text-gray-900 text-sm font-medium">
+                  {`Campaign: ${campaign}`}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <UserIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+                <span className="text-gray-900 text-sm font-medium">
+                  {Boolean(customerId) ?
+                    `Belonging to customer Id: ${customerId}` : `Voucher is not tied to a customer.`
+                  }
+                </span>
+              </div>
             </div>
           </aside>
         </div>
@@ -149,11 +171,10 @@ const IssueVoucherModal = ({
                     name="search"
                     id="search"
                     className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                    placeholder={`Enter ${
-                      inputTypeSelected === "email"
+                    placeholder={`Enter ${inputTypeSelected === "email"
                         ? "email address"
                         : "contact number"
-                    }.`}
+                      }.`}
                     value={input}
                     onChange={onInputChanged}
                   />
@@ -298,6 +319,8 @@ export const VoucherDetails = () => {
           issued={voucher.issued}
           expiry={voucher.expiry}
           redeemed={voucher.redeemed}
+          campaign={voucher.campaign}
+          customerId={voucher.customerId}
           openModal={openModal}
           onIssueClicked={onIssueClicked}
           onRedeemClicked={onRedeemClicked}

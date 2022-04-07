@@ -22,6 +22,7 @@ const initialState = {
   user: { ...initialUser },
   loggedIn: localStorage.getItem("user") ? true : false,
   currStore: 0, //to be updated when login is finalised
+  currSpend: 0,
   status: "idle",
   error: "null",
 };
@@ -105,6 +106,14 @@ export const fetchAnOrder = createAsyncThunk(
   }
 );
 
+export const getCurrentSpending = createAsyncThunk(
+  "customers/getCurrentSpending",
+  async (customerId) => {
+    const response = await api.get("store/member/spending", customerId);
+    return response.data;
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -159,6 +168,9 @@ const userSlice = createSlice({
     builder.addCase(updateAccount.rejected, (state, action) => {
       state.error = "Update failed";
     });
+    builder.addCase(getCurrentSpending.fulfilled, (state, action) => {
+      state.currSpend = action.payload;
+    });
   },
 });
 
@@ -171,5 +183,7 @@ export const selectUser = (state) => state.user.user;
 export const selectUserId = (state) => state.user.user.id;
 
 export const selectUserStore = (state) => state.user.currStore;
+
+export const selectCurrSpend = (state) => state.user.currSpend;
 
 export default userSlice.reducer;

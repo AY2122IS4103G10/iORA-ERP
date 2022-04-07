@@ -4,6 +4,7 @@ import listingReducer from "./slices/listingSlice";
 import purchasesReducer from "./slices/purchasesSlice";
 import supportTicketReducer from "./slices/supportTicketSlice";
 import userReducer from "./slices/userSlice";
+import membershipTierReducer from "./slices/membershipTierSlice";
 
 export default configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export default configureStore({
     cart: cartReducer,
     purchases: purchasesReducer,
     supportTickets: supportTicketReducer,
+    membershipTiers: membershipTierReducer,
   },
 });

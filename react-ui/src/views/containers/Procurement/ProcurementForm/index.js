@@ -94,7 +94,6 @@ const ProcurementItemsList = ({
   const [skipPageReset, setSkipPageReset] = useState(false);
 
   const columns = useMemo(() => {
-    console.log(data);
     const updateMyData = (rowIndex, columnId, value) => {
       setSkipPageReset(true);
       setData((old) =>
@@ -186,7 +185,7 @@ const ProcurementItemsList = ({
       //   ],
       // },
     ];
-  }, [setData, isEditing, setSelectedProduct, openInfoModal]);
+  }, [setData, setSelectedProduct, openInfoModal]);
 
   return (
     <div className="mt-4">

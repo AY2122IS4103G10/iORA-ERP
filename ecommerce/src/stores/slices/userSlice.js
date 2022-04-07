@@ -11,7 +11,7 @@ const guest = {
   email: "NA",
   username: "guest",
   salt: "",
-  password: ""
+  password: "",
 };
 
 const initialUser = localStorage.getItem("user")
@@ -114,6 +114,14 @@ export const getCurrentSpending = createAsyncThunk(
   }
 );
 
+export const fetchCustomer = createAsyncThunk(
+  "customers/fetchCustomer",
+  async (data) => {
+    const response = await api.get("sam/customer/view", data);
+    return response.data;
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -147,7 +155,6 @@ const userSlice = createSlice({
       state.error = "Login failed";
     });
     builder.addCase(postLoginJwt.fulfilled, (state, action) => {
-      console.log(action.payload)
       state.user = { ...action.payload };
       state.loggedIn = true;
     });
@@ -171,6 +178,10 @@ const userSlice = createSlice({
     builder.addCase(getCurrentSpending.fulfilled, (state, action) => {
       state.currSpend = action.payload;
     });
+    builder.addCase(fetchCustomer.fulfilled, (state, action) => {
+      state.user = { ...action.payload };
+      state.status = "succeeded"
+    });
   },
 });
 
@@ -185,5 +196,10 @@ export const selectUserId = (state) => state.user.user.id;
 export const selectUserStore = (state) => state.user.currStore;
 
 export const selectCurrSpend = (state) => state.user.currSpend;
+
+export const selectUserOrders = (state) => state.user.user.orders;
+
+export const selectUserOrderById = (state, orderId) =>
+  state.user.user.orders.find((order) => order.id === orderId);
 
 export default userSlice.reducer;

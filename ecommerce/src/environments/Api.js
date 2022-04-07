@@ -132,3 +132,9 @@ export const ticketApi = {
     return axiosPrivate.put(`${REST_ENDPOINT}sam/ticket/resolve/${ticketId}`);
   }
 }
+
+export const productApi = {
+  getModelBySku(sku) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/model/name/${sku}`);
+  },
+};

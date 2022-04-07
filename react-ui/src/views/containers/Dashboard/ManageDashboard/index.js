@@ -8,22 +8,24 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip,
+  Tooltip
 } from "chart.js";
 import moment from "moment";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
+import { productApi } from "../../../../environments/Api";
 import {
   getCustomerOrders,
   getCustomerOrdersOfSite,
   getProcurementOrdersOfSite,
   getStockLevelSites,
   getStockTransferOrdersOfSite,
-  setSiteId,
+  setSiteId
 } from "../../../../stores/slices/dashboardSlice";
 import { Header } from "../../../components/Header";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 import SharedStats from "../components/Stats";
 
 ChartJS.register(
@@ -422,8 +424,8 @@ export const ManageDashboard = () => {
                   />
                 )}
               </div>
-              <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
-                <h3 className="text-lg font-medium">
+              <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6 row-span-2">
+                <h3 className="text-lg font-medium mb-4">
                   Bestsellers in {siteChosen.name}
                 </h3>
                 {siteChosen.id !== 0 && (
@@ -503,6 +505,8 @@ export const ManageDashboard = () => {
 };
 
 const Bestsellers = ({ orders }) => {
+  const [showModels, setShowModels] = useState(true);
+  // const [selectedModelCode, setSelectedModelCode] = useState(null);
   const prodQtys = [
     ...orders
       .flatMap((order) => order?.lineItems)
@@ -529,10 +533,146 @@ const Bestsellers = ({ orders }) => {
       : [];
   const prodBestsellers = prodQtys.sort((p1, p2) => p2[1] - p1[1]);
   return (
-    <ul>
-      {modelBestsellers.slice(0,5).map((x, index) => (
-        <li key={index}>{index + 1}. {x[0]}</li>
-      ))}
-    </ul>
+    <>
+      <ToggleLeftLabel
+        enabled={!showModels}
+        onEnabledChanged={() => setShowModels(!showModels)}
+        label="Filtered by Colour and Size"
+      />
+      <dl className="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200">
+        {showModels ? (
+          modelBestsellers
+            .slice(0, 5)
+            ?.map((model, index) => <ModelCard model={model} index={index} />)
+        // ) : selectedModelCode ? (
+        //   <></>
+        ) : (
+          prodBestsellers
+            .slice(0, 5)
+            ?.map((prod, index) => <ProductCard prod={prod} index={index} />)
+        )}
+      </dl>
+    </>
+  );
+};
+
+const ModelCard = ({ model, index }) => {
+  const [modelFull, setModel] = useState();
+
+  useEffect(() => {
+    productApi.getModelByModelCode(model[0]).then(({ data }) => {
+      setModel(data);
+    });
+  }, [model]);
+
+  return (
+    <div key={model[0]} className="flex px-4 py-5 sm:p-6">
+      <div className="flex-grow">
+        <dt className="text-base font-medium text-gray-900">
+          {index + 1}. {modelFull?.name}
+        </dt>
+        <dt className="ml-4 text-base font-medium text-gray-600">
+          Sold: {model[1]}
+        </dt>
+        <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
+          <div className="grid grid-cols-1">
+            <p className="ml-4 text-sm font-semibold text-gray-500">
+              <strong className="font-medium text-cyan-700">Product Code:</strong>{" "}
+              {modelFull?.modelCode}
+            </p>
+            <p className="ml-4 text-sm font-semibold text-gray-500">
+              <strong className="font-medium text-cyan-700">Price:</strong> $
+              {Number.parseFloat(modelFull?.discountPrice).toFixed(2)}
+            </p>
+            <p className="ml-4 text-sm font-semibold text-gray-500">
+              <strong className="font-medium text-cyan-700">
+                Available Colour(s):
+              </strong>{" "}
+              {modelFull?.productFields
+                .filter((f) => f.fieldName === "COLOUR")
+                .map((f) => f.fieldValue)
+                .join(", ")}
+            </p>
+            <p className="ml-4 text-sm font-semibold text-gray-500">
+              <strong className="font-medium text-cyan-700">
+                Available Size(s):
+              </strong>{" "}
+              {modelFull?.productFields
+                .filter((f) => f.fieldName === "SIZE")
+                .map((f) => f.fieldValue)
+                .join(", ")}
+            </p>
+          </div>
+        </dd>
+        {/* <button
+              type="button"
+              className="inline-flex items-center ml-4 mt-2 py-1.5 px-3 border-2 border-gray-400 rounded-full shadow-sm text-gray-400 bg-white-300 hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-600"
+            >
+              <FilterIcon className="h-5 w-5" aria-hidden="true" />
+              <span className="font-medium text-md">Filter for this product</span>
+            </button> */}
+      </div>
+      <div className="ml-4 flex-shrink-0">
+        <img
+          width="90"
+          src={modelFull?.imageLinks[0]}
+          alt={modelFull?.description}
+        />
+      </div>
+    </div>
+  );
+};
+
+const ProductCard = ({ prod, index }) => {
+  const [product, setProduct] = useState();
+  const [model, setModel] = useState();
+
+  useEffect(() => {
+    productApi.getProductBySku(prod[0]).then(({ data }) => {
+      setProduct(data);
+    });
+    productApi.getModelBySku(prod[0]).then(({ data }) => {
+      setModel(data);
+    });
+  }, [prod]);
+
+  return (
+    <div key={prod[0]} className="flex px-4 py-5 sm:p-6">
+      <div className="flex-grow">
+        <dt className="text-base font-medium text-gray-900">
+          {index + 1}. {model?.name}
+        </dt>
+        <dt className="ml-4 text-sm font-medium text-gray-500">
+          Colour:{" "}
+          {
+            product?.productFields?.find((f) => f.fieldName === "COLOUR")
+              ?.fieldValue
+          }{" "}
+          Size:{" "}
+          {
+            product?.productFields?.find((f) => f.fieldName === "SIZE")
+              ?.fieldValue
+          }
+        </dt>
+        <dt className="ml-4 text-base font-medium text-gray-600">
+          Sold: {prod[1]}
+        </dt>
+        <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
+          <div className="grid grid-cols-1">
+            <p className="ml-4 text-sm font-semibold text-gray-500">
+              <strong className="font-medium text-cyan-700">SKU Code:</strong>{" "}
+              {product?.sku}
+            </p>
+            <p className="ml-4 text-sm font-semibold text-gray-500">
+              <strong className="font-medium text-cyan-700">Price:</strong> $
+              {Number.parseFloat(model?.discountPrice).toFixed(2)}
+            </p>
+          </div>
+        </dd>
+      </div>
+      <div className="ml-4 flex-shrink-0">
+        <img width="90" src={model?.imageLinks[0]} alt={model?.description} />
+      </div>
+    </div>
   );
 };

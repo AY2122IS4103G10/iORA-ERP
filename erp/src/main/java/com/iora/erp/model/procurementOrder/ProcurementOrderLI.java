@@ -1,6 +1,7 @@
 package com.iora.erp.model.procurementOrder;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.persistence.ElementCollection;
@@ -30,6 +31,9 @@ public class ProcurementOrderLI {
 
     @ElementCollection
     private List<String> files;
+
+    @ElementCollection
+    private Map<Long, Integer> siteQuantities;
 
     public ProcurementOrderLI() {
         this.requestedQty = 0;
@@ -107,6 +111,14 @@ public class ProcurementOrderLI {
 
     public void setFiles(List<String> files) {
         this.files = files;
+    }
+
+    public Map<Long,Integer> getSiteQuantities() {
+        return this.siteQuantities;
+    }
+
+    public void setSiteQuantities(Map<Long,Integer> siteQuantities) {
+        this.siteQuantities = siteQuantities;
     }
     
     @Override

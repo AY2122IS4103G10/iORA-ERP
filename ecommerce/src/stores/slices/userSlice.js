@@ -179,6 +179,7 @@ const userSlice = createSlice({
       state.currSpend = action.payload;
     });
     builder.addCase(fetchCustomer.fulfilled, (state, action) => {
+      action.payload.password !== undefined && delete action.payload.password;
       state.user = { ...action.payload };
       state.status = "succeeded"
     });

@@ -486,7 +486,6 @@ export const StockTransferForm = ({ subsys }) => {
   //get stock level and product information
   const [prodTableData, setProdTableData] = useState([]);
   const [loading, setLoading] = useState(false);
-  console.log(lineItems);
   const fetchStockLevel = async (id) => {
     setLoading(true);
     const { data } = await api.get(`store/viewStock/sites`, id);
@@ -657,7 +656,6 @@ export const StockTransferForm = ({ subsys }) => {
       fromSite: from,
       toSite: to,
     };
-    // console.log("Order created: ", stockTransferOrder);
     dispatch(
       createStockTransfer({ order: stockTransferOrder, siteId: currSite })
     )

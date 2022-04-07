@@ -168,7 +168,6 @@ const userSlice = createSlice({
       localStorage.setItem("refreshToken", action.payload.refreshToken);
     });
     builder.addCase(refreshTokenJwt.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.status = "succeeded";
       state.accessToken = action.payload.accessToken;
       localStorage.setItem("accessToken", action.payload.accessToken);

@@ -349,7 +349,6 @@ export const VoucherForm = () => {
     const customers = [];
     selectedRowKeys.map((key) => customers.push(data[key]));
     setSelectedCustomer([...customers]);
-    console.log(selectedCustomer)
     setOpen(false);
   };
 

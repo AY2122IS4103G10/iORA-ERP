@@ -36,6 +36,7 @@ public class ProcurementOrderLI {
         this.pickedQty = 0;
         this.packedQty = 0;
         this.receivedQty = 0;
+        this.costPrice = 0.0;
     }
 
     public ProcurementOrderLI(Product product, int requestedQty) {

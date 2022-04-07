@@ -424,7 +424,20 @@ export const ManageDashboard = () => {
               </div>
               <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
                 <h3 className="text-lg font-medium">
-                  Finances of {siteChosen.name}
+                  Bestsellers in {siteChosen.name}
+                </h3>
+                {siteChosen.id !== 0 && (
+                  <Bestsellers
+                    orders={
+                      siteCustomerOrders?.find((x) => x.id === siteChosen.id)
+                        ?.orders || []
+                    }
+                  />
+                )}
+              </div>
+              <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
+                <h3 className="text-lg font-medium">
+                  Overall Finances of {siteChosen.name}
                 </h3>
                 <SharedStats
                   stats={[
@@ -486,5 +499,40 @@ export const ManageDashboard = () => {
         </div>
       </div>
     </>
+  );
+};
+
+const Bestsellers = ({ orders }) => {
+  const prodQtys = [
+    ...orders
+      .flatMap((order) => order?.lineItems)
+      .map((li) => {
+        return { sku: li.product.sku, qty: li.qty };
+      })
+      .reduce(
+        (map, prod) => map.set(prod.sku, map.get(prod.sku) || 0 + prod.qty),
+        new Map()
+      ),
+  ];
+  const modelBestsellers =
+    prodQtys.length > 0
+      ? [
+          ...prodQtys.reduce(
+            (map, prod) =>
+              map.set(
+                prod[0].split("-")[0],
+                map.get(prod[0].split("-")[0]) || 0 + prod[1]
+              ),
+            new Map()
+          ),
+        ].sort((m1, m2) => m2[1] - m1[1])
+      : [];
+  const prodBestsellers = prodQtys.sort((p1, p2) => p2[1] - p1[1]);
+  return (
+    <ul>
+      {modelBestsellers.slice(0,5).map((x, index) => (
+        <li key={index}>{index + 1}. {x[0]}</li>
+      ))}
+    </ul>
   );
 };

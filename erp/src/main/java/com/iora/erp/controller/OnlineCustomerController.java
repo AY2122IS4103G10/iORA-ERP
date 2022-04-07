@@ -152,7 +152,7 @@ public class OnlineCustomerController {
     @GetMapping(path = "/history/{customerId}", produces = "application/json")
     public ResponseEntity<Object> getTransactionHistory(@PathVariable Long customerId) {
         try {
-            return ResponseEntity.ok(customerService.getCustomerById(customerId).getCustomerOrders());
+            return ResponseEntity.ok(customerService.getCustomerById(customerId).getOrders());
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

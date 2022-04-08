@@ -55,7 +55,7 @@ const Header = ({
     );
 };
 
-const SupportTicketBody = ({ messages, customer, order }) => {
+const SupportTicketBody = ({ subject, messages, customer, order }) => {
     return (
         <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
             <div className="space-y-3 lg:col-start-1 lg:col-span-2">
@@ -163,9 +163,9 @@ const SupportTicketBody = ({ messages, customer, order }) => {
                     <div className="px-4 py-5 sm:px-6">
                         <h2
                             id="warehouse-information-title"
-                            className="text-lg leading-3 font-medium text-gray-900"
+                            className="text-lg leading-3 font-bold text-gray-900"
                         >
-                            Messages
+                            Subject: {subject}
                         </h2>
                     </div>
                     <div className="border-t border-gray-200 px-4 py-1 sm:px-6">
@@ -333,9 +333,7 @@ const ResolveModal = ({ open, setOpen, ticketId, onResolveClicked }) => {
 export const SupportTicketDetails = () => {
     const { addToast } = useToasts();
     const { ticketId } = useParams();
-    const ticket = useSelector((state) =>
-        selectTicketById(state, parseInt(ticketId))
-    );
+    const ticket = useSelector((state) => selectTicketById(state, parseInt(ticketId)));
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const ticketStatus = useSelector((state) => state.supportTickets.status);
@@ -471,10 +469,10 @@ export const SupportTicketDetails = () => {
                     setOpen={setOpen}
                     setOpenDelete={setOpenDelete} />
                 <SupportTicketBody
+                    subject={ticket.subject}
                     messages={ticket.messages}
                     customer={ticket.customer}
-                    order={ticket.customerOrder}
-                    status={ticket.status} />
+                    order={ticket.customerOrder} />
                 {ticket.status === "PENDING" &&
                     <InputArea
                         input={input}

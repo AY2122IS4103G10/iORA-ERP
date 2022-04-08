@@ -361,8 +361,18 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public SupportTicket createSupportTicket(SupportTicket supportTicket) {
+    public List<SupportTicket> getPublicSupportTickets() {
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.status = :status", SupportTicket.class);
+        q.setParameter("status", SupportTicket.Status.RESOLVED);
+        return q.getResultList();
+    }
+
+    @Override
+    public SupportTicket createSupportTicket(SupportTicket supportTicket) throws CustomerException {
         em.persist(supportTicket);
+        Customer c = getCustomerById(supportTicket.getCustomer().getId());
+        c.addSupportTicket(supportTicket);
+        em.merge(c);
         return supportTicket;
     }
 

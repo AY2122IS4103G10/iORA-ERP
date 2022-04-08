@@ -42,7 +42,8 @@ public interface CustomerService {
 
     public abstract SupportTicket getSupportTicket(Long id) throws SupportTicketException;
     public abstract List<SupportTicket> getAllSupportTickets();
-    public abstract SupportTicket createSupportTicket(SupportTicket supportTicket);
+    public abstract List<SupportTicket> getPublicSupportTickets();
+    public abstract SupportTicket createSupportTicket(SupportTicket supportTicket) throws CustomerException;
     public abstract SupportTicket updateSupportTicket(SupportTicket supportTicket) throws SupportTicketException;
     public abstract SupportTicket resolveSupportTicket(Long id) throws SupportTicketException;
     public abstract SupportTicket replySupportTicket(Long id, String message, String name, String imageUrl)

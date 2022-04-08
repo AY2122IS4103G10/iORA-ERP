@@ -613,14 +613,19 @@ public class DataLoader implements CommandLineRunner {
 
 		// ProcurementOrders
 		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("BBV0010201H-1"), 50);
+		poli1.setCostPrice(1d);
 		em.persist(poli1);
 		ProcurementOrderLI poli2 = new ProcurementOrderLI(productService.getProduct("ASK0009709Y-2"), 30);
+		poli2.setCostPrice(1d);
 		em.persist(poli2);
 		ProcurementOrderLI poli3 = new ProcurementOrderLI(productService.getProduct("AKB0009339J-3"), 45);
+		poli3.setCostPrice(1d);
 		em.persist(poli3);
 		ProcurementOrderLI poli4 = new ProcurementOrderLI(productService.getProduct("ASK0007868Y-1"), 75);
+		poli4.setCostPrice(1d);
 		em.persist(poli4);
 		ProcurementOrderLI poli5 = new ProcurementOrderLI(productService.getProduct("AB0008084Y-A-2"), 70);
+		poli5.setCostPrice(1d);
 		em.persist(poli5);
 
 		ProcurementOrder po1 = new ProcurementOrder();
@@ -758,8 +763,5 @@ public class DataLoader implements CommandLineRunner {
 		st.setCustomer(cust);
 		st.setCustomerOrder(co1);
 		customerService.createSupportTicket(st);
-
-		cust.addSupportTicket(st);
-		customerService.updateCustomerAccount(cust);
 	}
 }

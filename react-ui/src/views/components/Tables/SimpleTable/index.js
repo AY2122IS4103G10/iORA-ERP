@@ -236,7 +236,7 @@ export const UploadFileCell = forwardRef(
         id="file-upload"
         name="file-upload"
         type="file"
-        className="sr-only"
+        className="text-center sr-only"
         multiple
         onChange={onChange}
         onBlur={onBlur}

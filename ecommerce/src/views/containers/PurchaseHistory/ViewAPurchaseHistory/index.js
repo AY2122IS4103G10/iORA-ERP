@@ -28,27 +28,19 @@ export const PurchaseHistoryDetails = () => {
   const navigate = useNavigate();
   const { addToast } = useToasts();
   const user = useSelector(selectUser);
-  const userId = user?.id;
   const order = useSelector((state) =>
     selectUserOrderById(state, parseInt(orderId))
   );
-  const status = order?.statusHistory[order.statusHistory.length - 1];
+  const status = Boolean(order.statusHistory) ? order.statusHistory[order.statusHistory.length - 1] : null;
   const [lineItems, setLineItems] = useState([]);
 
   useEffect(() => {
-    userId && dispatch(fetchCustomer(userId));
-  }, [dispatch, userId]);
+    dispatch(fetchCustomer(user.id));
+  }, [dispatch]);
 
   useEffect(() => {
-    if (!order) {
-      addToast(`Error: You cannot view Customer Order ${orderId}`, {
-        appearance: "error",
-        autoDismiss: true,
-      });
-      navigate("/str/pos/orderHistory");
-    }
     const orderLineItems = order?.lineItems || [];
-    const status = order?.statusHistory[order.statusHistory.length - 1];
+    const status = Boolean(order.statusHistory) ? order.statusHistory[order.statusHistory.length - 1] : null;
     fetchAllModelsBySkus(orderLineItems).then((data) =>
       setLineItems(
         orderLineItems.map((item, index) => {
@@ -61,9 +53,10 @@ export const PurchaseHistoryDetails = () => {
               ...item.product,
               ...data[index],
               step:
-                status.status === "PENDING"
-                  ? 0
-                  : [
+                !Boolean(status) ? null :
+                  status.status === "PENDING"
+                    ? 0
+                    : [
                       "PICKING",
                       "PICKED",
                       "PACKING",
@@ -71,10 +64,10 @@ export const PurchaseHistoryDetails = () => {
                       "READY_FOR_DELIVERY",
                       "READY_FOR_COLLECTION",
                     ].some((s) => status.status === s)
-                  ? 1
-                  : status.status === "COMPLETED"
-                  ? 3
-                  : 2,
+                      ? 1
+                      : status.status === "COMPLETED"
+                        ? 3
+                        : 2
             },
             promo: promo !== undefined ? promo.promotion.fieldValue : null,
           };
@@ -103,18 +96,20 @@ export const PurchaseHistoryDetails = () => {
             </dt>
             <dd className="font-medium text-gray-900">
               {moment
-                .unix(order.statusHistory[0].timeStamp / 1000)
+                .unix(order.dateTime / 1000)
                 .format("MMMM Do, YYYY")}
             </dd>
           </dl>
-          <div className="mt-4 sm:mt-0">
-            <Link
-              to={`/checkout/success/${orderId}`}
-              className="font-medium text-gray-600 hover:text-gray-500"
-            >
-              View invoice<span aria-hidden="true"> &rarr;</span>
-            </Link>
-          </div>
+          {Boolean(order.statusHistory) &&
+            <div className="mt-4 sm:mt-0">
+              <Link
+                to={`/checkout/success/${orderId}`}
+                className="font-medium text-gray-600 hover:text-gray-500"
+              >
+                View invoice<span aria-hidden="true"> &rarr;</span>
+              </Link>
+            </div>
+          }
         </div>
 
         <section aria-labelledby="products-heading" className="mt-8">
@@ -147,17 +142,17 @@ export const PurchaseHistoryDetails = () => {
                         {order.refundedLIs.find(
                           (item) => item.product.sku === product.sku
                         ) && (
-                          <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                            Refunded
-                          </span>
-                        )}
+                            <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                              Refunded
+                            </span>
+                          )}
                         {order.exchangedLIs.find(
                           (item) => item.product.sku === product.sku
                         ) && (
-                          <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                            Exchanged
-                          </span>
-                        )}
+                            <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                              Exchanged
+                            </span>
+                          )}
                       </h3>
                       <p className="font-medium text-gray-900 mt-1">
                         ${product.listPrice}
@@ -182,90 +177,92 @@ export const PurchaseHistoryDetails = () => {
                         }
                       </span>
                     </div>
-                    <div className="sm:col-span-12 md:col-span-7">
-                      <dl className="grid grid-cols-1 gap-y-8 border-b py-8 border-gray-200 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
-                        <div>
-                          <dt className="font-medium text-gray-900">
-                            Delivery address
-                          </dt>
-                          <dd className="mt-3 text-gray-500">
-                            <address className="not-italic">
+                    {Boolean(order.statusHistory) &&
+                      <div className="sm:col-span-12 md:col-span-7">
+                        <dl className="grid grid-cols-1 gap-y-8 border-b py-8 border-gray-200 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
+                          <div>
+                            <dt className="font-medium text-gray-900">
+                              Delivery address
+                            </dt>
+                            <dd className="mt-3 text-gray-500">
+                              <address className="not-italic">
+                                <span className="block">
+                                  {user.firstName} {user.lastName}
+                                </span>
+                                <span className="block">
+                                  {order.deliveryAddress.street1},{" "}
+                                  {order.deliveryAddress.street2}
+                                </span>
+                                <span className="block">
+                                  {order.deliveryAddress.city},{" "}
+                                  {order.deliveryAddress.zip}
+                                </span>
+                              </address>
+                            </dd>
+                          </div>
+                          <div>
+                            <dt className="font-medium text-gray-900">
+                              Contact
+                            </dt>
+                            <dd className="mt-3 text-gray-500 space-y-3">
                               <span className="block">
-                                {user.firstName} {user.lastName}
-                              </span>
-                              <span className="block">
-                                {order.deliveryAddress.street1},{" "}
-                                {order.deliveryAddress.street2}
-                              </span>
-                              <span className="block">
-                                {order.deliveryAddress.city},{" "}
-                                {order.deliveryAddress.zip}
-                              </span>
-                            </address>
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="font-medium text-gray-900">
-                            Contact
-                          </dt>
-                          <dd className="mt-3 text-gray-500 space-y-3">
-                          <span className="block">
                                 {user.email}
                               </span>
                               <span className="block">
                                 {user.contactNumber}
                               </span>
-                          </dd>
-                        </div>
-                      </dl>
-                      <p className="font-medium text-gray-900 mt-6 md:mt-10">
-                        {status.status.charAt(0) +
-                          status.status.slice(1).toLowerCase()}{" "}
-                        on{" "}
-                        {moment
-                          .unix(status.timeStamp / 1000)
-                          .format("MMMM Do, YYYY")}
-                      </p>
-                      <div className="mt-6">
-                        <div className="bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-2 bg-gray-600 rounded-full"
-                            style={{
-                              width: `calc((${product.step} * 2 + 1) / 8 * 100%)`,
-                            }}
-                          />
-                        </div>
-                        <div className="hidden sm:grid grid-cols-4 font-medium text-gray-600 mt-6">
-                          <div className="text-gray-600">Order placed</div>
-                          <div
-                            className={classNames(
-                              product.step > 0 ? "text-gray-600" : "",
-                              "text-center"
-                            )}
-                          >
-                            Processing
+                            </dd>
                           </div>
-                          <div
-                            className={classNames(
-                              product.step > 1 ? "text-gray-600" : "",
-                              "text-center"
-                            )}
-                          >
-                            {order.delivery
-                              ? "Shipped"
-                              : "Ready for Collection"}
+                        </dl>
+                        <p className="font-medium text-gray-900 mt-6 md:mt-10">
+                          {status.status.charAt(0) +
+                            status.status.slice(1).toLowerCase()}{" "}
+                          on{" "}
+                          {moment
+                            .unix(status.timeStamp / 1000)
+                            .format("MMMM Do, YYYY")}
+                        </p>
+                        <div className="mt-6">
+                          <div className="bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-2 bg-gray-600 rounded-full"
+                              style={{
+                                width: `calc((${product.step} * 2 + 1) / 8 * 100%)`,
+                              }}
+                            />
                           </div>
-                          <div
-                            className={classNames(
-                              product.step > 2 ? "text-gray-600" : "",
-                              "text-right"
-                            )}
-                          >
-                            {order.delivery ? "Delivered" : "Collected"}
+                          <div className="hidden sm:grid grid-cols-4 font-medium text-gray-600 mt-6">
+                            <div className="text-gray-600">Order placed</div>
+                            <div
+                              className={classNames(
+                                product.step > 0 ? "text-gray-600" : "",
+                                "text-center"
+                              )}
+                            >
+                              Processing
+                            </div>
+                            <div
+                              className={classNames(
+                                product.step > 1 ? "text-gray-600" : "",
+                                "text-center"
+                              )}
+                            >
+                              {order.delivery
+                                ? "Shipped"
+                                : "Ready for Collection"}
+                            </div>
+                            <div
+                              className={classNames(
+                                product.step > 2 ? "text-gray-600" : "",
+                                "text-right"
+                              )}
+                            >
+                              {order.delivery ? "Delivered" : "Collected"}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    }
                   </div>
                 );
               })}

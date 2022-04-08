@@ -43,7 +43,7 @@ const Header = ({
                 {status !== "RESOLVED" && customerId === JSON.parse(localStorage.getItem("user")).id &&
                     <button
                         type="button"
-                        className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500`}
+                        className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500`}
                         onClick={() => setOpen(true)}
                     >
                         <span>Close Ticket</span>
@@ -158,7 +158,7 @@ const InputArea = ({ input, onInputChanged, onReplyClicked, file, setFile, loadi
     )
 }
 
-const ResolveModal = ({ open, setOpen, ticketId, onResolveClicked }) => {
+const ResolveModal = ({ open, setOpen, onResolveClicked }) => {
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={() => setOpen(false)}>
@@ -190,8 +190,8 @@ const ResolveModal = ({ open, setOpen, ticketId, onResolveClicked }) => {
                     >
                         <div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                             <div className="sm:flex sm:items-start">
-                                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                                    <ExclamationIcon className="h-6 w-6 text-indigo-600" aria-hidden="true" />
+                                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 sm:mx-0 sm:h-10 sm:w-10">
+                                    <ExclamationIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
                                 </div>
                                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                     <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
@@ -210,7 +210,7 @@ const ResolveModal = ({ open, setOpen, ticketId, onResolveClicked }) => {
                             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                                 <button
                                     type="button"
-                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:ml-3 sm:w-auto sm:text-sm"
                                     onClick={onResolveClicked}
                                 >
                                     Resolve
@@ -237,7 +237,7 @@ export const SupportDetails = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const ticket = useSelector((state) => selectTicketById(state, parseInt(ticketId)));
-    const ticketStatus = useSelector((state) => state.supportTickets.status);
+    const ticketStatus = useSelector((state) => state.supportTickets.detailsStatus);
 
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
@@ -245,7 +245,7 @@ export const SupportDetails = () => {
     const [file, setFile] = useState({});
 
     useEffect(() => {
-        ticketStatus === "succeeded" && dispatch(fetchSupportTickets());
+        ticketStatus === "idle" && dispatch(fetchSupportTickets());
     }, [ticketStatus, dispatch]);
 
     const onResolveClicked = () => {
@@ -364,7 +364,6 @@ export const SupportDetails = () => {
             <ResolveModal
                 open={open}
                 setOpen={setOpen}
-                ticketId={ticketId}
                 onResolveClicked={onResolveClicked} />
         </div>
     );

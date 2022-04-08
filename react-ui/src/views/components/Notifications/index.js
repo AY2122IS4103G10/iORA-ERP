@@ -114,24 +114,28 @@ export function Notifications({ open, setOpen, setNewNoti }) {
                           <li key={index}>
                             <div className="group relative flex items-center py-6 px-5">
                               <Link
-                                to={`${
-                                  noti.title.split(" ")[0] === "Stock"
+                                to={`${noti.title.split(" ")[0] === "Stock"
                                     ? "stocktransfer/" +
-                                      noti.title.split(" ")[
-                                        noti.title.split(" ").length - 1
-                                      ]
+                                    noti.title.split(" ")[
+                                    noti.title.split(" ").length - 1
+                                    ]
                                     : noti.title.split(" ")[0] === "Procurement"
-                                    ? "procurements/" +
+                                      ? "procurements/" +
                                       noti.title.split(" ")[
-                                        noti.title.split(" ").length - 1
+                                      noti.title.split(" ").length - 1
                                       ]
-                                    : noti.title.split(" ")[0] === "Online"
-                                    ? "orders/" +
-                                      noti.title.split(" ")[
+                                      : noti.title.split(" ")[0] === "Online"
+                                        ? "orders/" +
+                                        noti.title.split(" ")[
                                         noti.title.split(" ").length - 1
-                                      ]
-                                    : "stocktransfer/create"
-                                }`}
+                                        ]
+                                        : noti.title.split(" ")[0] === "Support"
+                                          ? "support/" +
+                                          noti.title.split(" ")[
+                                          noti.title.split(" ").length - 1
+                                          ]
+                                          : "stocktransfer/create"
+                                  }`}
                               >
                                 {/* <div
                                 className="absolute inset-0 group-hover:bg-gray-50"

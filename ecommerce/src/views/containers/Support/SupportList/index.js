@@ -359,7 +359,7 @@ export const SupportList = () => {
   const onOrderChanged = (e) => setOrder(e.target.value);
   const [file, setFile] = useState({});
   const [loading, setLoading] = useState(false);
-  const ticketStatus = useSelector((state) => state.supportTickets.status);
+  const ticketStatus = useSelector((state) => state.supportTickets.listStatus);
 
   useEffect(() => {
     ticketStatus === "idle" && dispatch(fetchUserSupportTickets(JSON.parse(localStorage.getItem("user")).id)).then(

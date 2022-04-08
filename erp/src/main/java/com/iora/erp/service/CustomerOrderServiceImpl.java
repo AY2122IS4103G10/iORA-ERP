@@ -785,16 +785,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
                     coli.setPickedQty(coli.getPickedQty() + qty);
-                    boolean picked = true;
-                    for (CustomerOrderLI coli2 : lineItems) {
-                        if (coli2.getPickedQty() < coli2.getQty()) {
-                            picked = false;
-                        }
-                    }
-                    if (picked) {
-                        onlineOrder.addStatusHistory(
-                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
-                    }
+                    // boolean picked = true;
+                    // for (CustomerOrderLI coli2 : lineItems) {
+                    //     if (coli2.getPickedQty() < coli2.getQty()) {
+                    //         picked = false;
+                    //     }
+                    // }
+                    // if (picked) {
+                    //     onlineOrder.addStatusHistory(
+                    //             new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
+                    // }
                     return em.merge(onlineOrder);
                 }
             }
@@ -808,16 +808,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     } else {
                         coli.setPackedQty(coli.getPackedQty() + qty);
 
-                        boolean packed = true;
-                        for (CustomerOrderLI coli2 : lineItems) {
-                            if (coli2.getPackedQty() < coli2.getPickedQty()) {
-                                packed = false;
-                            }
-                        }
-                        if (packed) {
-                            onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
-                        }
+                        // boolean packed = true;
+                        // for (CustomerOrderLI coli2 : lineItems) {
+                        //     if (coli2.getPackedQty() < coli2.getPickedQty()) {
+                        //         packed = false;
+                        //     }
+                        // }
+                        // if (packed) {
+                        //     onlineOrder.addStatusHistory(
+                        //             new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
+                        // }
                         return em.merge(onlineOrder);
                     }
                 }
@@ -841,16 +841,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
                     coli.setPickedQty(qty);
-                    boolean picked = true;
-                    for (CustomerOrderLI coli2 : lineItems) {
-                        if (coli2.getPickedQty() < coli2.getQty()) {
-                            picked = false;
-                        }
-                    }
-                    if (picked) {
-                        onlineOrder.addStatusHistory(
-                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
-                    }
+                    // boolean picked = true;
+                    // for (CustomerOrderLI coli2 : lineItems) {
+                    //     if (coli2.getPickedQty() < coli2.getQty()) {
+                    //         picked = false;
+                    //     }
+                    // }
+                    // if (picked) {
+                    //     onlineOrder.addStatusHistory(
+                    //             new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
+                    // }
                     return em.merge(onlineOrder);
                 }
             }
@@ -864,16 +864,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     } else {
                         coli.setPackedQty(qty);
 
-                        boolean packed = true;
-                        for (CustomerOrderLI coli2 : lineItems) {
-                            if (coli2.getPackedQty() < coli2.getPickedQty()) {
-                                packed = false;
-                            }
-                        }
-                        if (packed) {
-                            onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
-                        }
+                        // boolean packed = true;
+                        // for (CustomerOrderLI coli2 : lineItems) {
+                        //     if (coli2.getPackedQty() < coli2.getPickedQty()) {
+                        //         packed = false;
+                        //     }
+                        // }
+                        // if (packed) {
+                        //     onlineOrder.addStatusHistory(
+                        //             new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
+                        // }
                         return em.merge(onlineOrder);
                     }
                 }

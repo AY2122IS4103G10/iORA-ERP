@@ -5,7 +5,8 @@ const initialState = {
   supportTickets: [],
   publicSupportTickets: [],
   userSupportTickets: [],
-  status: "idle",
+  listStatus: "idle",
+  detailsStatus: "idle",
   error: null,
 };
 
@@ -61,48 +62,41 @@ const supportTicketSlice = createSlice({
   name: "supportTickets",
   initialState,
   extraReducers(builder) {
-    builder.addCase(createSupportTicket.pending, (state, action) => {
-      state.status = "loading";
-    });
     builder.addCase(createSupportTicket.fulfilled, (state, action) => {
-      state.status = "idle";
-      state.supportTickets = action.payload;
-    });
-    builder.addCase(createSupportTicket.rejected, (state, action) => {
-      state.status = "failed";
+      state.listStatus = "idle";
     });
     builder.addCase(fetchSupportTickets.pending, (state, action) => {
-      state.status = "loading";
+      state.detailsStatus = "loading";
     });
     builder.addCase(fetchSupportTickets.fulfilled, (state, action) => {
-      state.status = "idle";
+      state.detailsStatus = "succeeded";
       state.supportTickets = action.payload;
     });
     builder.addCase(fetchSupportTickets.rejected, (state, action) => {
-      state.status = "failed";
+      state.detailsStatus = "failed";
     });
     builder.addCase(fetchPublicSupportTickets.pending, (state, action) => {
-      state.status = "loading";
+      state.listStatus = "loading";
     });
     builder.addCase(fetchPublicSupportTickets.fulfilled, (state, action) => {
-      state.status = "succeeded";
+      state.listStatus = "succeeded";
       state.publicSupportTickets = action.payload;
     });
     builder.addCase(fetchUserSupportTickets.rejected, (state, action) => {
-      state.status = "failed";
+      state.listStatus = "failed";
     });
     builder.addCase(fetchUserSupportTickets.pending, (state, action) => {
-      state.status = "loading";
+      state.listStatus = "loading";
     });
     builder.addCase(fetchUserSupportTickets.fulfilled, (state, action) => {
-      state.status = "succeeded";
+      state.listStatus = "succeeded";
       state.userSupportTickets = action.payload;
     });
     builder.addCase(fetchPublicSupportTickets.rejected, (state, action) => {
-      state.status = "failed";
+      state.listStatus = "failed";
     });
     builder.addCase(replySupportTicket.fulfilled, (state, action) => {
-      state.status = "succeeded";
+      state.detailsStatus = "idle";
     });
     builder.addCase(resolveSupportTicket.fulfilled, (state, action) => {
       const {
@@ -111,7 +105,7 @@ const supportTicketSlice = createSlice({
       } = action.payload;
       const supportTicket = state.supportTickets.find((st) => st.id === id);
       if (supportTicket) {
-        supportTicket.status = status;
+        supportTicket.detailsStatus = status;
       }
     });
   },

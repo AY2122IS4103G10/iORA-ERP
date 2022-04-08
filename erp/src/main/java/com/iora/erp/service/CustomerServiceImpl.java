@@ -16,6 +16,7 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.exception.SupportTicketException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
@@ -36,6 +37,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private SiteService siteService;
     @PersistenceContext
     private EntityManager em;
     @Autowired
@@ -362,7 +365,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<SupportTicket> getPublicSupportTickets() {
-        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.status = :status", SupportTicket.class);
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.status = :status",
+                SupportTicket.class);
         q.setParameter("status", SupportTicket.Status.RESOLVED);
         return q.getResultList();
     }
@@ -372,6 +376,7 @@ public class CustomerServiceImpl implements CustomerService {
         em.persist(supportTicket);
         Customer c = getCustomerById(supportTicket.getCustomer().getId());
         c.addSupportTicket(supportTicket);
+        siteService.getSite(1L).addNotification(new Notification("Support Ticket # " + supportTicket.getId(), "New ticket"));
         em.merge(c);
         return supportTicket;
     }
@@ -401,6 +406,7 @@ public class CustomerServiceImpl implements CustomerService {
             emailService.sendSimpleMessage(st.getCustomer().getEmail(), "Support Ticket #" + id,
                     "You have a new reply: " + message);
         } else {
+            siteService.getSite(1L).addNotification(new Notification("Support Ticket # " + id, "Reply from customer"));
             st.setStatus(SupportTicket.Status.PENDING);
         }
 

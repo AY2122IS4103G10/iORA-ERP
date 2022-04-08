@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -78,6 +79,26 @@ public class ManufacturingController {
     public ResponseEntity<Object> manufactureProcurementOrder(@PathVariable Long orderId) {
         try {
             return ResponseEntity.ok(procurementService.manufactureProcurementOrder(orderId));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/procurementOrder/pick", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> pickProcurementOrder(@RequestBody ProcurementOrder po) {
+        try {
+            return ResponseEntity.ok(procurementService.pickProcurementOrder(po));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/procurementOrder/pack", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> packProcurementOrder(@RequestBody ProcurementOrder po) {
+        try {
+            return ResponseEntity.ok(procurementService.packProcurementOrder(po));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

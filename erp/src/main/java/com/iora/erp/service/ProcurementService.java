@@ -24,11 +24,14 @@ public interface ProcurementService {
     public abstract ProcurementOrder rejectProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
     public abstract ProcurementOrder acceptProcurementOrder(Long id, Long siteId) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException;
     public abstract ProcurementOrder manufactureProcurementOrder(Long id) throws SiteConfirmationException, IllegalPOModificationException, ProcurementOrderException, IllegalTransferException;
+    public abstract ProcurementOrder pickProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException;
+    public abstract ProcurementOrder packProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException;
     public abstract ProcurementOrder pickPackProcurementOrder(Long id) throws ProcurementOrderException;
     public abstract ProcurementOrder scanProductAtFactory(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
     public abstract ProcurementOrder adjustProductsAtFactory(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
     public abstract ProcurementOrder shipProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException;
     public abstract ProcurementOrder shipMultipleProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException;
+    public abstract ProcurementOrder receiveProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException;
     public abstract ProcurementOrder scanProductAtWarehouse(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
     public abstract ProcurementOrder adjustProductsAtWarehouse(Long id, String rfidsku, int qty) throws ProductException, ProcurementOrderException;
     public abstract ProcurementOrder completeProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException;

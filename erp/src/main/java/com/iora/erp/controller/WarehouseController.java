@@ -99,6 +99,16 @@ public class WarehouseController {
         return procurementService.getProcurementOrdersOfSite(site);
     }
 
+    @PutMapping(path = "/procurementOrder/receive", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> packProcurementOrder(@RequestBody ProcurementOrder po) {
+        try {
+            return ResponseEntity.ok(procurementService.receiveProcurementOrder(po));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
     @PatchMapping(path = "/procurementOrder/scan/{orderId}", produces = "application/json")
     public ResponseEntity<Object> scanProductsAtWarehouse(@PathVariable Long orderId, @RequestParam String barcode) {
         try {

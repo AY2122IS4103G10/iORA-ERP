@@ -374,7 +374,7 @@ export const SimpleTable = ({
                       {headerGroup.headers.map((column) => (
                         <th
                           scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
+                          className="px-6 py-3 text-center text-xs font-medium text-gray-900 uppercase tracking-wider"
                           {...column.getHeaderProps(
                             sortBy && column.getSortByToggleProps(),
                             {

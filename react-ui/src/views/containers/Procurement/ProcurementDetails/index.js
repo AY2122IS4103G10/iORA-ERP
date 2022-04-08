@@ -14,29 +14,42 @@ import { awsConfig } from "../../../../config";
 import { DownloadIcon } from "@heroicons/react/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import { ProductModal } from "../ProcurementForm";
 
-const ItemsSummary = ({ subsys, data, handlePrint, onDownloadClicked }) => {
+const ItemsSummary = ({
+  subsys,
+  data,
+  handlePrint,
+  onDownloadClicked,
+  setSelectedProduct,
+  openInfoModal,
+}) => {
+  const siteCols = Object.keys(data[0]?.siteQuantities).map((store) => ({
+    Header: () => (
+      <div className="flex items-center justify-between">
+        <span>{store}</span>
+      </div>
+    ),
+    minWidth: 100,
+    maxWidth: 130,
+    accessor: `siteQuantities.${store}`,
+  }));
   const columns = useMemo(() => {
     return [
       {
         Header: "SKU",
         accessor: "product.sku",
-      },
-      {
-        Header: "Name",
-        accessor: "product.name",
         Cell: (e) => {
-          return e.row.original.product.imageLinks?.length ? (
-            <a
-              href={e.row.original.product.imageLinks[0]}
-              className="hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
+          return (
+            <button
+              className="font-medium hover:underline"
+              onClick={() => {
+                setSelectedProduct(e.row.original.product);
+                openInfoModal();
+              }}
             >
-              {e.value}
-            </a>
-          ) : (
-            e.value
+              <span className="text-ellipsis overflow-hidden">{e.value}</span>
+            </button>
           );
         },
       },
@@ -59,12 +72,13 @@ const ItemsSummary = ({ subsys, data, handlePrint, onDownloadClicked }) => {
         Cell: (e) => `$${e.value}`,
       },
       {
-        Header: "Req",
-        accessor: "requestedQty",
+        Header: "Sites",
+        accessor: "siteQuantities",
+        columns: siteCols,
       },
       {
-        Header: "Ful",
-        accessor: "packedQty",
+        Header: "Total",
+        accessor: "requestedQty",
       },
       {
         Header: "",
@@ -125,7 +139,7 @@ const ItemsSummary = ({ subsys, data, handlePrint, onDownloadClicked }) => {
         },
       },
     ];
-  }, [onDownloadClicked]);
+  }, [onDownloadClicked, openInfoModal, setSelectedProduct, siteCols]);
   const hiddenColumns = subsys === "lg" ? ["files"] : [];
   return (
     <div className="pt-8">
@@ -226,10 +240,12 @@ const ProcurementDetailsBody = ({
   notes,
   handlePrint,
   onDownloadClicked,
+  openInfoModal,
+  setSelectedProduct,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-      {/* Site Information*/}
+      {/* Procurement Information*/}
       <section aria-labelledby="order-information-title">
         <div className="bg-white shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:px-6">
@@ -311,16 +327,20 @@ const ProcurementDetailsBody = ({
     {history && Boolean(history.length) && (
       <ActivitySection history={history} />
     )}
-    <div className="lg:col-start-1 lg:col-span-3">
-      <section aria-labelledby="order-summary">
-        <ItemsSummary
-          subsys={subsys}
-          data={lineItems}
-          handlePrint={handlePrint}
-          onDownloadClicked={onDownloadClicked}
-        />
-      </section>
-    </div>
+    {Boolean(lineItems.length) && (
+      <div className="lg:col-start-1 lg:col-span-3">
+        <section aria-labelledby="order-summary">
+          <ItemsSummary
+            subsys={subsys}
+            data={lineItems}
+            handlePrint={handlePrint}
+            onDownloadClicked={onDownloadClicked}
+            openInfoModal={openInfoModal}
+            setSelectedProduct={setSelectedProduct}
+          />
+        </section>
+      </div>
+    )}
   </div>
 );
 
@@ -367,6 +387,8 @@ export const ProcurementDetails = () => {
   } = useOutletContext();
   const { pathname } = useLocation();
   const [history, setHistory] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(false);
+  const [openInfo, setOpenInfo] = useState(false);
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -428,6 +450,10 @@ export const ProcurementDetails = () => {
       );
     });
   }, [statusHistory]);
+
+  const openInfoModal = () => setOpenInfo(true);
+  const closeInfoModal = () => setOpenInfo(false);
+
   console.log(lineItems);
   return (
     <>
@@ -445,6 +471,8 @@ export const ProcurementDetails = () => {
         history={history}
         handlePrint={handlePrint}
         onDownloadClicked={onDownloadClicked}
+        openInfoModal={openInfoModal}
+        setSelectedProduct={setSelectedProduct}
       />
       <div className="hidden">
         <ProductStickerPrint
@@ -455,6 +483,14 @@ export const ProcurementDetails = () => {
           }))}
         />
       </div>
+      {selectedProduct && (
+        <ProductModal
+          open={openInfo}
+          closeModal={closeInfoModal}
+          product={selectedProduct}
+          onDownloadClicked={onDownloadClicked}
+        />
+      )}
     </>
   );
 };

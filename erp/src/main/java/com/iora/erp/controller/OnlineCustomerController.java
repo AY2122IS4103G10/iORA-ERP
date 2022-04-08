@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 // import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
@@ -166,6 +167,57 @@ public class OnlineCustomerController {
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/ticket/all", produces = "application/json")
+    public List<SupportTicket> getAllSupportTickets() {
+        return customerService.getAllSupportTickets();
+    }
+
+    @GetMapping(path = "/ticket/public", produces = "application/json")
+    public List<SupportTicket> getPublicSupportTickets() {
+        return customerService.getPublicSupportTickets();
+    }
+
+    @GetMapping(path = "/ticket/user/{customerId}", produces = "application/json")
+    public List<SupportTicket> getUserSupportTickets(@PathVariable Long customerId) {
+        try {
+            return customerService.getCustomerById(customerId).getSupportTickets();
+        } catch (CustomerException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @PostMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createSupportTicket(@RequestBody SupportTicket supportTicket) {
+        try {
+            return ResponseEntity.ok(customerService.createSupportTicket(supportTicket));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/ticket/resolve/{id}", produces = "application/json")
+    public ResponseEntity<Object> resolveSupportTicket(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.resolveSupportTicket(id));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/ticket/reply/{ticketId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> replySupportTicket(@PathVariable Long ticketId, @RequestParam String name,
+            @RequestBody Map<String, String> message) {
+        try {
+            System.out.println(message);
+            return ResponseEntity.ok(
+                    customerService.replySupportTicket(ticketId, message.get("input"), name, message.get("url")));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 

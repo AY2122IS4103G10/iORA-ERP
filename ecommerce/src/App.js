@@ -14,6 +14,7 @@ import { Listings } from "./views/containers/Listings";
 import { Membership } from "./views/containers/Membership";
 import { PurchaseHistoryList } from "./views/containers/PurchaseHistory/PurchaseHistoryList";
 import { PurchaseHistoryDetails } from "./views/containers/PurchaseHistory/ViewAPurchaseHistory";
+import { SupportDetails } from "./views/containers/Support/SupportDetails";
 import { SupportList } from "./views/containers/Support/SupportList";
 import ViewModel from "./views/containers/ViewModel";
 
@@ -46,7 +47,10 @@ function App() {
 
           <Route path="membership" element={<Membership />} />
 
-          <Route path="support" element={<SupportList />} />
+          <Route path="support" element={<Outlet />} >
+            <Route index element={<SupportList />} />
+            <Route path=":ticketId" element={<SupportDetails />} />
+          </Route>
 
           <Route path="orders" element={<Outlet />}>
             <Route index element={<PurchaseHistoryList />} />

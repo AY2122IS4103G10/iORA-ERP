@@ -491,7 +491,6 @@ public class SAMController {
             return ResponseEntity
                     .ok(procurementService.createProcurementOrder(procurementOrder, siteId));
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
@@ -639,15 +638,6 @@ public class SAMController {
     @GetMapping(path = "/ticket/all", produces = "application/json")
     public List<SupportTicket> getAllSupportTickets() {
         return customerService.getAllSupportTickets();
-    }
-
-    @PostMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createSupportTicket(@RequestBody SupportTicket supportTicket) {
-        try {
-            return ResponseEntity.ok(customerService.createSupportTicket(supportTicket));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
     }
 
     @PutMapping(path = "/ticket", consumes = "application/json", produces = "application/json")

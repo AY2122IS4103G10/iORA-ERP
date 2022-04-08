@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { uploadFile } from "react-s3";
 import { Dialog } from "@headlessui/react";
-import { api } from "../../../../environments/Api";
+import { api, sitesApi } from "../../../../environments/Api";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import {
@@ -87,13 +87,60 @@ export const ItemsList = ({
 const ProcurementItemsList = ({
   data,
   setData,
-  isEditing,
   setSelectedProduct,
   openInfoModal,
+  stores,
+  storeCheckedState,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
 
   const columns = useMemo(() => {
+    const siteCols = stores
+      .filter((_, index) => storeCheckedState[index])
+      .map((store) => ({
+        Header: () => (
+          <div className="flex items-center justify-between">
+            <span>{store.id}</span>
+          </div>
+        ),
+        minWidth: 100,
+        maxWidth: 130,
+        accessor: `siteQuantities.${store.id}`,
+        Cell: (row) => {
+          const storeId = parseInt(row.column.id.split(".")[1]);
+          return (
+            <EditableCell
+              value={row.row.original.siteQuantities[storeId]}
+              row={row.row}
+              column={row.column}
+              updateMyData={updateSiteCol}
+            />
+          );
+        },
+      }));
+    const updateSiteCol = (rowIndex, columnId, value) => {
+      const split = columnId.split(".");
+      columnId = split[0];
+      const storeId = split[1];
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: { ...old[rowIndex][columnId], [storeId]: value },
+              requestedQty: Object.values({
+                ...old[rowIndex][columnId],
+                [storeId]: value,
+              })
+                .map((val) => parseInt(val))
+                .reduce((partialSum, a) => partialSum + a, 0),
+            };
+          }
+          return row;
+        })
+      );
+    };
     const updateMyData = (rowIndex, columnId, value) => {
       setSkipPageReset(true);
       setData((old) =>
@@ -121,20 +168,27 @@ const ProcurementItemsList = ({
                 openInfoModal();
               }}
             >
-              {e.value}
+              <span className="text-ellipsis overflow-hidden">{e.value}</span>
             </button>
           );
         },
       },
       {
         Header: "Color",
+        minWidth: 100,
+        maxWidth: 130,
         accessor: (row) =>
           row.product.productFields.find(
             (field) => field.fieldName === "COLOUR"
           ).fieldValue,
+        Cell: (e) => (
+          <div className="text-ellipsis overflow-hidden">{e.value}</div>
+        ),
       },
       {
         Header: "Size",
+        minWidth: 30,
+        maxWidth: 60,
         accessor: (row) =>
           row.product.productFields.find((field) => field.fieldName === "SIZE")
             .fieldValue,
@@ -157,35 +211,16 @@ const ProcurementItemsList = ({
         },
       },
       {
-        Header: "Quantity",
+        Header: "Sites",
+        columns: siteCols,
+      },
+      {
+        Header: "Total",
         accessor: "requestedQty",
         disableSortBy: true,
-        Cell: (row) => {
-          return (
-            <EditableCell
-              value={row.row.original.requestedQty}
-              row={row.row}
-              column={row.column}
-              updateMyData={updateMyData}
-            />
-          );
-        },
       },
-      // {
-      //   Header: "Sites",
-      //   columns: [
-      //     {
-      //       Header: "Site A",
-      //       accessor: "[siteA]",
-      //     },
-      //     {
-      //       Header: "Site B",
-      //       accessor: "[siteB]",
-      //     },
-      //   ],
-      // },
     ];
-  }, [setData, setSelectedProduct, openInfoModal]);
+  }, [setData, setSelectedProduct, openInfoModal, stores, storeCheckedState]);
 
   return (
     <div className="mt-4">
@@ -193,6 +228,7 @@ const ProcurementItemsList = ({
         columns={columns}
         data={data}
         skipPageReset={skipPageReset}
+        flex
       />
     </div>
   );
@@ -379,7 +415,13 @@ const UploadFileList = ({ data, setData }) => {
   );
 };
 
-const ProductModal = ({ open, closeModal, product }) => {
+export const ProductModal = ({
+  open,
+  closeModal,
+  product,
+  files,
+  onDownloadClicked,
+}) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
       <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
@@ -467,6 +509,47 @@ const ProductModal = ({ open, closeModal, product }) => {
   );
 };
 
+const FormCheckboxes = ({
+  legend,
+  options,
+  inputField,
+  onFieldsChanged,
+  fieldValues = [],
+  isEditing,
+  ...rest
+}) => {
+  return (
+    <fieldset className="space-y-5">
+      <legend className="sr-only">{legend}</legend>
+      {options.map((option, index) => {
+        return (
+          <div key={index} className="ml-1 relative flex items-start">
+            <div className="flex items-center h-5">
+              <input
+                id={inputField}
+                aria-describedby={inputField}
+                name={inputField}
+                type="checkbox"
+                className="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                checked={
+                  Boolean(fieldValues.length) ? fieldValues[index] : false
+                }
+                onChange={() => onFieldsChanged(index)}
+                {...rest}
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label htmlFor="comments" className="font-medium text-gray-700">
+                {option.id}. {option.name}
+              </label>
+            </div>
+          </div>
+        );
+      })}
+    </fieldset>
+  );
+};
+
 const ProcurementFormBody = ({
   isEditing,
   headquarters,
@@ -478,6 +561,10 @@ const ProcurementFormBody = ({
   warehouses,
   setWarehouseSelected,
   warehouseSelected,
+  stores,
+  onStoresChanged,
+  storeCheckedState,
+  setStoreCheckedState,
   items,
   setItems,
   models,
@@ -552,6 +639,36 @@ const ProcurementFormBody = ({
                     <div>No warehouses</div>
                   )}
                 </div>
+                <div className="sm:col-span-2 max-h-56 overflow-auto">
+                  {Boolean(stores.length) ? (
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Stores
+                        </label>
+                        <button
+                          className="mr-1 block text-sm font-medium text-cyan-700"
+                          onClick={() => onStoresChanged(-1)}
+                        >
+                          {!storeCheckedState.every(Boolean)
+                            ? "Select"
+                            : "Deselect"}{" "}
+                          all
+                        </button>
+                      </div>
+                      <FormCheckboxes
+                        legend="Stores"
+                        options={stores}
+                        inputField="Store"
+                        onFieldsChanged={onStoresChanged}
+                        fieldValues={storeCheckedState}
+                        isEditing={isEditing}
+                      />
+                    </div>
+                  ) : (
+                    <div>No Stores</div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -574,9 +691,10 @@ const ProcurementFormBody = ({
                 <ProcurementItemsList
                   data={items}
                   setData={setItems}
-                  isEditing={isEditing}
                   setSelectedProduct={setSelectedProduct}
                   openInfoModal={openInfoModal}
+                  stores={stores}
+                  storeCheckedState={storeCheckedState}
                 />
               )}
             </div>
@@ -657,16 +775,20 @@ export const ProcurementForm = () => {
   const [openInfo, setOpenInfo] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const skus = useSelector(selectAllProducts).flatMap((model) =>
     model.products.map((product) => ({
       ...product,
-      ...model,
+      modelCode: model.modelCode,
+      name: model.name,
+      imageLinks: model.imageLinks,
+      description: model.description,
     }))
   );
+
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+
   const headquarters = useSelector(selectAllHeadquarters);
   const hq = headquarters[0];
   const hqStatus = useSelector((state) => state.sites.hqStatus);
@@ -701,6 +823,55 @@ export const ProcurementForm = () => {
     setWarehouseSelected(warehouse);
   }, [warehouse]);
 
+  const [stores, setStores] = useState([]);
+  const [storeCheckedState, setStoreCheckedState] = useState([]);
+
+  const onStoresChanged = (pos) => {
+    const updateCheckedState = storeCheckedState.map((item, index) =>
+      index === pos || pos === -1 ? !item : item
+    );
+    setStoreCheckedState(updateCheckedState);
+    const siteQuantities = lineItems.length ? lineItems[0]?.siteQuantities : {};
+    stores
+      .filter((store, index) => {
+        return (
+          updateCheckedState[index] &&
+          !Object.keys(siteQuantities).includes(store.id.toString())
+        );
+      })
+      .forEach((store) => {
+        siteQuantities[store.id] = 0;
+      });
+    stores
+      .filter((store, index) => {
+        return (
+          !updateCheckedState[index] &&
+          Object.keys(siteQuantities).includes(store.id.toString())
+        );
+      })
+      .forEach((store) => {
+        delete siteQuantities[store.id];
+      });
+    setLineItems(
+      lineItems.map((item) => ({
+        ...item,
+        siteQuantities,
+        requestedQty: Object.values(siteQuantities)
+          .map((val) => parseInt(val))
+          .reduce((partialSum, a) => partialSum + a, 0),
+      }))
+    );
+  };
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      const { data } = await sitesApi.searchByType("Store");
+      setStores(data);
+      setStoreCheckedState(new Array(data.length).fill(false));
+    };
+    fetchStores();
+  }, []);
+
   const [selectedRows, setSelectedRows] = useState([]);
 
   const onAddItemsClicked = (evt) => {
@@ -710,16 +881,23 @@ export const ProcurementForm = () => {
     );
     const lineItems = [];
     selectedRowKeys.map((key) => lineItems.push(skus[key]));
+    const siteQuantities = {};
+    stores
+      .filter((_, index) => storeCheckedState[index])
+      .forEach((store) => (siteQuantities[store.id] = 0));
+
     setLineItems(
       lineItems.map(({ ...item }) => ({
         product: { ...item },
-        requestedQty: 1,
+        requestedQty: 0,
         costPrice: 0,
+        siteQuantities,
       }))
     );
     const set = Array.from(
       new Set(lineItems.map((item) => item.modelCode))
     ).map((prod) => lineItems.find((i) => i.modelCode === prod));
+
     setModels(
       set.map(({ modelCode, name, imageLinks }) => ({
         modelCode,
@@ -736,6 +914,7 @@ export const ProcurementForm = () => {
     manufacturingSelected,
     warehouseSelected,
     lineItems.length,
+    storeCheckedState.some(Boolean),
   ].every(Boolean);
 
   const handleUpload = async (file) => {
@@ -823,6 +1002,7 @@ export const ProcurementForm = () => {
             },
             requestedQty: item.requestedQty,
             costPrice: item.costPrice,
+            siteQuantities: item.siteQuantities,
           };
           if (model !== undefined) {
             lineItem.files = model.files;
@@ -873,6 +1053,16 @@ export const ProcurementForm = () => {
         notes,
       } = data;
       setIsEditing(true);
+      lIs.length &&
+        setStoreCheckedState(
+          stores
+            .map((store) => store.id)
+            .map((store) => {
+              return Object.keys(lIs[0]?.siteQuantities)
+                .map((qty) => parseInt(qty))
+                .includes(store);
+            })
+        );
       fetchAllModelsBySkus(lIs).then((data) => {
         const arr = lIs.map((item, index) => ({
           ...item,
@@ -912,7 +1102,7 @@ export const ProcurementForm = () => {
           autoDismiss: true,
         })
       );
-  }, [orderId, addToast]);
+  }, [orderId, addToast, stores]);
 
   const openModal = () => setOpenProducts(true);
   const closeModal = () => setOpenProducts(false);
@@ -933,6 +1123,10 @@ export const ProcurementForm = () => {
         warehouses={warehouses}
         warehouseSelected={warehouseSelected}
         setWarehouseSelected={setWarehouseSelected}
+        stores={stores}
+        onStoresChanged={onStoresChanged}
+        storeCheckedState={storeCheckedState}
+        setStoreCheckedState={setStoreCheckedState}
         items={lineItems}
         setItems={setLineItems}
         models={models}

@@ -74,7 +74,7 @@ export const OnlineOrderList = ({ subsys }) => {
     };
     fetchOnlineOrdersOfSite();
   }, [currSiteId, addToast, subsys]);
-
+  console.log(data)
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);
 

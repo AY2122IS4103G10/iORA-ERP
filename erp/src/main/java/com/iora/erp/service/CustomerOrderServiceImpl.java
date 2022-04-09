@@ -66,6 +66,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     private SiteService siteService;
     @Autowired
     private StripeService stripeService;
+    @Autowired
+    private EmailService emailService;
     @PersistenceContext
     private EntityManager em;
 
@@ -214,7 +216,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (customerOrder.getCustomerId() != null) {
             updateMembershipPoints(customerOrder);
         }
-
+        
         // Remove stocks from site
         if (!(customerOrder instanceof OnlineOrder)) {
             for (CustomerOrderLI coli : customerOrder.getLineItems()) {
@@ -230,6 +232,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             OnlineOrder oo = (OnlineOrder) customerOrder;
             Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
             c.setAddress(oo.getDeliveryAddress());
+
+            //set email to customer
+            if (oo.getId() > 7L) {
+                emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
+            }
             em.merge(c);
         }
 
@@ -281,7 +288,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         // Add ProductItem to Line Items
-        Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
+        String sku = product.getSku();
+        String model = sku.substring(0, sku.lastIndexOf("-"));
+        Model mdl = em.find(Model.class, model.trim());
         boolean added = false;
         for (int i = 0; i < lineItems.size(); i++) {
             if (lineItems.get(i).getProduct().equals(product)) {
@@ -314,7 +323,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         // Remove ProductItem from Line Items
-        Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
+        String sku = product.getSku();
+        String model = sku.substring(0, sku.lastIndexOf("-"));
+        Model mdl = em.find(Model.class, model.trim());
         boolean removed = false;
         for (int i = 0; i < lineItems.size(); i++) {
             if (lineItems.get(i).getProduct().equals(product)) {
@@ -346,7 +357,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         List<PromotionLI> bestMultiPromosUsed = new ArrayList<>();
 
         for (CustomerOrderLI coli : lineItems) {
-            Model m = em.find(Model.class, coli.getProduct().getSku().split("-")[0]);
+            String sku = coli.getProduct().getSku();
+            String model = sku.substring(0, sku.lastIndexOf("-"));
+            Model m = em.find(Model.class, model.trim());
             modelMap.put(coli, m);
             bestPrices.put(coli, m.getDiscountPrice());
         }
@@ -744,19 +757,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<CustomerOrderLI> getPickingList() throws ProductException {
+    public Map<String, Integer> getPickingList() throws ProductException {
         Query q = em
                 .createNativeQuery(
                         "SELECT li.product_sku, sum(li.qty) FROM CUSTOMER_ORDER co, CUSTOMER_ORDERLI li, CUSTOMER_ORDER_LINE_ITEMS WHERE co.id = customer_order_id AND li.id = line_items_id AND co.status = :status AND site_id = 3 GROUP BY li.product_sku")
                 .setParameter("status", "PENDING");
 
-        List<CustomerOrderLI> pickingList = new ArrayList<>();
+        Map<String, Integer> pickingList = new HashMap<>();
 
         for (Object object : q.getResultList()) {
             Object[] array = (Object[]) object;
 
             BigInteger qty = (BigInteger) array[1];
-            pickingList.add(new CustomerOrderLI(qty.intValue(), productService.getProduct((String) array[0])));
+            pickingList.put((String) array[0], qty.intValue());
         }
 
         return pickingList;

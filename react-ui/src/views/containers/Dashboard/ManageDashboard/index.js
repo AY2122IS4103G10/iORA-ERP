@@ -12,7 +12,8 @@ import {
 } from "chart.js";
 import moment from "moment";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
+import { Bar, Chart, Doughnut } from "react-chartjs-2";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { productApi } from "../../../../environments/Api";
 import {
@@ -27,6 +28,7 @@ import { Header } from "../../../components/Header";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 import SharedStats from "../components/Stats";
+import { colourPicker, cyans, multi, getRevenue, getOrder, getProduct, getRevenuePerOrder, delta, deltaType, rangeLabels } from "../utils";
 
 ChartJS.register(
   ArcElement,
@@ -39,107 +41,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-const cyans = [
-  "rgba(22, 78, 99, alpha)",
-  "rgba(21, 94, 117, alpha)",
-  "rgba(14, 116, 144, alpha)",
-  "rgba(8, 145, 178, alpha)",
-  "rgba(6, 182, 212, alpha)",
-  "rgba(103, 232, 249, alpha)",
-  "rgba(34, 211, 238, alpha)",
-  "rgba(165, 243, 252, alpha)",
-  "rgba(207, 250, 254, alpha)",
-  "rgba(236, 254, 255, alpha)",
-  "rgba(22, 78, 99, alpha)",
-  "rgba(21, 94, 117, alpha)",
-  "rgba(14, 116, 144, alpha)",
-  "rgba(8, 145, 178, alpha)",
-  "rgba(6, 182, 212, alpha)",
-  "rgba(103, 232, 249, alpha)",
-  "rgba(34, 211, 238, alpha)",
-  "rgba(165, 243, 252, alpha)",
-  "rgba(207, 250, 254, alpha)",
-  "rgba(236, 254, 255, alpha)",
-  "rgba(22, 78, 99, alpha)",
-  "rgba(21, 94, 117, alpha)",
-  "rgba(14, 116, 144, alpha)",
-  "rgba(8, 145, 178, alpha)",
-  "rgba(6, 182, 212, alpha)",
-  "rgba(103, 232, 249, alpha)",
-  "rgba(34, 211, 238, alpha)",
-  "rgba(165, 243, 252, alpha)",
-  "rgba(207, 250, 254, alpha)",
-  "rgba(236, 254, 255, alpha)",
-];
-
-const multi = [
-  "rgba(14, 116, 144, alpha)",
-  "rgba(190, 24, 93, alpha)",
-  "rgba(161, 98, 7, alpha)",
-  "rgba(15, 118, 110, alpha)",
-  "rgba(67, 56, 202, alpha)",
-  "rgba(185, 28, 28, alpha)",
-  "rgba(14, 116, 144, alpha)",
-  "rgba(190, 24, 93, alpha)",
-  "rgba(161, 98, 7, alpha)",
-  "rgba(15, 118, 110, alpha)",
-  "rgba(67, 56, 202, alpha)",
-  "rgba(185, 28, 28, alpha)",
-  "rgba(14, 116, 144, alpha)",
-  "rgba(190, 24, 93, alpha)",
-  "rgba(161, 98, 7, alpha)",
-  "rgba(15, 118, 110, alpha)",
-  "rgba(67, 56, 202, alpha)",
-  "rgba(185, 28, 28, alpha)",
-];
-
-export const colourPicker = (palette, number, alpha) =>
-  palette.slice(0, number).map((rgba) => rgba.replace("alpha", `${alpha}`));
-
-export const data3 = {
-  labels: ["January", "February", "March", "April", "May", "June", "July"],
-  datasets: [
-    {
-      label: "Dataset 1",
-      data: [256, 476, 611, 624, 785, 346, 567],
-      borderColor: colourPicker(cyans, 3, 1)[2],
-      backgroundColor: colourPicker(cyans, 3, 0.5)[2],
-    },
-    {
-      label: "Dataset 2",
-      data: [70, 672, 123, 142, 564, 726, 345],
-      borderColor: colourPicker(multi, 3, 1)[2],
-      backgroundColor: colourPicker(multi, 3, 0.5)[2],
-    },
-  ],
-};
-
-const data = {
-  labels: ["900", "800", "700", "600", "500", "400"],
-  datasets: [
-    {
-      label: "# of Votes",
-      data: [12, 19, 3, 5, 2, 3],
-      backgroundColor: colourPicker(cyans, 6, 0.6),
-      borderColor: colourPicker(cyans, 6, 1),
-      borderWidth: 0,
-    },
-  ],
-};
-
-const data2 = {
-  labels: ["Cyan", "Pink", "Yellow", "Teal", "Indigo", "Red"],
-  datasets: [
-    {
-      label: "# of Votes",
-      data: [12, 19, 3, 5, 2, 3],
-      backgroundColor: colourPicker(multi, 6, 0.8),
-      borderColor: colourPicker(multi, 6, 1),
-      borderWidth: 3,
-    },
-  ],
-};
 
 export const ManageDashboard = () => {
   const dispatch = useDispatch();
@@ -158,24 +59,11 @@ export const ManageDashboard = () => {
   const stockLevelSites = useSelector(
     ({ dashboard }) => dashboard.stockLevelSites
   );
-  const currStats = useSelector(
-    ({ dashboard }) => dashboard.customerOrdersByDate.slice(-1)[0]
+  const stats = useSelector(
+    ({ dashboard }) => [...dashboard.customerOrdersByDate].reverse()
   );
-  const prevStats = useSelector(
-    ({ dashboard }) => dashboard.customerOrdersByDate.slice(-2)[0]
-  );
-  const getStats = (obj, type, coeff, total) =>
-    total
-      ? Object.values(obj).reduce((sum, site) => sum + site[type] * coeff, 0)
-      : obj[siteChosen?.id][type] * coeff;
-  const getRevenue = (obj, total = false) =>
-    getStats(obj, "revenue", 0.01, total);
-  const getOrder = (obj, total = false) => getStats(obj, "orders", 1, total);
-  const getProduct = (obj, total = false) =>
-    getStats(obj, "products", 1, total);
-  const delta = (curr, prev) =>
-    Number.parseFloat(Math.abs(curr - prev) / prev).toFixed(2);
-  const deltaType = (curr, prev) => (curr > prev ? "increase" : "decrease");
+  const currStats = stats[0];
+  const prevStats = stats[1];
   const siteCustomerOrders = useSelector(
     (state) => state.dashboard.customerOrders
   );
@@ -208,31 +96,23 @@ export const ManageDashboard = () => {
   }, [status, dispatch, stockLevelSites, siteId]);
 
   useLayoutEffect(() => {
-    range &&
-      dispatch(
-        getCustomerOrders({
-          startDate: moment()
-            .add(1, "day")
-            .subtract(2, range.unit)
-            .format("DDMMyyyy")
-            .toString(),
-          endDate: moment()
-            .subtract(1, range.unit)
-            .format("DDMMyyyy")
-            .toString(),
-        })
-      );
-    range &&
-      dispatch(
-        getCustomerOrders({
-          startDate: moment()
-            .add(1, "day")
-            .subtract(1, range.unit)
-            .format("DDMMyyyy")
-            .toString(),
-          endDate: moment().format("DDMMyyyy").toString(),
-        })
-      );
+    if (range) {
+      for (let i = 6; i >= 0; i--) {
+        dispatch(
+          getCustomerOrders({
+            startDate: moment()
+              .add(1, "day")
+              .subtract(i + 1, range.unit)
+              .format("DDMMyyyy")
+              .toString(),
+            endDate: moment()
+              .subtract(i, range.unit)
+              .format("DDMMyyyy")
+              .toString(),
+          })
+        );
+      }
+    }
   }, [dispatch, range]);
 
   useEffect(() => {
@@ -276,43 +156,43 @@ export const ManageDashboard = () => {
                   stats={[
                     {
                       name: "Revenue",
-                      stat: getRevenue(currStats, true),
-                      previousStat: getRevenue(prevStats, true),
+                      stat: getRevenue(currStats),
+                      previousStat: getRevenue(prevStats),
                       prefix: "$",
                       change: delta(
-                        getRevenue(currStats, true),
-                        getRevenue(prevStats, true)
+                        getRevenue(currStats),
+                        getRevenue(prevStats)
                       ),
                       changeType: deltaType(
-                        getRevenue(currStats, true),
-                        getRevenue(prevStats, true)
+                        getRevenue(currStats),
+                        getRevenue(prevStats)
                       ),
                     },
                     {
                       name: "Total Customer Orders",
-                      stat: getOrder(currStats, true),
-                      previousStat: getOrder(prevStats, true),
+                      stat: getOrder(currStats),
+                      previousStat: getOrder(prevStats),
                       change: delta(
-                        getOrder(currStats, true),
-                        getOrder(prevStats, true)
+                        getOrder(currStats),
+                        getOrder(prevStats)
                       ),
                       changeType: deltaType(
-                        getOrder(currStats, true),
-                        getOrder(prevStats, true)
+                        getOrder(currStats),
+                        getOrder(prevStats)
                       ),
                     },
                     {
                       name: "Products Sold",
-                      stat: getProduct(currStats, true),
-                      previousStat: getProduct(prevStats, true),
+                      stat: getProduct(currStats),
+                      previousStat: getProduct(prevStats),
                       suffix: " items",
                       change: delta(
-                        getProduct(currStats, true),
-                        getProduct(prevStats, true)
+                        getProduct(currStats),
+                        getProduct(prevStats)
                       ),
                       changeType: deltaType(
-                        getProduct(currStats, true),
-                        getProduct(prevStats, true)
+                        getProduct(currStats),
+                        getProduct(prevStats)
                       ),
                     },
                   ]}
@@ -387,6 +267,112 @@ export const ManageDashboard = () => {
                   ]}
                 />
               </div>
+              <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
+                <h3 className="text-lg font-medium">
+                  Overall Finances of {siteChosen.name}
+                </h3>
+                <SharedStats
+                  stats={[
+                    {
+                      name: "Revenue",
+                      stat: getRevenue(currStats, siteChosen?.id),
+                      previousStat: getRevenue(prevStats, siteChosen?.id),
+                      prefix: "$",
+                      change: delta(
+                        getRevenue(currStats, siteChosen?.id),
+                        getRevenue(prevStats, siteChosen?.id)
+                      ),
+                      changeType: deltaType(
+                        getRevenue(currStats, siteChosen?.id),
+                        getRevenue(prevStats, siteChosen?.id)
+                      ),
+                    },
+                    {
+                      name: "Total Customer Orders",
+                      stat: getOrder(currStats, siteChosen?.id),
+                      previousStat: getOrder(prevStats, siteChosen?.id),
+                      change: delta(getOrder(currStats), getOrder(prevStats, siteChosen?.id)),
+                      changeType: deltaType(
+                        getOrder(currStats, siteChosen?.id),
+                        getOrder(prevStats, siteChosen?.id)
+                      ),
+                    },
+                    {
+                      name: "Products Sold",
+                      stat: getProduct(currStats, siteChosen?.id),
+                      previousStat: getProduct(prevStats, siteChosen?.id),
+                      suffix: " items",
+                      change: delta(
+                        getProduct(currStats, siteChosen?.id),
+                        getProduct(prevStats, siteChosen?.id)
+                      ),
+                      changeType: deltaType(
+                        getProduct(currStats, siteChosen?.id),
+                        getProduct(prevStats, siteChosen?.id)
+                      ),
+                    },
+                    {
+                      name: "Average Order Revenue",
+                      stat: getRevenuePerOrder(currStats, siteChosen?.id),
+                      previousStat: getRevenuePerOrder(prevStats, siteChosen?.id),
+                      prefix: "$",
+                      change: delta(
+                        getRevenuePerOrder(currStats, siteChosen?.id),
+                        getRevenuePerOrder(prevStats, siteChosen?.id)
+                      ),
+                      changeType: deltaType(
+                        getRevenuePerOrder(currStats, siteChosen?.id),
+                        getRevenuePerOrder(prevStats, siteChosen?.id)
+                      ),
+                    },
+                  ]}
+                />
+              </div>
+              {siteChosen.id !== 0 && (
+                <Bestsellers
+                  name={siteChosen.name}
+                  orders={
+                    siteCustomerOrders?.find((x) => x.id === siteChosen.id)
+                      ?.orders || []
+                  }
+                />
+              )}
+              <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6 md:col-span-2">
+                <h3 className="text-lg font-medium">Sales</h3>
+                {stats.length > 2 &&
+                  <Chart type="bar" data={{
+                    labels: rangeLabels(range.unit),
+                    datasets: [
+                      {
+                        label: `Revenue over past 7 ${range.unit}s in $`,
+                        data: stats.slice(0, 7).reverse().map(x => getRevenue(x, siteChosen?.id)),
+                        borderColor: colourPicker(cyans, 3, 1)[2],
+                        backgroundColor: colourPicker(cyans, 3, 0.5)[2],
+                        borderWidth: 2,
+                        fill: false,
+                        type: 'line',
+                      },
+                      {
+                        label: `Products sold over past 7 ${range.unit}s`,
+                        data: stats.slice(0, 7).reverse().map(x => getProduct(x, siteChosen?.id)),
+                        borderColor: colourPicker(multi, 5, 1)[4],
+                        backgroundColor: colourPicker(multi, 5, 0.5)[4],
+                        borderWidth: 2,
+                        fill: true,
+                        type: 'bar',
+                      },
+                      {
+                        label: `Orders made over past 7 ${range.unit}s`,
+                        data: stats.slice(0, 7).reverse().map(x => getOrder(x, siteChosen?.id)),
+                        borderColor: colourPicker(multi, 3, 1)[2],
+                        backgroundColor: colourPicker(multi, 3, 0.5)[2],
+                        borderWidth: 2,
+                        fill: true,
+                        type: 'bar',
+                      },
+                    ]
+                  }} />}
+              </div>
               <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
                 <h3 className="text-lg font-medium">
                   Stock Level of {siteChosen?.name}
@@ -424,87 +410,24 @@ export const ManageDashboard = () => {
                   />
                 )}
               </div>
-              <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6 row-span-2">
-                <h3 className="text-lg font-medium mb-4">
-                  Bestsellers in {siteChosen.name}
-                </h3>
-                {siteChosen.id !== 0 && (
-                  <Bestsellers
-                    orders={
-                      siteCustomerOrders?.find((x) => x.id === siteChosen.id)
-                        ?.orders || []
-                    }
-                  />
-                )}
-              </div>
-              <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6">
-                <h3 className="text-lg font-medium">
-                  Overall Finances of {siteChosen.name}
-                </h3>
-                <SharedStats
-                  stats={[
-                    {
-                      name: "Revenue",
-                      stat: getRevenue(currStats),
-                      previousStat: getRevenue(prevStats),
-                      prefix: "$",
-                      change: delta(
-                        getRevenue(currStats),
-                        getRevenue(prevStats)
-                      ),
-                      changeType: deltaType(
-                        getRevenue(currStats),
-                        getRevenue(prevStats)
-                      ),
-                    },
-                    {
-                      name: "Total Customer Orders",
-                      stat: getOrder(currStats),
-                      previousStat: getOrder(prevStats),
-                      change: delta(getOrder(currStats), getOrder(prevStats)),
-                      changeType: deltaType(
-                        getOrder(currStats),
-                        getOrder(prevStats)
-                      ),
-                    },
-                    {
-                      name: "Products Sold",
-                      stat: getProduct(currStats),
-                      previousStat: getProduct(prevStats),
-                      suffix: " items",
-                      change: delta(
-                        getProduct(currStats),
-                        getProduct(prevStats)
-                      ),
-                      changeType: deltaType(
-                        getProduct(currStats),
-                        getProduct(prevStats)
-                      ),
-                    },
-                  ]}
-                />
-              </div>
             </>
           )}
-          <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
+          {/* <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
             <h3 className="text-lg font-medium">iORA</h3>
             <Doughnut data={data} />
           </div>
           <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
             <h3 className="text-lg font-medium">LALU</h3>
             <Doughnut data={data2} />
-          </div>
-          <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6 md:col-span-2">
-            <h3 className="text-lg font-medium">Sales</h3>
-            <Line data={data3} />
-          </div>
+          </div> */}
         </div>
       </div>
     </>
   );
 };
 
-const Bestsellers = ({ orders }) => {
+const Bestsellers = ({ name, orders }) => {
+  const [loading, setLoading] = useState(false);
   const [showModels, setShowModels] = useState(true);
   // const [selectedModelCode, setSelectedModelCode] = useState(null);
   const prodQtys = [
@@ -521,38 +444,52 @@ const Bestsellers = ({ orders }) => {
   const modelBestsellers =
     prodQtys.length > 0
       ? [
-          ...prodQtys.reduce(
-            (map, prod) =>
-              map.set(
-                prod[0].split("-")[0],
-                map.get(prod[0].split("-")[0]) || 0 + prod[1]
-              ),
-            new Map()
-          ),
-        ].sort((m1, m2) => m2[1] - m1[1])
+        ...prodQtys.reduce(
+          (map, prod) =>
+            map.set(
+              prod[0].split("-")[0],
+              map.get(prod[0].split("-")[0]) || 0 + prod[1]
+            ),
+          new Map()
+        ),
+      ].sort((m1, m2) => m2[1] - m1[1])
       : [];
   const prodBestsellers = prodQtys.sort((p1, p2) => p2[1] - p1[1]);
+  const compact = showModels ? modelBestsellers.length < 3 : prodBestsellers.length < 3;
+
+  const changeShowModels = async () => {
+    setLoading(true);
+    setShowModels(!showModels);
+    setTimeout(() => setLoading(false), 700);
+  }
+
   return (
-    <>
+    <div className={`rounded-lg bg-white overflow-visible shadow m-4 p-6 row-span-${compact ? 1 : 2}`}>
+      <h3 className="text-lg font-medium mb-4">
+        Bestsellers in {name}
+      </h3>
       <ToggleLeftLabel
         enabled={!showModels}
-        onEnabledChanged={() => setShowModels(!showModels)}
+        onEnabledChanged={changeShowModels}
         label="Filtered by Colour and Size"
       />
       <dl className="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200">
-        {showModels ? (
-          modelBestsellers
-            .slice(0, 5)
-            ?.map((model, index) => <ModelCard model={model} index={index} />)
-        // ) : selectedModelCode ? (
-        //   <></>
-        ) : (
-          prodBestsellers
-            .slice(0, 5)
-            ?.map((prod, index) => <ProductCard prod={prod} index={index} />)
-        )}
+        {loading ?
+          <div className="flex py-12 items-center justify-center">
+            <TailSpin color="#00BFFF" height={30} width={30} />
+          </div> : showModels ? (
+            modelBestsellers
+              .slice(0, 5)
+              ?.map((model, index) => <ModelCard model={model} index={index} />)
+            // ) : selectedModelCode ? (
+            //   <></>
+          ) : (
+            prodBestsellers
+              .slice(0, 5)
+              ?.map((prod, index) => <ProductCard prod={prod} index={index} />)
+          )}
       </dl>
-    </>
+    </div>
   );
 };
 
@@ -560,7 +497,7 @@ const ModelCard = ({ model, index }) => {
   const [modelFull, setModel] = useState();
 
   useEffect(() => {
-    productApi.getModelByModelCode(model[0]).then(({ data }) => {
+    model && productApi.getModelByModelCode(model[0]).then(({ data }) => {
       setModel(data);
     });
   }, [model]);

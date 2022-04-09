@@ -682,9 +682,9 @@ public class DataLoader implements CommandLineRunner {
 		coli2.setSubTotal(78.0);
 
 		CustomerOrderLI coli3 = new CustomerOrderLI();
-		coli3.setProduct(productService.getProduct("ASK0009273W-1"));
+		coli3.setProduct(productService.getProduct("AB0009153W-1"));
 		coli3.setQty(2);
-		coli3.setSubTotal(38.0);
+		coli3.setSubTotal(98.0);
 
 		CustomerOrderLI coli4 = new CustomerOrderLI();
 		coli4.setProduct(productService.getProduct("AB0009153W-1"));
@@ -709,7 +709,7 @@ public class DataLoader implements CommandLineRunner {
 		coli7.setQty(1);
 		coli7.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli7);
-
+		
 		Payment payment1 = new Payment(127, "241563", PaymentTypeEnum.VISA);
 		customerOrderService.createPayment(payment1);
 
@@ -747,8 +747,9 @@ public class DataLoader implements CommandLineRunner {
 		oo2.setCustomerId(5L);
 		oo2.addLineItem(coli1);
 		oo2.addLineItem(coli2);
+		oo2.addLineItem(coli3);
 		oo2.addPayment(payment3);
-		oo2.setSite(siteService.getSite(10L));
+		oo2.setSite(siteService.getSite(3L));
 		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
 				"Singapore",
 				"117417", "", CountryEnum.Singapore, "65162727");

@@ -32,8 +32,8 @@ export const Membership = () => {
 
     useEffect(() => {
         dispatch(fetchMembershipTiers());
-        dispatch(getCurrentSpending(user.id));
-    }, [dispatch]);
+        user.id && dispatch(getCurrentSpending(user.id));
+    }, [dispatch, user.id]);
 
     const nextTier =
         membershipTiers.find((tier) => tier.minSpend > currSpend) ||
@@ -147,7 +147,7 @@ export const Membership = () => {
                                         </select>
                                         <button
                                             type="button"
-                                            className="mt-2 bg-white py-2 px-4 border text-white border-gray-300 bg-indigo-600 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            className="mt-2 py-2 px-4 border text-white border-gray-300 bg-indigo-600 rounded-md shadow-sm text-sm font-medium hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                             onClick={() => setOpen(true)}>
                                             Redeem
                                         </button>
@@ -178,7 +178,7 @@ export const Membership = () => {
                 <li>Update About Exciting Promotions, Events & News</li>
             </ol>
 
-            <ul role="list" className="mt-8 pt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+            <ul className="mt-8 pt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
                 <li className="col-span-1 flex flex-col bg-gray-100 rounded-lg shadow divide-y divide-gray-200" >
                     <div className="flex-1 flex flex-col p-8">
                         <h5 className="text-2xl">SILVER</h5>

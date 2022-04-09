@@ -66,6 +66,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     private SiteService siteService;
     @Autowired
     private StripeService stripeService;
+    @Autowired
+    private EmailService emailService;
     @PersistenceContext
     private EntityManager em;
 
@@ -214,7 +216,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (customerOrder.getCustomerId() != null) {
             updateMembershipPoints(customerOrder);
         }
-
+        
         // Remove stocks from site
         if (!(customerOrder instanceof OnlineOrder)) {
             for (CustomerOrderLI coli : customerOrder.getLineItems()) {
@@ -230,6 +232,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             OnlineOrder oo = (OnlineOrder) customerOrder;
             Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
             c.setAddress(oo.getDeliveryAddress());
+
+            //set email to customer
+            emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
             em.merge(c);
         }
 

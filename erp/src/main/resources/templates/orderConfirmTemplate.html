@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lange="en" xmlns:th="http://www.iora.com"/>
+    <head>
+        <title th:remove="all">Template for HTML email</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+    <style type="text/css">
+        h2 {
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+    <body>
+        <h2>Order Confirmation</h2>
+        <p>
+            Dear Customer, thank you for shopping at iORA!
+        </p>
+        <p>
+            You have been successfully placed an order with us on
+            <span th:text="${dateTime}">28 12 2012</span>
+        </p>
+       
+        <table id="itemsTable">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="lineItem : ${orderLineItems}">
+                    <td>
+                        <p th:text="${lineItem.product.sku}"></p>
+                        <p th:each="field : ${lineItem.product.productFields}">
+                            <span th:text="${field.fieldName}"></span>
+                            <span th:text="${field.fieldValue}"></span>
+                        </p>
+                    </td>
+                    <td th:text="${lineItem.qty}"></td>
+                    <td th:text="${lineItem.subTotal}"></td>
+                </tr>
+                <td>
+                    <td style="font-weight: bold;">Total</td>
+                    <td></td>
+                    <td></td>
+                    <td th:text="${totalAmount}"></td>
+                </td>
+            </tbody>
+        </table>
+
+        <p>
+            Regards, <br/>
+            <em>iORA Group</em>
+        </p>
+    </body>
+</html>
+

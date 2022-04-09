@@ -757,19 +757,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<CustomerOrderLI> getPickingList() throws ProductException {
+    public Map<String, Integer> getPickingList() throws ProductException {
         Query q = em
                 .createNativeQuery(
                         "SELECT li.product_sku, sum(li.qty) FROM CUSTOMER_ORDER co, CUSTOMER_ORDERLI li, CUSTOMER_ORDER_LINE_ITEMS WHERE co.id = customer_order_id AND li.id = line_items_id AND co.status = :status AND site_id = 3 GROUP BY li.product_sku")
                 .setParameter("status", "PENDING");
 
-        List<CustomerOrderLI> pickingList = new ArrayList<>();
+        Map<String, Integer> pickingList = new HashMap<>();
 
         for (Object object : q.getResultList()) {
             Object[] array = (Object[]) object;
 
             BigInteger qty = (BigInteger) array[1];
-            pickingList.add(new CustomerOrderLI(qty.intValue(), productService.getProduct((String) array[0])));
+            pickingList.put((String) array[0], qty.intValue());
         }
 
         return pickingList;

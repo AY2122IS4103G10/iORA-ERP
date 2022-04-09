@@ -378,11 +378,14 @@ public class SAMController {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @PostMapping(path = "/voucher", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> generateVouchers(@RequestBody Voucher voucher, @RequestParam int qty) {
+    public ResponseEntity<Object> generateVouchers(@RequestBody Map<String, Object> body, @RequestParam int qty) {
         try {
             return ResponseEntity
-                    .ok(customerService.generateVouchers(voucher, qty));
+                    .ok(customerService.generateVouchers((String) body.get("campaign"),
+                            Double.parseDouble((String) body.get("amount")), new Date((Long) body.get("expiry")),
+                            (List<Integer>) body.get("customerIds"), qty));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -488,7 +491,6 @@ public class SAMController {
             return ResponseEntity
                     .ok(procurementService.createProcurementOrder(procurementOrder, siteId));
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
@@ -606,6 +608,18 @@ public class SAMController {
         }
     }
 
+    @GetMapping(path = "/dashboard/voucher/{campaign}", produces = "application/json")
+    public ResponseEntity<Object> getVouchersPerformance(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "ddMMyyyy") Date date,
+            @PathVariable Long siteId) {
+        try {
+            return ResponseEntity
+                    .ok(stockTransferService.getDailyStockTransferOrders(siteId, date == null ? new Date() : date));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     /*
      * ---------------------------------------------------------
      * B.4 CRM
@@ -624,15 +638,6 @@ public class SAMController {
     @GetMapping(path = "/ticket/all", produces = "application/json")
     public List<SupportTicket> getAllSupportTickets() {
         return customerService.getAllSupportTickets();
-    }
-
-    @PostMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createSupportTicket(@RequestBody SupportTicket supportTicket) {
-        try {
-            return ResponseEntity.ok(customerService.createSupportTicket(supportTicket));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
     }
 
     @PutMapping(path = "/ticket", consumes = "application/json", produces = "application/json")

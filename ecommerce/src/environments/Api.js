@@ -129,6 +129,12 @@ export const purchasesApi = {
 
 export const ticketApi = {
   resolveTicket(ticketId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}sam/ticket/resolve/${ticketId}`);
+    return axiosPrivate.put(`${REST_ENDPOINT}online/ticket/resolve/${ticketId}`);
   }
 }
+
+export const productApi = {
+  getModelBySku(sku) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/model/name/${sku}`);
+  },
+};

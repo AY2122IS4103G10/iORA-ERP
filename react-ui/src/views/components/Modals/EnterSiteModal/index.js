@@ -16,7 +16,7 @@ export const EnterSiteModal = ({
   const navigate = useNavigate();
   return (
     <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-bottom bg-white h-80 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+      <div className="inline-block align-bottom bg-white h-80 rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
         <form onSubmit={handleEnterSite}>
           <div>
             <div className="m-4 mt-2">

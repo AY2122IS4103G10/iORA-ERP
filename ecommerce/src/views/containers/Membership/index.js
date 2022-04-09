@@ -1,11 +1,22 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationIcon, XIcon } from '@heroicons/react/outline';
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { useToasts } from "react-toast-notifications";
 import { api } from '../../../environments/Api';
+import {
+    fetchMembershipTiers,
+    selectAllMembershipTiers,
+} from "../../../stores/slices/membershipTierSlice";
+import {
+    getCurrentSpending,
+    selectCurrSpend
+} from "../../../stores/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import ProgressBar from "@ramonak/react-progress-bar";
 
 export const Membership = () => {
+    const dispatch = useDispatch(); 
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [amount, setAmount] = useState(5);
     const handleChange = (e) => {
@@ -15,6 +26,26 @@ export const Membership = () => {
 
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const membershipTiers = useSelector((state) => selectAllMembershipTiers(state));
+    const currSpend = useSelector((state) => selectCurrSpend(state));
+
+    useEffect(() => {
+        dispatch(fetchMembershipTiers());
+        dispatch(getCurrentSpending(user.id));
+    }, [dispatch]);
+
+    const nextTier =
+        membershipTiers.find((tier) => tier.minSpend > currSpend) ||
+        {
+            name: "DIAMOND",
+            minSpend: currSpend,
+        };
+    const currTier =
+        membershipTiers
+            .filter((tier) => tier.minSpend <= currSpend)
+            .slice(-1)[0];
+
     const onRedeemClicked = () => {
         const redeemPoints = async () => {
             const { data } = await api.get("online/redeemPoints", `${user.email}/${amount}`);
@@ -70,7 +101,26 @@ export const Membership = () => {
                     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
                         <div className="bg-white shadow sm:rounded-lg">
                             <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-                                <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-5">
+                                {currTier && nextTier && (
+                                    <>
+                                        <div className="col-span-2 my-3 pb-5">
+                                            <p className="block text-md text-gray-700 my-4">
+                                                Upgrade from a {currTier.name} member to a {nextTier.name}{" "}
+                                                member simply by spending ${nextTier.minSpend}!
+                                            </p>
+                                            <ProgressBar
+                                                animateOnRender
+                                                initCompletedOnAnimation={`${currSpend + 75}`}
+                                                bgColor="#4f46e5"
+                                                completed={`${currSpend + 150}`}
+                                                maxCompleted={nextTier.minSpend + 150}
+                                                customLabel={`$${nextTier.minSpend - currSpend
+                                                    } more to ${nextTier.name}`}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                                <dl className="grid grid-cols-1 gap-x-5 gap-y-8 pt-5 sm:grid-cols-5">
                                     <div className="sm:col-span-2">
                                         <dt className="text-sm font-bold text-gray-600">
                                             Your Membership Tier

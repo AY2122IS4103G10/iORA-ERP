@@ -237,7 +237,6 @@ export const UploadFileCell = forwardRef(
         name="file-upload"
         type="file"
         className="sr-only"
-        accept="image/*"
         multiple
         onChange={onChange}
         onBlur={onBlur}
@@ -362,9 +361,9 @@ export const SimpleTable = ({
           )}
       </div>
       <div className="mt-4 flex flex-col">
-        <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div className="-my-2 overflow-auto sm:-mx-6 lg:-mx-8">
           <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+            <div className="shadow border-b border-gray-200 sm:rounded-lg">
               <table
                 {...getTableProps()}
                 className="min-w-full divide-y divide-gray-200"
@@ -375,7 +374,7 @@ export const SimpleTable = ({
                       {headerGroup.headers.map((column) => (
                         <th
                           scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
+                          className="px-6 py-3 text-center text-xs font-medium text-gray-900 uppercase tracking-wider"
                           {...column.getHeaderProps(
                             sortBy && column.getSortByToggleProps(),
                             {

@@ -15,6 +15,7 @@ import {
 export const PickPackList = ({
   data,
   status,
+  setShowConfirm,
   procurementId,
   openConfirmModal,
   handlePickPack,
@@ -162,6 +163,7 @@ export const PickPackList = ({
       },
     ];
   }, [setData, status, onSaveQuanityClicked, handlePickPack]);
+
   const hiddenColumns =
     manufacturing.id !== currSiteId ||
     ["MANUFACTURED", "PICKING", "PACKING", "ACCEPTED"].every(
@@ -169,6 +171,7 @@ export const PickPackList = ({
     )
       ? ["[editButton]"]
       : [];
+
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -180,14 +183,15 @@ export const PickPackList = ({
             type="button"
             className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
             onClick={() => {
-              setAction({
-                name: "Complete",
-                action: handlePickPack,
-                body: `The quantity picked of one or more items have not reached their requested quantity.
-                Are you sure you want to complete picking for "Order #${procurementId}"? 
-                This action cannot be undone.`,
-              });
-              openConfirmModal();
+              // setAction({
+              //   name: "Complete",
+              //   action: handlePickPack,
+              //   body: `The quantity picked of one or more items have not reached their requested quantity.
+              //   Are you sure you want to complete picking for "Order #${procurementId}"?
+              //   This action cannot be undone.`,
+              // });
+              // openConfirmModal();
+              setShowConfirm(true);
             }}
           >
             <span>Complete Picking</span>
@@ -256,6 +260,7 @@ export const ConfirmSection = ({
   body,
   onConfirmClicked,
   cancelPath,
+  setShowConfirm,
 }) => {
   const navigate = useNavigate();
   return (
@@ -277,14 +282,19 @@ export const ConfirmSection = ({
         <button
           type="button"
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:col-start-2 sm:text-sm"
-          onClick={onConfirmClicked}
+          onClick={() => {
+            onConfirmClicked();
+            setShowConfirm && setShowConfirm(false);
+          }}
         >
           Confirm
         </button>
         <button
           type="button"
           className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-          onClick={() => navigate(cancelPath)}
+          onClick={() =>
+            setShowConfirm ? setShowConfirm(false) : navigate(cancelPath)
+          }
         >
           Cancel
         </button>
@@ -313,6 +323,7 @@ export const ProcurementPickPack = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const manufactureOrder = async () => {
     try {
@@ -363,11 +374,12 @@ export const ProcurementPickPack = () => {
             autoDismiss: true,
           }
         );
-      } else closeConfirmModal();
+      }
       if (status.status === "PACKED") {
         openInvoice();
         navigate(`/${subsys}/procurements/${procurementId}/delivery`);
       }
+      if (showConfirm) setShowConfirm(false)
     } catch (error) {
       addToast(`Error: ${error.response.data}`, {
         appearance: "error",
@@ -465,8 +477,9 @@ export const ProcurementPickPack = () => {
           "PACKING",
           "PACKED",
         ].some((s) => s === status.status) ? (
-          ["ACCEPTED", "PICKED", "PACKED"].some((s) => s === status.status) ? (
-            subsys === "mf" ? (
+          ["ACCEPTED", "PICKED", "PACKED"].some((s) => s === status.status) ||
+          showConfirm ? (
+            manufacturing.id === currSiteId ? (
               <section
                 aria-labelledby="confirm-manufactured"
                 className="flex justify-center"
@@ -477,14 +490,14 @@ export const ProcurementPickPack = () => {
                   title={`Confirm items ${
                     status.status === "ACCEPTED"
                       ? "manufactured"
-                      : status.status === "PICKED"
+                      : status.status === "PICKING"
                       ? "picked"
                       : "packed"
                   }`}
                   body={`Confirm that all the items in this order have been ${
                     status.status === "ACCEPTED"
                       ? "manufactured"
-                      : status.status === "PICKED"
+                      : status.status === "PICKING"
                       ? "picked"
                       : "packed"
                   }?
@@ -492,7 +505,7 @@ export const ProcurementPickPack = () => {
                   ${
                     status.status === "ACCEPTED"
                       ? "picking"
-                      : status.status === "PICKED"
+                      : status.status === "PICKING"
                       ? "packing"
                       : "delivery"
                   } stage.`}
@@ -543,6 +556,7 @@ export const ProcurementPickPack = () => {
                 openConfirmModal={openConfirmModal}
                 handlePickPack={handlePickPack}
                 procurementId={procurementId}
+                setShowConfirm={setShowConfirm}
                 setData={setLineItems}
                 manufacturing={manufacturing}
                 currSiteId={currSiteId}

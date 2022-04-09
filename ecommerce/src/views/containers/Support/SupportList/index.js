@@ -1,27 +1,70 @@
-import { useEffect, useMemo } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { PaperClipIcon, XIcon } from "@heroicons/react/outline";
+import moment from "moment";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
+import { IMGBB_SECRET } from '../../../../config';
 import {
-  fetchSupportTickets,
-  selectAllSupportTickets,
+  createSupportTicket, fetchPublicSupportTickets,
+  fetchUserSupportTickets,
+  selectPublicSupportTickets,
+  selectUserSupportTickets
 } from "../../../../stores/slices/supportTicketSlice";
 import {
   SelectColumnFilter,
-  SimpleTable,
+  SimpleTable
 } from "../../../components/Tables/SimpleTable";
-import moment from "moment";
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment } from "react";
-import { PaperClipIcon, XIcon } from "@heroicons/react/outline";
-import { useState } from "react";
 
-const SupportTicketModal = ({ open, setOpen, closeNewTicketModal }) => {
+const SupportTicketModal = ({
+  open,
+  setOpen,
+  subject,
+  onSubjectChanged,
+  category,
+  onCategoryChanged,
+  order,
+  onOrderChanged,
+  message,
+  onMessageChanged,
+  file,
+  setFile,
+  onSubmitClicked,
+  loading
+}) => {
+  const categories = [
+    {
+      value: "ACCOUNT",
+    },
+    {
+      value: "ORDER",
+    },
+    {
+      value: "GENERAL",
+    }
+  ]
+
+  const orders = () => {
+    const list = [{label : "", value : 0}];
+    JSON.parse(localStorage.getItem("user")).orders.forEach((order) => {
+      list.push({
+        label: "Order #" + order.id + ", Amount Spent: $" + order.totalAmount,
+        value: order.id,
+      })
+    });
+    return list;
+  }
+
+  const fileRef = useRef();
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
-        onClose={setOpen}
+        onClose={() => setOpen(false)}
       >
         <div
           className="flex min-h-screen text-center md:block md:px-2 lg:px-4"
@@ -60,7 +103,7 @@ const SupportTicketModal = ({ open, setOpen, closeNewTicketModal }) => {
                 <button
                   type="button"
                   className="absolute top-4 right-4 text-gray-400 hover:text-gray-500 sm:top-8 sm:right-6 md:top-6 md:right-6 lg:top-8 lg:right-8"
-                  onClick={closeNewTicketModal}
+                  onClick={() => setOpen(false)}
                 >
                   <span className="sr-only">Close</span>
                   <XIcon className="h-6 w-6" aria-hidden="true" />
@@ -82,34 +125,75 @@ const SupportTicketModal = ({ open, setOpen, closeNewTicketModal }) => {
                             <div className="grid grid-cols-3 gap-6">
                               <div className="col-span-3 sm:col-span-2">
                                 <label
-                                  htmlFor="company-website"
                                   className="block text-sm font-medium text-gray-700"
                                 >
-                                  Title
+                                  Subject
                                 </label>
                                 <div className="mt-1 rounded-md shadow-sm flex">
                                   <input
                                     type="text"
-                                    name="username"
-                                    id="username"
-                                    autoComplete="username"
+                                    name="subject"
+                                    id="subject"
+                                    required
+                                    value={subject}
+                                    onChange={onSubjectChanged}
                                     className="focus:ring-gray-500 focus:border-gray-500 flex-grow block w-full min-w-0 rounded-md sm:text-sm border-gray-300"
                                   />
                                 </div>
                               </div>
 
+                              <div className="col-span-3 sm:col-span-2">
+                                <label
+                                  className="block text-sm font-medium text-gray-700"
+                                >
+                                  Category
+                                </label>
+                                <div className="mt-1 rounded-md shadow-sm flex">
+                                  <select
+                                    className="focus:ring-indigo-500 focus:border-indigo-500 relative block w-full rounded-none rounded-t-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
+                                    required
+                                    value={category}
+                                    onChange={onCategoryChanged}>
+                                    {categories.map((option) => (
+                                      <option value={option.value}>{option.value}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+
+                              {category === "ORDER" &&
+                                <div className="col-span-3 sm:col-span-2">
+                                  <label
+                                    className="block text-sm font-medium text-gray-700"
+                                  >
+                                    Order Number
+                                  </label>
+                                  <div className="mt-1 rounded-md shadow-sm flex">
+                                    <select
+                                      className="focus:ring-indigo-500 focus:border-indigo-500 relative block w-full rounded-none rounded-t-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
+                                      value={order}
+                                      onChange={onOrderChanged}>
+                                      {orders().map((option) => (
+                                        <option value={option.value}>{option.label}</option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>}
+
                               <div className="col-span-3">
                                 <label
-                                  htmlFor="about"
                                   className="block text-sm font-medium text-gray-700"
                                 >
                                   Description
                                 </label>
                                 <div className="mt-1">
                                   <textarea
-                                    id="about"
-                                    name="about"
+                                    id="message"
+                                    name="message"
+                                    required
                                     rows={3}
+                                    value={message}
+                                    onChange={onMessageChanged}
                                     className="shadow-sm focus:ring-gray-500 focus:border-gray-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                                   />
                                 </div>
@@ -118,102 +202,53 @@ const SupportTicketModal = ({ open, setOpen, closeNewTicketModal }) => {
                                 </p>
                               </div>
 
-                              <div className="col-span-3">
-                                <label className="block text-sm font-medium text-gray-700">
-                                  Attachments
-                                </label>
-                                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                  {/* <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
-                    {e.value.map((file, index) => {
-                      const idx = index;
-                      return (
-                        <li
-                          key={index}
-                          className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
-                        >
-                          <div className="w-0 flex-1 flex items-center">
-                            <PaperClipIcon
-                              className="flex-shrink-0 h-5 w-5 text-gray-400"
-                              aria-hidden="true"
-                            />
-                            <span className="ml-2 flex-1 w-0 truncate">
-                              {file.name ? file.name : file}
-                            </span>
-                          </div>
-                          <div className="ml-4 flex-shrink-0 flex space-x-4">
-                            <button
-                              type="button"
-                              className="bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                              onClick={() => {
-                                setData((old) =>
-                                  old.map((row, index) => {
-                                    if (index === e.row.index) {
-                                      return {
-                                        ...old[e.row.index],
-                                        files: e.value.filter(
-                                          (_, index) => index !== idx
-                                        ),
-                                      };
-                                    }
-                                    return row;
-                                  })
-                                );
-                              }}
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul> */}
-                                </div>
-                                <div className="mt-1 border-2 border-gray-300 border-dashed rounded-md px-6 pt-5 pb-6 flex justify-center">
-                                  <div className="space-y-1 text-center">
-                                    <svg
-                                      className="mx-auto h-12 w-12 text-gray-400"
-                                      stroke="currentColor"
-                                      fill="none"
-                                      viewBox="0 0 48 48"
-                                      aria-hidden="true"
-                                    >
-                                      <path
-                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                        strokeWidth={2}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                    </svg>
-                                    <div className="flex text-sm text-gray-600">
-                                      <label
-                                        htmlFor="file-upload"
-                                        className="relative cursor-pointer bg-white rounded-md font-medium text-gray-600 hover:text-gray-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-gray-500"
-                                      >
-                                        <span>Upload a file</span>
-                                        <input
-                                          id="file-upload"
-                                          name="file-upload"
-                                          type="file"
-                                          className="sr-only"
-                                        />
-                                      </label>
-                                      <p className="pl-1">or drag and drop</p>
-                                    </div>
-                                    <p className="text-xs text-gray-500">
-                                      PNG, JPG, GIF up to 10MB
-                                    </p>
-                                  </div>
-                                </div>
+                              <div className="flex">
+                                <input ref={fileRef}
+                                  onChange={(e) => {
+                                    setFile(e.target.files[0])
+                                  }}
+                                  multiple={false}
+                                  type="file"
+                                  accept="image/*"
+                                  hidden />
+                                <button
+                                  type="button"
+                                  className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
+                                  onClick={() => fileRef.current.click()}
+                                >
+                                  <PaperClipIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
+                                  <span className="text-sm text-gray-500 group-hover:text-gray-600 italic">
+                                    {Boolean(file.name) ? file.name : "Attach a file"}
+                                  </span>
+                                </button>
+                                {Boolean(file.name) &&
+                                  <button
+                                    type="button"
+                                    className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
+                                    onClick={() => setFile([])}
+                                  >
+                                    <XIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
+                                  </button>}
                               </div>
                             </div>
                           </div>
                           <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                            <button
-                              type="submit"
-                              className="bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                            >
-                              Save
-                            </button>
+                            {loading ?
+                              <button
+                                type="button"
+                                disabled
+                                className="bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                              >
+                                <TailSpin color="#00BFFF" height={20} width={20} />
+                              </button>
+                              :
+                              <button
+                                type="submit"
+                                onClick={onSubmitClicked}
+                                className="bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                              >
+                                Save
+                              </button>}
                           </div>
                         </div>
                       </form>
@@ -228,8 +263,29 @@ const SupportTicketModal = ({ open, setOpen, closeNewTicketModal }) => {
     </Transition.Root>
   );
 };
-const SupportTicketTable = ({ data, handleOnClick }) => {
-  const columns = useMemo(
+const SupportTicketTable = ({ data, handleOnClick, user }) => {
+  const publicColumns = useMemo(
+    () => [
+      {
+        Header: "Category",
+        accessor: "category",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Subject",
+        accessor: "subject",
+      },
+      {
+        Header: "Last Response",
+        accessor: (row) => `${row.messages[row.messages.length - 1]}`,
+        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, hh:mm"),
+      }
+    ],
+    []
+  );
+
+  const userColumns = useMemo(
     () => [
       {
         Header: "Category",
@@ -246,6 +302,28 @@ const SupportTicketTable = ({ data, handleOnClick }) => {
         accessor: (row) => `${row.messages[row.messages.length - 1]}`,
         Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, hh:mm"),
       },
+      {
+        Header: "Status",
+        accessor: "status",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+        Cell: (e) => (e.value === "PENDING" ? (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800">
+            Pending Admin
+          </span>
+        ) :
+          (e.value === "PENDING_CUSTOMER" ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              Admin Replied
+            </span>
+          ) :
+            (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                Resolved
+              </span>
+            ))
+        ),
+      }
     ],
     []
   );
@@ -254,7 +332,7 @@ const SupportTicketTable = ({ data, handleOnClick }) => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
         <SimpleTable
-          columns={columns}
+          columns={user ? userColumns : publicColumns}
           data={data}
           handleOnClick={handleOnClick}
         />
@@ -264,20 +342,143 @@ const SupportTicketTable = ({ data, handleOnClick }) => {
 };
 
 export const SupportList = () => {
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const data = useSelector(selectAllSupportTickets);
-  const supportTicketStatus = useSelector(
-    (state) => state.supportTickets.status
-  );
+  const publicTickets = useSelector((state) => selectPublicSupportTickets(state));
+  const userTickets = useSelector((state) => selectUserSupportTickets(state));
   const [openNewTicket, setOpenNewTicket] = useState(false);
+
+  const [subject, setSubject] = useState("");
+  const onSubjectChanged = (e) => setSubject(e.target.value);
+  const [message, setMessage] = useState("");
+  const onMessageChanged = (e) => setMessage(e.target.value);
+  const [category, setCategory] = useState("ACCOUNT");
+  const onCategoryChanged = (e) => setCategory(e.target.value);
+  const [order, setOrder] = useState(0);
+  const onOrderChanged = (e) => setOrder(e.target.value);
+  const [file, setFile] = useState({});
+  const [loading, setLoading] = useState(false);
+  const ticketStatus = useSelector((state) => state.supportTickets.listStatus);
+
   useEffect(() => {
-    supportTicketStatus === "idle" && dispatch(fetchSupportTickets());
-  }, [supportTicketStatus, dispatch]);
+    ticketStatus === "idle" && dispatch(fetchUserSupportTickets(JSON.parse(localStorage.getItem("user")).id)).then(
+      dispatch(fetchPublicSupportTickets()));
+  }, [ticketStatus]);
+
   const handleOnClick = (row) => navigate(`${row.original.id}`);
 
-  const openNewTicketModal = () => setOpenNewTicket(true);
-  const closeNewTicketModal = () => setOpenNewTicket(false);
+  const onSubmitClicked = (evt) => {
+    evt.preventDefault();
+    setLoading(true);
+    const image = new FormData();
+    image.append('image', file)
+
+    const name = JSON.parse(localStorage.getItem("user")).firstName + " " + JSON.parse(localStorage.getItem("user")).lastName
+    var imageUrl;
+
+    Boolean(file.name) ? fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`,
+      {
+        method: 'POST',
+        body: image,
+      }
+    ).then((response) => response.json())
+      .then((data) => {
+        imageUrl = data.data.url;
+        dispatch(createSupportTicket(
+          {
+            subject,
+            category,
+            messages: [{
+              message,
+              name,
+              imageUrl
+            }],
+            customer: {
+              id: JSON.parse(localStorage.getItem("user")).id
+            },
+
+          }
+        ))
+          .unwrap()
+          .then(() => {
+            setSubject("");
+            setMessage("");
+            setCategory("");
+            setOrder("");
+            setFile([]);
+            setOpenNewTicket(false);
+            navigate("/support");
+            addToast("Successfully replied to ticket", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }) : dispatch(createSupportTicket(
+        {
+          subject,
+          category,
+          messages: [{
+            message,
+            name,
+            imageUrl
+          }],
+          customer: {
+            id: JSON.parse(localStorage.getItem("user")).id
+          },
+          customerOrder: order === 0 ? null : {
+            id:  order
+          }
+        }
+      ))
+        .unwrap()
+        .then(() => {
+          setSubject("");
+          setMessage("");
+          setCategory("");
+          setOrder("");
+          setFile([]);
+          setOpenNewTicket(false);
+          navigate("/support");
+          addToast("Ticket successfully created", {
+            appearance: "success",
+            autoDismiss: true,
+          });
+        })
+        .catch((err) => {
+          console.log({
+            subject,
+            category,
+            messages: [{
+              message,
+              name,
+              imageUrl
+            }],
+            customer: {
+              id: JSON.parse(localStorage.getItem("user")).id
+            },
+            customerOrder: order === 0 ? null : {
+              id:  order
+            }
+          });
+          addToast(`Error: ${err.message}`, {
+            appearance: "error",
+            autoDismiss: true,
+          });
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+  }
 
   return (
     <>
@@ -292,36 +493,48 @@ export const SupportList = () => {
             ticket.
           </h2>
           <SupportTicketTable
-            data={data.filter((value) => value.status === "RESOLVED")}
+            data={publicTickets}
             handleOnClick={handleOnClick}
+            user={false}
           />
         </div>
         <div>
           <h1 className="text-3xl text-center font-bold text-gray-900 pt-5 pb-5">
             Your Support Tickets
           </h1>
-          <div className="px-4 md:flex md:items-center md:justify-between lg:px-8 xl:px-12">
-            <div className="mt-6 flex space-x-3 md:mt-0">
-              <button
-                type="button"
-                className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
-                onClick={openNewTicketModal}
-              >
-                <span>New Ticket</span>
-              </button>
-            </div>
-          </div>
           <SupportTicketTable
-            data={data.filter(
-              (value) =>
-                value.customer.id ===
-                JSON.parse(localStorage.getItem("user")).id
-            )}
+            data={userTickets}
             handleOnClick={handleOnClick}
+            user={true}
           />
         </div>
+        <div className="px-4 md:flex md:items-center md:justify-between lg:px-8 xl:px-12 float-right pt-5">
+          <div className="mt-6 flex space-x-3 md:mt-0">
+            <button
+              type="button"
+              className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
+              onClick={() => setOpenNewTicket(true)}
+            >
+              <span>Create a New Ticket</span>
+            </button>
+          </div>
+        </div>
       </div>
-      <SupportTicketModal open={openNewTicket} setOpen={setOpenNewTicket} />
+      <SupportTicketModal
+        open={openNewTicket}
+        setOpen={setOpenNewTicket}
+        subject={subject}
+        onSubjectChanged={onSubjectChanged}
+        category={category}
+        onCategoryChanged={onCategoryChanged}
+        order={order}
+        onOrderChanged={onOrderChanged}
+        message={message}
+        onMessageChanged={onMessageChanged}
+        file={file}
+        setFile={setFile}
+        onSubmitClicked={onSubmitClicked}
+        loading={loading} />
     </>
   );
 };

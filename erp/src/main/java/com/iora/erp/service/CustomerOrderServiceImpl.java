@@ -174,7 +174,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             stripeService.capturePayment(clientSecret);
         }
         if (customerOrder.getVoucher() != null) {
-            if (!customerOrder.getVoucher().getCustomerIds().contains(customerOrder.getCustomerId())) {
+            if (customerOrder.getVoucher().getCustomerId() != customerOrder.getCustomerId()) {
                 throw new CustomerException("Customer is not entitled to this voucher.");
             } else {
                 customerService.redeemVoucher(customerOrder.getVoucher().getVoucherCode());
@@ -614,26 +614,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     // Helper methods
-
-    // amount added to payments
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
-        TypedQuery<CustomerOrder> q = em.createQuery(
-                "SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date", CustomerOrder.class);
-        q.setParameter("id", customer.getId());
-        q.setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP);
-
-        double spending = q.getResultList()
-                .stream()
-                .map(x -> x.getPayments())
-                .map(x -> x.stream().mapToDouble(y -> y.getAmount()).sum())
-                .collect(Collectors.summingDouble(Double::doubleValue));
+        double spending = getCurrentSpending(customer.getId());
 
         List<MembershipTier> tiers = em
                 .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
                 .getResultList();
         MembershipTier membershipTier = tiers.get(0);
+
         for (MembershipTier tier : tiers) {
             if (spending > tier.getMinSpend()) {
                 membershipTier = tier;
@@ -663,6 +653,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         membershipPoints = membershipPoints
                 + (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier());
         customer.setMembershipPoints(membershipPoints);
+    }
+
+    public double getCurrentSpending(Long customerId) {
+        TypedQuery<CustomerOrder> q = em.createQuery(
+                "SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date", CustomerOrder.class);
+        q.setParameter("id", customerId);
+        q.setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP);
+
+        return q.getResultList()
+                .stream()
+                .map(x -> x.getPayments())
+                .map(x -> x.stream().mapToDouble(y -> y.getAmount()).sum())
+                .collect(Collectors.summingDouble(Double::doubleValue));
     }
 
     /*
@@ -746,6 +749,25 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    public List<CustomerOrderLI> getPickingList() throws ProductException {
+        Query q = em
+                .createNativeQuery(
+                        "SELECT li.product_sku, sum(li.qty) FROM CUSTOMER_ORDER co, CUSTOMER_ORDERLI li, CUSTOMER_ORDER_LINE_ITEMS WHERE co.id = customer_order_id AND li.id = line_items_id AND co.status = :status AND site_id = 3 GROUP BY li.product_sku")
+                .setParameter("status", "PENDING");
+
+        List<CustomerOrderLI> pickingList = new ArrayList<>();
+
+        for (Object object : q.getResultList()) {
+            Object[] array = (Object[]) object;
+
+            BigInteger qty = (BigInteger) array[1];
+            pickingList.add(new CustomerOrderLI(qty.intValue(), productService.getProduct((String) array[0])));
+        }
+
+        return pickingList;
+    }
+
+    @Override
     public OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
         Site actionBy = em.find(Site.class, siteId);
@@ -787,16 +809,17 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
                     coli.setPickedQty(coli.getPickedQty() + qty);
-                    boolean picked = true;
-                    for (CustomerOrderLI coli2 : lineItems) {
-                        if (coli2.getPickedQty() < coli2.getQty()) {
-                            picked = false;
-                        }
-                    }
-                    if (picked) {
-                        onlineOrder.addStatusHistory(
-                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
-                    }
+                    // boolean picked = true;
+                    // for (CustomerOrderLI coli2 : lineItems) {
+                    // if (coli2.getPickedQty() < coli2.getQty()) {
+                    // picked = false;
+                    // }
+                    // }
+                    // if (picked) {
+                    // onlineOrder.addStatusHistory(
+                    // new OOStatus(onlineOrder.getSite(), new Date(),
+                    // OnlineOrderStatusEnum.PICKED));
+                    // }
                     return em.merge(onlineOrder);
                 }
             }
@@ -810,16 +833,17 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     } else {
                         coli.setPackedQty(coli.getPackedQty() + qty);
 
-                        boolean packed = true;
-                        for (CustomerOrderLI coli2 : lineItems) {
-                            if (coli2.getPackedQty() < coli2.getPickedQty()) {
-                                packed = false;
-                            }
-                        }
-                        if (packed) {
-                            onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
-                        }
+                        // boolean packed = true;
+                        // for (CustomerOrderLI coli2 : lineItems) {
+                        // if (coli2.getPackedQty() < coli2.getPickedQty()) {
+                        // packed = false;
+                        // }
+                        // }
+                        // if (packed) {
+                        // onlineOrder.addStatusHistory(
+                        // new OOStatus(onlineOrder.getSite(), new Date(),
+                        // OnlineOrderStatusEnum.PACKED));
+                        // }
                         return em.merge(onlineOrder);
                     }
                 }
@@ -843,16 +867,17 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
                     coli.setPickedQty(qty);
-                    boolean picked = true;
-                    for (CustomerOrderLI coli2 : lineItems) {
-                        if (coli2.getPickedQty() < coli2.getQty()) {
-                            picked = false;
-                        }
-                    }
-                    if (picked) {
-                        onlineOrder.addStatusHistory(
-                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
-                    }
+                    // boolean picked = true;
+                    // for (CustomerOrderLI coli2 : lineItems) {
+                    // if (coli2.getPickedQty() < coli2.getQty()) {
+                    // picked = false;
+                    // }
+                    // }
+                    // if (picked) {
+                    // onlineOrder.addStatusHistory(
+                    // new OOStatus(onlineOrder.getSite(), new Date(),
+                    // OnlineOrderStatusEnum.PICKED));
+                    // }
                     return em.merge(onlineOrder);
                 }
             }
@@ -866,16 +891,17 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     } else {
                         coli.setPackedQty(qty);
 
-                        boolean packed = true;
-                        for (CustomerOrderLI coli2 : lineItems) {
-                            if (coli2.getPackedQty() < coli2.getPickedQty()) {
-                                packed = false;
-                            }
-                        }
-                        if (packed) {
-                            onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
-                        }
+                        // boolean packed = true;
+                        // for (CustomerOrderLI coli2 : lineItems) {
+                        // if (coli2.getPackedQty() < coli2.getPickedQty()) {
+                        // packed = false;
+                        // }
+                        // }
+                        // if (packed) {
+                        // onlineOrder.addStatusHistory(
+                        // new OOStatus(onlineOrder.getSite(), new Date(),
+                        // OnlineOrderStatusEnum.PACKED));
+                        // }
                         return em.merge(onlineOrder);
                     }
                 }

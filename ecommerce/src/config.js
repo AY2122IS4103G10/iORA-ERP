@@ -1,0 +1,1 @@
+export const IMGBB_SECRET = "72971cfd7358a13d6543e5aa7e187e5e"

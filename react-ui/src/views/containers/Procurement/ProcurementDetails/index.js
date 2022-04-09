@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
+import AWS from "aws-sdk";
 import moment from "moment";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useOutletContext } from "react-router-dom";
@@ -9,29 +10,46 @@ import { sitesApi } from "../../../../environments/Api";
 import { eventTypes } from "../../../../constants/eventTypes";
 import { ProductSticker } from "../../Products/ProductPrint";
 import { forwardRef } from "react";
+import { awsConfig } from "../../../../config";
+import { DownloadIcon } from "@heroicons/react/solid";
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { ProductModal } from "../ProcurementForm";
 
-const ItemsSummary = ({ data, handlePrint }) => {
+const ItemsSummary = ({
+  subsys,
+  data,
+  handlePrint,
+  onDownloadClicked,
+  setSelectedProduct,
+  openInfoModal,
+}) => {
+  const siteCols = Object.keys(data[0]?.siteQuantities).map((store) => ({
+    Header: () => (
+      <div className="flex items-center justify-between">
+        <span>{store}</span>
+      </div>
+    ),
+    minWidth: 100,
+    maxWidth: 130,
+    accessor: `siteQuantities.${store}`,
+  }));
   const columns = useMemo(() => {
     return [
       {
         Header: "SKU",
         accessor: "product.sku",
-      },
-      {
-        Header: "Name",
-        accessor: "product.name",
         Cell: (e) => {
-          return e.row.original.product.imageLinks?.length ? (
-            <a
-              href={e.row.original.product.imageLinks[0]}
-              className="hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
+          return (
+            <button
+              className="font-medium hover:underline"
+              onClick={() => {
+                setSelectedProduct(e.row.original.product);
+                openInfoModal();
+              }}
             >
-              {e.value}
-            </a>
-          ) : (
-            e.value
+              <span className="text-ellipsis overflow-hidden">{e.value}</span>
+            </button>
           );
         },
       },
@@ -49,19 +67,80 @@ const ItemsSummary = ({ data, handlePrint }) => {
             .fieldValue,
       },
       {
-        Header: "Req",
+        Header: "Cost",
+        accessor: "costPrice",
+        Cell: (e) => `$${e.value}`,
+      },
+      {
+        Header: "Sites",
+        accessor: "siteQuantities",
+        columns: siteCols,
+      },
+      {
+        Header: "Total",
         accessor: "requestedQty",
       },
       {
-        Header: "Ful",
-        accessor: "packedQty",
-      },
-      {
-        Header: "Cost",
-        accessor: "costPrice",
+        Header: "",
+        accessor: "files",
+        disableSortBy: true,
+        Cell: (e) => {
+          return (
+            <Menu as="div" className="relative inline-block text-left">
+              <div>
+                <Menu.Button
+                  className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+                  disabled={!e.value.length}
+                >
+                  Files
+                </Menu.Button>
+              </div>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="z-20 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="py-1">
+                    {e.value.map((file, index) => {
+                      return (
+                        <Menu.Item key={index}>
+                          <div className="pr-4 flex items-center justify-between text-sm">
+                            <div className="overflow-hidden truncate block px-4 py-2 text-sm text-gray-700">
+                              <span className="flex-1 w-0 truncate">
+                                {file}
+                              </span>
+                            </div>
+                            <div className="ml-4 flex-shrink-0 flex space-x-4">
+                              <button
+                                type="button"
+                                className="bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                                onClick={() => onDownloadClicked(file)}
+                              >
+                                <DownloadIcon
+                                  className="flex-shrink-0 h-4 w-4"
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        </Menu.Item>
+                      );
+                    })}
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          );
+        },
       },
     ];
-  }, []);
+  }, [onDownloadClicked, openInfoModal, setSelectedProduct, siteCols]);
+  const hiddenColumns = subsys === "lg" ? ["files"] : [];
   return (
     <div className="pt-8">
       <div className="md:flex md:items-center md:justify-between">
@@ -78,7 +157,11 @@ const ItemsSummary = ({ data, handlePrint }) => {
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable columns={columns} data={data} />
+          <SimpleTable
+            columns={columns}
+            data={data}
+            hiddenColumns={hiddenColumns}
+          />
         </div>
       )}
     </div>
@@ -147,7 +230,7 @@ export const ActivitySection = ({ history }) => {
 };
 
 const ProcurementDetailsBody = ({
-  pathname,
+  subsys,
   history,
   status,
   lineItems,
@@ -155,13 +238,14 @@ const ProcurementDetailsBody = ({
   headquarters,
   warehouse,
   notes,
-  onFulfilClicked,
-  onVerifyReceivedClicked,
   handlePrint,
+  onDownloadClicked,
+  openInfoModal,
+  setSelectedProduct,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-      {/* Site Information*/}
+      {/* Procurement Information*/}
       <section aria-labelledby="order-information-title">
         <div className="bg-white shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:px-6">
@@ -243,11 +327,20 @@ const ProcurementDetailsBody = ({
     {history && Boolean(history.length) && (
       <ActivitySection history={history} />
     )}
-    <div className="lg:col-start-1 lg:col-span-3">
-      <section aria-labelledby="order-summary">
-        <ItemsSummary data={lineItems} handlePrint={handlePrint} />
-      </section>
-    </div>
+    {Boolean(lineItems.length) && (
+      <div className="lg:col-start-1 lg:col-span-3">
+        <section aria-labelledby="order-summary">
+          <ItemsSummary
+            subsys={subsys}
+            data={lineItems}
+            handlePrint={handlePrint}
+            onDownloadClicked={onDownloadClicked}
+            openInfoModal={openInfoModal}
+            setSelectedProduct={setSelectedProduct}
+          />
+        </section>
+      </div>
+    )}
   </div>
 );
 
@@ -294,10 +387,39 @@ export const ProcurementDetails = () => {
   } = useOutletContext();
   const { pathname } = useLocation();
   const [history, setHistory] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(false);
+  const [openInfo, setOpenInfo] = useState(false);
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+
+  const onDownloadClicked = (file) => {
+    AWS.config.update({
+      accessKeyId: awsConfig.accessKeyId,
+      secretAccessKey: awsConfig.secretAccessKey,
+    });
+    const handleDownload = () => {
+      const s3 = new AWS.S3({ region: awsConfig.region });
+      const bucketParams = {
+        Bucket: awsConfig.bucketName,
+        Key: file,
+      };
+
+      s3.getObject(bucketParams, (err, data) => {
+        if (err) {
+          console.log(err, err.stack);
+        } else {
+          let blob = new Blob([data.Body], { type: data.ContentType });
+          let link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = `/${file}`;
+          link.click();
+        }
+      });
+    };
+    return handleDownload();
+  };
 
   useEffect(() => {
     fetchAllActionBy(statusHistory).then((data) => {
@@ -328,7 +450,11 @@ export const ProcurementDetails = () => {
       );
     });
   }, [statusHistory]);
-  console.log(lineItems)
+
+  const openInfoModal = () => setOpenInfo(true);
+  const closeInfoModal = () => setOpenInfo(false);
+
+  console.log(lineItems);
   return (
     <>
       <ProcurementDetailsBody
@@ -344,6 +470,9 @@ export const ProcurementDetails = () => {
         pathname={pathname}
         history={history}
         handlePrint={handlePrint}
+        onDownloadClicked={onDownloadClicked}
+        openInfoModal={openInfoModal}
+        setSelectedProduct={setSelectedProduct}
       />
       <div className="hidden">
         <ProductStickerPrint
@@ -354,6 +483,14 @@ export const ProcurementDetails = () => {
           }))}
         />
       </div>
+      {selectedProduct && (
+        <ProductModal
+          open={openInfo}
+          closeModal={closeInfoModal}
+          product={selectedProduct}
+          onDownloadClicked={onDownloadClicked}
+        />
+      )}
     </>
   );
 };

@@ -35,13 +35,6 @@ export const Profile = () => {
 
   const onSaveClicked = (evt) => {
     evt.preventDefault();
-    console.log({
-      ...user,
-      firstName,
-      lastName,
-      dob,
-      contactNumber: contactNo,
-    })
     dispatch(
       updateAccount({
         ...user,
@@ -81,10 +74,6 @@ export const Profile = () => {
                 >
                   Profile
                 </h2>
-                <p className="mt-1 text-sm text-gray-500">
-                  This information will be displayed publicly so be careful what
-                  you share.
-                </p>
               </div>
 
               <div className="mt-6 grid grid-cols-4 gap-6">

@@ -324,6 +324,9 @@ export const departmentApi = {
 };
 
 export const productApi = {
+  getProductBySku(sku) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/product/${sku}`);
+  },
   searchProductBySku(sku) {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/product?sku=${sku}`);
   },
@@ -332,6 +335,9 @@ export const productApi = {
   },
   getModelBySku(sku) {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/model/name/${sku}`);
+  },
+  getModelByModelCode(modelCode) {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/model/${modelCode}`);
   },
   generateRFIDs(map) {
     return axiosPrivate.post(`${REST_ENDPOINT}warehouse/generateRFID`, map);
@@ -475,6 +481,16 @@ export const posApi = {
   searchSku(sku) {
     return axiosPrivate.get(
       `${REST_ENDPOINT}store/customerOrder/product?sku=${sku}`
+    );
+  },
+  getVoucherCodes(customerId) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/member/vouchers/${customerId}`
+    );
+  },
+  getCurrentSpending(customerId) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}store/member/spending/${customerId}`
     );
   },
 };

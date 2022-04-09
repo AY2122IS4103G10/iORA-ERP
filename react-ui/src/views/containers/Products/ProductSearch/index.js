@@ -216,7 +216,6 @@ export const ProductSearch = () => {
   });
 
   const canSearch = Boolean(search);
-  // console.log(products)
   const onSearchClicked = (evt) => {
     evt.preventDefault();
     const fetchProducts = async () => {

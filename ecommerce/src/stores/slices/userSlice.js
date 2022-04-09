@@ -22,17 +22,10 @@ const initialState = {
   user: { ...initialUser },
   loggedIn: localStorage.getItem("user") ? true : false,
   currStore: 0, //to be updated when login is finalised
+  currSpend: 0,
   status: "idle",
   error: "null",
 };
-
-export const fetchUser = createAsyncThunk("user/fetchUser", async ({ id }) => {
-  const response = await api.get("sam/customer/view", id);
-  if (response.data === "") {
-    return Promise.reject(response.error);
-  }
-  return response.data;
-});
 
 export const login = createAsyncThunk(
   "auth/login",
@@ -102,17 +95,6 @@ export const updateAccount = createAsyncThunk(
   }
 );
 
-export const fetchUserOrders = createAsyncThunk(
-  "user/userOrders",
-  async (id) => {
-    const response = await api.get("/online/history", id);
-    if (response.data === "") {
-      return Promise.reject(response.error);
-    }
-    return response.data;
-  }
-);
-
 export const fetchAnOrder = createAsyncThunk(
   "user/getUserOrder",
   async (orderId) => {
@@ -120,6 +102,22 @@ export const fetchAnOrder = createAsyncThunk(
     if (response.data === "") {
       return Promise.reject(response.error);
     }
+    return response.data;
+  }
+);
+
+export const getCurrentSpending = createAsyncThunk(
+  "customers/getCurrentSpending",
+  async (customerId) => {
+    const response = await api.get("store/member/spending", customerId);
+    return response.data;
+  }
+);
+
+export const fetchCustomer = createAsyncThunk(
+  "customers/fetchCustomer",
+  async (data) => {
+    const response = await api.get("sam/customer/view", data);
     return response.data;
   }
 );
@@ -135,13 +133,6 @@ const userSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(fetchUser.fulfilled, (state, action) => {
-      state.user = action.payload;
-      state.status = "succeeded";
-    });
-    builder.addCase(fetchUser.rejected, (state, action) => {
-      state.error = "Fetch user failed";
-    });
     builder.addCase(login.fulfilled, (state, action) => {
       action.payload.salt !== undefined && delete action.payload.salt;
       action.payload.hashPass !== undefined && delete action.payload.hashPass;
@@ -164,7 +155,6 @@ const userSlice = createSlice({
       state.error = "Login failed";
     });
     builder.addCase(postLoginJwt.fulfilled, (state, action) => {
-      console.log(action.payload)
       state.user = { ...action.payload };
       state.loggedIn = true;
     });
@@ -185,20 +175,13 @@ const userSlice = createSlice({
     builder.addCase(updateAccount.rejected, (state, action) => {
       state.error = "Update failed";
     });
-    builder.addCase(fetchUserOrders.pending, (state, action) => {
-      state.status = "loading";
+    builder.addCase(getCurrentSpending.fulfilled, (state, action) => {
+      state.currSpend = action.payload;
     });
-    builder.addCase(fetchUserOrders.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.user = action.payload;
-    });
-    builder.addCase(fetchUserOrders.rejected, (state, action) => {
-      state.status = "loading";
-      state.error = action.error.message;
-    });
-    builder.addCase(fetchAnOrder.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.searchedOrder = action.payload;
+    builder.addCase(fetchCustomer.fulfilled, (state, action) => {
+      action.payload.password !== undefined && delete action.payload.password;
+      state.user = { ...action.payload };
+      state.status = "succeeded"
     });
   },
 });
@@ -213,10 +196,11 @@ export const selectUserId = (state) => state.user.user.id;
 
 export const selectUserStore = (state) => state.user.currStore;
 
-export default userSlice.reducer;
+export const selectCurrSpend = (state) => state.user.currSpend;
 
-export const selectAllOrder = (state) => state.user.userOrders;
-export const selectOrderById = (state, id) =>
-  state.user.searchedOrder.id === id
-    ? state.user.searchedOrder
-    : state.user.userOrders.find((order) => order.id === id);
+export const selectUserOrders = (state) => state.user.user.orders;
+
+export const selectUserOrderById = (state, orderId) =>
+  state.user.user.orders.find((order) => order.id === orderId);
+
+export default userSlice.reducer;

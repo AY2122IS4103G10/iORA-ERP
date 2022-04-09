@@ -28,7 +28,6 @@ import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
-import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
@@ -528,13 +527,11 @@ public class DataLoader implements CommandLineRunner {
 		c7.setPassword("password");
 		customerService.createCustomerAccount(c7);
 
-		Voucher voucher1 = new Voucher("dataLoader", 10, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"));
 		// Generate 10 $10 vouchers
-		customerService.generateVouchers(voucher1, 10);
+		customerService.generateVouchers("dataLoader", 10d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"), null, 10);
 
-		Voucher voucher2 = new Voucher("dataLoader", 5, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"));
 		// Generate 10 $5 vouchers
-		customerService.generateVouchers(voucher2, 10);
+		customerService.generateVouchers("dataLoader", 5d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"), null, 10);
 
 		// Adding Promotions
 		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5),
@@ -616,14 +613,19 @@ public class DataLoader implements CommandLineRunner {
 
 		// ProcurementOrders
 		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("BBV0010201H-1"), 50);
+		poli1.setCostPrice(1d);
 		em.persist(poli1);
 		ProcurementOrderLI poli2 = new ProcurementOrderLI(productService.getProduct("ASK0009709Y-2"), 30);
+		poli2.setCostPrice(1d);
 		em.persist(poli2);
 		ProcurementOrderLI poli3 = new ProcurementOrderLI(productService.getProduct("AKB0009339J-3"), 45);
+		poli3.setCostPrice(1d);
 		em.persist(poli3);
 		ProcurementOrderLI poli4 = new ProcurementOrderLI(productService.getProduct("ASK0007868Y-1"), 75);
+		poli4.setCostPrice(1d);
 		em.persist(poli4);
 		ProcurementOrderLI poli5 = new ProcurementOrderLI(productService.getProduct("AB0008084Y-A-2"), 70);
+		poli5.setCostPrice(1d);
 		em.persist(poli5);
 
 		ProcurementOrder po1 = new ProcurementOrder();
@@ -680,9 +682,9 @@ public class DataLoader implements CommandLineRunner {
 		coli2.setSubTotal(78.0);
 
 		CustomerOrderLI coli3 = new CustomerOrderLI();
-		coli3.setProduct(productService.getProduct("ASK0009273W-1"));
+		coli3.setProduct(productService.getProduct("AB0009153W-1"));
 		coli3.setQty(2);
-		coli3.setSubTotal(38.0);
+		coli3.setSubTotal(98.0);
 
 		CustomerOrderLI coli4 = new CustomerOrderLI();
 		coli4.setProduct(productService.getProduct("AB0009153W-1"));
@@ -708,6 +710,84 @@ public class DataLoader implements CommandLineRunner {
 		coli7.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli7);
 
+		CustomerOrderLI coli8 = new CustomerOrderLI();
+		coli8.setProduct(productService.getProduct("BBV0010200H-1"));
+		coli8.setQty(1);
+		coli8.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli8);
+
+		CustomerOrderLI coli9 = new CustomerOrderLI();
+		coli9.setProduct(productService.getProduct("BBV0010199H-1"));
+		coli9.setQty(1);
+		coli9.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli9);
+
+		CustomerOrderLI coli10 = new CustomerOrderLI();
+		coli10.setProduct(productService.getProduct("AB0010059H-1"));
+		coli10.setQty(1);
+		coli10.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli10);
+
+		CustomerOrderLI coli11 = new CustomerOrderLI();
+		coli11.setProduct(productService.getProduct("BBV0010200H-1"));
+		coli11.setQty(1);
+		coli11.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli11);
+
+		CustomerOrderLI coli12 = new CustomerOrderLI();
+		coli12.setProduct(productService.getProduct("ASK0009022A-1"));
+		coli12.setQty(1);
+		coli12.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli12);
+
+		CustomerOrderLI coli13 = new CustomerOrderLI();
+		coli13.setProduct(productService.getProduct("BBV0010200H-1"));
+		coli13.setQty(1);
+		coli13.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli13);
+
+		CustomerOrderLI coli14 = new CustomerOrderLI();
+		coli14.setProduct(productService.getProduct("ASK0010265A-1"));
+		coli14.setQty(1);
+		coli14.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli14);
+
+		CustomerOrderLI coli15 = new CustomerOrderLI();
+		coli15.setProduct(productService.getProduct("ASK0010259H-1"));
+		coli15.setQty(1);
+		coli15.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli15);
+
+		CustomerOrderLI coli16 = new CustomerOrderLI();
+		coli16.setProduct(productService.getProduct("ASK0010155H-1"));
+		coli16.setQty(1);
+		coli16.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli16);
+
+		CustomerOrderLI coli17 = new CustomerOrderLI();
+		coli17.setProduct(productService.getProduct("AK0009973J-1"));
+		coli17.setQty(1);
+		coli17.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli17);
+
+		CustomerOrderLI coli18 = new CustomerOrderLI();
+		coli18.setProduct(productService.getProduct("ASK0009770Y-1"));
+		coli18.setQty(1);
+		coli18.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli18);
+
+		CustomerOrderLI coli19 = new CustomerOrderLI();
+		coli19.setProduct(productService.getProduct("AB0009978H-1"));
+		coli19.setQty(1);
+		coli19.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli19);
+
+		CustomerOrderLI coli20 = new CustomerOrderLI();
+		coli20.setProduct(productService.getProduct("AK0009973J-1"));
+		coli20.setQty(1);
+		coli20.setSubTotal(49.0);
+		customerOrderService.createCustomerOrderLI(coli20);
+
 		Payment payment1 = new Payment(127, "241563", PaymentTypeEnum.VISA);
 		customerOrderService.createPayment(payment1);
 
@@ -724,16 +804,17 @@ public class DataLoader implements CommandLineRunner {
 		co1.addPayment(payment1);
 		co1.setPaid(true);
 		co1.setSite(siteService.getSite(4L));
-		co1.setCustomerId(2L);
+		co1.setCustomerId(1L);
 		customerOrderService.createCustomerOrder(co1, null);
 
 		siteService.addProducts(4L, "ASK0010155H-1", 8);
 		siteService.addProducts(4L, "AB0010059H-1", 9);
 		OnlineOrder oo1 = new OnlineOrder(false);
-		oo1.setCustomerId(5L);
+		oo1.setCustomerId(2L);
 		oo1.setPickupSite((StoreSite) siteService.getSite(4L));
-		oo1.addLineItem(coli6);
-		oo1.addLineItem(coli7);
+		oo1.addLineItem(coli1);
+		oo1.addLineItem(coli2);
+		oo1.addLineItem(coli3);
 		oo1.setPaid(true);
 		oo1.addPayment(payment2);
 		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
@@ -742,16 +823,49 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createOnlineOrder(oo1, null);
 
 		OnlineOrder oo2 = new OnlineOrder(true);
-		oo2.setCustomerId(5L);
-		oo2.addLineItem(coli1);
-		oo2.addLineItem(coli2);
+		oo2.setCustomerId(3L);
+		oo2.addLineItem(coli6);
+		oo2.addLineItem(coli7);
 		oo2.addPayment(payment3);
-		oo2.setSite(siteService.getSite(10L));
+		oo2.setSite(siteService.getSite(3L));
 		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
 				"Singapore",
 				"117417", "", CountryEnum.Singapore, "65162727");
 		oo2.setDeliveryAddress(da1);
 		customerOrderService.createOnlineOrder(oo2, null);
+
+		OnlineOrder oo3 = new OnlineOrder(true);
+		oo3.setCustomerId(4L);
+		oo3.addLineItem(coli8);
+		oo3.addLineItem(coli9);
+		oo3.addLineItem(coli10);
+		oo3.setSite(siteService.getSite(3L));
+		oo3.setDeliveryAddress(customerService.getCustomerById(4L).getAddress());
+		customerOrderService.createOnlineOrder(oo3, null);
+
+		OnlineOrder oo4 = new OnlineOrder(true);
+		oo4.setCustomerId(5L);
+		oo4.addLineItem(coli11);
+		oo4.addLineItem(coli12);
+		oo4.setSite(siteService.getSite(3L));
+		oo4.setDeliveryAddress(customerService.getCustomerById(5L).getAddress());
+		customerOrderService.createOnlineOrder(oo4, null);
+
+		OnlineOrder oo5 = new OnlineOrder(true);
+		oo5.setCustomerId(6L);
+		oo5.addLineItem(coli13);
+		oo5.addLineItem(coli14);
+		oo5.setSite(siteService.getSite(3L));
+		oo5.setDeliveryAddress(customerService.getCustomerById(6L).getAddress());
+		customerOrderService.createOnlineOrder(oo5, null);
+
+		OnlineOrder oo6 = new OnlineOrder(true);
+		oo6.setCustomerId(6L);
+		oo6.addLineItem(coli15);
+		oo6.addLineItem(coli16);
+		oo6.setSite(siteService.getSite(3L));
+		oo6.setDeliveryAddress(customerService.getCustomerById(6L).getAddress());
+		customerOrderService.createOnlineOrder(oo6, null);
 
 		Customer cust = customerService.getCustomerById(2L);
 		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");
@@ -761,8 +875,5 @@ public class DataLoader implements CommandLineRunner {
 		st.setCustomer(cust);
 		st.setCustomerOrder(co1);
 		customerService.createSupportTicket(st);
-
-		cust.addSupportTicket(st);
-		customerService.updateCustomerAccount(cust);
 	}
 }

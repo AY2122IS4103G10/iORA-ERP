@@ -5,7 +5,7 @@ import {
   ShoppingBagIcon,
   SupportIcon,
   UserIcon,
-  XIcon as XIconOutline
+  XIcon as XIconOutline,
 } from "@heroicons/react/outline";
 import { Fragment, useState } from "react";
 import { useSelector } from "react-redux";
@@ -73,21 +73,8 @@ const ProfileDropdown = ({ handleLogout }) => {
           </Menu.Item>
           <Menu.Item>
             {({ active }) => (
-              <a
-                href="/"
-                className={classNames(
-                  active ? "bg-gray-100" : "",
-                  "block px-4 py-2 text-sm text-gray-700"
-                )}
-              >
-                Settings
-              </a>
-            )}
-          </Menu.Item>
-          <Menu.Item>
-            {({ active }) => (
-              <a
-                href="/"
+              <Link
+                to="/"
                 onClick={handleLogout}
                 className={classNames(
                   active ? "bg-gray-100" : "",
@@ -95,7 +82,7 @@ const ProfileDropdown = ({ handleLogout }) => {
                 )}
               >
                 Logout
-              </a>
+              </Link>
             )}
           </Menu.Item>
         </Menu.Items>
@@ -189,14 +176,14 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                             aria-labelledby={`${category.id}-${item.id}-heading-mobile`}
                             className="mt-6 flex flex-col space-y-6"
                           >
-                              <li key={item.name} className="flow-root">
-                                <a
-                                  href={item.href}
-                                  className="-m-2 p-2 block text-gray-500"
-                                >
-                                  {item.name}
-                                </a>
-                              </li>
+                            <li key={item.name} className="flow-root">
+                              <a
+                                href={item.href}
+                                className="-m-2 p-2 block text-gray-500"
+                              >
+                                {item.name}
+                              </a>
+                            </li>
                           </ul>
                         </div>
                       ))}
@@ -238,7 +225,6 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                   </div>
                 </div>
               )}
-
             </div>
           </Transition.Child>
         </Dialog>
@@ -265,59 +251,59 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                   alt="iORA"
                 />
               </Link>
-            </div> 
+            </div>
 
             {/* Flyout menus */}
-                {navigation.categories.map((category) => (
-                  <Popover key={category.name} className="flex relative px-4 ">
-                    {({ open }) => (
-                      <>
-                        <Popover.Button
-                          className={classNames(
-                            open
-                              ? "border-gray-600 text-gray-600"
-                              : "border-transparent text-gray-700 hover:text-gray-800",
-                            "relative z-10 flex items-center transition-colors ease-out duration-200 text-sm font-medium border-b-2 -mb-px pt-px"
-                          )}
-                        >
-                          {category.name}
-                        </Popover.Button>
+            {navigation.categories.map((category) => (
+              <Popover key={category.name} className="flex relative px-4 ">
+                {({ open }) => (
+                  <>
+                    <Popover.Button
+                      className={classNames(
+                        open
+                          ? "border-gray-600 text-gray-600"
+                          : "border-transparent text-gray-700 hover:text-gray-800",
+                        "relative z-10 flex items-center transition-colors ease-out duration-200 text-sm font-medium border-b-2 -mb-px pt-px"
+                      )}
+                    >
+                      {category.name}
+                    </Popover.Button>
 
-                        <Transition
-                          as={Fragment}
-                          enter="transition ease-out duration-200"
-                          enterFrom="opacity-0"
-                          enterTo="opacity-100"
-                          leave="transition ease-in duration-150"
-                          leaveFrom="opacity-100"
-                          leaveTo="opacity-0"
-                        >
-                          <Popover.Panel className="absolute z-20 left-1/4 transform translate-y-8 mt-3 px-2 w-screen max-w-xs sm:px-0">
-                            <div className="shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
-                              <div className="text-sm bg-white p-6 pl-12">
-                                <div className="justify-center">
-                                  {category.items.map((item) => (
-                                    <p
-                                      key={item.name}
-                                      className=" text-gray-800 mb-1"
-                                    >
-                                      <Link
-                                        to={item.href}
-                                        className="hover:text-gray-500"
-                                      >
-                                        {item.name}
-                                      </Link>
-                                    </p>
-                                  ))}
-                                </div>
-                              </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-200"
+                      enterFrom="opacity-0"
+                      enterTo="opacity-100"
+                      leave="transition ease-in duration-150"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <Popover.Panel className="absolute z-20 left-1/4 transform translate-y-8 mt-3 px-2 w-screen max-w-xs sm:px-0">
+                        <div className="shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+                          <div className="text-sm bg-white p-6 pl-12">
+                            <div className="justify-center">
+                              {category.items.map((item) => (
+                                <p
+                                  key={item.name}
+                                  className=" text-gray-800 mb-1"
+                                >
+                                  <Link
+                                    to={item.href}
+                                    className="hover:text-gray-500"
+                                  >
+                                    {item.name}
+                                  </Link>
+                                </p>
+                              ))}
                             </div>
-                          </Popover.Panel>
-                        </Transition>
-                      </>
-                    )}
-                  </Popover>
-                ))}
+                          </div>
+                        </div>
+                      </Popover.Panel>
+                    </Transition>
+                  </>
+                )}
+              </Popover>
+            ))}
             <div className="ml-auto flex items-center">
               {!loggedIn && (
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
@@ -363,7 +349,10 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
               {loggedIn && <ProfileDropdown handleLogout={handleLogout} />}
               {/* Support */}
               <div className="ml-4 flow-root lg:ml-6">
-                <Link to="/support" className="p-2 text-gray-400 hover:text-gray-500">
+                <Link
+                  to="/support"
+                  className="p-2 text-gray-400 hover:text-gray-500"
+                >
                   <span className="sr-only">Support</span>
                   <SupportIcon className="w-6 h-6" aria-hidden="true" />
                 </Link>

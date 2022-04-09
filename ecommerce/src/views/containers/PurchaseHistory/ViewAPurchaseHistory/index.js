@@ -22,6 +22,12 @@ export const fetchAllModelsBySkus = async (items) => {
   return Promise.all(items.map((item) => fetchModelBySku(item.product.sku)));
 };
 
+function calculateSubTotal(lineItems) {
+  let subTotal = 0;
+  subTotal = lineItems.map((item) => item.subTotal).reduce((a, b) => a + b);
+  return subTotal;
+}
+
 export const PurchaseHistoryDetails = () => {
   const { orderId } = useParams();
   const dispatch = useDispatch();
@@ -35,8 +41,8 @@ export const PurchaseHistoryDetails = () => {
   const [lineItems, setLineItems] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchCustomer(user.id));
-  }, [dispatch]);
+    user.id && dispatch(fetchCustomer(user.id));
+  }, [dispatch, user.id]);
 
   useEffect(() => {
     const orderLineItems = order?.lineItems || [];

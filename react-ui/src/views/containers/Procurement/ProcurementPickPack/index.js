@@ -1,12 +1,12 @@
 import { CheckIcon } from "@heroicons/react/outline";
 import { useMemo } from "react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { procurementApi } from "../../../../environments/Api";
-import { scanItem } from "../../../../stores/slices/procurementSlice";
+import { api, procurementApi } from "../../../../environments/Api";
+// import { scanItem } from "../../../../stores/slices/procurementSlice";
 import {
   EditableCell,
   SimpleTable,
@@ -16,54 +16,115 @@ export const PickPackList = ({
   data,
   status,
   setShowConfirm,
-  procurementId,
-  openConfirmModal,
   handlePickPack,
-  setAction,
   setData,
-  onSaveQuanityClicked,
   manufacturing,
   currSiteId,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
-
   const columns = useMemo(() => {
-    const handleEditRow = (rowIndex) => {
-      setData((item) =>
-        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
-      );
-    };
-
-    const onSaveClicked = (rowIndex, obj) => {
-      if (status === "MANUFACTURED" || status === "ACCEPTED")
-        handlePickPack().then(() => handleSaveRow(rowIndex, obj));
-      else handleSaveRow(rowIndex, obj);
-    };
-
-    const handleSaveRow = (rowIndex, obj) => {
-      onSaveQuanityClicked(
-        rowIndex,
-        obj.product.sku,
-        ["MANUFACTURED", "PICKING"].some((s) => s === status)
-          ? obj.pickedQty
-          : obj.packedQty
-      );
-    };
-
-    const updateMyData = (rowIndex, columnId, value) => {
+    const siteCols = data.length
+      ? Object.keys(data[0]?.siteQuantities).map((store) => ({
+          Header: () => (
+            <div className="flex items-center justify-between">
+              <span>{store}</span>
+            </div>
+          ),
+          minWidth: 100,
+          maxWidth: 130,
+          accessor: `siteQuantities.${store}`,
+          Cell: (row) => {
+            const storeId = parseInt(row.column.id.split(".")[1]);
+            return row.row.original.isEditing &&
+              manufacturing.id === currSiteId &&
+              ["MANUFACTURED", "PICKING", "ACCEPTED", "PACKING"].some(
+                (s) => s === status
+              ) ? (
+              
+                <EditableCell
+                  value={row.row.original.siteQuantities[storeId]}
+                  row={row.row}
+                  column={row.column}
+                  updateMyData={updateSiteCol}
+                />
+             
+            ) : (
+              row.value
+            );
+          },
+        }))
+      : [];
+    const updateSiteCol = (rowIndex, columnId, value) => {
+      const split = columnId.split(".");
+      columnId = split[0];
+      const storeId = split[1];
       setSkipPageReset(true);
       setData((old) =>
         old.map((row, index) => {
           if (index === rowIndex) {
             return {
               ...old[rowIndex],
-              [columnId]: value,
+              [columnId]: { ...old[rowIndex][columnId], [storeId]: value },
+              [status === "PICKING" || status === "MANUFACTURED"
+                ? "pickedQty"
+                : "packedQty"]: Object.values({
+                ...old[rowIndex][columnId],
+                [storeId]: value,
+              })
+                .map((val) => parseInt(val))
+                .reduce((partialSum, a) => partialSum + a, 0),
             };
           }
           return row;
         })
       );
     };
+
+    const handleEditRow = (rowIndex) => {
+      setData((item) =>
+        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+      );
+    };
+
+    const onSaveClicked = (rowIndex) => {
+      if (status === "MANUFACTURED" || status === "ACCEPTED")
+        handlePickPack().then(() => handleSaveRow(rowIndex));
+      else handleSaveRow(rowIndex);
+    };
+
+    const handleSaveRow = (rowIndex) => {
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [status === "PICKING" || status === "MANUFACTURED"
+                ? "pickedQty"
+                : "packedQty"]: Object.values(old[rowIndex].siteQuantities)
+                .map((val) => parseInt(val))
+                .reduce((partialSum, a) => partialSum + a, 0),
+              isEditing: false,
+            };
+          }
+          return row;
+        })
+      );
+    };
+
+    // const updateMyData = (rowIndex, columnId, value) => {
+    //   setSkipPageReset(true);
+    //   setData((old) =>
+    //     old.map((row, index) => {
+    //       if (index === rowIndex) {
+    //         return {
+    //           ...old[rowIndex],
+    //           [columnId]: value,
+    //         };
+    //       }
+    //       return row;
+    //     })
+    //   );
+    // };
     return [
       {
         Header: "SKU",
@@ -83,65 +144,21 @@ export const PickPackList = ({
             .fieldValue,
       },
       {
+        Header: "Sites",
+        accessor: "siteQuantities",
+        columns: siteCols,
+      },
+      {
         Header: "Req",
         accessor: "requestedQty",
       },
       {
         Header: "Picked",
         accessor: "pickedQty",
-        Cell: (e) => {
-          return e.row.original.isEditing &&
-            ["MANUFACTURED", "PICKING", "ACCEPTED"].some(
-              (s) => s === status
-            ) ? (
-            <EditableCell
-              value={e.value}
-              row={e.row}
-              column={e.column}
-              updateMyData={updateMyData}
-              min="0"
-              max={e.row.original.requestedQty}
-            />
-          ) : (
-            e.value
-          );
-        },
       },
       {
         Header: "Packed",
         accessor: "packedQty",
-        Cell: (e) => {
-          return e.row.original.isEditing &&
-            ["PACKING"].some((s) => s === status) ? (
-            <EditableCell
-              value={e.value}
-              row={e.row}
-              column={e.column}
-              updateMyData={updateMyData}
-              min="0"
-              max={e.row.original.pickedQty}
-            />
-          ) : (
-            e.value
-          );
-        },
-      },
-      {
-        Header: "Status",
-        accessor: "[status]",
-        Cell: (row) => {
-          const lineItem = row.row.original;
-          return lineItem.pickedQty === 0
-            ? "READY"
-            : lineItem.pickedQty !== lineItem.requestedQty
-            ? "PICKING"
-            : lineItem.pickedQty === lineItem.requestedQty &&
-              lineItem.packedQty === 0
-            ? "PICKED"
-            : lineItem.packedQty !== lineItem.requestedQty
-            ? "PACKING"
-            : "PACKED";
-        },
       },
       {
         Header: "",
@@ -153,7 +170,7 @@ export const PickPackList = ({
               onClick={() =>
                 !e.row.original.isEditing
                   ? handleEditRow(e.row.index)
-                  : onSaveClicked(e.row.index, e.row.original)
+                  : onSaveClicked(e.row.index)
               }
             >
               {!e.row.original.isEditing ? "Edit" : "Save"}
@@ -162,7 +179,7 @@ export const PickPackList = ({
         },
       },
     ];
-  }, [setData, status, onSaveQuanityClicked, handlePickPack]);
+  }, [setData, status, handlePickPack, data, currSiteId, manufacturing]);
 
   const hiddenColumns =
     manufacturing.id !== currSiteId ||
@@ -178,34 +195,37 @@ export const PickPackList = ({
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           Picking / Packing List
         </h3>
-        {status === "PICKING" && manufacturing.id === currSiteId && (
-          <button
-            type="button"
-            className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-            onClick={() => {
-              // setAction({
-              //   name: "Complete",
-              //   action: handlePickPack,
-              //   body: `The quantity picked of one or more items have not reached their requested quantity.
-              //   Are you sure you want to complete picking for "Order #${procurementId}"?
-              //   This action cannot be undone.`,
-              // });
-              // openConfirmModal();
-              setShowConfirm(true);
-            }}
-          >
-            <span>Complete Picking</span>
-          </button>
-        )}
+        {data
+          .map((item) =>
+            status === "PICKING" || status === "ACCEPTED"
+              ? item.pickedQty
+              : item.packedQty
+          )
+          .every((qty) => qty !== 0) &&
+          manufacturing.id === currSiteId && (
+            <button
+              type="button"
+              className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+              onClick={() => {
+                setShowConfirm(true);
+              }}
+            >
+              <span>
+                Complete {status === "PICKING" ? "Picking" : "Packing"}
+              </span>
+            </button>
+          )}
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable
-            columns={columns}
-            data={data}
-            skipPageReset={skipPageReset}
-            hiddenColumns={hiddenColumns}
-          />
+          <form>
+            <SimpleTable
+              columns={columns}
+              data={data}
+              skipPageReset={skipPageReset}
+              hiddenColumns={hiddenColumns}
+            />
+          </form>
         </div>
       )}
     </div>
@@ -314,15 +334,13 @@ export const ProcurementPickPack = () => {
     lineItems,
     setLineItems,
     openInvoice,
-    setAction,
     openConfirmModal,
-    closeConfirmModal,
     manufacturing,
     currSiteId,
   } = useOutletContext();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
+  // const [search, setSearch] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
 
   const manufactureOrder = async () => {
@@ -344,15 +362,15 @@ export const ProcurementPickPack = () => {
   };
 
   const onConfirmClicked = () => {
-    status.status === "ACCEPTED" ? manufactureOrder() : handlePickPack();
+    status.status === "ACCEPTED" ? manufactureOrder() : onSaveQuantityClicked();
   };
 
-  const onScanClicked = (evt) => {
-    evt.preventDefault();
-    if (status.status === "MANUFACTURED")
-      handlePickPack().then(() => handleScan(search));
-    else handleScan(search);
-  };
+  // const onScanClicked = (evt) => {
+  //   evt.preventDefault();
+  //   if (status.status === "MANUFACTURED")
+  //     handlePickPack().then(() => handleScan(search));
+  //   else handleScan(search);
+  // };
 
   const handlePickPack = async () => {
     try {
@@ -379,7 +397,7 @@ export const ProcurementPickPack = () => {
         openInvoice();
         navigate(`/${subsys}/procurements/${procurementId}/delivery`);
       }
-      if (showConfirm) setShowConfirm(false)
+      if (showConfirm) setShowConfirm(false);
     } catch (error) {
       addToast(`Error: ${error.response.data}`, {
         appearance: "error",
@@ -388,60 +406,64 @@ export const ProcurementPickPack = () => {
     }
   };
 
-  const handleScan = (barcode) => {
-    dispatch(scanItem({ orderId: procurementId, barcode }))
-      .unwrap()
-      .then((data) => {
-        const { lineItems: lIs, statusHistory } = data;
-        setLineItems(
-          lineItems.map((item, index) => ({
-            ...item,
-            pickedQty: lIs[index].pickedQty,
-            packedQty: lIs[index].packedQty,
-          }))
-        );
-        setStatus(statusHistory[statusHistory.length - 1]);
-        setStatusHistory(statusHistory);
-        addToast(
-          `Successfully  ${
-            status.status === "PICKING" || status.status === "MANUFACTURED"
-              ? "picked"
-              : "packed"
-          } ${barcode}.`,
-          {
-            appearance: "success",
-            autoDismiss: true,
-          }
-        );
-        setSearch("");
-      })
-      .catch((error) => {
-        addToast(`Error: ${error.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-        setSearch("");
-      });
-  };
+  // const handleScan = (barcode) => {
+  //   dispatch(scanItem({ orderId: procurementId, barcode }))
+  //     .unwrap()
+  //     .then((data) => {
+  //       const { lineItems: lIs, statusHistory } = data;
+  //       setLineItems(
+  //         lineItems.map((item, index) => ({
+  //           ...item,
+  //           pickedQty: lIs[index].pickedQty,
+  //           packedQty: lIs[index].packedQty,
+  //         }))
+  //       );
+  //       setStatus(statusHistory[statusHistory.length - 1]);
+  //       setStatusHistory(statusHistory);
+  //       addToast(
+  //         `Successfully  ${
+  //           status.status === "PICKING" || status.status === "MANUFACTURED"
+  //             ? "picked"
+  //             : "packed"
+  //         } ${barcode}.`,
+  //         {
+  //           appearance: "success",
+  //           autoDismiss: true,
+  //         }
+  //       );
+  //       setSearch("");
+  //     })
+  //     .catch((error) => {
+  //       addToast(`Error: ${error.message}`, {
+  //         appearance: "error",
+  //         autoDismiss: true,
+  //       });
+  //       setSearch("");
+  //     });
+  // };
 
-  const onSearchChanged = (e) => {
-    if (
-      e.target.value.length - search.length > 10 &&
-      e.target.value.includes("-")
-    ) {
-      if (status.status === "MANUFACTURED")
-        handlePickPack().then(() => handleScan(e.target.value));
-      else handleScan(e.target.value);
-    }
-    setSearch(e.target.value);
-  };
+  // const onSearchChanged = (e) => {
+  //   if (
+  //     e.target.value.length - search.length > 10 &&
+  //     e.target.value.includes("-")
+  //   ) {
+  //     if (status.status === "MANUFACTURED")
+  //       handlePickPack().then(() => handleScan(e.target.value));
+  //     else handleScan(e.target.value);
+  //   }
+  //   setSearch(e.target.value);
+  // };
 
-  const onSaveQuanityClicked = async (rowIndex, sku, qty) => {
+  const onSaveQuantityClicked = async () => {
     try {
-      const { data } = await procurementApi.pickPackAtFactory(
-        procurementId,
-        sku,
-        qty
+      const { data } = await api.update(
+        `manufacturing/procurementOrder/${
+          status.status === "PICKING" ? "pick" : "pack"
+        }`,
+        {
+          id: procurementId,
+          lineItems,
+        }
       );
       const { lineItems: lIs, statusHistory } = data;
       setStatus(statusHistory[statusHistory.length - 1]);
@@ -451,13 +473,23 @@ export const ProcurementPickPack = () => {
           ...row,
           pickedQty: lIs[index].pickedQty,
           packedQty: lIs[index].packedQty,
-          isEditing: rowIndex === index && false,
+          isEditing: true,
         }))
       );
-      addToast(`Success: Updated quantity.`, {
-        appearance: "success",
-        autoDismiss: true,
-      });
+      setShowConfirm(false);
+      addToast(
+        `Successfully completed ${
+          status.status === "PICKING" ? "picking" : "packing"
+        }.`,
+        {
+          appearance: "success",
+          autoDismiss: true,
+        }
+      );
+      if (
+        statusHistory[statusHistory.length - 1].status === "READY_FOR_SHIPPING"
+      )
+        navigate(`/${subsys}/procurements/${procurementId}`);
     } catch (error) {
       addToast(`Error: ${error.response.data}`, {
         appearance: "error",
@@ -510,7 +542,7 @@ export const ProcurementPickPack = () => {
                       : "delivery"
                   } stage.`}
                   onConfirmClicked={onConfirmClicked}
-                  cancelPath={`/${subsys}/procurements/${procurementId}`}
+                  setShowConfirm={setShowConfirm}
                 />
               </section>
             ) : (
@@ -525,17 +557,18 @@ export const ProcurementPickPack = () => {
               </div>
             )
           ) : (
-            subsys === "mf" && (
-              <section aria-labelledby="scan-items">
-                <ScanItemsSection
-                  search={search}
-                  searchHelper={`Scan barcode or enter product SKU. Scan once to "pick", a second
-                  time to "pack".`}
-                  onSearchChanged={onSearchChanged}
-                  onScanClicked={onScanClicked}
-                />
-              </section>
-            )
+            // subsys === "mf" && (
+            //   <section aria-labelledby="scan-items">
+            //     <ScanItemsSection
+            //       search={search}
+            //       searchHelper={`Scan barcode or enter product SKU. Scan once to "pick", a second
+            //       time to "pack".`}
+            //       onSearchChanged={onSearchChanged}
+            //       onScanClicked={onScanClicked}
+            //     />
+            //   </section>
+            // )
+            <div></div>
           )
         ) : (
           <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
@@ -552,7 +585,6 @@ export const ProcurementPickPack = () => {
               <PickPackList
                 data={lineItems}
                 status={status.status}
-                setAction={setAction}
                 openConfirmModal={openConfirmModal}
                 handlePickPack={handlePickPack}
                 procurementId={procurementId}
@@ -560,7 +592,6 @@ export const ProcurementPickPack = () => {
                 setData={setLineItems}
                 manufacturing={manufacturing}
                 currSiteId={currSiteId}
-                onSaveQuanityClicked={onSaveQuanityClicked}
               />
             </section>
           )}

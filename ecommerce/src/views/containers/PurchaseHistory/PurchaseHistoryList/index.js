@@ -21,7 +21,7 @@ const columns = [
   {
     Header: "Date of Purchase",
     accessor: "dateTime",
-    Cell: (e) => moment(e.value).format("DD MMM YYYY"),
+    Cell: (e) => moment(e.value).format("MMMM Do, YYYY"),
   },
   {
     Header: "Status",

@@ -216,7 +216,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (customerOrder.getCustomerId() != null) {
             updateMembershipPoints(customerOrder);
         }
-        
+
         // Remove stocks from site
         if (!(customerOrder instanceof OnlineOrder)) {
             for (CustomerOrderLI coli : customerOrder.getLineItems()) {
@@ -233,7 +233,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
             c.setAddress(oo.getDeliveryAddress());
 
-            //set email to customer
+            // set email to customer
             if (oo.getId() > 7L) {
                 emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
             }
@@ -757,10 +757,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public Map<String, Integer> getPickingList() throws ProductException {
+    public Map<String, Integer> getPickingList(Long siteId) throws ProductException {
         Query q = em
                 .createNativeQuery(
-                        "SELECT li.product_sku, sum(li.qty) FROM CUSTOMER_ORDER co, CUSTOMER_ORDERLI li, CUSTOMER_ORDER_LINE_ITEMS WHERE co.id = customer_order_id AND li.id = line_items_id AND co.status = :status AND site_id = 3 GROUP BY li.product_sku")
+                        "SELECT li.product_sku, sum(li.qty) FROM CUSTOMER_ORDER co, CUSTOMER_ORDERLI li, CUSTOMER_ORDER_LINE_ITEMS WHERE co.id = customer_order_id AND li.id = line_items_id AND co.status = :status AND site_id = "
+                                + siteId + " GROUP BY li.product_sku")
                 .setParameter("status", "PENDING");
 
         Map<String, Integer> pickingList = new HashMap<>();

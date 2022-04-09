@@ -296,10 +296,10 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/pickingList", produces = "application/json")
-    public ResponseEntity<Object> getPickingList() {
+    @GetMapping(path = "/pickingList/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> getPickingList(@PathVariable Long siteId) {
         try {
-            return ResponseEntity.ok(customerOrderService.getPickingList());
+            return ResponseEntity.ok(customerOrderService.getPickingList(siteId));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());

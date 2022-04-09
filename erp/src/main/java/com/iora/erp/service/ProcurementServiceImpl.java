@@ -281,7 +281,7 @@ public class ProcurementServiceImpl implements ProcurementService {
     public ProcurementOrder pickProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException {
         ProcurementOrder old = getProcurementOrder(procurementOrder.getId());
         old.setLineItems(procurementOrder.getLineItems());
-        old.addStatus(new POStatus(old.getLastActor(), new Date(), ProcurementOrderStatusEnum.PICKED));
+        old.addStatus(new POStatus(old.getLastActor(), new Date(), ProcurementOrderStatusEnum.PACKING));
         return updateProcurementOrder(old);
     }
 
@@ -289,7 +289,7 @@ public class ProcurementServiceImpl implements ProcurementService {
     public ProcurementOrder packProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException {
         ProcurementOrder old = getProcurementOrder(procurementOrder.getId());
         old.setLineItems(procurementOrder.getLineItems());
-        old.addStatus(new POStatus(old.getLastActor(), new Date(), ProcurementOrderStatusEnum.PACKED));
+        old.addStatus(new POStatus(old.getLastActor(), new Date(), ProcurementOrderStatusEnum.READY_FOR_SHIPPING));
         return updateProcurementOrder(old);
     }
 

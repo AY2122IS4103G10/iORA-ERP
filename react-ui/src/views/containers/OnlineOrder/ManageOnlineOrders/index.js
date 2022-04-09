@@ -71,7 +71,7 @@ export const ManageOnlineOrders = ({ subsys, children }) => {
 
   return (
     <>
-      {<Header subsys={subsys} />}
+      <Header subsys={subsys} />
       {children}
     </>
   );

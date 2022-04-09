@@ -62,12 +62,7 @@ export const OnlineOrderList = ({ subsys }) => {
           ? onlineOrderApi.getAllPickupOfSite(currSiteId)
           : onlineOrderApi.getAllBySite(currSiteId));
 
-        const { data: picking } = await api.getAll("online/pickingList");
-        console.log(
-          picking
-            .map((item) => item.qty)
-            .reduce((partialSum, a) => partialSum + a, 0)
-        );
+
         setData(data);
         setLoading(false);
       } catch (error) {

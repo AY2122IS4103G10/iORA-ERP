@@ -40,12 +40,14 @@ export const PickPackList = ({
               ["MANUFACTURED", "PICKING", "ACCEPTED", "PACKING"].some(
                 (s) => s === status
               ) ? (
-              <EditableCell
-                value={row.row.original.siteQuantities[storeId]}
-                row={row.row}
-                column={row.column}
-                updateMyData={updateSiteCol}
-              />
+              
+                <EditableCell
+                  value={row.row.original.siteQuantities[storeId]}
+                  row={row.row}
+                  column={row.column}
+                  updateMyData={updateSiteCol}
+                />
+             
             ) : (
               row.value
             );
@@ -216,12 +218,14 @@ export const PickPackList = ({
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable
-            columns={columns}
-            data={data}
-            skipPageReset={skipPageReset}
-            hiddenColumns={hiddenColumns}
-          />
+          <form>
+            <SimpleTable
+              columns={columns}
+              data={data}
+              skipPageReset={skipPageReset}
+              hiddenColumns={hiddenColumns}
+            />
+          </form>
         </div>
       )}
     </div>
@@ -482,7 +486,9 @@ export const ProcurementPickPack = () => {
           autoDismiss: true,
         }
       );
-      if (status.status === "READY_FOR_SHIPPING")
+      if (
+        statusHistory[statusHistory.length - 1].status === "READY_FOR_SHIPPING"
+      )
         navigate(`/${subsys}/procurements/${procurementId}`);
     } catch (error) {
       addToast(`Error: ${error.response.data}`, {

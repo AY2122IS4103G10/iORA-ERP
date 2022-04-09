@@ -59,7 +59,7 @@ const ProductList = ({ products, openModal, onProductSelectedChanged }) => {
   );
 };
 
-const RFIDModal = ({
+export const RFIDModal = ({
   open,
   closeModal,
   product,

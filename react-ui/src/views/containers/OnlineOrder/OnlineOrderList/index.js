@@ -5,7 +5,7 @@ import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { onlineOrderApi } from "../../../../environments/Api";
+import { api, onlineOrderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import {
   SelectColumnFilter,
@@ -61,6 +61,13 @@ export const OnlineOrderList = ({ subsys }) => {
         const { data } = await (subsys === "str"
           ? onlineOrderApi.getAllPickupOfSite(currSiteId)
           : onlineOrderApi.getAllBySite(currSiteId));
+
+        const { data: picking } = await api.getAll("online/pickingList");
+        console.log(
+          picking
+            .map((item) => item.qty)
+            .reduce((partialSum, a) => partialSum + a, 0)
+        );
         setData(data);
         setLoading(false);
       } catch (error) {

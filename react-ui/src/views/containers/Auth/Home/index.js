@@ -259,7 +259,7 @@ const paths = [
     iconForeground: "text-purple-700",
     iconBackground: "bg-purple-50",
     description:
-      "Click here for the Point-of-Sale system and pages to view the store's stock.",
+      "Click here for the Procurement and Stock Transfer orders ready for delivery.",
   },
 ];
 

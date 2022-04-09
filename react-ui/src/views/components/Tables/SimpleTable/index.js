@@ -181,6 +181,7 @@ export const EditableCell = ({
   max,
   step = "1",
   updateMyData,
+  ...rest
 }) => {
   const [value, setValue] = useState(initialValue);
 
@@ -193,21 +194,31 @@ export const EditableCell = ({
     updateMyData(index, id, value);
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key.toLowerCase() === "tab") {
+      const form = event.target.form;
+      const index = [...form].indexOf(event.target);
+      form.elements[index + 1].focus();
+      event.preventDefault();
+    }
+  };
+
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
-
   return (
-    <input
-      type="number"
-      className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-      min={min}
-      max={max && max}
-      step={step}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-    />
+      <input
+        type="number"
+        className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+        min={min}
+        max={max && max}
+        step={step}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        onKeyDown={handleKeyDown}
+        {...rest}
+      />
   );
 };
 

@@ -296,6 +296,16 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/pickingList", produces = "application/json")
+    public ResponseEntity<Object> getPickingList() {
+        try {
+            return ResponseEntity.ok(customerOrderService.getPickingList());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PatchMapping(path = "/scan/{orderId}", produces = "application/json")
     public ResponseEntity<Object> scanProduct(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
@@ -313,7 +323,8 @@ public class OnlineCustomerController {
     }
 
     @PutMapping(path = "/order/{orderId}/{sku}/{qty}", produces = "application/json")
-    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku, @PathVariable int qty) {
+    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku,
+            @PathVariable int qty) {
         try {
             return ResponseEntity.ok(customerOrderService.adjustProduct(orderId, sku, qty));
         } catch (Exception ex) {

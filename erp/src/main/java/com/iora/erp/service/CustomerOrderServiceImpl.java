@@ -234,7 +234,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             c.setAddress(oo.getDeliveryAddress());
 
             //set email to customer
-            emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
+            if (oo.getId() > 7L) {
+                emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
+            }
             em.merge(c);
         }
 
@@ -286,7 +288,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         // Add ProductItem to Line Items
-        Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
+        String sku = product.getSku();
+        String model = sku.substring(0, sku.lastIndexOf("-"));
+        Model mdl = em.find(Model.class, model.trim());
         boolean added = false;
         for (int i = 0; i < lineItems.size(); i++) {
             if (lineItems.get(i).getProduct().equals(product)) {
@@ -319,7 +323,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         // Remove ProductItem from Line Items
-        Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
+        String sku = product.getSku();
+        String model = sku.substring(0, sku.lastIndexOf("-"));
+        Model mdl = em.find(Model.class, model.trim());
         boolean removed = false;
         for (int i = 0; i < lineItems.size(); i++) {
             if (lineItems.get(i).getProduct().equals(product)) {
@@ -351,7 +357,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         List<PromotionLI> bestMultiPromosUsed = new ArrayList<>();
 
         for (CustomerOrderLI coli : lineItems) {
-            Model m = em.find(Model.class, coli.getProduct().getSku().split("-")[0]);
+            String sku = coli.getProduct().getSku();
+            String model = sku.substring(0, sku.lastIndexOf("-"));
+            Model m = em.find(Model.class, model.trim());
             modelMap.put(coli, m);
             bestPrices.put(coli, m.getDiscountPrice());
         }

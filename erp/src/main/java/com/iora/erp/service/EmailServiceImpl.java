@@ -4,12 +4,10 @@ import java.io.UnsupportedEncodingException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.validation.MessageInterpolator.Context;
 
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.OnlineOrder;
-import com.iora.erp.model.customerOrder.CustomerOrderLI;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.AbstractContext;
 import org.thymeleaf.context.IContext;
 
 @Component
@@ -78,10 +75,12 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendOnlineOrderConfirmation(Customer customer, OnlineOrder order) {
         org.thymeleaf.context.Context context = new org.thymeleaf.context.Context();
+
         context.setVariable("dateTime", order.getDateTime());
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
-        sendHTMLMessage(customer.getEmail(), "Order Confirmation", "orderConfirmTemplate", context);
+        String subject = "Order Confirmation #" + order.getId();
+        sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
 
         
     }

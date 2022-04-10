@@ -1,15 +1,13 @@
 import { Dialog } from "@headlessui/react";
 import {
   CashIcon,
-  CreditCardIcon,
-  DeviceMobileIcon,
-  XIcon,
+  CreditCardIcon, XIcon
 } from "@heroicons/react/outline";
 import {
   DeviceTabletIcon,
   ExclamationIcon,
   InformationCircleIcon,
-  SearchIcon,
+  SearchIcon
 } from "@heroicons/react/solid";
 import ProgressBar from "@ramonak/react-progress-bar";
 import { loadStripeTerminal } from "@stripe/terminal-js";
@@ -22,7 +20,7 @@ import { orderApi, posApi } from "../../../../environments/Api";
 import { getCustomerByPhone } from "../../../../stores/slices/customerSlice";
 import {
   fetchMembershipTiers,
-  selectAllMembershipTiers,
+  selectAllMembershipTiers
 } from "../../../../stores/slices/membershipTierSlice";
 import { getVoucherByCode } from "../../../../stores/slices/posSlice";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
@@ -49,21 +47,21 @@ const paymentTypes = [
     icon: CreditCardIcon,
     id: 4,
   },
-  {
-    name: "PayLah",
-    icon: DeviceMobileIcon,
-    id: 5,
-  },
-  {
-    name: "GrabPay",
-    icon: DeviceMobileIcon,
-    id: 6,
-  },
-  {
-    name: "Fave",
-    icon: DeviceMobileIcon,
-    id: 7,
-  },
+  // {
+  //   name: "PayLah",
+  //   icon: DeviceMobileIcon,
+  //   id: 5,
+  // },
+  // {
+  //   name: "GrabPay",
+  //   icon: DeviceMobileIcon,
+  //   id: 6,
+  // },
+  // {
+  //   name: "Fave",
+  //   icon: DeviceMobileIcon,
+  //   id: 7,
+  // },
 ];
 
 export const CheckoutForm = ({
@@ -180,8 +178,9 @@ export const CheckoutForm = ({
       ...res.data.map((voucher, index) => {
         return {
           id: index + 1,
-          name: `${voucher.campaign}: $${voucher.amount
-            } voucher (expiring ${moment(voucher.expiry).format("DD/MM/yyyy")})`,
+          name: `${voucher.campaign}: $${
+            voucher.amount
+          } voucher (expiring ${moment(voucher.expiry).format("DD/MM/yyyy")})`,
           ...voucher,
         };
       }),
@@ -339,16 +338,16 @@ export const CheckoutForm = ({
                     </p>
                     <p className="flex text-sm text-gray-700 pr-10">
                       <span className="flex grow">No. of Orders:</span>
-                      {customer?.customerOrders?.length}
+                      {customer?.orders?.length || 0}
                     </p>
-                    {customer?.customerOrders?.length > 0 && (
+                    {customer?.orders?.length > 0 && (
                       <p className="flex text-sm text-gray-700 pr-10">
                         <span className="flex grow">Avg Spend:</span> $
                         {Number.parseFloat(
-                          customer?.customerOrders.reduce(
+                          customer?.orders.reduce(
                             (sum, order) => sum + order.totalAmount,
                             0
-                          ) / customer?.customerOrders?.length
+                          ) / customer?.orders?.length
                         ).toFixed(2)}
                       </p>
                     )}
@@ -357,7 +356,9 @@ export const CheckoutForm = ({
                         bgColor="#0891b2"
                         completed={`${progress.current + 150}`}
                         maxCompleted={progress.next + 150}
-                        customLabel={`$${progress.next - progress.current} more to ${progress.tier}`}
+                        customLabel={`$${
+                          progress.next - progress.current
+                        } more to ${progress.tier}`}
                       />
                     </div>
                     <div className="col-span-1 sm:col-span-2">
@@ -660,20 +661,20 @@ export const Card = ({
     cs
       ? setClientSecret(cs)
       : checkoutItems.length > 0 &&
-      posApi
-        .getPaymentIntent(checkoutItems, voucherAmt)
-        .then((response) => setClientSecret(response.data))
-        .catch((err) => {
-          addToast(`Error: ${err.response.data.message}`, {
-            appearance: "error",
-            autoDismiss: true,
+        posApi
+          .getPaymentIntent(checkoutItems, voucherAmt)
+          .then((response) => setClientSecret(response.data))
+          .catch((err) => {
+            addToast(`Error: ${err.response.data.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
           });
-        });
   }, [checkoutItems, voucherAmt, addToast, cs]);
 
   useEffect(() => {
     !connected && posId && terminal && setSimulated();
-  }, [connected, posId, terminal])
+  }, [connected, posId, terminal]);
 
   const setSimulated = async () => {
     const config = { simulated: true };
@@ -758,15 +759,15 @@ export const Card = ({
             alt="card-reader"
           />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            {loading ?
-              connected
+            {loading
+              ? connected
                 ? "Checking out"
                 : "Connecting to reader..."
               : connected
-                ? `Reader ${localStorage
+              ? `Reader ${localStorage
                   .getItem("pos-posdeviceid")
                   .replace(/"/g, "")}`
-                : "No readers"}
+              : "No readers"}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {connected
@@ -774,36 +775,39 @@ export const Card = ({
               : "Get started by connecting your reader via Bluetooth."}
           </p>
           <div className="my-6">
-            {loading ? <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              disabled
-            ><TailSpin width="20" height="20"/></button>
-              : connected ? (
-                <button
-                  type="button"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  onClick={simulatedCheckout}
-                >
-                  <DeviceTabletIcon
-                    className="-ml-1 mr-2 h-5 w-5"
-                    aria-hidden="true"
-                  />
-                  Simulate Checkout
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  onClick={setSimulated}
-                >
-                  <DeviceTabletIcon
-                    className="-ml-1 mr-2 h-5 w-5"
-                    aria-hidden="true"
-                  />
-                  Connect to Simulated Reader
-                </button>
-              )}
+            {loading ? (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                disabled
+              >
+                <TailSpin width="20" height="20" />
+              </button>
+            ) : connected ? (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={simulatedCheckout}
+              >
+                <DeviceTabletIcon
+                  className="-ml-1 mr-2 h-5 w-5"
+                  aria-hidden="true"
+                />
+                Simulate Checkout
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={setSimulated}
+              >
+                <DeviceTabletIcon
+                  className="-ml-1 mr-2 h-5 w-5"
+                  aria-hidden="true"
+                />
+                Connect to Simulated Reader
+              </button>
+            )}
           </div>
         </div>
       </div>

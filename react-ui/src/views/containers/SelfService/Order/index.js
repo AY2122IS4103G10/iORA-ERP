@@ -1,6 +1,12 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
-import { CheckIcon, MinusSmIcon, PlusSmIcon, SelectorIcon, XCircleIcon } from "@heroicons/react/solid";
+import {
+  CheckIcon,
+  MinusSmIcon,
+  PlusSmIcon,
+  SelectorIcon,
+  XCircleIcon,
+} from "@heroicons/react/solid";
 import ProgressBar from "@ramonak/react-progress-bar";
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
@@ -19,7 +25,7 @@ import {
 import ManageCheckout from "../ManageCheckout";
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 const OrderList = ({
@@ -40,6 +46,8 @@ const OrderList = ({
   addRfidClicked,
   onVoucherChanged,
   addVoucherClicked,
+  addMemVoucherClicked,
+  removeVoucherClicked,
   handleZeroDollarCheckout,
   Modify,
   openModal,
@@ -47,9 +55,13 @@ const OrderList = ({
   isLoading,
   error,
   voucherError,
+  memPts,
+  setMemPts,
+  useMemPts,
+  toggleUseMemPts,
 }) => (
   <main>
-    <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-0">
+    <div className="max-w-2xl mx-auto py-16 px-4 sm:pt-24 sm:px-6 lg:px-0">
       <h1 className="text-3xl font-extrabold text-center tracking-tight text-gray-900 sm:text-4xl">
         Please leave items in Scanner Box until checkout is complete
       </h1>
@@ -284,8 +296,13 @@ const OrderList = ({
           >
             Voucher
           </label>
-          {customerVouchers ?
-            <Combobox as="div" value={voucherCode} onChange={onVoucherChanged} className="col-span-3">
+          {customerVouchers ? (
+            <Combobox
+              as="div"
+              value={voucherCode}
+              onChange={onVoucherChanged}
+              className="col-span-3"
+            >
               <div className="relative">
                 <Combobox.Input
                   className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
@@ -294,7 +311,10 @@ const OrderList = ({
                   placeholder="Choose One"
                 />
                 <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-                  <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                  <SelectorIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
                 </Combobox.Button>
 
                 {filteredVouchers.length > 0 && (
@@ -305,25 +325,39 @@ const OrderList = ({
                         value={voucher.voucherCode}
                         className={({ active }) =>
                           classNames(
-                            'relative cursor-default select-none py-2 pl-3 pr-9',
-                            active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                            "relative cursor-default select-none py-2 pl-3 pr-9",
+                            active
+                              ? "bg-indigo-600 text-white"
+                              : "text-gray-900"
                           )
                         }
                       >
                         {({ active, selected }) => (
                           <>
-                            <span className={classNames('block truncate', selected && 'font-semibold')}>
-                              {`${voucher.campaign}: $${voucher.amount} voucher (expiring ${moment(voucher.expiry).format("DD/MM/yyyy")})`}
+                            <span
+                              className={classNames(
+                                "block truncate",
+                                selected && "font-semibold"
+                              )}
+                            >
+                              {`${voucher.campaign}: $${
+                                voucher.amount
+                              } voucher (expiring ${moment(
+                                voucher.expiry
+                              ).format("DD/MM/yyyy")})`}
                             </span>
 
                             {selected && (
                               <span
                                 className={classNames(
-                                  'absolute inset-y-0 right-0 flex items-center pr-4',
-                                  active ? 'text-white' : 'text-indigo-600'
+                                  "absolute inset-y-0 right-0 flex items-center pr-4",
+                                  active ? "text-white" : "text-indigo-600"
                                 )}
                               >
-                                <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                <CheckIcon
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                />
                               </span>
                             )}
                           </>
@@ -334,7 +368,8 @@ const OrderList = ({
                 )}
               </div>
             </Combobox>
-            : <input
+          ) : (
+            <input
               type="text"
               name="voucher"
               id="voucher"
@@ -344,16 +379,70 @@ const OrderList = ({
               value={voucherCode}
               onChange={onVoucherChanged}
               aria-describedby="voucher"
-            />}
-          <button
-            type="submit"
-            className="col-span-1 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            onClick={addVoucherClicked}
-          >
-            Add voucher
-          </button>
+            />
+          )}
+          {voucher ? (
+            <button
+              type="submit"
+              className="col-span-1 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              onClick={removeVoucherClicked}
+            >
+              Remove voucher
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="col-span-1 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={addVoucherClicked}
+            >
+              Add voucher
+            </button>
+          )}
+          {customer.membershipPoints ? (
+            <>
+              {useMemPts ? (
+                <>
+                  <div className="col-span-2 grid grid-rows-1">
+                    <label for="memPts" className="form-label text-sm mt-2">
+                      Use {memPts}/{customer.membershipPoints} points
+                    </label>
+                    <input
+                      type="range"
+                      className="accent-indigo-600 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
+                      min={0}
+                      max={customer.membershipPoints}
+                      value={memPts}
+                      onChange={(e) => setMemPts(e.target.value)}
+                      id="memPts"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="justify-center mt-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    onClick={addMemVoucherClicked}
+                  >
+                    Get ${memPts} off
+                  </button>
+                </>
+              ) : (
+                <p className="block font-medium text-gray-700 mt-4 col-span-3">
+                  No vouchers? Use your points instead!
+                </p>
+              )}
+              <button
+                className={`${
+                  useMemPts
+                    ? "border-red-600 text-white bg-red-600 hover:bg-red-500 focus:ring-red-500"
+                    : "border-gray-500 text-black bg-white hover:bg-gray-50 focus:ring-gray-500"
+                } col-span-1 justify-center mt-2 py-2 px-4 border shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2`}
+                onClick={toggleUseMemPts}
+              >
+                {useMemPts ? "Cancel" : "Use points now!"}
+              </button>
+            </>
+          ) : null}
           {voucherError && (
-            <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4">
+            <div className="mt-3 bg-red-50 border-l-4 border-red-400 p-4 col-span-4">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <XCircleIcon
@@ -369,7 +458,7 @@ const OrderList = ({
           )}
         </div>
         {/* Order summary */}
-        <section aria-labelledby="summary-heading" className="mt-10">
+        <section aria-labelledby="summary-heading" className="mt-6">
           <div className="grid grid-cols-2 gap-x-12">
             {currTier && nextTier && (
               <>
@@ -384,8 +473,9 @@ const OrderList = ({
                     bgColor="#4f46e5"
                     completed={`${customer.currSpend + 150}`}
                     maxCompleted={nextTier.minSpend + 150}
-                    customLabel={`$${nextTier.minSpend - customer.currSpend
-                      } more to ${nextTier.name}`}
+                    customLabel={`$${
+                      nextTier.minSpend - customer.currSpend
+                    } more to ${nextTier.name}`}
                   />
                 </div>
               </>
@@ -553,22 +643,27 @@ export function Order() {
   const [voucherCode, setVoucherCode] = useState("");
   const [voucher, setVoucher] = useState(null);
   const [voucherDiscount, setVoucherDiscount] = useState(0);
+  const [memPts, setMemPts] = useState(0);
+  const [checkoutItems, setCheckoutItems] = useState([]);
+  const [order, setOrder] = useState({});
+  const siteId = localStorage?.getItem("siteId");
+  const customer = useSelector((state) => selectSSCustomer(state));
+  const [customerVouchers, setCustomerVouchers] = useState([]);
+
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
   const [voucherError, setVoucherError] = useState("");
   const [openCheckout, setOpenCheckout] = useState(false);
-  const [checkoutItems, setCheckoutItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [order, setOrder] = useState({});
   const [useReader, setUseReader] = useState(true);
-  const siteId = localStorage?.getItem("siteId");
-  const customer = useSelector((state) => selectSSCustomer(state));
-  const [customerVouchers, setCustomerVouchers] = useState([]);
   const [query, setQuery] = useState("");
+  const [useMemPts, setUseMemPts] = useState(false);
   const filteredVouchers =
-    query === ''
+    query === ""
       ? customerVouchers
-      : customerVouchers.filter((voucher) => voucher.voucherCode.includes(query))
+      : customerVouchers.filter((voucher) =>
+          voucher.voucherCode.includes(query)
+        );
   const membershipTiers = useSelector((state) =>
     selectAllMembershipTiers(state)
   );
@@ -713,6 +808,27 @@ export function Order() {
     fetchVoucher(voucherCode);
   };
 
+  const addMemVoucherClicked = (e) => {
+    e.preventDefault();
+    setVoucherCode("");
+    setQuery("");
+    setVoucherDiscount(memPts);
+    setUseMemPts(false);
+    setVoucher({
+      campaign: "membership points",
+      amount: memPts,
+      voucherCode: "USEMEM",
+    });
+  };
+
+  const removeVoucherClicked = (e) => {
+    e.preventDefault();
+    setVoucher(null);
+    setVoucherDiscount(0);
+    setVoucherCode("");
+    setQuery("");
+  };
+
   const onVoucherChanged = (e) => {
     if (!e?.target?.value) {
       setVoucherCode(e);
@@ -726,13 +842,16 @@ export function Order() {
   };
 
   const fetchVoucher = async (code) => {
+    setVoucherCode("");
+    setQuery("");
     try {
       const { data } = await posApi.getVoucherByCode(code);
       setVoucher(data);
       setVoucherDiscount(data?.amount);
-      setVoucherCode("");
+      setVoucherError("");
     } catch (err) {
-      setVoucherCode("");
+      setVoucher(null);
+      setVoucherDiscount(0);
       setVoucherError("No such voucher found");
     }
   };
@@ -776,9 +895,16 @@ export function Order() {
   }, [dispatch]);
 
   useEffect(() => {
-    customer?.id && posApi.getVoucherCodes(customer.id)
-      .then(({ data }) => setCustomerVouchers(data));
+    customer?.id &&
+      posApi
+        .getVoucherCodes(customer.id)
+        .then(({ data }) => setCustomerVouchers(data));
   }, [customer]);
+
+  const toggleUseMemPts = (e) => {
+    e.preventDefault();
+    setUseMemPts(!useMemPts);
+  };
 
   return (
     <>
@@ -808,6 +934,7 @@ export function Order() {
           filteredVouchers={filteredVouchers}
           currTier={currTier}
           nextTier={nextTier}
+          memPts={memPts}
           rfid={rfid}
           voucher={voucher}
           voucherCode={voucherCode}
@@ -819,7 +946,12 @@ export function Order() {
           addRfidClicked={addRfidClicked}
           onVoucherChanged={onVoucherChanged}
           addVoucherClicked={addVoucherClicked}
+          addMemVoucherClicked={addMemVoucherClicked}
+          removeVoucherClicked={removeVoucherClicked}
           setQuery={setQuery}
+          setMemPts={setMemPts}
+          useMemPts={useMemPts}
+          toggleUseMemPts={toggleUseMemPts}
           Modify={Modify}
           openModal={openModal}
           openCheckoutModal={openCheckoutModal}

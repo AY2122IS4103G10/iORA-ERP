@@ -1,5 +1,6 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,11 +23,11 @@ export const fetchAllModelsBySkus = async (items) => {
   return Promise.all(items.map((item) => fetchModelBySku(item.product.sku)));
 };
 
-function calculateSubTotal(lineItems) {
+const calculateSubTotal = (lineItems) => {
   let subTotal = 0;
-  subTotal = lineItems.map((item) => item.subTotal).reduce((a, b) => a + b);
+  subTotal = lineItems.map((item) => item.subTotal).reduce((a, b) => a + b, 0);
   return subTotal;
-}
+};
 
 export const PurchaseHistoryDetails = () => {
   const { orderId } = useParams();
@@ -37,7 +38,9 @@ export const PurchaseHistoryDetails = () => {
   const order = useSelector((state) =>
     selectUserOrderById(state, parseInt(orderId))
   );
-  const status = Boolean(order.statusHistory) ? order.statusHistory[order.statusHistory.length - 1] : null;
+  const status = Boolean(order?.statusHistory)
+    ? order?.statusHistory[order?.statusHistory.length - 1]
+    : null;
   const [lineItems, setLineItems] = useState([]);
 
   useEffect(() => {
@@ -46,7 +49,9 @@ export const PurchaseHistoryDetails = () => {
 
   useEffect(() => {
     const orderLineItems = order?.lineItems || [];
-    const status = Boolean(order.statusHistory) ? order.statusHistory[order.statusHistory.length - 1] : null;
+    const status = Boolean(order?.statusHistory)
+      ? order?.statusHistory[order?.statusHistory.length - 1]
+      : null;
     fetchAllModelsBySkus(orderLineItems).then((data) =>
       setLineItems(
         orderLineItems.map((item, index) => {
@@ -58,22 +63,33 @@ export const PurchaseHistoryDetails = () => {
             product: {
               ...item.product,
               ...data[index],
-              step:
-                !Boolean(status) ? null :
-                  status.status === "PENDING"
-                    ? 0
-                    : [
-                      "PICKING",
-                      "PICKED",
-                      "PACKING",
-                      "PACKED",
-                      "READY_FOR_DELIVERY",
-                      "READY_FOR_COLLECTION",
-                    ].some((s) => status.status === s)
-                      ? 1
-                      : status.status === "COMPLETED"
-                        ? 3
-                        : 2
+              step: !Boolean(status)
+                ? null
+                : status.status === "PENDING"
+                ? 0
+                : (
+                    order?.pickupSite
+                      ? [
+                          "PICKING",
+                          "PICKED",
+                          "PACKING",
+                          "PACKED",
+                          "READY_FOR_DELIVERY",
+                          "DELIVERING",
+                          "DELIVERING_MULTIPLE",
+                        ].some((s) => status.status === s)
+                      : [
+                          "PICKING",
+                          "PICKED",
+                          "PACKING",
+                          "PACKED",
+                          "READY_FOR_DELIVERY",
+                        ].some((s) => status.status === s)
+                  )
+                ? 1
+                : status.status === "COMPLETED" || status.status === "COLLECTED"
+                ? 4
+                : 2,
             },
             promo: promo !== undefined ? promo.promotion.fieldValue : null,
           };
@@ -81,8 +97,8 @@ export const PurchaseHistoryDetails = () => {
       )
     );
   }, [order, addToast, navigate, orderId]);
-
-  return (
+console.log(order)
+  return order ? (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 sm:py-16 lg:px-8">
         <NavigatePrev page="Orders" path="/orders" />
@@ -93,7 +109,7 @@ export const PurchaseHistoryDetails = () => {
         <div className="text-sm border-b border-gray-200 mt-2 pb-5 sm:flex sm:justify-between">
           <dl className="flex">
             <dt className="text-gray-500">Order number&nbsp;</dt>
-            <dd className="font-medium text-gray-900">{order.id}</dd>
+            <dd className="font-medium text-gray-900">{order?.id}</dd>
             <dt>
               <span className="sr-only">Date</span>
               <span className="text-gray-400 mx-2" aria-hidden="true">
@@ -101,12 +117,10 @@ export const PurchaseHistoryDetails = () => {
               </span>
             </dt>
             <dd className="font-medium text-gray-900">
-              {moment
-                .unix(order.dateTime / 1000)
-                .format("MMMM Do, YYYY")}
+              {moment.unix(order?.dateTime / 1000).format("MMMM Do, YYYY")}
             </dd>
           </dl>
-          {Boolean(order.statusHistory) &&
+          {Boolean(order?.statusHistory) && (
             <div className="mt-4 sm:mt-0">
               <Link
                 to={`/checkout/success/${orderId}`}
@@ -115,7 +129,7 @@ export const PurchaseHistoryDetails = () => {
                 View invoice<span aria-hidden="true"> &rarr;</span>
               </Link>
             </div>
-          }
+          )}
         </div>
 
         <section aria-labelledby="products-heading" className="mt-8">
@@ -148,20 +162,29 @@ export const PurchaseHistoryDetails = () => {
                         {order.refundedLIs.find(
                           (item) => item.product.sku === product.sku
                         ) && (
-                            <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                              Refunded
-                            </span>
-                          )}
+                          <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                            Refunded
+                          </span>
+                        )}
                         {order.exchangedLIs.find(
                           (item) => item.product.sku === product.sku
                         ) && (
-                            <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                              Exchanged
-                            </span>
-                          )}
+                          <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                            Exchanged
+                          </span>
+                        )}
                       </h3>
                       <p className="font-medium text-gray-900 mt-1">
-                        ${product.listPrice}
+                        {product.listPrice !== product.discountPrice ? (
+                          <>
+                            <span className="line-through text-sm mr-2 text-gray-500">
+                              ${product.listPrice}
+                            </span>
+                            <span>${product.discountPrice}</span>
+                          </>
+                        ) : (
+                          <span>${product.listPrice}</span>
+                        )}
                       </p>
                       <p className="text-gray-500 mt-3">
                         {product.description}
@@ -183,7 +206,7 @@ export const PurchaseHistoryDetails = () => {
                         }
                       </span>
                     </div>
-                    {Boolean(order.statusHistory) &&
+                    {Boolean(order?.statusHistory) && (
                       <div className="sm:col-span-12 md:col-span-7">
                         <dl className="grid grid-cols-1 gap-y-8 border-b py-8 border-gray-200 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
                           <div>
@@ -211,9 +234,7 @@ export const PurchaseHistoryDetails = () => {
                               Contact
                             </dt>
                             <dd className="mt-3 text-gray-500 space-y-3">
-                              <span className="block">
-                                {user.email}
-                              </span>
+                              <span className="block">{user.email}</span>
                               <span className="block">
                                 {user.contactNumber}
                               </span>
@@ -221,8 +242,10 @@ export const PurchaseHistoryDetails = () => {
                           </div>
                         </dl>
                         <p className="font-medium text-gray-900 mt-6 md:mt-10">
-                          {status.status.charAt(0) +
-                            status.status.slice(1).toLowerCase()}{" "}
+                          {(
+                            status.status.charAt(0) +
+                            status.status.slice(1).toLowerCase()
+                          ).replaceAll("_", " ")}{" "}
                           on{" "}
                           {moment
                             .unix(status.timeStamp / 1000)
@@ -268,7 +291,7 @@ export const PurchaseHistoryDetails = () => {
                           </div>
                         </div>
                       </div>
-                    }
+                    )}
                   </div>
                 );
               })}
@@ -332,7 +355,9 @@ export const PurchaseHistoryDetails = () => {
             <dl className="mt-8 divide-y divide-gray-200 text-sm lg:mt-0 lg:pr-8 lg:col-span-7">
               <div className="pb-4 flex items-center justify-between">
                 <dt className="text-gray-600">Subtotal</dt>
-                <dd className="font-medium text-gray-900">$72</dd>
+                <dd className="font-medium text-gray-900">
+                  ${calculateSubTotal(lineItems)}
+                </dd>
               </div>
               <div className="py-4 flex items-center justify-between">
                 <dt className="text-gray-600">Shipping</dt>
@@ -341,8 +366,20 @@ export const PurchaseHistoryDetails = () => {
                 </dd>
               </div>
               {/* <div className="py-4 flex items-center justify-between">
-                <dt className="text-gray-600">Tax</dt>
-                <dd className="font-medium text-gray-900">$6.16</dd>
+                <dt className="text-gray-600">Discounts</dt>
+                <dd className="font-medium text-gray-900">
+                  {order?.promotions?.map((promo) => (
+                    <div
+                      key={promo.id}
+                      className="flex items-center justify-between"
+                    >
+                      <dt className="text-gray-600">
+                        {promo.promotion.fieldValue}
+                      </dt>
+                      <dd>-${Math.abs(promo.subTotal)}</dd>
+                    </div>
+                  ))}
+                </dd>
               </div> */}
               <div className="pt-4 flex items-center justify-between">
                 <dt className="font-medium text-gray-900">Order total</dt>
@@ -354,6 +391,10 @@ export const PurchaseHistoryDetails = () => {
           </div>
         </section>
       </div>
+    </div>
+  ) : (
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BCD4" height={20} width={20} />
     </div>
   );
 };

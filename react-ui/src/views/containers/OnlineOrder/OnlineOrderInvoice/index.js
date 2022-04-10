@@ -80,7 +80,7 @@ export const OnlineInvoiceBody = ({
 
       <div className="border-t border-gray-200">
         <h2 className="sr-only">Your order</h2>
-        {site.id !== pickupSite.id && (
+        {site?.id !== pickupSite?.id && (
           <div>
             <h4 className="sr-only">Addresses</h4>
             <dl className="border-b border-gray-200 grid grid-cols-2 gap-x-6 text-sm py-10">

@@ -20,8 +20,8 @@ const columns = [
   },
   {
     Header: "Status",
-    accessor: "status",
-    Cell: (e) => (Boolean(e.value) ? e.value : "Completed"),
+    accessor: (row) => row.statusHistory[row.statusHistory.length - 1].status,
+    Cell: (e) => e.value.replaceAll("_", " "),
     Filter: SelectColumnFilter,
     filter: "includes",
   },
@@ -35,7 +35,7 @@ const columns = [
 export const PurchaseHistoryList = () => {
   const navigate = useNavigate();
   const data = useSelector(selectUserOrders);
-
+console.log(data)
   const handleOnClick = (row) => navigate(`${row.original.id}`);
   return (
     <div className="min-h-full">

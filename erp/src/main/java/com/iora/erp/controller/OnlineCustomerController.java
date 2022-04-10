@@ -264,6 +264,16 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/order/{siteId}/{status}", produces = "application/json")
+    public ResponseEntity<Object> getOOBySiteStatus(@PathVariable Long siteId, @PathVariable String status) {
+        try {
+            return ResponseEntity.ok(customerOrderService.getOOBySiteStatus(siteId, status));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+
     @GetMapping(path = "/searchOrder/{siteId}", produces = "application/json")
     public List<OnlineOrder> searchOnlineOrders(@PathVariable Long siteId, @RequestParam String orderId) {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
@@ -355,7 +365,8 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(customerOrderService.adjustProduct(orderId, sku, qty));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -364,7 +375,8 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(customerOrderService.deliverOnlineOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -373,7 +385,8 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(customerOrderService.deliverMultipleOnlineOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -382,7 +395,8 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(customerOrderService.receiveOnlineOrder(orderId, siteId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 

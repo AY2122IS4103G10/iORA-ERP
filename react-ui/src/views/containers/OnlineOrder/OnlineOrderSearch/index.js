@@ -1,14 +1,17 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { onlineOrderApi } from "../../../../environments/Api";
+import { selectUserSite } from "../../../../stores/slices/userSlice";
 
 export const OnlineOrderSearch = ({ subsys }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const { addToast } = useToasts();
+  const currSiteId = useSelector(selectUserSite);
 
   const canSearch = Boolean(search);
   const onSearchClicked = (evt) => {
@@ -16,12 +19,29 @@ export const OnlineOrderSearch = ({ subsys }) => {
     const fetchOrder = async (search) => {
       try {
         const { data } = await onlineOrderApi.get(search);
+        const { site, statusHistory } = data;
+        console.log(currSiteId !== site.id)
+        if (subsys === "lg") {
+          if (
+            currSiteId !== site.id ||
+            statusHistory[statusHistory.length - 1].status !==
+              "READY_FOR_DELIVERY"
+          )
+            throw new Error("Not authorised to view order.");
+        }
         navigate(pathname.replace("search", data.id));
       } catch (error) {
-        addToast(`Error: ${error.response.data}.`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
+        addToast(
+          `Error: ${
+            error.response !== undefined
+              ? error.response.data
+              : error.message
+          }`,
+          {
+            appearance: "error",
+            autoDismiss: true,
+          }
+        );
       }
     };
     if (canSearch) fetchOrder(search);

@@ -106,8 +106,12 @@ export const pickPackStockTransfer = createAsyncThunk(
 export const scanItemStockTransfer = createAsyncThunk(
   "stocktransfer/scanItem",
   async ({ orderId, barcode }) => {
-    const response = await stockTransferApi.scanItem(orderId, barcode);
-    return response.data;
+    try {
+      const response = await stockTransferApi.scanItem(orderId, barcode);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
@@ -146,16 +150,25 @@ export const completeStockTransfer = createAsyncThunk(
 export const adjustAtFrom = createAsyncThunk(
   "stocktransfer/adjustAtFrom",
   async ({ orderId, sku, qty }) => {
-    const response = await stockTransferApi.adjustAtFrom(orderId, sku, qty);
-    return response.data;
+    try {
+      const response = await stockTransferApi.adjustAtFrom(orderId, sku, qty);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const adjustAtTo = createAsyncThunk(
   "stocktransfer/adjustAtTo",
   async ({ orderId, sku, qty }) => {
-    const response = await stockTransferApi.adjustAtTo(orderId, sku, qty);
-    return response.data;
+    try {
+
+      const response = await stockTransferApi.adjustAtTo(orderId, sku, qty);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 

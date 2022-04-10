@@ -1,14 +1,21 @@
 import {
-  ArchiveIcon,
-  CogIcon, LogoutIcon, QuestionMarkCircleIcon,
-  ShieldCheckIcon
+  CogIcon,
+  DocumentTextIcon,
+  LogoutIcon,
+  QuestionMarkCircleIcon,
+  ShieldCheckIcon,
+  ShoppingBagIcon,
+  TruckIcon,
 } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { sitesApi } from "../../../../environments/Api";
-import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+import {
+  selectUserSite,
+  updateCurrSite,
+} from "../../../../stores/slices/userSlice";
 import { EnterSiteModal } from "../../../components/Modals/EnterSiteModal";
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
@@ -18,13 +25,19 @@ const navigation = [
   {
     name: "Procurement",
     href: "/lg/procurements",
-    icon: ArchiveIcon,
+    icon: DocumentTextIcon,
     current: false,
   },
   {
     name: "Stock Transfer",
     href: "/lg/stocktransfer",
-    icon: ArchiveIcon,
+    icon: TruckIcon,
+    current: false,
+  },
+  {
+    name: "Online Order",
+    href: "/lg/orders",
+    icon: ShoppingBagIcon,
     current: false,
   },
 ];
@@ -44,7 +57,7 @@ export const LGIndex = () => {
   const [siteSelected, setSiteSelected] = useState(sites[0]);
   const [siteCode, setSiteCode] = useState("");
   const { addToast } = useToasts();
-  
+
   useEffect(() => {
     const fetchAllSites = async () => {
       const { data } = await sitesApi.getAll();
@@ -63,7 +76,7 @@ export const LGIndex = () => {
         appearance: "success",
         autoDismiss: true,
       });
-      dispatch(updateCurrSite())
+      dispatch(updateCurrSite());
       setSiteCode("");
       closeSiteModal();
     } else {

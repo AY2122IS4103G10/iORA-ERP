@@ -106,7 +106,7 @@ const InvoiceSummary = ({ data, status }) => {
       {
         Header: "Qty",
         accessor: `${
-          status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"
+          status === "READY_FOR_DELIVERY" ? "packedQty" : "qty"
         }`,
       },
     ];
@@ -164,6 +164,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       setLoading(true);
       try {
         const { data } = await orderApi.get(orderId);
+        console.log(data);
         const {
           lineItems,
           delivery,
@@ -245,8 +246,17 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       href: `/${subsys}/orders/${orderId}/pick-pack`,
       current: false,
     },
-    status !== "" && delivery
-      ? { name: "Delivery", href: "#", current: false }
+    status !== "" &&
+    (delivery ||
+      (site?.id !== pickupSite?.id &&
+        statusHistory[statusHistory.length - 1].status !==
+          "READY_FOR_COLLECTION" &&
+        statusHistory[statusHistory.length - 1].status !== "COLLECTED"))
+      ? {
+          name: "Delivery",
+          href: `/${subsys}/orders/${orderId}/delivery`,
+          current: false,
+        }
       : {
           name: "Collection",
           href: `/${subsys}/orders/${orderId}/collect`,
@@ -262,15 +272,16 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     <>
       <div className="py-8 xl:py-10">
         <Header
-        subsys={subsys}
+          subsys={subsys}
           disableTabs={delivery === null || delivery === undefined}
           tabs={tabs}
           orderId={orderId}
-          disableInvoice={status === "" || !delivery}
+          disableInvoice={status === ""}
           openInvoice={openInvoice}
         />
         <Outlet
           context={{
+            addToast,
             subsys,
             orderId,
             dateTime,
@@ -294,6 +305,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             refundedLIs,
             exchangedLIs,
             voucher,
+            openInvoice,
           }}
         />
       </div>
@@ -319,6 +331,8 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             deliveryAddress={deliveryAddress}
             data={lineItems}
             qrValue={qrValue}
+            site={site}
+            pickupSite={pickupSite}
           >
             <InvoiceSummary data={lineItems} status={status.status} />
           </OnlineOrderInvoice>
@@ -354,6 +368,8 @@ export const CustomerOrderWrapper = ({ subsys }) => {
                 ? "Scan to start picking."
                 : "Scan to start delivery."
             }
+            site={site}
+            pickupSite={pickupSite}
           >
             <InvoiceSummary data={lineItems} status={status.status} />
           </OnlineOrderInvoice>

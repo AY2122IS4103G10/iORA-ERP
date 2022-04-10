@@ -16,11 +16,13 @@ export const Profile = () => {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [contactNo, setContactNo] = useState("");
   const [dob, setDob] = useState(null);
 
   const onFirstNameChanged = (e) => setFirstName(e.target.value);
   const onLastNameChanged = (e) => setLastName(e.target.value);
+  const onEmailChanged = (e) => setEmail(e.target.value);
   const onContactNoChanged = (e) => setContactNo(e.target.value);
   const onDobChanged = (date) => setDob(date);
 
@@ -30,6 +32,7 @@ export const Profile = () => {
       setLastName(user.lastName);
       setContactNo(user.contactNumber);
       setDob(user.dob);
+      setEmail(user.email);
     }
   }, [user]);
 
@@ -42,9 +45,10 @@ export const Profile = () => {
         lastName,
         dob,
         contactNumber: contactNo,
+        email,
       })
     )
-      .then(({payload}) => {
+      .then(({ payload }) => {
         setFirstName(payload.firstName);
         setLastName(payload.lastName);
         setContactNo(payload.contactNo);
@@ -110,6 +114,25 @@ export const Profile = () => {
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     value={lastName}
                     onChange={onLastNameChanged}
+                  />
+                </div>
+
+                <div className="col-span-4 sm:col-span-2">
+                  <label
+                    htmlFor="email-address"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Email address
+                  </label>
+                  <input
+                    type="email"
+                    name="email-address"
+                    id="email-address"
+                    autoComplete="email"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    value={email}
+                    onChange={onEmailChanged}
+                    required
                   />
                 </div>
 

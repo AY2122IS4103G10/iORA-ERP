@@ -14,6 +14,7 @@ import com.iora.erp.model.customer.Voucher;
 public interface CustomerService {
     public abstract Customer createCustomerAccount(Customer customer) throws CustomerException, RegistrationException;
     public abstract Customer updateCustomerAccount(Customer customer) throws CustomerException;
+    public abstract Customer updateCustomerPassword(Long customerId, String oldPassword, String newPassword) throws CustomerException;
     public abstract void blockCustomer(Customer customer) throws CustomerException;
     public abstract void unblockCustomer(Customer customer) throws CustomerException;
     public abstract List<Customer> listOfCustomer();

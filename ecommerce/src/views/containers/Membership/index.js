@@ -138,7 +138,7 @@ export const Membership = () => {
                                             Redeem Points
                                         </dt>
                                         <select
-                                            className="focus:ring-indigo-500 focus:border-indigo-500 relative block w-full rounded-none rounded-t-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
+                                            className="focus:ring-indigo-500 focus:border-indigo-500 relative block w-full rounded-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
                                             value={amount}
                                             onChange={handleChange}>
                                             {options.map((option) => (

@@ -181,7 +181,6 @@ const AddCustomersModal = ({
   selectedRows,
   setSelectedRows,
   onAddClicked,
-  loading,
 }) => {
   const itemCols = useMemo(() => {
     return [

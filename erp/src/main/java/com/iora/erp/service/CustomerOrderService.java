@@ -16,6 +16,7 @@ import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
 import com.iora.erp.model.customerOrder.RefundLI;
+import com.iora.erp.model.site.Site;
 import com.stripe.exception.StripeException;
 
 public interface CustomerOrderService {
@@ -23,6 +24,8 @@ public interface CustomerOrderService {
         public abstract List<CustomerOrder> searchCustomerOrders(Long siteId, Long orderId);
         public abstract List<CustomerOrder> searchStoreOrders(Long siteId, Long orderId);
         public abstract List<OnlineOrder> searchOnlineOrders(Long siteId, Long orderId);
+        public abstract List<OnlineOrder> getOnlineOrdersOfSite(Site site);
+        public abstract List<OnlineOrder> getOnlineOrdersByStatus(String status);
         public abstract List<OnlineOrder> getPickupOrdersBySite(Long siteId);
 
         public abstract CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret) throws StripeException, InsufficientPaymentException, CustomerException;

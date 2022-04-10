@@ -10,11 +10,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.model.site.Site;
 
 @Embeddable
 public class OOStatus {
+    @JsonIgnoreProperties({"stockLevel"})
     @ManyToOne
     private Site actionBy;
 

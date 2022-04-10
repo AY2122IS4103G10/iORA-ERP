@@ -1,18 +1,18 @@
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useToasts } from "react-toast-notifications";
-import { PencilIcon } from "@heroicons/react/solid";
+import {useDispatch, useSelector} from "react-redux";
+import {Link, useNavigate, useParams} from "react-router-dom";
+import {useToasts} from "react-toast-notifications";
+import {PencilIcon} from "@heroicons/react/solid";
 import {
   fetchCustomers,
   blockExistingCustomer,
   selectCustomerById,
   unblockExistingCustomer,
 } from "../../../../stores/slices/customerSlice";
-import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { useEffect } from "react";
+import {NavigatePrev} from "../../../components/Breadcrumbs/NavigatePrev";
+import {useEffect} from "react";
 import moment from "moment";
 
-const Header = ({ customerId, firstName, lastName, availStatus, toggleBlock }) => {
+const Header = ({customerId, firstName, lastName, availStatus, toggleBlock}) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev page="Customers" path={"/sm/customers"} />
@@ -34,10 +34,13 @@ const Header = ({ customerId, firstName, lastName, availStatus, toggleBlock }) =
         </Link>
         <button
           type="button"
-          className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-${availStatus ? "red" : "cyan"
-            }-600 hover:bg-${availStatus ? "red" : "cyan"
-            }-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-${availStatus ? "red" : "cyan"
-            }-500`}
+          className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-${
+            availStatus ? "red" : "cyan"
+          }-600 hover:bg-${
+            availStatus ? "red" : "cyan"
+          }-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-${
+            availStatus ? "red" : "cyan"
+          }-500`}
           onClick={toggleBlock}>
           <span>{availStatus ? "Block" : "Unblock"}</span>
         </button>
@@ -55,7 +58,7 @@ const CustomerDetailsBody = ({
   membershipPoints,
   membershipTier,
   storeCredit,
-  availStatus
+  availStatus,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
     <div className="space-y-6 lg:col-start-1 lg:col-span-2">
@@ -129,14 +132,16 @@ const CustomerDetailsBody = ({
   </div>
 );
 
-const AddressDetails = ({ mainName,
+const AddressDetails = ({
+  mainName,
   street1,
   street2,
   zip,
   city,
   state,
   deliveryContact,
-  country }) => {
+  country,
+}) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       {/* Customer Information*/}
@@ -191,17 +196,18 @@ const AddressDetails = ({ mainName,
           </dl>
         </div>
       </div>
-    </div>)
-}
+    </div>
+  );
+};
 
 export const CustomerDetails = () => {
-  const { addToast } = useToasts();
-  const { customerId } = useParams();
+  const {addToast} = useToasts();
+  const {customerId} = useParams();
   const customer = useSelector((state) => selectCustomerById(state, parseInt(customerId)));
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cusStatus = useSelector((state) => state.customers.status);
-  
+
   useEffect(() => {
     cusStatus === "idle" && dispatch(fetchCustomers());
   }, [cusStatus, dispatch]);
@@ -262,7 +268,7 @@ export const CustomerDetails = () => {
           membershipTier={customer.membershipTier}
           storeCredit={customer.storeCredit}
         />
-        {Boolean(customer.address) &&
+        {Boolean(customer.address) && (
           <AddressDetails
             mainName={customer.address.name}
             street1={customer.address.street1}
@@ -272,7 +278,8 @@ export const CustomerDetails = () => {
             state={customer.address.state}
             deliveryContact={customer.address.phone}
             country={customer.address.country}
-          />}
+          />
+        )}
       </div>
     )
   );

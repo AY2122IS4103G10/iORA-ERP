@@ -50,6 +50,7 @@ const CustomerFormBody = ({
   onDeliveryContact,
   country,
   onCountry,
+  countries,
 }) => (
   <div className="mt-4 max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
     <h1 className="sr-only">{!isEditing ? "Add New" : "Edit"} Customer</h1>
@@ -108,21 +109,6 @@ const CustomerFormBody = ({
                         value={email}
                         onChange={onEmailChanged}
                         required
-                      />
-                    </SimpleInputGroup>
-                    <SimpleInputGroup
-                      label="Password"
-                      inputField="password"
-                      className="sm:mt-0 sm:col-span-2">
-                      <SimpleInputBox
-                        type="password"
-                        name="password"
-                        id="password"
-                        autoComplete="password"
-                        value={password}
-                        onChange={onPasswordChanged}
-                        disabled={isEditing}
-                        className={isEditing ? "bg-gray-200" : ""}
                       />
                     </SimpleInputGroup>
                     <SimpleInputGroup
@@ -195,126 +181,160 @@ const CustomerFormBody = ({
                         disabled
                       />
                     </SimpleInputGroup>
-                    <div>
-                      <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-                        <h3 className="text-lg leading-6 font-medium mt-12 text-gray-900">
-                          Delivery Address
-                        </h3>
+
+                    <SimpleInputGroup
+                      label="Address"
+                      inputField="address"
+                      className="relative rounded-md sm:mt-0 sm:col-span-2">
+                      <div className="py-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-3">
+                          <label
+                            htmlFor="receiverName"
+                            className="block text-sm font-medium text-gray-700">
+                            Receiver Name
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              name="name"
+                              id="name"
+                              className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              autoComplete="receiverName"
+                              value={receiverName}
+                              onChange={onReceiverName}
+                            />
+                          </div>
+                        </div>
+                        <div className="sm:col-span-3">
+                          <label
+                            htmlFor="deliveryContract"
+                            className="block text-sm font-medium text-gray-700">
+                            Contact Number
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              name="phone"
+                              id="phone"
+                              className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              autoComplete="deliveryContract"
+                              value={deliveryContact}
+                              onChange={onDeliveryContact}
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                        <SimpleInputGroup
-                          label="Receiver Name"
-                          inputField="Receiver Name"
-                          className="sm:mt-0 sm:col-span-2">
-                          <SimpleInputBox
-                            type="text"
-                            name="name"
-                            id="name"
-                            autoComplete="receiverName"
-                            value={receiverName}
-                            onChange={onReceiverName}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Reciever Number"
-                          inputField="Reciever Number"
-                          className="sm:mt-0 sm:col-span-2">
-                          <SimpleInputBox
-                            type="text"
-                            name="phone"
-                            id="phone"
-                            autoComplete="deliveryContract"
-                            value={deliveryContact}
-                            onChange={onDeliveryContact}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Street / Building / Road"
-                          inputField="Street Name/Building/ Road"
-                          className="sm:mt-0 sm:col-span-2">
-                          <SimpleInputBox
-                            type="text"
-                            name="street1"
-                            id="street1"
-                            autoComplete="street1"
-                            value={street1}
-                            onChange={onStreet1}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Unit Number"
-                          inputField="Unit Number"
-                          className="sm:mt-0 sm:col-span-2">
-                          <SimpleInputBox
-                            type="text"
-                            name="street2"
-                            id="street2"
-                            autoComplete="street2"
-                            value={street2}
-                            onChange={onStreet2}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Country"
-                          inputField="country"
-                          className="sm:mt-0 sm:col-span-2">
-                          <SimpleInputBox
-                            type="text"
-                            name="country"
-                            id="country"
-                            autoComplete="country"
-                            value={country}
-                            onChange={onCountry}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="Zip / Postal Code"
-                          inputField="zip"
-                          className="sm:mt-0 sm:col-span-2">
-                          <SimpleInputBox
+                      <div className="py-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-4">
+                          <label
+                            htmlFor="street1"
+                            className="block text-sm font-medium text-gray-700">
+                            Street / Building / Road
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              name="street1"
+                              id="street1"
+                              className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              autoComplete="street1"
+                              value={street1}
+                              onChange={onStreet1}
+                            />
+                          </div>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label
+                            htmlFor="street2"
+                            className="block text-sm font-medium text-gray-700">
+                            Unit Number
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              name="street2"
+                              id="street2"
+                              className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              autoComplete="street2"
+                              value={street2}
+                              onChange={onStreet2}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="py-4">
+                        <label htmlFor="zip" className="block text-sm font-medium text-gray-700">
+                          ZIP / Postal code
+                        </label>
+                        <div className="mt-2">
+                          <input
                             type="text"
                             name="zip"
                             id="zip"
+                            className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
                             autoComplete="zip"
                             value={zip}
                             onChange={onZip}
-                            required
                           />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="City"
-                          inputField="city"
-                          className="sm:mt-0 sm:col-span-2">
-                          <SimpleInputBox
-                            type="text"
-                            name="city"
-                            id="city"
-                            autoComplete="city"
-                            value={city}
-                            onChange={onCity}
-                            required
-                          />
-                        </SimpleInputGroup>
-                        <SimpleInputGroup
-                          label="State"
-                          inputField="state"
-                          className="sm:mt-0 sm:col-span-2">
-                          <SimpleInputBox
-                            type="text"
-                            name="state"
-                            id="state"
-                            autoComplete="state"
-                            value={state}
-                            onChange={onState}
-                          />
-                        </SimpleInputGroup>
+                        </div>
                       </div>
-                    </div>
+                      <div className="py-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-2">
+                          <label
+                            htmlFor="country"
+                            className="block text-sm font-medium text-gray-700">
+                            Country
+                          </label>
+
+                          <select
+                            id="countries"
+                            name="countries"
+                            className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm rounded-md"
+                            value={country}
+                            onChange={onCountry}>
+                            {countries.map((country, index) => (
+                              <option key={index} value={country}>
+                                {country}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                            City
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              name="city"
+                              id="city"
+                              className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              autoComplete="city"
+                              value={city}
+                              onChange={onCity}
+                            />
+                          </div>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label
+                            htmlFor="state"
+                            className="block text-sm font-medium text-gray-700">
+                            State / Province
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              name="state"
+                              id="state"
+                              className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              autoComplete="state"
+                              value={state}
+                              onChange={onState}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </SimpleInputGroup>
                   </div>
                 </div>
               </div>
@@ -342,6 +362,11 @@ const CustomerFormBody = ({
   </div>
 );
 
+export const fetchCountries = async () => {
+  const {data} = await api.getAll("admin/countries");
+  return data;
+};
+
 export const CustomerForm = ({subsys}) => {
   const {customerId} = useParams();
   const {addToast} = useToasts();
@@ -363,6 +388,7 @@ export const CustomerForm = ({subsys}) => {
   const [state, setState] = useState("");
   const [deliveryContact, setDeliveryContact] = useState("");
   const [country, setCountry] = useState("");
+  const [countries, setCountries] = useState([]);
   const [addressID, setAddressID] = useState("");
 
   const dispatch = useDispatch();
@@ -388,76 +414,9 @@ export const CustomerForm = ({subsys}) => {
 
   const canAdd = [firstName, lastName, dob, contactNumber, email].every(Boolean);
 
-  const onAddCustomerClicked = (evt) => {
-    evt.preventDefault();
-    if (canAdd)
-      if (!isEditing) {
-        dispatch(
-          addNewCustomer({
-            firstName,
-            lastName,
-            dob,
-            contactNumber,
-            availStatus: true,
-            email,
-            password,
-          })
-        )
-          .unwrap()
-          .then(() => {
-            addToast("Successfully added customer", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            navigate(subsys === "str" ? `/str/pos/orderPurchase` : "/sm/customers");
-          })
-          .catch((err) => {
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            });
-          });
-      } else {
-        dispatch(
-          updateExistingCustomer({
-            id: customerId,
-            firstName,
-            lastName,
-            dob,
-            contactNumber,
-            email,
-            address: {
-              id: addressID,
-              name: receiverName,
-              street1,
-              street2,
-              city,
-              zip,
-              state,
-              country,
-              phone: deliveryContact,
-            },
-          })
-        )
-          .unwrap()
-          .then(() => {
-            addToast("Successfully updated customer", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            navigate(`/sm/customers/${customerId}`);
-          })
-          .catch((err) => {
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            });
-          });
-      }
-  };
-
-  const onCancelClicked = () =>
-    navigate(!isEditing ? "/sm/customers" : `/sm/customers/${customerId}`);
+  useEffect(() => {
+    fetchCountries().then((data) => setCountries(data));
+  }, []);
 
   useEffect(() => {
     Boolean(customerId) &&
@@ -493,6 +452,76 @@ export const CustomerForm = ({subsys}) => {
         setCountry(address.country);
       });
   }, [customerId]);
+
+  const onAddCustomerClicked = (evt) => {
+    evt.preventDefault();
+    if (canAdd)
+      if (!isEditing)
+        dispatch(
+          addNewCustomer({
+            firstName,
+            lastName,
+            dob,
+            contactNumber,
+            availStatus: true,
+            email,
+            password,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully added customer", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            navigate(subsys === "str" ? `/str/pos/orderPurchase` : "/sm/customers");
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+          });
+      else
+        dispatch(
+          updateExistingCustomer({
+            id: customerId,
+            firstName,
+            lastName,
+            dob,
+            contactNumber,
+            email,
+            address: {
+              id: addressID,
+              name: receiverName,
+              street1,
+              street2,
+              city,
+              zip,
+              state,
+              country,
+              phone: deliveryContact,
+            },
+          })
+        )
+          .unwrap()
+          .then(() => {
+            addToast("Successfully updated customer", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            navigate(`/sm/customers/${customerId}`);
+          })
+          .catch((err) => {
+            addToast(`Error: ${err.message}`, {
+              appearance: "error",
+              autoDismiss: true,
+            });
+          });
+  };
+
+  const onCancelClicked = () =>
+    navigate(!isEditing ? "/sm/customers" : `/sm/customers/${customerId}`);
 
   return (
     <CustomerFormBody
@@ -533,6 +562,7 @@ export const CustomerForm = ({subsys}) => {
       onDeliveryContact={onDeliveryContact}
       country={country}
       onCountry={onCountry}
+      countries={countries}
     />
   );
 };

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { refreshTokenJwt } from "../../../../stores/slices/userSlice";
+import { fetchCustomerByEmail, refreshTokenJwt } from "../../../../stores/slices/userSlice";
 
 export function Auth({ children }) {
   const dispatch = useDispatch();
@@ -20,6 +20,7 @@ export function Auth({ children }) {
           location.pathname === "/login" &&
             data?.username !== null &&
             navigate("/settings/account");
+          data.username && dispatch(fetchCustomerByEmail(data.username))
         })
         .catch((err) => {
           addToast(`Error: ${err.message}`, {
@@ -29,6 +30,7 @@ export function Auth({ children }) {
           localStorage.removeItem("refreshToken");
           location.pathname.startsWith("/settings") && navigate("/login");
         });
+      // refreshJwt();
     } else {
       location.pathname.startsWith("/settings") && navigate("/login");
     }

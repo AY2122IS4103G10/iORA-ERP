@@ -87,7 +87,7 @@ export const register = createAsyncThunk("auth/register", async (user) => {
 export const updateAccount = createAsyncThunk(
   "auth/updateAccount",
   async (user) => {
-    const response = await api.update("/online/profile/edit", user);
+    const response = await api.update("online/profile/edit", user);
     if (response.data === "") {
       return Promise.reject(response.error);
     }
@@ -118,6 +118,14 @@ export const fetchCustomer = createAsyncThunk(
   "customers/fetchCustomer",
   async (data) => {
     const response = await api.get("sam/customer/view", data);
+    return response.data;
+  }
+);
+
+export const fetchCustomerByEmail = createAsyncThunk(
+  "customers/fetchCustomerByEmail",
+  async (data) => {
+    const response = await api.get("sam/customer/email", data);
     return response.data;
   }
 );
@@ -169,7 +177,7 @@ const userSlice = createSlice({
     });
     builder.addCase(updateAccount.fulfilled, (state, action) => {
       action.payload.password !== undefined && delete action.payload.password;
-      state.user = action.payload;
+      state.user = { ...action.payload };
       state.status = "succeeded";
     });
     builder.addCase(updateAccount.rejected, (state, action) => {
@@ -181,7 +189,12 @@ const userSlice = createSlice({
     builder.addCase(fetchCustomer.fulfilled, (state, action) => {
       action.payload.password !== undefined && delete action.payload.password;
       state.user = { ...action.payload };
-      state.status = "succeeded"
+      state.status = "succeeded";
+    });
+    builder.addCase(fetchCustomerByEmail.fulfilled, (state, action) => {
+      action.payload.password !== undefined && delete action.payload.password;
+      state.user = { ...action.payload };
+      state.status = "succeeded";
     });
   },
 });

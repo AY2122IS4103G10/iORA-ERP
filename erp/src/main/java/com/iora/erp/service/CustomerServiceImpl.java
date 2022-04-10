@@ -376,7 +376,8 @@ public class CustomerServiceImpl implements CustomerService {
         em.persist(supportTicket);
         Customer c = getCustomerById(supportTicket.getCustomer().getId());
         c.addSupportTicket(supportTicket);
-        siteService.getSite(1L).addNotification(new Notification("Support Ticket # " + supportTicket.getId(), "New ticket"));
+        siteService.getSite(1L)
+                .addNotification(new Notification("Support Ticket # " + supportTicket.getId(), "New ticket"));
         em.merge(c);
         return supportTicket;
     }
@@ -422,5 +423,18 @@ public class CustomerServiceImpl implements CustomerService {
 
         em.remove(st);
         return id;
+    }
+
+    @Override
+    public Customer updateCustomerPassword(Long customerId, String oldPassword, String newPassword) throws CustomerException {
+        Customer old = em.find(Customer.class, customerId);
+
+        if (old == null) {
+            throw new CustomerException("Customer not found");
+        } else if (!passwordEncoder.matches(oldPassword, old.getPassword())) {
+            throw new CustomerException("Incorrect current password.");
+        }
+        old.setPassword(passwordEncoder.encode(newPassword));
+        return old;
     }
 }

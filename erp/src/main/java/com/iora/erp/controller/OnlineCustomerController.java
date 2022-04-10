@@ -139,6 +139,17 @@ public class OnlineCustomerController {
         }
     }
 
+    @PostMapping(path = "/profile/password/{id}/{oldPassword}/{newPassword}", produces = "application/json")
+    public ResponseEntity<Object> changePassword(@PathVariable Long id, @PathVariable String oldPassword,
+            @PathVariable String newPassword) {
+        try {
+            return ResponseEntity.ok(customerService.updateCustomerPassword(id, oldPassword, newPassword));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
     @PostMapping(path = "/resetpw/{id}", produces = "application/json")
     public ResponseEntity<Object> resetPassword(@PathVariable Long id) {
         try {

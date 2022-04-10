@@ -365,9 +365,9 @@ const InvoiceSummary = ({ data, status }) => {
             .fieldValue,
       },
       {
-        Header: `${status === "READY_FOR_SHIPPING" ? "Ful" : "Req"}`,
+        Header: "Qty",
         accessor: `${
-          status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"
+          status === "READY_FOR_DELIVERY" ? "packedQty" : "requestedQty"
         }`,
       },
     ];

@@ -385,8 +385,8 @@ export const onlineOrderApi = {
       `${REST_ENDPOINT}online/deliverMultiple/${orderId}`
     );
   },
-  receive(orderId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}online/receive/${orderId}`);
+  receive(orderId, siteId) {
+    return axiosPrivate.put(`${REST_ENDPOINT}online/deliver/${orderId}/${siteId}`);
   },
   collect(orderId) {
     return axiosPrivate.put(`${REST_ENDPOINT}online/collect/${orderId}`);

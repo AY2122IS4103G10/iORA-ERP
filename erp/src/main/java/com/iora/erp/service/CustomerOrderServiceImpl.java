@@ -178,6 +178,24 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    public List<OnlineOrder> getOOBySiteStatus(Long siteId, String status) throws CustomerOrderException {
+        Site site = em.find(Site.class, siteId);
+        if (site == null) {
+            throw new CustomerOrderException("Site cannot be found.");
+        }
+
+        List<OnlineOrder> deliveries = new ArrayList<>();
+
+        for (OnlineOrder oo : getOnlineOrdersOfSite(site)) {
+            if (oo.getLastStatus() == OnlineOrderStatusEnum.valueOf(status.toUpperCase())) {
+                deliveries.add(oo);
+            }
+        }
+
+        return deliveries;
+    }
+
+    @Override
     public List<OnlineOrder> getPickupOrdersBySite(Long siteId) {
         TypedQuery<OnlineOrder> q = em.createQuery(
                 "SELECT oo FROM OnlineOrder oo WHERE oo.pickupSite.id = :siteId AND oo.delivery = false",
@@ -837,6 +855,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PICKING) {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
+                    if (coli.getPickedQty() + qty > coli.getQty()) {
+                        throw new CustomerOrderException("You are picking items that are not meant for this order.");
+                    }
                     coli.setPickedQty(coli.getPickedQty() + qty);
                     boolean picked = true;
                     for (CustomerOrderLI coli2 : lineItems) {
@@ -895,6 +916,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PICKING) {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
+                    if (coli.getPickedQty() + qty > coli.getQty()) {
+                        throw new CustomerOrderException("You are picking items that are not meant for this order.");
+                    }
                     coli.setPickedQty(qty);
                     boolean picked = true;
                     for (CustomerOrderLI coli2 : lineItems) {

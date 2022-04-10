@@ -7,12 +7,12 @@ export const OnlineInvoiceBody = ({
   title,
   orderId,
   orderStatus,
-  // company,
   dateTime,
   delivery,
   customer,
   deliveryAddress,
-  fromSite,
+  site,
+  pickupSite,
   qrValue,
   children,
   qrHelper,
@@ -27,20 +27,6 @@ export const OnlineInvoiceBody = ({
         <h4 className="sr-only">Order Information</h4>
         <dl className="grid grid-cols-2 gap-x-6 text-sm py-10">
           <div>
-            {/* <dt className="font-medium text-gray-900">{company.name}</dt>
-            <dd className="mt-2 text-gray-700">
-              <address className="not-italic">
-                <span className="block">
-                  {company.address.road}
-                  {company.address.unit !== "NIL" &&
-                    `, #${company.address.unit}`}
-                </span>
-                <span className="block">
-                  {company.address.city}, {company.address.postalCode}
-                </span>
-                <span className="block">{company.telephone}</span>
-              </address>
-            </dd> */}
             <dd className="mt-2 text-gray-700">
               <div className="my-10">
                 <QRCode
@@ -94,7 +80,7 @@ export const OnlineInvoiceBody = ({
 
       <div className="border-t border-gray-200">
         <h2 className="sr-only">Your order</h2>
-        {delivery && (
+        {site.id !== pickupSite.id && (
           <div>
             <h4 className="sr-only">Addresses</h4>
             <dl className="border-b border-gray-200 grid grid-cols-2 gap-x-6 text-sm py-10">
@@ -102,30 +88,42 @@ export const OnlineInvoiceBody = ({
                 <dt className="font-medium text-gray-900">Shipping From</dt>
                 <dd className="mt-2 text-gray-700">
                   <address className="not-italic">
-                    <span className="block">{fromSite.name}</span>
-                    <span className="block">{fromSite.address.road}</span>
+                    <span className="block">{site?.name}</span>
+                    <span className="block">{site?.address.road}</span>
                     <span className="block">
-                      {fromSite.address.city}, {fromSite.address.postalCode}
+                      {site?.address.city}, {site?.address.postalCode}
                     </span>
-                    <span className="block">{fromSite.phoneNumber}</span>
+                    <span className="block">{site?.phoneNumber}</span>
                   </address>
                 </dd>
               </div>
               <div>
                 <dt className="font-medium text-gray-900">Shipping To</dt>
                 <dd className="mt-2 text-gray-700">
-                  <address className="not-italic">
-                    <span className="block">
-                      {customer.firstName} {customer.lastName}
-                    </span>
-                    <span className="block">
-                      {deliveryAddress.street1}, {deliveryAddress.street2}
-                    </span>
-                    <span className="block">
-                      {deliveryAddress.city}, {deliveryAddress.zip}
-                    </span>
-                    <span className="block">{customer.contactNumber}</span>
-                  </address>
+                  {pickupSite ? (
+                    <address className="not-italic">
+                      <span className="block">{pickupSite.name}</span>
+                      <span className="block">{pickupSite.address.road}</span>
+                      <span className="block">
+                        {pickupSite.address.city},{" "}
+                        {pickupSite.address.postalCode}
+                      </span>
+                      <span className="block">{pickupSite.phoneNumber}</span>
+                    </address>
+                  ) : (
+                    <address className="not-italic">
+                      <span className="block">
+                        {customer.firstName} {customer.lastName}
+                      </span>
+                      <span className="block">
+                        {deliveryAddress?.street1}, {deliveryAddress?.street2}
+                      </span>
+                      <span className="block">
+                        {deliveryAddress?.city}, {deliveryAddress?.zip}
+                      </span>
+                      <span className="block">{customer.contactNumber}</span>
+                    </address>
+                  )}
                 </dd>
               </div>
             </dl>
@@ -144,12 +142,12 @@ export const OnlineOrderInvoice = forwardRef(
       title,
       orderId,
       orderStatus,
-      // company,
       dateTime,
       delivery,
       customer,
       deliveryAddress,
-      fromSite,
+      site,
+      pickupSite,
       data,
       qrValue,
       qrHelper,
@@ -163,12 +161,12 @@ export const OnlineOrderInvoice = forwardRef(
           title={title}
           orderId={orderId}
           orderStatus={orderStatus}
-          // company={company}
           dateTime={dateTime}
           delivery={delivery}
           customer={customer}
           deliveryAddress={deliveryAddress}
-          fromSite={fromSite}
+          site={site}
+          pickupSite={pickupSite}
           data={data}
           qrValue={qrValue}
           qrHelper={qrHelper}

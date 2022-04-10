@@ -1,12 +1,10 @@
 package com.iora.erp.enumeration;
 
 public enum ParcelSize {
-    EXTRA_SMALL_FLEX_PACKAGE(6.0, 6.0, 2.0, 5.0),
-    SMALL_FLEX_PACKAGE(10.0, 8.0, 6.0, 30.0),
-    MEDIUM_FLEX_PACKAGE(12.0, 10.0, 8.0, 40.0),
-    MEDIUM_BOX(12.0, 10.0, 8.0, 55.0),
-    LARGE_BOX(14.0, 10.0, 8.0, 70.0),
-    EXTRA_LARGE_BOX(16.0, 14.0, 10.0, 110.0);
+    SATCHEL_500G_ATL_A5(3.0, 32.5, 20.5, 0.5),
+    SATCHEL_1KG(4.0, 35.0, 28.5, 1.0),
+    SATCHEL_3KG(9.0, 41.0, 32.5, 3.0),
+    SATCHEL_5KG(8.0, 58.0, 43.0, 5.0);
 
     private Double height;
     private Double width;

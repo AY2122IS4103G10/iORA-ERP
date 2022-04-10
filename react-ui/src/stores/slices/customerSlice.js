@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api, customerApi, posApi } from "../../environments/Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api, customerApi, posApi} from "../../environments/Api";
 
 const initialState = {
   customers: [],
@@ -8,13 +8,10 @@ const initialState = {
   error: null,
 };
 
-export const fetchCustomers = createAsyncThunk(
-  "customers/fetchCustomers",
-  async () => {
-    const response = await api.getAll("sam/customer/view/all");
-    return response.data;
-  }
-);
+export const fetchCustomers = createAsyncThunk("customers/fetchCustomers", async () => {
+  const response = await api.getAll("sam/customer/view/all");
+  return response.data;
+});
 
 export const getCustomerByPhone = createAsyncThunk(
   "customers/getCustomerByPhone",
@@ -78,7 +75,7 @@ const customerSlice = createSlice({
       state.ssCustomer = action.payload[0];
     });
     builder.addCase(getCurrentSpending.fulfilled, (state, action) => {
-      state.ssCustomer = { currSpend: action.payload, ...state.ssCustomer };
+      state.ssCustomer = {currSpend: action.payload, ...state.ssCustomer};
     });
     builder.addCase(fetchCustomers.pending, (state, action) => {
       state.status = "loading";
@@ -94,7 +91,7 @@ const customerSlice = createSlice({
       state.customers.push(action.payload);
     });
     builder.addCase(updateExistingCustomer.fulfilled, (state, action) => {
-      const {
+      /*const {
         id,
         firstName,
         lastName,
@@ -119,11 +116,11 @@ const customerSlice = createSlice({
         //existingCustomer.membershipTier = membershipTier;
         existingCustomer.membershipPoints = membershipPoints;
         existingCustomer.storeCredit = storeCredit;
-      }
-      // state.status = "idle";
+      }*/
+      state.status = "idle";
     });
     builder.addCase(blockExistingCustomer.fulfilled, (state, action) => {
-      const { id, availStatus } = action.payload;
+      const {id, availStatus} = action.payload;
       const existingCustomer = state.customers.find((cus) => cus.id === id);
       if (existingCustomer) {
         existingCustomer.availStatus = availStatus;
@@ -131,7 +128,7 @@ const customerSlice = createSlice({
       // state.status = "idle";
     });
     builder.addCase(unblockExistingCustomer.fulfilled, (state, action) => {
-      const { id, availStatus } = action.payload;
+      const {id, availStatus} = action.payload;
       const existingCustomer = state.customers.find((cus) => cus.id === id);
       if (existingCustomer) {
         existingCustomer.availStatus = availStatus;
@@ -143,7 +140,7 @@ const customerSlice = createSlice({
 
 export default customerSlice.reducer;
 
-export const { removeSSCustomer } = customerSlice.actions;
+export const {removeSSCustomer} = customerSlice.actions;
 
 export const selectAllCustomers = (state) => state.customers.customers;
 

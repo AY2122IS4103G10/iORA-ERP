@@ -99,6 +99,7 @@ import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VouchersList } from "./views/containers/Vouchers/VouchersList";
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import { OnlineOrderPicking } from "./views/containers/OnlineOrder/OnlineOrderPicking/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -618,7 +619,7 @@ function App() {
                 path="picking"
                 element={
                   <ManageOnlineOrders subsys="wh">
-                    <OnlineOrderSearch subsys="wh" />
+                    <OnlineOrderPicking subsys="wh" />
                   </ManageOnlineOrders>
                 }
               />

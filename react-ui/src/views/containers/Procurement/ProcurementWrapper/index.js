@@ -281,8 +281,10 @@ export const ProcurementWrapper = ({ subsys }) => {
                 ...item.product,
                 modelCode: data[index].modelCode,
                 name: data[index].name,
+                description: data[index].description,
                 imageLinks: data[index].imageLinks,
               },
+              isEditing: true,
             }))
           );
         });

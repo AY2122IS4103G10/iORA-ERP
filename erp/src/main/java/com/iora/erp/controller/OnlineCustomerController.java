@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 // import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
@@ -58,7 +59,7 @@ public class OnlineCustomerController {
 
     /*
      * ---------------------------------------------------------
-     * G.1 Customer Purchase Management
+     * Customer Purchase Management
      * ---------------------------------------------------------
      */
 
@@ -152,7 +153,7 @@ public class OnlineCustomerController {
     @GetMapping(path = "/history/{customerId}", produces = "application/json")
     public ResponseEntity<Object> getTransactionHistory(@PathVariable Long customerId) {
         try {
-            return ResponseEntity.ok(customerService.getCustomerById(customerId).getCustomerOrders());
+            return ResponseEntity.ok(customerService.getCustomerById(customerId).getOrders());
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
@@ -169,6 +170,57 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/ticket/all", produces = "application/json")
+    public List<SupportTicket> getAllSupportTickets() {
+        return customerService.getAllSupportTickets();
+    }
+
+    @GetMapping(path = "/ticket/public", produces = "application/json")
+    public List<SupportTicket> getPublicSupportTickets() {
+        return customerService.getPublicSupportTickets();
+    }
+
+    @GetMapping(path = "/ticket/user/{customerId}", produces = "application/json")
+    public List<SupportTicket> getUserSupportTickets(@PathVariable Long customerId) {
+        try {
+            return customerService.getCustomerById(customerId).getSupportTickets();
+        } catch (CustomerException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @PostMapping(path = "/ticket", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> createSupportTicket(@RequestBody SupportTicket supportTicket) {
+        try {
+            return ResponseEntity.ok(customerService.createSupportTicket(supportTicket));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/ticket/resolve/{id}", produces = "application/json")
+    public ResponseEntity<Object> resolveSupportTicket(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.resolveSupportTicket(id));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/ticket/reply/{ticketId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> replySupportTicket(@PathVariable Long ticketId, @RequestParam String name,
+            @RequestBody Map<String, String> message) {
+        try {
+            System.out.println(message);
+            return ResponseEntity.ok(
+                    customerService.replySupportTicket(ticketId, message.get("input"), name, message.get("url")));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     /*
      * ---------------------------------------------------------
      * Online Order
@@ -182,6 +234,22 @@ public class OnlineCustomerController {
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/order/site/{siteId}", produces = "application/json")
+    public List<OnlineOrder> getOnlineOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return customerOrderService.getOnlineOrdersOfSite(site);
+    }
+
+    @GetMapping(path = "/order/status/{status}", produces = "application/json")
+    public ResponseEntity<Object> getOnlineOrdersByStatus(@PathVariable String status) {
+        try {
+            return ResponseEntity.ok(customerOrderService.getOnlineOrdersByStatus(status));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
@@ -244,6 +312,16 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/pickingList/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> getPickingList(@PathVariable Long siteId) {
+        try {
+            return ResponseEntity.ok(customerOrderService.getPickingList(siteId));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PatchMapping(path = "/scan/{orderId}", produces = "application/json")
     public ResponseEntity<Object> scanProduct(@PathVariable Long orderId, @RequestParam String barcode) {
         try {
@@ -261,7 +339,8 @@ public class OnlineCustomerController {
     }
 
     @PutMapping(path = "/order/{orderId}/{sku}/{qty}", produces = "application/json")
-    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku, @PathVariable int qty) {
+    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku,
+            @PathVariable int qty) {
         try {
             return ResponseEntity.ok(customerOrderService.adjustProduct(orderId, sku, qty));
         } catch (Exception ex) {
@@ -304,6 +383,12 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
+    /*
+     * ---------------------------------------------------------
+     * Ecommerce
+     * ---------------------------------------------------------
+     */
 
     // Get models by fashion line (iORA) and tag (top)
     // Return empty list if no results

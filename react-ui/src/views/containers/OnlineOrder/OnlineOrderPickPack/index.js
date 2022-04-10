@@ -21,6 +21,8 @@ const PickPackList = ({
   onSaveQuanityClicked,
   site,
   currSiteId,
+  delivery,
+  pickupSite
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
@@ -157,7 +159,7 @@ const PickPackList = ({
     ];
   }, [handlePickPack, setData, status, onSaveQuanityClicked]);
   const hiddenColumns =
-    site.id !== currSiteId ||
+    (delivery ? site.id !== currSiteId : pickupSite.id !== currSiteId) ||
     ["PENDING", "PICKING", "PACKING"].every((s) => s !== status)
       ? ["[editButton]"]
       : [];
@@ -197,6 +199,7 @@ export const OnlineOrderPickPack = () => {
     openInvoice,
     pickupSite,
     site,
+    delivery
   } = useOutletContext();
 
   const status = st.status;
@@ -371,6 +374,8 @@ export const OnlineOrderPickPack = () => {
                     onSaveQuanityClicked={onSaveQuanityClicked}
                     site={site}
                     currSiteId={currSiteId}
+                    delivery={delivery}
+                    pickupSite={pickupSite}
                   />
                 </section>
               )}

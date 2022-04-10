@@ -12,8 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 
 @Entity
@@ -39,8 +37,7 @@ public class SupportTicket {
     @Column(nullable = false)
     private String subject;
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @ManyToOne (optional = false)
+    @ManyToOne(optional = false)
     private Customer customer;
 
     @OneToOne

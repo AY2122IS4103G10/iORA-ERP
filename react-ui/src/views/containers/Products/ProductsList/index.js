@@ -81,7 +81,7 @@ export const ProductsTable = ({ data, handleOnClick }) => {
         <SimpleTable
           columns={columns}
           data={data}
-          flex={true}
+          flex
           handleOnClick={handleOnClick}
         />
       </div>

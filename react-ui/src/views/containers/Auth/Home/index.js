@@ -29,7 +29,7 @@ export const EnterStoreModal = ({
 }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-bottom bg-white h-80 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+      <div className="inline-block align-bottom bg-white h-80 rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
         <div>
           <div className="m-4 mt-2">
             <Dialog.Title
@@ -259,7 +259,7 @@ const paths = [
     iconForeground: "text-purple-700",
     iconBackground: "bg-purple-50",
     description:
-      "Click here for the Point-of-Sale system and pages to view the store's stock.",
+      "Click here for the Procurement and Stock Transfer orders ready for delivery.",
   },
 ];
 

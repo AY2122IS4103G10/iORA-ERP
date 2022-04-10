@@ -66,6 +66,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     private SiteService siteService;
     @Autowired
     private StripeService stripeService;
+    @Autowired
+    private EmailService emailService;
     @PersistenceContext
     private EntityManager em;
 
@@ -156,6 +158,26 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    public List<OnlineOrder> getOnlineOrdersOfSite(Site site) {
+        return em
+                .createQuery("SELECT oo FROM OnlineOrder oo WHERE oo.site = :site OR oo.pickupSite = :site",
+                        OnlineOrder.class)
+                .setParameter("site", site)
+                .getResultList();
+    }
+
+    @Override
+    public List<OnlineOrder> getOnlineOrdersByStatus(String status) {
+        List<OnlineOrder> oOrders = new ArrayList<>();
+        for (OnlineOrder oo : searchOnlineOrders(0L, null)) {
+            if (oo.getLastStatus() == OnlineOrderStatusEnum.valueOf(status.toUpperCase())) {
+                oOrders.add(oo);
+            }
+        }
+        return oOrders;
+    }
+
+    @Override
     public List<OnlineOrder> getPickupOrdersBySite(Long siteId) {
         TypedQuery<OnlineOrder> q = em.createQuery(
                 "SELECT oo FROM OnlineOrder oo WHERE oo.pickupSite.id = :siteId AND oo.delivery = false",
@@ -172,7 +194,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             stripeService.capturePayment(clientSecret);
         }
         if (customerOrder.getVoucher() != null) {
-            if (!customerOrder.getVoucher().getCustomerIds().contains(customerOrder.getCustomerId())) {
+            if (customerOrder.getVoucher().getCustomerId() != customerOrder.getCustomerId()) {
                 throw new CustomerException("Customer is not entitled to this voucher.");
             } else {
                 customerService.redeemVoucher(customerOrder.getVoucher().getVoucherCode());
@@ -230,6 +252,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             OnlineOrder oo = (OnlineOrder) customerOrder;
             Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
             c.setAddress(oo.getDeliveryAddress());
+
+            // set email to customer
+            if (oo.getId() > 7L) {
+                emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
+            }
             em.merge(c);
         }
 
@@ -281,7 +308,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         // Add ProductItem to Line Items
-        Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
+        String sku = product.getSku();
+        String model = sku.substring(0, sku.lastIndexOf("-"));
+        Model mdl = em.find(Model.class, model.trim());
         boolean added = false;
         for (int i = 0; i < lineItems.size(); i++) {
             if (lineItems.get(i).getProduct().equals(product)) {
@@ -314,7 +343,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         // Remove ProductItem from Line Items
-        Model mdl = em.find(Model.class, product.getSku().split("-")[0]);
+        String sku = product.getSku();
+        String model = sku.substring(0, sku.lastIndexOf("-"));
+        Model mdl = em.find(Model.class, model.trim());
         boolean removed = false;
         for (int i = 0; i < lineItems.size(); i++) {
             if (lineItems.get(i).getProduct().equals(product)) {
@@ -346,7 +377,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         List<PromotionLI> bestMultiPromosUsed = new ArrayList<>();
 
         for (CustomerOrderLI coli : lineItems) {
-            Model m = em.find(Model.class, coli.getProduct().getSku().split("-")[0]);
+            String sku = coli.getProduct().getSku();
+            String model = sku.substring(0, sku.lastIndexOf("-"));
+            Model m = em.find(Model.class, model.trim());
             modelMap.put(coli, m);
             bestPrices.put(coli, m.getDiscountPrice());
         }
@@ -609,26 +642,16 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     // Helper methods
-
-    // amount added to payments
     public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
-        TypedQuery<CustomerOrder> q = em.createQuery(
-                "SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date", CustomerOrder.class);
-        q.setParameter("id", customer.getId());
-        q.setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP);
-
-        double spending = q.getResultList()
-                .stream()
-                .map(x -> x.getPayments())
-                .map(x -> x.stream().mapToDouble(y -> y.getAmount()).sum())
-                .collect(Collectors.summingDouble(Double::doubleValue));
+        double spending = getCurrentSpending(customer.getId());
 
         List<MembershipTier> tiers = em
                 .createQuery("SELECT m FROM MembershipTier m ORDER BY m.multiplier ASC", MembershipTier.class)
                 .getResultList();
         MembershipTier membershipTier = tiers.get(0);
+
         for (MembershipTier tier : tiers) {
             if (spending > tier.getMinSpend()) {
                 membershipTier = tier;
@@ -658,6 +681,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         membershipPoints = membershipPoints
                 + (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier());
         customer.setMembershipPoints(membershipPoints);
+    }
+
+    public double getCurrentSpending(Long customerId) {
+        TypedQuery<CustomerOrder> q = em.createQuery(
+                "SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date", CustomerOrder.class);
+        q.setParameter("id", customerId);
+        q.setParameter("date", Timestamp.valueOf(LocalDateTime.now().minusYears(2)), TemporalType.TIMESTAMP);
+
+        return q.getResultList()
+                .stream()
+                .map(x -> x.getPayments())
+                .map(x -> x.stream().mapToDouble(y -> y.getAmount()).sum())
+                .collect(Collectors.summingDouble(Double::doubleValue));
     }
 
     /*
@@ -741,6 +777,26 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    public Map<String, Integer> getPickingList(Long siteId) throws ProductException {
+        Query q = em
+                .createNativeQuery(
+                        "SELECT li.product_sku, sum(li.qty) FROM CUSTOMER_ORDER co, CUSTOMER_ORDERLI li, CUSTOMER_ORDER_LINE_ITEMS WHERE co.id = customer_order_id AND li.id = line_items_id AND co.status = :status AND site_id = "
+                                + siteId + " GROUP BY li.product_sku")
+                .setParameter("status", "PENDING");
+
+        Map<String, Integer> pickingList = new HashMap<>();
+
+        for (Object object : q.getResultList()) {
+            Object[] array = (Object[]) object;
+
+            BigInteger qty = (BigInteger) array[1];
+            pickingList.put((String) array[0], qty.intValue());
+        }
+
+        return pickingList;
+    }
+
+    @Override
     public OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
         Site actionBy = em.find(Site.class, siteId);
@@ -790,7 +846,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     }
                     if (picked) {
                         onlineOrder.addStatusHistory(
-                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
+                                new OOStatus(onlineOrder.getSite(), new Date(),
+                                        OnlineOrderStatusEnum.PICKED));
                     }
                     return em.merge(onlineOrder);
                 }
@@ -813,7 +870,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         }
                         if (packed) {
                             onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
+                                    new OOStatus(onlineOrder.getSite(), new Date(),
+                                            OnlineOrderStatusEnum.PACKED));
                         }
                         return em.merge(onlineOrder);
                     }
@@ -846,7 +904,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     }
                     if (picked) {
                         onlineOrder.addStatusHistory(
-                                new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PICKED));
+                                new OOStatus(onlineOrder.getSite(), new Date(),
+                                        OnlineOrderStatusEnum.PICKED));
                     }
                     return em.merge(onlineOrder);
                 }
@@ -869,7 +928,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         }
                         if (packed) {
                             onlineOrder.addStatusHistory(
-                                    new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PACKED));
+                                    new OOStatus(onlineOrder.getSite(), new Date(),
+                                            OnlineOrderStatusEnum.PACKED));
                         }
                         return em.merge(onlineOrder);
                     }

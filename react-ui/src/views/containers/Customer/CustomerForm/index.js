@@ -183,7 +183,7 @@ const CustomerFormBody = ({
                     <div>
                       <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                         <h3 className="text-lg leading-6 font-medium mt-12 text-gray-900">
-                          Delivering Address
+                          Delivery Address
                         </h3>
                       </div>
                       <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
@@ -216,7 +216,7 @@ const CustomerFormBody = ({
                           />
                         </SimpleInputGroup>
                         <SimpleInputGroup
-                          label="Street/ Building/ Road"
+                          label="Street / Building / Road"
                           inputField="Street Name/Building/ Road"
                           className="sm:mt-0 sm:col-span-2">
                           <SimpleInputBox
@@ -258,7 +258,7 @@ const CustomerFormBody = ({
                           />
                         </SimpleInputGroup>
                         <SimpleInputGroup
-                          label="zip"
+                          label="Zip / Postal Code"
                           inputField="zip"
                           className="sm:mt-0 sm:col-span-2">
                           <SimpleInputBox
@@ -272,7 +272,7 @@ const CustomerFormBody = ({
                           />
                         </SimpleInputGroup>
                         <SimpleInputGroup
-                          label="city"
+                          label="City"
                           inputField="city"
                           className="sm:mt-0 sm:col-span-2">
                           <SimpleInputBox
@@ -286,7 +286,7 @@ const CustomerFormBody = ({
                           />
                         </SimpleInputGroup>
                         <SimpleInputGroup
-                          label="state"
+                          label="State"
                           inputField="state"
                           className="sm:mt-0 sm:col-span-2">
                           <SimpleInputBox

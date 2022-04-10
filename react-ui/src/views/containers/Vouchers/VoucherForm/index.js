@@ -315,10 +315,10 @@ export const VoucherForm = () => {
     dispatch(
       addNewVouchers({
         initialVoucher: {
-          campaign,
-          amount: value,
-          expiry: expDate,
-          customerIds: selectedCustomer.map((value) => value.id)
+            campaign,
+            amount : value,
+            expiry : Date.parse(expDate),
+            customerIds: selectedCustomer.map((value) => value.id)
         }, quantity
       })
     )
@@ -349,7 +349,6 @@ export const VoucherForm = () => {
     const customers = [];
     selectedRowKeys.map((key) => customers.push(data[key]));
     setSelectedCustomer([...customers]);
-    console.log(selectedCustomer)
     setOpen(false);
   };
 

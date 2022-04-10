@@ -59,7 +59,7 @@ const ProductList = ({ products, openModal, onProductSelectedChanged }) => {
   );
 };
 
-const RFIDModal = ({
+export const RFIDModal = ({
   open,
   closeModal,
   product,
@@ -216,7 +216,6 @@ export const ProductSearch = () => {
   });
 
   const canSearch = Boolean(search);
-  // console.log(products)
   const onSearchClicked = (evt) => {
     evt.preventDefault();
     const fetchProducts = async () => {

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lange="en" xmlns:th="http://www.iora.com" />
+
+<head>
+    <title th:remove="all">Template for HTML email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<style type="text/css">
+    td,th, tr {
+        border: 1px solid #000000;
+        text-align: left;
+        padding: 8px;
+    }
+</style>
+
+<body>
+    <div class="grid-container" style="border-radius: 1px;">
+        <div style="grid-area: header">
+            <img style="height: 120px; width: 200px; margin: auto; display: block;"
+                src="https://cloudfront.gotomalls.com/uploads/retailers/logo/LB2fm8vWvnNUmpay-LB2eHKLOVIgO5DTF-iora-1489037898_1.jpg" />
+        </div>
+        <p>
+            Dear Customer, thank you for shopping at iORA!
+        </p>
+        <p>
+            You have successfully placed an order with us on
+            <span th:text="${#dates.format(dateTime, 'dd-MM-yyyy HH:mm')}">28 12 2012</span>
+        </p>
+
+        <table id="itemsTable" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="lineItem : ${orderLineItems}" style="text-align: left; padding: 8px;">
+                    <td>
+                        <p th:text="${lineItem.product.sku}"></p>
+                        <span th:each="field : ${lineItem.product.productFields}">
+                            <span th:text="${field.fieldName}"></span>
+                            <span>:</span>
+                            <span th:text="${field.fieldValue}"></span>
+                        </span>
+                    </td>
+                    <td th:text="${lineItem.qty}"></td>
+                    <td th:text="${lineItem.subTotal}"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td style="font-weight: bold;">Total</td>
+                    <td th:text="${totalAmount}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <p>
+        Best regards, <br />
+        <em>iORA Group</em>
+    </p>
+</body>
+
+</html>

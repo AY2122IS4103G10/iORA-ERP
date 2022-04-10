@@ -167,14 +167,6 @@ public class Customer implements Serializable {
         this.contactNumber = contactNumber;
     }
 
-    public List<CustomerOrder> getCustomerOrders() {
-        return this.orders;
-    }
-
-    public void setCustomerOrders(List<CustomerOrder> orders) {
-        this.orders = orders;
-    }
-
     @Override
     public String toString() {
         return String.format(

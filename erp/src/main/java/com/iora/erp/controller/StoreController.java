@@ -458,6 +458,26 @@ public class StoreController {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }    
+
+    @GetMapping(path = "/member/vouchers/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> getVouchersOfCustomer(@PathVariable Long customerId) {
+        try {
+            return ResponseEntity.ok(customerService.getVouchersOfCustomer(customerId));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/member/spending/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> getCurrentSpending(@PathVariable Long customerId) {
+        try {
+            return ResponseEntity.ok(customerOrderService.getCurrentSpending(customerId));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
     @GetMapping(path = "/voucher/{voucherCode}", produces = "application/json")

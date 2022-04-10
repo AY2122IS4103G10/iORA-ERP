@@ -5,7 +5,7 @@ import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { onlineOrderApi } from "../../../../environments/Api";
+import { api, onlineOrderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import {
   SelectColumnFilter,
@@ -61,6 +61,8 @@ export const OnlineOrderList = ({ subsys }) => {
         const { data } = await (subsys === "str"
           ? onlineOrderApi.getAllPickupOfSite(currSiteId)
           : onlineOrderApi.getAllBySite(currSiteId));
+
+
         setData(data);
         setLoading(false);
       } catch (error) {
@@ -72,7 +74,7 @@ export const OnlineOrderList = ({ subsys }) => {
     };
     fetchOnlineOrdersOfSite();
   }, [currSiteId, addToast, subsys]);
-
+  console.log(data)
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);
 

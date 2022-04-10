@@ -16,13 +16,13 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
 import com.iora.erp.exception.SupportTicketException;
+import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customer.Voucher;
-import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
 import com.iora.erp.utils.StringGenerator;
 
@@ -37,6 +37,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private SiteService siteService;
     @PersistenceContext
     private EntityManager em;
     @Autowired
@@ -214,20 +216,20 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Voucher> generateVouchers(Voucher voucher, int qty) throws CustomerException {
+    public List<Voucher> generateVouchers(String campaign, double amount, Date expiry, List<Integer> customerIds,
+            int qty) throws CustomerException {
         List<Voucher> vouchers = new ArrayList<>();
+        if (customerIds == null) {
+            customerIds = new ArrayList<>();
+        }
 
-        String campaign = voucher.getCampaign();
-        double amount = voucher.getAmount();
-        Date expDate = voucher.getExpiry();
-        List<Long> customerIds = voucher.getCustomerIds();
         qty = qty < customerIds.size() ? customerIds.size() : qty;
 
         for (int i = 0; i < qty; i++) {
-            Voucher v = new Voucher(campaign, amount, expDate, customerIds);
+            Voucher v = new Voucher(campaign, amount, expiry);
             em.persist(v);
             if (i < customerIds.size()) {
-                issueVoucher(v.getVoucherCode(), customerIds.get(i));
+                issueVoucher(v.getVoucherCode(), Long.valueOf(customerIds.get(i)));
             }
             vouchers.add(v);
         }
@@ -245,7 +247,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<Voucher> getVouchersOfCustomer(Long customerId) throws CustomerException {
         return em
-                .createQuery("SELECT DISTINCT v FROM Voucher v WHERE :customerId MEMBER OF v.customerIds",
+                .createQuery("SELECT v FROM Voucher v WHERE v.customerId = :customerId",
                         Voucher.class)
                 .setParameter("customerId", customerId)
                 .getResultList();
@@ -272,13 +274,10 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Voucher issueVoucher(String voucherCode, Long customerId) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
-        voucher.addCustomerId(customerId);
+        voucher.setCustomerId(customerId);
         Customer customer = getCustomerById(customerId);
 
-        emailService.sendSimpleMessage(customer.getEmail(), "iORA S$" + voucher.getAmount() + " Voucher",
-                "Dear customer, Your S$" + voucher.getAmount() + " voucher code is " + voucher.getVoucherCode()
-                        + ". Please redeem it any of our physical or online stores before the expiry date "
-                        + new SimpleDateFormat("yyyy-mm-dd").format(voucher.getExpiry()));
+        emailService.sendVoucherCode(customer, voucher);
         voucher.setIssued(true);
 
         return voucher;
@@ -362,8 +361,20 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public SupportTicket createSupportTicket(SupportTicket supportTicket) {
+    public List<SupportTicket> getPublicSupportTickets() {
+        TypedQuery<SupportTicket> q = em.createQuery("SELECT st FROM SupportTicket st WHERE st.status = :status",
+                SupportTicket.class);
+        q.setParameter("status", SupportTicket.Status.RESOLVED);
+        return q.getResultList();
+    }
+
+    @Override
+    public SupportTicket createSupportTicket(SupportTicket supportTicket) throws CustomerException {
         em.persist(supportTicket);
+        Customer c = getCustomerById(supportTicket.getCustomer().getId());
+        c.addSupportTicket(supportTicket);
+        siteService.getSite(1L).addNotification(new Notification("Support Ticket # " + supportTicket.getId(), "New ticket"));
+        em.merge(c);
         return supportTicket;
     }
 
@@ -389,9 +400,9 @@ public class CustomerServiceImpl implements CustomerService {
             throw new SupportTicketException("Ticket has already been resolved.");
         } else if (st.getStatus() == SupportTicket.Status.PENDING) {
             st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
-            emailService.sendSimpleMessage(st.getCustomer().getEmail(), "Support Ticket #" + id,
-                    "You have a new reply: " + message);
+            emailService.sendTicketReply(st.getCustomer(), st, message);
         } else {
+            siteService.getSite(1L).addNotification(new Notification("Support Ticket # " + id, "Reply from customer"));
             st.setStatus(SupportTicket.Status.PENDING);
         }
 

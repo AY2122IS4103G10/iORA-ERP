@@ -163,13 +163,11 @@ const PickPackList = ({
         },
       },
     ];
-  }, [setData, status, handlePickPack,  onSaveQuanityClicked]);
+  }, [setData, status, handlePickPack, onSaveQuanityClicked]);
 
   const hiddenColumns =
     manufacturing.id !== currSiteId ||
-    ["MANUFACTURED", "PICKING", "PACKING", "ACCEPTED"].every(
-      (s) => s !== status
-    )
+    ["PICKING", "PACKING", "ACCEPTED"].every((s) => s !== status)
       ? ["[editButton]"]
       : [];
 
@@ -179,26 +177,6 @@ const PickPackList = ({
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           Picking / Packing List
         </h3>
-        {data
-          .map((item) =>
-            status === "PICKING" || status === "ACCEPTED"
-              ? item.pickedQty
-              : item.packedQty
-          )
-          .every((qty) => qty !== 0) &&
-          manufacturing.id === currSiteId && (
-            <button
-              type="button"
-              className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
-              onClick={() => {
-                setShowConfirm(true);
-              }}
-            >
-              <span>
-                Complete {status === "PICKING" ? "Picking" : "Packing"}
-              </span>
-            </button>
-          )}
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
@@ -310,20 +288,18 @@ export const StockTransferPickPack = () => {
   };
 
   const onSaveQuanityClicked = async (_, sku, qty) => {
-    await dispatch(adjustAtFrom({ orderId: order.id, sku, qty }))
-      .unwrap()
-      .then(() => {
-        addToast(`Success: Updated quantity.`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-      })
-      .catch((error) => {
-        addToast(`Error: ${error.response.data}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
+    try {
+      await dispatch(adjustAtFrom({ orderId: order.id, sku, qty })).unwrap();
+      addToast(`Success: Updated quantity.`, {
+        appearance: "success",
+        autoDismiss: true,
       });
+    } catch (error) {
+      addToast(`Error: ${error.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
   };
   return (
     <>

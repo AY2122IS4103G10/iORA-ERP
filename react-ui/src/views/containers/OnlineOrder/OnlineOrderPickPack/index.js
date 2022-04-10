@@ -22,7 +22,7 @@ const PickPackList = ({
   site,
   currSiteId,
   delivery,
-  pickupSite
+  pickupSite,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
@@ -159,7 +159,7 @@ const PickPackList = ({
     ];
   }, [handlePickPack, setData, status, onSaveQuanityClicked]);
   const hiddenColumns =
-    (delivery ? site.id !== currSiteId : pickupSite.id !== currSiteId) ||
+    site.id !== currSiteId ||
     ["PENDING", "PICKING", "PACKING"].every((s) => s !== status)
       ? ["[editButton]"]
       : [];
@@ -192,14 +192,13 @@ export const OnlineOrderPickPack = () => {
     currSiteId,
     status: st,
     setStatus,
-    statusHistory,
     setStatusHistory,
     lineItems,
     setLineItems,
     openInvoice,
     pickupSite,
     site,
-    delivery
+    delivery,
   } = useOutletContext();
 
   const status = st.status;
@@ -313,8 +312,7 @@ export const OnlineOrderPickPack = () => {
               (s) => s === status
             ) ? (
               ["PICKED", "PACKED"].some((s) => s === status) ? (
-                statusHistory[0].actionBy.id === currSiteId ||
-                (pickupSite && pickupSite.id === currSiteId) ? (
+                site.id === currSiteId ? (
                   <section
                     aria-labelledby="confirm"
                     className="flex justify-center"
@@ -343,8 +341,7 @@ export const OnlineOrderPickPack = () => {
                   </div>
                 )
               ) : (
-                (statusHistory[0].actionBy.id === currSiteId ||
-                  (pickupSite && pickupSite.id === currSiteId)) && (
+                site.id === currSiteId && (
                   <section aria-labelledby="scan-items">
                     <ScanItemsSection
                       search={search}

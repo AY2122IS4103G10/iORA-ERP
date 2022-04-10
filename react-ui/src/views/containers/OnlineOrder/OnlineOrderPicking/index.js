@@ -280,7 +280,7 @@ export const OnlineOrderPicking = ({ subsys }) => {
       setLoading(true);
       try {
         const { data } = await api.getAll(`online/pickingList/${currSiteId}`);
-        const { data: orders } = await api.getAll(`logistics/procurementOrder/${currSiteId}/PENDING`);
+        const { data: orders } = await api.getAll(`online/order/${currSiteId}/PENDING`);
         const lineItems = Object.keys(data).map((key, index) => ({
           id: index + 1,
           sku: key,

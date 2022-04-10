@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StoreSite;
@@ -25,6 +26,7 @@ public class OnlineOrder extends CustomerOrder {
 
     private boolean delivery;
 
+    @JsonIgnoreProperties({"stockLevel"})
     @ManyToOne
     private StoreSite pickupSite;
 

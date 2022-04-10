@@ -1,21 +1,23 @@
 package com.iora.erp.service;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.customer.Customer;
+import com.iora.erp.model.customer.SupportTicket;
+import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import org.thymeleaf.context.IContext;
 
 @Component
@@ -23,21 +25,10 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private JavaMailSender emailSender;
-
     @Autowired
     private TemplateEngine templateEngine;
 
-    @Override
-    public void sendSimpleMessage(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("iorasalesmail@gmail.com");
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        emailSender.send(message);
-    }
-
-    public void sendHTMLMessage(String to, String subject, String templateName, IContext context) {
+    private void sendHTMLMessage(String to, String subject, String templateName, IContext context) {
         MimeMessage msg = emailSender.createMimeMessage();
         String body = templateEngine.process(templateName, context);
         try {
@@ -54,34 +45,74 @@ public class EmailServiceImpl implements EmailService {
         emailSender.send(msg);
     }
 
+    private void sendSimpleHTMLMessage(String to, String subject, String name, String agenda, String code,
+            String text) {
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("agenda", agenda);
+        context.setVariable("code", code);
+        context.setVariable("text", text);
+        sendHTMLMessage(to, subject, "simpleTemplate", context);
+    }
+
     @Override
     public void sendTemporaryPassword(Employee employee, String tempPassword) {
-        sendSimpleMessage(
+        String text = "Please login and change your password immediately.";
+        sendSimpleHTMLMessage(
                 employee.getEmail(),
-                "Your iORA Account Details",
-                "Hello " + employee.getName() + ", your login username is: " + employee.getUsername() + " and your temporary password is : "
-                        + tempPassword + ". Please login and change your password immediately.");
+                "iORA ERP Temporary Password",
+                employee.getUsername(),
+                "temporary password",
+                tempPassword,
+                text);
     }
 
     @Override
     public void sendCustomerPassword(Customer customer, String tempPassword) {
-        sendSimpleMessage(
-        customer.getEmail(),
+        String text = "Please login and change your password immediately.";
+        sendSimpleHTMLMessage(
+                customer.getEmail(),
                 "iORA Password Reset",
-                "Hello " + customer.getLastName() + ", your new password is : "
-                        + tempPassword + ". Please login and change your password immediately.");
+                customer.getLastName(),
+                "temporary password",
+                tempPassword,
+                text);
     }
 
     @Override
     public void sendOnlineOrderConfirmation(Customer customer, OnlineOrder order) {
-        org.thymeleaf.context.Context context = new org.thymeleaf.context.Context();
+        Context context = new Context();
 
         context.setVariable("dateTime", order.getDateTime());
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
         String subject = "Order Confirmation #" + order.getId();
         sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
-
-        
     }
+
+    @Override
+    public void sendVoucherCode(Customer customer, Voucher voucher) {
+        String text = "Please redeem it any of our physical or online stores before the expiry date "
+                + new SimpleDateFormat("yyyy-mm-dd").format(voucher.getExpiry());
+
+        sendSimpleHTMLMessage(
+                customer.getEmail(),
+                "iORA Voucher Code", customer.getLastName(),
+                "new $" + voucher.getAmount() + " voucher code",
+                voucher.getVoucherCode(),
+                text);
+    }
+
+    @Override
+    public void sendTicketReply(Customer customer, SupportTicket supportTicket, String message) {
+        String text = "Please login to iORA website to view / reply to this ticket";
+        sendSimpleHTMLMessage(
+                customer.getEmail(),
+                "iORA Support Ticket Reply",
+                customer.getLastName(),
+                "Support Ticket #" + supportTicket.getId() + " new reply",
+                message,
+                text);
+    }
+
 }

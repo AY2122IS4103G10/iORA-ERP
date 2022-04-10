@@ -277,10 +277,7 @@ public class CustomerServiceImpl implements CustomerService {
         voucher.setCustomerId(customerId);
         Customer customer = getCustomerById(customerId);
 
-        emailService.sendSimpleMessage(customer.getEmail(), "iORA S$" + voucher.getAmount() + " Voucher",
-                "Dear customer, Your S$" + voucher.getAmount() + " voucher code is " + voucher.getVoucherCode()
-                        + ". Please redeem it any of our physical or online stores before the expiry date "
-                        + new SimpleDateFormat("yyyy-mm-dd").format(voucher.getExpiry()));
+        emailService.sendVoucherCode(customer, voucher);
         voucher.setIssued(true);
 
         return voucher;
@@ -404,8 +401,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new SupportTicketException("Ticket has already been resolved.");
         } else if (st.getStatus() == SupportTicket.Status.PENDING) {
             st.setStatus(SupportTicket.Status.PENDING_CUSTOMER);
-            emailService.sendSimpleMessage(st.getCustomer().getEmail(), "Support Ticket #" + id,
-                    "You have a new reply: " + message);
+            emailService.sendTicketReply(st.getCustomer(), st, message);
         } else {
             siteService.getSite(1L).addNotification(new Notification("Support Ticket # " + id, "Reply from customer"));
             st.setStatus(SupportTicket.Status.PENDING);

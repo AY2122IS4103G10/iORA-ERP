@@ -59,7 +59,7 @@ public class OnlineCustomerController {
 
     /*
      * ---------------------------------------------------------
-     * G.1 Customer Purchase Management
+     * Customer Purchase Management
      * ---------------------------------------------------------
      */
 
@@ -248,6 +248,22 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/order/site/{siteId}", produces = "application/json")
+    public List<OnlineOrder> getOnlineOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return customerOrderService.getOnlineOrdersOfSite(site);
+    }
+
+    @GetMapping(path = "/order/status/{status}", produces = "application/json")
+    public ResponseEntity<Object> getOnlineOrdersByStatus(@PathVariable String status) {
+        try {
+            return ResponseEntity.ok(customerOrderService.getOnlineOrdersByStatus(status));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/searchOrder/{siteId}", produces = "application/json")
     public List<OnlineOrder> searchOnlineOrders(@PathVariable Long siteId, @RequestParam String orderId) {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
@@ -378,6 +394,12 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
+    /*
+     * ---------------------------------------------------------
+     * Ecommerce
+     * ---------------------------------------------------------
+     */
 
     // Get models by fashion line (iORA) and tag (top)
     // Return empty list if no results

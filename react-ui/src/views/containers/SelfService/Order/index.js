@@ -1,7 +1,8 @@
-import { Dialog, Transition } from "@headlessui/react";
+import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
-import { MinusSmIcon, PlusSmIcon, XCircleIcon } from "@heroicons/react/solid";
+import { CheckIcon, MinusSmIcon, PlusSmIcon, SelectorIcon, XCircleIcon } from "@heroicons/react/solid";
 import ProgressBar from "@ramonak/react-progress-bar";
+import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,8 +18,14 @@ import {
 } from "../../../../stores/slices/membershipTierSlice";
 import ManageCheckout from "../ManageCheckout";
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
+
 const OrderList = ({
   customer,
+  customerVouchers,
+  filteredVouchers,
   currTier,
   nextTier,
   lineItems,
@@ -28,6 +35,7 @@ const OrderList = ({
   rfid,
   voucher,
   voucherCode,
+  setQuery,
   onRfidChanged,
   addRfidClicked,
   onVoucherChanged,
@@ -276,17 +284,67 @@ const OrderList = ({
           >
             Voucher
           </label>
-          <input
-            type="text"
-            name="voucher"
-            id="voucher"
-            autoComplete="voucher"
-            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block col-span-3 sm:text-sm border-gray-300 rounded-md"
-            placeholder="XXXXXXXXXX"
-            value={voucherCode}
-            onChange={onVoucherChanged}
-            aria-describedby="voucher"
-          />
+          {customerVouchers ?
+            <Combobox as="div" value={voucherCode} onChange={onVoucherChanged} className="col-span-3">
+              <div className="relative">
+                <Combobox.Input
+                  className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
+                  onChange={(event) => setQuery(event.target.value)}
+                  displayValue={(voucher) => voucher.voucherCode || voucher}
+                  placeholder="Choose One"
+                />
+                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                  <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </Combobox.Button>
+
+                {filteredVouchers.length > 0 && (
+                  <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    {filteredVouchers.map((voucher, index) => (
+                      <Combobox.Option
+                        key={index}
+                        value={voucher.voucherCode}
+                        className={({ active }) =>
+                          classNames(
+                            'relative cursor-default select-none py-2 pl-3 pr-9',
+                            active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                          )
+                        }
+                      >
+                        {({ active, selected }) => (
+                          <>
+                            <span className={classNames('block truncate', selected && 'font-semibold')}>
+                              {`${voucher.campaign}: $${voucher.amount} voucher (expiring ${moment(voucher.expiry).format("DD/MM/yyyy")})`}
+                            </span>
+
+                            {selected && (
+                              <span
+                                className={classNames(
+                                  'absolute inset-y-0 right-0 flex items-center pr-4',
+                                  active ? 'text-white' : 'text-indigo-600'
+                                )}
+                              >
+                                <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Combobox.Option>
+                    ))}
+                  </Combobox.Options>
+                )}
+              </div>
+            </Combobox>
+            : <input
+              type="text"
+              name="voucher"
+              id="voucher"
+              autoComplete="voucher"
+              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block col-span-3 sm:text-sm border-gray-300 rounded-md"
+              placeholder="XXXXXXXXXX"
+              value={voucherCode}
+              onChange={onVoucherChanged}
+              aria-describedby="voucher"
+            />}
           <button
             type="submit"
             className="col-span-1 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -326,9 +384,8 @@ const OrderList = ({
                     bgColor="#4f46e5"
                     completed={`${customer.currSpend + 150}`}
                     maxCompleted={nextTier.minSpend + 150}
-                    customLabel={`$${
-                      nextTier.minSpend - customer.currSpend
-                    } more to ${nextTier.name}`}
+                    customLabel={`$${nextTier.minSpend - customer.currSpend
+                      } more to ${nextTier.name}`}
                   />
                 </div>
               </>
@@ -506,6 +563,12 @@ export function Order() {
   const [useReader, setUseReader] = useState(true);
   const siteId = localStorage?.getItem("siteId");
   const customer = useSelector((state) => selectSSCustomer(state));
+  const [customerVouchers, setCustomerVouchers] = useState([]);
+  const [query, setQuery] = useState("");
+  const filteredVouchers =
+    query === ''
+      ? customerVouchers
+      : customerVouchers.filter((voucher) => voucher.voucherCode.includes(query))
   const membershipTiers = useSelector((state) =>
     selectAllMembershipTiers(state)
   );
@@ -651,6 +714,11 @@ export function Order() {
   };
 
   const onVoucherChanged = (e) => {
+    if (!e?.target?.value) {
+      setVoucherCode(e);
+      fetchVoucher(e);
+      return;
+    }
     if (e.target.value.length - voucherCode.length > 9) {
       fetchVoucher(e.target.value);
     }
@@ -707,6 +775,11 @@ export function Order() {
     dispatch(fetchMembershipTiers());
   }, [dispatch]);
 
+  useEffect(() => {
+    customer?.id && posApi.getVoucherCodes(customer.id)
+      .then(({ data }) => setCustomerVouchers(data));
+  }, [customer]);
+
   return (
     <>
       {!renderSummary && (
@@ -731,6 +804,8 @@ export function Order() {
       {!renderSummary && (
         <OrderList
           customer={customer}
+          customerVouchers={customerVouchers}
+          filteredVouchers={filteredVouchers}
           currTier={currTier}
           nextTier={nextTier}
           rfid={rfid}
@@ -744,6 +819,7 @@ export function Order() {
           addRfidClicked={addRfidClicked}
           onVoucherChanged={onVoucherChanged}
           addVoucherClicked={addVoucherClicked}
+          setQuery={setQuery}
           Modify={Modify}
           openModal={openModal}
           openCheckoutModal={openCheckoutModal}

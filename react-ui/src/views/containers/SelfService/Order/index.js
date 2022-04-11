@@ -817,7 +817,6 @@ export function Order() {
     setVoucher({
       campaign: "membership points",
       amount: memPts,
-      voucherCode: "USEMEM",
     });
   };
 

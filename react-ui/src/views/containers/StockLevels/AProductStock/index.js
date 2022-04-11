@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { getAProduct } from "../../../../stores/slices/productSlice";
 import {
@@ -12,20 +13,13 @@ import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchModelBySku } from "../../StockTransfer/StockTransferForm";
 
-const columns = [
-  {
-    Header: "Quantity",
-    accessor: "qty",
-  },
-];
-
 export const AProductStock = ({ subsys }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const stocklevel = useSelector(selectProductStock);
-
+  console.log(stocklevel);
   useEffect(() => {
     const fetchProduct = async () => {
       const data = await dispatch(getAProduct(id)).unwrap();
@@ -40,6 +34,39 @@ export const AProductStock = ({ subsys }) => {
     };
     onPageLoad();
   }, [dispatch, id]);
+
+  const columns = [
+    {
+      Header: "#",
+      accessor: "site.id",
+    },
+    {
+      Header: "Code",
+      accessor: "site.siteCode",
+    },
+    {
+      Header: "Name",
+      accessor: "site.name",
+      Cell: (e) => {
+        return (
+          <Link
+            to={`/${subsys}/stocklevels/${e.row.original.site.id}`}
+            className="hover:underline"
+          >
+            {e.value}
+          </Link>
+        );
+      },
+    },
+    {
+      Header: "Phone",
+      accessor: "site.phoneNumber",
+    },
+    {
+      Header: "Qty",
+      accessor: "qty",
+    },
+  ];
 
   return loading ? (
     <div className="flex mt-5 items-center justify-center">

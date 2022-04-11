@@ -247,7 +247,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                                 "Customer does not have enough points for the membership points redemption.");
                     }
                     v = new Voucher(v.getCampaign(), v.getAmount(), new Date(System.currentTimeMillis() + 86400000));
-                    v.setCustomerId(c.getId());
                     v.setCustomerOrder(customerOrder);
                     v.setIssued(true);
                     v.setRedeemed(true);

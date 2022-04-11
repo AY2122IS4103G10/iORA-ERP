@@ -274,7 +274,6 @@ public class OnlineCustomerController {
         }
     }
 
-
     @GetMapping(path = "/searchOrder/{siteId}", produces = "application/json")
     public List<OnlineOrder> searchOnlineOrders(@PathVariable Long siteId, @RequestParam String orderId) {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
@@ -338,6 +337,28 @@ public class OnlineCustomerController {
     public ResponseEntity<Object> getPickingList(@PathVariable Long siteId) {
         try {
             return ResponseEntity.ok(customerOrderService.getPickingList(siteId));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/startPick", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> startPick(@RequestBody List<Long> orderIds) {
+        try {
+            customerOrderService.startPick(orderIds);
+            return ResponseEntity.ok().build();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/finishPick", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> finishPick(@RequestBody List<Long> orderIds) {
+        try {
+            customerOrderService.finishPick(orderIds);
+            return ResponseEntity.ok().build();
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());

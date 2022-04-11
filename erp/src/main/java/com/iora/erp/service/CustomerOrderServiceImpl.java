@@ -28,6 +28,7 @@ import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
+import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.company.Address;
@@ -330,7 +331,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI) {
+    public CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI) throws ModelException {
+        customerOrderLI.setSubTotal(customerOrderLI.getQty()
+                * productService.getModelByProduct(customerOrderLI.getProduct()).getDiscountPrice());
         em.persist(customerOrderLI);
         return customerOrderLI;
     }
@@ -885,6 +888,26 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         return pickingList;
+    }
+
+    @Override
+    public void startPick(List<Long> orderIds) throws CustomerOrderException {
+        for (int i = 0; i < orderIds.size(); i++) {
+            OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderIds.get(i));
+            Site actionBy = onlineOrder.getLastActor();
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.PICKING));
+            updateOnlineOrder(onlineOrder);
+        }
+    }
+
+    @Override
+    public void finishPick(List<Long> orderIds) throws CustomerOrderException {
+        for (int i = 0; i < orderIds.size(); i++) {
+            OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderIds.get(i));
+            Site actionBy = onlineOrder.getLastActor();
+            onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.PICKED));
+            updateOnlineOrder(onlineOrder);
+        }
     }
 
     @Override

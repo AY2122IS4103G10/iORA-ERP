@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -22,6 +23,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
+import com.iora.erp.enumeration.ParcelSize;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
@@ -1216,5 +1218,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 .setParameter("end", dateEnd);
 
         return q.getResultList();
+    }
+
+    @Override
+    public List<ParcelSize> getParcelSizes() {
+        return Arrays.asList(ParcelSize.values());
     }
 }

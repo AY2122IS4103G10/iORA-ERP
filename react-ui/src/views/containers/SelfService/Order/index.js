@@ -404,13 +404,13 @@ const OrderList = ({
                 <>
                   <div className="col-span-2 grid grid-rows-1">
                     <label for="memPts" className="form-label text-sm mt-2">
-                      Use {memPts}/{customer.membershipPoints} points
+                      Use {memPts}/{Math.min(customer.membershipPoints, amount)} points
                     </label>
                     <input
                       type="range"
                       className="accent-indigo-600 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
                       min={0}
-                      max={customer.membershipPoints}
+                      max={Math.min(customer.membershipPoints, amount)}
                       value={memPts}
                       onChange={(e) => setMemPts(e.target.value)}
                       id="memPts"

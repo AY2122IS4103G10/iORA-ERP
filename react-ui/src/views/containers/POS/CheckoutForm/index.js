@@ -220,7 +220,6 @@ export const CheckoutForm = ({
       setVoucher({
         campaign: "membership points",
         amount: memPts,
-        voucherCode: "USEMEM",
       });
       setVoucherDiscount(memPts);
       addToast(`Success: Claiming ${memPts} points for $${memPts} discount`, {

@@ -1,15 +1,21 @@
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Combobox, Dialog } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
 import {
+  CheckIcon,
   ExclamationIcon,
   MinusSmIcon,
   PlusSmIcon,
+  SelectorIcon
 } from "@heroicons/react/solid";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { api, posApi } from "../../../../environments/Api";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { CheckoutForm } from "../CheckoutForm";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 const OrderList = ({
   rfid,
@@ -24,71 +30,87 @@ const OrderList = ({
   openSureModal,
   searchProducts,
 }) => {
-  const [focusInput, setFocusInput] = useState(false);
-  const [focusDropdown, setFocusDropdown] = useState(false);
   return (
     <main>
       <div className="max-w-6xl mx-auto py-2 px-4 sm:py-2 sm:px-6">
         <form>
-          <div>
-            <label
-              htmlFor="rfid"
-              className="block mt-8 text-sm font-medium text-gray-700"
-            >
+          <Combobox as="div" value={rfid} onChange={onRfidChanged}>
+            <Combobox.Label className="block mt-8 text-sm font-medium text-gray-700">
               SKU Code or RFID
-            </label>
-            <div className="mt-1 flex space-x-2">
-              <Menu as="div" className="relative inline-block text-left py-1">
-                <Transition
-                  show={Boolean(rfid) && (focusInput || focusDropdown)}
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <Menu.Items
-                    className="origin-top-left absolute left-0 m-2 mt-9 w-56 max-h-96 overflow-y-scroll rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-20 focus:outline-none z-10"
-                    onFocus={() => setFocusDropdown(true)}
-                    onBlur={() => setFocusDropdown(false)}
-                  >
-                    <div className="py-1">
-                      {searchProducts.map((prod, index) => (
-                        <Menu.Item key={index}>
-                          <button
-                            className="w-full items-start text-left"
-                            value={prod.name}
-                            onClick={(e) => addRfidClicked(e, prod.name)}
-                          >
-                            <h4 className="text-sm my-1 px-3 font-medium">
-                              {prod.name}
-                            </h4>
-                            <p className="text-xs my-1 px-3">
-                              {prod.fields[1]} {prod.fields[0]}
-                            </p>
-                          </button>
-                        </Menu.Item>
-                      ))}
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
-              <input
-                type="text"
-                name="rfid"
-                id="rfid"
-                autoComplete="rfid"
-                className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-10/12 sm:text-sm border-gray-300 rounded-md"
-                placeholder="10-0001234-0XXXXX-0000XXXXX or AA0009876-1"
-                value={rfid}
+            </Combobox.Label>
+            <div className="flex relative mt-1">
+              <Combobox.Input
+                className="w-10/12 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm"
                 onChange={onRfidChanged}
-                required
-                aria-describedby="rfid"
-                onFocus={() => setFocusInput(true)}
-                onBlur={() => setFocusInput(false)}
               />
+              <Combobox.Button className="relative inset-y-0 right-0 flex items-center rounded-r-md -ml-10 px-2 focus:outline-none">
+                <SelectorIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </Combobox.Button>
+
+              {searchProducts.length > 0 && (
+                <Combobox.Options className="absolute z-10 mt-10 max-h-96 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  {searchProducts.map((prod, index) => (
+                    <Combobox.Option
+                      key={index}
+                      value={prod.name}
+                      className={({ active }) =>
+                        classNames(
+                          "relative cursor-default select-none py-2 pl-3 pr-6",
+                          active ? "bg-cyan-600 text-white" : "text-gray-900"
+                        )
+                      }
+                    >
+                      {({ active, selected }) => (
+                        <>
+                          <div className="flex">
+                            <span
+                              className={classNames(
+                                "flex w-2/12 text-sm truncate",
+                                selected && "font-semibold"
+                              )}
+                            >
+                              {prod.name}
+                            </span>
+                            <span
+                              className={classNames(
+                                "flex w-2/12 truncate text-gray-500",
+                                active ? "text-cyan-200" : "text-gray-500"
+                              )}
+                            >
+                              COLOUR: {prod.fields[1]}
+                            </span>
+                            <span
+                              className={classNames(
+                                "flex w-2/12 truncate text-gray-500",
+                                active ? "text-cyan-200" : "text-gray-500"
+                              )}
+                            >
+                              SIZE: {prod.fields[0]}
+                            </span>
+                          </div>
+
+                          {selected && (
+                            <span
+                              className={classNames(
+                                "absolute inset-y-0 right-0 flex items-center pr-4",
+                                active ? "text-white" : "text-cyan-600"
+                              )}
+                            >
+                              <CheckIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </Combobox.Option>
+                  ))}
+                </Combobox.Options>
+              )}
               <button
                 type="submit"
                 className="w-2/12 flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-sm rounded-md text-white bg-cyan-600 hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -97,7 +119,7 @@ const OrderList = ({
                 Add product
               </button>
             </div>
-          </div>
+          </Combobox>
         </form>
 
         <form className="mt-12">
@@ -116,20 +138,22 @@ const OrderList = ({
                     <div className="ml-4 flex-1 flex flex-col sm:ml-6">
                       <div>
                         <div className="flex justify-between">
-                          <h4 className="text-lg w-7/12">
-                            <strong className="font-medium text-gray-700 hover:text-gray-800">
+                          <div className="text-lg w-7/12">
+                            <h4 className="font-medium text-gray-700 hover:text-gray-800">
                               {productDetails.get(lineItem.product.sku)?.name}
-                            </strong>
-                            <p className="mt-1 flex text-sm text-gray-500">
+                            </h4>
+                            <p className="flex text-sm text-gray-500">
+                              COLOUR:{" "}
                               {productDetails.get(lineItem.product.sku)?.colour}
-                              &nbsp; -- &nbsp;
+                            </p>
+                            <p className="flex text-sm text-gray-500">
+                              SIZE:{" "}
                               {productDetails.get(lineItem.product.sku)
                                 ?.size !== null
                                 ? productDetails.get(lineItem.product.sku)?.size
-                                : null}{" "}
-                              &nbsp;
+                                : null}
                             </p>
-                          </h4>
+                          </div>
                           <div className="text-lg w-1/12">
                             <p className="mt-1 flex font-medium text-sm text-gray-500">
                               QTY
@@ -302,22 +326,22 @@ export const PosPurchaseOrder = () => {
   const openSureModal = () => setSureModalState(true);
   const closeSureModal = () => setSureModalState(false);
   const onRfidChanged = (e) => {
-    e.preventDefault();
-    if (
-      e.target.value.length - rfid.length > 10 &&
-      e.target.value.includes("-")
-    ) {
-      addProduct(e.target.value);
-    } else {
-      setRfid(e.target.value);
-      e.target.value && findSku(e.target.value);
+    const newRfid = e?.target ? e.target.value : e;
+    if (e?.target) e.preventDefault();
+    if (newRfid.length - rfid.length > 7 && newRfid.includes("-")) {
+      addProduct(newRfid);
+      if (e?.currentTarget) e.currentTarget.blur();
+      return;
     }
+    setRfid(newRfid);
+    findSku(newRfid);
   };
 
   const findSku = async (sku) => {
+    if (!sku) return setSearchProducts([]);
     const { data } = await posApi.searchSku(sku);
     setSearchProducts(
-      data.map((prod, index) => {
+      data.slice(0, 10).map((prod, index) => {
         return {
           id: index,
           name: prod.sku,

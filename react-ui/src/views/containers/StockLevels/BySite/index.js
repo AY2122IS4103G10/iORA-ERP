@@ -34,8 +34,8 @@ export const SiteTables = (subsys) => {
   const data = useSelector(selectAllSites);
   const siteStatus = useSelector((state) => state.sites.status);
   useEffect(() => {
-    siteStatus === "idle" && dispatch(getAllSites());
-  }, [dispatch, siteStatus]);
+    dispatch(getAllSites());
+  }, [dispatch]);
 
   const path = "/" + subsys.subsys.subsys + "/stocklevels";
   return siteStatus === "loading" ? (

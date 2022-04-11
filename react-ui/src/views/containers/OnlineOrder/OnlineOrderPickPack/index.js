@@ -195,14 +195,15 @@ const PackageModal = ({
   numPackages,
   onNumPackagesChanged,
   onSaveClicked,
-  packages
+  packages,
+  sizes,
 }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
       <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
         <div className="max-w-3xl mx-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
           <form onSubmit={onSaveClicked}>
-            <div className="p-4 space-y-8 divide-y divide-gray-200">
+            <div className="space-y-8 divide-y divide-gray-200">
               <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
                 <div>
                   <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -286,17 +287,28 @@ export const OnlineOrderPickPack = () => {
   const status = st.status;
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [numPackages, setNumPackages] = useState(1)
-  const [packages, setPackages] = useState([])
+  const [numPackages, setNumPackages] = useState(1);
+  const [packages, setPackages] = useState([
+    { id: 1, size: "SATCHEL 500G ATL A5" },
+  ]);
+  const [sizes, setSizes] = useState([]);
+  const [openPackage, setOpenPackage] = useState(false);
+
+  const onNumPackagesChanged = (e) => {
+    if (parseInt(e.target.value) > 0) {
+      setNumPackages(e.target.value);
+    }
+  };
+
   const onConfirmClicked = () => handlePickPack();
 
   useEffect(() => {
     const fetchPackageSizes = async () => {
-      const {data} = await api.getAll("online/order/pacelSize")
-      console.log(data)
-    }
-    fetchPackageSizes()
-  }, [])
+      const { data } = await api.getAll("online/order/parcelSize");
+      setSizes(data.map((size) => size.replaceAll("_", " ")));
+    };
+    fetchPackageSizes();
+  }, []);
 
   const onScanClicked = (evt) => {
     evt.preventDefault();
@@ -395,82 +407,102 @@ export const OnlineOrderPickPack = () => {
       });
     }
   };
+
+  const openPackageModal = () => setOpenPackage(true);
+  const closePackageModal = () => setOpenPackage(false);
+
   return (
-    <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
-      <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-        <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
-          <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-            {["PENDING", "PICKING", "PICKED", "PACKING", "PACKED"].some(
-              (s) => s === status
-            ) ? (
-              ["PICKED", "PACKED"].some((s) => s === status) ? (
-                site.id === currSiteId ? (
-                  <section
-                    aria-labelledby="confirm"
-                    className="flex justify-center"
-                  >
-                    <ConfirmSection
-                      subsys={subsys}
-                      procurementId={orderId}
-                      title={`Confirm items ${
-                        status === "PICKED" ? "picked" : "packed"
-                      }`}
-                      body={`Confirm that all the items in this order have been ${
-                        status === "PICKED" ? "picked" : "packed"
-                      }?
+    <>
+      <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+        <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+          <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+            <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+              {["PENDING", "PICKING", "PICKED", "PACKING", "PACKED"].some(
+                (s) => s === status
+              ) ? (
+                ["PICKED", "PACKED"].some((s) => s === status) ? (
+                  site.id === currSiteId ? (
+                    <section
+                      aria-labelledby="confirm"
+                      className="flex justify-center"
+                    >
+                      <ConfirmSection
+                        subsys={subsys}
+                        procurementId={orderId}
+                        title={`Confirm items ${
+                          status === "PICKED" ? "picked" : "packed"
+                        }`}
+                        body={`Confirm that all the items in this order have been ${
+                          status === "PICKED" ? "picked" : "packed"
+                        }?
                   This action cannot be undone, and this order will advance to the
                   ${status === "PICKED" ? "packing" : "delivery"} stage.`}
-                      onConfirmClicked={onConfirmClicked}
-                    />
-                  </section>
+                        onConfirmClicked={
+                          status === "PACKED"
+                            ? openPackageModal
+                            : onConfirmClicked
+                        }
+                      />
+                    </section>
+                  ) : (
+                    <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                      <span className="mt-2 block text-base font-medium text-gray-900">
+                        {status === "PICKED"
+                          ? "Items have been picked"
+                          : "Items are ready to be delivered."}
+                      </span>
+                    </div>
+                  )
                 ) : (
-                  <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
-                    <span className="mt-2 block text-base font-medium text-gray-900">
-                      {status === "PICKED"
-                        ? "Items have been picked"
-                        : "Items are ready to be delivered."}
-                    </span>
-                  </div>
+                  site.id === currSiteId && (
+                    <section aria-labelledby="scan-items">
+                      <ScanItemsSection
+                        search={search}
+                        onSearchChanged={onSearchChanged}
+                        onScanClicked={onScanClicked}
+                      />
+                    </section>
+                  )
                 )
               ) : (
-                site.id === currSiteId && (
-                  <section aria-labelledby="scan-items">
-                    <ScanItemsSection
-                      search={search}
-                      onSearchChanged={onSearchChanged}
-                      onScanClicked={onScanClicked}
+                <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                  <span className="mt-2 block text-base font-medium text-gray-900">
+                    No items to pick / pack.
+                  </span>
+                </div>
+              )}
+              {["PENDING", "PICKING", "PICKED", "PACKING", "PACKED"].some(
+                (s) => s === status
+              ) &&
+                ["sm", "wh", "str"].some((s) => s === subsys) && (
+                  <section aria-labelledby="order-summary">
+                    <PickPackList
+                      data={lineItems}
+                      status={status}
+                      setData={setLineItems}
+                      handlePickPack={handlePickPack}
+                      onSaveQuanityClicked={onSaveQuanityClicked}
+                      site={site}
+                      currSiteId={currSiteId}
+                      delivery={delivery}
+                      pickupSite={pickupSite}
                     />
                   </section>
-                )
-              )
-            ) : (
-              <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
-                <span className="mt-2 block text-base font-medium text-gray-900">
-                  No items to pick / pack.
-                </span>
-              </div>
-            )}
-            {["PENDING", "PICKING", "PICKED", "PACKING", "PACKED"].some(
-              (s) => s === status
-            ) &&
-              ["sm", "wh", "str"].some((s) => s === subsys) && (
-                <section aria-labelledby="order-summary">
-                  <PickPackList
-                    data={lineItems}
-                    status={status}
-                    setData={setLineItems}
-                    handlePickPack={handlePickPack}
-                    onSaveQuanityClicked={onSaveQuanityClicked}
-                    site={site}
-                    currSiteId={currSiteId}
-                    delivery={delivery}
-                    pickupSite={pickupSite}
-                  />
-                </section>
-              )}
+                )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {Boolean(sizes.length) && (
+        <PackageModal
+          open={openPackage}
+          closeModal={closePackageModal}
+          numPackages={numPackages}
+          onNumPackagesChanged={onNumPackagesChanged}
+          packages={packages}
+          sizes={sizes}
+        />
+      )}
+    </>
   );
 };

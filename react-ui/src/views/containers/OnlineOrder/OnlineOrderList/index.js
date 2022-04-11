@@ -33,6 +33,7 @@ const OnlineOrderTable = ({ data, handleOnClick }) => {
       {
         Header: "Total Amount",
         accessor: "totalAmount",
+        Cell: (e) => `$${e.value.toFixed(2)}`,
       },
       {
         Header: "Updated",
@@ -65,7 +66,7 @@ export const OnlineOrderList = ({ subsys }) => {
           : onlineOrderApi.getAllBySite(currSiteId));
 
         if (subsys === "lg") {
-          setData(data.filter(order => !order.delivery));
+          setData(data.filter((order) => !order.delivery));
         } else {
           setData(data);
         }

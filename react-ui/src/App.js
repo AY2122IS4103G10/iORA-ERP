@@ -142,7 +142,7 @@ function App() {
               <Route path="my" element={<MyStoreStock subsys="sm" />} />
               <Route path="sites" element={<SiteStocks subsys="sm" />} />
               <Route path="products" element={<ProductStocks subsys="sm" />} />
-              <Route path=":id" element={<AsiteStock />} />
+              <Route path=":id" element={<AsiteStock subsys="sm" />} />
               <Route
                 path="products/:id"
                 element={<AProductStock subsys="sm" />}
@@ -322,7 +322,7 @@ function App() {
               <Route path="edit" element={<EditStockLevel subsys="str" />} />
               <Route path="sites" element={<SiteStocks subsys="str" />} />
               <Route path="products" element={<ProductStocks subsys="str" />} />
-              <Route path=":id" element={<AsiteStock />} />
+              <Route path=":id" element={<AsiteStock subsys="str" />} />
               <Route
                 path="products/:id"
                 element={<AProductStock subsys="str" />}
@@ -563,7 +563,7 @@ function App() {
               <Route path="edit" element={<EditStockLevel subsys="wh" />} />
               <Route path="sites" element={<SiteStocks subsys="wh" />} />
               <Route path="products" element={<ProductStocks subsys="wh" />} />
-              <Route path=":id" element={<AsiteStock />} />
+              <Route path=":id" element={<AsiteStock subsys="wh" />} />
               <Route
                 path="products/:id"
                 element={<AProductStock subsys="wh" />}

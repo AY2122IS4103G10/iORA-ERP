@@ -468,7 +468,7 @@ public class OnlineCustomerController {
     }
 
     @GetMapping(path = "/public/modelSearch", produces = "application/json")
-    public List<Model> searchModelsByModelCode(@RequestParam String name) {
+    public List<Model> searchModelsByName(@RequestParam String name) {
         return productService.searchModelsByName(name);
     }
 

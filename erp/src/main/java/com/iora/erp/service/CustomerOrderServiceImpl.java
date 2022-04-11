@@ -291,7 +291,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (CustomerOrderLI coli : customerOrder.getLineItems()) {
                 try {
                     siteService.removeProducts(customerOrder.getSite().getId(), coli.getProduct().getSku(),
-                            coli.getPackedQty());
+                            coli.getQty());
                 } catch (NoStockLevelException | IllegalTransferException e) {
                     e.printStackTrace();
                 }
@@ -825,6 +825,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
             if (pickupSiteHasStock) {
                 onlineOrder.setSite(onlineOrder.getPickupSite());
+                onlineOrder.addStatusHistory(
+                        new OOStatus(onlineOrder.getPickupSite(), new Date(), OnlineOrderStatusEnum.PENDING));
             } else {
                 onlineOrder.setSite(siteService.getSite(3L));
                 Site store = onlineOrder.getPickupSite();
@@ -833,9 +835,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         new DeliveryAddress(store.getName(), add.getRoad(), add.getUnit() + ", " + add.getBuilding(),
                                 add.getCity(), add.getPostalCode(), add.getState(), CountryEnum.Singapore,
                                 store.getPhoneNumber()));
+                onlineOrder.addStatusHistory(
+                        new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PENDING));
             }
-            onlineOrder.addStatusHistory(
-                    new OOStatus(onlineOrder.getPickupSite(), new Date(), OnlineOrderStatusEnum.PENDING));
+
         }
 
         if (clientSecret != null && clientSecret != "") {

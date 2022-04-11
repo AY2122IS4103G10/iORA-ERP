@@ -351,7 +351,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku)
             throws CustomerOrderException {
-        // Get Product
         Product product = em.find(Product.class, rfidsku);
         ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
@@ -361,7 +360,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             product = productItem.getProduct();
         }
 
-        // Add ProductItem to Line Items
         String sku = product.getSku();
         String model = sku.substring(0, sku.lastIndexOf("-"));
         Model mdl = em.find(Model.class, model.trim());
@@ -386,7 +384,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public List<CustomerOrderLI> removeFromCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku)
             throws CustomerOrderException {
-        // Get Product
         Product product = em.find(Product.class, rfidsku);
         ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
@@ -396,7 +393,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             product = productItem.getProduct();
         }
 
-        // Remove ProductItem from Line Items
         String sku = product.getSku();
         String model = sku.substring(0, sku.lastIndexOf("-"));
         Model mdl = em.find(Model.class, model.trim());

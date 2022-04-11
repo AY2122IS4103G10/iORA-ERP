@@ -15,7 +15,6 @@ import com.iora.erp.model.company.JobTitle;
 import com.iora.erp.model.company.Vendor;
 
 public interface AdminService {
-    //need fix @role things
     public abstract JobTitle createJobTitle(JobTitle jobTitle) throws JobTitleException;
     public abstract JobTitle updateJobTitle(JobTitle jobTitle) throws JobTitleException;
     public abstract void deleteJobTitle(Long id) throws JobTitleException;
@@ -25,7 +24,6 @@ public interface AdminService {
     public abstract JobTitle getJobTitleById(Long id)  throws JobTitleException;
     public abstract JobTitle getJobTitlesByName(String name) throws JobTitleException;
 
-    //vendor
     public abstract Department createDepartment(Department department) throws DepartmentException;
     public abstract Department editDepartment(Department department) throws DepartmentException;
     public abstract void deleteDepartment(Long id) throws DepartmentException, CompanyException;

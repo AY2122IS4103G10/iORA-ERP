@@ -469,16 +469,16 @@ public class StockTransferServiceImpl implements StockTransferService {
         for (StockTransferOrderLI stoli : lineItems) {
             if (stoli.getProduct().equals(product)) {
                 stoli.setReceivedQty(qty);
-                // boolean picked = true;
-                // for (StockTransferOrderLI stoli2 : lineItems) {
-                //     if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
-                //         picked = false;
-                //     }
-                // }
-                // if (picked) {
-                //     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                //             StockTransferStatusEnum.COMPLETED));
-                // }
+                /* boolean picked = true;
+                for (StockTransferOrderLI stoli2 : lineItems) {
+                    if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
+                        picked = false;
+                    }
+                }
+                if (picked) {
+                    stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                            StockTransferStatusEnum.COMPLETED));
+                } */
                 try {
                     siteService.addProducts(stOrder.getToSite().getId(), product.getSku(), qty);
                 } catch (NoStockLevelException e) {

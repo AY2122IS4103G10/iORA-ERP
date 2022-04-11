@@ -89,7 +89,7 @@ public class DataLoader implements CommandLineRunner {
 		}
 	}
 
-	// Insert Data-Init here
+	// Data Initialisation
 	private void loadData() throws Exception {
 		// Singapore
 		Address a1 = new Address(CountryEnum.Singapore, "Singapore", "Enterprise 10", "Singapore", "NIL",
@@ -419,13 +419,6 @@ public class DataLoader implements CommandLineRunner {
 						"1st Street", "12345", true, 30.689753, 103.449317),
 				"345678", "+86 123 456 7890", iora);
 		em.persist(m1);
-
-		/*
-		 * Currency rm = new Currency("RM", "Malaysian Ringgit", Country.Malaysia);
-		 * Currency sgd = new Currency("SGD", "Singapore Dollar", Country.Singapore);
-		 * em.persist(rm);
-		 * em.persist(sgd);
-		 */
 
 		// Adding birthday points and membership tiers
 		BirthdayPoints bday = new BirthdayPoints("STANDARD", 200, 1, 2.00);

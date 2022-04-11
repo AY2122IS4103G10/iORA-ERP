@@ -457,7 +457,7 @@ public class AdminServiceImpl implements AdminService {
         c.getVendors().remove(v);
     }
 
-    // need add vendor, Department and site mapping
+    // TODO: need add vendor, Department and site mapping
     @Override
     public Company editCompany(Company company) throws CompanyException {
         Company old = getCompanyById(company.getId());

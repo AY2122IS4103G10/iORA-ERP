@@ -141,7 +141,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [customer, setCustomer] = useState(-1);
   const [totalAmount, setTotalAmount] = useState(-1);
   const [payments, setPayments] = useState([]);
-  const [paid, setPaid] = useState(false);
   const [site, setSite] = useState(false);
   const [pickupSite, setPickupSite] = useState(null);
   const [country, setCountry] = useState(null);
@@ -171,7 +170,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           customerId,
           totalAmount,
           payments,
-          paid,
           pickupSite,
           site,
           country,
@@ -208,7 +206,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         fetchCustomer(customerId).then((data) => setCustomer(data));
         setTotalAmount(totalAmount);
         setPayments(payments);
-        setPaid(paid);
         setPickupSite(pickupSite);
         setSite(site);
         setCountry(country);
@@ -289,7 +286,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             deliveryAddress,
             totalAmount,
             payments,
-            paid,
             site,
             pickupSite,
             country,

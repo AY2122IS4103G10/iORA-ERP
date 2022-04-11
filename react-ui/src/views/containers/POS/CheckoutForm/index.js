@@ -123,7 +123,6 @@ export const CheckoutForm = ({
           ...order,
           totalAmount: Math.max(amount - voucherDiscount, 0),
           customerId: customerId,
-          paid: true,
           voucher,
           payments: [
             {

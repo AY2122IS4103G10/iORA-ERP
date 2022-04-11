@@ -291,7 +291,6 @@ export const PosPurchaseOrder = () => {
       lineItems: lineItems,
       promotions: promotions,
       payments: [],
-      paid: false,
       refundedLIs: [],
       exchangedLIs: [],
       site: {

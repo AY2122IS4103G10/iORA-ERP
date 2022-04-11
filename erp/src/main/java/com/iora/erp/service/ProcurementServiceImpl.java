@@ -349,16 +349,16 @@ public class ProcurementServiceImpl implements ProcurementService {
                         throw new ProcurementOrderException("You are packing items that are not meant for this order.");
                     } else {
                         poli.setPackedQty(poli.getPackedQty() + qty);
-                        // boolean packed = true;
-                        // for (ProcurementOrderLI poli2 : lineItems) {
-                        //     if (poli2.getPackedQty() < poli2.getPickedQty()) {
-                        //         packed = false;
-                        //     }
-                        // }
-                        // if (packed) {
-                        //     procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
-                        //             ProcurementOrderStatusEnum.PACKED));
-                        // }
+                        boolean packed = true;
+                        for (ProcurementOrderLI poli2 : lineItems) {
+                            if (poli2.getPackedQty() < poli2.getPickedQty()) {
+                                packed = false;
+                            }
+                        }
+                        if (packed) {
+                            procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                                    ProcurementOrderStatusEnum.PACKED));
+                        }
                         return em.merge(procurementOrder);
                     }
                 }
@@ -405,16 +405,16 @@ public class ProcurementServiceImpl implements ProcurementService {
                         throw new ProcurementOrderException("You are packing items that are not meant for this order.");
                     } else {
                         poli.setPackedQty(qty);
-                        // boolean packed = true;
-                        // for (ProcurementOrderLI poli2 : lineItems) {
-                        //     if (poli2.getPackedQty() < poli2.getPickedQty()) {
-                        //         packed = false;
-                        //     }
-                        // }
-                        // if (packed) {
-                        //     procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
-                        //             ProcurementOrderStatusEnum.PACKED));
-                        // }
+                        boolean packed = true;
+                        for (ProcurementOrderLI poli2 : lineItems) {
+                            if (poli2.getPackedQty() < poli2.getPickedQty()) {
+                                packed = false;
+                            }
+                        }
+                        if (packed) {
+                            procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
+                                    ProcurementOrderStatusEnum.PACKED));
+                        }
                         return em.merge(procurementOrder);
                     }
                 }

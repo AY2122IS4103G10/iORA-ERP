@@ -333,6 +333,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Voucher redeemVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setRedeemed(true);
+        voucher.setCustomerId(null);
         return voucher;
     }
 

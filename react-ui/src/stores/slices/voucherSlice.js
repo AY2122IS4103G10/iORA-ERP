@@ -29,9 +29,9 @@ export const addNewVouchers = createAsyncThunk(
 
 export const issueVoucher = createAsyncThunk(
   "vouchers/issueVoucher",
-  async ({ code: voucherCode, id: customerId }) => {
+  async ({ voucherCode, customerIds }) => {
     try {
-      const response = await voucherApi.issue(voucherCode, customerId);
+      const response = await voucherApi.issue(voucherCode, customerIds);
       return response.data;
     } catch (error) {
       return Promise.reject(error.response.data);
@@ -83,13 +83,15 @@ const voucherSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(issueVoucher.fulfilled, (state, action) => {
-      const { voucherCode, issued } = action.payload;
+      state.status = "idle";
+      state.vouchers = action.payload;
+      /* const { voucherCode, issued } = action.payload;
       const existingVoucher = state.vouchers.find(
         (voucher) => voucher.voucherCode === voucherCode
       );
       if (existingVoucher) {
         existingVoucher.issued = issued;
-      }
+      } */
     });
     builder.addCase(redeemVoucher.fulfilled, (state, action) => {
       const { voucherCode, redeemed } = action.payload;

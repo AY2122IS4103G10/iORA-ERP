@@ -1,6 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { TailSpin } from "react-loader-spinner";
@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import {
-  fetchCustomers,
   selectAllCustomers
 } from "../../../../stores/slices/customerSlice";
 import { addNewVouchers } from "../../../../stores/slices/voucherSlice";
@@ -302,10 +301,6 @@ export const VoucherForm = () => {
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
     [quantity, value, expDate].every(Boolean) && requestStatus === "idle";
-
-  useEffect(() => {
-    customerStatus === "idle" && dispatch(fetchCustomers());
-  }, [customerStatus, dispatch]);
 
   const onAddVoucherClicked = (evt) => {
     evt.preventDefault();

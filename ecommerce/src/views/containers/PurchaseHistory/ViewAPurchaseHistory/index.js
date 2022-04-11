@@ -394,7 +394,7 @@ console.log(order)
     </div>
   ) : (
     <div className="flex mt-5 items-center justify-center">
-      <TailSpin color="#00BCD4" height={20} width={20} />
+      <TailSpin color="#111827" height={20} width={20} />
     </div>
   );
 };

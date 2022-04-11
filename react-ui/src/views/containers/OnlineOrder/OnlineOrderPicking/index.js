@@ -1,14 +1,16 @@
-import { CheckCircleIcon } from "@heroicons/react/outline";
+import { Dialog } from "@headlessui/react";
+import { CheckCircleIcon, CheckIcon } from "@heroicons/react/outline";
 import { PrinterIcon, XIcon } from "@heroicons/react/solid";
 import moment from "moment";
 import { useRef } from "react";
+import { useCallback } from "react";
 import { forwardRef } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
-import { api, logisticsApi } from "../../../../environments/Api";
+import { api } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { BasicTable } from "../../../components/Tables/BasicTable";
@@ -252,7 +254,9 @@ const PickingInvoice = forwardRef(({ data, orders }, ref) => {
 
         <div className="border-t border-gray-200">
           <h3 className="sr-only">Items</h3>
-          <PickingListTable data={data} />
+          <div className="mt-8">
+            <PickingListTable data={data} />
+          </div>
         </div>
       </div>
     </div>
@@ -266,59 +270,88 @@ export const OnlineOrderPicking = ({ subsys }) => {
   const [openInfo, setOpenInfo] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [orders, setOrders] = useState(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const currSiteId = parseInt(useSelector(selectUserSite));
   const componentRef = useRef();
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
 
+  const fetchOnlineOrdersOfSite = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.getAll(`online/pickingList/${currSiteId}`);
+      const { data: orders } = await api.getAll(
+        `online/order/${currSiteId}/PENDING`
+      );
+      const lineItems = Object.keys(data).map((key, index) => ({
+        id: index + 1,
+        sku: key,
+        qty: Object.values(data)[index],
+      }));
+      fetchAllModelsBySkus(lineItems).then((data) =>
+        setData(
+          lineItems
+            .map((item, index) => {
+              return {
+                ...item,
+                modelCode: data[index].modelCode,
+                name: data[index].name,
+                description: data[index].description,
+                imageLinks: data[index].imageLinks,
+                product: data[index].products.find(
+                  (product) => product.sku === item.sku
+                ),
+              };
+            })
+            .sort((item) => item.name)
+        )
+      );
+      setOrders(orders.map((order) => order.id));
+      setLoading(false);
+    } catch (error) {
+      addToast(`Error: ${error.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  }, [addToast, currSiteId]);
+
+  const fetchAllModelsBySkus = async (items) => {
+    return Promise.all(items.map((item) => fetchModelBySku(item.sku)));
+  };
   useEffect(() => {
-    const fetchAllModelsBySkus = async (items) => {
-      return Promise.all(items.map((item) => fetchModelBySku(item.sku)));
-    };
-    const fetchOnlineOrdersOfSite = async () => {
-      setLoading(true);
-      try {
-        const { data } = await api.getAll(`online/pickingList/${currSiteId}`);
-        const { data: orders } = await api.getAll(`online/order/${currSiteId}/PENDING`);
-        const lineItems = Object.keys(data).map((key, index) => ({
-          id: index + 1,
-          sku: key,
-          qty: Object.values(data)[index],
-        }));
-        fetchAllModelsBySkus(lineItems).then((data) =>
-          setData(
-            lineItems.map((item, index) => ({
-              ...item,
-              modelCode: data[index].modelCode,
-              name: data[index].name,
-              description: data[index].description,
-              imageLinks: data[index].imageLinks,
-              product: data[index].products.find(
-                (product) => product.sku === item.sku
-              ),
-            }))
-          )
-        );
-        setOrders(orders.map((order) => order.id));
-        setLoading(false);
-      } catch (error) {
-        addToast(`Error: ${error.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      }
-    };
     fetchOnlineOrdersOfSite();
-  }, [currSiteId, addToast, subsys]);
+  }, [currSiteId, addToast, subsys, fetchOnlineOrdersOfSite]);
 
   const handleOnClick = (row) => {
-    console.log(row.original);
     setSelectedProduct(row.original);
     openInfoModal();
   };
+
+  const onStartPickedClicked = async () => {
+    try {
+      await api.update("online/startPick", orders);
+      addToast(`Orders ${orders.join(", ")} have started picking.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      closeConfirmModal();
+      fetchOnlineOrdersOfSite();
+    } catch (error) {
+      addToast(`Error: ${error.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+  };
   const openInfoModal = () => setOpenInfo(true);
   const closeInfoModal = () => setOpenInfo(false);
+
+  const openConfirmModal = () => setOpenConfirm(true);
+  const closeConfirmModal = () => setOpenConfirm(false);
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    onAfterPrint: openConfirmModal,
+  });
 
   return loading ? (
     <div className="flex mt-5 items-center justify-center">
@@ -354,6 +387,62 @@ export const OnlineOrderPicking = ({ subsys }) => {
       <div className="hidden">
         <PickingInvoice ref={componentRef} data={data} orders={orders} />
       </div>
+      <SimpleModal open={openConfirm} closeModal={closeConfirmModal}>
+        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+          <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
+            <button
+              type="button"
+              className="bg-white rounded-md text-gray-400 hover:text-gray-500"
+              onClick={closeConfirmModal}
+            >
+              <span className="sr-only">Close</span>
+              <XIcon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
+          <div className="sm:flex sm:items-start">
+            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+              <CheckIcon
+                className="h-6 w-6 text-green-600"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <Dialog.Title
+                as="h3"
+                className="text-lg leading-6 font-medium text-gray-900"
+              >
+                Start picking for orders
+              </Dialog.Title>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500">
+                  Start picking for PENDING orders? A picking list for these
+                  orders will be generated, and they're statuses will be updated
+                  to PICKING.
+                  <span className="mt-2 block text-sm font-medium text-gray-900">
+                    Please ensure the picking list has been printed before clicking "Confirm".
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:ml-3 sm:w-auto sm:text-sm"
+              onClick={onStartPickedClicked}
+            >
+              Confirm
+            </button>
+            <button
+              type="button"
+              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:w-auto sm:text-sm"
+              onClick={closeConfirmModal}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </SimpleModal>
     </>
   );
 };

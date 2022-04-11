@@ -105,9 +105,7 @@ const InvoiceSummary = ({ data, status }) => {
       },
       {
         Header: "Qty",
-        accessor: `${
-          status === "READY_FOR_DELIVERY" ? "packedQty" : "qty"
-        }`,
+        accessor: `${status === "READY_FOR_DELIVERY" ? "packedQty" : "qty"}`,
       },
     ];
   }, [status]);
@@ -188,6 +186,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           setLineItems(
             lineItems.map((item, index) => ({
               ...item,
+              index: index + 1,
               product: {
                 ...item.product,
                 modelCode: data[index].modelCode,

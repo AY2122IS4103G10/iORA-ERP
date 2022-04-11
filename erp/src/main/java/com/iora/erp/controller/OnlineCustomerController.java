@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iora.erp.enumeration.ParcelSize;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
@@ -390,6 +391,11 @@ public class OnlineCustomerController {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
+    }
+
+    @GetMapping(path = "/order/parcelSize", produces = "application/json")
+    public List<ParcelSize> getParcelSize() {
+        return customerOrderService.getParcelSizes();
     }
 
     @PutMapping(path = "/deliver/{orderId}", produces = "application/json")

@@ -82,7 +82,7 @@ const customerSlice = createSlice({
     });
     builder.addCase(fetchCustomers.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.customers = state.customers.concat(action.payload);
+      state.customers = action.payload;
     });
     builder.addCase(fetchCustomers.rejected, (state, action) => {
       state.status = "failed";

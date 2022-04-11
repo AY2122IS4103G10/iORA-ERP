@@ -195,7 +195,7 @@ export default function OrderSuccess({ clientSecret }) {
                     Discount
                   </dt>
                   <dd className="mt-2 text-gray-700 flex justify-end items-end">
-                    -${Number.parseFloat(-order.voucher?.amount).toFixed(2)}
+                    -${Number.parseFloat(Math.abs(order.voucher?.amount)).toFixed(2)}
                   </dd>
                 </div>
               </div>

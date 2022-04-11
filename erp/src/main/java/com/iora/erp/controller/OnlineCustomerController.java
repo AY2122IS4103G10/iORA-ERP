@@ -18,6 +18,7 @@ import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 // import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
+import com.iora.erp.model.product.Model;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.security.JWTUtil;
@@ -464,6 +465,11 @@ public class OnlineCustomerController {
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    @GetMapping(path = "/public/modelSearch", produces = "application/json")
+    public List<Model> searchModelsByModelCode(@RequestParam String code) {
+        return productService.searchModelsByModelCode(code);
     }
 
     @PostMapping(path = "/public/model/skulist", produces = "application/json")

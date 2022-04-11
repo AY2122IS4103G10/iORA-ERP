@@ -39,8 +39,8 @@ export const api = {
 };
 
 export const voucherApi = {
-  issue(code, id) {
-    return axiosPrivate.put(`${REST_ENDPOINT}sam/voucher/issue/${code}/${id}`);
+  issue(code, customerIds) {
+    return axiosPrivate.put(`${REST_ENDPOINT}sam/voucher/issue/${code}`, customerIds);
   },
   redeem(id) {
     return axiosPrivate.put(`${REST_ENDPOINT}sam/voucher/redeem/${id}`);

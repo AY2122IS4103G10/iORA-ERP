@@ -1,26 +1,33 @@
+import { Dialog } from "@headlessui/react";
 import { CodeIcon, TrashIcon } from "@heroicons/react/outline";
 import {
-  CalendarIcon as CalendarIconSolid,
-  CheckCircleIcon, CashIcon, UserIcon
+  CalendarIcon as CalendarIconSolid, CashIcon, CheckCircleIcon, UserIcon
 } from "@heroicons/react/solid";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { api } from "../../../../environments/Api";
+import {
+  selectAllCustomers
+} from "../../../../stores/slices/customerSlice";
 import {
   deleteExistingVoucher,
   fetchVouchers,
   issueVoucher,
   redeemVoucher,
-  selectVoucherByCode,
+  selectVoucherByCode
 } from "../../../../stores/slices/voucherSlice";
 import { classNames } from "../../../../utilities/Util";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import ConfirmDelete from "../../../components/Modals/ConfirmDelete";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import {
+  SelectColumnFilter
+} from "../../../components/Tables/ClickableRowTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 const VoucherDetailsBody = ({
   voucherCode,
@@ -130,80 +137,113 @@ const VoucherDetailsBody = ({
   </div>
 );
 
-const IssueVoucherModal = ({
+const IssueCustomersModal = ({
   open,
-  closeModal,
-  input,
-  onInputChanged,
+  setOpen,
+  data,
+  selectedRows,
+  setSelectedRows,
   onIssueClicked,
-  inputTypeSelected,
-  onInputTypeSelectedChanged,
   loading,
 }) => {
+  const itemCols = useMemo(() => {
+    return [
+      {
+        Header: "#",
+        accessor: "id",
+      },
+      {
+        Header: "Name",
+        accessor: (row) => `${row.firstName} ${row.lastName}`,
+      },
+      {
+        Header: "DOB",
+        accessor: "dob",
+        Cell: (e) => moment(e.value).format("DD/MM/YY"),
+      },
+      {
+        Header: "Contact",
+        accessor: "contactNumber",
+      },
+      {
+        Header: "Member Points",
+        accessor: "membershipPoints",
+      },
+      {
+        Header: "Member Tier",
+        accessor: "membershipTier.name",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Status",
+        accessor: "availStatus",
+        Cell: (e) => (e.value ? (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Active
+          </span>
+        ) : (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            Blocked
+          </span>
+        ))
+      },
+      {
+        Header: "Email",
+        accessor: "email",
+      },
+    ];
+  }, []);
+
   return (
-    <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+    <SimpleModal open={open} closeModal={() => setOpen(false)}>
+      <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-max">
         {loading ? (
           <div className="flex items-center justify-center">
             <TailSpin color="#00BFFF" height={20} width={20} />
           </div>
         ) : (
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Issue Voucher
-            </h3>
-            <div className="mt-2 max-w-xl text-sm text-gray-500">
-              <p>
-                Enter customer email address or contact number to issue voucher.
-              </p>
-            </div>
-            <form
-              className="mt-5 sm:flex sm:items-center"
-              onSubmit={onIssueClicked}
-            >
-              <div className="w-full sm:max-w-xs">
-                <label htmlFor="order-no" className="sr-only">
-                  Customer Contact / Email
-                </label>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                  <input
-                    type={inputTypeSelected === "email" ? "email" : "number"}
-                    name="search"
-                    id="search"
-                    className="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                    placeholder={`Enter ${inputTypeSelected === "email"
-                        ? "email address"
-                        : "contact number"
-                      }.`}
-                    value={input}
-                    onChange={onInputChanged}
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center">
-                    <label htmlFor="type" className="sr-only">
-                      Type
-                    </label>
-                    <select
-                      id="type"
-                      name="type"
-                      className="focus:ring-cyan-500 focus:border-cyan-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
-                      value={inputTypeSelected}
-                      onChange={onInputTypeSelectedChanged}
-                    >
-                      <option value="email">Email</option>
-                      <option value="phone">Phone</option>
-                    </select>
-                  </div>
-                </div>
+          <>
+            <div>
+              <div className="flex justify-between border-b border-gray-200">
+                <Dialog.Title
+                  as="h3"
+                  className="m-3 text-center text-lg leading-6 font-medium text-gray-900"
+                >
+                  Select Customers
+                </Dialog.Title>
               </div>
-              <button
-                type="submit"
-                className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-              >
-                Issue
-              </button>
-            </form>
-          </div>
-        )}
+              <div className="border-b border-gray-200 m-5">
+                <SimpleTable
+                  columns={itemCols}
+                  data={data}
+                  rowSelect={true}
+                  selectedRows={selectedRows}
+                  setSelectedRows={setSelectedRows}
+                  />
+
+                  <p className="italic">Note: If more than 1 customer is selected, other vouchers of the same type will be issued.</p>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  onClick={onIssueClicked}
+                >
+                  Issue
+                </button>
+              </div>
+            </div>
+          </>)}
       </div>
     </SimpleModal>
   );
@@ -217,63 +257,49 @@ export const VoucherDetails = () => {
   const voucher = useSelector((state) =>
     selectVoucherByCode(state, voucherCode)
   );
-  const [input, setInput] = useState("");
-  const [inputTypeSelected, setInputTypeSelected] = useState("email");
+  const [selectedRows, setSelectedRows] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [openIssue, setOpenIssue] = useState(false);
   const [loading, setLoading] = useState(false);
+  const data = useSelector(selectAllCustomers)
   const voucherStatus = useSelector((state) => state.vouchers.status);
   useEffect(() => {
     voucherStatus === "idle" && dispatch(fetchVouchers());
   }, [voucherStatus, dispatch]);
-  const onInputChanged = (e) => setInput(e.target.value);
-  const onInputTypeSelectedChanged = (e) =>
-    setInputTypeSelected(e.target.value);
+
   const openModal = () => setOpenDelete(true);
   const closeModal = () => setOpenDelete(false);
   const openIssueModal = () => setOpenIssue(true);
-  const closeIssueModal = () => setOpenIssue(false);
 
   const onIssueClicked = (evt) => {
     evt.preventDefault();
+    setLoading(true);
+    const selectedRowKeys = Object.keys(selectedRows).map((key) =>
+      parseInt(key) + 1
+    );
+
     if (!voucher.issued) {
-      const fetchCustomer = async () => {
-        const { data } = await api.get(
-          `sam/customer/${inputTypeSelected}`,
-          input
-        );
-        return data;
-      };
-      fetchCustomer()
-        .then((data) => {
-          setLoading(true);
-          dispatch(issueVoucher({ code: voucherCode, id: data.id }))
-            .unwrap()
-            .then(() => {
-              addToast("Successfully issued voucher", {
-                appearance: "success",
-                autoDismiss: true,
-              });
-              closeIssueModal();
-            })
-            .catch((err) => {
-              addToast(`Error: ${err.message}`, {
-                appearance: "error",
-                autoDismiss: true,
-              });
-            })
-            .finally(() => {
-              setLoading(false);
-            });
+      dispatch(issueVoucher({ voucherCode, customerIds : selectedRowKeys}))
+        .unwrap()
+        .then(() => {
+          addToast("Successfully issued voucher", {
+            appearance: "success",
+            autoDismiss: true,
+          });
+          setOpenIssue(false);
         })
-        .catch(() =>
-          addToast(`Error: Customer not found. Please try again`, {
+        .catch((err) => {
+          addToast(`Error: ${err.message}`, {
             appearance: "error",
             autoDismiss: true,
-          })
-        );
+          });
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   };
+
   const onRedeemClicked = () => {
     if (!voucher.redeemed)
       dispatch(redeemVoucher(voucherCode))
@@ -332,14 +358,13 @@ export const VoucherDetails = () => {
           closeModal={closeModal}
           onConfirm={onDeleteVoucherClicked}
         />
-        <IssueVoucherModal
-          input={input}
-          onInputChanged={onInputChanged}
-          inputTypeSelected={inputTypeSelected}
-          onInputTypeSelectedChanged={onInputTypeSelectedChanged}
-          onIssueClicked={onIssueClicked}
+        <IssueCustomersModal
           open={openIssue}
-          closeModal={closeIssueModal}
+          setOpen={setOpenIssue}
+          data={data}
+          selectedRows={selectedRows}
+          setSelectedRows={setSelectedRows}
+          onIssueClicked={onIssueClicked}
           loading={loading}
         />
       </>

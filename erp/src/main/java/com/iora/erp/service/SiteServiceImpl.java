@@ -1,6 +1,9 @@
 package com.iora.erp.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -206,10 +209,21 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public List<StockLevelLI> getStockLevelByProduct(String SKUCode) {
-        return em.createQuery("SELECT sl FROM StockLevelLI sl WHERE sl.product.sku = :sku", StockLevelLI.class)
+    public List<Map<String,Object>> getStockLevelByProduct(String SKUCode) {
+        List<StockLevelLI> list = em
+                .createQuery("SELECT sl FROM StockLevelLI sl WHERE sl.product.sku = :sku", StockLevelLI.class)
                 .setParameter("sku", SKUCode)
                 .getResultList();
+
+        List<Map<String,Object>> stockList = new ArrayList<>();
+        for (StockLevelLI stli : list) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("site", getSite(stli.getStockLevel().getId()));
+            map.put("qty", stli.getQty());
+            stockList.add(map);
+        }
+
+        return stockList;
     }
 
     @Override

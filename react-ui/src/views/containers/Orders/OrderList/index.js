@@ -31,7 +31,8 @@ const OrderTable = ({ data, handleOnClick, type }) => {
             },
             {
               Header: "Status",
-              accessor: "status",
+              accessor: (row) =>
+                row.statusHistory[row.statusHistory.length - 1].status,
               Filter: SelectColumnFilter,
               filter: "includes",
             },
@@ -104,7 +105,7 @@ export const OrderList = ({ subsys, type }) => {
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);
-  
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

@@ -21,10 +21,6 @@ const ItemTable = ({ data }) => {
   const columns = useMemo(
     () => [
       {
-        Header: "#",
-        accessor: "id",
-      },
-      {
         Header: "SKU",
         accessor: "product.sku",
       },

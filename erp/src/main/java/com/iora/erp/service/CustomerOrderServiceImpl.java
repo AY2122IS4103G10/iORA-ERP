@@ -793,6 +793,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             site2.addNotification(noti);
         }
 
+        onlineOrder.setStatus(onlineOrder.getLastStatus());
         return em.merge(onlineOrder);
     }
 

@@ -57,7 +57,6 @@ const CustomerDetailsBody = ({
   contactNumber,
   membershipPoints,
   membershipTier,
-  storeCredit,
   availStatus,
 }) => (
   <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
@@ -119,10 +118,6 @@ const CustomerDetailsBody = ({
                 <dd className="mt-1 text-sm text-gray-900">
                   {membershipPoints ? membershipPoints : "-"}
                 </dd>
-              </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Store Credit</dt>
-                <dd className="mt-1 text-sm text-gray-900">{storeCredit ? storeCredit : "-"}</dd>
               </div>
             </dl>
           </div>
@@ -266,7 +261,6 @@ export const CustomerDetails = () => {
           contactNumber={customer.contactNumber}
           membershipPoints={customer.membershipPoints}
           membershipTier={customer.membershipTier}
-          storeCredit={customer.storeCredit}
         />
         {Boolean(customer.address) && (
           <AddressDetails

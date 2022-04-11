@@ -348,7 +348,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
               {/* Account */}
               {loggedIn && <ProfileDropdown handleLogout={handleLogout} />}
               {/* Support */}
-              <div className="ml-4 flow-root lg:ml-6">
+              {loggedIn && <div className="ml-4 flow-root lg:ml-6">
                 <Link
                   to="/support"
                   className="p-2 text-gray-400 hover:text-gray-500"
@@ -356,7 +356,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                   <span className="sr-only">Support</span>
                   <SupportIcon className="w-6 h-6" aria-hidden="true" />
                 </Link>
-              </div>
+              </div>}
               {/* Cart */}
               <div className="ml-4 flow-root lg:ml-6">
                 <Link to="cart" className="group -m-2 p-2 flex items-center">

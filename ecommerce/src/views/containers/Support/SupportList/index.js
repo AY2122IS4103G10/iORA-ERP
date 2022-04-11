@@ -47,7 +47,7 @@ const SupportTicketModal = ({
   ]
 
   const orders = () => {
-    const list = [{label : "", value : 0}];
+    const list = [{ label: "", value: 0 }];
     JSON.parse(localStorage.getItem("user")).orders.forEach((order) => {
       list.push({
         label: "Order #" + order.id + ", Amount Spent: $" + order.totalAmount,
@@ -362,9 +362,12 @@ export const SupportList = () => {
   const ticketStatus = useSelector((state) => state.supportTickets.listStatus);
 
   useEffect(() => {
-    ticketStatus === "idle" && dispatch(fetchUserSupportTickets(JSON.parse(localStorage.getItem("user")).id)).then(
-      dispatch(fetchPublicSupportTickets()));
-  }, [ticketStatus]);
+    dispatch(fetchUserSupportTickets(JSON.parse(localStorage.getItem("user")).id));
+  }, [ticketStatus === "idle", dispatch, navigate]);
+
+  useEffect(() => {
+    dispatch(fetchPublicSupportTickets());
+  }, [ticketStatus === "idle", dispatch, navigate]);
 
   const handleOnClick = (row) => navigate(`${row.original.id}`);
 
@@ -436,7 +439,7 @@ export const SupportList = () => {
             id: JSON.parse(localStorage.getItem("user")).id
           },
           customerOrder: order === 0 ? null : {
-            id:  order
+            id: order
           }
         }
       ))
@@ -467,7 +470,7 @@ export const SupportList = () => {
               id: JSON.parse(localStorage.getItem("user")).id
             },
             customerOrder: order === 0 ? null : {
-              id:  order
+              id: order
             }
           });
           addToast(`Error: ${err.message}`, {

@@ -245,8 +245,8 @@ export const SupportDetails = () => {
     const [file, setFile] = useState({});
 
     useEffect(() => {
-        ticketStatus === "idle" && dispatch(fetchSupportTickets());
-    }, [ticketStatus, dispatch]);
+        dispatch(fetchSupportTickets());
+    }, [ticketStatus === "idle", dispatch, navigate]);
 
     const onResolveClicked = () => {
         setOpen(false);

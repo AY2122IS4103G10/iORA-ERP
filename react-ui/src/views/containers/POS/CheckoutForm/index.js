@@ -1,13 +1,10 @@
 import { Dialog } from "@headlessui/react";
-import {
-  CashIcon,
-  CreditCardIcon, XIcon
-} from "@heroicons/react/outline";
+import { CashIcon, CreditCardIcon, XIcon } from "@heroicons/react/outline";
 import {
   DeviceTabletIcon,
   ExclamationIcon,
   InformationCircleIcon,
-  SearchIcon
+  SearchIcon,
 } from "@heroicons/react/solid";
 import ProgressBar from "@ramonak/react-progress-bar";
 import { loadStripeTerminal } from "@stripe/terminal-js";
@@ -20,7 +17,7 @@ import { orderApi, posApi } from "../../../../environments/Api";
 import { getCustomerByPhone } from "../../../../stores/slices/customerSlice";
 import {
   fetchMembershipTiers,
-  selectAllMembershipTiers
+  selectAllMembershipTiers,
 } from "../../../../stores/slices/membershipTierSlice";
 import { getVoucherByCode } from "../../../../stores/slices/posSlice";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
@@ -76,6 +73,7 @@ export const CheckoutForm = ({
   const [customerId, setCustomerId] = useState(null);
   const [customerName, setCustomerName] = useState("");
   const [customer, setCustomer] = useState({});
+  const [memPts, setMemPts] = useState(0);
   const [voucherCodes, setVoucherCodes] = useState([]);
   const [selectedVoucherCode, setSelectedVoucherCode] = useState({
     id: 0,
@@ -204,11 +202,28 @@ export const CheckoutForm = ({
     );
   };
 
+  const changeMemPts = (e) => {
+    e.preventDefault();
+    setMemPts(e.target.value);
+    if (e.target.value === 0) return;
+    setVoucherCode("USEMEM");
+  };
+
   const getVoucherDetails = async () => {
     if (voucherCode === "") {
       setVoucherDiscount(0);
       addToast(`Info: You did not key in a voucher code`, {
         appearance: "info",
+        autoDismiss: true,
+      });
+    } else if (voucherCode === "USEMEM") {
+      setVoucher({
+        campaign: "membership points",
+        amount: memPts,
+      });
+      setVoucherDiscount(memPts);
+      addToast(`Success: Claiming ${memPts} points for $${memPts} discount`, {
+        appearance: "success",
         autoDismiss: true,
       });
     } else {
@@ -224,7 +239,7 @@ export const CheckoutForm = ({
         setVoucher(data);
         setVoucherDiscount(data?.amount);
         addToast(
-          `Success: Voucher with code: ${voucherCode} of $${data?.amount} was found`,
+          `Success: $${data?.amount} Voucher with ${voucherCode} code found`,
           {
             appearance: "success",
             autoDismiss: true,
@@ -370,6 +385,26 @@ export const CheckoutForm = ({
                         disabled={voucherCodes.length === 0}
                       />
                     </div>
+                    {customer?.membershipPoints ? (
+                      <>
+                        <label
+                          for="memPts"
+                          className="form-label text-sm font-medium mt-2 col-span-1 sm:col-span-2 text-gray-700"
+                        >
+                          Drag to use {memPts}/{Math.min(customer.membershipPoints, amount)}{" "}
+                          points
+                        </label>
+                        <input
+                          type="range"
+                          className="accent-cyan-600 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none col-span-1 sm:col-span-2"
+                          min={0}
+                          max={Math.min(customer.membershipPoints, amount)}
+                          value={memPts}
+                          onChange={changeMemPts}
+                          id="memPts"
+                        />
+                      </>
+                    ) : null}
                   </div>
                 )}
               </div>
@@ -793,7 +828,7 @@ export const Card = ({
                   className="-ml-1 mr-2 h-5 w-5"
                   aria-hidden="true"
                 />
-                Simulate Checkout
+                Checkout
               </button>
             ) : (
               <button

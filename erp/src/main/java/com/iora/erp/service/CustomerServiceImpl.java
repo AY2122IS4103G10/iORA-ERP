@@ -1,6 +1,5 @@
 package com.iora.erp.service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -284,6 +283,53 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public List<Voucher> issueVouchers(String voucherCode, List<Long> customerIds) throws CustomerException {
+        Voucher voucher = getVoucher(voucherCode);
+        Customer customer = getCustomerById(customerIds.get(0));
+        voucher.setCustomerId(customer.getId());
+        emailService.sendVoucherCode(customer, voucher);
+        voucher.setIssued(true);
+
+        if (customerIds.size() > 1) {
+            int vouchersNeeded = customerIds.size() - 1;
+            int index = 1;
+            String campaign = voucher.getCampaign();
+            Double amount = voucher.getAmount();
+
+            List<Voucher> existingVouchers = em
+                    .createQuery(
+                            "SELECT v FROM Voucher v WHERE v.issued = false AND v.campaign = :campaign AND v.amount = :amount",
+                            Voucher.class)
+                    .setParameter("campaign", campaign)
+                    .setParameter("amount", amount)
+                    .getResultList();
+
+            for (int i = 0; i < existingVouchers.size(); i++) {
+                if (vouchersNeeded > 0) {
+                    Voucher v = existingVouchers.get(i);
+                    Customer c = getCustomerById(customerIds.get(index));
+                    v.setCustomerId(c.getId());
+                    emailService.sendVoucherCode(c, voucher);
+                    v.setIssued(true);
+                    vouchersNeeded -= 1;
+                    index++;
+                }
+            }
+            if (vouchersNeeded > 0) {
+                for (int j = index; j < customerIds.size(); j++) {
+                    Voucher v = new Voucher(campaign, amount, voucher.getExpiry());
+                    Customer c = getCustomerById(customerIds.get(j));
+                    v.setCustomerId(c.getId());
+                    emailService.sendVoucherCode(c, voucher);
+                    v.setIssued(true);
+                    em.persist(v);
+                }
+            }
+        }
+        return getAllVouchers();
+    }
+
+    @Override
     public Voucher redeemVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setRedeemed(true);
@@ -422,7 +468,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer updateCustomerPassword(Long customerId, String oldPassword, String newPassword) throws CustomerException {
+    public Customer updateCustomerPassword(Long customerId, String oldPassword, String newPassword)
+            throws CustomerException {
         Customer old = em.find(Customer.class, customerId);
 
         if (old == null) {

@@ -23,6 +23,7 @@ import { useToasts } from "react-toast-notifications";
 import { classNames } from "../../../../utilities/Util";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 
 export const getProductItem = (data, sku) => {
   return data.products.filter(
@@ -53,8 +54,8 @@ const actions = [
   },
   {
     id: 3,
-    name: "Set"
-  }
+    name: "Set",
+  },
 ];
 
 export const Slideover = ({
@@ -267,18 +268,28 @@ export const QuantityTable = ({ qty, baselineQty }) => {
             <table className="min-w-full divide-y divide-gray-300">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="py-3.5 text-center text-sm font-semibold text-gray-900">
+                  <th
+                    scope="col"
+                    className="py-3.5 text-center text-sm font-semibold text-gray-900"
+                  >
                     Quantity
                   </th>
-                  <th scope="col" className="py-3.5 text-center text-sm font-semibold text-gray-900">
+                  <th
+                    scope="col"
+                    className="py-3.5 text-center text-sm font-semibold text-gray-900"
+                  >
                     Baseline Quantity
                   </th>
                 </tr>
               </thead>
               <tbody className="text-center divide-y divide-gray-200 bg-white">
                 <tr>
-                  <td className="whitespace-nowrap px-3 py-4 text-base text-black">{qty ?? 0}</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-black">{baselineQty ?? 0}</td>
+                  <td className="whitespace-nowrap px-3 py-4 text-base text-black">
+                    {qty ?? 0}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-black">
+                    {baselineQty ?? 0}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -287,9 +298,17 @@ export const QuantityTable = ({ qty, baselineQty }) => {
       </div>
     </div>
   );
-}
+};
 
-export const EditQtyModal = ({ open, closeModal, selected, setSelected, inputQty, setInputQty, handleEditQty }) => {
+export const EditQtyModal = ({
+  open,
+  closeModal,
+  selected,
+  setSelected,
+  inputQty,
+  setInputQty,
+  handleEditQty,
+}) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
       <div className="inline-block align-bottom bg-white h-70 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
@@ -348,14 +367,16 @@ export const EditQtyModal = ({ open, closeModal, selected, setSelected, inputQty
       </div>
     </SimpleModal>
   );
-}
+};
 
-export const StockLevelForm = (subsys) => {
+export const StockLevelForm = ({ subsys }) => {
   const dispatch = useDispatch();
 
   const { id } = useParams(); //sku code
   const siteId = useSelector(selectUserSite); //get current store/site user is in
-  const productStock = useSelector((state) => selectSiteProductStock(state, id));
+  const productStock = useSelector((state) =>
+    selectSiteProductStock(state, id)
+  );
   //get product information
   const modelCode = id.substring(0, id.indexOf("-"));
   const model = useSelector(selectModel);
@@ -392,7 +413,7 @@ export const StockLevelForm = (subsys) => {
     } else {
       dispatch(editStock({ sku: id, qty: qty, siteId: siteId }))
         .unwrap()
-        .then((response) => {
+        .then(() => {
           addToast("Successfully updated stock levels", {
             appearance: "success",
             autoDismiss: true,
@@ -409,7 +430,7 @@ export const StockLevelForm = (subsys) => {
           });
         });
     }
-  }
+  };
 
   // const handleEditStock = (e) => {
   //   e.preventDefault();
@@ -451,7 +472,11 @@ export const StockLevelForm = (subsys) => {
       <div className="min-h-full">
         <main className="py-10">
           {/* Page header */}
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+            <NavigatePrev
+              page="Stock Levels"
+              path={`/${subsys}/stocklevels/my`}
+            />
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
                 <div className="relative">
@@ -462,7 +487,9 @@ export const StockLevelForm = (subsys) => {
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">SKU: {id}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {model.name}
+                </h1>
               </div>
             </div>
           </div>
@@ -484,11 +511,17 @@ export const StockLevelForm = (subsys) => {
                     <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                       <div className="sm:col-span-1">
                         <dt className="text-sm font-medium text-gray-500">
-                          Name
+                          Product Code
                         </dt>
                         <dd className="mt-1 text-sm text-gray-900">
-                          {model === null ? "loading" : model.name}
+                          {model.modelCode}
                         </dd>
+                      </div>
+                      <div className="sm:col-span-1">
+                        <dt className="text-sm font-medium text-gray-500">
+                          SKU
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900">{id}</dd>
                       </div>
 
                       <div className="sm:col-span-1">
@@ -496,24 +529,33 @@ export const StockLevelForm = (subsys) => {
                           Price
                         </dt>
                         <dd className="mt-1 text-sm text-gray-900">
-                          {model === null ? "" : model.listPrice}
+                          {model.discountPrice < model.listPrice ? (
+                            <>
+                              <span className="line-through text-sm mr-2 text-gray-500">
+                                ${model.listPrice}
+                              </span>
+                              <span>${model.discountPrice}</span>
+                            </>
+                          ) : (
+                            <span>${model.listPrice}</span>
+                          )}
                         </dd>
                       </div>
                       {model != null && model.products != null
                         ? model?.products
-                          ?.filter((prod) => prod.sku === id.trim())[0]
-                          ?.productFields.map((field) => {
-                            return (
-                              <div key={field.id} className="sm:col-span-1">
-                                <dt className="text-sm font-medium text-gray-500">
-                                  {field.fieldName}
-                                </dt>
-                                <dd className="mt-1 text-sm text-gray-900">
-                                  {field.fieldValue}
-                                </dd>
-                              </div>
-                            );
-                          })
+                            ?.filter((prod) => prod.sku === id.trim())[0]
+                            ?.productFields.map((field) => {
+                              return (
+                                <div key={field.id} className="sm:col-span-1">
+                                  <dt className="text-sm font-medium text-gray-500">
+                                    {field.fieldName}
+                                  </dt>
+                                  <dd className="mt-1 text-sm text-gray-900">
+                                    {field.fieldValue}
+                                  </dd>
+                                </div>
+                              );
+                            })
                         : ""}
 
                       <div className="sm:col-span-1">
@@ -521,9 +563,7 @@ export const StockLevelForm = (subsys) => {
                           Online Exclusive
                         </dt>
                         <dd className="mt-1 text-sm text-gray-900">
-                          {model === null
-                            ? ""
-                            : model.onlineOnly.toString().toUpperCase()}
+                          {model.onlineOnly ? "YES" : "NO"}
                         </dd>
                       </div>
                       <div className="sm:col-span-1">
@@ -531,12 +571,10 @@ export const StockLevelForm = (subsys) => {
                           Available
                         </dt>
                         <dd className="mt-1 text-sm text-gray-900">
-                          {model === null
-                            ? ""
-                            : model.available.toString().toUpperCase()}
+                          {model.available ? "YES" : "NO"}
                         </dd>
                       </div>
-                      <div className="sm:col-span-1">
+                      <div className="sm:col-span-2">
                         <dt className="text-sm font-medium text-gray-500">
                           Description
                         </dt>

@@ -180,14 +180,12 @@ const PickPackList = ({
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <form>
-            <SimpleTable
-              columns={columns}
-              data={data}
-              skipPageReset={skipPageReset}
-              hiddenColumns={hiddenColumns}
-            />
-          </form>
+          <SimpleTable
+            columns={columns}
+            data={data}
+            skipPageReset={skipPageReset}
+            hiddenColumns={hiddenColumns}
+          />
         </div>
       )}
     </div>

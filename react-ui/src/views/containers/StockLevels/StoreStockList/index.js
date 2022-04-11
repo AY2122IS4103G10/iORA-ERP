@@ -9,7 +9,10 @@ import {
   selectUserSite,
   updateCurrSite,
 } from "../../../../stores/slices/userSlice";
-import { SelectableTable, SelectColumnFilter } from "../../../components/Tables/SelectableTable";
+import {
+  SelectableTable,
+  SelectColumnFilter,
+} from "../../../components/Tables/SelectableTable";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
 import { useState } from "react";
 import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
@@ -19,14 +22,18 @@ export const MyStoreStock = (subsys) => {
   const id = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
   const siteStock = useSelector(selectCurrSiteStock);
+  const stockStatus = useSelector((state) => state.stocklevel.status);
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getASiteStock(id));
   }, [dispatch, id]);
 
   useEffect(() => {
-    siteStock?.products &&
+    if (siteStock?.products) {
+      setLoading(true);
       fetchAllModelsBySkus(siteStock.products).then((data) => {
         setData(
           siteStock.products.map((item, index) => ({
@@ -40,7 +47,9 @@ export const MyStoreStock = (subsys) => {
             },
           }))
         );
+        setLoading(false);
       });
+    }
   }, [siteStock?.products]);
 
   const tabs = [
@@ -94,7 +103,7 @@ export const MyStoreStock = (subsys) => {
           ).fieldValue;
         },
         Filter: SelectColumnFilter,
-        filter: "includes"
+        filter: "includes",
       },
       {
         Header: "Size",
@@ -104,7 +113,7 @@ export const MyStoreStock = (subsys) => {
           ).fieldValue;
         },
         Filter: SelectColumnFilter,
-        filter: "includes"
+        filter: "includes",
       },
 
       {
@@ -139,31 +148,31 @@ export const MyStoreStock = (subsys) => {
         tabs={tabs}
         button={<EditStockButton />}
       />
-      {Boolean(siteStock) && (
-        <div className="min-h-full">
-          <main className="py-8 ml-2">
-            <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
-              <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-                {/* Stock Levels*/}
-                <section aria-labelledby="stocks-level">
-                  <div className="ml-2 mr-2">
-                    {siteStock === null ? (
-                      <div className="flex mt-5 items-center justify-center">
-                        <TailSpin color="#00BFFF" height={20} width={20} />
-                      </div>
-                    ) : (
+      {stockStatus === "loading" || loading ? (
+        <div className="flex mt-5 items-center justify-center">
+          <TailSpin color="#00BFFF" height={20} width={20} />
+        </div>
+      ) : (
+        Boolean(siteStock) && (
+          <div className="min-h-full">
+            <main className="py-8 ml-2">
+              <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+                <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+                  {/* Stock Levels*/}
+                  <section aria-labelledby="stocks-level">
+                    <div className="ml-2 mr-2">
                       <SelectableTable
                         columns={columns}
                         data={data}
                         path={path}
                       />
-                    )}
-                  </div>
-                </section>
+                    </div>
+                  </section>
+                </div>
               </div>
-            </div>
-          </main>
-        </div>
+            </main>
+          </div>
+        )
       )}
     </>
   );

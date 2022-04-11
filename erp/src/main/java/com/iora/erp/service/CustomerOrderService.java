@@ -8,6 +8,7 @@ import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
+import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
@@ -36,7 +37,7 @@ public interface CustomerOrderService {
 
         public abstract CustomerOrderLI getCustomerOrderLI(Long id) throws CustomerOrderException;
         public abstract List<CustomerOrderLI> getCustomerOrderLIs(CustomerOrder customerOrder);
-        public abstract CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI);
+        public abstract CustomerOrderLI createCustomerOrderLI(CustomerOrderLI customerOrderLI) throws ModelException;
         public abstract CustomerOrderLI updateCustomerOrderLI(CustomerOrderLI customerOrderLI) throws CustomerOrderException;
         public abstract List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException;
         public abstract List<CustomerOrderLI> removeFromCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku) throws CustomerOrderException;
@@ -61,6 +62,8 @@ public interface CustomerOrderService {
         public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
         public abstract OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
         public abstract Map<String, Integer> getPickingList(Long siteId) throws ProductException;
+        public abstract void startPick(List<Long> orderIds) throws CustomerOrderException;
+        public abstract void finishPick(List<Long> orderIds) throws CustomerOrderException;
         public abstract OnlineOrder scanProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException;
         public abstract OnlineOrder adjustProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException, NoStockLevelException, IllegalTransferException, ProductException;
         public abstract OnlineOrder deliverOnlineOrder(Long orderId) throws CustomerOrderException;

@@ -3,7 +3,6 @@ import { CurrencyDollarIcon, GlobeIcon } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { useToasts } from "react-toast-notifications";
 import { addToCart } from "../../../stores/slices/cartSlice";
 import {
   fetchModel,
@@ -11,13 +10,6 @@ import {
   selectModel,
   selectProductStock
 } from "../../../stores/slices/listingSlice";
-
-const product = {
-  breadcrumbs: [
-    { id: 1, name: "Women", href: "#" },
-    { id: 2, name: "Clothing", href: "#" },
-  ],
-};
 
 const policies = [
   {
@@ -155,7 +147,6 @@ const findProduct = (model, selectedColor, selectedSize) => {
 
 export default function ViewModel() {
   const dispatch = useDispatch();
-  const { addToast } = useToasts();
   const { modelCode } = useParams();
   const model = useSelector(selectModel);
   const [selectedColor, setSelectedColor] = useState(0);
@@ -165,9 +156,9 @@ export default function ViewModel() {
   const productStock = useSelector(selectProductStock);
 
   useEffect(() => {
-    dispatch(fetchModel(modelCode));
+    modelCode && dispatch(fetchModel(modelCode));
     window.scrollTo(0, 0);
-  }, [dispatch]);
+  }, [dispatch, modelCode]);
 
   //fetch the stock availability
   useEffect(() => {
@@ -177,7 +168,7 @@ export default function ViewModel() {
         dispatch(fetchProductStock(product?.sku));
       }
     }
-  }, [selectedColor, selectedSize]);
+  }, [dispatch, model, selectedColor, selectedSize]);
 
   const onAddCartClicked = (e) => {
     e.preventDefault();

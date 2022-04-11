@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { classNames } from "../../../../../ecommerce/src/utilities/Util";
 import { selectCartQty } from "../../../stores/slices/cartSlice";
+import { api } from "../../../environments/Api";
 
 const ProfileDropdown = ({ handleLogout }) => {
   return (
@@ -91,6 +92,122 @@ const ProfileDropdown = ({ handleLogout }) => {
   );
 };
 
+const SearchPopover = () => {
+  const [results, setResults] = useState([]);
+  const [search, setSearch] = useState("");
+
+  const onSearchChanged = async (e) => {
+    setSearch(e.target.value);
+    const { data } = await api.getAll(
+      `online/public/modelSearch?name=${e.target.value}`
+    );
+    setResults(data);
+  };
+
+  return (
+    <Popover.Group className="z-10 absolute bottom-0 inset-x-0 sm:static sm:flex-1 sm:self-stretch">
+      <div className="border-t h-14 px-4 flex space-x-8 overflow-x-auto pb-px sm:h-full sm:border-t-0 sm:justify-center sm:overflow-visible sm:pb-0">
+        <Popover className="flex justify-between">
+          <>
+            <div className="relative flex">
+              <Popover.Button className="ml-4 flow-root lg:ml-6">
+                <div className=" text-gray-400 hover:text-gray-500">
+                  <span className="sr-only">Search</span>
+                  <SearchIcon className="w-6 h-6" aria-hidden="true" />
+                </div>
+              </Popover.Button>
+            </div>
+
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Popover.Panel className="absolute top-full inset-x-0 text-gray-500 sm:text-sm">
+                {/* Presentational element used to render the bottom shadow, if we put the shadow on the actual panel it pokes out the top, so we use this shorter element to hide the top of the shadow */}
+                <div
+                  className="absolute inset-0 bg-white shadow"
+                  aria-hidden="true"
+                />
+                <div className="p-4 flex items-center justify-evenly">
+                  <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+                    <div className="py-4 px-8 flex-1 flex">
+                      <form className="w-full flex md:ml-0">
+                        <label htmlFor="search-field" className="sr-only">
+                          Search
+                        </label>
+                        <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+                          <div
+                            className="absolute inset-y-0 left-0 flex items-center pointer-events-none"
+                            aria-hidden="true"
+                          >
+                            <SearchIcon
+                              className="h-5 w-5"
+                              aria-hidden="true"
+                            />
+                          </div>
+                          <input
+                            id="search-field"
+                            name="search-field"
+                            className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
+                            placeholder="Search products"
+                            type="search"
+                            value={search}
+                            onChange={onSearchChanged}
+                          />
+                        </div>
+                      </form>
+                    </div>
+                    <ul className="max-h-64 overflow-y-auto overflow-x-hidden divide-y divide-gray-200">
+                      {results.map((result, index) => (
+                        <li
+                          key={index}
+                          className="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-gray-600"
+                        >
+                          <div className="flex justify-between space-x-3">
+                            <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden">
+                              <img
+                                src={result.imageLinks[0]}
+                                alt={result.name}
+                                className="object-center object-cover"
+                              />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <Link
+                                to={`/products/view/${result.modelCode}`}
+                                className="block focus:outline-none"
+                              >
+                                <span
+                                  className="absolute inset-0"
+                                  aria-hidden="true"
+                                />
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {result.name}
+                                </p>
+                                <p className="text-sm text-gray-500 truncate">
+                                  {result.description}
+                                </p>
+                              </Link>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </Popover.Panel>
+            </Transition>
+          </>
+        </Popover>
+      </div>
+    </Popover.Group>
+  );
+};
+
 export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
   const [open, setOpen] = useState(false);
   const cartCount = useSelector(selectCartQty);
@@ -141,9 +258,9 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
               <Tab.Group as="div" className="mt-2">
                 <div className="border-b border-gray-200">
                   <Tab.List className="-mb-px flex px-4 space-x-8">
-                    {navigation.categories.map((category) => (
+                    {navigation.categories.map((result) => (
                       <Tab
-                        key={category.name}
+                        key={result.name}
                         className={({ selected }) =>
                           classNames(
                             selected
@@ -153,27 +270,27 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                           )
                         }
                       >
-                        {category.name}
+                        {result.name}
                       </Tab>
                     ))}
                   </Tab.List>
                 </div>
                 <Tab.Panels as={Fragment}>
-                  {navigation.categories.map((category) => (
+                  {navigation.categories.map((result) => (
                     <Tab.Panel
-                      key={category.name}
+                      key={result.name}
                       className="pt-10 pb-8 px-4 space-y-10"
                     >
-                      {category.items.map((item) => (
+                      {result.items.map((item) => (
                         <div key={item.name}>
                           <p
-                            id={`${category.id}-${item.id}-heading-mobile`}
+                            id={`${result.id}-${item.id}-heading-mobile`}
                             className="font-medium text-gray-900"
                           >
                             {item.name}
                           </p>
                           <ul
-                            aria-labelledby={`${category.id}-${item.id}-heading-mobile`}
+                            aria-labelledby={`${result.id}-${item.id}-heading-mobile`}
                             className="mt-6 flex flex-col space-y-6"
                           >
                             <li key={item.name} className="flow-root">
@@ -254,8 +371,8 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
             </div>
 
             {/* Flyout menus */}
-            {navigation.categories.map((category) => (
-              <Popover key={category.name} className="flex relative px-4 ">
+            {navigation.categories.map((result) => (
+              <Popover key={result.name} className="flex relative px-4 ">
                 {({ open }) => (
                   <>
                     <Popover.Button
@@ -266,7 +383,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                         "relative z-10 flex items-center transition-colors ease-out duration-200 text-sm font-medium border-b-2 -mb-px pt-px"
                       )}
                     >
-                      {category.name}
+                      {result.name}
                     </Popover.Button>
 
                     <Transition
@@ -282,7 +399,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                         <div className="shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
                           <div className="text-sm bg-white p-6 pl-12">
                             <div className="justify-center">
-                              {category.items.map((item) => (
+                              {result.items.map((item) => (
                                 <p
                                   key={item.name}
                                   className=" text-gray-800 mb-1"
@@ -323,40 +440,28 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                 </div>
               )}
 
-              {/* <div className="hidden lg:ml-8 lg:flex">
-                <a
-                  href="#"
-                  className="text-gray-700 hover:text-gray-800 flex items-center"
-                >
-                  <img
-                    src="https://tailwindui.com/img/flags/flag-canada.svg"
-                    alt=""
-                    className="w-5 h-auto block flex-shrink-0"
-                  />
-                  <span className="ml-3 block text-sm font-medium">CAD</span>
-                  <span className="sr-only">, change currency</span>
-                </a>
-              </div> */}
-
               {/* Search */}
-              <div className="ml-4 flow-root lg:ml-6">
+              {/* <div className="ml-4 flow-root lg:ml-6">
                 <a href="/" className="p-2 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">Search</span>
                   <SearchIcon className="w-6 h-6" aria-hidden="true" />
                 </a>
-              </div>
+              </div> */}
+              <SearchPopover />
               {/* Account */}
               {loggedIn && <ProfileDropdown handleLogout={handleLogout} />}
               {/* Support */}
-              {loggedIn && <div className="ml-4 flow-root lg:ml-6">
-                <Link
-                  to="/support"
-                  className="p-2 text-gray-400 hover:text-gray-500"
-                >
-                  <span className="sr-only">Support</span>
-                  <SupportIcon className="w-6 h-6" aria-hidden="true" />
-                </Link>
-              </div>}
+              {loggedIn && (
+                <div className="ml-4 flow-root lg:ml-6">
+                  <Link
+                    to="/support"
+                    className="p-2 text-gray-400 hover:text-gray-500"
+                  >
+                    <span className="sr-only">Support</span>
+                    <SupportIcon className="w-6 h-6" aria-hidden="true" />
+                  </Link>
+                </div>
+              )}
               {/* Cart */}
               <div className="ml-4 flow-root lg:ml-6">
                 <Link to="cart" className="group -m-2 p-2 flex items-center">

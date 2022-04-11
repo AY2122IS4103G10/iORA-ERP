@@ -398,19 +398,19 @@ const OrderList = ({
               Add voucher
             </button>
           )}
-          {customer.membershipPoints ? (
+          {customer?.membershipPoints ? (
             <>
               {useMemPts ? (
                 <>
                   <div className="col-span-2 grid grid-rows-1">
                     <label for="memPts" className="form-label text-sm mt-2">
-                      Use {memPts}/{Math.min(customer.membershipPoints, amount)} points
+                      Use {memPts}/{Math.min(customer?.membershipPoints, amount)} points
                     </label>
                     <input
                       type="range"
                       className="accent-indigo-600 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none"
                       min={0}
-                      max={Math.min(customer.membershipPoints, amount)}
+                      max={Math.min(customer?.membershipPoints, amount)}
                       value={memPts}
                       onChange={(e) => setMemPts(e.target.value)}
                       id="memPts"
@@ -697,7 +697,6 @@ export function Order() {
       lineItems: lineItems,
       promotions: promotions,
       payments: [],
-      paid: false,
       refundedLIs: [],
       exchangedLIs: [],
       voucher,
@@ -721,7 +720,6 @@ export function Order() {
             ccTransactionId: "",
           },
         ],
-        paid: true,
         refundedLIs: [],
         exchangedLIs: [],
         voucher,

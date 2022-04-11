@@ -43,23 +43,6 @@ public class AuthenticationController {
      * ---------------------------------------------------------
      */
 
-    /*
-     * Deprecated
-     * 
-     * @GetMapping(path = "/empLogin", produces = "application/json")
-     * public ResponseEntity<Object> employeeLogin(@RequestParam String username,
-     * 
-     * @RequestParam String password) {
-     * try {
-     * return ResponseEntity.ok(employeeService.loginAuthentication(username,
-     * password));
-     * } catch (Exception ex) {
-     * System.err.println(ex.getMessage());
-     * return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-     * }
-     * }
-     */
-
     @GetMapping(path = "/refreshToken")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);

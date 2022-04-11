@@ -70,7 +70,6 @@ const OrderDetailsBody = ({
   customer,
   totalAmount,
   payments,
-  paid,
   pickupSite,
   country,
   lineItems,
@@ -206,13 +205,6 @@ const OrderDetailsBody = ({
                   </dd>
                 </div>
 
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Paid</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {paid ? "YES" : "NO"}
-                  </dd>
-                </div>
-
                 {Boolean(payments.length) && (
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">
@@ -258,7 +250,6 @@ export const CustomerOrderDetails = () => {
     deliveryAddress,
     totalAmount,
     payments,
-    paid,
     pickupSite,
     country,
     status,
@@ -309,7 +300,6 @@ export const CustomerOrderDetails = () => {
       deliveryAddress={deliveryAddress}
       totalAmount={totalAmount}
       payments={payments}
-      paid={paid}
       pickupSite={pickupSite}
       country={country}
       status={status.status}

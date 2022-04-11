@@ -56,14 +56,9 @@ public class CustomerServiceImpl implements CustomerService {
             getCustomerByEmail(customer.getEmail());
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
-            // DeliveryAddress da = customer.getAddress();
             customer.setMembershipTier(findMembershipTierById("BASIC"));
             customer.setPassword(passwordEncoder.encode(customer.getPassword()));
-            // customer.setAddress(new DeliveryAddress());
             em.persist(customer);
-            // em.persist(da);
-            // customer.setAddress(da);
-
             return customer;
         }
     }
@@ -123,19 +118,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<Customer> listOfCustomer() {
-        // need run test if query exits timing for large database
         return em.createQuery("SELECT c FROM Customer c", Customer.class).getResultList();
     }
 
     @Override
     public List<Customer> getCustomerByFields(String search) {
-        /*
-         * TypedQuery<Customer> q = em.
-         * createQuery("SELECT c FROM Customer c WHERE LOWER(c.getEmail) Like :email OR "
-         * +
-         * "LOWER(c.getLastName) Like :last OR LOWER(c.getFirstName) Like :first OR c.getContactNumber Like :contact"
-         * , Customer.class);
-         */
         return em.createQuery("SELECT c FROM Customer c WHERE LOWER(c.email) LIKE :email OR " +
                 "LOWER(c.lastName) LIKE :last OR LOWER(c.firstName) LIKE :first OR c.contactNumber LIKE :contact",
                 Customer.class)
@@ -333,6 +320,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Voucher redeemVoucher(String voucherCode) throws CustomerException {
         Voucher voucher = getVoucher(voucherCode);
         voucher.setRedeemed(true);
+        voucher.setCustomerId(null);
         return voucher;
     }
 

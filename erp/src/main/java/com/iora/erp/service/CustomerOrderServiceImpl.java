@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -24,6 +25,7 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.enumeration.PaymentTypeEnum;
+import com.iora.erp.enumeration.ParcelSize;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
@@ -247,7 +249,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                                 "Customer does not have enough points for the membership points redemption.");
                     }
                     v = new Voucher(v.getCampaign(), v.getAmount(), new Date(System.currentTimeMillis() + 86400000));
-                    v.setCustomerId(c.getId());
                     v.setCustomerOrder(customerOrder);
                     v.setIssued(true);
                     v.setRedeemed(true);
@@ -292,7 +293,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (CustomerOrderLI coli : customerOrder.getLineItems()) {
                 try {
                     siteService.removeProducts(customerOrder.getSite().getId(), coli.getProduct().getSku(),
-                            coli.getPackedQty());
+                            coli.getQty());
                 } catch (NoStockLevelException | IllegalTransferException e) {
                     e.printStackTrace();
                 }
@@ -350,7 +351,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public List<CustomerOrderLI> addToCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku)
             throws CustomerOrderException {
-        // Get Product
         Product product = em.find(Product.class, rfidsku);
         ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
@@ -360,7 +360,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             product = productItem.getProduct();
         }
 
-        // Add ProductItem to Line Items
         String sku = product.getSku();
         String model = sku.substring(0, sku.lastIndexOf("-"));
         Model mdl = em.find(Model.class, model.trim());
@@ -385,7 +384,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public List<CustomerOrderLI> removeFromCustomerOrderLIs(List<CustomerOrderLI> lineItems, String rfidsku)
             throws CustomerOrderException {
-        // Get Product
         Product product = em.find(Product.class, rfidsku);
         ProductItem productItem = em.find(ProductItem.class, rfidsku);
 
@@ -395,7 +393,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             product = productItem.getProduct();
         }
 
-        // Remove ProductItem from Line Items
         String sku = product.getSku();
         String model = sku.substring(0, sku.lastIndexOf("-"));
         Model mdl = em.find(Model.class, model.trim());
@@ -826,6 +823,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
             if (pickupSiteHasStock) {
                 onlineOrder.setSite(onlineOrder.getPickupSite());
+                onlineOrder.addStatusHistory(
+                        new OOStatus(onlineOrder.getPickupSite(), new Date(), OnlineOrderStatusEnum.PENDING));
             } else {
                 onlineOrder.setSite(siteService.getSite(3L));
                 Site store = onlineOrder.getPickupSite();
@@ -834,9 +833,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         new DeliveryAddress(store.getName(), add.getRoad(), add.getUnit() + ", " + add.getBuilding(),
                                 add.getCity(), add.getPostalCode(), add.getState(), CountryEnum.Singapore,
                                 store.getPhoneNumber()));
+                onlineOrder.addStatusHistory(
+                        new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.PENDING));
             }
-            onlineOrder.addStatusHistory(
-                    new OOStatus(onlineOrder.getPickupSite(), new Date(), OnlineOrderStatusEnum.PENDING));
+
         }
 
         if (clientSecret != null && clientSecret != "") {
@@ -1312,5 +1312,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 .setParameter("end", dateEnd);
 
         return q.getResultList();
+    }
+
+    @Override
+    public List<ParcelSize> getParcelSizes() {
+        return Arrays.asList(ParcelSize.values());
     }
 }

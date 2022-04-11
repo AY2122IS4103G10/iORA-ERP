@@ -1,6 +1,9 @@
 package com.iora.erp.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -206,10 +209,21 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public List<StockLevelLI> getStockLevelByProduct(String SKUCode) {
-        return em.createQuery("SELECT sl FROM StockLevelLI sl WHERE sl.product.sku = :sku", StockLevelLI.class)
+    public List<Map<String,Object>> getStockLevelByProduct(String SKUCode) {
+        List<StockLevelLI> list = em
+                .createQuery("SELECT sl FROM StockLevelLI sl WHERE sl.product.sku = :sku", StockLevelLI.class)
                 .setParameter("sku", SKUCode)
                 .getResultList();
+
+        List<Map<String,Object>> stockList = new ArrayList<>();
+        for (StockLevelLI stli : list) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("site", getSite(stli.getStockLevel().getId()));
+            map.put("qty", stli.getQty());
+            stockList.add(map);
+        }
+
+        return stockList;
     }
 
     @Override
@@ -310,97 +324,4 @@ public class SiteServiceImpl implements SiteService {
         }
         return null;
     }
-
-    /*
-     * @Override
-     * public Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId, Long
-     * toSiteId, String SKUCode, int qty)
-     * throws NoStockLevelException, IllegalTransferException {
-     * StockLevel sl1 = removeProducts(fromSiteId, SKUCode, qty);
-     * StockLevel sl2 = addProducts(toSiteId, SKUCode, qty);
-     * return Pair.of(sl1, sl2);
-     * }
-     * 
-     * @Override
-     * public StockLevel addProductsWithRfid(Long siteId, List<String> rfidskus)
-     * throws NoStockLevelException {
-     * Map<String, Long> counter = rfidskus.stream().parallel().map(new
-     * Function<String, Product>() {
-     * public Product apply(String rfidsku) {
-     * Product product = em.find(Product.class, rfidsku);
-     * if (product != null) {
-     * return product;
-     * }
-     * ProductItem productItem = em.find(ProductItem.class, rfidsku);
-     * if (productItem == null) {
-     * return null;
-     * } else {
-     * return productItem.getProduct();
-     * }
-     * }
-     * }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(),
-     * Collectors.counting()));
-     * 
-     * for (Map.Entry<String, Long> entry : counter.entrySet()) {
-     * addProducts(siteId, entry.getKey(), entry.getValue().intValue());
-     * }
-     * return em.find(Site.class, siteId).getStockLevel();
-     * }
-     * 
-     * @Override
-     * public StockLevel removeProductsWithRfid(Long siteId, List<String> rfidskus)
-     * throws NoStockLevelException, IllegalTransferException {
-     * Map<String, Long> counter = rfidskus.stream().parallel().map(new
-     * Function<String, Product>() {
-     * public Product apply(String rfidsku) {
-     * Product product = em.find(Product.class, rfidsku);
-     * if (product != null) {
-     * return product;
-     * }
-     * ProductItem productItem = em.find(ProductItem.class, rfidsku);
-     * if (productItem == null) {
-     * return null;
-     * } else {
-     * return productItem.getProduct();
-     * }
-     * }
-     * }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(),
-     * Collectors.counting()));
-     * 
-     * for (Map.Entry<String, Long> entry : counter.entrySet()) {
-     * removeProducts(siteId, entry.getKey(), entry.getValue().intValue());
-     * }
-     * return em.find(Site.class, siteId).getStockLevel();
-     * }
-     * 
-     * @Override
-     * public Pair<StockLevel, StockLevel> moveProductsWithRfid(Long fromSiteId,
-     * Long toSiteId,
-     * List<String> rfidskus)
-     * throws NoStockLevelException, IllegalTransferException {
-     * Map<String, Long> counter = rfidskus.stream().parallel().map(new
-     * Function<String, Product>() {
-     * public Product apply(String rfidsku) {
-     * Product product = em.find(Product.class, rfidsku);
-     * if (product != null) {
-     * return product;
-     * }
-     * ProductItem productItem = em.find(ProductItem.class, rfidsku);
-     * if (productItem == null) {
-     * return null;
-     * } else {
-     * return productItem.getProduct();
-     * }
-     * }
-     * }).filter(x -> x != null).collect(Collectors.groupingBy(x -> x.getSku(),
-     * Collectors.counting()));
-     * 
-     * for (Map.Entry<String, Long> entry : counter.entrySet()) {
-     * moveProducts(fromSiteId, toSiteId, entry.getKey(),
-     * entry.getValue().intValue());
-     * }
-     * return Pair.of(em.find(Site.class, fromSiteId).getStockLevel(),
-     * em.find(Site.class, toSiteId).getStockLevel());
-     * }
-     */
 }

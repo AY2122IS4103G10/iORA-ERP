@@ -11,12 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iora.erp.enumeration.ParcelSize;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
-// import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.site.Site;
@@ -24,7 +24,6 @@ import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
-// import com.iora.erp.service.EasyPostService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StripeService;
@@ -314,7 +313,7 @@ public class OnlineCustomerController {
         }
     }
 
-    // Haven't get into making it work
+    // TODO: Haven't get into making it work
     @PutMapping(path = "/cancel/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> cancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
@@ -392,6 +391,11 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/order/parcelSize", produces = "application/json")
+    public List<ParcelSize> getParcelSize() {
+        return customerOrderService.getParcelSizes();
+    }
+
     @PutMapping(path = "/deliver/{orderId}", produces = "application/json")
     public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId) {
         try {
@@ -437,8 +441,6 @@ public class OnlineCustomerController {
      * ---------------------------------------------------------
      */
 
-    // Get models by fashion line (iORA) and tag (top)
-    // Return empty list if no results
     @GetMapping(path = "/public/model/tag/{company}/{tag}", produces = "application/json")
     public ResponseEntity<Object> getModelsByCompanyAndTag(@PathVariable String company, @PathVariable String tag) {
         try {
@@ -448,8 +450,6 @@ public class OnlineCustomerController {
         }
     }
 
-    // Get models by tag (top)
-    // Return empty list if no results
     @GetMapping(path = "/public/model/tag/{tag}", produces = "application/json")
     public ResponseEntity<Object> getModelsByTag(@PathVariable String tag) {
         try {
@@ -459,8 +459,6 @@ public class OnlineCustomerController {
         }
     }
 
-    // Get models by category (2 FOR S$49 / IORA NEW ARRIVALS)
-    // Return empty list if no results
     @GetMapping(path = "/public/model/category/{category}", produces = "application/json")
     public ResponseEntity<Object> getModelsByCategory(@PathVariable String category) {
         try {

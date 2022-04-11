@@ -44,11 +44,4 @@ public class ErpApplication {
 			}
 		};
 	}
-	/*
-	 * private static class MyTimeTask extends TimerTask {
-	 * public void run() {
-	 * 
-	 * }
-	 * }
-	 */
 }

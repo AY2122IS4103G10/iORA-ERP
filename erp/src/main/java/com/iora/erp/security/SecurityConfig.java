@@ -45,9 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests().anyRequest().permitAll();
 
-        // http.authorizeRequests().antMatchers("/auth/login/**","/auth/refreshToken/**").permitAll();
-        // http.authorizeRequests().antMatchers("/admin/**").hasAnyAuthority("SYSADMIN_BASIC");;
-        // http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(authFilterCustomer);
         http.addFilter(authFilterEmployee);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

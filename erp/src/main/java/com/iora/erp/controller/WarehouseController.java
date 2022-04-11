@@ -146,7 +146,6 @@ public class WarehouseController {
         }
     }
 
-    // Online Delivery
     @PostMapping(path = "/onlineDelivery/create/{orderId}/{siteId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
             @RequestBody Delivery deliveryParcel) {

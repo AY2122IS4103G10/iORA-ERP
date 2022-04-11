@@ -10,9 +10,6 @@ import javax.persistence.Id;
 
 import com.iora.erp.enumeration.PaymentTypeEnum;
 
-//no status?
-//payement
-
 @Entity
 public class Payment {
     @Id

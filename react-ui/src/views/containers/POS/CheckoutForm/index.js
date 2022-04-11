@@ -123,7 +123,6 @@ export const CheckoutForm = ({
           ...order,
           totalAmount: Math.max(amount - voucherDiscount, 0),
           customerId: customerId,
-          paid: true,
           voucher,
           payments: [
             {
@@ -281,7 +280,11 @@ export const CheckoutForm = ({
         </div>
         {mode === 0 &&
           (showChoice ? (
-            <Choice setMode={setMode} setShowChoice={setShowChoice} />
+            <Choice
+              setMode={setMode}
+              setShowChoice={setShowChoice}
+              showCashOnly={amount <= voucherDiscount}
+            />
           ) : (
             <div className="grow max-w-md sm:grid sm:grid-cols-1 gap-4 pl-3">
               <div className="rounded-md bg-blue-50 p-4">
@@ -391,8 +394,8 @@ export const CheckoutForm = ({
                           for="memPts"
                           className="form-label text-sm font-medium mt-2 col-span-1 sm:col-span-2 text-gray-700"
                         >
-                          Drag to use {memPts}/{Math.min(customer.membershipPoints, amount)}{" "}
-                          points
+                          Drag to use {memPts}/
+                          {Math.min(customer.membershipPoints, amount)} points
                         </label>
                         <input
                           type="range"
@@ -487,31 +490,33 @@ export const CheckoutForm = ({
   );
 };
 
-const Choice = ({ setMode, setShowChoice }) => {
+const Choice = ({ setMode, setShowChoice, showCashOnly }) => {
   return (
     <>
       <div className="rounded-lg bg-white overflow-hidden divide-y divide-gray-200 sm:divide-y-0 grid grid-cols-3 sm:gap-0 sm:max-w-md">
-        {paymentTypes.map((type, index) => (
-          <div
-            key={type.id}
-            className="m-1 border shadow rounded-lg align-middle sm:rounded-md relative bg-white py-3 px-3 focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500"
-          >
-            <div className="m-0 flex justify-center">
-              <button onClick={() => setMode(type.id)}>
-                {/* Extend touch target to entire panel */}
-                <span className="absolute inset-0" aria-hidden="true" />
+        {paymentTypes
+          .filter((x) => (showCashOnly ? x.id === 1 : true))
+          .map((type, index) => (
+            <div
+              key={type.id}
+              className="m-1 border shadow rounded-lg align-middle sm:rounded-md relative bg-white py-3 px-3 focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500"
+            >
+              <div className="m-0 flex justify-center">
+                <button onClick={() => setMode(type.id)}>
+                  {/* Extend touch target to entire panel */}
+                  <span className="absolute inset-0" aria-hidden="true" />
 
-                <div className="flex text-lg justify-center align-middle ">
-                  <h3>{type.name}</h3>
-                  <type.icon
-                    className="ml-2 inline-flex h-5 w-5 text-cyan-500 row-span-1"
-                    aria-hidden="true"
-                  />
-                </div>
-              </button>
+                  <div className="flex text-lg justify-center align-middle ">
+                    <h3>{type.name}</h3>
+                    <type.icon
+                      className="ml-2 inline-flex h-5 w-5 text-cyan-500 row-span-1"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
       <div className="mt-3 flex flex-row-reverse space-x-4 space-x-reverse justify-center">
         <button
@@ -669,7 +674,9 @@ export const Card = ({
 }) => {
   const [terminal, setTerminal] = useState(null);
   const [connected, setConnected] = useState(false);
-  const posId = localStorage.getItem("pos-posdeviceid").replace(/"/g, "");
+  const [posId, setPosId] = useState(
+    localStorage.getItem("pos-posdeviceid")?.replace(/"/g, "")
+  );
   const [clientSecret, setClientSecret] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -774,7 +781,6 @@ export const Card = ({
         autoDismiss: true,
       });
       await handleSubmit(result2.paymentIntent.id);
-      setLoading(false);
     } catch (err) {
       addToast(`Error: ${err}`, {
         appearance: "error",
@@ -800,8 +806,8 @@ export const Card = ({
                 : "Connecting to reader..."
               : connected
               ? `Reader ${localStorage
-                  .getItem("pos-posdeviceid")
-                  .replace(/"/g, "")}`
+                  ?.getItem("pos-posdeviceid")
+                  ?.replace(/"/g, "")}`
               : "No readers"}
           </h3>
           <p className="mt-1 text-sm text-gray-500">

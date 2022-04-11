@@ -35,7 +35,7 @@ const columns = [
 export const PurchaseHistoryList = () => {
   const navigate = useNavigate();
   const data = useSelector(selectUserOrders);
-console.log(data)
+
   const handleOnClick = (row) => navigate(`${row.original.id}`);
   return (
     <div className="min-h-full">

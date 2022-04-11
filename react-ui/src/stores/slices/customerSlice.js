@@ -101,7 +101,6 @@ const customerSlice = createSlice({
         contactNumber,
         membershipPoints,
         //membershipTier,
-        storeCredit,
         availStatus,
       } = action.payload;
       const existingCustomer = state.customers.find((cus) => cus.id === id);
@@ -115,7 +114,6 @@ const customerSlice = createSlice({
         existingCustomer.contactNumber = contactNumber;
         //existingCustomer.membershipTier = membershipTier;
         existingCustomer.membershipPoints = membershipPoints;
-        existingCustomer.storeCredit = storeCredit;
       }*/
       state.status = "idle";
     });

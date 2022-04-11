@@ -32,8 +32,6 @@ const CustomerFormBody = ({
   onMembershipTierChanged,
   membershipPoints,
   onMembershipPointsChanged,
-  storeCredit,
-  onStoreCreditChanged,
   receiverName,
   onReceiverName,
   street1,
@@ -166,22 +164,6 @@ const CustomerFormBody = ({
                         disabled
                       />
                     </SimpleInputGroup>
-                    <SimpleInputGroup
-                      label="Store Credit"
-                      inputField="storeCredit"
-                      className="sm:mt-0 sm:col-span-2">
-                      <SimpleInputBox
-                        type="text"
-                        name="storeCredit"
-                        id="storeCredit"
-                        autoComplete="storeCredit"
-                        value={storeCredit}
-                        onChange={onStoreCreditChanged}
-                        className="bg-gray-200"
-                        disabled
-                      />
-                    </SimpleInputGroup>
-
                     <SimpleInputGroup
                       label="Address"
                       inputField="address"
@@ -379,7 +361,6 @@ export const CustomerForm = ({subsys}) => {
   const [password, setPassword] = useState("");
   const [membershipTier, setMembershipTier] = useState({name: "BASIC"});
   const [membershipPoints, setMembershipPoints] = useState("0");
-  const [storeCredit, setStoreCredit] = useState("0");
   const [receiverName, setRecieverName] = useState("");
   const [street1, setStreet1] = useState("");
   const [street2, setStreet2] = useState("");
@@ -402,7 +383,6 @@ export const CustomerForm = ({subsys}) => {
   const onContactNumberChanged = (e) => setContactNumber(e.target.value);
   const onMembershipTierChanged = (e) => setMembershipTier(e.target.value);
   const onMembershipPointsChanged = (e) => setMembershipPoints(e.target.value);
-  const onStoreCreditChanged = (e) => setStoreCredit(e.target.value);
   const onReceiverName = (e) => setRecieverName(e.target.value);
   const onStreet1 = (e) => setStreet1(e.target.value);
   const onStreet2 = (e) => setStreet2(e.target.value);
@@ -429,7 +409,6 @@ export const CustomerForm = ({subsys}) => {
           email,
           membershipTier,
           membershipPoints,
-          storeCredit,
           address,
         } = response.data;
         setIsEditing(true);
@@ -440,7 +419,6 @@ export const CustomerForm = ({subsys}) => {
         setEmail(email);
         setMembershipTier(membershipTier);
         setMembershipPoints(membershipPoints);
-        setStoreCredit(storeCredit);
         setAddressID(address.id);
         setRecieverName(address.name);
         setStreet1(address.street1);
@@ -542,8 +520,6 @@ export const CustomerForm = ({subsys}) => {
       onMembershipTierChanged={onMembershipTierChanged}
       membershipPoints={membershipPoints}
       onMembershipPointsChanged={onMembershipPointsChanged}
-      storeCredit={storeCredit}
-      onStoreCreditChanged={onStoreCreditChanged}
       onAddCustomerClicked={onAddCustomerClicked}
       onCancelClicked={onCancelClicked}
       receiverName={receiverName}

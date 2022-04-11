@@ -72,13 +72,15 @@ const DeliveryList = ({
         })
       );
     };
-    const handleEditRow = (rowIndex) => {
+    const handleEditRow = (evt, rowIndex) => {
+      evt.preventDefault()
       setData((item) =>
         item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
       );
     };
 
-    const handleSaveRow = (rowIndex) => {
+    const handleSaveRow = (evt, rowIndex) => {
+      evt.preventDefault()
       setData((old) =>
         old.map((row, index) => {
           if (index === rowIndex) {
@@ -162,10 +164,10 @@ const DeliveryList = ({
           return (
             <button
               className="text-cyan-600 hover:text-cyan-900"
-              onClick={() =>
+              onClick={(evt) =>
                 !e.row.original.isEditing
-                  ? handleEditRow(e.row.index)
-                  : handleSaveRow(e.row.index)
+                  ? handleEditRow(evt, e.row.index)
+                  : handleSaveRow(evt, e.row.index)
               }
             >
               {!e.row.original.isEditing ? "Edit" : "Save"}
@@ -201,12 +203,14 @@ const DeliveryList = ({
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable
-            columns={columns}
-            data={data}
-            skipPageReset={skipPageReset}
-            hiddenColumns={hiddenColumns}
-          />
+          <form>
+            <SimpleTable
+              columns={columns}
+              data={data}
+              skipPageReset={skipPageReset}
+              hiddenColumns={hiddenColumns}
+            />
+          </form>
         </div>
       )}
     </div>

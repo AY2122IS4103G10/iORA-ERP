@@ -18,7 +18,7 @@ const ProfileDropdown = ({ handleLogout }) => {
   return (
     <Menu as="div" className="z-10 ml-3 relative">
       <div>
-        <Menu.Button className="p-2 text-gray-400 hover:text-gray-500 lg:ml-4">
+        <Menu.Button className="hidden lg:flow-root p-2 text-gray-400 hover:text-gray-500 lg:ml-4">
           <span className="sr-only">Account</span>
           <UserIcon className="w-6 h-6" aria-hidden="true" />
         </Menu.Button>
@@ -109,7 +109,7 @@ const SearchPopover = () => {
       <div className="border-t h-14 px-4 flex space-x-8 overflow-x-auto pb-px sm:h-full sm:border-t-0 sm:justify-center sm:overflow-visible sm:pb-0">
         <Popover className="flex justify-between">
           <>
-            <div className="relative flex">
+            <div className="items-center justify-end relative flex">
               <Popover.Button className="ml-4 flow-root lg:ml-6">
                 <div className=" text-gray-400 hover:text-gray-500">
                   <span className="sr-only">Search</span>
@@ -162,11 +162,11 @@ const SearchPopover = () => {
                         </div>
                       </form>
                     </div>
-                    <ul className="max-h-64 overflow-y-auto overflow-x-hidden divide-y divide-gray-200">
+                    <ul className="divide-y divide-gray-200">
                       {results.map((result, index) => (
                         <li
                           key={index}
-                          className="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-gray-600"
+                          className="relative overflow-hidden bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-gray-600"
                         >
                           <div className="flex justify-between space-x-3">
                             <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden">
@@ -197,6 +197,7 @@ const SearchPopover = () => {
                         </li>
                       ))}
                     </ul>
+                    )
                   </div>
                 </div>
               </Popover.Panel>
@@ -309,20 +310,7 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                 </Tab.Panels>
               </Tab.Group>
 
-              <div className="border-t border-gray-200 py-6 px-4 space-y-6">
-                {navigation.pages.map((page) => (
-                  <div key={page.name} className="flow-root">
-                    <a
-                      href={page.href}
-                      className="-m-2 p-2 block font-medium text-gray-900"
-                    >
-                      {page.name}
-                    </a>
-                  </div>
-                ))}
-              </div>
-
-              {!loggedIn && (
+              {!loggedIn ? (
                 <div className="border-t border-gray-200 py-6 px-4 space-y-6">
                   <div className="flow-root">
                     <Link
@@ -338,6 +326,50 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                       className="-m-2 p-2 block font-medium text-gray-900"
                     >
                       Create account
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-t border-gray-200 py-6 px-4 space-y-6">
+                  <div className="flow-root">
+                    <Link
+                      to="/settings/profile"
+                      className="-m-2 p-2 block font-medium text-gray-900"
+                    >
+                      Your profile
+                    </Link>
+                  </div>
+                  <div className="flow-root">
+                    <Link
+                      to="/orders"
+                      className="-m-2 p-2 block font-medium text-gray-900"
+                    >
+                      Order history
+                    </Link>
+                  </div>
+                  <div className="flow-root">
+                    <Link
+                      to="/membership"
+                      className="-m-2 p-2 block font-medium text-gray-900"
+                    >
+                      Membership
+                    </Link>
+                  </div>
+                  <div className="flow-root">
+                    <Link
+                      to="/support"
+                      className="-m-2 p-2 block font-medium text-gray-900"
+                    >
+                      Support centre
+                    </Link>
+                  </div>
+                  <div className="flow-root">
+                    <Link
+                      to="/"
+                      onClick={handleLogout}
+                      className="-m-2 p-2 block font-medium text-gray-900"
+                    >
+                      Logout
                     </Link>
                   </div>
                 </div>
@@ -439,20 +471,12 @@ export const NavBar = ({ navigation, loggedIn, handleLogout }) => {
                   </Link>
                 </div>
               )}
-
-              {/* Search */}
-              {/* <div className="ml-4 flow-root lg:ml-6">
-                <a href="/" className="p-2 text-gray-400 hover:text-gray-500">
-                  <span className="sr-only">Search</span>
-                  <SearchIcon className="w-6 h-6" aria-hidden="true" />
-                </a>
-              </div> */}
               <SearchPopover />
               {/* Account */}
               {loggedIn && <ProfileDropdown handleLogout={handleLogout} />}
               {/* Support */}
               {loggedIn && (
-                <div className="ml-4 flow-root lg:ml-6">
+                <div className="hidden ml-4 lg:flow-root lg:ml-6">
                   <Link
                     to="/support"
                     className="p-2 text-gray-400 hover:text-gray-500"

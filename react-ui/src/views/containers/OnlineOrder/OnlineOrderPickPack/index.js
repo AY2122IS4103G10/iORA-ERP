@@ -1,9 +1,14 @@
+import { useEffect } from "react";
 import { useMemo } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { onlineOrderApi } from "../../../../environments/Api";
+import { api, onlineOrderApi } from "../../../../environments/Api";
+import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
+import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import {
   EditableCell,
   SimpleTable,
@@ -184,6 +189,83 @@ const PickPackList = ({
   );
 };
 
+const PackageModal = ({
+  open,
+  closeModal,
+  numPackages,
+  onNumPackagesChanged,
+  onSaveClicked,
+  packages
+}) => {
+  return (
+    <SimpleModal open={open} closeModal={closeModal}>
+      <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
+        <div className="max-w-3xl mx-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <form onSubmit={onSaveClicked}>
+            <div className="p-4 space-y-8 divide-y divide-gray-200">
+              <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+                <div>
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Packages
+                  </h3>
+                  <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                    <SimpleInputGroup
+                      label="No. of packages"
+                      inputField="packages"
+                      className="sm:mt-0 sm:col-span-2"
+                    >
+                      <SimpleInputBox
+                        type="number"
+                        name="packages"
+                        id="packages"
+                        value={numPackages}
+                        onChange={onNumPackagesChanged}
+                        required
+                      />
+                    </SimpleInputGroup>
+                    {/* <ul role="list" className="divide-y divide-gray-200">
+                      {packages.map((pack, index) => (
+                        <li key={index} className="py-4 flex">
+                          {index}. 
+                          <div className="ml-3">
+                          <SimpleSelectMenu
+                            options={companies}
+                            selected={companySelected}
+                            setSelected={setCompanySelected}
+                          />
+                          </div>
+                        </li>
+                      ))}
+                    </ul> */}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-5">
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                    onClick={closeModal}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </SimpleModal>
+  );
+};
+
 export const OnlineOrderPickPack = () => {
   const { addToast } = useToasts();
   const {
@@ -204,7 +286,17 @@ export const OnlineOrderPickPack = () => {
   const status = st.status;
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [numPackages, setNumPackages] = useState(1)
+  const [packages, setPackages] = useState([])
   const onConfirmClicked = () => handlePickPack();
+
+  useEffect(() => {
+    const fetchPackageSizes = async () => {
+      const {data} = await api.getAll("online/order/pacelSize")
+      console.log(data)
+    }
+    fetchPackageSizes()
+  }, [])
 
   const onScanClicked = (evt) => {
     evt.preventDefault();

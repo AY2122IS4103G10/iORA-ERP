@@ -40,14 +40,12 @@ export const PickPackList = ({
               ["MANUFACTURED", "PICKING", "ACCEPTED", "PACKING"].some(
                 (s) => s === status
               ) ? (
-              
-                <EditableCell
-                  value={row.row.original.siteQuantities[storeId]}
-                  row={row.row}
-                  column={row.column}
-                  updateMyData={updateSiteCol}
-                />
-             
+              <EditableCell
+                value={row.row.original.siteQuantities[storeId]}
+                row={row.row}
+                column={row.column}
+                updateMyData={updateSiteCol}
+              />
             ) : (
               row.value
             );
@@ -80,13 +78,15 @@ export const PickPackList = ({
       );
     };
 
-    const handleEditRow = (rowIndex) => {
+    const handleEditRow = (evt, rowIndex) => {
+      evt.preventDefault();
       setData((item) =>
         item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
       );
     };
 
-    const onSaveClicked = (rowIndex) => {
+    const onSaveClicked = (evt, rowIndex) => {
+      evt.preventDefault();
       if (status === "MANUFACTURED" || status === "ACCEPTED")
         handlePickPack().then(() => handleSaveRow(rowIndex));
       else handleSaveRow(rowIndex);
@@ -110,21 +110,6 @@ export const PickPackList = ({
         })
       );
     };
-
-    // const updateMyData = (rowIndex, columnId, value) => {
-    //   setSkipPageReset(true);
-    //   setData((old) =>
-    //     old.map((row, index) => {
-    //       if (index === rowIndex) {
-    //         return {
-    //           ...old[rowIndex],
-    //           [columnId]: value,
-    //         };
-    //       }
-    //       return row;
-    //     })
-    //   );
-    // };
     return [
       {
         Header: "SKU",
@@ -167,10 +152,10 @@ export const PickPackList = ({
           return (
             <button
               className="text-cyan-600 hover:text-cyan-900"
-              onClick={() =>
+              onClick={(evt) =>
                 !e.row.original.isEditing
-                  ? handleEditRow(e.row.index)
-                  : onSaveClicked(e.row.index)
+                  ? handleEditRow(evt, e.row.index)
+                  : onSaveClicked(evt, e.row.index)
               }
             >
               {!e.row.original.isEditing ? "Edit" : "Save"}
@@ -224,6 +209,7 @@ export const PickPackList = ({
               data={data}
               skipPageReset={skipPageReset}
               hiddenColumns={hiddenColumns}
+              flex
             />
           </form>
         </div>
@@ -488,8 +474,10 @@ export const ProcurementPickPack = () => {
       );
       if (
         statusHistory[statusHistory.length - 1].status === "READY_FOR_SHIPPING"
-      )
-        navigate(`/${subsys}/procurements/${procurementId}`);
+      ) {
+        navigate(`/${subsys}/procurements/${procurementId}/delivery`);
+        openInvoice();
+      }
     } catch (error) {
       addToast(`Error: ${error.response.data}`, {
         appearance: "error",

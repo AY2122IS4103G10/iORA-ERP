@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllSites,
@@ -37,7 +38,11 @@ export const SiteTables = (subsys) => {
   }, [dispatch, siteStatus]);
 
   const path = "/" + subsys.subsys.subsys + "/stocklevels";
-  return (
+  return siteStatus === "loading" ? (
+    <div className="flex mt-5 items-center justify-center">
+      <TailSpin color="#00BFFF" height={20} width={20} />
+    </div>
+  ) : (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">
         <SelectableTable columns={columns} data={data} path={path} />

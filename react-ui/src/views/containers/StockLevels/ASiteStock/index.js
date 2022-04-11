@@ -6,6 +6,7 @@ import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 import { useState } from "react";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 
 const columns = [
   {
@@ -60,7 +61,7 @@ const processAddress = (addressObj) => {
   return str;
 };
 
-export const AsiteStock = () => {
+export const AsiteStock = ({ subsys }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const site = useSelector(selectSite);
@@ -92,7 +93,11 @@ export const AsiteStock = () => {
       <div className="min-h-full">
         <main className="py-10">
           {/* Page header */}
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+            <NavigatePrev
+              page="Stock Levels"
+              path={`/${subsys}/stocklevels/sites`}
+            />
             <div className="flex items-center space-x-3">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">

@@ -2,7 +2,6 @@ package com.iora.erp.data;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -460,7 +459,7 @@ public class DataLoader implements CommandLineRunner {
 		c2.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c2.setEmail("pengyu_33@msn.com");
 		c2.setPassword("password");
-		c2.setMembershipPoints(200);
+		c2.setMembershipPoints(200d);
 		Customer cc2 = customerService.createCustomerAccount(c2);
 		DeliveryAddress da2 = new DeliveryAddress("Remus", "252 Jurong East Street 24", "#02-120", "Singapore",
 				"600252", "",
@@ -798,11 +797,9 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createPayment(payment3);
 
 		CustomerOrder co1 = new CustomerOrder();
-		co1.setDateTime(new Date());
 		co1.addLineItem(coli4);
 		co1.addLineItem(coli5);
 		co1.addPayment(payment1);
-		co1.setPaid(true);
 		co1.setSite(siteService.getSite(4L));
 		co1.setCustomerId(1L);
 		customerOrderService.createCustomerOrder(co1, null);
@@ -815,7 +812,6 @@ public class DataLoader implements CommandLineRunner {
 		oo1.addLineItem(coli1);
 		oo1.addLineItem(coli2);
 		oo1.addLineItem(coli3);
-		oo1.setPaid(true);
 		oo1.addPayment(payment2);
 		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
 				"189554", "", CountryEnum.Singapore, "60981335");

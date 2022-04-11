@@ -15,8 +15,6 @@ public interface StripeService {
 
     public abstract PaymentIntent capturePayment(String clientSecret) throws StripeException;
 
-    public abstract PaymentIntent cancelPayment(String clientSecret) throws StripeException;
-
     public abstract Refund refundPayment(String clientSecret, double amount) throws StripeException;
 
 }

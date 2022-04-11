@@ -46,8 +46,6 @@ public class CustomerOrder {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Payment> payments;
 
-    private Boolean paid;
-
     @OneToMany
     private List<RefundLI> refundedLIs;
 
@@ -123,14 +121,6 @@ public class CustomerOrder {
     public void addPayment(Payment payment) {
         this.payments.add(payment);
         this.totalAmount += payment.getAmount();
-    }
-
-    public Boolean isPaid() {
-        return this.paid;
-    }
-
-    public void setPaid(Boolean paid) {
-        this.paid = paid;
     }
 
     public List<RefundLI> getRefundedLIs() {

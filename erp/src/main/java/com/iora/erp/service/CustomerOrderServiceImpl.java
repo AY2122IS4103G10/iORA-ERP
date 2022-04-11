@@ -21,16 +21,20 @@ import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
+import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
+import com.iora.erp.enumeration.PaymentTypeEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
+import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Notification;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
+import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
@@ -208,23 +212,51 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public CustomerOrder createCustomerOrder(CustomerOrder customerOrder, String clientSecret)
             throws StripeException, InsufficientPaymentException, CustomerException {
-        if (clientSecret != null && clientSecret != "") {
-            stripeService.capturePayment(clientSecret);
-        }
-        if (customerOrder.getVoucher() != null) {
-            if (customerOrder.getVoucher().getCustomerId() != customerOrder.getCustomerId()) {
-                throw new CustomerException("Customer is not entitled to this voucher.");
-            } else {
-                customerService.redeemVoucher(customerOrder.getVoucher().getVoucherCode());
-            }
-        }
+        // Customer is not a member
+        if (customerOrder.getCustomerId() == null) {
 
-        if (customerOrder instanceof OnlineOrder) {
-            OnlineOrder oo = (OnlineOrder) customerOrder;
-            DeliveryAddress da = oo.getDeliveryAddress();
-            em.persist(da);
-            oo.setDeliveryAddress(null);
-            customerOrder = oo;
+            if (customerOrder.getVoucher() != null) {
+                Voucher v = customerService.getVoucher(customerOrder.getVoucher().getVoucherCode());
+                if (v.getCustomerId() != null) {
+                    throw new CustomerException("Voucher belongs to an existing member.");
+                } else {
+                    customerService.redeemVoucher(v.getVoucherCode());
+                }
+            }
+
+            if (clientSecret != null && clientSecret != "") {
+                stripeService.capturePayment(clientSecret);
+            }
+        } else {
+
+            // Customer is a member
+            Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
+            if (customerOrder.getVoucher() != null) {
+                Voucher v;
+                try {
+                    v = customerService.getVoucher(customerOrder.getVoucher().getVoucherCode());
+                    if (v.getCustomerId() != c.getId()) {
+                        throw new CustomerException("Customer is not entitled to this voucher.");
+                    }
+                    customerService.redeemVoucher(v.getVoucherCode());
+                } catch (CustomerException ex) {
+                    v = customerOrder.getVoucher();
+                    if (v.getAmount() > c.getMembershipPoints()) {
+                        throw new CustomerException(
+                                "Customer does not have enough points for the membership points redemption.");
+                    }
+                    v = new Voucher(v.getCampaign(), v.getAmount(), new Date(System.currentTimeMillis() + 86400000));
+                    v.setCustomerId(c.getId());
+                    v.setCustomerOrder(customerOrder);
+                    v.setIssued(true);
+                    v.setRedeemed(true);
+                    em.persist(v);
+                    customerOrder.setVoucher(v);
+                }
+            }
+            if (clientSecret != null && clientSecret != "") {
+                stripeService.capturePayment(clientSecret);
+            }
         }
 
         em.persist(customerOrder);
@@ -249,10 +281,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (payments.stream().mapToDouble(x -> x.getAmount()).sum() < customerOrder.getTotalAmount()) {
             throw new InsufficientPaymentException("Insufficient Payment");
         }
-        customerOrder.setPaid(true);
 
         if (customerOrder.getCustomerId() != null) {
-            updateMembershipPoints(customerOrder);
+            addMembershipPoints(customerOrder);
         }
 
         // Remove stocks from site
@@ -271,7 +302,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
             c.setAddress(oo.getDeliveryAddress());
 
-            // set email to customer
+            // send email to customer
+            // TODO: remove this 7L
             if (oo.getId() > 7L) {
                 emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
             }
@@ -615,41 +647,44 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public RefundLI createRefundLI(Long orderId, RefundLI refundLI, Double refundAmount) throws CustomerOrderException {
-        CustomerOrder co = getCustomerOrder(orderId);
-        Boolean refundable = false;
-
-        List<CustomerOrderLI> colis = co.getLineItems();
-        for (CustomerOrderLI coli : colis) {
-            if (coli.getProduct().equals(refundLI.getProduct()) && coli.getQty() >= refundLI.getQty()) {
-                refundable = true;
-                coli.setQty(coli.getQty() - refundLI.getQty());
-            }
-        }
-
-        if (!refundable) {
-            throw new CustomerOrderException("Item to be refunded is not in the customer order.");
-        }
-
         try {
-            if (refundAmount == null) {
-                Customer c = customerService.getCustomerById(co.getCustomerId());
-                c.setStoreCredit(c.getStoreCredit()
-                        + productService.getModelByProduct(refundLI.getProduct()).getDiscountPrice());
-                em.merge(c);
-            } else {
-                Customer c = customerService.getCustomerById(co.getCustomerId());
-                c.setStoreCredit(c.getStoreCredit() + refundAmount);
-                em.merge(c);
+            CustomerOrder co = getCustomerOrder(orderId);
+            Customer c = customerService.getCustomerById(co.getCustomerId());
+            Boolean refundable = false;
+
+            List<CustomerOrderLI> colis = co.getLineItems();
+            for (CustomerOrderLI coli : colis) {
+                if (coli.getProduct().equals(refundLI.getProduct()) && coli.getQty() >= refundLI.getQty()) {
+                    refundable = true;
+                    coli.setQty(coli.getQty() - refundLI.getQty());
+                    revertMembershipPoints(c, refundAmount);
+                    em.merge(c);
+                    break;
+                }
             }
+
+            if (!refundable) {
+                throw new CustomerOrderException("Item to be refunded is not in the customer order.");
+            }
+
+            for (Payment p : co.getPayments()) {
+                if (p.getPaymentType() == PaymentTypeEnum.MASTERCARD || p.getPaymentType() == PaymentTypeEnum.VISA
+                        || p.getPaymentType() == PaymentTypeEnum.NETS) {
+                    stripeService.refundPayment(p.getCcTransactionId(), Math.min(refundAmount, p.getAmount()));
+                    if (refundAmount > p.getAmount()) {
+                        c.setMembershipPoints(c.getMembershipPoints() + (refundAmount - p.getAmount()));
+                    }
+                }
+            }
+
+            em.persist(refundLI);
+            co.addRefundedLI(refundLI);
+            em.merge(co);
+            return refundLI;
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println(ex);
+            throw new CustomerOrderException(ex.getMessage());
         }
-
-        em.persist(refundLI);
-        co.addRefundedLI(refundLI);
-        em.merge(co);
-        return refundLI;
     }
 
     @Override
@@ -660,7 +695,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     // Helper methods
-    public void updateMembershipPoints(CustomerOrder order) throws CustomerException {
+    public void addMembershipPoints(CustomerOrder order) throws CustomerException {
         Customer customer = customerService.getCustomerById(order.getCustomerId());
 
         double spending = getCurrentSpending(customer.getId());
@@ -695,10 +730,37 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 bdayMultiplier = membershipTier.getBirthday().getMultiplier();
             }
         }
-        Integer membershipPoints = customer.getMembershipPoints();
-        membershipPoints = membershipPoints
-                + (int) (order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier());
+
+        Double membershipPoints = customer.getMembershipPoints()
+                + order.getTotalAmount() * bdayMultiplier * membershipTier.getMultiplier();
         customer.setMembershipPoints(membershipPoints);
+        em.merge(customer);
+    }
+
+    private void revertMembershipPoints(Customer customer, Double refundAmount) {
+        MembershipTier mt = customer.getMembershipTier();
+
+        double bdayMultiplier = 1;
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(customer.getDob());
+        if (currentMonth == cal.get(Calendar.MONTH)) {
+            Integer ordersThisMonth = em
+                    .createQuery("SELECT o FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
+                            CustomerOrder.class)
+                    .setParameter("id", customer.getId())
+                    .setParameter("date",
+                            Timestamp.valueOf(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())),
+                            TemporalType.TIMESTAMP)
+                    .getResultList()
+                    .size();
+            if (ordersThisMonth == 0) {
+                bdayMultiplier = mt.getBirthday().getMultiplier();
+            }
+        }
+
+        Double pointsToDeduct = refundAmount * bdayMultiplier * mt.getMultiplier();
+        customer.setMembershipPoints(customer.getMembershipPoints() - pointsToDeduct);
     }
 
     public double getCurrentSpending(Long customerId) {
@@ -737,10 +799,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret)
             throws StripeException, InsufficientPaymentException, CustomerException {
-        if (clientSecret != null && clientSecret != "") {
-            stripeService.capturePayment(clientSecret);
-        }
         if (onlineOrder.getVoucher() != null) {
+            if (onlineOrder.getVoucher().getCustomerId() != onlineOrder.getCustomerId()) {
+                throw new CustomerException("Customer is not entitled to this voucher.");
+            }
             customerService.redeemVoucher(onlineOrder.getVoucher().getVoucherCode());
         }
         if (onlineOrder.isDelivery()) {
@@ -762,9 +824,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 onlineOrder.setSite(onlineOrder.getPickupSite());
             } else {
                 onlineOrder.setSite(siteService.getSite(3L));
+                Site store = onlineOrder.getPickupSite();
+                Address add = store.getAddress();
+                onlineOrder.setDeliveryAddress(
+                        new DeliveryAddress(store.getName(), add.getRoad(), add.getUnit() + ", " + add.getBuilding(),
+                                add.getCity(), add.getPostalCode(), add.getState(), CountryEnum.Singapore,
+                                store.getPhoneNumber()));
             }
             onlineOrder.addStatusHistory(
                     new OOStatus(onlineOrder.getPickupSite(), new Date(), OnlineOrderStatusEnum.PENDING));
+        }
+
+        if (clientSecret != null && clientSecret != "") {
+            stripeService.capturePayment(clientSecret);
         }
 
         em.persist(onlineOrder);

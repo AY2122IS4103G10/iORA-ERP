@@ -313,6 +313,15 @@ public class OnlineCustomerController {
         }
     }
 
+    @PutMapping(path = "/customer/cancel/{orderId}/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> customerCancelancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long customerId) {
+        try {
+            return ResponseEntity.ok(customerOrderService.customerCancelOnlineOrder(orderId, customerId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     // TODO: Haven't get into making it work
     @PutMapping(path = "/cancel/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> cancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {

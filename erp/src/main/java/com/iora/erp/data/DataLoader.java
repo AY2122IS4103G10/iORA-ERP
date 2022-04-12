@@ -921,7 +921,7 @@ public class DataLoader implements CommandLineRunner {
 
 		siteService.editStockLevel(4L, "ASK0010259H-1", 0);
 		OnlineOrder oo6 = new OnlineOrder(false);
-		oo6.setCustomerId(6L);
+		oo6.setCustomerId(7L);
 		oo6.addLineItem(coli15);
 		oo6.addLineItem(coli16);
 		Payment payment7 = new Payment(coli15.getSubTotal() + coli16.getSubTotal(), "7-1", PaymentTypeEnum.CASH);

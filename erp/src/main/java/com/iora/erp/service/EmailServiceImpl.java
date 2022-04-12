@@ -82,12 +82,26 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendOnlineOrderConfirmation(Customer customer, OnlineOrder order) {
         Context context = new Context();
-
+        context.setVariable("header", "Dear Customer, thank you for shopping at iORA!");
+        context.setVariable("agenda", "You have successfully placed an order with us on ");
         context.setVariable("dateTime", order.getDateTime());
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
         String subject = "Order Confirmation #" + order.getId();
         sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
+    }
+
+    @Override
+    public void sendOnlineOrderCancellation(Customer customer, OnlineOrder order) {
+        Context context = new Context();
+        context.setVariable("header", "Dear Customer, we deeply regret to inform you that your order has been cancelled due to insufficient stocks. Payment(s) have been fully refunded to your card and it may take up to 14 working days to take effect.");
+        context.setVariable("agenda", "Please email, call, or create a support ticket at https://iora.online/sg/ if you would like to contact us. Your order was previously placed on ");
+        context.setVariable("dateTime", order.getDateTime());
+        context.setVariable("orderLineItems", order.getLineItems());
+        context.setVariable("totalAmount", order.getTotalAmount());
+        String subject = "Order Confirmation #" + order.getId();
+        sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
+        
     }
 
     @Override
@@ -114,5 +128,4 @@ public class EmailServiceImpl implements EmailService {
                 message,
                 text);
     }
-
 }

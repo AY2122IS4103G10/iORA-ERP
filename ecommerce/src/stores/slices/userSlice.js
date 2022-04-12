@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api, onlineOrderApi } from "../../environments/Api";
-import { authApi } from "../../environments/Api";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {api, onlineOrderApi} from "../../environments/Api";
+import {authApi} from "../../environments/Api";
 
 const guest = {
   id: -1,
@@ -14,12 +14,10 @@ const guest = {
   password: "",
 };
 
-const initialUser = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
-  : guest;
+const initialUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : guest;
 
 const initialState = {
-  user: { ...initialUser },
+  user: {...initialUser},
   loggedIn: localStorage.getItem("user") ? true : false,
   currStore: 0, //to be updated when login is finalised
   currSpend: 0,
@@ -27,53 +25,41 @@ const initialState = {
   error: "null",
 };
 
-export const login = createAsyncThunk(
-  "auth/login",
-  async ({ email, password }) => {
-    try {
-      const response = await authApi.login(email, password);
-      return response.data;
-    } catch (error) {
-      return Promise.reject(error.response.data);
-    }
+export const login = createAsyncThunk("auth/login", async ({email, password}) => {
+  try {
+    const response = await authApi.login(email, password);
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error.response.data);
   }
-);
+});
 
-export const loginJwt = createAsyncThunk(
-  "auth/loginJwt",
-  async (credentials) => {
-    try {
-      const response = await authApi.loginJwt(credentials);
-      return response.data;
-    } catch (error) {
-      return Promise.reject(error.response.data);
-    }
+export const loginJwt = createAsyncThunk("auth/loginJwt", async (credentials) => {
+  try {
+    const response = await authApi.loginJwt(credentials);
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error.response.data);
   }
-);
+});
 
-export const postLoginJwt = createAsyncThunk(
-  "auth/postLoginJwt",
-  async (accessToken) => {
-    try {
-      const response = await authApi.postLoginJwt(accessToken);
-      return response.data;
-    } catch (error) {
-      return Promise.reject(error.response.data);
-    }
+export const postLoginJwt = createAsyncThunk("auth/postLoginJwt", async (accessToken) => {
+  try {
+    const response = await authApi.postLoginJwt(accessToken);
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error.response.data);
   }
-);
+});
 
-export const refreshTokenJwt = createAsyncThunk(
-  "auth/refreshTokenJwt",
-  async (refreshToken) => {
-    try {
-      const response = await authApi.refreshTokenJwt(refreshToken);
-      return response.data;
-    } catch (error) {
-      return Promise.reject(error.response.message);
-    }
+export const refreshTokenJwt = createAsyncThunk("auth/refreshTokenJwt", async (refreshToken) => {
+  try {
+    const response = await authApi.refreshTokenJwt(refreshToken);
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error.response.message);
   }
-);
+});
 
 export const register = createAsyncThunk("auth/register", async (user) => {
   try {
@@ -84,27 +70,21 @@ export const register = createAsyncThunk("auth/register", async (user) => {
   }
 });
 
-export const updateAccount = createAsyncThunk(
-  "auth/updateAccount",
-  async (user) => {
-    const response = await api.update("online/profile/edit", user);
-    if (response.data === "") {
-      return Promise.reject(response.error);
-    }
-    return response.data;
+export const updateAccount = createAsyncThunk("auth/updateAccount", async (user) => {
+  const response = await api.update("online/profile/edit", user);
+  if (response.data === "") {
+    return Promise.reject(response.error);
   }
-);
+  return response.data;
+});
 
-export const fetchAnOrder = createAsyncThunk(
-  "user/getUserOrder",
-  async (orderId) => {
-    const response = await api.get("/online/history", orderId);
-    if (response.data === "") {
-      return Promise.reject(response.error);
-    }
-    return response.data;
+export const fetchAnOrder = createAsyncThunk("user/getUserOrder", async (orderId) => {
+  const response = await api.get("/online/history", orderId);
+  if (response.data === "") {
+    return Promise.reject(response.error);
   }
-);
+  return response.data;
+});
 
 export const getCurrentSpending = createAsyncThunk(
   "customers/getCurrentSpending",
@@ -114,13 +94,10 @@ export const getCurrentSpending = createAsyncThunk(
   }
 );
 
-export const fetchCustomer = createAsyncThunk(
-  "customers/fetchCustomer",
-  async (data) => {
-    const response = await api.get("sam/customer/view", data);
-    return response.data;
-  }
-);
+export const fetchCustomer = createAsyncThunk("customers/fetchCustomer", async (data) => {
+  const response = await api.get("sam/customer/view", data);
+  return response.data;
+});
 
 export const fetchCustomerByEmail = createAsyncThunk(
   "customers/fetchCustomerByEmail",
@@ -130,20 +107,14 @@ export const fetchCustomerByEmail = createAsyncThunk(
   }
 );
 
-export const cancelOrder = createAsyncThunk(
-  "customers/cancelOrder",
-  async (data) => {
-    try {
-      const response = await onlineOrderApi.cancelOrder(
-        data.orderId,
-        data.customerId
-      );
-      return response.data;
-    } catch (err) {
-      return Promise.reject(err.response.data);
-    }
+export const cancelOrder = createAsyncThunk("customers/cancelOrder", async (data) => {
+  try {
+    const response = await onlineOrderApi.cancelOrder(data.orderId, data.customerId);
+    return response.data;
+  } catch (err) {
+    return Promise.reject(err.response.data);
   }
-);
+});
 
 const userSlice = createSlice({
   name: "user",
@@ -152,7 +123,7 @@ const userSlice = createSlice({
     logout(state) {
       localStorage.removeItem("user");
       state.loggedIn = false;
-      state.user = { ...guest };
+      state.user = {...guest};
     },
   },
   extraReducers(builder) {
@@ -169,7 +140,7 @@ const userSlice = createSlice({
     builder.addCase(loginJwt.fulfilled, (state, action) => {
       state = {
         ...state,
-        user: { ...action.payload },
+        user: {...action.payload},
         status: "succeeded",
         loggedIn: true,
       };
@@ -178,7 +149,7 @@ const userSlice = createSlice({
       state.error = "Login failed";
     });
     builder.addCase(postLoginJwt.fulfilled, (state, action) => {
-      state.user = { ...action.payload };
+      state.user = {...action.payload};
       state.loggedIn = true;
     });
     builder.addCase(register.fulfilled, (state, action) => {
@@ -192,7 +163,7 @@ const userSlice = createSlice({
     });
     builder.addCase(updateAccount.fulfilled, (state, action) => {
       action.payload.password !== undefined && delete action.payload.password;
-      state.user = { ...action.payload };
+      state.user = {...action.payload};
       state.status = "succeeded";
     });
     builder.addCase(updateAccount.rejected, (state, action) => {
@@ -203,12 +174,12 @@ const userSlice = createSlice({
     });
     builder.addCase(fetchCustomer.fulfilled, (state, action) => {
       action.payload.password !== undefined && delete action.payload.password;
-      state.user = { ...action.payload };
+      state.user = {...action.payload};
       state.status = "succeeded";
     });
     builder.addCase(fetchCustomerByEmail.fulfilled, (state, action) => {
       action.payload.password !== undefined && delete action.payload.password;
-      state.user = { ...action.payload };
+      state.user = {...action.payload};
       state.status = "succeeded";
     });
     builder.addCase(cancelOrder.pending, (state, action) => {
@@ -218,17 +189,17 @@ const userSlice = createSlice({
       state.status = "failed";
     });
     builder.addCase(cancelOrder.fulfilled, (state, action) => {
-      console.log(action.payload)
+      console.log(action.payload);
       const order = state.user.orders.find((order) => order.id === action.payload.id);
       if (order) {
-        order.statusHistory = action.payload.statusHistory
+        order.statusHistory = action.payload.statusHistory;
       }
       state.status = "succeeded";
     });
   },
 });
 
-export const { logout } = userSlice.actions;
+export const {logout} = userSlice.actions;
 
 export const selectUserLoggedIn = (state) => state.user.loggedIn;
 

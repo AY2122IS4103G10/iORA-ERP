@@ -23,8 +23,10 @@ export const Profile = () => {
   const [zip, setZip] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
   const [deliveryCon, setDeliveryCon] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [addressID, setAddressID] = useState("");
 
   const onFirstNameChanged = (e) => setFirstName(e.target.value);
   const onLastNameChanged = (e) => setLastName(e.target.value);
@@ -36,6 +38,7 @@ export const Profile = () => {
   const onStreet2Changed = (e) => setStreet2(e.target.value);
   const onZipChanged = (e) => setZip(e.target.value);
   const onCityChanged = (e) => setCity(e.target.value);
+  const onStateChanged = (e) => setState(e.target.value);
   const onCountryChanged = (e) => setCountry(e.target.value);
   const onDeliveryConChanged = (e) => setDeliveryCon(e.target.value);
 
@@ -51,8 +54,10 @@ export const Profile = () => {
       setStreet2(user.address.street2);
       setZip(user.address.zip);
       setCity(user.address.city);
+      setState(user.address.state);
       setCountry(user.address.country);
       setDeliveryCon(user.address.phone);
+      setAddressID(user.address.id);
     }
   }, [user]);
 
@@ -71,14 +76,32 @@ export const Profile = () => {
         dob,
         contactNumber: contactNo,
         email,
+        address: {
+          id: addressID,
+          street1,
+          street2,
+          name: receiverName,
+          city,
+          state,
+          zip,
+          country,
+          phone: deliveryCon,
+        },
       })
     )
       .then(({payload}) => {
-        console.log(payload);
         setFirstName(payload.firstName);
         setLastName(payload.lastName);
         setContactNo(payload.contactNumber);
         setDob(payload.dob);
+        console.log(payload);
+        setStreet1(payload.address.street1);
+        setStreet2(payload.address.street2);
+        setCity(payload.address.city);
+        setCountry(payload.address.country);
+        setRecieverName(payload.address.name);
+        setZip(payload.address.zip);
+        setDeliveryCon(payload.address.phone);
         addToast("Successfully updated account.", {
           appearance: "success",
           autoDismiss: true,
@@ -107,7 +130,7 @@ export const Profile = () => {
 
               <div className="mt-6 grid grid-cols-4 gap-6">
                 <div className="col-span-4 sm:col-span-2">
-                  <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="first-name" className="block text-sm font-medium text-gray-500">
                     First name
                   </label>
                   {isEditing ? (
@@ -126,7 +149,7 @@ export const Profile = () => {
                 </div>
 
                 <div className="col-span-4 sm:col-span-2">
-                  <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="last-name" className="block text-sm font-medium text-gray-500">
                     Last name
                   </label>
                   {isEditing ? (
@@ -147,7 +170,7 @@ export const Profile = () => {
                 <div className="col-span-4 sm:col-span-2">
                   <label
                     htmlFor="email-address"
-                    className="block text-sm font-medium text-gray-700">
+                    className="block text-sm font-medium text-gray-500">
                     Email address
                   </label>
                   {isEditing ? (
@@ -167,7 +190,7 @@ export const Profile = () => {
                 </div>
 
                 <div className="col-span-4 sm:col-span-2">
-                  <label htmlFor="contactNo" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="contactNo" className="block text-sm font-medium text-gray-500">
                     Contact number
                   </label>
                   {isEditing ? (
@@ -186,7 +209,7 @@ export const Profile = () => {
                 </div>
 
                 <div className="col-span-4 sm:col-span-2">
-                  <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="dob" className="block text-sm font-medium text-gray-500">
                     Date of birth
                   </label>
                   {isEditing ? (
@@ -202,34 +225,34 @@ export const Profile = () => {
               </div>
               <div>
                 <h1
-                  id="payment-details-heading"
-                  className="text-lg mt-12 leading-6 font-medium text-blue-800">
+                  id="address-details-heading"
+                  className="text-lg mt-12 border-t border-gray-200 py-5 leading-6 font-medium text-blue-800">
                   Address
                 </h1>
               </div>
               <div className="mt-6 grid grid-cols-4 gap-6">
                 <div className="col-span-4 sm:col-span-2">
-                  <label htmlFor="receiverName" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="receiverName" className="block text-sm font-medium text-gray-500">
                     Receiver Name
                   </label>
                   {isEditing ? (
                     <input
                       type="text"
-                      name="recieverName"
-                      id="recieverName"
-                      autoComplete="receieverName"
+                      name="receiverName"
+                      id="receiverName"
+                      autoComplete="receiverName"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       value={receiverName}
                       onChange={onReceiverNameChanged}
                     />
                   ) : (
-                    <p className="py-2 sm:text-sm">{receiverName}</p>
+                    <p className="py-3 sm:text-sm">{receiverName}</p>
                   )}
                 </div>
                 <div className="col-span-2 sm:col-span-2">
                   <label
                     htmlFor="receiverContact"
-                    className="block text-sm font-medium text-gray-700">
+                    className="block text-sm font-medium text-gray-500">
                     Receiver Contact
                   </label>
                   {isEditing ? (
@@ -243,11 +266,11 @@ export const Profile = () => {
                       onChange={onDeliveryConChanged}
                     />
                   ) : (
-                    <p className="py-2 sm:text-sm">{deliveryCon}</p>
+                    <p className="py-3 sm:text-sm">{deliveryCon}</p>
                   )}
                 </div>
                 <div className="col-span-4 sm:col-span-2">
-                  <label htmlFor="street1" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="street1" className="block text-sm font-medium text-gray-500">
                     Street / Building
                   </label>
                   {isEditing ? (
@@ -261,11 +284,11 @@ export const Profile = () => {
                       onChange={onStreet1Changed}
                     />
                   ) : (
-                    <p className="py-2 sm:text-sm">{street1}</p>
+                    <p className="py-3 sm:text-sm">{street1}</p>
                   )}
                 </div>
-                <div className="col-span-4 sm:col-span-2">
-                  <label htmlFor="street2" className="block text-sm font-medium text-gray-700">
+                <div className="col-span-4 sm:col-span-1">
+                  <label htmlFor="street2" className="block text-sm font-medium text-gray-500">
                     Unit No.
                   </label>
                   {isEditing ? (
@@ -279,11 +302,29 @@ export const Profile = () => {
                       onChange={onStreet2Changed}
                     />
                   ) : (
-                    <p className="py-2 sm:text-sm">{street2}</p>
+                    <p className="py-3 sm:text-sm">{street2}</p>
+                  )}
+                </div>
+                <div className="col-span-4 sm:col-span-1">
+                  <label htmlFor="zip" className="block text-sm font-medium text-gray-500">
+                    Zip/ Postal Code
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="zip"
+                      id="zip"
+                      autoComplete="zip"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      value={zip}
+                      onChange={onZipChanged}
+                    />
+                  ) : (
+                    <p className="py-3 sm:text-sm">{zip}</p>
                   )}
                 </div>
                 <div className="col-span-4 sm:col-span-2">
-                  <label htmlFor="street2" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="country" className="block text-sm font-medium text-gray-500">
                     Country
                   </label>
                   {isEditing ? (
@@ -297,11 +338,11 @@ export const Profile = () => {
                       onChange={onCountryChanged}
                     />
                   ) : (
-                    <p className="py-2 sm:text-sm">{country}</p>
+                    <p className="py-3 sm:text-sm">{country}</p>
                   )}
                 </div>
                 <div className="col-span-4 sm:col-span-1">
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-500">
                     City
                   </label>
                   {isEditing ? (
@@ -315,25 +356,25 @@ export const Profile = () => {
                       onChange={onCityChanged}
                     />
                   ) : (
-                    <p className="py-2 sm:text-sm">{city}</p>
+                    <p className="py-3 sm:text-sm">{city}</p>
                   )}
                 </div>
                 <div className="col-span-4 sm:col-span-1">
-                  <label htmlFor="zip" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="state" className="block text-sm font-medium text-gray-500">
                     State / Province
                   </label>
                   {isEditing ? (
                     <input
                       type="text"
-                      name="zip"
-                      id="zip"
-                      autoComplete="zip"
+                      name="state"
+                      id="state"
+                      autoComplete="state"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      value={zip}
-                      onChange={onZipChanged}
+                      value={state}
+                      onChange={onStateChanged}
                     />
                   ) : (
-                    <p className="py-2 sm:text-sm">{zip}</p>
+                    <p className="py-3 sm:text-sm">{state}</p>
                   )}
                 </div>
               </div>

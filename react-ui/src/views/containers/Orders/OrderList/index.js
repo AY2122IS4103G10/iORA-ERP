@@ -34,9 +34,13 @@ const OrderTable = ({ data, handleOnClick, type }) => {
               accessor: (row) => row.customerId,
             },
             {
-              Header: "Total Amount",
+              Header: "Items",
+              accessor: (row) => row.lineItems.length,
+            },
+            {
+              Header: "Total",
               accessor: "totalAmount",
-              Cell: (row) => `${row.value.toFixed(2)}`,
+              Cell: (row) => `$${row.value.toFixed(2)}`,
             },
             {
               Header: "Date",
@@ -54,9 +58,13 @@ const OrderTable = ({ data, handleOnClick, type }) => {
               accessor: (row) => row.customerId,
             },
             {
-              Header: "Total Amount",
+              Header: "Items",
+              accessor: (row) => row.lineItems.length,
+            },
+            {
+              Header: "Total",
               accessor: "totalAmount",
-              Cell: (row) => `${row.value.toFixed(2)}`,
+              Cell: (row) => `$${row.value.toFixed(2)}`,
             },
             {
               Header: "Date",

@@ -15,7 +15,7 @@ import { ProductStickerPrint } from "../ProductRFID";
 
 const ProductList = ({ products, openModal, onProductSelectedChanged }) => {
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-md">
+    <div className="max-h-screen bg-white shadow overflow-auto sm:rounded-md">
       <ul className="divide-y divide-gray-200">
         {products.map((product, index) => {
           return (

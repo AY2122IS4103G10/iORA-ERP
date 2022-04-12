@@ -873,7 +873,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         Customer c = customerService.getCustomerById(customerId);
         revertMembershipPoints(c, onlineOrder.getTotalAmount());
         for (Payment p : onlineOrder.getPayments()) {
-            stripeService.refundPayment(p.getCcTransactionId(), p.getAmount());
             c.setMembershipPoints(c.getMembershipPoints() + p.getAmount());
             em.merge(c);
             p.setAmount(0);
@@ -886,11 +885,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
+    public OnlineOrder cancelOnlineOrder(Long orderId, Long siteId)
+            throws CustomerOrderException, CustomerException, StripeException {
         Site actionBy = em.find(Site.class, siteId);
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 
-        if (actionBy == null || !(actionBy instanceof WarehouseSite) || !(actionBy instanceof StoreSite)) {
+        if (actionBy == null || (!(actionBy instanceof WarehouseSite) && !(actionBy instanceof StoreSite))) {
             throw new CustomerOrderException("Site is not authorised to cancel the order.");
         } else if (actionBy instanceof WarehouseSite) {
             onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.CANCELLED));
@@ -898,6 +898,14 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.CANCELLED));
         }
 
+        Customer c = customerService.getCustomerById(onlineOrder.getCustomerId());
+        revertMembershipPoints(c, onlineOrder.getTotalAmount());
+        for (Payment p : onlineOrder.getPayments()) {
+            stripeService.refundPayment(p.getCcTransactionId(), p.getAmount());
+            p.setAmount(0);
+        }
+
+        emailService.sendOnlineOrderCancellation(c, onlineOrder);
         return updateOnlineOrder(onlineOrder);
     }
 
@@ -983,7 +991,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
                     if (coli.getPickedQty() + qty > coli.getQty()) {
-                        throw new CustomerOrderException("You are picking items that are not meant for this order.");
+                        throw new CustomerOrderException("The qty of this product has exceeded the required qty.");
                     }
                     coli.setPickedQty(coli.getPickedQty() + qty);
                     boolean picked = true;
@@ -1043,8 +1051,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PICKING) {
             for (CustomerOrderLI coli : lineItems) {
                 if (coli.getProduct().equals(product)) {
-                    if (coli.getPickedQty() + qty > coli.getQty()) {
-                        throw new CustomerOrderException("You are picking items that are not meant for this order.");
+                    if (qty > coli.getQty()) {
+                        throw new CustomerOrderException("The qty of this product has exceeded the required qty.");
                     }
                     coli.setPickedQty(qty);
                     boolean picked = true;

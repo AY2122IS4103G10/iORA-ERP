@@ -95,7 +95,7 @@ public interface CustomerOrderService {
 
         public abstract OnlineOrder customerCancelOnlineOrder(Long orderId, Long customerId) throws CustomerOrderException, CustomerException, StripeException;
 
-        public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
+        public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException, CustomerException, StripeException;
 
         public abstract OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
 

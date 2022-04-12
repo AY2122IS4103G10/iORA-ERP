@@ -322,7 +322,6 @@ public class OnlineCustomerController {
         }
     }
 
-    // TODO: Haven't get into making it work
     @PutMapping(path = "/cancel/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> cancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {

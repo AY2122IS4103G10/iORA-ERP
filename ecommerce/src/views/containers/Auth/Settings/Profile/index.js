@@ -2,6 +2,7 @@ import moment from "moment";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {useToasts} from "react-toast-notifications";
 import {selectUser, selectUserOrders, updateAccount} from "../../../../../stores/slices/userSlice";
@@ -11,6 +12,7 @@ export const Profile = () => {
   const dispatch = useDispatch();
   const {addToast} = useToasts();
   const user = useSelector(selectUser);
+  const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -90,11 +92,11 @@ export const Profile = () => {
       })
     )
       .then(({payload}) => {
+        console.log(payload);
         setFirstName(payload.firstName);
         setLastName(payload.lastName);
         setContactNo(payload.contactNumber);
         setDob(payload.dob);
-        console.log(payload);
         setStreet1(payload.address.street1);
         setStreet2(payload.address.street2);
         setCity(payload.address.city);
@@ -106,6 +108,7 @@ export const Profile = () => {
           appearance: "success",
           autoDismiss: true,
         });
+        setIsEditing(!isEditing);
       })
       .catch((error) =>
         addToast(`Error: ${error.message}`, {

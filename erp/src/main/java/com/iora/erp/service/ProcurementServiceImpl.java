@@ -242,12 +242,19 @@ public class ProcurementServiceImpl implements ProcurementService {
     public ProcurementOrder pickProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException {
         ProcurementOrder old = getProcurementOrder(procurementOrder.getId());
         old.setLineItems(procurementOrder.getLineItems());
+        
         old.addStatus(new POStatus(old.getLastActor(), new Date(), ProcurementOrderStatusEnum.PACKING));
         return updateProcurementOrder(old);
     }
 
     @Override
     public ProcurementOrder packProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException {
+        for (ProcurementOrderLI poli : procurementOrder.getLineItems()) {
+            if (poli.getPackedQty() > poli.getPickedQty()) {
+                throw new ProcurementOrderException("Packed qty cannot be more than picked qty.");
+            }
+        }
+
         ProcurementOrder old = getProcurementOrder(procurementOrder.getId());
         old.setLineItems(procurementOrder.getLineItems());
         old.addStatus(new POStatus(old.getLastActor(), new Date(), ProcurementOrderStatusEnum.READY_FOR_SHIPPING));
@@ -287,17 +294,6 @@ public class ProcurementServiceImpl implements ProcurementService {
             for (ProcurementOrderLI poli : lineItems) {
                 if (poli.getProduct().equals(product)) {
                     poli.setPickedQty(poli.getPickedQty() + qty);
-                    /* boolean picked = true;
-                    for (ProcurementOrderLI poli2 : lineItems) {
-                    if (poli2.getPickedQty() < poli2.getRequestedQty()) {
-                    picked = false;
-                    }
-                    }
-                    if (picked) {
-                    procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new
-                    Date(),
-                    ProcurementOrderStatusEnum.PICKED));
-                    } */
                     return em.merge(procurementOrder);
                 }
             }
@@ -343,17 +339,6 @@ public class ProcurementServiceImpl implements ProcurementService {
             for (ProcurementOrderLI poli : lineItems) {
                 if (poli.getProduct().equals(product)) {
                     poli.setPickedQty(qty);
-                    /* boolean picked = true;
-                    for (ProcurementOrderLI poli2 : lineItems) {
-                    if (poli2.getPickedQty() < poli2.getRequestedQty()) {
-                    picked = false;
-                    }
-                    }
-                    if (picked) {
-                    procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new
-                    Date(),
-                    ProcurementOrderStatusEnum.PICKED));
-                    } */
                     return em.merge(procurementOrder);
                 }
             }

@@ -186,7 +186,11 @@ export const EditableCell = ({
   const [value, setValue] = useState(initialValue);
 
   const onChange = (e) => {
-    setValue(e.target.value);
+    if (
+      parseFloat(e.target.value) >= parseFloat(min) ||
+      (max && parseFloat(e.target.value) <= parseFloat(max))
+    )
+      setValue(e.target.value);
     // updateMyData(index, id, e.target.value);
   };
 
@@ -207,18 +211,16 @@ export const EditableCell = ({
     setValue(initialValue);
   }, [initialValue]);
   return (
-      <input
-        type="number"
-        className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-        min={min}
-        max={max && max}
-        step={step}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        onKeyDown={handleKeyDown}
-        {...rest}
-      />
+    <input
+      type="number"
+      className="text-center shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+      step={step}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      onKeyDown={handleKeyDown}
+      {...rest}
+    />
   );
 };
 

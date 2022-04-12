@@ -120,7 +120,8 @@ public class SAMController {
         try {
             return ResponseEntity.ok(productService.createModel(model));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -194,7 +195,8 @@ public class SAMController {
         try {
             return ResponseEntity.ok(productService.updateModel(model));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 

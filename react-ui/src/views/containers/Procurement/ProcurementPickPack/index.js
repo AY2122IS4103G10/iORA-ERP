@@ -45,6 +45,7 @@ export const PickPackList = ({
                 row={row.row}
                 column={row.column}
                 updateMyData={updateSiteCol}
+                min="0"
               />
             ) : (
               row.value

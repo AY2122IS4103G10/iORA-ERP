@@ -66,6 +66,7 @@ export const AsiteStock = ({ subsys }) => {
   const dispatch = useDispatch();
   const site = useSelector(selectSite);
   const status = useSelector((state) => state.sites.status);
+  const [loading, setLoading] = useState(false);
   const [lineItems, setLineItems] = useState([]);
 
   useEffect(() => {
@@ -73,19 +74,22 @@ export const AsiteStock = ({ subsys }) => {
   }, [dispatch, id]);
 
   useEffect(() => {
+    setLoading(true);
     const { stockLevel } = site && site;
     if (stockLevel !== undefined) {
       const products = stockLevel.products;
-      fetchAllModelsBySkus(products).then((data) => {
-        setLineItems(
-          products.map((stock, index) => ({
-            ...stock,
-            modelCode: data[index].modelCode,
-            name: data[index].name,
-            imageLinks: data[index].imageLinks,
-          }))
-        );
-      });
+      products &&
+        fetchAllModelsBySkus(products).then((data) => {
+          setLineItems(
+            products.map((stock, index) => ({
+              ...stock,
+              modelCode: data[index].modelCode,
+              name: data[index].name,
+              imageLinks: data[index].imageLinks,
+            }))
+          );
+          setLoading(false);
+        });
     }
   }, [site]);
   return status === "succeeded" ? (
@@ -179,7 +183,7 @@ export const AsiteStock = ({ subsys }) => {
                   Stock Levels
                 </h2>
                 <div className="ml-2 mr-2">
-                  {lineItems === null || lineItems === undefined ? (
+                  {loading ? (
                     <div className="flex mt-5 items-center justify-center">
                       <TailSpin color="#00BCD4" height={20} width={20} />
                     </div>

@@ -16,8 +16,9 @@ import {
   RefundTable,
   VoucherTable,
 } from "../../POS/OrderDetails";
+import { Link } from "react-router-dom";
 
-const ItemTable = ({ data }) => {
+const ItemTable = ({ data, subsys }) => {
   const columns = useMemo(
     () => [
       {
@@ -27,6 +28,15 @@ const ItemTable = ({ data }) => {
       {
         Header: "Name",
         accessor: "product.name",
+        Cell: (e) => {
+          return subsys === "sm" ? (
+            <Link to={`/sm/products/${e.row.original.product.modelCode}`}>
+              {e.value}
+            </Link>
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Color",
@@ -46,7 +56,7 @@ const ItemTable = ({ data }) => {
         accessor: "qty",
       },
     ],
-    []
+    [subsys]
   );
 
   return (
@@ -63,6 +73,7 @@ const ItemTable = ({ data }) => {
 };
 
 const OrderDetailsBody = ({
+  subsys,
   history,
   dateTime,
   delivery,
@@ -227,7 +238,9 @@ const OrderDetailsBody = ({
         <section aria-labelledby="line-items">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="md:col-span-2">
-              {Boolean(lineItems?.length) && <ItemTable data={lineItems} />}
+              {Boolean(lineItems?.length) && (
+                <ItemTable data={lineItems} subsys={subsys} />
+              )}
             </div>
             {Boolean(promotions?.length) && <PromoTable data={promotions} />}
             {voucher && <VoucherTable data={[voucher]} />}
@@ -244,6 +257,7 @@ const OrderDetailsBody = ({
 
 export const CustomerOrderDetails = () => {
   const {
+    subsys,
     dateTime,
     customer,
     delivery,
@@ -294,6 +308,7 @@ export const CustomerOrderDetails = () => {
   }, [statusHistory]);
   return (
     <OrderDetailsBody
+      subsys={subsys}
       dateTime={dateTime}
       customer={customer}
       delivery={delivery}

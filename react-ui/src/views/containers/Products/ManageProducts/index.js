@@ -11,23 +11,23 @@ const smTabs = [
 ];
 
 const whTabs = [
-  { name: "Search Product", href: "/wh/products/search", current: true },
   { name: "Print Label", href: "/wh/products/print", current: false },
   {
     name: "Generate RFID",
     href: "/wh/products/rfid",
     current: false,
   },
+  { name: "Search Product", href: "/wh/products/search", current: true },
 ];
 
 const mfTabs = [
-  { name: "Search Product", href: "/mf/products/search", current: true },
   { name: "Print Label", href: "/mf/products/print", current: false },
   {
     name: "Generate RFID",
     href: "/mf/products/rfid",
     current: false,
   },
+  { name: "Search Product", href: "/mf/products/search", current: true },
 ];
 
 const Header = ({ subsys }) => {

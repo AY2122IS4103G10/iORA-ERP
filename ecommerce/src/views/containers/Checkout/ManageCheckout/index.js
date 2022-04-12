@@ -57,7 +57,7 @@ export const ManageCheckout = () => {
 
   const cart = useSelector(selectCart);
   const customerId = useSelector(selectUserId);
-  console.log(storeList);
+
   const loadAddress = () => {
     setAddress(
       JSON.parse(localStorage.getItem("user")).address.street1 +
@@ -68,7 +68,7 @@ export const ManageCheckout = () => {
     setState(JSON.parse(localStorage.getItem("user")).address.state);
     setPostalCode(JSON.parse(localStorage.getItem("user")).address.zip);
   };
-  console.log(cart);
+
   useEffect(() => {
     Boolean(JSON.parse(localStorage.getItem("user")).address) && loadAddress();
 

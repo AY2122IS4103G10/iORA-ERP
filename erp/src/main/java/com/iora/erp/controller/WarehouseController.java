@@ -9,7 +9,6 @@ import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
-import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.service.EasyPostService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
@@ -64,7 +63,7 @@ public class WarehouseController {
     }
 
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
+    public List<Map<String, Object>> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
 

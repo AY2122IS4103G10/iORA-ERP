@@ -671,8 +671,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 if (p.getPaymentType() == PaymentTypeEnum.MASTERCARD || p.getPaymentType() == PaymentTypeEnum.VISA
                         || p.getPaymentType() == PaymentTypeEnum.NETS) {
                     stripeService.refundPayment(p.getCcTransactionId(), Math.min(refundAmount, p.getAmount()));
+
                     if (refundAmount > p.getAmount()) {
                         c.setMembershipPoints(c.getMembershipPoints() + (refundAmount - p.getAmount()));
+                        p.setAmount(0);
+                    } else {
+                        p.setAmount(p.getAmount() - refundAmount);
                     }
                 }
             }
@@ -854,6 +858,34 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    public OnlineOrder customerCancelOnlineOrder(Long orderId, Long customerId)
+            throws CustomerOrderException, CustomerException, StripeException {
+
+        OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
+
+        if (onlineOrder.getCustomerId() != customerId) {
+            throw new CustomerOrderException("Order does not belong to you and cannot be cancelled.");
+        }
+        if (onlineOrder.getLastStatus() != OnlineOrderStatusEnum.PENDING) {
+            throw new CustomerOrderException("Order has already began processing and cannot be cancelled.");
+        }
+
+        Customer c = customerService.getCustomerById(customerId);
+        revertMembershipPoints(c, onlineOrder.getTotalAmount());
+        for (Payment p : onlineOrder.getPayments()) {
+            stripeService.refundPayment(p.getCcTransactionId(), p.getAmount());
+            c.setMembershipPoints(c.getMembershipPoints() + p.getAmount());
+            em.merge(c);
+            p.setAmount(0);
+        }
+
+        onlineOrder.addStatusHistory(new OOStatus(null, new Date(), OnlineOrderStatusEnum.CANCELLED));
+
+        return updateOnlineOrder(onlineOrder);
+
+    }
+
+    @Override
     public OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
         Site actionBy = em.find(Site.class, siteId);
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
@@ -863,7 +895,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         } else if (actionBy instanceof WarehouseSite) {
             onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.CANCELLED));
         } else {
-            onlineOrder.setSite(siteService.getSite(3L));
             onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.CANCELLED));
         }
 

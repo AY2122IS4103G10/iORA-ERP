@@ -1,6 +1,7 @@
 package com.iora.erp.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
@@ -105,7 +106,7 @@ public class StoreController {
     }
 
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
+    public List<Map<String, Object>> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
 

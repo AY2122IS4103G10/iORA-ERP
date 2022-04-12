@@ -82,7 +82,10 @@ export const PickPackList = ({
     const handleEditRow = (evt, rowIndex) => {
       evt.preventDefault();
       setData((item) =>
-        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+        item.map((row, index) => {
+          if (index === rowIndex) return { ...row, isEditing: true };
+          return row;
+        })
       );
     };
 

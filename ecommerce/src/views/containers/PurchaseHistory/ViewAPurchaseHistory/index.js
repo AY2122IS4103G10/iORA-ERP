@@ -127,7 +127,7 @@ export const PurchaseHistoryDetails = () => {
       )
     );
   }, [order, addToast, navigate, orderId]);
-  console.log(order);
+
   return (
     <>
       {order ? (
@@ -495,7 +495,7 @@ export const PurchaseHistoryDetails = () => {
               <span>Confirm</span>
               {loading && (
                 <div className="flex ml-2 items-center justify-center">
-                  <TailSpin color="#FFFF" height={20} width={20} />
+                  <TailSpin color="#FFFFFF" height={20} width={20} />
                 </div>
               )}
             </button>

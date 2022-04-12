@@ -479,7 +479,8 @@ const AddProductFormBody = ({
           <RightColSection
             fieldName="Colour"
             openModal={openModal}
-            setFieldNameSelected={setFieldNameSelected}
+            // setFieldNameSelected={setFieldNameSelected}
+            disableButton
           >
             {colors.length ? (
               <FormCheckboxes
@@ -498,7 +499,8 @@ const AddProductFormBody = ({
           <RightColSection
             fieldName="Size"
             openModal={openModal}
-            setFieldNameSelected={setFieldNameSelected}
+            // setFieldNameSelected={setFieldNameSelected}
+            disableButton
           >
             {sizes.length ? (
               <FormCheckboxes
@@ -517,8 +519,8 @@ const AddProductFormBody = ({
           <RightColSection
             fieldName="Promotion"
             openModal={openModal}
-            setFieldNameSelected={setFieldNameSelected}
-            disableButton={true}
+            // setFieldNameSelected={setFieldNameSelected}
+            disableButton
           >
             {promotions.length ? (
               <FormCheckboxes
@@ -536,7 +538,8 @@ const AddProductFormBody = ({
           <RightColSection
             fieldName="Tag"
             openModal={openModal}
-            setFieldNameSelected={setFieldNameSelected}
+            // setFieldNameSelected={setFieldNameSelected}
+            disableButton
           >
             {tags.length ? (
               <FormCheckboxes

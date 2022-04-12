@@ -30,7 +30,10 @@ const ItemTable = ({ data, subsys }) => {
         accessor: "product.name",
         Cell: (e) => {
           return subsys === "sm" ? (
-            <Link to={`/sm/products/${e.row.original.product.modelCode}`}>
+            <Link
+              to={`/sm/products/${e.row.original.product.modelCode}`}
+              className="hover:underline"
+            >
               {e.value}
             </Link>
           ) : (
@@ -89,6 +92,7 @@ const OrderDetailsBody = ({
   refundedLIs,
   exchangedLIs,
   voucher,
+  site,
 }) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
@@ -111,6 +115,25 @@ const OrderDetailsBody = ({
             </div>
             <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
               <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
+                {site && delivery === undefined && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Puchased at
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      <address className="not-italic">
+                        <span className="block">{site.name}</span>
+                        <span className="block">{site.address.road}</span>
+                        <span className="block">
+                          {site.address.city},{" "}
+                          {site.address.postalCode}
+                        </span>
+                        <span className="block">{site.phoneNumber}</span>
+                      </address>
+                    </dd>
+                  </div>
+                )}
+
                 {status && (
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">
@@ -122,7 +145,7 @@ const OrderDetailsBody = ({
 
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
-                    Date Created
+                    Date
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     {moment(dateTime).format("DD/MM/YYYY, H:mm:ss")}
@@ -135,9 +158,17 @@ const OrderDetailsBody = ({
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     <address className="not-italic">
-                      <span className="block">
-                        {customer.firstName} {customer.lastName}
-                      </span>
+                      {subsys === "sm" ? (
+                        <Link to={`/sm/customers/${customer.id}`}>
+                          <span className="block hover:underline">
+                            {customer.firstName} {customer.lastName}
+                          </span>
+                        </Link>
+                      ) : (
+                        <span className="block">
+                          {customer.firstName} {customer.lastName}
+                        </span>
+                      )}
                       <span className="block">{customer.email}</span>
                       <span className="block">{customer.contactNumber}</span>
                     </address>
@@ -212,7 +243,7 @@ const OrderDetailsBody = ({
                   </dt>
 
                   <dd className="mt-1 text-sm text-gray-900">
-                    {totalAmount.toFixed(2)}
+                    ${totalAmount.toFixed(2)}
                   </dd>
                 </div>
 
@@ -273,9 +304,10 @@ export const CustomerOrderDetails = () => {
     refundedLIs,
     exchangedLIs,
     voucher,
+    site,
   } = useOutletContext();
   const [history, setHistory] = useState([]);
-
+ 
   useEffect(() => {
     statusHistory !== undefined &&
       fetchAllActionBy(statusHistory).then((data) => {
@@ -324,6 +356,7 @@ export const CustomerOrderDetails = () => {
       refundedLIs={refundedLIs}
       exchangedLIs={exchangedLIs}
       voucher={voucher}
+      site={site}
     />
   );
 };

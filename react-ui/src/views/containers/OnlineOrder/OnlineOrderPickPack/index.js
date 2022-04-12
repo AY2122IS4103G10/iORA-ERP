@@ -1,3 +1,4 @@
+import { XIcon } from "@heroicons/react/outline";
 import { useEffect } from "react";
 import { useMemo } from "react";
 import { useState } from "react";
@@ -5,10 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { api, onlineOrderApi } from "../../../../environments/Api";
-import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import {
   EditableCell,
   SimpleTable,
@@ -195,8 +194,10 @@ const PackageModal = ({
   numPackages,
   onNumPackagesChanged,
   onSaveClicked,
-  packages,
   sizes,
+  sizeSelected,
+  onSizeSelectedChanged,
+  onRemoveClicked,
 }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
@@ -213,31 +214,55 @@ const PackageModal = ({
                     <SimpleInputGroup
                       label="No. of packages"
                       inputField="packages"
-                      className="sm:mt-0 sm:col-span-2"
+                      className="sm:mt-0 sm:col-span-2 relative flex"
                     >
-                      <SimpleInputBox
-                        type="number"
-                        name="packages"
-                        id="packages"
-                        value={numPackages}
-                        onChange={onNumPackagesChanged}
-                        required
-                      />
+                      <div className="flex-1 flex items-center justify-between">
+                        <span>{numPackages}</span>
+                        <button
+                          type="submit"
+                          className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          onClick={onNumPackagesChanged}
+                        >
+                          Add
+                        </button>
+                      </div>
                     </SimpleInputGroup>
-                    {/* <ul role="list" className="divide-y divide-gray-200">
-                      {packages.map((pack, index) => (
-                        <li key={index} className="py-4 flex">
-                          {index}. 
-                          <div className="ml-3">
-                          <SimpleSelectMenu
-                            options={companies}
-                            selected={companySelected}
-                            setSelected={setCompanySelected}
-                          />
+                    <ul className="max-h-96 overflow-auto divide-y divide-gray-200">
+                      {sizeSelected.map((_, index) => (
+                        <li
+                          key={index}
+                          className="py-4 flex items-center justify-between"
+                        >
+                          <span className="text-sm">{index + 1}.</span>
+                          <div>
+                            <select
+                              id="countries"
+                              name="countries"
+                              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm rounded-md"
+                              value={sizeSelected[index]}
+                              onChange={(e) => {
+                                onSizeSelectedChanged(e.target.value, index);
+                              }}
+                            >
+                              {sizes.map((size, index) => (
+                                <option key={index} value={size}>
+                                  {size}
+                                </option>
+                              ))}
+                            </select>
                           </div>
+                          <button
+                            className="mr-4"
+                            onClick={(evt) => onRemoveClicked(evt, index)}
+                          >
+                            <XIcon
+                              className="h-5 w-5 text-gray-500"
+                              aria-hidden="true"
+                            />
+                          </button>
                         </li>
                       ))}
-                    </ul> */}
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -283,20 +308,32 @@ export const OnlineOrderPickPack = () => {
     site,
     delivery,
   } = useOutletContext();
-
   const status = st.status;
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [numPackages, setNumPackages] = useState(1);
-  const [packages, setPackages] = useState([
-    { id: 1, size: "SATCHEL 500G ATL A5" },
-  ]);
   const [sizes, setSizes] = useState([]);
+  const [sizeSelected, setSizeSelected] = useState([]);
   const [openPackage, setOpenPackage] = useState(false);
 
-  const onNumPackagesChanged = (e) => {
-    if (parseInt(e.target.value) > 0) {
-      setNumPackages(e.target.value);
+  const onNumPackagesChanged = (evt) => {
+    evt.preventDefault();
+    sizeSelected.push(sizes[0]);
+    setNumPackages(sizeSelected.length);
+    setSizeSelected(sizeSelected);
+  };
+  const onSizeSelectedChanged = (e, index) => {
+    setSizeSelected(
+      sizeSelected.map((size, idx) => (index === idx ? e : size))
+    );
+  };
+
+  const onRemoveClicked = (evt, idx) => {
+    evt.preventDefault();
+    if (sizeSelected.length > 1) {
+      const s = sizeSelected.filter((_, index) => index !== idx);
+      setSizeSelected(s);
+      setNumPackages(s.length);
     }
   };
 
@@ -305,7 +342,9 @@ export const OnlineOrderPickPack = () => {
   useEffect(() => {
     const fetchPackageSizes = async () => {
       const { data } = await api.getAll("online/order/parcelSize");
-      setSizes(data.map((size) => size.replaceAll("_", " ")));
+      const sizes = data.map((size) => size.replaceAll("_", " "));
+      setSizes(sizes);
+      setSizeSelected([sizes[0]]);
     };
     fetchPackageSizes();
   }, []);
@@ -499,8 +538,10 @@ export const OnlineOrderPickPack = () => {
           closeModal={closePackageModal}
           numPackages={numPackages}
           onNumPackagesChanged={onNumPackagesChanged}
-          packages={packages}
           sizes={sizes}
+          sizeSelected={sizeSelected}
+          onSizeSelectedChanged={onSizeSelectedChanged}
+          onRemoveClicked={onRemoveClicked}
         />
       )}
     </>

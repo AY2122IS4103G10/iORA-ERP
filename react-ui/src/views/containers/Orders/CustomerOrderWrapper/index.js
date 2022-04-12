@@ -8,7 +8,7 @@ import { Outlet } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
-import { api, orderApi } from "../../../../environments/Api";
+import { api, onlineOrderApi, orderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import Confirmation from "../../../components/Modals/Confirmation";
@@ -27,13 +27,20 @@ const deliveryStatuses = [
 ];
 
 const Header = ({
+  statusHistory,
   subsys,
   disableTabs,
   tabs,
   orderId,
   openInvoice,
   disableInvoice,
+  openConfirm,
+  setAction,
+  onCancelOrderClicked,
 }) => {
+  const status =
+    statusHistory.length && statusHistory[statusHistory.length - 1].status;
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev page="Orders" path={`/${subsys}/orders/search`} />
@@ -41,10 +48,22 @@ const Header = ({
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${orderId}`}</h1>
           <div className="mt-3 flex md:mt-0 md:absolute md:top-3 md:right-0">
-            {!disableInvoice && (
+            {(status === "PENDING" || status === "PICKING") && (
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                onClick={() => {
+                  setAction({ name: "Cancel", action: onCancelOrderClicked });
+                  openConfirm();
+                }}
+              >
+                <span>Cancel Order</span>
+              </button>
+            )}
+            {!disableInvoice && (
+              <button
+                type="button"
+                className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                 onClick={openInvoice}
               >
                 <span>View Invoice</span>
@@ -226,11 +245,32 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     fetchOrder();
   }, [subsys, orderId, addToast]);
 
+  const onCancelOrderClicked = async () => {
+    setLoading(true);
+    try {
+      const { data } = await onlineOrderApi.cancelOrder(orderId, currSiteId);
+      console.log(data);
+      addToast(`Success: Cancelled Order ${orderId}`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      closeConfirmModal();
+    } catch (err) {
+      addToast(`Error:  ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openInvoice = () => setOpen(true);
   const closeInvoice = () => setOpen(false);
 
   const openConfirmModal = () => setOpenConfirm(true);
   const closeConfirmModal = () => setOpenConfirm(false);
+
   const tabs = [
     {
       name: "Details",
@@ -274,6 +314,10 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           orderId={orderId}
           disableInvoice={status === ""}
           openInvoice={openInvoice}
+          statusHistory={statusHistory}
+          setAction={setAction}
+          openConfirm={openConfirmModal}
+          onCancelOrderClicked={onCancelOrderClicked}
         />
         <Outlet
           context={{

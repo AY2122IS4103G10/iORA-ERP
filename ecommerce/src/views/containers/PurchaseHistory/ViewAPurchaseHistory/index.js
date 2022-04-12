@@ -127,7 +127,7 @@ export const PurchaseHistoryDetails = () => {
       )
     );
   }, [order, addToast, navigate, orderId]);
-  console.log(order);
+
   return (
     <>
       {order ? (
@@ -495,7 +495,7 @@ export const PurchaseHistoryDetails = () => {
               <span>Confirm</span>
               {loading && (
                 <div className="flex ml-2 items-center justify-center">
-                  <TailSpin color="#FFFF" height={20} width={20} />
+                  <TailSpin color="#FFFFFF" height={20} width={20} />
                 </div>
               )}
             </button>
@@ -503,6 +503,7 @@ export const PurchaseHistoryDetails = () => {
               type="button"
               className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:w-auto sm:text-sm"
               onClick={closeConfirmModal}
+              disabled={loading}
             >
               Cancel
             </button>

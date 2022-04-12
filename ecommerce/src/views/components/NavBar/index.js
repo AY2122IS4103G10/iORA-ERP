@@ -162,7 +162,7 @@ const SearchPopover = () => {
                         </div>
                       </form>
                     </div>
-                    <ul className="divide-y divide-gray-200">
+                    <ul className="max-h-80 overflow-y-auto overflow-x- divide-y divide-gray-200">
                       {results.map((result, index) => (
                         <li
                           key={index}

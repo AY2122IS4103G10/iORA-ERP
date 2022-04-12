@@ -19,7 +19,8 @@ export const AProductStock = ({ subsys }) => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const stocklevel = useSelector(selectProductStock);
-  console.log(stocklevel);
+  const stockStatus = useSelector(state => state.stocklevel.status)
+
   useEffect(() => {
     const fetchProduct = async () => {
       const data = await dispatch(getAProduct(id)).unwrap();
@@ -150,7 +151,7 @@ export const AProductStock = ({ subsys }) => {
               {/* Stock Levels By Products*/}
               <section aria-labelledby="stocks-level">
                 <div className="m-1">
-                  {stocklevel === undefined || stocklevel === null ? (
+                  {stockStatus === "loading" ? (
                     <div className="flex mt-5 items-center justify-center">
                       <TailSpin color="#00BFFF" height={20} width={20} />
                     </div>

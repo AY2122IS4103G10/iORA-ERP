@@ -49,6 +49,12 @@ public class ProcurementOrderLI {
         this.requestedQty = requestedQty;
     }
 
+    public ProcurementOrderLI(Product product, Map<Long, Integer> siteQuantities) {
+        this();
+        this.product = product;
+        this.siteQuantities = siteQuantities;
+        this.requestedQty = siteQuantities.values().stream().reduce(0, (x, y) -> x + y);
+    }
 
     public Long getId() {
         return this.id;
@@ -114,14 +120,14 @@ public class ProcurementOrderLI {
         this.files = files;
     }
 
-    public Map<Long,Integer> getSiteQuantities() {
+    public Map<Long, Integer> getSiteQuantities() {
         return this.siteQuantities;
     }
 
-    public void setSiteQuantities(Map<Long,Integer> siteQuantities) {
+    public void setSiteQuantities(Map<Long, Integer> siteQuantities) {
         this.siteQuantities = siteQuantities;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this)

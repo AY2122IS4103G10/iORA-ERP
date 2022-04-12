@@ -16,6 +16,7 @@ import { PurchaseHistoryList } from "./views/containers/PurchaseHistory/Purchase
 import { PurchaseHistoryDetails } from "./views/containers/PurchaseHistory/ViewAPurchaseHistory";
 import { SupportDetails } from "./views/containers/Support/SupportDetails";
 import { SupportList } from "./views/containers/Support/SupportList";
+import { Error } from "./views/containers/Auth/Error";
 import ViewModel from "./views/containers/ViewModel";
 
 function App() {
@@ -47,7 +48,7 @@ function App() {
 
           <Route path="membership" element={<Membership />} />
 
-          <Route path="support" element={<Outlet />} >
+          <Route path="support" element={<Outlet />}>
             <Route index element={<SupportList />} />
             <Route path=":ticketId" element={<SupportDetails />} />
           </Route>
@@ -62,16 +63,9 @@ function App() {
             <Route path="account" element={<Account />} />
           </Route>
         </Route>
-        <Route
-          path="*"
-          element={
-            <main style={{ padding: "1rem" }}>
-              <p>There's nothing here!</p>
-            </main>
-          }
-        />
+        <Route path="*" element={<Error />} />
       </Routes>
-    </div >
+    </div>
   );
 }
 

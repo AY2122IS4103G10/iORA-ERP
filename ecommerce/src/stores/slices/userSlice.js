@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../environments/Api";
+import { api, onlineOrderApi } from "../../environments/Api";
 import { authApi } from "../../environments/Api";
 
 const guest = {
@@ -130,6 +130,21 @@ export const fetchCustomerByEmail = createAsyncThunk(
   }
 );
 
+export const cancelOrder = createAsyncThunk(
+  "customers/cancelOrder",
+  async (data) => {
+    try {
+      const response = await onlineOrderApi.cancelOrder(
+        data.orderId,
+        data.customerId
+      );
+      return response.data;
+    } catch (err) {
+      return Promise.reject(err.response.data);
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -194,6 +209,20 @@ const userSlice = createSlice({
     builder.addCase(fetchCustomerByEmail.fulfilled, (state, action) => {
       action.payload.password !== undefined && delete action.payload.password;
       state.user = { ...action.payload };
+      state.status = "succeeded";
+    });
+    builder.addCase(cancelOrder.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(cancelOrder.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(cancelOrder.fulfilled, (state, action) => {
+      console.log(action.payload)
+      const order = state.user.orders.find((order) => order.id === action.payload.id);
+      if (order) {
+        order.statusHistory = action.payload.statusHistory
+      }
       state.status = "succeeded";
     });
   },

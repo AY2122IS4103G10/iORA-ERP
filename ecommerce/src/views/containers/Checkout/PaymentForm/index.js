@@ -17,19 +17,40 @@ export default function PaymentForm({ clientSecret, order, onCancelClicked }) {
   const navigate = useNavigate();
   const elements = useElements();
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(false);
   const [paymentIntentId, setPaymentIntentId] = useState("");
 
   useEffect(() => {
     if (!clientSecret || !stripe) {
       return;
     }
-
-    getPaymentStatus();
-  }, [stripe, clientSecret, loading]);
-
-  const getPaymentStatus = () => {
-    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+    const createOnlineOrder = () => {
+      let newOrder = {
+        ...order,
+        payments: [
+          {
+            amount: order.totalAmount,
+            paymentType: "MASTERCARD",
+            ccTransactionId: paymentIntentId,
+          },
+        ],
+      };
+      setLoading(true);
+      checkoutApi
+        .createOnlineOrder(newOrder, paymentIntentId)
+        .then((response) => {
+          console.log(response.data);
+          dispatch(orderSuccess(response.data));
+          dispatch(clearCart());
+          setLoading(false);
+          navigate(`/checkout/success/${response.data.id}`);
+        })
+        .catch((err) => setMessage(err));
+    };
+    const getPaymentStatus = async () => {
+      const { paymentIntent } = await stripe.retrievePaymentIntent(
+        clientSecret
+      );
       setPaymentIntentId(paymentIntent.id);
       console.log("STATUS:", paymentIntent.status);
       console.log("Client Secret:", clientSecret);
@@ -45,12 +66,21 @@ export default function PaymentForm({ clientSecret, order, onCancelClicked }) {
           break;
         case "requires_capture":
           createOnlineOrder();
+          break;
         default:
           setMessage("Something went wrong.");
-          break;
       }
-    });
-  };
+    };
+    getPaymentStatus();
+  }, [
+    stripe,
+    clientSecret,
+    loading,
+    dispatch,
+    navigate,
+    order,
+    paymentIntentId,
+  ]);
 
   const handleSubmit = async (e) => {
     console.log("submit");
@@ -75,30 +105,8 @@ export default function PaymentForm({ clientSecret, order, onCancelClicked }) {
     setLoading(false);
   };
 
-  const createOnlineOrder = () => {
-    let newOrder = {
-      ...order,
-      payments: [
-        {
-          amount: order.totalAmount,
-          paymentType: "MASTERCARD",
-          ccTransactionId: paymentIntentId,
-        },
-      ],
-    };
-    checkoutApi
-      .createOnlineOrder(newOrder, paymentIntentId)
-      .then((response) => {
-        console.log(response.data);
-        dispatch(orderSuccess(response.data));
-        dispatch(clearCart());
-        navigate(`/checkout/success/${response.data.id}`);
-      })
-      .catch((err) => setMessage(err));
-  };
-
   return (
-    <>
+    <div>
       <div id="payment-form" className="m-4 pl-4">
         <h2
           id="summary-heading"
@@ -122,11 +130,13 @@ export default function PaymentForm({ clientSecret, order, onCancelClicked }) {
           onClick={handleSubmit}
         >
           <span>Make Payment</span>
-          {loading && <div className="flex items-center">
-            <TailSpin color="#FFFFFF" height={20} width={20} />
-          </div>}
+          {loading && (
+            <div className="ml-2 flex items-center">
+              <TailSpin color="#FFFFFF" height={20} width={20} />
+            </div>
+          )}
         </button>
       </div>
-    </>
+    </div>
   );
 }

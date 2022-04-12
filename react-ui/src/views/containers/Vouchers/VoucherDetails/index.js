@@ -203,7 +203,7 @@ const IssueCustomersModal = ({
             <TailSpin color="#00BFFF" height={20} width={20} />
           </div>
         ) : (
-          <>
+          <div>
             <div>
               <div className="flex justify-between border-b border-gray-200">
                 <Dialog.Title
@@ -243,7 +243,7 @@ const IssueCustomersModal = ({
                 </button>
               </div>
             </div>
-          </>)}
+          </div>)}
       </div>
     </SimpleModal>
   );

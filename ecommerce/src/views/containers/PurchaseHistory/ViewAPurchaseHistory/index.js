@@ -1,4 +1,4 @@
-import {  XIcon } from "@heroicons/react/solid";
+import { XIcon } from "@heroicons/react/solid";
 import { ExclamationIcon } from "@heroicons/react/outline";
 import { Dialog } from "@headlessui/react";
 import moment from "moment";
@@ -10,7 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { productApi } from "../../../../environments/Api";
 import {
-  fetchCustomer,
+  cancelOrder,
   selectUser,
   selectUserOrderById,
 } from "../../../../stores/slices/userSlice";
@@ -47,14 +47,28 @@ export const PurchaseHistoryDetails = () => {
     : null;
   const [lineItems, setLineItems] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // const onCancelOrderClicked = async () => {
-  //   try {
-  //     const {data} = await 
-  //   } catch (err) {
-
-  //   }
-  // }
+  const onCancelOrderClicked = async () => {
+    setLoading(true);
+    try {
+      await dispatch(
+        cancelOrder({ orderId: order?.id, customerId: order?.customerId })
+      ).unwrap();
+      addToast(`Success: Cancelled Order ${orderId}`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      closeConfirmModal();
+    } catch (err) {
+      addToast(`Error:  ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openConfirmModal = () => setOpenConfirm(true);
   const closeConfirmModal = () => setOpenConfirm(false);
@@ -81,7 +95,7 @@ export const PurchaseHistoryDetails = () => {
               ...data[index],
               step: !Boolean(status)
                 ? null
-                : status.status === "PENDING"
+                : status.status === "PENDING" || status.status === "CANCELLED"
                 ? 0
                 : (
                     order?.pickupSite
@@ -121,16 +135,25 @@ export const PurchaseHistoryDetails = () => {
           <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 sm:py-16 lg:px-8">
             <NavigatePrev page="Orders" path="/orders" />
             <div className="md:flex md:items-center md:justify-between">
-              <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                Order Details
-              </h1>
-              <button
-                type="button"
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                onClick={openConfirmModal}
-              >
-                <span>Cancel order</span>
-              </button>
+              <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
+                  Order Details
+                </h1>
+                {status.status === "CANCELLED" && (
+                  <span className="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                    Cancelled
+                  </span>
+                )}
+              </div>
+              {status.status === "PENDING" && (
+                <button
+                  type="button"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  onClick={openConfirmModal}
+                >
+                  <span>Cancel order</span>
+                </button>
+              )}
             </div>
 
             <div className="text-sm border-b border-gray-200 mt-2 pb-5 sm:flex sm:justify-between">
@@ -424,7 +447,7 @@ export const PurchaseHistoryDetails = () => {
           </div>
         </div>
       ) : (
-        <div className="flex mt-5 items-center justify-center">
+        <div className="flex my-12 items-center justify-center">
           <TailSpin color="#111827" height={20} width={20} />
         </div>
       )}
@@ -467,9 +490,14 @@ export const PurchaseHistoryDetails = () => {
             <button
               type="button"
               className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-              // onClick={onConfirm}
+              onClick={onCancelOrderClicked}
             >
-              Confirm
+              <span>Confirm</span>
+              {loading && (
+                <div className="flex ml-2 items-center justify-center">
+                  <TailSpin color="#FFFF" height={20} width={20} />
+                </div>
+              )}
             </button>
             <button
               type="button"

@@ -30,6 +30,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.bytebuddy.utility.RandomString;
+
 @Service("customerServiceImpl")
 @Transactional
 public class CustomerServiceImpl implements CustomerService {
@@ -57,8 +59,10 @@ public class CustomerServiceImpl implements CustomerService {
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
             customer.setMembershipTier(findMembershipTierById("BASIC"));
-            customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+            String password = RandomString.make(40);
+            customer.setPassword(passwordEncoder.encode(password));
             em.persist(customer);
+            emailService.sendCustomerPasswordCreation(customer, password);
             return customer;
         }
     }

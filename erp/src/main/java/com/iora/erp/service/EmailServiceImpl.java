@@ -80,6 +80,20 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public void sendCustomerPasswordCreation(Customer customer, String tempPassword) {
+        String welcomeLetter = "Thank you for signing up with iORA." + "\n" + "Your membership number is: "
+                + customer.getId() + "\n" + "Please use the temporary password ";
+        String text = "to login to your account and change your password. \n We look forward to servicing you!";
+        sendSimpleHTMLMessage(
+                customer.getEmail(),
+                "Welcome to iORA!",
+                customer.getLastName(),
+                welcomeLetter,
+                tempPassword,
+                text);
+    }
+
+    @Override
     public void sendOnlineOrderConfirmation(Customer customer, OnlineOrder order) {
         Context context = new Context();
         context.setVariable("header", "Dear Customer, thank you for shopping at iORA!");
@@ -94,14 +108,16 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendOnlineOrderCancellation(Customer customer, OnlineOrder order) {
         Context context = new Context();
-        context.setVariable("header", "Dear Customer, we deeply regret to inform you that your order has been cancelled due to insufficient stocks. Payment(s) have been fully refunded to your card and it may take up to 14 working days to take effect.");
-        context.setVariable("agenda", "Please email, call, or create a support ticket at https://iora.online/sg/ if you would like to contact us. Your order was previously placed on ");
+        context.setVariable("header",
+                "Dear Customer, we deeply regret to inform you that your order has been cancelled due to insufficient stocks. Payment(s) have been fully refunded to your card and it may take up to 14 working days to take effect.");
+        context.setVariable("agenda",
+                "Please email, call, or create a support ticket at https://iora.online/sg/ if you would like to contact us. Your order was previously placed on ");
         context.setVariable("dateTime", order.getDateTime());
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
         String subject = "Order Confirmation #" + order.getId();
         sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
-        
+
     }
 
     @Override

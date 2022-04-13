@@ -9,11 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { IMGBB_SECRET } from "../../../../config";
 import {
-  // createSupportTicket,
   fetchPublicSupportTickets,
-  fetchUserSupportTickets,
   selectPublicSupportTickets,
-  selectUserSupportTickets,
 } from "../../../../stores/slices/supportTicketSlice";
 import {
   createSupportTicket,
@@ -131,7 +128,7 @@ const SupportTicketModal = ({
                       aria-labelledby="information-heading"
                       className="mt-1"
                     >
-                      <form action="#" method="POST">
+                      <form onSubmit={onSubmitClicked}>
                         <div className="sm:overflow-hidden">
                           <div className="bg-white py-6 space-y-6 px-1">
                             <div className="grid grid-cols-3 gap-6">
@@ -144,10 +141,12 @@ const SupportTicketModal = ({
                                     type="text"
                                     name="subject"
                                     id="subject"
-                                    required
+                                    placeholder="Enter subject."
                                     value={subject}
                                     onChange={onSubjectChanged}
                                     className="focus:ring-gray-500 focus:border-gray-500 flex-grow block w-full min-w-0 rounded-md sm:text-sm border-gray-300"
+                                    required
+                                    autoFocus
                                   />
                                 </div>
                               </div>
@@ -276,7 +275,6 @@ const SupportTicketModal = ({
                             ) : (
                               <button
                                 type="submit"
-                                onClick={onSubmitClicked}
                                 className="bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                               >
                                 Save
@@ -312,7 +310,7 @@ const SupportTicketTable = ({ data, handleOnClick, user }) => {
       {
         Header: "Last Response",
         accessor: (row) => `${row.messages[row.messages.length - 1]}`,
-        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, hh:mm"),
+        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, h:mm a"),
       },
     ],
     []
@@ -333,7 +331,7 @@ const SupportTicketTable = ({ data, handleOnClick, user }) => {
       {
         Header: "Last Response",
         accessor: (row) => `${row.messages[row.messages.length - 1]}`,
-        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, hh:mm"),
+        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, h:mm a"),
       },
       {
         Header: "Status",
@@ -379,7 +377,6 @@ export const SupportList = () => {
   const publicTickets = useSelector((state) =>
     selectPublicSupportTickets(state)
   );
-  // const userTickets = useSelector((state) => selectUserSupportTickets(state));
   const user = useSelector(selectUser);
   const userOrders = useSelector(selectUserOrders);
   const userTickets = useSelector(selectUserTickets);
@@ -394,22 +391,16 @@ export const SupportList = () => {
   const onOrderChanged = (e) => setOrder(e.target.value);
   const [file, setFile] = useState({});
   const [loading, setLoading] = useState(false);
-  const ticketStatus = useSelector((state) => state.supportTickets.listStatus);
-
-  // useEffect(() => {
-  //   ticketStatus === "idle" && dispatch(fetchUserSupportTickets(JSON.parse(localStorage.getItem("user")).id));
-  // }, [ticketStatus, dispatch, navigate]);
 
   useEffect(() => {
-    ticketStatus === "idle" && dispatch(fetchPublicSupportTickets());
-  }, [ticketStatus, dispatch, navigate]);
+    dispatch(fetchPublicSupportTickets());
+  }, [dispatch, navigate]);
 
   const handleOnClick = (row) => navigate(`${row.original.id}`);
 
   const onSubmitClicked = async (evt) => {
     evt.preventDefault();
     setLoading(true);
-    // const name = `${user?.firstName} ${user.lastName}`
     const ticket = {
       subject,
       category,
@@ -434,7 +425,7 @@ export const SupportList = () => {
         );
         ticket["imageUrl"] = data.data.url;
       }
-
+      console.log(ticket);
       await dispatch(createSupportTicket(ticket)).unwrap();
       setSubject("");
       setMessage("");
@@ -455,120 +446,6 @@ export const SupportList = () => {
     } finally {
       setLoading(false);
     }
-
-    // Boolean(file.name)
-    //   ? fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`, {
-    //       method: "POST",
-    //       body: image,
-    //     })
-    //       .then((response) => response.json())
-    //       .then((data) => {
-    //         imageUrl = data.data.url;
-    //         dispatch(
-    //           createSupportTicket({
-    //             subject,
-    //             category,
-    //             messages: [
-    //               {
-    //                 message,
-    //                 name,
-    //                 imageUrl,
-    //               },
-    //             ],
-    //             customer: {
-    //               id: user?.id,
-    //             },
-    //           })
-    //         )
-    //           .unwrap()
-    //           .then(() => {
-    //             setSubject("");
-    //             setMessage("");
-    //             setCategory("");
-    //             setOrder("");
-    //             setFile([]);
-    //             setOpenNewTicket(false);
-    //             navigate("/support");
-    //             addToast("Successfully replied to ticket", {
-    //               appearance: "success",
-    //               autoDismiss: true,
-    //             });
-    //           })
-    //           .catch((err) => {
-    //             addToast(`Error: ${err.message}`, {
-    //               appearance: "error",
-    //               autoDismiss: true,
-    //             });
-    //           })
-    //           .finally(() => {
-    //             setLoading(false);
-    //           });
-    //       })
-    //   : dispatch(
-    //       createSupportTicket({
-    //         subject,
-    //         category,
-    //         messages: [
-    //           {
-    //             message,
-    //             name,
-    //             imageUrl,
-    //           },
-    //         ],
-    //         customer: {
-    //           id: JSON.parse(localStorage.getItem("user")).id,
-    //         },
-    //         customerOrder:
-    //           order === 0
-    //             ? null
-    //             : {
-    //                 id: order,
-    //               },
-    //       })
-    //     )
-    //       .unwrap()
-    //       .then(() => {
-    //         setSubject("");
-    //         setMessage("");
-    //         setCategory("");
-    //         setOrder("");
-    //         setFile([]);
-    //         setOpenNewTicket(false);
-    //         navigate("/support");
-    //         addToast("Ticket successfully created", {
-    //           appearance: "success",
-    //           autoDismiss: true,
-    //         });
-    //       })
-    //       .catch((err) => {
-    //         console.log({
-    //           subject,
-    //           category,
-    //           messages: [
-    //             {
-    //               message,
-    //               name,
-    //               imageUrl,
-    //             },
-    //           ],
-    //           customer: {
-    //             id: JSON.parse(localStorage.getItem("user")).id,
-    //           },
-    //           customerOrder:
-    //             order === 0
-    //               ? null
-    //               : {
-    //                   id: order,
-    //                 },
-    //         });
-    //         addToast(`Error: ${err.message}`, {
-    //           appearance: "error",
-    //           autoDismiss: true,
-    //         });
-    //       })
-    //       .finally(() => {
-    //         setLoading(false);
-    //       });
   };
 
   return (
@@ -583,21 +460,38 @@ export const SupportList = () => {
             If your issue has not been resolved before, please create a new
             ticket.
           </h2>
-          <SupportTicketTable
-            data={publicTickets}
-            handleOnClick={handleOnClick}
-            user={false}
-          />
+          {publicTickets.length ? (
+            <SupportTicketTable
+              data={publicTickets}
+              handleOnClick={handleOnClick}
+              user={false}
+            />
+          ) : (
+            <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+              <span className="mt-2 block text-sm font-medium text-gray-900">
+                No vouchers.
+              </span>
+            </div>
+          )}
         </div>
         <div>
           <h1 className="text-3xl text-center font-bold text-gray-900 pt-5 pb-5">
             Your Support Tickets
           </h1>
-          <SupportTicketTable
-            data={userTickets}
-            handleOnClick={handleOnClick}
-            user={true}
-          />
+
+          {userTickets.length ? (
+            <SupportTicketTable
+              data={userTickets}
+              handleOnClick={handleOnClick}
+              user={true}
+            />
+          ) : (
+            <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+              <span className="mt-2 block text-sm font-medium text-gray-900">
+                No support tickets.
+              </span>
+            </div>
+          )}
         </div>
         <div className="px-4 md:flex md:items-center md:justify-between lg:px-8 xl:px-12 float-right pt-5">
           <div className="mt-6 flex space-x-3 md:mt-0">

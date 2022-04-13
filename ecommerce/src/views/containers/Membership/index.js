@@ -30,6 +30,7 @@ import {
 import moment from "moment";
 import { api } from "../../../environments/Api";
 import { SimpleModal } from "../../components/Modals/SimpleModal";
+import { useCallback } from "react";
 
 const tiers = [
   {
@@ -123,8 +124,8 @@ export const Membership = () => {
   );
   const currSpend = useSelector((state) => selectCurrSpend(state));
 
-  useEffect(() => {
-    const getVoucherCodes = async (customerId) => {
+  const getVoucherCodes = useCallback(
+    async (customerId) => {
       setLoading(true);
       try {
         const { data } = await api.get("store/member/vouchers", customerId);
@@ -137,11 +138,15 @@ export const Membership = () => {
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [addToast]
+  );
+
+  useEffect(() => {
     dispatch(fetchMembershipTiers());
     user.id && dispatch(getCurrentSpending(user.id));
     user.id && getVoucherCodes(user.id);
-  }, [dispatch, user.id, addToast]);
+  }, [dispatch, user.id, addToast, getVoucherCodes]);
 
   const nextTier = membershipTiers.find(
     (tier) => tier.minSpend > currSpend
@@ -162,6 +167,7 @@ export const Membership = () => {
         appearance: "success",
         autoDismiss: true,
       });
+      getVoucherCodes(user?.id);
       setOpen(false);
     } catch (err) {
       addToast(`Error: ${err.message}`, {
@@ -293,7 +299,7 @@ export const Membership = () => {
                 </button>
               </div>
               <div className="max-w-7xl mx-auto py-24 px-4 bg-white sm:px-6 lg:px-8">
-                <div className="space-y-4">
+                <div className="space-y-8">
                   <div className="lg:text-center">
                     <p className="text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
                       Rewards
@@ -350,9 +356,14 @@ export const Membership = () => {
                       </dl>
                     </div>
                   </div>
-                  <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl leading-none tracking-tight ">
-                    Member Tiers
-                  </h2>
+                  <div>
+                    <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl leading-none tracking-tight">
+                      Member Tiers
+                    </h2>
+                    <p className="mt-4 max-w-2xl text-xl text-gray-500">
+                      Be rewarded as you spend.
+                    </p>
+                  </div>
                   <div className="space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
                     {tiers.map((tier) => (
                       <div
@@ -412,74 +423,79 @@ export const Membership = () => {
                         </div>
                       </div>
                     ))}
+                    <p className="lg:col-start-1 lg:col-span-3 italic pt-4 pb-4">
+                      * Birthday 2X points for the first successful transaction
+                      on your birthday month (capped at $200)
+                    </p>
                   </div>
-                  <p className="italic mt-4 pb-4">
-                    * Birthday 2X points for the first successful transaction on
-                    your birthday month (capped at $200)
-                  </p>
-                  <h1 className="w-full text-3xl font-bold text-gray-900">
-                    Redeeming Membership Points
-                  </h1>
-                  <h4 className="pt-2">
-                    Redeem your membership points for a voucher.
-                  </h4>
-                  <ul className="pt-2 list-disc list-inside">
-                    <li>
-                      Each point is worth a dollar. E.g. 5 points can be
-                      redeemed for a $5 voucher
-                    </li>
-                    <li>Vouchers are denoted in $5, $10, $25 and $50 only</li>
-                    <li>
-                      Voucher code will be sent to: <b>{user.email}</b>
-                    </li>
-                    <li>Only 1 voucher will be accepted per checkout</li>
-                  </ul>
-                  <h2 className="text-2xl pt-5 font-bold">
-                    Terms and Conditions
-                  </h2>
-                  <ul className="list-inside list-disc pt-5 text-sm">
-                    <li>
-                      The usage of membership privileges is ONLY applicable in
-                      Singapore stores.
-                    </li>
-                    <li>
-                      Membership is applicable for both retail stores and online
-                      store.
-                    </li>
-                    <li>
-                      Member's information are kept confidential and used
-                      strictly for loyalty program purpose only.
-                    </li>
-                    <li>
-                      Each person can only hold one iORA membership account. In
-                      the event that a member has more than 1 account, iORA
-                      management has the rights to keep only the most recently
-                      used account.
-                    </li>
-                    <li>
-                      Membership is not transferable or exchangeable for cash.
-                    </li>
-                    <li>
-                      Once the transaction of points redemption has been made,
-                      it cannot be cancelled nor reversed.
-                    </li>
-                    <li>
-                      Points will only be granted on the final purchase amount
-                      after discount and after deducting Cash Voucher or Gift
-                      Voucher.
-                    </li>
-                    <li>All accumulate points will expire after 1 year.</li>
-                    <li>
-                      Foreign applications with overseas contact will not be
-                      able to receive SMS correspondences.
-                    </li>
-                    <li>
-                      The company reserves the right to alter and amend any of
-                      the Terms & Conditions of the membership, including any or
-                      all of the benefits, or to terminate it at any time
-                      without prior notice.
-                    </li>
-                  </ul>
+                  <div>
+                    <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl leading-none tracking-tight">
+                      Redeeming Points
+                    </h1>
+                    <p className="mt-4 max-w-2xl text-xl text-gray-500">
+                      Redeem your membership points for vouchers you can use
+                      online or in-store.
+                    </p>
+                    <ul className="pt-8 list-disc list-inside">
+                      <li>
+                        Each point is worth $1. E.g. 5 points can be
+                        redeemed for a $5 voucher
+                      </li>
+                      <li>Vouchers are denoted in $5, $10, $25 and $50 only</li>
+                      <li>
+                        Voucher code will be sent to: <b>{user.email}</b>
+                      </li>
+                      <li>Only 1 voucher will be accepted per checkout</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl pt-5 font-bold">
+                      Terms and Conditions
+                    </h2>
+                    <ul className="list-inside list-disc pt-5 text-xs">
+                      <li>
+                        The usage of membership privileges is ONLY applicable in
+                        Singapore stores.
+                      </li>
+                      <li>
+                        Membership is applicable for both retail stores and
+                        online store.
+                      </li>
+                      <li>
+                        Member's information are kept confidential and used
+                        strictly for loyalty program purpose only.
+                      </li>
+                      <li>
+                        Each person can only hold one iORA membership account.
+                        In the event that a member has more than 1 account, iORA
+                        management has the rights to keep only the most recently
+                        used account.
+                      </li>
+                      <li>
+                        Membership is not transferable or exchangeable for cash.
+                      </li>
+                      <li>
+                        Once the transaction of points redemption has been made,
+                        it cannot be cancelled nor reversed.
+                      </li>
+                      <li>
+                        Points will only be granted on the final purchase amount
+                        after discount and after deducting Cash Voucher or Gift
+                        Voucher.
+                      </li>
+                      <li>All accumulate points will expire after 1 year.</li>
+                      <li>
+                        Foreign applications with overseas contact will not be
+                        able to receive SMS correspondences.
+                      </li>
+                      <li>
+                        The company reserves the right to alter and amend any of
+                        the Terms & Conditions of the membership, including any
+                        or all of the benefits, or to terminate it at any time
+                        without prior notice.
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>

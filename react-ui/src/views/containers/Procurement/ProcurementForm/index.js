@@ -113,6 +113,7 @@ const ProcurementItemsList = ({
               value={row.row.original.siteQuantities[storeId]}
               row={row.row}
               column={row.column}
+              min="0"
               updateMyData={updateSiteCol}
             />
           );
@@ -200,7 +201,7 @@ const ProcurementItemsList = ({
         Cell: (row) => {
           return (
             <EditableCell
-              value={row.row.original.costPrice}
+              value={row.value}
               step="0.01"
               min="0"
               row={row.row}
@@ -913,6 +914,7 @@ export const ProcurementForm = () => {
     warehouseSelected,
     lineItems.length,
     storeCheckedState.some(Boolean),
+    lineItems.every(item => item.requestedQty !== 0)
   ].every(Boolean);
 
   const handleUpload = async (file) => {

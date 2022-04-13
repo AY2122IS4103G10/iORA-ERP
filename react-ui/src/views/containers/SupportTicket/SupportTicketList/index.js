@@ -1,3 +1,5 @@
+import { CheckCircleIcon } from "@heroicons/react/outline";
+import moment from "moment";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +8,6 @@ import {
     selectAllSupportTickets
 } from "../../../../stores/slices/supportTicketSlice";
 import { SelectColumnFilter, SimpleTable } from "../../../components/Tables/SimpleTable";
-import moment from "moment";
 
 export const SupportTicketTable = ({ data, handleOnClick }) => {
     const columns = useMemo(
@@ -73,13 +74,22 @@ export const SupportTicketList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const data = useSelector(selectAllSupportTickets);
-    const supportTicketStatus = useSelector((state) => state.supportTickets.status);
     useEffect(() => {
-        supportTicketStatus === "idle" && dispatch(fetchSupportTickets());
-    }, [supportTicketStatus, dispatch]);
+        dispatch(fetchSupportTickets());
+    }, [dispatch]);
 
     const handleOnClick = (row) => navigate(`/sm/support/${row.original.id}`);
 
-    return <SupportTicketTable data={data} handleOnClick={handleOnClick} />;
+    return Boolean(data.length) ? (
+        <SupportTicketTable data={data} handleOnClick={handleOnClick} />
+    ) : (
+        <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+            <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <span className="mt-2 block text-sm font-medium text-gray-900">
+                No tickets requiring attention.
+            </span>
+        </div>
+    )
+        ;
 
 }

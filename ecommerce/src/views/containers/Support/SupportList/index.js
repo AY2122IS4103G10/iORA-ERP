@@ -469,7 +469,7 @@ export const SupportList = () => {
           ) : (
             <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
               <span className="mt-2 block text-sm font-medium text-gray-900">
-                No vouchers.
+                There is currently no resolved support ticket to display.
               </span>
             </div>
           )}

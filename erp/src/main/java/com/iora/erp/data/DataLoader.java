@@ -440,86 +440,92 @@ public class DataLoader implements CommandLineRunner {
 		c1.setContactNumber("83940775");
 		c1.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c1.setEmail("hongpeiisrandom@gmail.com");
-		c1.setPassword("password");
-		Customer cc1 = customerService.createCustomerAccount(c1);
+		c1.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c1.setPassword(passwordEncoder.encode("password"));
+		em.persist(c1);
 		DeliveryAddress da1 = new DeliveryAddress("HongPei", "313 Sembawang Drive", "#12-220", "Singapore", "750313",
 				"",
 				CountryEnum.Singapore,
 				"83940775");
 		em.persist(da1);
-		cc1.setAddress(da1);
+		c1.setAddress(da1);
 
 		Customer c2 = new Customer("Delven", "Wong");
 		c2.setContactNumber("92711363");
 		c2.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c2.setEmail("pengyu_33@msn.com");
-		c2.setPassword("password");
+		c2.setPassword(passwordEncoder.encode("password"));
 		c2.setMembershipPoints(200d);
-		Customer cc2 = customerService.createCustomerAccount(c2);
+		em.persist(c2);
 		DeliveryAddress da2 = new DeliveryAddress("Remus", "252 Jurong East Street 24", "#02-120", "Singapore",
 				"600252", "",
 				CountryEnum.Singapore,
 				"92711363");
 		em.persist(da2);
-		cc2.setAddress(da2);
+		c2.setAddress(da2);
 
 		Customer c3 = new Customer("Adeline", "Tan");
 		c3.setContactNumber("93834898");
 		c3.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c3.setEmail("tan.adelinejy@gmail.com");
-		c3.setPassword("password");
-		Customer cc3 = customerService.createCustomerAccount(c3);
+		c3.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c3.setPassword(passwordEncoder.encode("password"));
+		em.persist(c3);
 		DeliveryAddress da3 = new DeliveryAddress("Ade", "413 Serangoon Central", "#06-260", "Singapore", "550413", "",
 				CountryEnum.Singapore,
 				"93834898");
 		em.persist(da3);
-		cc3.setAddress(da3);
+		c3.setAddress(da3);
 
 		Customer c4 = new Customer("Louis", "Misson");
 		c4.setContactNumber("98550432");
 		c4.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c4.setEmail("louismisson8@gmail.com");
-		c4.setPassword("password");
-		Customer cc4 = customerService.createCustomerAccount(c4);
+		c4.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c4.setPassword(passwordEncoder.encode("password"));
+		em.persist(c4);
 		DeliveryAddress da4 = new DeliveryAddress("Louis", "307 Clementi Avenue 4", "#10-180", "Singapore", "120307",
 				"",
 				CountryEnum.Singapore,
 				"98550432");
 		em.persist(da4);
-		cc4.setAddress(da4);
+		c4.setAddress(da4);
 
 		Customer c5 = new Customer("Remus", "Kwan");
 		c5.setContactNumber("90556630");
 		c5.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c5.setEmail("remuskwan23@gmail.com");
-		c5.setPassword("password");
-		Customer cc5 = customerService.createCustomerAccount(c5);
+		c5.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c5.setPassword(passwordEncoder.encode("password"));
+		em.persist(c5);
 		DeliveryAddress da5 = new DeliveryAddress("Remus", "75A Redhill Rd, Block 75A", "#15-210", "Singapore",
 				"151075", "",
 				CountryEnum.Singapore,
 				"90556630");
 		em.persist(da5);
-		cc5.setAddress(da5);
+		c5.setAddress(da5);
 
 		Customer c6 = new Customer("Ruth", "Chong");
 		c6.setContactNumber("86065278");
 		c6.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c6.setEmail("ruth.cjn@gmail.com");
-		c6.setPassword("password");
-		Customer cc6 = customerService.createCustomerAccount(c6);
+		c6.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c6.setPassword(passwordEncoder.encode("password"));
+		em.persist(c6);
 		DeliveryAddress da6 = new DeliveryAddress("Ruth", "503 Hougang Ave 8, Block 503", "#16-320", "Singapore",
 				"530503", "",
 				CountryEnum.Singapore,
 				"86065278");
 		em.persist(da6);
-		cc6.setAddress(da6);
+		c6.setAddress(da6);
 
 		Customer c7 = new Customer("Steven", "Lim");
 		c7.setContactNumber("91234567");
 		c7.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c7.setEmail("iorasalesmail@gmail.com");
-		c7.setPassword("password");
-		customerService.createCustomerAccount(c7);
+		c7.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c7.setPassword(passwordEncoder.encode("password"));
+		em.persist(c7);
 
 		// Generate 10 $10 vouchers
 		customerService.generateVouchers("dataLoader", 10d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"),

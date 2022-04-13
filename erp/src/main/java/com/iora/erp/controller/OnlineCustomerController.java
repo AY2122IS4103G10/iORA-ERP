@@ -1,6 +1,8 @@
 package com.iora.erp.controller;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.SupportTicket;
+import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 // import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
@@ -29,6 +32,7 @@ import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +45,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleWriterExporterOutput;
 
 @RestController
 @RequestMapping("online")
@@ -481,4 +496,40 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
+    @GetMapping(path = "/public/reports/dailySales")
+    public void generateSalesReport(
+            HttpServletResponse response,
+            @RequestParam Long siteId,
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date date) {
+        try {
+            System.out.println("hello");
+            List<CustomerOrder> orders = customerOrderService.getDailyCustomerOrders(siteId, date);
+            System.out.println(orders);
+            JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(orders);
+            HashMap<String, Object> map = new HashMap<>();
+
+            map.put("DS1", beanCollectionDataSource);
+
+
+            JasperReport compileReport = JasperCompileManager
+                    .compileReport(new FileInputStream("src/main/resources/templates/DailySales.jrxml"));
+            JasperPrint finalReport = JasperFillManager.fillReport(compileReport, map, new JREmptyDataSource());
+            JRCsvExporter exporter = new JRCsvExporter();
+            exporter.setExporterInput(new SimpleExporterInput(finalReport));
+            // exporter.setExporterOutput(
+            // new SimpleWriterExporterOutput("employeeReport.csv"));
+
+            exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getOutputStream()));
+            response.setHeader(
+                    HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=SalesReport" + date.toString()  + ".csv;");
+            response.setContentType("text/csv");
+
+            exporter.exportReport();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }

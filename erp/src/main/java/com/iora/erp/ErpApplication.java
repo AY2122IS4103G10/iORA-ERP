@@ -1,12 +1,14 @@
 package com.iora.erp;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iora.erp.data.DataLoader;
 
+import org.h2.tools.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -44,6 +46,10 @@ public class ErpApplication {
 			}
 		};
 	}
+	@Bean(initMethod = "start", destroyMethod = "stop")
+    public Server h2Server() throws SQLException {
+        return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092");
+    }
 	/*
 	 * private static class MyTimeTask extends TimerTask {
 	 * public void run() {

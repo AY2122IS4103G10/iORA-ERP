@@ -81,14 +81,13 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendCustomerPasswordCreation(Customer customer, String tempPassword) {
-        String welcomeLetter = "Thank you for signing up with iORA." + "\n" + "Your membership number is: "
-                + customer.getId() + "\n" + "Please use the temporary password ";
-        String text = "to login to your account and change your password. \n We look forward to servicing you!";
+
+        String text = "Thank you for signing up with iORA! Please login and change your password immediately.";
         sendSimpleHTMLMessage(
                 customer.getEmail(),
                 "Welcome to iORA!",
                 customer.getLastName(),
-                welcomeLetter,
+                "temporary password",
                 tempPassword,
                 text);
     }

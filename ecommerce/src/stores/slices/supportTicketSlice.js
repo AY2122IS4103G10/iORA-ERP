@@ -63,7 +63,7 @@ const supportTicketSlice = createSlice({
   initialState,
   extraReducers(builder) {
     builder.addCase(createSupportTicket.fulfilled, (state, action) => {
-      state.listStatus = "idle";
+      state.user.supportTickets = state.user.supportTickets.push(action.payload);
     });
     builder.addCase(fetchSupportTickets.pending, (state, action) => {
       state.detailsStatus = "loading";

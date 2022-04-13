@@ -73,14 +73,17 @@ const DeliveryList = ({
       );
     };
     const handleEditRow = (evt, rowIndex) => {
-      evt.preventDefault()
+      evt.preventDefault();
       setData((item) =>
-        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+        item.map((row, index) => {
+          if (index === rowIndex) return { ...row, isEditing: true };
+          return row;
+        })
       );
     };
 
     const handleSaveRow = (evt, rowIndex) => {
-      evt.preventDefault()
+      evt.preventDefault();
       setData((old) =>
         old.map((row, index) => {
           if (index === rowIndex) {

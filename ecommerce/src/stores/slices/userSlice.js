@@ -116,6 +116,30 @@ export const cancelOrder = createAsyncThunk("customers/cancelOrder", async (data
   }
 });
 
+export const createSupportTicket = createAsyncThunk(
+  "customers/createSupportTicket",
+  async (supportTicket) => {
+    try {
+      const response = await api.create("online/ticket", supportTicket);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
+export const redeemPoints = createAsyncThunk(
+  "customers/redeemPoints",
+  async (data) => {
+    try {
+      const response = await api.get("online/redeemPoints", `${data.email}/${data.amount}`);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -189,11 +213,30 @@ const userSlice = createSlice({
       state.status = "failed";
     });
     builder.addCase(cancelOrder.fulfilled, (state, action) => {
-      console.log(action.payload);
-      const order = state.user.orders.find((order) => order.id === action.payload.id);
+      const order = state.user.orders.find(
+        (order) => order.id === action.payload.id
+      );
       if (order) {
         order.statusHistory = action.payload.statusHistory;
       }
+      state.status = "succeeded";
+    });
+
+    builder.addCase(createSupportTicket.fulfilled, (state, action) => {
+      console.log(action.payload);
+      state.user.supportTickets.push({
+        ...action.payload,
+      });
+      state.status = "succeeded";
+    });
+    builder.addCase(redeemPoints.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(redeemPoints.rejected, (state, action) => {
+      state.status = "failed";
+    });
+    builder.addCase(redeemPoints.fulfilled, (state, action) => {
+      state.user = { ...action.payload };
       state.status = "succeeded";
     });
   },
@@ -212,6 +255,8 @@ export const selectUserStore = (state) => state.user.currStore;
 export const selectCurrSpend = (state) => state.user.currSpend;
 
 export const selectUserOrders = (state) => state.user.user.orders;
+
+export const selectUserTickets = (state) => state.user.user.supportTickets;
 
 export const selectUserOrderById = (state, orderId) =>
   state.user.user.orders.find((order) => order.id === orderId);

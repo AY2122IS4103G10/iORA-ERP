@@ -374,18 +374,6 @@ export const CustomerDetails = () => {
           address={customer.address}
           orders={customer.orders}
         />
-        {/* {Boolean(customer.address) && (
-          <AddressDetails
-            mainName={customer.address.name}
-            street1={customer.address.street1}
-            street2={customer.address.street2}
-            zip={customer.address.zip}
-            city={customer.address.city}
-            state={customer.address.state}
-            deliveryContact={customer.address.phone}
-            country={customer.address.country}
-          />
-        )} */}
       </div>
     )
   );

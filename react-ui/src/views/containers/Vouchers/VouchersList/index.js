@@ -48,7 +48,7 @@ export const VouchersTable = ({ data, handleOnClick }) => {
         accessor: "redeemed",
         Cell: (e) => (e.value ? "Yes" : "No"),
       },
-    ],
+    ], []
   );
 
   return (
@@ -78,9 +78,10 @@ export const VouchersList = () => {
   useEffect(() => {
     voucherStatus === "idle" && dispatch(fetchVouchers());
   }, [voucherStatus, dispatch]);
+  
   useEffect(() => {
     dispatch(fetchCustomers());
-  }, []);
+  }, [dispatch]);
 
   return voucherStatus === "loading" ? (
     <div className="flex mt-5 items-center justify-center">

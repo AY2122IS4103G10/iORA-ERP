@@ -15,8 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
 
@@ -46,7 +45,7 @@ public class Customer implements Serializable {
     @JoinColumn(name = "customerId")
     private List<CustomerOrder> orders;
     private Boolean availStatus;
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIgnoreProperties({"customer"})
     @OneToMany
     private List<SupportTicket> supportTickets;
 

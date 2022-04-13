@@ -409,7 +409,6 @@ public class CustomerServiceImpl implements CustomerService {
         c.addSupportTicket(supportTicket);
         siteService.getSite(1L)
                 .addNotification(new Notification("Support Ticket # " + supportTicket.getId(), "New ticket"));
-        em.merge(c);
         return supportTicket;
     }
 

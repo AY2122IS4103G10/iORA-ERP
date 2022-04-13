@@ -184,11 +184,10 @@ export const EditableCell = ({
   ...rest
 }) => {
   const [value, setValue] = useState(initialValue);
-
   const onChange = (e) => {
     if (
-      parseFloat(e.target.value) >= parseFloat(min) ||
-      (max && parseFloat(e.target.value) <= parseFloat(max))
+      parseFloat(e.target.value) >= parseFloat(min) &&
+      (max ? parseFloat(e.target.value) <= parseFloat(max) : true)
     )
       setValue(e.target.value);
     // updateMyData(index, id, e.target.value);

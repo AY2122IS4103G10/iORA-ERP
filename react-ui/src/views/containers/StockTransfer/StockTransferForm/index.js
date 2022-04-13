@@ -20,14 +20,13 @@ import ErrorModal from "../../../components/Modals/ErrorModal";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import {
   ClickableRowTable,
-  EditableCell,
-  SelectColumnFilter,
 } from "../../../components/Tables/ClickableRowTable";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { EditableCell, SelectColumnFilter, SimpleTable } from "../../../components/Tables/SimpleTable";
 import { useToasts } from "react-toast-notifications";
 import { fetchSite } from "../../Procurement/ProcurementWrapper";
 import { SimpleInlineRG } from "../../../components/RadioGroups/SimpleInlineRG";
 import { TailSpin } from "react-loader-spinner";
+import { classNames } from "../../../../utilities/Util";
 
 const orderTypes = [
   { id: 1, title: "Send" },
@@ -428,7 +427,7 @@ const LineItemsTable = ({ data, setLineItems }) => {
         accessor: "qty",
       },
       {
-        Header: "Request Qty",
+        Header: "Qty",
         accessor: "requestedQty",
         disableSortBy: true,
         Cell: (row) => {
@@ -486,6 +485,13 @@ export const StockTransferForm = ({ subsys }) => {
   //get stock level and product information
   const [prodTableData, setProdTableData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const canAdd = [
+    Object.keys(from).length,
+    Object.keys(to).length,
+    lineItems.length,
+  ].every(Boolean);
+
   const fetchStockLevel = async (id) => {
     setLoading(true);
     const { data } = await api.get(`store/viewStock/sites`, id);
@@ -842,8 +848,14 @@ export const StockTransferForm = ({ subsys }) => {
                       {!isEditing ? (
                         <button
                           type="submit"
-                          className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          className={classNames(
+                            canAdd
+                              ? "bg-cyan-600 hover:bg-cyan-700"
+                              : "bg-cyan-800",
+                            "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                          )}
                           onClick={handleSubmit}
+                          disabled={!canAdd}
                         >
                           Create
                         </button>

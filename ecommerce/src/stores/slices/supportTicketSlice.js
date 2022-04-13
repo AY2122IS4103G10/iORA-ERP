@@ -105,7 +105,7 @@ const supportTicketSlice = createSlice({
       } = action.payload;
       const supportTicket = state.supportTickets.find((st) => st.id === id);
       if (supportTicket) {
-        supportTicket.detailsStatus = status;
+        supportTicket.status = status;
       }
     });
   },

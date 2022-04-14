@@ -45,9 +45,9 @@ public class EmailServiceImpl implements EmailService {
         }
         emailSender.send(msg);
     }
-    
+
     private void sendAgendaHTMLMessage(String to, String subject, String name, String agenda, String code,
-    String text) {
+            String text) {
         Context context = new Context();
         context.setVariable("name", name);
         context.setVariable("agenda", agenda);
@@ -55,7 +55,7 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("text", text);
         sendHTMLMessage(to, subject, "agendaTemplate", context);
     }
-    
+
     @Override
     public void sendSimpleHTMLMessage(String to, String subject, String name, String body) {
         Context context = new Context();
@@ -63,7 +63,7 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("body", body);
         sendHTMLMessage(to, subject, "simpleTemplate", context);
     }
-    
+
     @Override
     public void sendTemporaryPassword(Employee employee, String tempPassword) {
         String text = "Please login and change your password immediately.";
@@ -89,6 +89,18 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public void sendCustomerPasswordCreation(Customer customer, String tempPassword) {
+        String text = "Thank you for signing up with iORA! Please login and change your password immediately.";
+        sendAgendaHTMLMessage(
+                customer.getEmail(),
+                "Welcome to iORA!",
+                customer.getLastName(),
+                "temporary password",
+                tempPassword,
+                text);
+    }
+
+    @Override
     public void sendOnlineOrderConfirmation(Customer customer, OnlineOrder order) {
         Context context = new Context();
         context.setVariable("header", "Dear Customer, thank you for shopping at iORA!");
@@ -103,14 +115,16 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendOnlineOrderCancellation(Customer customer, OnlineOrder order) {
         Context context = new Context();
-        context.setVariable("header", "Dear Customer, we deeply regret to inform you that your order has been cancelled due to insufficient stocks. Payment(s) have been fully refunded to your card and it may take up to 10 working days to take effect.");
-        context.setVariable("agenda", "Please email, call, or create a support ticket at https://iora.online/sg/ if you would like to contact us. Your order was previously placed on ");
+        context.setVariable("header",
+                "Dear Customer, we deeply regret to inform you that your order has been cancelled due to insufficient stocks. Payment(s) have been fully refunded to your card and it may take up to 10 working days to take effect.");
+        context.setVariable("agenda",
+                "Please email, call, or create a support ticket at https://iora.online/sg/ if you would like to contact us. Your order was previously placed on ");
         context.setVariable("dateTime", order.getDateTime());
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
         String subject = "iORA Order Cancellation #" + order.getId();
         sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
-        
+
     }
 
     @Override

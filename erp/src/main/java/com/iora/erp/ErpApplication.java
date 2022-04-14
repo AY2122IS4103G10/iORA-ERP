@@ -13,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class ErpApplication {
@@ -46,10 +48,11 @@ public class ErpApplication {
 			}
 		};
 	}
+
 	@Bean(initMethod = "start", destroyMethod = "stop")
-    public Server h2Server() throws SQLException {
-        return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092");
-    }
+	public Server h2Server() throws SQLException {
+		return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092");
+	}
 	/*
 	 * private static class MyTimeTask extends TimerTask {
 	 * public void run() {
@@ -57,4 +60,5 @@ public class ErpApplication {
 	 * }
 	 * }
 	 */
+
 }

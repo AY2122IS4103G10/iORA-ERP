@@ -13,10 +13,10 @@ export const Listings = () => {
   const { tag } = useParams();
   const { line } = useParams();
   const dispatch = useDispatch();
-  const listings = useSelector(selectListings);
+  const listings = useSelector(selectListings)?.filter(
+    (product) => product.available
+  );
   const listingStatus = useSelector((state) => state.listing.status);
-  //   console.log(tag);
-  //   console.log(line);
 
   useEffect(() => {
     dispatch(fetchListings({ line: line, tag: tag }));

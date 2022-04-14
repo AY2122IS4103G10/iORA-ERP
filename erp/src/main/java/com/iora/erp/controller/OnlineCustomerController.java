@@ -3,23 +3,26 @@ package com.iora.erp.controller;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.websocket.server.PathParam;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iora.erp.enumeration.ParcelSize;
+import com.iora.erp.enumeration.ParcelSizeEnum;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.site.Site;
@@ -28,6 +31,7 @@ import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
+import com.iora.erp.service.ShippItService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StripeService;
 
@@ -43,8 +47,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -71,6 +77,10 @@ public class OnlineCustomerController {
     private SiteService siteService;
     @Autowired
     StripeService stripeService;
+    @Autowired
+    private ShippItService shippIt;
+    @Autowired
+    private RestTemplate restTemplate;
 
     /*
      * ---------------------------------------------------------
@@ -329,7 +339,8 @@ public class OnlineCustomerController {
     }
 
     @PutMapping(path = "/customer/cancel/{orderId}/{customerId}", produces = "application/json")
-    public ResponseEntity<Object> customerCancelancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long customerId) {
+    public ResponseEntity<Object> customerCancelancelOnlineOrder(@PathVariable Long orderId,
+            @PathVariable Long customerId) {
         try {
             return ResponseEntity.ok(customerOrderService.customerCancelOnlineOrder(orderId, customerId));
         } catch (Exception ex) {
@@ -404,7 +415,7 @@ public class OnlineCustomerController {
     }
 
     @PutMapping(path = "/order/{orderId}/{sku}/{qty}", produces = "application/json")
-    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku,
+    public ResponseEntity<Object> todeliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku,
             @PathVariable int qty) {
         try {
             return ResponseEntity.ok(customerOrderService.adjustProduct(orderId, sku, qty));
@@ -415,29 +426,45 @@ public class OnlineCustomerController {
     }
 
     @GetMapping(path = "/order/parcelSize", produces = "application/json")
-    public List<ParcelSize> getParcelSize() {
+    public List<ParcelSizeEnum> getParcelSize() {
         return customerOrderService.getParcelSizes();
     }
 
-    @PutMapping(path = "/deliver/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId) {
+    @RequestMapping(value = "/order/delivery/{orderId}/{siteId}", consumes = "application/json", method = RequestMethod.POST)
+    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
+            @RequestBody OnlineOrder parcelSizes) {
         try {
-            return ResponseEntity.ok(customerOrderService.deliverOnlineOrder(orderId));
+            return ResponseEntity.ok(shippIt.deliveryOrder(orderId, siteId, parcelSizes));
+
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/order/delivery/declareMultiple/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverMuiltipleOnlineOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(shippIt.moreToDelivery(orderId));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
-    @PutMapping(path = "/deliverMultiple/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> deliverMuiltipleOnlineOrder(@PathVariable Long orderId) {
-        try {
-            return ResponseEntity.ok(customerOrderService.deliverMultipleOnlineOrder(orderId));
-        } catch (Exception ex) {
-            System.err.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        }
+    @GetMapping(path = "/order/delivery/confirm", produces = "application/json")
+    public String confirmDeliveryingOrder() {
+        return shippIt.confirmDeliveryOrders();
     }
+
+    @GetMapping(path = "/order/delivery/retreivelabel/{parcelId}", produces = "application/json")
+    public String getLabel(@PathVariable Long parcelId) {
+        return shippIt.retreiveLabel(parcelId);
+    }
+
+    // timebased confirm order
+    // button confrim order
+    // tracking
 
     @PutMapping(path = "/deliver/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> receiveOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {

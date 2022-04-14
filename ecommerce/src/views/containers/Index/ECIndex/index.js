@@ -1,9 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import {
   logout,
-  selectUserLoggedIn
+  selectUserLoggedIn,
 } from "../../../../stores/slices/userSlice";
 import { NavBar } from "../../../components/NavBar";
 
@@ -12,9 +13,7 @@ const navigation = {
     {
       id: "Sale",
       name: "Sale",
-      items: [
-        { name: "Sales", href: "" }
-      ]
+      items: [{ name: "Sales", href: "" }],
     },
     {
       id: "iORA",
@@ -45,7 +44,6 @@ const navigation = {
         { name: "Denim", href: "products/lalu/denim" }, //cat
         { name: "Browse All", href: "products/lalu" },
       ],
-
     },
     {
       id: "SORA",
@@ -64,29 +62,15 @@ const navigation = {
 
 const footerNavigation = {
   products: [
-    { name: "Bags", href: "#" },
-    { name: "Tees", href: "#" },
-    { name: "Objects", href: "#" },
-    { name: "Home Goods", href: "#" },
-    { name: "Accessories", href: "#" },
+    { name: "Tops", href: "products/iora/tops" },
+    { name: "Bottoms", href: "products/iora/bottoms" },
+    { name: "Skirts", href: "products/iora/skirts" },
+    { name: "Dresses / One Piece", href: "products/iora/dress" },
+    { name: "Knits & Sweaters", href: "products/iora/knits" },
+    { name: "Browse All", href: "products/iora" },
   ],
-  company: [
-    { name: "Who we are", href: "#" },
-    { name: "Sustainability", href: "#" },
-    { name: "Press", href: "#" },
-    { name: "Careers", href: "#" },
-    { name: "Terms & Conditions", href: "#" },
-    { name: "Privacy", href: "#" },
-  ],
-  customerService: [
-    { name: "Contact", href: "#" },
-    { name: "Shipping", href: "#" },
-    { name: "Returns", href: "#" },
-    { name: "Warranty", href: "#" },
-    { name: "Secure Payments", href: "#" },
-    { name: "FAQ", href: "#" },
-    { name: "Find a store", href: "#" },
-  ],
+
+  customerService: [{ name: "Support", href: "/support" }],
 };
 
 export const ECIndex = () => {
@@ -140,84 +124,37 @@ export const ECIndex = () => {
                     <h3 className="text-sm font-medium text-gray-900">
                       Products
                     </h3>
-                    <ul role="list" className="mt-6 space-y-6">
+                    <ul className="mt-6 space-y-6">
                       {footerNavigation.products.map((item) => (
                         <li key={item.name} className="text-sm">
-                          <a
-                            href={item.href}
+                          <Link
+                            to={item.href}
                             className="text-gray-500 hover:text-gray-600"
                           >
                             {item.name}
-                          </a>
+                          </Link>
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-900">
-                      Company
+                      Customer Service
                     </h3>
-                    <ul role="list" className="mt-6 space-y-6">
-                      {footerNavigation.company.map((item) => (
+                    <ul className="mt-6 space-y-6">
+                      {footerNavigation.customerService.map((item) => (
                         <li key={item.name} className="text-sm">
-                          <a
-                            href={item.href}
+                          <Link
+                            to={item.href}
                             className="text-gray-500 hover:text-gray-600"
                           >
                             {item.name}
-                          </a>
+                          </Link>
                         </li>
                       ))}
                     </ul>
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-900">
-                    Customer Service
-                  </h3>
-                  <ul role="list" className="mt-6 space-y-6">
-                    {footerNavigation.customerService.map((item) => (
-                      <li key={item.name} className="text-sm">
-                        <a
-                          href={item.href}
-                          className="text-gray-500 hover:text-gray-600"
-                        >
-                          {item.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Newsletter section */}
-              <div className="mt-12 md:mt-0 md:row-start-2 md:col-start-3 md:col-span-8 lg:row-start-1 lg:col-start-9 lg:col-span-4">
-                <h3 className="text-sm font-medium text-gray-900">
-                  Sign up for our newsletter
-                </h3>
-                <p className="mt-6 text-sm text-gray-500">
-                  The latest deals and savings, sent to your inbox weekly.
-                </p>
-                <form className="mt-2 flex sm:max-w-md">
-                  <label htmlFor="email-address" className="sr-only">
-                    Email address
-                  </label>
-                  <input
-                    id="email-address"
-                    type="text"
-                    autoComplete="email"
-                    required
-                    className="appearance-none min-w-0 w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-4 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
-                  />
-                  <div className="ml-4 flex-shrink-0">
-                    <button
-                      type="submit"
-                      className="w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 flex items-center justify-center text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      Sign up
-                    </button>
-                  </div>
-                </form>
               </div>
             </div>
           </div>

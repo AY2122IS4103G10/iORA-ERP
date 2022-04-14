@@ -59,7 +59,7 @@
 		</field> -->
 	</subDataset>
 	<parameter name="DS1" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
-	<title>
+	<!-- <title>
 		<band height="72">
 			<frame>
 				<reportElement mode="Opaque" x="-20" y="-20" width="595" height="92" backcolor="#474747" uuid="6321f5e3-86eb-444f-acc1-8daaaa0d6c60">
@@ -74,32 +74,10 @@
 				</staticText>
 			</frame>
 		</band>
-	</title>
+	</title> -->
 	<pageHeader>
 		<band height="13"/>
 	</pageHeader>
-	<pageFooter>
-		<band height="40">
-			<property name="com.jaspersoft.studio.layout"/>
-			<textField>
-				<reportElement mode="Opaque" x="0" y="4" width="515" height="13" backcolor="#E6E6E6" uuid="fed27553-a6c4-4a8a-9056-2f6f2589a3e5"/>
-				<textElement textAlignment="Right"/>
-				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Report">
-				<reportElement mode="Opaque" x="515" y="4" width="40" height="13" backcolor="#E6E6E6" uuid="9f5ad531-d413-49c9-874b-8b99e8150fa6"/>
-				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="60" y="4" width="100" height="13" uuid="fc593335-5cbf-4caf-97b3-ff897c676bde"/>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="0" y="4" width="60" height="13" uuid="9fa7b9b9-f5df-4a38-a0ef-ee171444eeba"/>
-				<text><![CDATA[Generated:]]></text>
-			</staticText>
-		</band>
-	</pageFooter>
 	<summary>
 		<band height="200" splitType="Stretch">
 			<property name="local_mesure_unitheight" value="pixel"/>

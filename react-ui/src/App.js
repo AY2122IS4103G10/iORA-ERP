@@ -101,6 +101,7 @@ import { VouchersList } from "./views/containers/Vouchers/VouchersList";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import { OnlineOrderPicking } from "./views/containers/OnlineOrder/OnlineOrderPicking/index.js";
 import { OnlineOrderInhouse } from "./views/containers/Orders/OnlineOrderInhouse/index.js";
+import { ManageReports } from "./views/containers/Reports/ManageReports/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -304,6 +305,7 @@ function App() {
             {/* Analytics */}
             <Route path="analytics" element={<Outlet />}>
               <Route index element={<ManageDashboard />} />
+              <Route path="reports" element={<ManageReports/>}/>
             </Route>
           </Route>
 

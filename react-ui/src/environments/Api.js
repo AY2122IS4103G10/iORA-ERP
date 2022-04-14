@@ -561,3 +561,17 @@ export const dashboardApi = {
     );
   },
 };
+
+export const reportApi = {
+  getSalesReport(startDate, endDate) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/reports/dailySales?start=${startDate}&end=${endDate}`, 
+      {
+        responseType:"blob",
+        headers: {
+          Accept: 'application/octet-stream',
+        },
+      }
+    );
+  }
+}

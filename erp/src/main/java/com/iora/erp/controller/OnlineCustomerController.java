@@ -576,40 +576,4 @@ public class OnlineCustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
-    @GetMapping(path = "/public/reports/dailySales")
-    public void generateSalesReport(
-            HttpServletResponse response,
-            @RequestParam Long siteId,
-            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date date) {
-        try {
-            System.out.println("hello");
-            List<CustomerOrder> orders = customerOrderService.getDailyCustomerOrders(siteId, date);
-            System.out.println(orders);
-            JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(orders);
-            HashMap<String, Object> map = new HashMap<>();
-
-            map.put("DS1", beanCollectionDataSource);
-
-
-            JasperReport compileReport = JasperCompileManager
-                    .compileReport(new FileInputStream("src/main/resources/templates/DailySales.jrxml"));
-            JasperPrint finalReport = JasperFillManager.fillReport(compileReport, map, new JREmptyDataSource());
-            JRCsvExporter exporter = new JRCsvExporter();
-            exporter.setExporterInput(new SimpleExporterInput(finalReport));
-            // exporter.setExporterOutput(
-            // new SimpleWriterExporterOutput("employeeReport.csv"));
-
-            exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getOutputStream()));
-            response.setHeader(
-                    HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=SalesReport" + date.toString()  + ".csv;");
-            response.setContentType("text/csv");
-
-            exporter.exportReport();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
 }

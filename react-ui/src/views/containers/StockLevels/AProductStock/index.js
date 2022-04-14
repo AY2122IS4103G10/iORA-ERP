@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { TailSpin } from "react-loader-spinner";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { getAProduct } from "../../../../stores/slices/productSlice";
 import {
   getProductStockLevel,
-  selectProductStock,
 } from "../../../../stores/slices/stocklevelSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
+import { SelectColumnFilter, SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchModelBySku } from "../../StockTransfer/StockTransferForm";
 
 export const AProductStock = ({ subsys }) => {
@@ -18,19 +17,25 @@ export const AProductStock = ({ subsys }) => {
   const dispatch = useDispatch();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(false);
-  const stocklevel = useSelector(selectProductStock);
-  const stockStatus = useSelector(state => state.stocklevel.status)
+  const [lineItems, setLineItems] = useState([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
       const data = await dispatch(getAProduct(id)).unwrap();
       const model = await fetchModelBySku(data.sku);
-      setProduct({ ...data, name: model.name, modelCode: model.modelCode });
+      return { ...data, name: model.name, modelCode: model.modelCode };
     };
     const onPageLoad = async () => {
       setLoading(true);
-      await fetchProduct();
-      await dispatch(getProductStockLevel(id)).unwrap();
+      const product = await fetchProduct();
+      const data = await dispatch(getProductStockLevel(id)).unwrap();
+      setLineItems(
+        data.map((stock) => ({
+          ...stock,
+          status: product?.baselineQty > stock.qty ? "Low" : "Normal",
+        }))
+      );
+      setProduct(product);
       setLoading(false);
     };
     onPageLoad();
@@ -40,10 +45,22 @@ export const AProductStock = ({ subsys }) => {
     {
       Header: "#",
       accessor: "site.id",
+      Cell: (e) =>
+        e.row.original.status === "Low" ? (
+          <span className="text-red-500">{e.value}</span>
+        ) : (
+          e.value
+        ),
     },
     {
       Header: "Code",
       accessor: "site.siteCode",
+      Cell: (e) =>
+        e.row.original.status === "Low" ? (
+          <span className="text-red-500">{e.value}</span>
+        ) : (
+          e.value
+        ),
     },
     {
       Header: "Name",
@@ -54,7 +71,11 @@ export const AProductStock = ({ subsys }) => {
             to={`/${subsys}/stocklevels/${e.row.original.site.id}`}
             className="hover:underline"
           >
-            {e.value}
+            {e.row.original.status === "Low" ? (
+              <span className="text-red-500">{e.value}</span>
+            ) : (
+              e.value
+            )}
           </Link>
         );
       },
@@ -62,10 +83,34 @@ export const AProductStock = ({ subsys }) => {
     {
       Header: "Phone",
       accessor: "site.phoneNumber",
+      Cell: (e) =>
+        e.row.original.status === "Low" ? (
+          <span className="text-red-500">{e.value}</span>
+        ) : (
+          e.value
+        ),
     },
     {
       Header: "Qty",
       accessor: "qty",
+      Cell: (e) =>
+        e.row.original.status === "Low" ? (
+          <span className="text-red-500">{e.value}</span>
+        ) : (
+          e.value
+        ),
+    },
+    {
+      Header: "Status",
+      accessor: "status",
+      Filter: SelectColumnFilter,
+      filter: "includes",
+      Cell: (e) =>
+        e.value === "Low" ? (
+          <span className="text-red-500">Low</span>
+        ) : (
+          "Normal"
+        ),
     },
   ];
 
@@ -151,12 +196,12 @@ export const AProductStock = ({ subsys }) => {
               {/* Stock Levels By Products*/}
               <section aria-labelledby="stocks-level">
                 <div className="m-1">
-                  {stockStatus === "loading" ? (
+                  {loading ? (
                     <div className="flex mt-5 items-center justify-center">
                       <TailSpin color="#00BFFF" height={20} width={20} />
                     </div>
                   ) : (
-                    <SimpleTable columns={columns} data={stocklevel} />
+                    <SimpleTable columns={columns} data={lineItems} />
                   )}
                 </div>
               </section>

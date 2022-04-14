@@ -2,16 +2,38 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TailSpin } from "react-loader-spinner";
-import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
+import {
+  fetchSites,
+  selectSiteById,
+} from "../../../../stores/slices/siteSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 import { useState } from "react";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
+import { SelectColumnFilter } from "../../../components/Tables/ClickableRowTable";
 
 const columns = [
   {
+    Header: "Product Code",
+    accessor: "modelCode",
+    Filter: SelectColumnFilter,
+    filter: "includes",
+    Cell: (e) =>
+      e.row.original.status === "Low" ? (
+        <span className="text-red-500">{e.value}</span>
+      ) : (
+        e.value
+      ),
+  },
+  {
     Header: "SKU Code",
     accessor: "sku",
+    Cell: (e) =>
+      e.row.original.status === "Low" ? (
+        <span className="text-red-500">{e.value}</span>
+      ) : (
+        e.value
+      ),
   },
   {
     Header: "Name",
@@ -24,8 +46,14 @@ const columns = [
           target="_blank"
           rel="noopener noreferrer"
         >
-          {e.value}
+          {e.row.original.status === "Low" ? (
+            <span className="text-red-500">{e.value}</span>
+          ) : (
+            e.value
+          )}
         </a>
+      ) : e.row.original.status === "Low" ? (
+        <span className="text-red-500">{e.value}</span>
       ) : (
         e.value
       );
@@ -36,16 +64,42 @@ const columns = [
     accessor: (row) =>
       row.product.productFields.find((field) => field.fieldName === "COLOUR")
         .fieldValue,
+    Cell: (e) =>
+      e.row.original.status === "Low" ? (
+        <span className="text-red-500">{e.value}</span>
+      ) : (
+        e.value
+      ),
   },
   {
     Header: "Size",
     accessor: (row) =>
       row.product.productFields.find((field) => field.fieldName === "SIZE")
         .fieldValue,
+    Cell: (e) =>
+      e.row.original.status === "Low" ? (
+        <span className="text-red-500">{e.value}</span>
+      ) : (
+        e.value
+      ),
   },
   {
     Header: "Qty",
     accessor: "qty",
+    Cell: (e) =>
+      e.row.original.status === "Low" ? (
+        <span className="text-red-500">{e.value}</span>
+      ) : (
+        e.value
+      ),
+  },
+  {
+    Header: "Status",
+    accessor: "status",
+    Filter: SelectColumnFilter,
+    filter: "includes",
+    Cell: (e) =>
+      e.value === "Low" ? <span className="text-red-500">Low</span> : e.value,
   },
 ];
 
@@ -64,20 +118,19 @@ const processAddress = (addressObj) => {
 export const AsiteStock = ({ subsys }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const site = useSelector(selectSite);
+  const site = useSelector((state) => selectSiteById(state, parseInt(id)));
   const status = useSelector((state) => state.sites.status);
   const [loading, setLoading] = useState(false);
   const [lineItems, setLineItems] = useState([]);
 
   useEffect(() => {
-    dispatch(getASite(id));
+    dispatch(fetchSites());
   }, [dispatch, id]);
 
   useEffect(() => {
     setLoading(true);
-    const { stockLevel } = site && site;
-    if (stockLevel !== undefined) {
-      const products = stockLevel.products;
+    if (Boolean(site)) {
+      const products = site?.stockLevel.products;
       products &&
         fetchAllModelsBySkus(products).then((data) => {
           setLineItems(
@@ -86,6 +139,7 @@ export const AsiteStock = ({ subsys }) => {
               modelCode: data[index].modelCode,
               name: data[index].name,
               imageLinks: data[index].imageLinks,
+              status: stock.product.baselineQty > stock.qty ? "Low" : "Normal",
             }))
           );
           setLoading(false);

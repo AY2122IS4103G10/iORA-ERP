@@ -6,12 +6,13 @@ import {
 } from "@heroicons/react/outline";
 import { Fragment, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../../../stores/slices/userSlice";
 import { classNames } from "../../../utilities/Util";
 import { Notifications } from "../../components/Notifications";
 
 export const NavBar = ({ setSidebarOpen, badge }) => {
+  const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
@@ -42,17 +43,19 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
       <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
         {badge}
         <div className="ml-4 flex items-center md:ml-6">
-          <button
-            type="button"
-            onClick={notiClicked}
-            className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-          >
-            <span className="sr-only">View notifications</span>
-            <BellIcon
-              className={`h-6 w-6${newNoti && " text-red-600"}`}
-              aria-hidden="true"
-            />
-          </button>
+          {location.pathname.substring(1) !== "home" && location.pathname.substring(1) !== "account" && location.pathname.substring(1) !== "account/edit" && location.pathname.substring(1) !== "account/changepass"
+            &&
+            <button
+              type="button"
+              onClick={notiClicked}
+              className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+            >
+              <span className="sr-only">View notifications</span>
+              <BellIcon
+                className={`h-6 w-6${newNoti && " text-red-600"}`}
+                aria-hidden="true"
+              />
+            </button>}
           {/* Profile dropdown */}
           <Menu as="div" className="ml-3 relative">
             <div>

@@ -77,7 +77,7 @@ export const ManageReports = () => {
       const blob = new Blob([response.data]);
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
-      link.download = "Sales" + startDate + "-" + endDate + ".csv";
+      link.download = "Sales Report" + startDate + "-" + endDate + ".csv";
       link.click();
     });
   };

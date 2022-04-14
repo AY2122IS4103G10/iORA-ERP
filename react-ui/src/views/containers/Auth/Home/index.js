@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { classNames } from "../../../../utilities/Util";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 export const EnterStoreModal = ({
   open,
@@ -106,12 +107,12 @@ const Header = ({ name, jobTitle, stats, img }) => {
             </div>
           </div>
           <div className="mt-5 flex justify-center sm:mt-0">
-            <a
-              href="/account"
+            <Link
+              to="/account"
               className="flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               View profile
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -259,7 +260,7 @@ const paths = [
     iconForeground: "text-purple-700",
     iconBackground: "bg-purple-50",
     description:
-      "Click here for the Point-of-Sale system and pages to view the store's stock.",
+      "Click here for the Procurement and Stock Transfer orders ready for delivery.",
   },
 ];
 

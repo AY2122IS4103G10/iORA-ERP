@@ -1,17 +1,12 @@
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import {
   SimpleTable,
   SelectColumnFilter,
 } from "../../../components/Tables/SimpleTable";
-import { useEffect } from "react";
-import {
-  selectUser,
-  selectUserOrders,
-  fetchCustomer,
-} from "../../../../stores/slices/userSlice";
+import { selectUserOrders } from "../../../../stores/slices/userSlice";
 
 const columns = [
   {
@@ -21,12 +16,12 @@ const columns = [
   {
     Header: "Date of Purchase",
     accessor: "dateTime",
-    Cell: (e) => moment(e.value).format("DD MMM YYYY"),
+    Cell: (e) => moment(e.value).format("MMMM Do, YYYY"),
   },
   {
     Header: "Status",
-    accessor: "status",
-    Cell: (e) => (Boolean(e.value) ? e.value : "Completed"),
+    accessor: (row) => row.statusHistory[row.statusHistory.length - 1].status,
+    Cell: (e) => e.value.replaceAll("_", " "),
     Filter: SelectColumnFilter,
     filter: "includes",
   },
@@ -39,14 +34,7 @@ const columns = [
 
 export const PurchaseHistoryList = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const data = useSelector(selectUserOrders);
-  const user = useSelector(selectUser);
-  const userId = user?.id;
-
-  useEffect(() => {
-    userId && dispatch(fetchCustomer(userId));
-  }, [dispatch, userId]);
 
   const handleOnClick = (row) => navigate(`${row.original.id}`);
   return (

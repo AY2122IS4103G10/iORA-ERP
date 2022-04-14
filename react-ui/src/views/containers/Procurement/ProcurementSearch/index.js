@@ -39,10 +39,15 @@ export const ProcurementSearch = ({ subsys }) => {
           else throw new Error("Not authorised to view order.");
         } else navigate(pathname.replace("search", id));
       } catch (error) {
-        addToast(`Error: ${error.response.data}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
+        addToast(
+          `Error: ${
+            error.response !== undefined ? error.response.data : error.message
+          }`,
+          {
+            appearance: "error",
+            autoDismiss: true,
+          }
+        );
         setSearch("");
       }
     };

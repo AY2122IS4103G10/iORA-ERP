@@ -1,10 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import {
-  CashIcon,
-  CreditCardIcon,
-  DeviceMobileIcon,
-  XIcon,
-} from "@heroicons/react/outline";
+import { CashIcon, CreditCardIcon, XIcon } from "@heroicons/react/outline";
 import {
   DeviceTabletIcon,
   ExclamationIcon,
@@ -15,6 +10,7 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { loadStripeTerminal } from "@stripe/terminal-js";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { orderApi, posApi } from "../../../../environments/Api";
@@ -48,21 +44,21 @@ const paymentTypes = [
     icon: CreditCardIcon,
     id: 4,
   },
-  {
-    name: "PayLah",
-    icon: DeviceMobileIcon,
-    id: 5,
-  },
-  {
-    name: "GrabPay",
-    icon: DeviceMobileIcon,
-    id: 6,
-  },
-  {
-    name: "Fave",
-    icon: DeviceMobileIcon,
-    id: 7,
-  },
+  // {
+  //   name: "PayLah",
+  //   icon: DeviceMobileIcon,
+  //   id: 5,
+  // },
+  // {
+  //   name: "GrabPay",
+  //   icon: DeviceMobileIcon,
+  //   id: 6,
+  // },
+  // {
+  //   name: "Fave",
+  //   icon: DeviceMobileIcon,
+  //   id: 7,
+  // },
 ];
 
 export const CheckoutForm = ({
@@ -77,6 +73,7 @@ export const CheckoutForm = ({
   const [customerId, setCustomerId] = useState(null);
   const [customerName, setCustomerName] = useState("");
   const [customer, setCustomer] = useState({});
+  const [memPts, setMemPts] = useState(0);
   const [voucherCodes, setVoucherCodes] = useState([]);
   const [selectedVoucherCode, setSelectedVoucherCode] = useState({
     id: 0,
@@ -126,7 +123,6 @@ export const CheckoutForm = ({
           ...order,
           totalAmount: Math.max(amount - voucherDiscount, 0),
           customerId: customerId,
-          paid: true,
           voucher,
           payments: [
             {
@@ -138,11 +134,11 @@ export const CheckoutForm = ({
         },
         paymentIntentId
       );
+      closeModalComplex();
       addToast(`Success: Order with ID ${response.data.id} created`, {
         appearance: "success",
         autoDismiss: true,
       });
-      closeModalComplex();
       clear();
     } catch (err) {
       addToast(`Error: Order was not created`, {
@@ -205,11 +201,28 @@ export const CheckoutForm = ({
     );
   };
 
+  const changeMemPts = (e) => {
+    e.preventDefault();
+    setMemPts(e.target.value);
+    if (e.target.value === 0) return;
+    setVoucherCode("USEMEM");
+  };
+
   const getVoucherDetails = async () => {
     if (voucherCode === "") {
       setVoucherDiscount(0);
       addToast(`Info: You did not key in a voucher code`, {
         appearance: "info",
+        autoDismiss: true,
+      });
+    } else if (voucherCode === "USEMEM") {
+      setVoucher({
+        campaign: "membership points",
+        amount: memPts,
+      });
+      setVoucherDiscount(memPts);
+      addToast(`Success: Claiming ${memPts} points for $${memPts} discount`, {
+        appearance: "success",
         autoDismiss: true,
       });
     } else {
@@ -225,7 +238,7 @@ export const CheckoutForm = ({
         setVoucher(data);
         setVoucherDiscount(data?.amount);
         addToast(
-          `Success: Voucher with code: ${voucherCode} of $${data?.amount} was found`,
+          `Success: $${data?.amount} Voucher with ${voucherCode} code found`,
           {
             appearance: "success",
             autoDismiss: true,
@@ -267,7 +280,11 @@ export const CheckoutForm = ({
         </div>
         {mode === 0 &&
           (showChoice ? (
-            <Choice setMode={setMode} setShowChoice={setShowChoice} />
+            <Choice
+              setMode={setMode}
+              setShowChoice={setShowChoice}
+              showCashOnly={amount <= voucherDiscount}
+            />
           ) : (
             <div className="grow max-w-md sm:grid sm:grid-cols-1 gap-4 pl-3">
               <div className="rounded-md bg-blue-50 p-4">
@@ -339,16 +356,16 @@ export const CheckoutForm = ({
                     </p>
                     <p className="flex text-sm text-gray-700 pr-10">
                       <span className="flex grow">No. of Orders:</span>
-                      {customer?.customerOrders?.length}
+                      {customer?.orders?.length || 0}
                     </p>
-                    {customer?.customerOrders?.length > 0 && (
+                    {customer?.orders?.length > 0 && (
                       <p className="flex text-sm text-gray-700 pr-10">
                         <span className="flex grow">Avg Spend:</span> $
                         {Number.parseFloat(
-                          customer?.customerOrders.reduce(
+                          customer?.orders.reduce(
                             (sum, order) => sum + order.totalAmount,
                             0
-                          ) / customer?.customerOrders?.length
+                          ) / customer?.orders?.length
                         ).toFixed(2)}
                       </p>
                     )}
@@ -357,7 +374,9 @@ export const CheckoutForm = ({
                         bgColor="#0891b2"
                         completed={`${progress.current + 150}`}
                         maxCompleted={progress.next + 150}
-                        customLabel={`$${progress.next - progress.current} more to ${progress.tier}`}
+                        customLabel={`$${
+                          progress.next - progress.current
+                        } more to ${progress.tier}`}
                       />
                     </div>
                     <div className="col-span-1 sm:col-span-2">
@@ -369,6 +388,26 @@ export const CheckoutForm = ({
                         disabled={voucherCodes.length === 0}
                       />
                     </div>
+                    {customer?.membershipPoints ? (
+                      <>
+                        <label
+                          for="memPts"
+                          className="form-label text-sm font-medium mt-2 col-span-1 sm:col-span-2 text-gray-700"
+                        >
+                          Drag to use {memPts}/
+                          {Math.min(customer.membershipPoints, amount)} points
+                        </label>
+                        <input
+                          type="range"
+                          className="accent-cyan-600 bg-transparent focus:outline-none focus:ring-0 focus:shadow-none col-span-1 sm:col-span-2"
+                          min={0}
+                          max={Math.min(customer.membershipPoints, amount)}
+                          value={memPts}
+                          onChange={changeMemPts}
+                          id="memPts"
+                        />
+                      </>
+                    ) : null}
                   </div>
                 )}
               </div>
@@ -451,31 +490,33 @@ export const CheckoutForm = ({
   );
 };
 
-const Choice = ({ setMode, setShowChoice }) => {
+const Choice = ({ setMode, setShowChoice, showCashOnly }) => {
   return (
     <>
       <div className="rounded-lg bg-white overflow-hidden divide-y divide-gray-200 sm:divide-y-0 grid grid-cols-3 sm:gap-0 sm:max-w-md">
-        {paymentTypes.map((type, index) => (
-          <div
-            key={type.id}
-            className="m-1 border shadow rounded-lg align-middle sm:rounded-md relative bg-white py-3 px-3 focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500"
-          >
-            <div className="m-0 flex justify-center">
-              <button onClick={() => setMode(type.id)}>
-                {/* Extend touch target to entire panel */}
-                <span className="absolute inset-0" aria-hidden="true" />
+        {paymentTypes
+          .filter((x) => (showCashOnly ? x.id === 1 : true))
+          .map((type, index) => (
+            <div
+              key={type.id}
+              className="m-1 border shadow rounded-lg align-middle sm:rounded-md relative bg-white py-3 px-3 focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-500"
+            >
+              <div className="m-0 flex justify-center">
+                <button onClick={() => setMode(type.id)}>
+                  {/* Extend touch target to entire panel */}
+                  <span className="absolute inset-0" aria-hidden="true" />
 
-                <div className="flex text-lg justify-center align-middle ">
-                  <h3>{type.name}</h3>
-                  <type.icon
-                    className="ml-2 inline-flex h-5 w-5 text-cyan-500 row-span-1"
-                    aria-hidden="true"
-                  />
-                </div>
-              </button>
+                  <div className="flex text-lg justify-center align-middle ">
+                    <h3>{type.name}</h3>
+                    <type.icon
+                      className="ml-2 inline-flex h-5 w-5 text-cyan-500 row-span-1"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
       <div className="mt-3 flex flex-row-reverse space-x-4 space-x-reverse justify-center">
         <button
@@ -633,7 +674,9 @@ export const Card = ({
 }) => {
   const [terminal, setTerminal] = useState(null);
   const [connected, setConnected] = useState(false);
+  const posId = localStorage.getItem("pos-posdeviceid")?.replace(/"/g, "");
   const [clientSecret, setClientSecret] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadStripeTerminal().then((StripeTerminal) => {
@@ -669,8 +712,13 @@ export const Card = ({
           });
   }, [checkoutItems, voucherAmt, addToast, cs]);
 
+  useEffect(() => {
+    !connected && posId && terminal && setSimulated();
+  }, [connected, posId, terminal]);
+
   const setSimulated = async () => {
     const config = { simulated: true };
+    setLoading(true);
     const discoverResult = await terminal.discoverReaders(config);
     if (discoverResult.error) {
       addToast(`Failed to discover: ${discoverResult.error}`, {
@@ -698,6 +746,7 @@ export const Card = ({
       });
       setConnected(true);
     }
+    setLoading(false);
   };
 
   const simulatedCheckout = async () => {
@@ -705,6 +754,7 @@ export const Card = ({
       if (!terminal || !clientSecret) {
         throw new Error("Either reader or client secret is not connected.");
       }
+      setLoading(true);
       terminal.setSimulatorConfiguration({
         testCardNumber: "4242424242424242",
         paymentMethodType: "card",
@@ -728,12 +778,13 @@ export const Card = ({
         appearance: "success",
         autoDismiss: true,
       });
-      handleSubmit(result2.paymentIntent.id);
+      await handleSubmit(result2.paymentIntent.id);
     } catch (err) {
       addToast(`Error: ${err}`, {
         appearance: "error",
         autoDismiss: true,
       });
+      setLoading(false);
     }
   };
 
@@ -747,10 +798,14 @@ export const Card = ({
             alt="card-reader"
           />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            {connected
+            {loading
+              ? connected
+                ? "Checking out"
+                : "Connecting to reader..."
+              : connected
               ? `Reader ${localStorage
-                  .getItem("pos-posdeviceid")
-                  .replace(/"/g, "")}`
+                  ?.getItem("pos-posdeviceid")
+                  ?.replace(/"/g, "")}`
               : "No readers"}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
@@ -759,7 +814,15 @@ export const Card = ({
               : "Get started by connecting your reader via Bluetooth."}
           </p>
           <div className="my-6">
-            {connected ? (
+            {loading ? (
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                disabled
+              >
+                <TailSpin width="20" height="20" />
+              </button>
+            ) : connected ? (
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -769,7 +832,7 @@ export const Card = ({
                   className="-ml-1 mr-2 h-5 w-5"
                   aria-hidden="true"
                 />
-                Simulate Checkout
+                Checkout
               </button>
             ) : (
               <button

@@ -23,6 +23,7 @@ const ItemsSummary = ({
   onDownloadClicked,
   setSelectedProduct,
   openInfoModal,
+  status,
 }) => {
   const siteCols = Object.keys(data[0]?.siteQuantities).map((store) => ({
     Header: () => (
@@ -72,13 +73,40 @@ const ItemsSummary = ({
         Cell: (e) => `$${e.value}`,
       },
       {
+        Header: "Total Cost",
+        accessor: (row) => {
+          var qty;
+          if (status === "PICKED" || status === "PACKING") {
+            qty = row.pickedQty;
+          } else if (
+            ["PENDING", "ACCEPTED", "MANUFACTURED", "PICKING"].some(
+              (s) => s === status
+            )
+          ) {
+            qty = row.requestedQty;
+          } else qty = row.packedQty;
+          return row.costPrice * qty;
+        },
+        Cell: (e) => `$${e.value}`,
+      },
+      {
         Header: "Sites",
         accessor: "siteQuantities",
         columns: siteCols,
       },
       {
-        Header: "Total",
-        accessor: "requestedQty",
+        Header: "Total Qty",
+        accessor: (row) => {
+          if (status === "PICKED" || status === "PACKING") {
+            return row.pickedQty;
+          } else if (
+            ["PENDING", "ACCEPTED", "MANUFACTURED", "PICKING"].some(
+              (s) => s === status
+            )
+          ) {
+            return row.requestedQty;
+          } else return row.packedQty;
+        },
       },
       {
         Header: "",
@@ -139,7 +167,7 @@ const ItemsSummary = ({
         },
       },
     ];
-  }, [onDownloadClicked, openInfoModal, setSelectedProduct, siteCols]);
+  }, [onDownloadClicked, openInfoModal, setSelectedProduct, siteCols, status]);
   const hiddenColumns = subsys === "lg" ? ["files"] : [];
   return (
     <div className="pt-8">
@@ -332,6 +360,7 @@ const ProcurementDetailsBody = ({
         <section aria-labelledby="order-summary">
           <ItemsSummary
             subsys={subsys}
+            status={status}
             data={lineItems}
             handlePrint={handlePrint}
             onDownloadClicked={onDownloadClicked}

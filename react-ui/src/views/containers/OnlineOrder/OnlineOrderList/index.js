@@ -5,7 +5,7 @@ import { TailSpin } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { onlineOrderApi } from "../../../../environments/Api";
+import { api, onlineOrderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import {
   SelectColumnFilter,
@@ -33,6 +33,7 @@ const OnlineOrderTable = ({ data, handleOnClick }) => {
       {
         Header: "Total Amount",
         accessor: "totalAmount",
+        Cell: (e) => `$${e.value.toFixed(2)}`,
       },
       {
         Header: "Updated",
@@ -60,8 +61,15 @@ export const OnlineOrderList = ({ subsys }) => {
       try {
         const { data } = await (subsys === "str"
           ? onlineOrderApi.getAllPickupOfSite(currSiteId)
+          : subsys === "lg"
+          ? api.getAll(`online/order/${currSiteId}/READY_FOR_DELIVERY`)
           : onlineOrderApi.getAllBySite(currSiteId));
-        setData(data);
+
+        if (subsys === "lg") {
+          setData(data.filter((order) => !order.delivery));
+        } else {
+          setData(data);
+        }
         setLoading(false);
       } catch (error) {
         addToast(`Error: ${error.message}`, {

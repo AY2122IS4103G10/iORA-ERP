@@ -19,11 +19,9 @@
             <img style="height: 120px; width: 200px; margin: auto; display: block;"
                 src="https://cloudfront.gotomalls.com/uploads/retailers/logo/LB2fm8vWvnNUmpay-LB2eHKLOVIgO5DTF-iora-1489037898_1.jpg" />
         </div>
+        <p th:text="${header}"></p>
         <p>
-            Dear Customer, thank you for shopping at iORA!
-        </p>
-        <p>
-            You have successfully placed an order with us on
+            <span th:text="${agenda}"></span>
             <span th:text="${#dates.format(dateTime, 'dd-MM-yyyy HH:mm')}">28 12 2012</span>
         </p>
 

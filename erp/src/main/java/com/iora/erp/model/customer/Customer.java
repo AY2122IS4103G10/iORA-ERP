@@ -15,8 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
 
@@ -36,17 +35,17 @@ public class Customer implements Serializable {
     private Date dob;
     @Column(nullable = false, unique = true)
     private String contactNumber;
-    private Integer membershipPoints;
+    @Column(scale = 2)
+    private Double membershipPoints;
     @OneToOne
     private DeliveryAddress address;
     @ManyToOne
     private MembershipTier membershipTier;
-    private Double storeCredit;
     @OneToMany
     @JoinColumn(name = "customerId")
     private List<CustomerOrder> orders;
     private Boolean availStatus;
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIgnoreProperties({"customer"})
     @OneToMany
     private List<SupportTicket> supportTickets;
 
@@ -54,8 +53,7 @@ public class Customer implements Serializable {
     private String password;
 
     public Customer() {
-        this.membershipPoints = 0;
-        this.storeCredit = 0.0;
+        this.membershipPoints = 0.0;
         this.availStatus = true;
         this.supportTickets = new ArrayList<>();
     }
@@ -73,7 +71,7 @@ public class Customer implements Serializable {
     }
 
     public Customer(String firstName, String lastName, String email, Date dob, String contactNumber,
-            MembershipTier membershipTier, int membershipPoints, DeliveryAddress address) {
+            MembershipTier membershipTier, Double membershipPoints, DeliveryAddress address) {
         this();
         this.firstName = firstName;
         this.lastName = lastName;
@@ -119,14 +117,6 @@ public class Customer implements Serializable {
         this.lastName = lastName;
     }
 
-    public Double getStoreCredit() {
-        return storeCredit;
-    }
-
-    public void setStoreCredit(Double storeCredit) {
-        this.storeCredit = storeCredit;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -143,11 +133,11 @@ public class Customer implements Serializable {
         this.dob = dob;
     }
 
-    public Integer getMembershipPoints() {
+    public Double getMembershipPoints() {
         return membershipPoints;
     }
 
-    public void setMembershipPoints(Integer membershipPoints) {
+    public void setMembershipPoints(Double membershipPoints) {
         this.membershipPoints = membershipPoints;
     }
 

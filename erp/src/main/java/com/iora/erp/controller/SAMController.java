@@ -16,7 +16,6 @@ import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
-import com.iora.erp.model.site.StockLevelLI;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProcurementService;
@@ -61,7 +60,6 @@ public class SAMController {
      * ---------------------------------------------------------
      */
 
-    // Returns list of values by supplying fieldName
     @GetMapping(path = "/productField/{fieldName}", produces = "application/json")
     public ResponseEntity<Object> getProductFieldValues(@PathVariable String fieldName) {
         try {
@@ -71,13 +69,11 @@ public class SAMController {
         }
     }
 
-    // Returns list of all PromotionFields
     @GetMapping(path = "/promotionFields", produces = "application/json")
     public List<PromotionField> getPromotionFields() {
         return productService.getPromotionFields();
     }
 
-    // Get Models by supplying PromotionField
     @GetMapping(path = "/model/promo", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> getModelsByPromoField(@RequestBody PromotionField promoField) {
         try {
@@ -87,7 +83,6 @@ public class SAMController {
         }
     }
 
-    // Creates new ProductField instance with given JSON body
     @PostMapping(path = "/productField", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createProductField(@RequestBody ProductField productField) {
         try {
@@ -115,19 +110,18 @@ public class SAMController {
         }
     }
 
-    // Retrieves all ProductField instances
     @GetMapping(path = "/productField", produces = "application/json")
     public List<ProductField> getAllProductFields() {
         return productService.getAllProductFields();
     }
 
-    // Creates a new Model instance by supplying Model details in JSON body
     @PostMapping(path = "/model", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createModel(@RequestBody Model model) {
         try {
             return ResponseEntity.ok(productService.createModel(model));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -160,8 +154,6 @@ public class SAMController {
         }
     }
 
-    // Get models by fashion line (iORA) and tag (top)
-    // Return empty list if no results
     @GetMapping(path = "/model/tag/{company}/{tag}", produces = "application/json")
     public ResponseEntity<Object> getModelsByCompanyAndTag(@PathVariable String company, @PathVariable String tag) {
         try {
@@ -171,8 +163,6 @@ public class SAMController {
         }
     }
 
-    // Get models by tag (top)
-    // Return empty list if no results
     @GetMapping(path = "/model/tag/{tag}", produces = "application/json")
     public ResponseEntity<Object> getModelsByTag(@PathVariable String tag) {
         try {
@@ -182,8 +172,6 @@ public class SAMController {
         }
     }
 
-    // Get models by category (2 FOR S$49 / IORA NEW ARRIVALS)
-    // Return empty list if no results
     @GetMapping(path = "/model/category/{category}", produces = "application/json")
     public ResponseEntity<Object> getModelsByCategory(@PathVariable String category) {
         try {
@@ -207,7 +195,8 @@ public class SAMController {
         try {
             return ResponseEntity.ok(productService.updateModel(model));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -311,64 +300,6 @@ public class SAMController {
         }
     }
 
-    /*
-     * Deprecated
-     * 
-     * @GetMapping(path = "/productItem/sku/{sku}", produces = "application/json")
-     * public ResponseEntity<Object> getProductItemsByProduct(@PathVariable String
-     * sku) {
-     * try {
-     * return ResponseEntity.ok(productService.getProductItemsBySKU(sku));
-     * } catch (Exception ex) {
-     * return ResponseEntity.badRequest().body(ex.getMessage());
-     * }
-     * }
-     * 
-     * @GetMapping(path = "/productItem", produces = "application/json")
-     * public List<ProductItem> searchProductItems(@RequestParam String rfid) {
-     * return productService.searchProductItems(rfid);
-     * }
-     * 
-     * @PutMapping(path = "/productItem/sell/{rfid}", produces = "application/json")
-     * public ResponseEntity<Object> sellProductItem(@PathVariable String rfid) {
-     * try {
-     * productService.sellProductItem(rfid);
-     * return ResponseEntity.ok("Product Item with RFID " + rfid.trim() +
-     * " is successfully marked as sold.");
-     * } catch (Exception ex) {
-     * return ResponseEntity.badRequest().body(ex.getMessage());
-     * }
-     * }
-     * 
-     * @PutMapping(path = "/productItem/return/{rfid}", produces =
-     * "application/json")
-     * public ResponseEntity<Object> returnProductItem(@PathVariable String rfid) {
-     * try {
-     * productService.returnProductItem(rfid);
-     * return ResponseEntity.ok("Product Item with RFID " + rfid.trim() +
-     * " is successfully marked as unsold.");
-     * } catch (Exception ex) {
-     * return ResponseEntity.badRequest().body(ex.getMessage());
-     * }
-     * }
-     */
-
-    // // Links a PromotionField to Model.
-    // // A new PromotionField will be created if it does not exist.
-    // @PutMapping(path = "/promo/add/{modelCode}", consumes = "application/json",
-    // produces = "application/json")
-    // public ResponseEntity<Object> addPromoCategory(@PathVariable String
-    // modelCode,
-    // @RequestBody Map<String, String> body) {
-    // try {
-    // return ResponseEntity.ok(productService.addPromoCategory(modelCode,
-    // body.get("category"),
-    // Double.parseDouble(body.get("discountedPrice"))));
-    // } catch (Exception ex) {
-    // return ResponseEntity.badRequest().body(ex.getMessage());
-    // }
-    // }
-
     @GetMapping(path = "/voucher/{voucherCode}", produces = "application/json")
     public ResponseEntity<Object> getVoucher(@PathVariable String voucherCode) {
         try {
@@ -411,10 +342,10 @@ public class SAMController {
         }
     }
 
-    @PutMapping(path = "/voucher/issue/{voucherCode}/{customerId}", produces = "application/json")
-    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode, @PathVariable Long customerId) {
+    @PutMapping(path = "/voucher/issue/{voucherCode}", produces = "application/json")
+    public ResponseEntity<Object> issueVouchers(@PathVariable String voucherCode, @RequestBody List<Long> customerIds) {
         try {
-            return ResponseEntity.ok(customerService.issueVoucher(voucherCode, customerId));
+            return ResponseEntity.ok(customerService.issueVouchers(voucherCode, customerIds));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -475,7 +406,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public List<StockLevelLI> viewStockByProduct(@PathVariable String sku) {
+    public List<Map<String,Object>> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
 

@@ -99,6 +99,8 @@ import { VoucherForm } from "./views/containers/Vouchers/VoucherForm";
 import { VouchersList } from "./views/containers/Vouchers/VouchersList";
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import { OnlineOrderPicking } from "./views/containers/OnlineOrder/OnlineOrderPicking/index.js";
+import { OnlineOrderInhouse } from "./views/containers/Orders/OnlineOrderInhouse/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -140,7 +142,7 @@ function App() {
               <Route path="my" element={<MyStoreStock subsys="sm" />} />
               <Route path="sites" element={<SiteStocks subsys="sm" />} />
               <Route path="products" element={<ProductStocks subsys="sm" />} />
-              <Route path=":id" element={<AsiteStock />} />
+              <Route path=":id" element={<AsiteStock subsys="sm" />} />
               <Route
                 path="products/:id"
                 element={<AProductStock subsys="sm" />}
@@ -320,7 +322,7 @@ function App() {
               <Route path="edit" element={<EditStockLevel subsys="str" />} />
               <Route path="sites" element={<SiteStocks subsys="str" />} />
               <Route path="products" element={<ProductStocks subsys="str" />} />
-              <Route path=":id" element={<AsiteStock />} />
+              <Route path=":id" element={<AsiteStock subsys="str" />} />
               <Route
                 path="products/:id"
                 element={<AProductStock subsys="str" />}
@@ -398,6 +400,7 @@ function App() {
                 <Route index element={<CustomerOrderDetails />} />
                 <Route path="pick-pack" element={<OnlineOrderPickPack />} />
                 <Route path="collect" element={<OnlineOrderCollection />} />
+                <Route path="delivery" element={<OnlineOrderInhouse />} />
               </Route>
             </Route>
 
@@ -560,7 +563,7 @@ function App() {
               <Route path="edit" element={<EditStockLevel subsys="wh" />} />
               <Route path="sites" element={<SiteStocks subsys="wh" />} />
               <Route path="products" element={<ProductStocks subsys="wh" />} />
-              <Route path=":id" element={<AsiteStock />} />
+              <Route path=":id" element={<AsiteStock subsys="wh" />} />
               <Route
                 path="products/:id"
                 element={<AProductStock subsys="wh" />}
@@ -618,7 +621,7 @@ function App() {
                 path="picking"
                 element={
                   <ManageOnlineOrders subsys="wh">
-                    <OnlineOrderSearch subsys="wh" />
+                    <OnlineOrderPicking subsys="wh" />
                   </ManageOnlineOrders>
                 }
               />
@@ -699,6 +702,7 @@ function App() {
                 <Route path="delivery" element={<ProcurementDelivery />} />
               </Route>
             </Route>
+            {/* Stock Transfer */}
             <Route path="stocktransfer" element={<Outlet />}>
               <Route
                 index
@@ -716,19 +720,37 @@ function App() {
                   </ManageStockTransfer>
                 }
               />
-              <Route
-                path="create"
-                element={<StockTransferForm subsys="lg" />}
-              />
               <Route path=":id" element={<StockTransferWrapper subsys="lg" />}>
                 <Route index element={<ViewStockTransfer />} />
                 <Route path="pick-pack" element={<StockTransferPickPack />} />
                 <Route path="delivery" element={<StockTransferDelivery />} />
               </Route>
+            </Route>
+            <Route path="orders" element={<Outlet />}>
               <Route
-                path="edit/:id"
-                element={<StockTransferForm subsys="wh" />}
+                index
+                element={
+                  <ManageOnlineOrders subsys="lg">
+                    <OnlineOrderList subsys="lg" />
+                  </ManageOnlineOrders>
+                }
               />
+              <Route
+                path="search"
+                element={
+                  <ManageOnlineOrders subsys="lg">
+                    <OnlineOrderSearch subsys="lg" />
+                  </ManageOnlineOrders>
+                }
+              />
+              <Route
+                path=":orderId"
+                element={<CustomerOrderWrapper subsys="lg" />}
+              >
+                <Route index element={<CustomerOrderDetails />} />
+                <Route path="pick-pack" element={<OnlineOrderPickPack />} />
+                <Route path="delivery" element={<OnlineOrderInhouse />} />
+              </Route>
             </Route>
           </Route>
 

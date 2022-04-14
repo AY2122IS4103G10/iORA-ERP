@@ -113,6 +113,7 @@ const ProcurementItemsList = ({
               value={row.row.original.siteQuantities[storeId]}
               row={row.row}
               column={row.column}
+              min="0"
               updateMyData={updateSiteCol}
             />
           );
@@ -200,7 +201,7 @@ const ProcurementItemsList = ({
         Cell: (row) => {
           return (
             <EditableCell
-              value={row.row.original.costPrice}
+              value={row.value}
               step="0.01"
               min="0"
               row={row.row}
@@ -306,10 +307,14 @@ const UploadFileList = ({ data, setData }) => {
       {
         Header: "Product Code",
         accessor: "modelCode",
+        minWidth: 100,
+        maxWidth: 160,
       },
       {
         Header: "Name",
         accessor: "name",
+        minWidth: 300,
+        maxWidth: 350,
         Cell: (e) => {
           return e.row.original.imageLinks.length ? (
             <a
@@ -318,7 +323,7 @@ const UploadFileList = ({ data, setData }) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {e.value}
+              <span className="text-ellipsis overflow-hidden">{e.value}</span>
             </a>
           ) : (
             e.value
@@ -328,6 +333,8 @@ const UploadFileList = ({ data, setData }) => {
       {
         Header: "",
         accessor: "files",
+        minWidth: 368,
+        maxWidth: 500,
         Cell: (e) => {
           const fileRef = useRef();
           return (
@@ -384,10 +391,7 @@ const UploadFileList = ({ data, setData }) => {
                 </div>
               )}
               <div className="rounded-md font-medium">
-                <label
-                  htmlFor="file-upload"
-                  className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500"
-                >
+                <label className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500">
                   <span>Upload</span>
                   <UploadFileCell
                     ref={fileRef}
@@ -410,18 +414,13 @@ const UploadFileList = ({ data, setData }) => {
         columns={columns}
         data={data}
         skipPageReset={skipPageReset}
+        flex
       />
     </div>
   );
 };
 
-export const ProductModal = ({
-  open,
-  closeModal,
-  product,
-  files,
-  onDownloadClicked,
-}) => {
+export const ProductModal = ({ open, closeModal, product }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
       <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
@@ -915,6 +914,7 @@ export const ProcurementForm = () => {
     warehouseSelected,
     lineItems.length,
     storeCheckedState.some(Boolean),
+    lineItems.every(item => item.requestedQty !== 0)
   ].every(Boolean);
 
   const handleUpload = async (file) => {

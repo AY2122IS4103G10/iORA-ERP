@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lange="en" xmlns:th="http://www.iora.com" />
+
+<head>
+    <title th:remove="all">Template for HTML email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<style type="text/css">
+    td,
+    th,
+    tr {
+        border: 1px solid #000000;
+        text-align: left;
+        padding: 8px;
+    }
+</style>
+
+<body>
+    <div class="grid-container" style="border-radius: 1px;">
+        <div style="grid-area: header">
+            <img style="height: 120px; width: 200px; margin: auto; display: block;"
+                src="https://cloudfront.gotomalls.com/uploads/retailers/logo/LB2fm8vWvnNUmpay-LB2eHKLOVIgO5DTF-iora-1489037898_1.jpg" />
+        </div>
+        <p>
+            Dear <span th:text="${name}" />,
+        </p>
+        <p th:text="${body}">
+        </p>
+    </div>
+    <p>
+        Best regards, <br />
+        <em>iORA Group</em>
+    </p>
+</body>
+
+</html>

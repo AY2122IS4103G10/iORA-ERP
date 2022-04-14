@@ -21,19 +21,26 @@ const OrderTable = ({ data, handleOnClick, type }) => {
               accessor: "id",
             },
             {
+              Header: "Status",
+              accessor: (row) =>
+                row.statusHistory
+                  ? row.statusHistory[row.statusHistory.length - 1].status
+                  : "[status]",
+              Filter: SelectColumnFilter,
+              filter: "includes",
+            },
+            {
               Header: "Customer No.",
               accessor: (row) => row.customerId,
             },
             {
-              Header: "Total Amount",
-              accessor: "totalAmount",
-              Cell: (row) => `${row.value.toFixed(2)}`,
+              Header: "Items",
+              accessor: (row) => row.lineItems.length,
             },
             {
-              Header: "Status",
-              accessor: "status",
-              Filter: SelectColumnFilter,
-              filter: "includes",
+              Header: "Total",
+              accessor: "totalAmount",
+              Cell: (row) => `$${row.value.toFixed(2)}`,
             },
             {
               Header: "Date",
@@ -51,9 +58,13 @@ const OrderTable = ({ data, handleOnClick, type }) => {
               accessor: (row) => row.customerId,
             },
             {
-              Header: "Total Amount",
+              Header: "Items",
+              accessor: (row) => row.lineItems.length,
+            },
+            {
+              Header: "Total",
               accessor: "totalAmount",
-              Cell: (row) => `${row.value.toFixed(2)}`,
+              Cell: (row) => `$${row.value.toFixed(2)}`,
             },
             {
               Header: "Date",
@@ -75,36 +86,31 @@ export const OrderList = ({ subsys, type }) => {
   const currSiteId = parseInt(useSelector(selectUserSite));
 
   useEffect(() => {
+    setLoading(true);
     const fetchStoreOrders = async () => {
-      setLoading(true);
       const { data } = await orderApi.getAllStore();
       setData(data);
-      setLoading(false);
     };
 
     const fetchOnlineOrders = async () => {
-      setLoading(true);
       const { data } = await orderApi.getAllOnline();
       setData(data);
-      setLoading(false);
     };
 
     const fetchOnlineBySite = async (currSiteId) => {
-      setLoading(true);
       const { data } = await onlineOrderApi.getAllBySite(currSiteId);
       setData(data);
-      setLoading(false);
     };
 
     if (subsys === "sm") {
-      if (type === "store") fetchStoreOrders();
-      else fetchOnlineOrders();
-    } else fetchOnlineBySite(currSiteId);
+      if (type === "store") fetchStoreOrders().then(() => setLoading(false));
+      else fetchOnlineOrders().then(() => setLoading(false));
+    } else fetchOnlineBySite(currSiteId).then(() => setLoading(false));
   }, [subsys, currSiteId, type]);
 
   const handleOnClick = (row) =>
     navigate(`/${subsys}/orders/${row.original.id}`);
-  
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       <div className="mt-4">

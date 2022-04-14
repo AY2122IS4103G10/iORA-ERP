@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -8,10 +9,188 @@ import {
   scanItemStockTransfer,
 } from "../../../../stores/slices/stocktransferSlice";
 import {
+  EditableCell,
+  SimpleTable,
+} from "../../../components/Tables/SimpleTable";
+import {
   ConfirmSection,
-  PickPackList,
   ScanItemsSection,
 } from "../../Procurement/ProcurementPickPack";
+
+const PickPackList = ({
+  data,
+  status,
+  setShowConfirm,
+  handlePickPack,
+  setData,
+  manufacturing,
+  currSiteId,
+  onSaveQuanityClicked,
+}) => {
+  const [skipPageReset, setSkipPageReset] = useState(false);
+  const columns = useMemo(() => {
+    const handleEditRow = (rowIndex) => {
+      setData((item) =>
+        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
+      );
+    };
+
+    const onSaveClicked = (rowIndex, obj) => {
+      if (status === "MANUFACTURED" || status === "ACCEPTED")
+        handlePickPack().then(() => handleSaveRow(rowIndex, obj));
+      else handleSaveRow(rowIndex, obj);
+    };
+
+    const handleSaveRow = (rowIndex, obj) => {
+      onSaveQuanityClicked(
+        rowIndex,
+        obj.product.sku,
+        ["MANUFACTURED", "PICKING"].some((s) => s === status)
+          ? obj.pickedQty
+          : obj.packedQty
+      );
+    };
+
+    const updateMyData = (rowIndex, columnId, value) => {
+      setSkipPageReset(true);
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    };
+    return [
+      {
+        Header: "SKU",
+        accessor: (row) => row.product.sku,
+      },
+      {
+        Header: "Color",
+        accessor: (row) =>
+          row.product.productFields.find(
+            (field) => field.fieldName === "COLOUR"
+          ).fieldValue,
+      },
+      {
+        Header: "Size",
+        accessor: (row) =>
+          row.product.productFields.find((field) => field.fieldName === "SIZE")
+            .fieldValue,
+      },
+      {
+        Header: "Req",
+        accessor: "requestedQty",
+      },
+      {
+        Header: "Picked",
+        accessor: "pickedQty",
+        Cell: (e) => {
+          return e.row.original.isEditing &&
+            ["MANUFACTURED", "PICKING", "ACCEPTED"].some(
+              (s) => s === status
+            ) ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+              max={e.row.original.requestedQty}
+            />
+          ) : (
+            e.value
+          );
+        },
+      },
+      {
+        Header: "Packed",
+        accessor: "packedQty",
+        Cell: (e) => {
+          return e.row.original.isEditing &&
+            ["PACKING"].some((s) => s === status) ? (
+            <EditableCell
+              value={e.value}
+              row={e.row}
+              column={e.column}
+              updateMyData={updateMyData}
+              min="0"
+              max={e.row.original.pickedQty}
+            />
+          ) : (
+            e.value
+          );
+        },
+      },
+      {
+        Header: "Status",
+        accessor: "[status]",
+        Cell: (row) => {
+          const lineItem = row.row.original;
+          return lineItem.pickedQty === 0
+            ? "READY"
+            : lineItem.pickedQty !== lineItem.requestedQty
+            ? "PICKING"
+            : lineItem.pickedQty === lineItem.requestedQty &&
+              lineItem.packedQty === 0
+            ? "PICKED"
+            : lineItem.packedQty !== lineItem.requestedQty
+            ? "PACKING"
+            : "PACKED";
+        },
+      },
+      {
+        Header: "",
+        accessor: "[editButton]",
+        Cell: (e) => {
+          return (
+            <button
+              className="text-cyan-600 hover:text-cyan-900"
+              onClick={() =>
+                !e.row.original.isEditing
+                  ? handleEditRow(e.row.index)
+                  : onSaveClicked(e.row.index, e.row.original)
+              }
+            >
+              {!e.row.original.isEditing ? "Edit" : "Save"}
+            </button>
+          );
+        },
+      },
+    ];
+  }, [setData, status, handlePickPack, onSaveQuanityClicked]);
+
+  const hiddenColumns =
+    manufacturing.id !== currSiteId ||
+    ["PICKING", "PACKING", "ACCEPTED"].every((s) => s !== status)
+      ? ["[editButton]"]
+      : [];
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Picking / Packing List
+        </h3>
+      </div>
+      {Boolean(data.length) && (
+        <div className="mt-4">
+          <SimpleTable
+            columns={columns}
+            data={data}
+            skipPageReset={skipPageReset}
+            hiddenColumns={hiddenColumns}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const StockTransferPickPack = () => {
   const {
@@ -107,20 +286,18 @@ export const StockTransferPickPack = () => {
   };
 
   const onSaveQuanityClicked = async (_, sku, qty) => {
-    await dispatch(adjustAtFrom({ orderId: order.id, sku, qty }))
-      .unwrap()
-      .then(() => {
-        addToast(`Success: Updated quantity.`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-      })
-      .catch((error) => {
-        addToast(`Error: ${error.response.data}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
+    try {
+      await dispatch(adjustAtFrom({ orderId: order.id, sku, qty })).unwrap();
+      addToast(`Success: Updated quantity.`, {
+        appearance: "success",
+        autoDismiss: true,
       });
+    } catch (error) {
+      addToast(`Error: ${error.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
   };
   return (
     <>

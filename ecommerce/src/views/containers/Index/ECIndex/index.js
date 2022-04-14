@@ -1,10 +1,9 @@
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Outlet } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import {
   logout,
-  selectUserLoggedIn,
+  selectUserLoggedIn
 } from "../../../../stores/slices/userSlice";
 import { NavBar } from "../../../components/NavBar";
 
@@ -14,7 +13,7 @@ const navigation = {
       id: "Sale",
       name: "Sale",
       items: [
-        {name: "Sales", href: ""}
+        { name: "Sales", href: "" }
       ]
     },
     {
@@ -27,9 +26,9 @@ const navigation = {
         { name: "Skirts", href: "products/iora/skirts" },
         { name: "Dresses / One Piece", href: "products/iora/dress" },
         { name: "Knits & Sweaters", href: "products/iora/knits" },
-        { name: "Outerwear", href: "products/iora/outerwear" }, 
+        { name: "Outerwear", href: "products/iora/outerwear" },
         { name: "Office Wear", href: "products/iora/officewear" }, //cat
-        { name: "Browse All", href: "products/iora" }, 
+        { name: "Browse All", href: "products/iora" },
       ],
     },
     {
@@ -52,7 +51,7 @@ const navigation = {
       id: "SORA",
       name: "SORA",
       items: [
-        { name: "Bags", href: "products/sora/bags"}, //cat
+        { name: "Bags", href: "products/sora/bags" }, //cat
         { name: "Shoes", href: "products/sora/shoes" }, //cat
       ],
     },
@@ -91,6 +90,7 @@ const footerNavigation = {
 };
 
 export const ECIndex = () => {
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const loggedIn = useSelector(selectUserLoggedIn);
@@ -98,8 +98,13 @@ export const ECIndex = () => {
   const handleLogout = (e) => {
     e.preventDefault();
     dispatch(logout());
+    addToast("Logout Successful", {
+      appearance: "success",
+      autoDismiss: true,
+    });
     navigate("/");
   };
+
   return (
     <div className="bg-white">
       <header className="relative bg-white">
@@ -219,7 +224,7 @@ export const ECIndex = () => {
 
           <div className="border-t border-gray-100 py-10 text-center">
             <p className="text-sm text-gray-500">
-              &copy; 2021 Workflow, Inc. All rights reserved.
+              &copy; 2022 iORA SINGAPORE. All rights reserved.
             </p>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { getASite, selectSite } from "../../../../stores/slices/siteSlice";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
 import { useState } from "react";
+import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 
 const columns = [
   {
@@ -60,11 +61,12 @@ const processAddress = (addressObj) => {
   return str;
 };
 
-export const AsiteStock = () => {
+export const AsiteStock = ({ subsys }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const site = useSelector(selectSite);
   const status = useSelector((state) => state.sites.status);
+  const [loading, setLoading] = useState(false);
   const [lineItems, setLineItems] = useState([]);
 
   useEffect(() => {
@@ -72,19 +74,22 @@ export const AsiteStock = () => {
   }, [dispatch, id]);
 
   useEffect(() => {
+    setLoading(true);
     const { stockLevel } = site && site;
     if (stockLevel !== undefined) {
       const products = stockLevel.products;
-      fetchAllModelsBySkus(products).then((data) => {
-        setLineItems(
-          products.map((stock, index) => ({
-            ...stock,
-            modelCode: data[index].modelCode,
-            name: data[index].name,
-            imageLinks: data[index].imageLinks,
-          }))
-        );
-      });
+      products &&
+        fetchAllModelsBySkus(products).then((data) => {
+          setLineItems(
+            products.map((stock, index) => ({
+              ...stock,
+              modelCode: data[index].modelCode,
+              name: data[index].name,
+              imageLinks: data[index].imageLinks,
+            }))
+          );
+          setLoading(false);
+        });
     }
   }, [site]);
   return status === "succeeded" ? (
@@ -92,7 +97,11 @@ export const AsiteStock = () => {
       <div className="min-h-full">
         <main className="py-10">
           {/* Page header */}
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+            <NavigatePrev
+              page="Stock Levels"
+              path={`/${subsys}/stocklevels/sites`}
+            />
             <div className="flex items-center space-x-3">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
@@ -174,7 +183,7 @@ export const AsiteStock = () => {
                   Stock Levels
                 </h2>
                 <div className="ml-2 mr-2">
-                  {lineItems === null || lineItems === undefined ? (
+                  {loading ? (
                     <div className="flex mt-5 items-center justify-center">
                       <TailSpin color="#00BCD4" height={20} width={20} />
                     </div>

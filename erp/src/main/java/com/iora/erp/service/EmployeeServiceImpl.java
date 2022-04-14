@@ -251,8 +251,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void resetPasswordUser(String email) throws EmployeeException {
         Employee e = getEmployeeByEmail(email);
         String tempPassword = StringGenerator.generateRandom(48, 122, 8);
-        // e.setPassword(StringGenerator.generateProtectedPassword(e.getSalt(),
-        // tempPassword));
         e.setPassword(passwordEncoder().encode(tempPassword));
 
         emailService.sendTemporaryPassword(e, tempPassword);

@@ -4,12 +4,15 @@ import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
+  fetchCustomers
+} from "../../../../stores/slices/customerSlice";
+import {
   fetchVouchers,
-  selectAllVouchers,
+  selectAllVouchers
 } from "../../../../stores/slices/voucherSlice";
 import {
   SelectColumnFilter,
-  SimpleTable,
+  SimpleTable
 } from "../../../components/Tables/SimpleTable";
 
 export const VouchersTable = ({ data, handleOnClick }) => {
@@ -45,7 +48,7 @@ export const VouchersTable = ({ data, handleOnClick }) => {
         accessor: "redeemed",
         Cell: (e) => (e.value ? "Yes" : "No"),
       },
-    ],
+    ], []
   );
 
   return (
@@ -75,6 +78,10 @@ export const VouchersList = () => {
   useEffect(() => {
     voucherStatus === "idle" && dispatch(fetchVouchers());
   }, [voucherStatus, dispatch]);
+  
+  useEffect(() => {
+    dispatch(fetchCustomers());
+  }, [dispatch]);
 
   return voucherStatus === "loading" ? (
     <div className="flex mt-5 items-center justify-center">

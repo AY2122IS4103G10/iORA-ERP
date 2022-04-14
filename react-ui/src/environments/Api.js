@@ -39,8 +39,11 @@ export const api = {
 };
 
 export const voucherApi = {
-  issue(code, id) {
-    return axiosPrivate.put(`${REST_ENDPOINT}sam/voucher/issue/${code}/${id}`);
+  issue(code, customerIds) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}sam/voucher/issue/${code}`,
+      customerIds
+    );
   },
   redeem(id) {
     return axiosPrivate.put(`${REST_ENDPOINT}sam/voucher/redeem/${id}`);
@@ -367,6 +370,11 @@ export const onlineOrderApi = {
       lineItems
     );
   },
+  cancelOrder(orderId, siteId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/cancel/${orderId}/${siteId}`
+    );
+  },
   pickPack(orderId, siteId) {
     return axiosPrivate.put(
       `${REST_ENDPOINT}online/pickpack/${orderId}/${siteId}`
@@ -385,8 +393,10 @@ export const onlineOrderApi = {
       `${REST_ENDPOINT}online/deliverMultiple/${orderId}`
     );
   },
-  receive(orderId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}online/receive/${orderId}`);
+  receive(orderId, siteId) {
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/deliver/${orderId}/${siteId}`
+    );
   },
   collect(orderId) {
     return axiosPrivate.put(`${REST_ENDPOINT}online/collect/${orderId}`);

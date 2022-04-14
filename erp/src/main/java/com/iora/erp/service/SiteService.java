@@ -1,6 +1,7 @@
 package com.iora.erp.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.iora.erp.exception.IllegalTransferException;
 import com.iora.erp.exception.NoStockLevelException;
@@ -28,7 +29,7 @@ public interface SiteService {
     public abstract Site getSiteFromStockLevel(Long stockLevelId);
     public abstract List<Site> searchStockLevels(List<String> storeTypes, String country, String company);
     public abstract List<StockLevelLI> getStockLevelOfSite(Long siteId) throws NoStockLevelException;
-    public abstract List<StockLevelLI> getStockLevelByProduct(String SKUCode);
+    public abstract List<Map<String,Object>> getStockLevelByProduct(String SKUCode);
     public abstract StockLevelLI getStockLevelLI(Long siteId, String SKUCode);
 
     public abstract StockLevel addProducts(Long siteId, String SKUCode, int qty) throws NoStockLevelException;
@@ -38,18 +39,4 @@ public interface SiteService {
             throws NoStockLevelException, IllegalTransferException;
     public abstract List<Notification> getNotifications(Long siteId);
     public abstract List<Notification> updateNotifications(List<Notification> notifications, Long siteId);
-    
-    // public abstract Pair<StockLevel, StockLevel> moveProducts(Long fromSiteId,
-    // Long toSiteId, String SKUCode, int qty) throws NoStockLevelException,
-    // IllegalTransferException;
-
-    /*
-     * public abstract StockLevel addProductsWithRfid(Long siteId, List<String>
-     * rfidskus) throws NoStockLevelException;
-     * public abstract StockLevel removeProductsWithRfid(Long siteId, List<String>
-     * rfidskus) throws NoStockLevelException, IllegalTransferException;
-     * public abstract Pair<StockLevel, StockLevel> moveProductsWithRfid(Long
-     * fromSiteId, Long toSiteId, List<String> rfidskus) throws
-     * NoStockLevelException, IllegalTransferException;
-     */
 }

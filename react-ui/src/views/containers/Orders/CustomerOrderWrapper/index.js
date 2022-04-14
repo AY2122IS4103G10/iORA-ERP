@@ -8,7 +8,7 @@ import { Outlet } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
-import { api, orderApi } from "../../../../environments/Api";
+import { api, onlineOrderApi, orderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import Confirmation from "../../../components/Modals/Confirmation";
@@ -27,13 +27,20 @@ const deliveryStatuses = [
 ];
 
 const Header = ({
+  statusHistory,
   subsys,
   disableTabs,
   tabs,
   orderId,
   openInvoice,
   disableInvoice,
+  openConfirm,
+  setAction,
+  onCancelOrderClicked,
 }) => {
+  const status =
+    statusHistory.length && statusHistory[statusHistory.length - 1].status;
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
       <NavigatePrev page="Orders" path={`/${subsys}/orders/search`} />
@@ -41,10 +48,22 @@ const Header = ({
         <div className="md:flex md:items-center md:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{`Order #${orderId}`}</h1>
           <div className="mt-3 flex md:mt-0 md:absolute md:top-3 md:right-0">
-            {!disableInvoice && (
+            {(status === "PENDING" || status === "PICKING") && (
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                onClick={() => {
+                  setAction({ name: "Cancel", action: onCancelOrderClicked });
+                  openConfirm();
+                }}
+              >
+                <span>Cancel Order</span>
+              </button>
+            )}
+            {!disableInvoice && (
+              <button
+                type="button"
+                className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                 onClick={openInvoice}
               >
                 <span>View Invoice</span>
@@ -105,9 +124,7 @@ const InvoiceSummary = ({ data, status }) => {
       },
       {
         Header: "Qty",
-        accessor: `${
-          status === "READY_FOR_SHIPPING" ? "packedQty" : "requestedQty"
-        }`,
+        accessor: `${status === "READY_FOR_DELIVERY" ? "packedQty" : "qty"}`,
       },
     ];
   }, [status]);
@@ -143,7 +160,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [customer, setCustomer] = useState(-1);
   const [totalAmount, setTotalAmount] = useState(-1);
   const [payments, setPayments] = useState([]);
-  const [paid, setPaid] = useState(false);
   const [site, setSite] = useState(false);
   const [pickupSite, setPickupSite] = useState(null);
   const [country, setCountry] = useState(null);
@@ -164,6 +180,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       setLoading(true);
       try {
         const { data } = await orderApi.get(orderId);
+        console.log(data);
         const {
           lineItems,
           delivery,
@@ -172,7 +189,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           customerId,
           totalAmount,
           payments,
-          paid,
           pickupSite,
           site,
           country,
@@ -187,6 +203,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           setLineItems(
             lineItems.map((item, index) => ({
               ...item,
+              index: index + 1,
               product: {
                 ...item.product,
                 modelCode: data[index].modelCode,
@@ -208,7 +225,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         fetchCustomer(customerId).then((data) => setCustomer(data));
         setTotalAmount(totalAmount);
         setPayments(payments);
-        setPaid(paid);
         setPickupSite(pickupSite);
         setSite(site);
         setCountry(country);
@@ -229,11 +245,32 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     fetchOrder();
   }, [subsys, orderId, addToast]);
 
+  const onCancelOrderClicked = async () => {
+    setLoading(true);
+    try {
+      const { data } = await onlineOrderApi.cancelOrder(orderId, currSiteId);
+      console.log(data);
+      addToast(`Success: Cancelled Order ${orderId}`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      closeConfirmModal();
+    } catch (err) {
+      addToast(`Error:  ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openInvoice = () => setOpen(true);
   const closeInvoice = () => setOpen(false);
 
   const openConfirmModal = () => setOpenConfirm(true);
   const closeConfirmModal = () => setOpenConfirm(false);
+
   const tabs = [
     {
       name: "Details",
@@ -245,8 +282,17 @@ export const CustomerOrderWrapper = ({ subsys }) => {
       href: `/${subsys}/orders/${orderId}/pick-pack`,
       current: false,
     },
-    status !== "" && delivery
-      ? { name: "Delivery", href: "#", current: false }
+    status !== "" &&
+    (delivery ||
+      (site?.id !== pickupSite?.id &&
+        statusHistory[statusHistory.length - 1].status !==
+          "READY_FOR_COLLECTION" &&
+        statusHistory[statusHistory.length - 1].status !== "COLLECTED"))
+      ? {
+          name: "Delivery",
+          href: `/${subsys}/orders/${orderId}/delivery`,
+          current: false,
+        }
       : {
           name: "Collection",
           href: `/${subsys}/orders/${orderId}/collect`,
@@ -262,15 +308,20 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     <>
       <div className="py-8 xl:py-10">
         <Header
-        subsys={subsys}
+          subsys={subsys}
           disableTabs={delivery === null || delivery === undefined}
           tabs={tabs}
           orderId={orderId}
-          disableInvoice={status === "" || !delivery}
+          disableInvoice={status === ""}
           openInvoice={openInvoice}
+          statusHistory={statusHistory}
+          setAction={setAction}
+          openConfirm={openConfirmModal}
+          onCancelOrderClicked={onCancelOrderClicked}
         />
         <Outlet
           context={{
+            addToast,
             subsys,
             orderId,
             dateTime,
@@ -279,7 +330,6 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             deliveryAddress,
             totalAmount,
             payments,
-            paid,
             site,
             pickupSite,
             country,
@@ -294,6 +344,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             refundedLIs,
             exchangedLIs,
             voucher,
+            openInvoice,
           }}
         />
       </div>
@@ -319,6 +370,8 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             deliveryAddress={deliveryAddress}
             data={lineItems}
             qrValue={qrValue}
+            site={site}
+            pickupSite={pickupSite}
           >
             <InvoiceSummary data={lineItems} status={status.status} />
           </OnlineOrderInvoice>
@@ -354,6 +407,8 @@ export const CustomerOrderWrapper = ({ subsys }) => {
                 ? "Scan to start picking."
                 : "Scan to start delivery."
             }
+            site={site}
+            pickupSite={pickupSite}
           >
             <InvoiceSummary data={lineItems} status={status.status} />
           </OnlineOrderInvoice>

@@ -138,3 +138,9 @@ export const productApi = {
     return axiosPrivate.get(`${REST_ENDPOINT}sam/model/name/${sku}`);
   },
 };
+
+export const onlineOrderApi = {
+  cancelOrder(orderId, customerId) {
+    return axiosPrivate.put(`${REST_ENDPOINT}online/customer/cancel/${orderId}/${customerId}`)
+  }
+}

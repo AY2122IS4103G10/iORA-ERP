@@ -284,6 +284,7 @@ export const ProcurementWrapper = ({ subsys }) => {
                 description: data[index].description,
                 imageLinks: data[index].imageLinks,
               },
+              isEditing: true,
             }))
           );
         });

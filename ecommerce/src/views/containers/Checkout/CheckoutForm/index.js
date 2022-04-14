@@ -74,6 +74,7 @@ export const AddressForm = ({
             type="text"
             id="region"
             autoComplete="address-level1"
+            placeholder="Optional"
             value={state}
             onChange={(e) => setState(e.target.value)}
             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"

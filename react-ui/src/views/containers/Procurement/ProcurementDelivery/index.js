@@ -3,47 +3,117 @@ import { useState } from "react";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
-import { procurementApi } from "../../../../environments/Api";
+import { api, procurementApi } from "../../../../environments/Api";
 import {
   EditableCell,
   SimpleTable,
 } from "../../../components/Tables/SimpleTable";
-import { ScanItemsSection } from "../ProcurementPickPack";
+import { ConfirmSection } from "../ProcurementPickPack";
 
 const DeliveryList = ({
   data,
   setData,
   status,
-  onSaveQuanityClicked,
   warehouse,
   currSiteId,
+  setShowConfirm,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
-    const handleEditRow = (rowIndex) => {
-      setData((item) =>
-        item.map((row, index) => ({ ...row, isEditing: rowIndex === index }))
-      );
-    };
-
-    const handleSaveRow = (rowIndex, obj) => {
-      onSaveQuanityClicked(rowIndex, obj.product.sku, obj.receivedQty);
-    };
-
-    const updateMyData = (rowIndex, columnId, value) => {
+    const siteCols = data.length
+      ? Object.keys(data[0]?.siteQuantities).map((store) => ({
+          Header: () => (
+            <div className="flex items-center justify-between">
+              <span>{store}</span>
+            </div>
+          ),
+          minWidth: 100,
+          maxWidth: 130,
+          accessor: `siteQuantities.${store}`,
+          Cell: (row) => {
+            const storeId = parseInt(row.column.id.split(".")[1]);
+            return row.row.original.isEditing &&
+              warehouse.id === currSiteId &&
+              ["SHIPPING", "SHIPPING_MULTIPLE"].some((s) => s === status) ? (
+              <EditableCell
+                value={row.row.original.siteQuantities[storeId]}
+                row={row.row}
+                column={row.column}
+                updateMyData={updateSiteCol}
+              />
+            ) : (
+              row.value
+            );
+          },
+        }))
+      : [];
+    const updateSiteCol = (rowIndex, columnId, value) => {
+      const split = columnId.split(".");
+      columnId = split[0];
+      const storeId = split[1];
       setSkipPageReset(true);
       setData((old) =>
         old.map((row, index) => {
           if (index === rowIndex) {
             return {
               ...old[rowIndex],
-              [columnId]: value,
+              [columnId]: { ...old[rowIndex][columnId], [storeId]: value },
+              [status === "PICKING" || status === "MANUFACTURED"
+                ? "pickedQty"
+                : "packedQty"]: Object.values({
+                ...old[rowIndex][columnId],
+                [storeId]: value,
+              })
+                .map((val) => parseInt(val))
+                .reduce((partialSum, a) => partialSum + a, 0),
             };
           }
           return row;
         })
       );
     };
+    const handleEditRow = (evt, rowIndex) => {
+      evt.preventDefault();
+      setData((item) =>
+        item.map((row, index) => {
+          if (index === rowIndex) return { ...row, isEditing: true };
+          return row;
+        })
+      );
+    };
+
+    const handleSaveRow = (evt, rowIndex) => {
+      evt.preventDefault();
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex],
+              receivedQty: Object.values(old[rowIndex].siteQuantities)
+                .map((val) => parseInt(val))
+                .reduce((partialSum, a) => partialSum + a, 0),
+              isEditing: false,
+            };
+          }
+          return row;
+        })
+      );
+    };
+
+    // const updateMyData = (rowIndex, columnId, value) => {
+    //   setSkipPageReset(true);
+    //   setData((old) =>
+    //     old.map((row, index) => {
+    //       if (index === rowIndex) {
+    //         return {
+    //           ...old[rowIndex],
+    //           [columnId]: value,
+    //         };
+    //       }
+    //       return row;
+    //     })
+    //   );
+    // };
     return [
       {
         Header: "SKU",
@@ -63,39 +133,32 @@ const DeliveryList = ({
             .fieldValue,
       },
       {
+        Header: "Sites",
+        accessor: "siteQuantities",
+        columns: siteCols,
+      },
+      {
         Header: "To Deliver",
         accessor: "packedQty",
       },
       {
         Header: "Received",
         accessor: "receivedQty",
-        Cell: (e) => {
-          return e.row.original.isEditing &&
-            ["SHIPPING", "SHIPPING_MULTIPLE"].some((s) => s === status) ? (
-            <EditableCell
-              value={e.value}
-              row={e.row}
-              column={e.column}
-              updateMyData={updateMyData}
-              min="0"
-              max={e.row.original.requestedQty}
-            />
-          ) : (
-            e.value
-          );
-        },
-      },
-      {
-        Header: "Status",
-        accessor: "[status]",
-        Cell: (row) => {
-          const lineItem = row.row.original;
-          return status === "READY_FOR_SHIPPING"
-            ? "READY"
-            : lineItem.packedQty !== lineItem.receivedQty
-            ? "SHIPPING"
-            : "RECEIVED";
-        },
+        // Cell: (e) => {
+        //   return e.row.original.isEditing &&
+        //     ["SHIPPING", "SHIPPING_MULTIPLE"].some((s) => s === status) ? (
+        //     <EditableCell
+        //       value={e.value}
+        //       row={e.row}
+        //       column={e.column}
+        //       updateMyData={updateMyData}
+        //       min="0"
+        //       max={e.row.original.requestedQty}
+        //     />
+        //   ) : (
+        //     e.value
+        //   );
+        // },
       },
       {
         Header: "",
@@ -104,10 +167,10 @@ const DeliveryList = ({
           return (
             <button
               className="text-cyan-600 hover:text-cyan-900"
-              onClick={() =>
+              onClick={(evt) =>
                 !e.row.original.isEditing
-                  ? handleEditRow(e.row.index)
-                  : handleSaveRow(e.row.index, e.row.original)
+                  ? handleEditRow(evt, e.row.index)
+                  : handleSaveRow(evt, e.row.index)
               }
             >
               {!e.row.original.isEditing ? "Edit" : "Save"}
@@ -116,7 +179,7 @@ const DeliveryList = ({
         },
       },
     ];
-  }, [status, onSaveQuanityClicked, setData]);
+  }, [status, setData, data, currSiteId, warehouse]);
   const hiddenColumns =
     warehouse.id !== currSiteId ||
     ["SHIPPING", "SHIPPING_MULTIPLE"].every((s) => s !== status)
@@ -128,15 +191,29 @@ const DeliveryList = ({
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           Delivery List
         </h3>
+        {data.map((item) => item.receivedQty).every((qty) => qty !== 0) &&
+          warehouse.id === currSiteId && (
+            <button
+              type="button"
+              className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-cyan-500"
+              onClick={() => {
+                setShowConfirm(true);
+              }}
+            >
+              <span>Complete</span>
+            </button>
+          )}
       </div>
       {Boolean(data.length) && (
         <div className="mt-4">
-          <SimpleTable
-            columns={columns}
-            data={data}
-            skipPageReset={skipPageReset}
-            hiddenColumns={hiddenColumns}
-          />
+          <form>
+            <SimpleTable
+              columns={columns}
+              data={data}
+              skipPageReset={skipPageReset}
+              hiddenColumns={hiddenColumns}
+            />
+          </form>
         </div>
       )}
     </div>
@@ -199,7 +276,8 @@ export const ProcurementDelivery = () => {
     currSiteId,
   } = useOutletContext();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
+  // const [search, setSearch] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const onMultipleClicked = async () => {
     try {
@@ -263,59 +341,58 @@ export const ProcurementDelivery = () => {
     }
   };
 
-  const onScanClicked = (evt) => {
-    evt.preventDefault();
-    handleScan(search);
-  };
-  const handleScan = async (barcode) => {
-    try {
-      const { data } = await procurementApi.scanReceive(procurementId, barcode);
-      const { lineItems: lIs, statusHistory } = data;
-      const status = statusHistory[statusHistory.length - 1];
-      setLineItems(
-        lineItems.map((item, index) => ({
-          ...item,
-          receivedQty: lIs[index].receivedQty,
-        }))
-      );
-      setStatus(status);
-      setStatusHistory(statusHistory);
-      addToast(`Received ${barcode}.`, {
-        appearance: "success",
-        autoDismiss: true,
-      });
-      setSearch("");
-      if (status.status === "COMPLETED") {
-        addToast(`Order ${procurementId} completed.`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        navigate(`/${subsys}/procurements/${procurementId}`);
-      }
-    } catch (error) {
-      addToast(`Error: ${error.response.data}`, {
-        appearance: "error",
-        autoDismiss: true,
-      });
-    }
-  };
+  // const onScanClicked = (evt) => {
+  //   evt.preventDefault();
+  //   handleScan(search);
+  // };
+  // const handleScan = async (barcode) => {
+  //   try {
+  //     const { data } = await procurementApi.scanReceive(procurementId, barcode);
+  //     const { lineItems: lIs, statusHistory } = data;
+  //     const status = statusHistory[statusHistory.length - 1];
+  //     setLineItems(
+  //       lineItems.map((item, index) => ({
+  //         ...item,
+  //         receivedQty: lIs[index].receivedQty,
+  //       }))
+  //     );
+  //     setStatus(status);
+  //     setStatusHistory(statusHistory);
+  //     addToast(`Received ${barcode}.`, {
+  //       appearance: "success",
+  //       autoDismiss: true,
+  //     });
+  //     setSearch("");
+  //     if (status.status === "COMPLETED") {
+  //       addToast(`Order ${procurementId} completed.`, {
+  //         appearance: "success",
+  //         autoDismiss: true,
+  //       });
+  //       navigate(`/${subsys}/procurements/${procurementId}`);
+  //     }
+  //   } catch (error) {
+  //     addToast(`Error: ${error.response.data}`, {
+  //       appearance: "error",
+  //       autoDismiss: true,
+  //     });
+  //   }
+  // };
 
-  const onSearchChanged = (e) => {
-    if (
-      e.target.value.length - search.length > 10 &&
-      e.target.value.includes("-")
-    ) {
-      handleScan(e.target.value);
-    }
-    setSearch(e.target.value);
-  };
-  const onSaveQuanityClicked = async (rowIndex, sku, qty) => {
+  // const onSearchChanged = (e) => {
+  //   if (
+  //     e.target.value.length - search.length > 10 &&
+  //     e.target.value.includes("-")
+  //   ) {
+  //     handleScan(e.target.value);
+  //   }
+  //   setSearch(e.target.value);
+  // };
+  const onSaveQuantityClicked = async () => {
     try {
-      const { data } = await procurementApi.adjustAtWarehouse(
-        procurementId,
-        sku,
-        qty
-      );
+      const { data } = await api.update(`warehouse/procurementOrder/receive`, {
+        id: procurementId,
+        lineItems,
+      });
       const { lineItems: lIs, statusHistory } = data;
       setStatus(statusHistory[statusHistory.length - 1]);
       setStatusHistory(statusHistory);
@@ -324,20 +401,14 @@ export const ProcurementDelivery = () => {
           ...row,
           pickedQty: lIs[index].pickedQty,
           packedQty: lIs[index].packedQty,
-          isEditing: rowIndex === index && false,
         }))
       );
-      addToast(`Success: Updated quantity.`, {
+      setShowConfirm(false);
+      addToast(`Order ${procurementId} completed.`, {
         appearance: "success",
         autoDismiss: true,
       });
-      if (status.status === "COMPLETED") {
-        addToast(`Order ${procurementId} completed.`, {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        navigate(`/${subsys}/procurements/${procurementId}`);
-      }
+      navigate(`/${subsys}/procurements/${procurementId}`);
     } catch (error) {
       addToast(`Error: ${error.response.data}`, {
         appearance: "error",
@@ -345,12 +416,15 @@ export const ProcurementDelivery = () => {
       });
     }
   };
+
+  const onConfirmClicked = () => onSaveQuantityClicked();
+  console.log(lineItems);
   return (
     <div className="space-y-6 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-12 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
       <div className="space-y-6 lg:col-start-1 lg:col-span-2">
         {["READY_FOR_SHIPPING", "SHIPPING", "SHIPPING_MULTIPLE"].some(
           (s) => s === status.status
-        ) ? (
+        ) || showConfirm ? (
           status.status === "READY_FOR_SHIPPING" &&
           manufacturing.id === currSiteId &&
           subsys === "lg" ? (
@@ -365,17 +439,30 @@ export const ProcurementDelivery = () => {
               />
             </div>
           ) : (
-            (status.status === "SHIPPING" ||
-              status.status === "SHIPPING_MULTIPLE") &&
-            warehouse.id === currSiteId && (
-              <section aria-labelledby="scan-items">
-                <ScanItemsSection
-                  search={search}
-                  searchHelper={`Scan barcode or enter product SKU to confirm receipt of item.`}
-                  onSearchChanged={onSearchChanged}
-                  onScanClicked={onScanClicked}
+            // (status.status === "SHIPPING" ||
+            //   status.status === "SHIPPING_MULTIPLE") &&
+            // warehouse.id === currSiteId && (
+            //   <section aria-labelledby="scan-items">
+            //     <ScanItemsSection
+            //       search={search}
+            //       searchHelper={`Scan barcode or enter product SKU to confirm receipt of item.`}
+            //       onSearchChanged={onSearchChanged}
+            //       onScanClicked={onScanClicked}
+            //     />
+            //   </section>
+            // )
+            showConfirm && (
+              <div className="flex justify-center">
+                <ConfirmSection
+                  subsys={subsys}
+                  procurementId={procurementId}
+                  title="Confirm items received"
+                  body="Confirm that all the items in this order have been received?
+            This action cannot be undone, and this order will be marked as completed."
+                  onConfirmClicked={onConfirmClicked}
+                  setShowConfirm={setShowConfirm}
                 />
-              </section>
+              </div>
             )
           )
         ) : (
@@ -400,9 +487,10 @@ export const ProcurementDelivery = () => {
                 data={lineItems}
                 setData={setLineItems}
                 status={status.status}
-                onSaveQuanityClicked={onSaveQuanityClicked}
+                onSaveQuantityClicked={onSaveQuantityClicked}
                 warehouse={warehouse}
                 currSiteId={currSiteId}
+                setShowConfirm={setShowConfirm}
               />
             </section>
           )}

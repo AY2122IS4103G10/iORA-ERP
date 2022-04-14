@@ -1,13 +1,19 @@
 import { Outlet } from "react-router-dom";
-import { BellIcon, CogIcon, ShoppingBagIcon, UserCircleIcon } from "@heroicons/react/outline";
+import {
+  StarIcon,
+  ShoppingBagIcon,
+  UserCircleIcon,
+  KeyIcon,
+} from "@heroicons/react/outline";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { classNames } from "../../../../utilities/Util";
 
 const subNavigation = [
   { name: "Profile", href: "/settings/profile", icon: UserCircleIcon },
-  { name: "Account", href: "/settings/account", icon: CogIcon },
+  { name: "Password", href: "/settings/account", icon: KeyIcon },
   { name: "Your orders", href: "/orders", icon: ShoppingBagIcon },
+  { name: "Your membership", href: "/membership", icon: StarIcon },
 ];
 
 export const SettingsIndex = () => {

@@ -14,6 +14,7 @@ import com.iora.erp.model.customer.Voucher;
 public interface CustomerService {
     public abstract Customer createCustomerAccount(Customer customer) throws CustomerException, RegistrationException;
     public abstract Customer updateCustomerAccount(Customer customer) throws CustomerException;
+    public abstract Customer updateCustomerPassword(Long customerId, String oldPassword, String newPassword) throws CustomerException;
     public abstract void blockCustomer(Customer customer) throws CustomerException;
     public abstract void unblockCustomer(Customer customer) throws CustomerException;
     public abstract List<Customer> listOfCustomer();
@@ -32,6 +33,7 @@ public interface CustomerService {
     public abstract List<Voucher> getAvailableVouchersByAmount(double amount);
     public abstract void deleteVoucher(String voucherCode) throws CustomerException;
     public abstract Voucher issueVoucher(String voucherCode, Long customerId) throws CustomerException;
+    public abstract List<Voucher> issueVouchers(String voucherCode, List<Long> customerIds) throws CustomerException;
     public abstract Voucher redeemVoucher(String voucherCode) throws CustomerException;
 
     public abstract Customer redeemPoints(String email, int amount) throws CustomerException;

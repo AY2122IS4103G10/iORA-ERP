@@ -1,21 +1,26 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { PaperClipIcon, XIcon } from "@heroicons/react/outline";
+import axios from "axios";
 import moment from "moment";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-import { IMGBB_SECRET } from '../../../../config';
+import { IMGBB_SECRET } from "../../../../config";
 import {
-  createSupportTicket, fetchPublicSupportTickets,
-  fetchUserSupportTickets,
+  fetchPublicSupportTickets,
   selectPublicSupportTickets,
-  selectUserSupportTickets
 } from "../../../../stores/slices/supportTicketSlice";
 import {
+  createSupportTicket,
+  selectUser,
+  selectUserOrders,
+  selectUserTickets,
+} from "../../../../stores/slices/userSlice";
+import {
   SelectColumnFilter,
-  SimpleTable
+  SimpleTable,
 } from "../../../components/Tables/SimpleTable";
 
 const SupportTicketModal = ({
@@ -32,30 +37,34 @@ const SupportTicketModal = ({
   file,
   setFile,
   onSubmitClicked,
-  loading
+  loading,
+  orders,
 }) => {
   const categories = [
     {
+      id: 1,
       value: "ACCOUNT",
     },
     {
+      id: 2,
       value: "ORDER",
     },
     {
+      id: 3,
       value: "GENERAL",
-    }
-  ]
+    },
+  ];
 
-  const orders = () => {
-    const list = [{label : "", value : 0}];
-    JSON.parse(localStorage.getItem("user")).orders.forEach((order) => {
+  const options = () => {
+    const list = [{ label: "Select an order...", value: 0 }];
+    orders?.forEach((order) => {
       list.push({
-        label: "Order #" + order.id + ", Amount Spent: $" + order.totalAmount,
+        label: `Order #${order.id}, Amount Spent: $${order.totalAmount}`,
         value: order.id,
-      })
+      });
     });
     return list;
-  }
+  };
 
   const fileRef = useRef();
 
@@ -119,14 +128,12 @@ const SupportTicketModal = ({
                       aria-labelledby="information-heading"
                       className="mt-1"
                     >
-                      <form action="#" method="POST">
+                      <form onSubmit={onSubmitClicked}>
                         <div className="sm:overflow-hidden">
                           <div className="bg-white py-6 space-y-6 px-1">
                             <div className="grid grid-cols-3 gap-6">
                               <div className="col-span-3 sm:col-span-2">
-                                <label
-                                  className="block text-sm font-medium text-gray-700"
-                                >
+                                <label className="block text-sm font-medium text-gray-700">
                                   Subject
                                 </label>
                                 <div className="mt-1 rounded-md shadow-sm flex">
@@ -134,56 +141,65 @@ const SupportTicketModal = ({
                                     type="text"
                                     name="subject"
                                     id="subject"
-                                    required
+                                    placeholder="Enter subject."
                                     value={subject}
                                     onChange={onSubjectChanged}
                                     className="focus:ring-gray-500 focus:border-gray-500 flex-grow block w-full min-w-0 rounded-md sm:text-sm border-gray-300"
+                                    required
+                                    autoFocus
                                   />
                                 </div>
                               </div>
 
                               <div className="col-span-3 sm:col-span-2">
-                                <label
-                                  className="block text-sm font-medium text-gray-700"
-                                >
+                                <label className="block text-sm font-medium text-gray-700">
                                   Category
                                 </label>
                                 <div className="mt-1 rounded-md shadow-sm flex">
                                   <select
-                                    className="focus:ring-indigo-500 focus:border-indigo-500 relative block w-full rounded-none rounded-t-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
+                                    className="focus:ring-gray-500 focus:border-gray-500 relative block w-full rounded-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
                                     required
                                     value={category}
-                                    onChange={onCategoryChanged}>
+                                    onChange={onCategoryChanged}
+                                  >
                                     {categories.map((option) => (
-                                      <option value={option.value}>{option.value}</option>
+                                      <option
+                                        key={option.id}
+                                        value={option.value}
+                                      >
+                                        {option.value}
+                                      </option>
                                     ))}
                                   </select>
                                 </div>
                               </div>
 
-                              {category === "ORDER" &&
+                              {category === "ORDER" && (
                                 <div className="col-span-3 sm:col-span-2">
-                                  <label
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
+                                  <label className="block text-sm font-medium text-gray-700">
                                     Order Number
                                   </label>
                                   <div className="mt-1 rounded-md shadow-sm flex">
                                     <select
-                                      className="focus:ring-indigo-500 focus:border-indigo-500 relative block w-full rounded-none rounded-t-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
+                                      className="focus:ring-gray-500 focus:border-gray-500 relative block w-full rounded-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
                                       value={order}
-                                      onChange={onOrderChanged}>
-                                      {orders().map((option) => (
-                                        <option value={option.value}>{option.label}</option>
+                                      onChange={onOrderChanged}
+                                    >
+                                      {options().map((option, index) => (
+                                        <option
+                                          key={index}
+                                          value={option.value}
+                                        >
+                                          {option.label}
+                                        </option>
                                       ))}
                                     </select>
                                   </div>
-                                </div>}
+                                </div>
+                              )}
 
                               <div className="col-span-3">
-                                <label
-                                  className="block text-sm font-medium text-gray-700"
-                                >
+                                <label className="block text-sm font-medium text-gray-700">
                                   Description
                                 </label>
                                 <div className="mt-1">
@@ -203,52 +219,67 @@ const SupportTicketModal = ({
                               </div>
 
                               <div className="flex">
-                                <input ref={fileRef}
+                                <input
+                                  ref={fileRef}
                                   onChange={(e) => {
-                                    setFile(e.target.files[0])
+                                    setFile(e.target.files[0]);
                                   }}
                                   multiple={false}
                                   type="file"
                                   accept="image/*"
-                                  hidden />
+                                  hidden
+                                />
                                 <button
                                   type="button"
                                   className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
                                   onClick={() => fileRef.current.click()}
                                 >
-                                  <PaperClipIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
+                                  <PaperClipIcon
+                                    className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500"
+                                    aria-hidden="true"
+                                  />
                                   <span className="text-sm text-gray-500 group-hover:text-gray-600 italic">
-                                    {Boolean(file.name) ? file.name : "Attach a file"}
+                                    {Boolean(file.name)
+                                      ? file.name
+                                      : "Attach a file"}
                                   </span>
                                 </button>
-                                {Boolean(file.name) &&
+                                {Boolean(file.name) && (
                                   <button
                                     type="button"
                                     className="-ml-2 -my-2 rounded-full px-3 py-2 inline-flex items-center text-left text-gray-400 group"
                                     onClick={() => setFile([])}
                                   >
-                                    <XIcon className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500" aria-hidden="true" />
-                                  </button>}
+                                    <XIcon
+                                      className="-ml-1 h-5 w-5 mr-2 group-hover:text-gray-500"
+                                      aria-hidden="true"
+                                    />
+                                  </button>
+                                )}
                               </div>
                             </div>
                           </div>
                           <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                            {loading ?
+                            {loading ? (
                               <button
                                 type="button"
                                 disabled
                                 className="bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                               >
-                                <TailSpin color="#00BFFF" height={20} width={20} />
+                                <TailSpin
+                                  color="#00BFFF"
+                                  height={20}
+                                  width={20}
+                                />
                               </button>
-                              :
+                            ) : (
                               <button
                                 type="submit"
-                                onClick={onSubmitClicked}
                                 className="bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                               >
                                 Save
-                              </button>}
+                              </button>
+                            )}
                           </div>
                         </div>
                       </form>
@@ -279,8 +310,8 @@ const SupportTicketTable = ({ data, handleOnClick, user }) => {
       {
         Header: "Last Response",
         accessor: (row) => `${row.messages[row.messages.length - 1]}`,
-        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, hh:mm"),
-      }
+        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, h:mm a"),
+      },
     ],
     []
   );
@@ -300,30 +331,28 @@ const SupportTicketTable = ({ data, handleOnClick, user }) => {
       {
         Header: "Last Response",
         accessor: (row) => `${row.messages[row.messages.length - 1]}`,
-        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, hh:mm"),
+        Cell: (e) => moment(e.timeStamp).format("DD/MM/YY, h:mm a"),
       },
       {
         Header: "Status",
         accessor: "status",
         Filter: SelectColumnFilter,
         filter: "includes",
-        Cell: (e) => (e.value === "PENDING" ? (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800">
-            Pending Admin
-          </span>
-        ) :
-          (e.value === "PENDING_CUSTOMER" ? (
+        Cell: (e) =>
+          e.value === "PENDING" ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800">
+              Pending Admin
+            </span>
+          ) : e.value === "PENDING_CUSTOMER" ? (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
               Admin Replied
             </span>
-          ) :
-            (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                Resolved
-              </span>
-            ))
-        ),
-      }
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Resolved
+            </span>
+          ),
+      },
     ],
     []
   );
@@ -345,10 +374,13 @@ export const SupportList = () => {
   const { addToast } = useToasts();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const publicTickets = useSelector((state) => selectPublicSupportTickets(state));
-  const userTickets = useSelector((state) => selectUserSupportTickets(state));
+  const publicTickets = useSelector((state) =>
+    selectPublicSupportTickets(state)
+  );
+  const user = useSelector(selectUser);
+  const userOrders = useSelector(selectUserOrders);
+  const userTickets = useSelector(selectUserTickets);
   const [openNewTicket, setOpenNewTicket] = useState(false);
-
   const [subject, setSubject] = useState("");
   const onSubjectChanged = (e) => setSubject(e.target.value);
   const [message, setMessage] = useState("");
@@ -359,126 +391,62 @@ export const SupportList = () => {
   const onOrderChanged = (e) => setOrder(e.target.value);
   const [file, setFile] = useState({});
   const [loading, setLoading] = useState(false);
-  const ticketStatus = useSelector((state) => state.supportTickets.listStatus);
 
   useEffect(() => {
-    ticketStatus === "idle" && dispatch(fetchUserSupportTickets(JSON.parse(localStorage.getItem("user")).id)).then(
-      dispatch(fetchPublicSupportTickets()));
-  }, [ticketStatus]);
+    dispatch(fetchPublicSupportTickets());
+  }, [dispatch, navigate]);
 
   const handleOnClick = (row) => navigate(`${row.original.id}`);
 
-  const onSubmitClicked = (evt) => {
+  const onSubmitClicked = async (evt) => {
     evt.preventDefault();
     setLoading(true);
-    const image = new FormData();
-    image.append('image', file)
-
-    const name = JSON.parse(localStorage.getItem("user")).firstName + " " + JSON.parse(localStorage.getItem("user")).lastName
-    var imageUrl;
-
-    Boolean(file.name) ? fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`,
-      {
-        method: 'POST',
-        body: image,
-      }
-    ).then((response) => response.json())
-      .then((data) => {
-        imageUrl = data.data.url;
-        dispatch(createSupportTicket(
-          {
-            subject,
-            category,
-            messages: [{
-              message,
-              name,
-              imageUrl
-            }],
-            customer: {
-              id: JSON.parse(localStorage.getItem("user")).id
-            },
-
-          }
-        ))
-          .unwrap()
-          .then(() => {
-            setSubject("");
-            setMessage("");
-            setCategory("");
-            setOrder("");
-            setFile([]);
-            setOpenNewTicket(false);
-            navigate("/support");
-            addToast("Successfully replied to ticket", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-          })
-          .catch((err) => {
-            addToast(`Error: ${err.message}`, {
-              appearance: "error",
-              autoDismiss: true,
-            });
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      }) : dispatch(createSupportTicket(
+    const ticket = {
+      subject,
+      category,
+      messages: [
         {
-          subject,
-          category,
-          messages: [{
-            message,
-            name,
-            imageUrl
-          }],
-          customer: {
-            id: JSON.parse(localStorage.getItem("user")).id
-          },
-          customerOrder: order === 0 ? null : {
-            id:  order
-          }
-        }
-      ))
-        .unwrap()
-        .then(() => {
-          setSubject("");
-          setMessage("");
-          setCategory("");
-          setOrder("");
-          setFile([]);
-          setOpenNewTicket(false);
-          navigate("/support");
-          addToast("Ticket successfully created", {
-            appearance: "success",
-            autoDismiss: true,
-          });
-        })
-        .catch((err) => {
-          console.log({
-            subject,
-            category,
-            messages: [{
-              message,
-              name,
-              imageUrl
-            }],
-            customer: {
-              id: JSON.parse(localStorage.getItem("user")).id
-            },
-            customerOrder: order === 0 ? null : {
-              id:  order
-            }
-          });
-          addToast(`Error: ${err.message}`, {
-            appearance: "error",
-            autoDismiss: true,
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-  }
+          message,
+          name: `${user?.firstName} ${user.lastName}`,
+        },
+      ],
+      customer: {
+        id: user?.id,
+      },
+    };
+
+    const image = new FormData();
+    image.append("image", file);
+    try {
+      if (Boolean(file.name)) {
+        const { data } = await axios.post(
+          `https://api.imgbb.com/1/upload?key=${IMGBB_SECRET}`,
+          image
+        );
+        ticket["imageUrl"] = data.data.url;
+      }
+      console.log(ticket);
+      await dispatch(createSupportTicket(ticket)).unwrap();
+      setSubject("");
+      setMessage("");
+      setCategory("");
+      setOrder("");
+      setFile([]);
+      setOpenNewTicket(false);
+      navigate("/support");
+      addToast("Successfully created ticket. ", {
+        appearance: "success",
+        autoDismiss: true,
+      });
+    } catch (err) {
+      addToast(`Error: ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -492,21 +460,38 @@ export const SupportList = () => {
             If your issue has not been resolved before, please create a new
             ticket.
           </h2>
-          <SupportTicketTable
-            data={publicTickets}
-            handleOnClick={handleOnClick}
-            user={false}
-          />
+          {publicTickets.length ? (
+            <SupportTicketTable
+              data={publicTickets}
+              handleOnClick={handleOnClick}
+              user={false}
+            />
+          ) : (
+            <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+              <span className="mt-2 block text-sm font-medium text-gray-900">
+                There is currently no resolved support ticket to display.
+              </span>
+            </div>
+          )}
         </div>
         <div>
           <h1 className="text-3xl text-center font-bold text-gray-900 pt-5 pb-5">
             Your Support Tickets
           </h1>
-          <SupportTicketTable
-            data={userTickets}
-            handleOnClick={handleOnClick}
-            user={true}
-          />
+
+          {userTickets.length ? (
+            <SupportTicketTable
+              data={userTickets}
+              handleOnClick={handleOnClick}
+              user={true}
+            />
+          ) : (
+            <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+              <span className="mt-2 block text-sm font-medium text-gray-900">
+                No support tickets.
+              </span>
+            </div>
+          )}
         </div>
         <div className="px-4 md:flex md:items-center md:justify-between lg:px-8 xl:px-12 float-right pt-5">
           <div className="mt-6 flex space-x-3 md:mt-0">
@@ -534,7 +519,9 @@ export const SupportList = () => {
         file={file}
         setFile={setFile}
         onSubmitClicked={onSubmitClicked}
-        loading={loading} />
+        loading={loading}
+        orders={userOrders}
+      />
     </>
   );
 };

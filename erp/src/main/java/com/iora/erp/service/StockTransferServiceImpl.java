@@ -257,17 +257,20 @@ public class StockTransferServiceImpl implements StockTransferService {
         if (stOrder.getLastStatus() == StockTransferStatusEnum.PICKING) {
             for (StockTransferOrderLI stoli : lineItems) {
                 if (stoli.getProduct().equals(product)) {
+                    if (stoli.getPickedQty() + qty > stoli.getRequestedQty()) {
+                        throw new StockTransferException("You are picking items that are not meant for this order.");
+                    }
                     stoli.setPickedQty(stoli.getPickedQty() + qty);
-                    // boolean picked = true;
-                    // for (StockTransferOrderLI stoli2 : lineItems) {
-                    //     if (stoli2.getPickedQty() < stoli2.getRequestedQty()) {
-                    //         picked = false;
-                    //     }
-                    // }
-                    // if (picked) {
-                    //     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                    //             StockTransferStatusEnum.PICKED));
-                    // }
+                    boolean picked = true;
+                    for (StockTransferOrderLI stoli2 : lineItems) {
+                        if (stoli2.getPickedQty() < stoli2.getRequestedQty()) {
+                            picked = false;
+                        }
+                    }
+                    if (picked) {
+                        stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                                StockTransferStatusEnum.PICKED));
+                    }
 
                     return em.merge(stOrder);
 
@@ -281,16 +284,16 @@ public class StockTransferServiceImpl implements StockTransferService {
                         throw new StockTransferException("You are packing items that are not meant for this order.");
                     } else {
                         stoli.setPackedQty(stoli.getPackedQty() + qty);
-                        // boolean packed = true;
-                        // for (StockTransferOrderLI stoli2 : lineItems) {
-                        //     if (stoli2.getPackedQty() < stoli2.getPickedQty()) {
-                        //         packed = false;
-                        //     }
-                        // }
-                        // if (packed) {
-                        //     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                        //             StockTransferStatusEnum.PACKED));
-                        // }
+                        boolean packed = true;
+                        for (StockTransferOrderLI stoli2 : lineItems) {
+                            if (stoli2.getPackedQty() < stoli2.getPickedQty()) {
+                                packed = false;
+                            }
+                        }
+                        if (packed) {
+                            stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                                    StockTransferStatusEnum.PACKED));
+                        }
                         return em.merge(stOrder);
                     }
                 }
@@ -312,18 +315,21 @@ public class StockTransferServiceImpl implements StockTransferService {
         if (stOrder.getLastStatus() == StockTransferStatusEnum.PICKING) {
             for (StockTransferOrderLI stoli : lineItems) {
                 if (stoli.getProduct().equals(product)) {
+                    if (qty > stoli.getRequestedQty()) {
+                        throw new StockTransferException("You are picking items that are not meant for this order.");
+                    }
                     stoli.setPickedQty(qty);
 
-                    // boolean picked = true;
-                    // for (StockTransferOrderLI stoli2 : lineItems) {
-                    //     if (stoli2.getPickedQty() < stoli2.getRequestedQty()) {
-                    //         picked = false;
-                    //     }
-                    // }
-                    // if (picked) {
-                    //     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                    //             StockTransferStatusEnum.PICKED));
-                    // }
+                    boolean picked = true;
+                    for (StockTransferOrderLI stoli2 : lineItems) {
+                        if (stoli2.getPickedQty() < stoli2.getRequestedQty()) {
+                            picked = false;
+                        }
+                    }
+                    if (picked) {
+                        stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                                StockTransferStatusEnum.PICKED));
+                    }
 
                     return em.merge(stOrder);
 
@@ -337,16 +343,16 @@ public class StockTransferServiceImpl implements StockTransferService {
                         throw new StockTransferException("You are packing items that are not meant for this order.");
                     } else {
                         stoli.setPackedQty(qty);
-                        // boolean packed = true;
-                        // for (StockTransferOrderLI stoli2 : lineItems) {
-                        //     if (stoli2.getPackedQty() < stoli2.getPickedQty()) {
-                        //         packed = false;
-                        //     }
-                        // }
-                        // if (packed) {
-                        //     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                        //             StockTransferStatusEnum.PACKED));
-                        // }
+                        boolean packed = true;
+                        for (StockTransferOrderLI stoli2 : lineItems) {
+                            if (stoli2.getPackedQty() < stoli2.getPickedQty()) {
+                                packed = false;
+                            }
+                        }
+                        if (packed) {
+                            stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                                    StockTransferStatusEnum.PACKED));
+                        }
                         return em.merge(stOrder);
                     }
                 }
@@ -422,17 +428,20 @@ public class StockTransferServiceImpl implements StockTransferService {
 
         for (StockTransferOrderLI stoli : lineItems) {
             if (stoli.getProduct().equals(product)) {
+                if (qty > stoli.getPackedQty()) {
+                    throw new StockTransferException("You are receiving items that are not meant for this order.");
+                }
                 stoli.setReceivedQty(stoli.getReceivedQty() + qty);
-                // boolean picked = true;
-                // for (StockTransferOrderLI stoli2 : lineItems) {
-                //     if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
-                //         picked = false;
-                //     }
-                // }
-                // if (picked) {
-                //     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                //             StockTransferStatusEnum.COMPLETED));
-                // }
+                boolean picked = true;
+                for (StockTransferOrderLI stoli2 : lineItems) {
+                    if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
+                        picked = false;
+                    }
+                }
+                if (picked) {
+                    stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                            StockTransferStatusEnum.COMPLETED));
+                }
                 try {
                     siteService.addProducts(stOrder.getToSite().getId(), product.getSku(), qty);
                 } catch (NoStockLevelException e) {
@@ -460,16 +469,16 @@ public class StockTransferServiceImpl implements StockTransferService {
         for (StockTransferOrderLI stoli : lineItems) {
             if (stoli.getProduct().equals(product)) {
                 stoli.setReceivedQty(qty);
-                // boolean picked = true;
-                // for (StockTransferOrderLI stoli2 : lineItems) {
-                //     if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
-                //         picked = false;
-                //     }
-                // }
-                // if (picked) {
-                //     stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
-                //             StockTransferStatusEnum.COMPLETED));
-                // }
+                /* boolean picked = true;
+                for (StockTransferOrderLI stoli2 : lineItems) {
+                    if (stoli2.getReceivedQty() < stoli2.getPickedQty()) {
+                        picked = false;
+                    }
+                }
+                if (picked) {
+                    stOrder.addStatusHistory(new STOStatus(stOrder.getLastActor(), new Date(),
+                            StockTransferStatusEnum.COMPLETED));
+                } */
                 try {
                     siteService.addProducts(stOrder.getToSite().getId(), product.getSku(), qty);
                 } catch (NoStockLevelException e) {

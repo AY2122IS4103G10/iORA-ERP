@@ -13,20 +13,20 @@ import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iora.erp.enumeration.ParcelSize;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
-// import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
+import com.iora.erp.model.product.Model;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
-// import com.iora.erp.service.EasyPostService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StripeService;
@@ -74,7 +74,7 @@ public class OnlineCustomerController {
 
     /*
      * ---------------------------------------------------------
-     * G.1 Customer Purchase Management
+     * Customer Purchase Management
      * ---------------------------------------------------------
      */
 
@@ -148,6 +148,17 @@ public class OnlineCustomerController {
     public ResponseEntity<Object> editProfile(@RequestBody Customer customer) {
         try {
             return ResponseEntity.ok(customerService.updateCustomerAccount(customer));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/profile/password/{id}/{oldPassword}/{newPassword}", produces = "application/json")
+    public ResponseEntity<Object> changePassword(@PathVariable Long id, @PathVariable String oldPassword,
+            @PathVariable String newPassword) {
+        try {
+            return ResponseEntity.ok(customerService.updateCustomerPassword(id, oldPassword, newPassword));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
@@ -252,6 +263,31 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/order/site/{siteId}", produces = "application/json")
+    public List<OnlineOrder> getOnlineOrdersOfSite(@PathVariable Long siteId) {
+        Site site = siteService.getSite(siteId);
+        return customerOrderService.getOnlineOrdersOfSite(site);
+    }
+
+    @GetMapping(path = "/order/status/{status}", produces = "application/json")
+    public ResponseEntity<Object> getOnlineOrdersByStatus(@PathVariable String status) {
+        try {
+            return ResponseEntity.ok(customerOrderService.getOnlineOrdersByStatus(status));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/order/{siteId}/{status}", produces = "application/json")
+    public ResponseEntity<Object> getOOBySiteStatus(@PathVariable Long siteId, @PathVariable String status) {
+        try {
+            return ResponseEntity.ok(customerOrderService.getOOBySiteStatus(siteId, status));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/searchOrder/{siteId}", produces = "application/json")
     public List<OnlineOrder> searchOnlineOrders(@PathVariable Long siteId, @RequestParam String orderId) {
         return customerOrderService.searchOnlineOrders(siteId, (orderId == "") ? null : Long.parseLong(orderId));
@@ -292,7 +328,15 @@ public class OnlineCustomerController {
         }
     }
 
-    // Haven't get into making it work
+    @PutMapping(path = "/customer/cancel/{orderId}/{customerId}", produces = "application/json")
+    public ResponseEntity<Object> customerCancelancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long customerId) {
+        try {
+            return ResponseEntity.ok(customerOrderService.customerCancelOnlineOrder(orderId, customerId));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "/cancel/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> cancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {
@@ -311,10 +355,32 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/pickingList", produces = "application/json")
-    public ResponseEntity<Object> getPickingList() {
+    @GetMapping(path = "/pickingList/{siteId}", produces = "application/json")
+    public ResponseEntity<Object> getPickingList(@PathVariable Long siteId) {
         try {
-            return ResponseEntity.ok(customerOrderService.getPickingList());
+            return ResponseEntity.ok(customerOrderService.getPickingList(siteId));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/startPick", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> startPick(@RequestBody List<Long> orderIds) {
+        try {
+            customerOrderService.startPick(orderIds);
+            return ResponseEntity.ok().build();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/finishPick", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> finishPick(@RequestBody List<Long> orderIds) {
+        try {
+            customerOrderService.finishPick(orderIds);
+            return ResponseEntity.ok().build();
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -343,8 +409,14 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(customerOrderService.adjustProduct(orderId, sku, qty));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
+    }
+
+    @GetMapping(path = "/order/parcelSize", produces = "application/json")
+    public List<ParcelSize> getParcelSize() {
+        return customerOrderService.getParcelSizes();
     }
 
     @PutMapping(path = "/deliver/{orderId}", produces = "application/json")
@@ -352,7 +424,8 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(customerOrderService.deliverOnlineOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -361,7 +434,8 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(customerOrderService.deliverMultipleOnlineOrder(orderId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -370,7 +444,8 @@ public class OnlineCustomerController {
         try {
             return ResponseEntity.ok(customerOrderService.receiveOnlineOrder(orderId, siteId));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 
@@ -383,8 +458,12 @@ public class OnlineCustomerController {
         }
     }
 
-    // Get models by fashion line (iORA) and tag (top)
-    // Return empty list if no results
+    /*
+     * ---------------------------------------------------------
+     * Ecommerce
+     * ---------------------------------------------------------
+     */
+
     @GetMapping(path = "/public/model/tag/{company}/{tag}", produces = "application/json")
     public ResponseEntity<Object> getModelsByCompanyAndTag(@PathVariable String company, @PathVariable String tag) {
         try {
@@ -394,8 +473,6 @@ public class OnlineCustomerController {
         }
     }
 
-    // Get models by tag (top)
-    // Return empty list if no results
     @GetMapping(path = "/public/model/tag/{tag}", produces = "application/json")
     public ResponseEntity<Object> getModelsByTag(@PathVariable String tag) {
         try {
@@ -405,8 +482,6 @@ public class OnlineCustomerController {
         }
     }
 
-    // Get models by category (2 FOR S$49 / IORA NEW ARRIVALS)
-    // Return empty list if no results
     @GetMapping(path = "/public/model/category/{category}", produces = "application/json")
     public ResponseEntity<Object> getModelsByCategory(@PathVariable String category) {
         try {
@@ -432,6 +507,11 @@ public class OnlineCustomerController {
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    @GetMapping(path = "/public/modelSearch", produces = "application/json")
+    public List<Model> searchModelsByName(@RequestParam String name) {
+        return productService.searchModelsByName(name);
     }
 
     @PostMapping(path = "/public/model/skulist", produces = "application/json")

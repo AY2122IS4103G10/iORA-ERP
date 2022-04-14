@@ -16,14 +16,11 @@ import {
   RefundTable,
   VoucherTable,
 } from "../../POS/OrderDetails";
+import { Link } from "react-router-dom";
 
-const ItemTable = ({ data }) => {
+const ItemTable = ({ data, subsys }) => {
   const columns = useMemo(
     () => [
-      {
-        Header: "#",
-        accessor: "id",
-      },
       {
         Header: "SKU",
         accessor: "product.sku",
@@ -31,6 +28,18 @@ const ItemTable = ({ data }) => {
       {
         Header: "Name",
         accessor: "product.name",
+        Cell: (e) => {
+          return subsys === "sm" ? (
+            <Link
+              to={`/sm/products/${e.row.original.product.modelCode}`}
+              className="hover:underline"
+            >
+              {e.value}
+            </Link>
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Color",
@@ -50,7 +59,7 @@ const ItemTable = ({ data }) => {
         accessor: "qty",
       },
     ],
-    []
+    [subsys]
   );
 
   return (
@@ -67,6 +76,7 @@ const ItemTable = ({ data }) => {
 };
 
 const OrderDetailsBody = ({
+  subsys,
   history,
   dateTime,
   delivery,
@@ -74,7 +84,6 @@ const OrderDetailsBody = ({
   customer,
   totalAmount,
   payments,
-  paid,
   pickupSite,
   country,
   lineItems,
@@ -83,6 +92,7 @@ const OrderDetailsBody = ({
   refundedLIs,
   exchangedLIs,
   voucher,
+  site,
 }) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
@@ -105,6 +115,25 @@ const OrderDetailsBody = ({
             </div>
             <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
               <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
+                {site && delivery === undefined && (
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Puchased at
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      <address className="not-italic">
+                        <span className="block">{site.name}</span>
+                        <span className="block">{site.address.road}</span>
+                        <span className="block">
+                          {site.address.city},{" "}
+                          {site.address.postalCode}
+                        </span>
+                        <span className="block">{site.phoneNumber}</span>
+                      </address>
+                    </dd>
+                  </div>
+                )}
+
                 {status && (
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">
@@ -116,7 +145,7 @@ const OrderDetailsBody = ({
 
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
-                    Date Created
+                    Date
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     {moment(dateTime).format("DD/MM/YYYY, H:mm:ss")}
@@ -129,9 +158,17 @@ const OrderDetailsBody = ({
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     <address className="not-italic">
-                      <span className="block">
-                        {customer.firstName} {customer.lastName}
-                      </span>
+                      {subsys === "sm" ? (
+                        <Link to={`/sm/customers/${customer.id}`}>
+                          <span className="block hover:underline">
+                            {customer.firstName} {customer.lastName}
+                          </span>
+                        </Link>
+                      ) : (
+                        <span className="block">
+                          {customer.firstName} {customer.lastName}
+                        </span>
+                      )}
                       <span className="block">{customer.email}</span>
                       <span className="block">{customer.contactNumber}</span>
                     </address>
@@ -206,14 +243,7 @@ const OrderDetailsBody = ({
                   </dt>
 
                   <dd className="mt-1 text-sm text-gray-900">
-                    {totalAmount.toFixed(2)}
-                  </dd>
-                </div>
-
-                <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Paid</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {paid ? "YES" : "NO"}
+                    ${totalAmount.toFixed(2)}
                   </dd>
                 </div>
 
@@ -239,7 +269,9 @@ const OrderDetailsBody = ({
         <section aria-labelledby="line-items">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="md:col-span-2">
-              {Boolean(lineItems?.length) && <ItemTable data={lineItems} />}
+              {Boolean(lineItems?.length) && (
+                <ItemTable data={lineItems} subsys={subsys} />
+              )}
             </div>
             {Boolean(promotions?.length) && <PromoTable data={promotions} />}
             {voucher && <VoucherTable data={[voucher]} />}
@@ -256,13 +288,13 @@ const OrderDetailsBody = ({
 
 export const CustomerOrderDetails = () => {
   const {
+    subsys,
     dateTime,
     customer,
     delivery,
     deliveryAddress,
     totalAmount,
     payments,
-    paid,
     pickupSite,
     country,
     status,
@@ -272,9 +304,10 @@ export const CustomerOrderDetails = () => {
     refundedLIs,
     exchangedLIs,
     voucher,
+    site,
   } = useOutletContext();
   const [history, setHistory] = useState([]);
-
+ 
   useEffect(() => {
     statusHistory !== undefined &&
       fetchAllActionBy(statusHistory).then((data) => {
@@ -307,13 +340,13 @@ export const CustomerOrderDetails = () => {
   }, [statusHistory]);
   return (
     <OrderDetailsBody
+      subsys={subsys}
       dateTime={dateTime}
       customer={customer}
       delivery={delivery}
       deliveryAddress={deliveryAddress}
       totalAmount={totalAmount}
       payments={payments}
-      paid={paid}
       pickupSite={pickupSite}
       country={country}
       status={status.status}
@@ -323,6 +356,7 @@ export const CustomerOrderDetails = () => {
       refundedLIs={refundedLIs}
       exchangedLIs={exchangedLIs}
       voucher={voucher}
+      site={site}
     />
   );
 };

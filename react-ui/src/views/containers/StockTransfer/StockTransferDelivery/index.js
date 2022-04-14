@@ -26,7 +26,7 @@ const DeliveryList = ({
   onCompleteClicked,
   order,
   userSiteId,
-  onSaveQuanityClicked,
+  onSaveQuantityClicked,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
@@ -37,7 +37,7 @@ const DeliveryList = ({
     };
 
     const handleSaveRow = (rowIndex, obj) => {
-      onSaveQuanityClicked(rowIndex, obj.product.sku, obj.receivedQty);
+      onSaveQuantityClicked(rowIndex, obj.product.sku, obj.receivedQty);
     };
     const updateMyData = (rowIndex, columnId, value) => {
       setSkipPageReset(true);
@@ -125,7 +125,7 @@ const DeliveryList = ({
         },
       },
     ];
-  }, [status, onSaveQuanityClicked, setData]);
+  }, [status, onSaveQuantityClicked, setData]);
   const hiddenColumns =
     order.toSite.id !== userSiteId ||
     ["DELIVERING", "DELIVERING_MULTIPLE"].every((s) => s !== status)
@@ -260,7 +260,7 @@ export const StockTransferDelivery = () => {
     }
     setSearch(e.target.value);
   };
-  const onSaveQuanityClicked = async (_, sku, qty) => {
+  const onSaveQuantityClicked = async (_, sku, qty) => {
     await dispatch(adjustAtTo({ orderId: order.id, sku, qty }))
       .unwrap()
       .then(() => {
@@ -343,7 +343,7 @@ export const StockTransferDelivery = () => {
                 openConfirmModal={openConfirmModal}
                 order={order}
                 userSiteId={userSiteId}
-                onSaveQuanityClicked={onSaveQuanityClicked}
+                onSaveQuantityClicked={onSaveQuantityClicked}
               />
             </section>
           )}

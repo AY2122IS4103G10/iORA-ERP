@@ -2,13 +2,14 @@ package com.iora.erp.data;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -90,7 +91,7 @@ public class DataLoader implements CommandLineRunner {
 		}
 	}
 
-	// Insert Data-Init here
+	// Data Initialisation
 	private void loadData() throws Exception {
 		// Singapore
 		Address a1 = new Address(CountryEnum.Singapore, "Singapore", "Enterprise 10", "Singapore", "NIL",
@@ -421,13 +422,6 @@ public class DataLoader implements CommandLineRunner {
 				"345678", "+86 123 456 7890", iora);
 		em.persist(m1);
 
-		/*
-		 * Currency rm = new Currency("RM", "Malaysian Ringgit", Country.Malaysia);
-		 * Currency sgd = new Currency("SGD", "Singapore Dollar", Country.Singapore);
-		 * em.persist(rm);
-		 * em.persist(sgd);
-		 */
-
 		// Adding birthday points and membership tiers
 		BirthdayPoints bday = new BirthdayPoints("STANDARD", 200, 1, 2.00);
 		em.persist(bday);
@@ -446,92 +440,100 @@ public class DataLoader implements CommandLineRunner {
 		c1.setContactNumber("83940775");
 		c1.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c1.setEmail("hongpeiisrandom@gmail.com");
-		c1.setPassword("password");
-		Customer cc1 = customerService.createCustomerAccount(c1);
+		c1.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c1.setPassword(passwordEncoder.encode("password"));
+		em.persist(c1);
 		DeliveryAddress da1 = new DeliveryAddress("HongPei", "313 Sembawang Drive", "#12-220", "Singapore", "750313",
 				"",
 				CountryEnum.Singapore,
 				"83940775");
 		em.persist(da1);
-		cc1.setAddress(da1);
+		c1.setAddress(da1);
 
 		Customer c2 = new Customer("Delven", "Wong");
 		c2.setContactNumber("92711363");
 		c2.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c2.setEmail("pengyu_33@msn.com");
-		c2.setPassword("password");
-		c2.setMembershipPoints(200);
-		Customer cc2 = customerService.createCustomerAccount(c2);
+		c2.setPassword(passwordEncoder.encode("password"));
+		c2.setMembershipPoints(200d);
+		em.persist(c2);
 		DeliveryAddress da2 = new DeliveryAddress("Remus", "252 Jurong East Street 24", "#02-120", "Singapore",
 				"600252", "",
 				CountryEnum.Singapore,
 				"92711363");
 		em.persist(da2);
-		cc2.setAddress(da2);
+		c2.setAddress(da2);
 
 		Customer c3 = new Customer("Adeline", "Tan");
 		c3.setContactNumber("93834898");
 		c3.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c3.setEmail("tan.adelinejy@gmail.com");
-		c3.setPassword("password");
-		Customer cc3 = customerService.createCustomerAccount(c3);
+		c3.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c3.setPassword(passwordEncoder.encode("password"));
+		em.persist(c3);
 		DeliveryAddress da3 = new DeliveryAddress("Ade", "413 Serangoon Central", "#06-260", "Singapore", "550413", "",
 				CountryEnum.Singapore,
 				"93834898");
 		em.persist(da3);
-		cc3.setAddress(da3);
+		c3.setAddress(da3);
 
 		Customer c4 = new Customer("Louis", "Misson");
 		c4.setContactNumber("98550432");
 		c4.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c4.setEmail("louismisson8@gmail.com");
-		c4.setPassword("password");
-		Customer cc4 = customerService.createCustomerAccount(c4);
+		c4.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c4.setPassword(passwordEncoder.encode("password"));
+		em.persist(c4);
 		DeliveryAddress da4 = new DeliveryAddress("Louis", "307 Clementi Avenue 4", "#10-180", "Singapore", "120307",
 				"",
 				CountryEnum.Singapore,
 				"98550432");
 		em.persist(da4);
-		cc4.setAddress(da4);
+		c4.setAddress(da4);
 
 		Customer c5 = new Customer("Remus", "Kwan");
 		c5.setContactNumber("90556630");
 		c5.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c5.setEmail("remuskwan23@gmail.com");
-		c5.setPassword("password");
-		Customer cc5 = customerService.createCustomerAccount(c5);
+		c5.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c5.setPassword(passwordEncoder.encode("password"));
+		em.persist(c5);
 		DeliveryAddress da5 = new DeliveryAddress("Remus", "75A Redhill Rd, Block 75A", "#15-210", "Singapore",
 				"151075", "",
 				CountryEnum.Singapore,
 				"90556630");
 		em.persist(da5);
-		cc5.setAddress(da5);
+		c5.setAddress(da5);
 
 		Customer c6 = new Customer("Ruth", "Chong");
 		c6.setContactNumber("86065278");
 		c6.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c6.setEmail("ruth.cjn@gmail.com");
-		c6.setPassword("password");
-		Customer cc6 = customerService.createCustomerAccount(c6);
+		c6.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c6.setPassword(passwordEncoder.encode("password"));
+		em.persist(c6);
 		DeliveryAddress da6 = new DeliveryAddress("Ruth", "503 Hougang Ave 8, Block 503", "#16-320", "Singapore",
 				"530503", "",
 				CountryEnum.Singapore,
 				"86065278");
 		em.persist(da6);
-		cc6.setAddress(da6);
+		c6.setAddress(da6);
 
 		Customer c7 = new Customer("Steven", "Lim");
 		c7.setContactNumber("91234567");
 		c7.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c7.setEmail("iorasalesmail@gmail.com");
-		c7.setPassword("password");
-		customerService.createCustomerAccount(c7);
+		c7.setMembershipTier(customerService.findMembershipTierById("BASIC"));
+		c7.setPassword(passwordEncoder.encode("password"));
+		em.persist(c7);
 
 		// Generate 10 $10 vouchers
-		customerService.generateVouchers("dataLoader", 10d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"), null, 10);
+		customerService.generateVouchers("dataLoader", 10d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"),
+				null, 10);
 
 		// Generate 10 $5 vouchers
-		customerService.generateVouchers("dataLoader", 5d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"), null, 10);
+		customerService.generateVouchers("dataLoader", 5d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"), null,
+				10);
 
 		// Adding Promotions
 		PromotionField pf1 = new PromotionField("category", "2 FOR S$ 29", 2, List.of(0.00, 0.00), List.of(14.5, 14.5),
@@ -612,21 +614,60 @@ public class DataLoader implements CommandLineRunner {
 		}
 
 		// ProcurementOrders
-		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("BBV0010201H-1"), 50);
+		Map<Long, Integer> siteQ1 = new HashMap<>();
+		siteQ1.put(4L, 25);
+		siteQ1.put(5L, 25);
+		ProcurementOrderLI poli1 = new ProcurementOrderLI(productService.getProduct("BBV0010201H-1"), siteQ1);
 		poli1.setCostPrice(1d);
 		em.persist(poli1);
-		ProcurementOrderLI poli2 = new ProcurementOrderLI(productService.getProduct("ASK0009709Y-2"), 30);
+		Map<Long, Integer> siteQ2 = new HashMap<>();
+		siteQ2.put(4L, 15);
+		siteQ2.put(5L, 15);
+		ProcurementOrderLI poli2 = new ProcurementOrderLI(productService.getProduct("ASK0009709Y-2"), siteQ2);
 		poli2.setCostPrice(1d);
 		em.persist(poli2);
-		ProcurementOrderLI poli3 = new ProcurementOrderLI(productService.getProduct("AKB0009339J-3"), 45);
+		Map<Long, Integer> siteQ3 = new HashMap<>();
+		siteQ3.put(4L, 10);
+		siteQ3.put(5L, 15);
+		ProcurementOrderLI poli3 = new ProcurementOrderLI(productService.getProduct("AKB0009339J-3"), siteQ3);
 		poli3.setCostPrice(1d);
 		em.persist(poli3);
-		ProcurementOrderLI poli4 = new ProcurementOrderLI(productService.getProduct("ASK0007868Y-1"), 75);
+		Map<Long, Integer> siteQ4 = new HashMap<>();
+		siteQ4.put(4L, 40);
+		siteQ4.put(5L, 35);
+		ProcurementOrderLI poli4 = new ProcurementOrderLI(productService.getProduct("ASK0007868Y-1"), siteQ4);
 		poli4.setCostPrice(1d);
 		em.persist(poli4);
-		ProcurementOrderLI poli5 = new ProcurementOrderLI(productService.getProduct("AB0008084Y-A-2"), 70);
+		Map<Long, Integer> siteQ5 = new HashMap<>();
+		siteQ5.put(4L, 35);
+		siteQ5.put(5L, 35);
+		ProcurementOrderLI poli5 = new ProcurementOrderLI(productService.getProduct("ASK0008072Y-2"), siteQ5);
 		poli5.setCostPrice(1d);
 		em.persist(poli5);
+		Map<Long, Integer> siteQ6 = new HashMap<>();
+		siteQ6.put(4L, 20);
+		siteQ6.put(5L, 20);
+		ProcurementOrderLI poli6 = new ProcurementOrderLI(productService.getProduct("ASK0008072Y-1"), siteQ6);
+		poli6.setCostPrice(1d);
+		em.persist(poli6);
+		Map<Long, Integer> siteQ7 = new HashMap<>();
+		siteQ7.put(4L, 15);
+		siteQ7.put(5L, 15);
+		ProcurementOrderLI poli7 = new ProcurementOrderLI(productService.getProduct("AB0008084Y-A-2"), siteQ7);
+		poli7.setCostPrice(1d);
+		em.persist(poli7);
+		Map<Long, Integer> siteQ8 = new HashMap<>();
+		siteQ8.put(4L, 13);
+		siteQ8.put(5L, 12);
+		ProcurementOrderLI poli8 = new ProcurementOrderLI(productService.getProduct("AB0008084Y-A-3"), siteQ8);
+		poli8.setCostPrice(1d);
+		em.persist(poli8);
+		Map<Long, Integer> siteQ9 = new HashMap<>();
+		siteQ9.put(4L, 20);
+		siteQ9.put(5L, 15);
+		ProcurementOrderLI poli9 = new ProcurementOrderLI(productService.getProduct("AB0008084Y-A-4"), siteQ9);
+		poli9.setCostPrice(1d);
+		em.persist(poli9);
 
 		ProcurementOrder po1 = new ProcurementOrder();
 		po1.setHeadquarters(siteService.getSite(1L));
@@ -647,6 +688,24 @@ public class DataLoader implements CommandLineRunner {
 		po2.addLineItem(poli5);
 		procurementService.createProcurementOrder(po2, 1L);
 
+		ProcurementOrder po3 = new ProcurementOrder();
+		po3.setHeadquarters(siteService.getSite(1L));
+		po3.setManufacturing(siteService.getSite(22L));
+		po3.setWarehouse(siteService.getSite(2L));
+		po3.setNotes("Stay safe and thank you :)");
+		po3.addLineItem(poli6);
+		po3.addLineItem(poli7);
+		procurementService.createProcurementOrder(po3, 1L);
+
+		ProcurementOrder po4 = new ProcurementOrder();
+		po4.setHeadquarters(siteService.getSite(1L));
+		po4.setManufacturing(siteService.getSite(22L));
+		po4.setWarehouse(siteService.getSite(2L));
+		po4.setNotes("Please refer to the attached files thank you.");
+		po4.addLineItem(poli8);
+		po4.addLineItem(poli9);
+		procurementService.createProcurementOrder(po4, 1L);
+
 		// StockTransferOrders
 		StockTransferOrderLI stoli1 = new StockTransferOrderLI(productService.getProduct("BBV0010199H-1"), 5);
 		em.persist(stoli1);
@@ -658,6 +717,14 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(stoli4);
 		StockTransferOrderLI stoli5 = new StockTransferOrderLI(productService.getProduct("BSK0010245Y-3"), 4);
 		em.persist(stoli5);
+		StockTransferOrderLI stoli6 = new StockTransferOrderLI(productService.getProduct("ASK0009018W-1"), 10);
+		em.persist(stoli6);
+		StockTransferOrderLI stoli7 = new StockTransferOrderLI(productService.getProduct("ASK0009018W-2"), 10);
+		em.persist(stoli7);
+		StockTransferOrderLI stoli8 = new StockTransferOrderLI(productService.getProduct("ASK0009018W-3"), 10);
+		em.persist(stoli8);
+		StockTransferOrderLI stoli9 = new StockTransferOrderLI(productService.getProduct("ASK0009018W-4"), 10);
+		em.persist(stoli9);
 
 		StockTransferOrder sto1 = new StockTransferOrder(siteService.getSite(10L), siteService.getSite(15L));
 		sto1.addLineItem(stoli1);
@@ -670,152 +737,139 @@ public class DataLoader implements CommandLineRunner {
 		sto2.addLineItem(stoli5);
 		stockTransferService.createStockTransferOrder(sto2, 1L);
 
+		StockTransferOrder sto3 = new StockTransferOrder(siteService.getSite(11L), siteService.getSite(7L));
+		sto3.addLineItem(stoli6);
+		sto3.addLineItem(stoli7);
+		stockTransferService.createStockTransferOrder(sto3, 1L);
+
+		StockTransferOrder sto4 = new StockTransferOrder(siteService.getSite(4L), siteService.getSite(9L));
+		sto4.addLineItem(stoli8);
+		sto4.addLineItem(stoli9);
+		stockTransferService.createStockTransferOrder(sto4, 4L);
+
 		// Customer Order
 		CustomerOrderLI coli1 = new CustomerOrderLI();
 		coli1.setProduct(productService.getProduct("AB0010031H-1"));
 		coli1.setQty(1);
-		coli1.setSubTotal(39.0);
+		customerOrderService.createCustomerOrderLI(coli1);
 
 		CustomerOrderLI coli2 = new CustomerOrderLI();
 		coli2.setProduct(productService.getProduct("ASK0009136A-1"));
 		coli2.setQty(2);
-		coli2.setSubTotal(78.0);
+		customerOrderService.createCustomerOrderLI(coli2);
 
 		CustomerOrderLI coli3 = new CustomerOrderLI();
 		coli3.setProduct(productService.getProduct("AB0009153W-1"));
 		coli3.setQty(2);
-		coli3.setSubTotal(98.0);
+		customerOrderService.createCustomerOrderLI(coli3);
 
 		CustomerOrderLI coli4 = new CustomerOrderLI();
 		coli4.setProduct(productService.getProduct("AB0009153W-1"));
-		coli4.setQty(2);
-		coli4.setSubTotal(98.0);
+		coli4.setQty(1);
 		customerOrderService.createCustomerOrderLI(coli4);
 
 		CustomerOrderLI coli5 = new CustomerOrderLI();
 		coli5.setProduct(productService.getProduct("ASK0007868Y-1"));
 		coli5.setQty(1);
-		coli5.setSubTotal(29.0);
 		customerOrderService.createCustomerOrderLI(coli5);
 
 		CustomerOrderLI coli6 = new CustomerOrderLI();
 		coli6.setProduct(productService.getProduct("ASK0010155H-1"));
 		coli6.setQty(1);
-		coli6.setSubTotal(29.0);
 		customerOrderService.createCustomerOrderLI(coli6);
 
 		CustomerOrderLI coli7 = new CustomerOrderLI();
 		coli7.setProduct(productService.getProduct("AB0010059H-1"));
 		coli7.setQty(1);
-		coli7.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli7);
 
 		CustomerOrderLI coli8 = new CustomerOrderLI();
 		coli8.setProduct(productService.getProduct("BBV0010200H-1"));
 		coli8.setQty(1);
-		coli8.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli8);
 
 		CustomerOrderLI coli9 = new CustomerOrderLI();
 		coli9.setProduct(productService.getProduct("BBV0010199H-1"));
 		coli9.setQty(1);
-		coli9.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli9);
 
 		CustomerOrderLI coli10 = new CustomerOrderLI();
 		coli10.setProduct(productService.getProduct("AB0010059H-1"));
 		coli10.setQty(1);
-		coli10.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli10);
 
 		CustomerOrderLI coli11 = new CustomerOrderLI();
 		coli11.setProduct(productService.getProduct("BBV0010200H-1"));
 		coli11.setQty(1);
-		coli11.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli11);
 
 		CustomerOrderLI coli12 = new CustomerOrderLI();
 		coli12.setProduct(productService.getProduct("ASK0009022A-1"));
 		coli12.setQty(1);
-		coli12.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli12);
 
 		CustomerOrderLI coli13 = new CustomerOrderLI();
 		coli13.setProduct(productService.getProduct("BBV0010200H-1"));
 		coli13.setQty(1);
-		coli13.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli13);
 
 		CustomerOrderLI coli14 = new CustomerOrderLI();
 		coli14.setProduct(productService.getProduct("ASK0010265A-1"));
 		coli14.setQty(1);
-		coli14.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli14);
 
 		CustomerOrderLI coli15 = new CustomerOrderLI();
 		coli15.setProduct(productService.getProduct("ASK0010259H-1"));
 		coli15.setQty(1);
-		coli15.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli15);
 
 		CustomerOrderLI coli16 = new CustomerOrderLI();
 		coli16.setProduct(productService.getProduct("ASK0010155H-1"));
 		coli16.setQty(1);
-		coli16.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli16);
 
 		CustomerOrderLI coli17 = new CustomerOrderLI();
 		coli17.setProduct(productService.getProduct("AK0009973J-1"));
 		coli17.setQty(1);
-		coli17.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli17);
 
 		CustomerOrderLI coli18 = new CustomerOrderLI();
 		coli18.setProduct(productService.getProduct("ASK0009770Y-1"));
 		coli18.setQty(1);
-		coli18.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli18);
 
 		CustomerOrderLI coli19 = new CustomerOrderLI();
 		coli19.setProduct(productService.getProduct("AB0009978H-1"));
 		coli19.setQty(1);
-		coli19.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli19);
 
 		CustomerOrderLI coli20 = new CustomerOrderLI();
 		coli20.setProduct(productService.getProduct("AK0009973J-1"));
 		coli20.setQty(1);
-		coli20.setSubTotal(49.0);
 		customerOrderService.createCustomerOrderLI(coli20);
 
-		Payment payment1 = new Payment(127, "241563", PaymentTypeEnum.VISA);
-		customerOrderService.createPayment(payment1);
-
-		Payment payment2 = new Payment(78, "546130", PaymentTypeEnum.MASTERCARD);
-		customerOrderService.createPayment(payment2);
-
-		Payment payment3 = new Payment(77, "981651", PaymentTypeEnum.NETS);
-		customerOrderService.createPayment(payment3);
-
+		siteService.addProducts(4L, "AB0010031H-1", 8);
+		siteService.addProducts(4L, "ASK0009136A-1", 9);
+		siteService.addProducts(4L, "AB0009153W-1", 9);
+		siteService.addProducts(4L, "ASK0007868Y-1", 9);
 		CustomerOrder co1 = new CustomerOrder();
-		co1.setDateTime(new Date());
 		co1.addLineItem(coli4);
 		co1.addLineItem(coli5);
+		Payment payment1 = new Payment(coli4.getSubTotal() + coli5.getSubTotal(), "1-1", PaymentTypeEnum.CASH);
+		em.persist(payment1);
 		co1.addPayment(payment1);
-		co1.setPaid(true);
 		co1.setSite(siteService.getSite(4L));
 		co1.setCustomerId(1L);
 		customerOrderService.createCustomerOrder(co1, null);
-
-		siteService.addProducts(4L, "ASK0010155H-1", 8);
-		siteService.addProducts(4L, "AB0010059H-1", 9);
 		OnlineOrder oo1 = new OnlineOrder(false);
 		oo1.setCustomerId(2L);
 		oo1.setPickupSite((StoreSite) siteService.getSite(4L));
 		oo1.addLineItem(coli1);
 		oo1.addLineItem(coli2);
 		oo1.addLineItem(coli3);
-		oo1.setPaid(true);
+		Payment payment2 = new Payment(coli1.getSubTotal() + coli2.getSubTotal() + coli3.getSubTotal(), "2-1",
+				PaymentTypeEnum.CASH);
+		em.persist(payment2);
 		oo1.addPayment(payment2);
 		DeliveryAddress da = new DeliveryAddress("Work", " 51 Bras Basah Road", "Plaza By The Park", "Singapore",
 				"189554", "", CountryEnum.Singapore, "60981335");
@@ -826,6 +880,8 @@ public class DataLoader implements CommandLineRunner {
 		oo2.setCustomerId(3L);
 		oo2.addLineItem(coli6);
 		oo2.addLineItem(coli7);
+		Payment payment3 = new Payment(coli6.getSubTotal() + coli7.getSubTotal(), "3-1", PaymentTypeEnum.CASH);
+		em.persist(payment3);
 		oo2.addPayment(payment3);
 		oo2.setSite(siteService.getSite(3L));
 		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
@@ -839,6 +895,10 @@ public class DataLoader implements CommandLineRunner {
 		oo3.addLineItem(coli8);
 		oo3.addLineItem(coli9);
 		oo3.addLineItem(coli10);
+		Payment payment4 = new Payment(coli8.getSubTotal() + coli9.getSubTotal() + coli10.getSubTotal(), "4-1",
+				PaymentTypeEnum.CASH);
+		em.persist(payment4);
+		oo3.addPayment(payment4);
 		oo3.setSite(siteService.getSite(3L));
 		oo3.setDeliveryAddress(customerService.getCustomerById(4L).getAddress());
 		customerOrderService.createOnlineOrder(oo3, null);
@@ -847,6 +907,9 @@ public class DataLoader implements CommandLineRunner {
 		oo4.setCustomerId(5L);
 		oo4.addLineItem(coli11);
 		oo4.addLineItem(coli12);
+		Payment payment5 = new Payment(coli11.getSubTotal() + coli12.getSubTotal(), "5-1", PaymentTypeEnum.CASH);
+		em.persist(payment5);
+		oo4.addPayment(payment5);
 		oo4.setSite(siteService.getSite(3L));
 		oo4.setDeliveryAddress(customerService.getCustomerById(5L).getAddress());
 		customerOrderService.createOnlineOrder(oo4, null);
@@ -855,15 +918,22 @@ public class DataLoader implements CommandLineRunner {
 		oo5.setCustomerId(6L);
 		oo5.addLineItem(coli13);
 		oo5.addLineItem(coli14);
+		Payment payment6 = new Payment(coli13.getSubTotal() + coli14.getSubTotal(), "6-1", PaymentTypeEnum.CASH);
+		em.persist(payment6);
+		oo5.addPayment(payment6);
 		oo5.setSite(siteService.getSite(3L));
 		oo5.setDeliveryAddress(customerService.getCustomerById(6L).getAddress());
 		customerOrderService.createOnlineOrder(oo5, null);
 
-		OnlineOrder oo6 = new OnlineOrder(true);
-		oo6.setCustomerId(6L);
+		siteService.editStockLevel(4L, "ASK0010259H-1", 0);
+		OnlineOrder oo6 = new OnlineOrder(false);
+		oo6.setCustomerId(7L);
 		oo6.addLineItem(coli15);
 		oo6.addLineItem(coli16);
-		oo6.setSite(siteService.getSite(3L));
+		Payment payment7 = new Payment(coli15.getSubTotal() + coli16.getSubTotal(), "7-1", PaymentTypeEnum.CASH);
+		em.persist(payment7);
+		oo6.addPayment(payment7);
+		oo6.setPickupSite((StoreSite) siteService.getSite(4L));
 		oo6.setDeliveryAddress(customerService.getCustomerById(6L).getAddress());
 		customerOrderService.createOnlineOrder(oo6, null);
 

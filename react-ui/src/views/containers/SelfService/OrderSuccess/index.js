@@ -3,11 +3,14 @@ import { useStripe } from "@stripe/react-stripe-js";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Barcode from "react-barcode";
+import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { orderApi } from "../../../../environments/Api";
+import { removeSSCustomer } from "../../../../stores/slices/customerSlice";
 
 export default function OrderSuccess({ clientSecret }) {
+  const dispatch = useDispatch();
   const stripe = useStripe();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -40,6 +43,7 @@ export default function OrderSuccess({ clientSecret }) {
 
   useEffect(() => {
     localStorage.removeItem("customer");
+    dispatch(removeSSCustomer());
     orderApi
       .get(id)
       .then(({ data }) => {
@@ -51,7 +55,7 @@ export default function OrderSuccess({ clientSecret }) {
           autoDismiss: true,
         });
       });
-  }, [id, addToast]);
+  }, [id, addToast, dispatch]);
 
   return (
     <main className="bg-white px-4 pt-16 pb-24 sm:px-6 sm:pt-24 lg:px-8 lg:py-32">
@@ -145,9 +149,7 @@ export default function OrderSuccess({ clientSecret }) {
             </div>
           ))}
           {order.promotions?.length > 0 && (
-            <h3 className="text-lg font-medium text-indigo-600">
-              Promotions
-            </h3>
+            <h3 className="text-lg font-medium text-indigo-600">Promotions</h3>
           )}
           {order.promotions?.map((promotion, index) => (
             <div
@@ -181,9 +183,7 @@ export default function OrderSuccess({ clientSecret }) {
           ))}
           {order.voucher && (
             <>
-              <h3 className="text-lg font-medium text-indigo-600">
-                Voucher
-              </h3>
+              <h3 className="text-lg font-medium text-indigo-600">Voucher</h3>
               <div className="grid grid-cols-4 gap-2 w-full">
                 <div className="col-span-3 flex items-center">
                   <h4 className="font-medium text-gray-900">
@@ -195,7 +195,10 @@ export default function OrderSuccess({ clientSecret }) {
                     Discount
                   </dt>
                   <dd className="mt-2 text-gray-700 flex justify-end items-end">
-                    -${Number.parseFloat(-order.voucher?.amount).toFixed(2)}
+                    -$
+                    {Number.parseFloat(Math.abs(order.voucher?.amount)).toFixed(
+                      2
+                    )}
                   </dd>
                 </div>
               </div>

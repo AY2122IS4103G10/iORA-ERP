@@ -59,7 +59,6 @@ export default function ManageCheckout({
       const { data } = await orderApi.createOrder(
         {
           ...order,
-          paid: true,
           payments: [
             {
               amount: amount,

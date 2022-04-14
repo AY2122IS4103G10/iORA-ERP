@@ -1,4 +1,4 @@
-import { useEffect, useMemo} from "react";
+import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -9,24 +9,48 @@ import {
   selectUserSite,
   updateCurrSite,
 } from "../../../../stores/slices/userSlice";
-import { SelectableTable } from "../../../components/Tables/SelectableTable";
+import {
+  SelectableTable,
+  SelectColumnFilter,
+} from "../../../components/Tables/SelectableTable";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
-
-// const convertData = (data) =>
-//   data.products.map((product) => ({
-//     sku: product.sku,
-//     qty: product.qty,
-//     reserve: product.reserveQty,
-//   }));
+import { useState } from "react";
+import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
+import { TailSpin } from "react-loader-spinner";
 
 export const MyStoreStock = (subsys) => {
   const id = useSelector(selectUserSite); //get current store/site user is in
   const dispatch = useDispatch();
   const siteStock = useSelector(selectCurrSiteStock);
+  const stockStatus = useSelector((state) => state.stocklevel.status);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     dispatch(updateCurrSite());
     dispatch(getASiteStock(id));
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (siteStock?.products) {
+      setLoading(true);
+      fetchAllModelsBySkus(siteStock.products).then((data) => {
+        setData(
+          siteStock.products.map((item, index) => ({
+            ...item,
+            product: {
+              ...item.product,
+              modelCode: data[index].modelCode,
+              name: data[index].name,
+              description: data[index].description,
+              imageLinks: data[index].imageLinks,
+            },
+          }))
+        );
+        setLoading(false);
+      });
+    }
+  }, [siteStock?.products]);
 
   const tabs = [
     {
@@ -61,50 +85,61 @@ export const MyStoreStock = (subsys) => {
 
   const path = `/${subsys.subsys}/stocklevels/my`;
 
-  const columns = useMemo(()=> [
-    {
-      Header: "SKU Code",
-      accessor: "sku",
-    },
-    {
-      Header: "Colour",
-      Cell: (row) => {
-        return (
-          row.row.original.product.productFields.find((field) => field.fieldName === 'COLOUR').fieldValue
-        );
-      }
-    },
-    {
-      Header: "Size",
-      Cell: (row) => {
-        return (
-          row.row.original.product.productFields.find((field) => field.fieldName === 'SIZE').fieldValue
-        );
-      }
-    },
+  const columns = useMemo(
+    () => [
+      {
+        Header: "SKU",
+        accessor: "sku",
+      },
+      {
+        Header: "Name",
+        accessor: "product.name",
+      },
+      {
+        Header: "Colour",
+        accessor: (row) => {
+          return row.product.productFields.find(
+            (field) => field.fieldName === "COLOUR"
+          ).fieldValue;
+        },
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Size",
+        accessor: (row) => {
+          return row.product.productFields.find(
+            (field) => field.fieldName === "SIZE"
+          ).fieldValue;
+        },
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
 
-    {
-      Header: "Qty",
-      accessor: "qty",
-    }
-    // {
-    //   Header: "",
-    //   accessor: "accessor",
-    //   disableSortBy: true,
-    //   Cell: (e) => {
-    //     return (
-    //       <div>
-    //         <button
-    //           type="button"
-    //           className="px-3 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-    //         >
-    //           Edit Qty
-    //         </button>
-    //       </div>
-    //     );
-    //   }
-    // }
-  ], []);
+      {
+        Header: "Qty",
+        accessor: "qty",
+      },
+      // {
+      //   Header: "",
+      //   accessor: "accessor",
+      //   disableSortBy: true,
+      //   Cell: (e) => {
+      //     return (
+      //       <div>
+      //         <button
+      //           type="button"
+      //           className="px-3 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+      //         >
+      //           Edit Qty
+      //         </button>
+      //       </div>
+      //     );
+      //   }
+      // }
+    ],
+    []
+  );
 
   return (
     <>
@@ -113,29 +148,31 @@ export const MyStoreStock = (subsys) => {
         tabs={tabs}
         button={<EditStockButton />}
       />
-      {Boolean(siteStock) && (
-        <div className="min-h-full">
-          <main className="py-8 ml-2">
-            <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
-              <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-                {/* Stock Levels*/}
-                <section aria-labelledby="stocks-level">
-                  <div className="ml-2 mr-2">
-                    {siteStock === null ? (
-                      <p>loading</p>
-                    ) : (
+      {stockStatus === "loading" || loading ? (
+        <div className="flex mt-5 items-center justify-center">
+          <TailSpin color="#00BFFF" height={20} width={20} />
+        </div>
+      ) : (
+        Boolean(siteStock) && (
+          <div className="min-h-full">
+            <main className="py-8 ml-2">
+              <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+                <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+                  {/* Stock Levels*/}
+                  <section aria-labelledby="stocks-level">
+                    <div className="ml-2 mr-2">
                       <SelectableTable
                         columns={columns}
-                        data={siteStock?.products}
+                        data={data}
                         path={path}
                       />
-                    )}
-                  </div>
-                </section>
+                    </div>
+                  </section>
+                </div>
               </div>
-            </div>
-          </main>
-        </div>
+            </main>
+          </div>
+        )
       )}
     </>
   );

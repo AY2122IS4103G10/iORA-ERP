@@ -1,4 +1,3 @@
-import { PrinterIcon, XIcon } from "@heroicons/react/outline";
 import { forwardRef } from "react";
 import { useRef } from "react";
 import { useState } from "react";
@@ -6,18 +5,17 @@ import Barcode from "react-barcode";
 import { useReactToPrint } from "react-to-print";
 import { useToasts } from "react-toast-notifications";
 import { productApi } from "../../../../environments/Api";
-import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { fetchAllModelsBySkus } from "../../StockTransfer/StockTransferForm";
+import { RFIDModal } from "../ProductSearch";
 
 export const ProductList = ({
   products,
-  handlePrint,
   openModal,
   onProductSelectedChanged,
-  printQty,
-  onPrintQtyChanged,
+  openRFIDModal,
 }) => {
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-md">
+    <div className="max-h-screen bg-white shadow overflow-auto sm:rounded-md">
       <ul className="divide-y divide-gray-200">
         {products.map((product) => (
           <li key={product.rfid}>
@@ -43,36 +41,17 @@ export const ProductList = ({
                 </div>
 
                 <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
-                  <div>
-                    <div className="mt-1 flex rounded-md shadow-sm">
-                      <div className="relative flex items-stretch flex-grow focus-within:z-10">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">Qty:</span>
-                        </div>
-                        <input
-                          type="number"
-                          name="qty"
-                          id="qty"
-                          min="1"
-                          className="pl-12 focus:ring-cyan-500 focus:border-cyan-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                          value={printQty}
-                          onChange={onPrintQtyChanged}
-                        />
-                      </div>
+                  <div className="flex space-x-4">
+                    <div className="sm:mt-0 sm:ml-5">
                       <button
                         type="button"
-                        className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
-                        onClick={() =>
-                          Promise.resolve(
-                            onProductSelectedChanged(product)
-                          ).then(() => handlePrint())
-                        }
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                        onClick={() => {
+                          onProductSelectedChanged(product);
+                          openRFIDModal();
+                        }}
                       >
-                        <PrinterIcon
-                          className="h-5 w-5 text-gray-400"
-                          aria-hidden="true"
-                        />
-                        <span>Print</span>
+                        View
                       </button>
                     </div>
                   </div>
@@ -112,38 +91,16 @@ export const ProductStickerPrint = forwardRef(({ printQty, product }, ref) => {
   );
 });
 
-const StickerModal = ({ open, closeModal, product }) => {
-  return (
-    <SimpleModal open={open} closeModal={closeModal}>
-      <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:min-w-full sm:p-6 md:min-w-full lg:min-w-fit">
-        <div className="sm:block absolute top-0 right-0 pt-4 pr-4">
-          <button
-            type="button"
-            className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-            onClick={closeModal}
-          >
-            <span className="sr-only">Close</span>
-            <XIcon className="h-6 w-6" aria-hidden="true" />
-          </button>
-        </div>
-        <ProductSticker product={product} />
-      </div>
-    </SimpleModal>
-  );
-};
-
 const ProductRFIDBody = ({
   onSearchClicked,
   search,
   onSearchChanged,
   rfidQty,
   onRfidQtyChanged,
-  printQty,
-  onPrintQtyChanged,
   products,
   openStickerModal,
-  handlePrint,
   onProductSelectedChanged,
+  openRFIDModal,
 }) => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
@@ -205,10 +162,8 @@ const ProductRFIDBody = ({
         <ProductList
           products={products}
           openModal={openStickerModal}
-          handlePrint={handlePrint}
           onProductSelectedChanged={onProductSelectedChanged}
-          printQty={printQty}
-          onPrintQtyChanged={onPrintQtyChanged}
+          openRFIDModal={openRFIDModal}
         />
       </div>
     </div>
@@ -236,7 +191,12 @@ export const ProductRFID = () => {
       const { data } = await productApi.generateRFIDs(map);
       if (data !== "") {
         const prods = products;
-        setProducts(prods.concat(data));
+        const models = await fetchAllModelsBySkus(data);
+        setProducts(
+          prods.concat(
+            data.map((prod, index) => ({ ...prod, ...models[index] }))
+          )
+        );
         setSearch("");
       } else
         addToast(`Error: Product(s) not found.`, {
@@ -253,8 +213,8 @@ export const ProductRFID = () => {
   const onRfidQtyChanged = (e) => setRfidQty(e.target.value);
   const onPrintQtyChanged = (e) => setPrintQty(e.target.value);
 
-  const openStickerModal = () => setOpen(true);
-  const closeStickerModal = () => setOpen(false);
+  const openRFIDModal = () => setOpen(true);
+  const closeRFIDModal = () => setOpen(false);
 
   return (
     <>
@@ -269,16 +229,20 @@ export const ProductRFID = () => {
         printQty={printQty}
         onPrintQtyChanged={onPrintQtyChanged}
         products={products}
-        openStickerModal={openStickerModal}
         handlePrint={handlePrint}
         onProductSelectedChanged={onProductSelectedChanged}
+        openRFIDModal={openRFIDModal}
       />
       {Boolean(productSelected) && (
         <>
-          <StickerModal
+          <RFIDModal
             open={open}
+            closeModal={closeRFIDModal}
             product={productSelected}
-            closeModal={closeStickerModal}
+            printQty={printQty}
+            onPrintQtyChanged={onPrintQtyChanged}
+            onProductSelectedChanged={onProductSelectedChanged}
+            handlePrint={handlePrint}
           />
           <div className="hidden">
             <ProductStickerPrint

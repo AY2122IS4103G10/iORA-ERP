@@ -21,7 +21,7 @@ export const StockTransferSearch = ({ subsys }) => {
         if (subsys === "lg") {
           if (
             currSiteId !== fromSite.id ||
-            statusHistory[statusHistory.length - 1].status ===
+            statusHistory[statusHistory.length - 1].status !==
               "READY_FOR_DELIVERY"
           )
             throw new Error("Not authorised to view order.");
@@ -31,10 +31,17 @@ export const StockTransferSearch = ({ subsys }) => {
         }
         navigate(pathname.replace("search", id));
       } catch (error) {
-        addToast(`Error: ${error.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        });
+        addToast(
+          `Error: ${
+            error.response !== undefined
+              ? error.response.data
+              : error.message
+          }`,
+          {
+            appearance: "error",
+            autoDismiss: true,
+          }
+        );
         setSearch("");
       }
     };

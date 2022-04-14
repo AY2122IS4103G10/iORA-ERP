@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom";
 import { NavBar } from "../../../components/NavBar";
 import { SideBar } from "../../../components/SideBar";
 import {
-  CogIcon,
   UserIcon,
   HomeIcon,
   QuestionMarkCircleIcon,
@@ -13,7 +12,6 @@ import {
 const navigation = [
   { name: "Home", href: "/home", icon: HomeIcon },
   { name: "Account", href: "/account", icon: UserIcon },
-  { name: "Settings", href: "/account/settings", icon: CogIcon },
 ];
 
 const secondaryNavigation = [

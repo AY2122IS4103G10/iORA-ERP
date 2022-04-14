@@ -413,6 +413,7 @@ export const SupportList = () => {
       customer: {
         id: user?.id,
       },
+      customerOrder: {id : order}
     };
 
     const image = new FormData();
@@ -478,7 +479,17 @@ export const SupportList = () => {
           <h1 className="text-3xl text-center font-bold text-gray-900 pt-5 pb-5">
             Your Support Tickets
           </h1>
-
+          <div className="px-4 md:flex md:items-center md:justify-end lg:px-8 xl:px-12 pt-5">
+            <div className="mt-6 flex space-x-3 md:mt-0">
+              <button
+                type="button"
+                className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
+                onClick={() => setOpenNewTicket(true)}
+              >
+                <span>Create a New Ticket</span>
+              </button>
+            </div>
+          </div>
           {userTickets.length ? (
             <SupportTicketTable
               data={userTickets}
@@ -492,17 +503,6 @@ export const SupportList = () => {
               </span>
             </div>
           )}
-        </div>
-        <div className="px-4 md:flex md:items-center md:justify-between lg:px-8 xl:px-12 float-right pt-5">
-          <div className="mt-6 flex space-x-3 md:mt-0">
-            <button
-              type="button"
-              className="ml-3 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
-              onClick={() => setOpenNewTicket(true)}
-            >
-              <span>Create a New Ticket</span>
-            </button>
-          </div>
         </div>
       </div>
       <SupportTicketModal

@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/outline";
 import { Fragment, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../../stores/slices/userSlice";
 import { classNames } from "../../../utilities/Util";
 import { Notifications } from "../../components/Notifications";
@@ -59,9 +59,8 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
               <Menu.Button className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
                 <img
                   className="h-8 w-8 rounded-full"
-                  src={`https://randomuser.me/api/portraits/${
-                    user?.id % 2 === 0 ? "wo" : ""
-                  }men/${user?.id}.jpg`}
+                  src={`https://randomuser.me/api/portraits/${user?.id % 2 === 0 ? "wo" : ""
+                    }men/${user?.id}.jpg`}
                   alt=""
                 />
                 <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
@@ -86,28 +85,28 @@ export const NavBar = ({ setSidebarOpen, badge }) => {
               <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <Menu.Item>
                   {({ active }) => (
-                    <a
-                      href="/account"
+                    <Link
+                      to="/account"
                       className={classNames(
                         active ? "bg-gray-100" : "",
                         "block px-4 py-2 text-sm text-gray-700"
                       )}
                     >
                       Your Profile
-                    </a>
+                    </Link>
                   )}
                 </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
-                    <a
-                      href="/account/settings"
+                    <Link
+                      to="/account/edit"
                       className={classNames(
                         active ? "bg-gray-100" : "",
                         "block px-4 py-2 text-sm text-gray-700"
                       )}
                     >
                       Settings
-                    </a>
+                    </Link>
                   )}
                 </Menu.Item>
                 <Menu.Item>

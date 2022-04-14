@@ -1,6 +1,7 @@
 package com.iora.erp.controller;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.site.Site;
@@ -25,12 +27,17 @@ import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
 import com.iora.erp.service.ProductService;
+import com.iora.erp.service.ShippItService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StripeService;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,8 +46,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("online")
@@ -56,6 +65,10 @@ public class OnlineCustomerController {
     private SiteService siteService;
     @Autowired
     StripeService stripeService;
+    @Autowired
+    private ShippItService shippIt;
+    @Autowired
+    private RestTemplate restTemplate;
 
     /*
      * ---------------------------------------------------------
@@ -314,7 +327,8 @@ public class OnlineCustomerController {
     }
 
     @PutMapping(path = "/customer/cancel/{orderId}/{customerId}", produces = "application/json")
-    public ResponseEntity<Object> customerCancelancelOnlineOrder(@PathVariable Long orderId, @PathVariable Long customerId) {
+    public ResponseEntity<Object> customerCancelancelOnlineOrder(@PathVariable Long orderId,
+            @PathVariable Long customerId) {
         try {
             return ResponseEntity.ok(customerOrderService.customerCancelOnlineOrder(orderId, customerId));
         } catch (Exception ex) {
@@ -389,7 +403,7 @@ public class OnlineCustomerController {
     }
 
     @PutMapping(path = "/order/{orderId}/{sku}/{qty}", produces = "application/json")
-    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku,
+    public ResponseEntity<Object> todeliverOnlineOrder(@PathVariable Long orderId, @PathVariable String sku,
             @PathVariable int qty) {
         try {
             return ResponseEntity.ok(customerOrderService.adjustProduct(orderId, sku, qty));
@@ -404,13 +418,14 @@ public class OnlineCustomerController {
         return customerOrderService.getParcelSizes();
     }
 
-    @PutMapping(path = "/deliver/{orderId}", produces = "application/json")
-    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId) {
+    @RequestMapping(value = "/order", method = RequestMethod.POST)
+    public ResponseEntity<Object> deliverOnlineOrder() {
         try {
-            return ResponseEntity.ok(customerOrderService.deliverOnlineOrder(orderId));
+
+            return ResponseEntity.ok(shippIt.deliveryOrder());
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 

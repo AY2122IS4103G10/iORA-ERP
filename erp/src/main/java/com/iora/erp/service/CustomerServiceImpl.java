@@ -59,10 +59,10 @@ public class CustomerServiceImpl implements CustomerService {
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
             customer.setMembershipTier(findMembershipTierById("BASIC"));
-            String password = RandomString.make(40);
+            String password = RandomString.make(10);
             customer.setPassword(passwordEncoder.encode(password));
             em.persist(customer);
-            emailService.sendCustomerPasswordCreation(customer, password);
+            // emailService.sendCustomerPasswordCreation(customer, password);
             return customer;
         }
     }

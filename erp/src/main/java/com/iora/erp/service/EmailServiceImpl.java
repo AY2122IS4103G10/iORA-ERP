@@ -81,7 +81,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendCustomerPasswordCreation(Customer customer, String tempPassword) {
-
         String text = "Thank you for signing up with iORA! Please login and change your password immediately.";
         sendSimpleHTMLMessage(
                 customer.getEmail(),

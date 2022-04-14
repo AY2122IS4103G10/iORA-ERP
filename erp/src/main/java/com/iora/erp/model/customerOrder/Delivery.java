@@ -17,37 +17,19 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String parcelID;
-    private String shipmentID;
-    private Integer quantity;
+    private String deliveryID;
+    private String trackingID;
     private Date dateTime;
     private Long siteId;
 
     @Enumerated(EnumType.STRING)
     private ParcelSize ps;
 
-    public Delivery(Integer quantity, String parcelSize) {
-        this.quantity = quantity;
+    public Delivery(String parcelSize) {
         this.ps = ParcelSize.valueOf(parcelSize);
     }
 
     public Delivery() {
-    }
-
-    public String getParcelID() {
-        return parcelID;
-    }
-
-    public void setParcelID(String parcelID) {
-        this.parcelID = parcelID;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
     }
 
     public Long getId() {
@@ -66,14 +48,6 @@ public class Delivery {
         this.ps = ps;
     }
 
-    public String getShipmentID() {
-        return shipmentID;
-    }
-
-    public void setShipmentID(String shipmentID) {
-        this.shipmentID = shipmentID;
-    }
-
     public Date getDateTime() {
         return dateTime;
     }
@@ -88,6 +62,22 @@ public class Delivery {
 
     public void setSiteId(Long siteId) {
         this.siteId = siteId;
+    }
+
+    public String getDeliveryID() {
+        return deliveryID;
+    }
+
+    public void setDeliveryID(String deliveryID) {
+        this.deliveryID = deliveryID;
+    }
+
+    public String getTrackingID() {
+        return trackingID;
+    }
+
+    public void setTrackingID(String trackingID) {
+        this.trackingID = trackingID;
     }
 
 }

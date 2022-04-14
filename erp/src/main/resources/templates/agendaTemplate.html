@@ -24,8 +24,13 @@
         <p>
             Dear <span th:text="${name}" />,
         </p>
-        <p th:text="${body}">
+        <p>
+            Your <span th:text="${agenda}" /> is:
         </p>
+        <p>
+            <b th:text="${code}" />
+        </p>
+        <p th:text="${text}" />
     </div>
     <p>
         Best regards, <br />

@@ -13,6 +13,7 @@ import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -44,21 +45,29 @@ public class EmailServiceImpl implements EmailService {
         }
         emailSender.send(msg);
     }
-
-    private void sendSimpleHTMLMessage(String to, String subject, String name, String agenda, String code,
-            String text) {
+    
+    private void sendAgendaHTMLMessage(String to, String subject, String name, String agenda, String code,
+    String text) {
         Context context = new Context();
         context.setVariable("name", name);
         context.setVariable("agenda", agenda);
         context.setVariable("code", code);
         context.setVariable("text", text);
+        sendHTMLMessage(to, subject, "agendaTemplate", context);
+    }
+    
+    @Override
+    public void sendSimpleHTMLMessage(String to, String subject, String name, String body) {
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("body", body);
         sendHTMLMessage(to, subject, "simpleTemplate", context);
     }
-
+    
     @Override
     public void sendTemporaryPassword(Employee employee, String tempPassword) {
         String text = "Please login and change your password immediately.";
-        sendSimpleHTMLMessage(
+        sendAgendaHTMLMessage(
                 employee.getEmail(),
                 "iORA ERP Temporary Password",
                 employee.getUsername(),
@@ -70,7 +79,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendCustomerPassword(Customer customer, String tempPassword) {
         String text = "Please login and change your password immediately.";
-        sendSimpleHTMLMessage(
+        sendAgendaHTMLMessage(
                 customer.getEmail(),
                 "iORA Password Reset",
                 customer.getLastName(),
@@ -109,7 +118,7 @@ public class EmailServiceImpl implements EmailService {
         String text = "Please redeem it any of our physical or online stores before the expiry date "
                 + new SimpleDateFormat("yyyy-mm-dd").format(voucher.getExpiry());
 
-        sendSimpleHTMLMessage(
+        sendAgendaHTMLMessage(
                 customer.getEmail(),
                 "iORA Voucher Code", customer.getLastName(),
                 "new $" + voucher.getAmount() + " voucher code",
@@ -120,7 +129,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendTicketReply(Customer customer, SupportTicket supportTicket, String message) {
         String text = "Please login to iORA website to view / reply to this ticket";
-        sendSimpleHTMLMessage(
+        sendAgendaHTMLMessage(
                 customer.getEmail(),
                 "iORA Support Ticket Reply",
                 customer.getLastName(),

@@ -7,6 +7,7 @@ import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 
 public interface EmailService {
+    public abstract void sendSimpleHTMLMessage(String to, String subject, String name, String body);
     public abstract void sendTemporaryPassword(Employee employee, String tempPassword);
     public abstract void sendCustomerPassword(Customer customer, String tempPassword);
     public abstract void sendOnlineOrderConfirmation(Customer customer, OnlineOrder order);

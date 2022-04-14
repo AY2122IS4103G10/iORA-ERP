@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -149,13 +150,22 @@ public class ShippItServiceImpl implements ShippItService {
                     delivery.setSiteId(siteId);
                     em.persist(delivery);
                     onlineOrder.getParcelDelivery().add(delivery);
+                    String deliveryURL = "https://app.staging.shippit.com/track/";
+                    deliveryURL = deliveryURL.concat(delivery.getTrackingID().toLowerCase());
+                    delivery.setTrackingURL(deliveryURL);
+                    System.out.println(deliveryURL);
+                    // trackingDelivery(delivery.getId());
                 }
             }
-            if (onlineOrder.getParcelDelivery().size() != oOrder.getParcelDelivery().size()) {
-                onlineOrder.setStatus(OnlineOrderStatusEnum.DELIVERING_MULTIPLE);
-            } else {
+            if (onlineOrder.getParcelDelivery().size() == oOrder.getParcelDelivery().size()) {
                 onlineOrder.setStatus(OnlineOrderStatusEnum.READY_FOR_DELIVERY);
             }
+
+            // for (Delivery xDelivery : onlineOrder.getParcelDelivery()) {
+            // trackingDelivery(xDelivery.getId());
+            // retreiveLabel(xDelivery.getId());
+            // }
+
             return onlineOrder;
 
         } else {
@@ -178,7 +188,7 @@ public class ShippItServiceImpl implements ShippItService {
     @Override
     public String retreiveLabel(Long parcelId) {
         Delivery parcel = em.find(Delivery.class, parcelId);
-        String trackingNum = "PPCRSNIA0B4VG";// parcel.getTrackingID();
+        String trackingNum = parcel.getTrackingID();
         String url = "https://app.staging.shippit.com/api/3/orders/{tracking_number}/label";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -190,26 +200,6 @@ public class ShippItServiceImpl implements ShippItService {
         JSONObject jsonObject = new JSONObject(jsonB);
         String link = jsonObject.getJSONObject("response").getString("qualified_url");
         return link;
-    }
-
-    @Async("threadPoolTaskExecutor")
-    @Override
-    public String confirmDeliveryOrders() {
-        try {
-            List<Delivery> unconfirmedDelivery = getAllUncomfirmedDelivery();
-            for (Delivery x : unconfirmedDelivery) {
-                CompletableFuture.supplyAsync(() -> retreiveLabel(x.getId()));
-            }
-        } catch (OnlineOrderDeliveryException e) {
-
-        }
-        return null;
-    }
-
-    @Override
-    public OnlineOrder cancelDeliverOrder(Long trackingId) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -229,4 +219,40 @@ public class ShippItServiceImpl implements ShippItService {
         }
     }
 
+    @Override
+    public String trackingDelivery(Long parcelId) {
+        Delivery parcel = em.find(Delivery.class, parcelId);
+        String trackingNum = parcel.getTrackingID();
+        String url = "https://app.staging.shippit.com/api/3/orders/{tracking_number}/tracking";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(tokenBearer());
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class,
+                trackingNum);
+        String jsonB = response.getBody();
+        JSONObject jsonObject = new JSONObject(jsonB);
+        String link = jsonObject.getJSONObject("response").getString("tracking_url");
+        parcel.setTrackingURL(link);
+        return link;
+    }
+
+    /*
+     * @Override
+     * public OnlineOrder fillTrackingURL(Long onlineOrder) throws
+     * InterruptedException {
+     * TimeUnit.MINUTES.sleep(1);
+     * OnlineOrder oo = em.find(OnlineOrder.class, onlineOrder);
+     * List<Delivery> parcelList = oo.getParcelDelivery();
+     * for (Delivery delivery : parcelList) {
+     * String url = trackingDelivery(delivery.getId());
+     * Delivery dd = em.find(Delivery.class, delivery.getId());
+     * dd.setTrackingURL(url);
+     * System.out.println(dd.toString());
+     * }
+     * System.out.println(oo.toString());
+     * oo = em.find(OnlineOrder.class, onlineOrder);
+     * return oo;
+     * }
+     */
 }

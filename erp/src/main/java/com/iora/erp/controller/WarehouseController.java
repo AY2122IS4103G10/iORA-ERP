@@ -3,13 +3,11 @@ package com.iora.erp.controller;
 import java.util.List;
 import java.util.Map;
 
-import com.easypost.exception.EasyPostException;
-import com.easypost.model.ShipmentCollection;
 import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
-import com.iora.erp.service.EasyPostService;
+import com.iora.erp.service.ShippItService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
@@ -38,7 +36,7 @@ public class WarehouseController {
     @Autowired
     private ProductService productService;
     @Autowired
-    private EasyPostService easyPostService;
+    private ShippItService easyPostService;
 
     /*
      * ---------------------------------------------------------
@@ -142,34 +140,6 @@ public class WarehouseController {
             return ResponseEntity.ok(procurementService.completeProcurementOrder(orderId));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PostMapping(path = "/onlineDelivery/create/{orderId}/{siteId}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> createOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
-            @RequestBody Delivery deliveryParcel) {
-        try {
-            return ResponseEntity.ok(easyPostService.createParcel(orderId, siteId, deliveryParcel));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PostMapping(path = "/onlineDelivery/createBatch/{siteId}", produces = "application/json")
-    public ResponseEntity<Object> createBatchOnlineOrderDelivery(@PathVariable Long siteId) {
-        try {
-            return ResponseEntity.ok(easyPostService.createBatchDelivery(siteId));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @GetMapping(path = "/onlineDelivery/retreiveShipments", produces = "application/json")
-    public ShipmentCollection retreiveShipment() {
-        try {
-            return easyPostService.retreiveListOfShipments();
-        } catch (EasyPostException e) {
-            return null;
         }
     }
 

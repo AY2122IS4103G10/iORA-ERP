@@ -20,7 +20,6 @@ import {
 const PickPackList = ({
   data,
   status,
-  setShowConfirm,
   handlePickPack,
   setData,
   manufacturing,
@@ -250,8 +249,8 @@ export const StockTransferPickPack = () => {
       });
   };
 
-  const handleScan = (barcode) => {
-    dispatch(scanItemStockTransfer({ orderId: order.id, barcode }))
+  const handleScan = async (barcode) => {
+    await dispatch(scanItemStockTransfer({ orderId: order.id, barcode }))
       .unwrap()
       .then(() => {
         addToast(

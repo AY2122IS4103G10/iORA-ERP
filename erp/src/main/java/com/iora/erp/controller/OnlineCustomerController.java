@@ -450,7 +450,7 @@ public class OnlineCustomerController {
         }
     }
 
-    @GetMapping(path = "/order/delivery/confirm", produces = "application/json")
+    @RequestMapping(path = "/order/delivery/confirm", produces = "application/json", method = RequestMethod.GET)
     public String confirmDeliveryingOrder() {
         return shippIt.confirmDeliveryOrders();
     }
@@ -458,6 +458,11 @@ public class OnlineCustomerController {
     @GetMapping(path = "/order/delivery/retreivelabel/{parcelId}", produces = "application/json")
     public String getLabel(@PathVariable Long parcelId) {
         return shippIt.retreiveLabel(parcelId);
+    }
+
+    @GetMapping(path = "/order/delivery/{deliveryId}", produces = "application/json")
+    public Delivery getDeliveryDetails(@PathVariable Long deliveryId) {
+        return customerOrderService.getDeliveryInfoById(deliveryId);
     }
 
     // timebased confirm order

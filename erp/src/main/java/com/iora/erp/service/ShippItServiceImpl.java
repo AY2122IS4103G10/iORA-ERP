@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -31,8 +32,10 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -175,27 +178,27 @@ public class ShippItServiceImpl implements ShippItService {
     @Override
     public String retreiveLabel(Long parcelId) {
         Delivery parcel = em.find(Delivery.class, parcelId);
-        String trackingNum = parcel.getTrackingID();
-        String url = "https://app.staging.shippit.com/api/3/orders/" + trackingNum + "/label";
+        String trackingNum = "PPCRSNIA0B4VG";// parcel.getTrackingID();
+        String url = "https://app.staging.shippit.com/api/3/orders/{tracking_number}/label";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(tokenBearer());
-        HttpEntity<String> entity = new HttpEntity<>(null, headers);
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class, entity);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class,
+                trackingNum);
         String jsonB = response.getBody();
-        System.out.println(jsonB);
         JSONObject jsonObject = new JSONObject(jsonB);
         String link = jsonObject.getJSONObject("response").getString("qualified_url");
-        System.out.println(link);
         return link;
     }
 
+    @Async("threadPoolTaskExecutor")
     @Override
     public String confirmDeliveryOrders() {
         try {
             List<Delivery> unconfirmedDelivery = getAllUncomfirmedDelivery();
             for (Delivery x : unconfirmedDelivery) {
-
+                CompletableFuture.supplyAsync(() -> retreiveLabel(x.getId()));
             }
         } catch (OnlineOrderDeliveryException e) {
 
@@ -218,7 +221,7 @@ public class ShippItServiceImpl implements ShippItService {
     @Override
     public List<Delivery> getAllUncomfirmedDelivery() throws OnlineOrderDeliveryException {
         try {
-            Query q = em.createQuery("SELECT d FROM Delivery d WHERE d.confirmOrder :=status");
+            Query q = em.createQuery("SELECT d FROM Delivery d WHERE d.confirmOrder = :status");
             q.setParameter("status", true);
             return q.getResultList();
         } catch (Exception ex) {

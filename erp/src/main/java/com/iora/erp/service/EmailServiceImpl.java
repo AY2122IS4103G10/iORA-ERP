@@ -87,7 +87,7 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("dateTime", order.getDateTime());
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
-        String subject = "Order Confirmation #" + order.getId();
+        String subject = "iORA Order Confirmation #" + order.getId();
         sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
     }
 
@@ -99,7 +99,7 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("dateTime", order.getDateTime());
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
-        String subject = "Order Confirmation #" + order.getId();
+        String subject = "iORA Order Cancellation #" + order.getId();
         sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
         
     }

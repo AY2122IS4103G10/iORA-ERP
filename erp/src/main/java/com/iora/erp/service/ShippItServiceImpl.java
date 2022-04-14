@@ -10,12 +10,14 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.enumeration.ParcelSizeEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.exception.OnlineOrderDeliveryException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OOStatus;
@@ -136,7 +138,6 @@ public class ShippItServiceImpl implements ShippItService {
                     String jsonB = response.getBody();
                     JSONObject jsonObject = new JSONObject(jsonB);
 
-                    System.out.print(jsonObject);
                     Delivery delivery = new Delivery();
                     delivery.setDateTime(new Date());
                     delivery.setPs(parcelInfo);
@@ -169,6 +170,60 @@ public class ShippItServiceImpl implements ShippItService {
             onlineOrder.setStatus(OnlineOrderStatusEnum.DELIVERING_MULTIPLE);
         }
         return onlineOrder;
+    }
+
+    @Override
+    public String retreiveLabel(Long parcelId) {
+        Delivery parcel = em.find(Delivery.class, parcelId);
+        String trackingNum = parcel.getTrackingID();
+        String url = "https://app.staging.shippit.com/api/3/orders/" + trackingNum + "/label";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(tokenBearer());
+        HttpEntity<String> entity = new HttpEntity<>(null, headers);
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class, entity);
+        String jsonB = response.getBody();
+        System.out.println(jsonB);
+        JSONObject jsonObject = new JSONObject(jsonB);
+        String link = jsonObject.getJSONObject("response").getString("qualified_url");
+        System.out.println(link);
+        return link;
+    }
+
+    @Override
+    public String confirmDeliveryOrders() {
+        try {
+            List<Delivery> unconfirmedDelivery = getAllUncomfirmedDelivery();
+            for (Delivery x : unconfirmedDelivery) {
+
+            }
+        } catch (OnlineOrderDeliveryException e) {
+
+        }
+        return null;
+    }
+
+    @Override
+    public OnlineOrder cancelDeliverOrder(Long trackingId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public OnlineOrder fetchStatus() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Delivery> getAllUncomfirmedDelivery() throws OnlineOrderDeliveryException {
+        try {
+            Query q = em.createQuery("SELECT d FROM Delivery d WHERE d.confirmOrder :=status");
+            q.setParameter("status", true);
+            return q.getResultList();
+        } catch (Exception ex) {
+            throw new OnlineOrderDeliveryException();
+        }
     }
 
 }

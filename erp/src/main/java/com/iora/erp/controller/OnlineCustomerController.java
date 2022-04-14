@@ -441,6 +441,20 @@ public class OnlineCustomerController {
         }
     }
 
+    @GetMapping(path = "/order/delivery/confirm", produces = "application/json")
+    public String confirmDeliveryingOrder() {
+        return shippIt.confirmDeliveryOrders();
+    }
+
+    @GetMapping(path = "/order/delivery/retreivelabel/{parcelId}", produces = "application/json")
+    public String getLabel(@PathVariable Long parcelId) {
+        return shippIt.retreiveLabel(parcelId);
+    }
+
+    // timebased confirm order
+    // button confrim order
+    // tracking
+
     @PutMapping(path = "/deliver/{orderId}/{siteId}", produces = "application/json")
     public ResponseEntity<Object> receiveOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId) {
         try {

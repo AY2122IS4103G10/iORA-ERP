@@ -5,6 +5,7 @@ import java.util.List;
 import com.iora.erp.enumeration.ParcelSizeEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
+import com.iora.erp.exception.OnlineOrderDeliveryException;
 import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 
@@ -21,5 +22,15 @@ public interface ShippItService {
             throws CustomerOrderException, CustomerException;
 
     public abstract OnlineOrder moreToDelivery(Long orderId) throws CustomerOrderException;
+
+    public abstract String confirmDeliveryOrders();
+
+    public abstract OnlineOrder cancelDeliverOrder(Long trackingId);
+
+    public abstract String retreiveLabel(Long parcelId);
+
+    public abstract OnlineOrder fetchStatus();
+
+    public abstract List<Delivery> getAllUncomfirmedDelivery() throws OnlineOrderDeliveryException;
 
 }

@@ -51,9 +51,9 @@
 		</field>
 		<field name="totalAmount" class="java.lang.Double">
 		</field>
-		<field name="voucher" class="java.lang.String">
-			 <fieldDescription><![CDATA[voucher.getCampaign()]]></fieldDescription>
-		</field>
+		<!-- <field name="voucher" class="java.lang.String">
+			 <fieldDescription><![CDATA[voucher.getVoucherCode()]]></fieldDescription>
+		</field> -->
 		<!-- <field name="site" class="java.lang.Long">
 			 <fieldDescription><![CDATA[site.getId()]]></fieldDescription>
 		</field> -->
@@ -210,7 +210,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Helvetica Neue" size="12"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$F{voucher}]]></textFieldExpression>
+								<!-- <textFieldExpression><![CDATA[$F{voucher}]]></textFieldExpression> -->
 							</textField>
 						</jr:detailCell>
 					</jr:column>

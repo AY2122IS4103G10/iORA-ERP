@@ -32,6 +32,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (username.contains("@")) {
             try {
                 Customer customer = customerService.getCustomerByEmail(username);
+                if (!customer.getAvailStatus()) {
+                    throw new CustomerException("Customer blocked");
+                }
                 return new User(customer.getEmail(), customer.getPassword(),
                         List.of(new SimpleGrantedAuthority("CUSTOMER")));
             } catch (CustomerException ex) {
@@ -40,6 +43,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         } else {
             try {
                 Employee employee = employeeService.getEmployeeByUsername(username);
+                if (!employee.getAvailStatus()) {
+                    throw new EmployeeException("Empployee blocked");
+                }
                 Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                 employee.getJobTitle().getResponsibility().forEach(accessRight -> {
                     authorities.add(new SimpleGrantedAuthority(accessRight.name()));

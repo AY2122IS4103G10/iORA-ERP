@@ -128,4 +128,7 @@ public interface CustomerOrderService {
         public abstract Map<Long, Long> getOnlineOrdersInDateRange(Date start, Date end);
 
         public abstract List<CustomerOrder> getDailyCustomerOrders(Long siteId, Date date);
+
+        public abstract List<CustomerOrder> getAllCustomerOrderInRange(Date start, Date end);
+
 }

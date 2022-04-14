@@ -267,7 +267,7 @@ const SupportTicketModal = ({
                                 className="bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                               >
                                 <TailSpin
-                                  color="#00BFFF"
+                                  color="#FFFFFF"
                                   height={20}
                                   width={20}
                                 />

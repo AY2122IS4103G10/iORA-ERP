@@ -158,6 +158,7 @@ const SearchPopover = () => {
                             type="search"
                             value={search}
                             onChange={onSearchChanged}
+                            autoFocus
                           />
                         </div>
                       </form>

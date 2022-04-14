@@ -56,7 +56,7 @@ export const CartItems = ({
                     <div className="flex justify-between">
                       <h3 className="text-sm">
                         <Link
-                          to={`/products/view/${item.product.sku}`}
+                          to={`/products/view/${item.model.modelCode}`}
                           className="font-medium text-gray-700 hover:text-gray-800"
                         >
                           {item.model.name}
@@ -186,19 +186,11 @@ export const CartSummary = ({
         <div className="border-t border-gray-200 pt-4 flex justify-between">
           <dt className="text-sm text-gray-600">Discount/Promotions</dt>
           <dd className="text-sm font-medium text-gray-900">
-            -${Math.abs(totalDiscount)}
-          </dd>
-        </div>
-        <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
-          <dt className="flex items-center text-sm text-gray-600">
-            <span>Shipping estimate</span>
-          </dt>
-          <dd className="text-sm font-medium text-gray-900">
-            ${delivery === 1 ? 2.5 : 0}
+            -${Math.abs(totalDiscount).toFixed(2)}
           </dd>
         </div>
 
-        <fieldset>
+        {/* <fieldset>
           {deliveryOptions.map((option) => (
             <div key={option.id} className="relative flex items-start mb-1">
               <div className="flex items-center h-5">
@@ -224,15 +216,12 @@ export const CartSummary = ({
               </div>
             </div>
           ))}
-        </fieldset>
+        </fieldset> */}
 
         <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
           <dt className="text-base font-medium text-gray-900">Order total</dt>
           <dd className="text-base font-medium text-gray-900">
-            $
-            {delivery === 1
-              ? subTotal + totalDiscount + 2.5
-              : subTotal + totalDiscount}
+            ${subTotal + totalDiscount}
           </dd>
         </div>
       </dl>
@@ -289,7 +278,6 @@ export const Cart = () => {
       navigate("/login");
     }
   };
-
   useEffect(() => {
     async function calculate() {
       let subTotal = 0;
@@ -299,8 +287,9 @@ export const Cart = () => {
         return lineItem;
       });
       setSubTotal(subTotal);
-
+      
       const response = await checkoutApi.calculatePromotions(lineItems);
+      console.log(response.data);
       setPromotions(response.data[1]);
       setTotalDiscount(
         response.data
@@ -308,13 +297,10 @@ export const Cart = () => {
           .reduce((x, y) => x + y, 0)
       );
       //discount amount
-      console.log(totalDiscount);
-
-      console.log(promotions);
-      console.log(response.data);
     }
     calculate();
   }, [cart]);
+
   return (
     <div className="max-w-2xl mx-auto pt-16 pb-24 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
       <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">

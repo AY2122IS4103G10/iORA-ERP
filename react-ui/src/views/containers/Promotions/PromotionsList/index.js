@@ -41,7 +41,14 @@ export const PromotionsTable = ({
       {
         Header: "% Disc.",
         accessor: "coefficients",
-        Cell: (e) => e.value.join(", "),
+        Cell: (e) => {
+          return e.value
+            .map((c) => ((1 - c) * 100).toFixed(0))
+            .map((val) => {
+              return val != 100 ? val : 0;
+            })
+            .join(", ");
+        },
       },
       {
         Header: "Fixed Disc.",
@@ -119,7 +126,9 @@ export const PromotionsList = ({
     setQuota(row.original.quota);
     setPercent(!row.original.coefficients.every((val) => val === 0.0));
     setFixed(!row.original.constants.every((val) => val === 0.0));
-    setCoefficients(row.original.coefficients.join(","));
+    setCoefficients(
+      row.original.coefficients.map((c) => ((1 - c) * 100).toFixed(0)).join(",")
+    );
     setConstants(row.original.constants.join(","));
     setGlobal(row.original.global);
     setStackable(row.original.stackable);

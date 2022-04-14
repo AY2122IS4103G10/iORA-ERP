@@ -581,50 +581,7 @@ export const ProductDetails = () => {
   useEffect(() => {
     prodStatus === "idle" && dispatch(fetchProducts());
   }, [prodStatus, dispatch]);
-  // const [openAddSku, setOpenAddSku] = useState(false);
-  // const [skus, setSkus] = useState([]);
-  // const [sku, setSku] = useState("");
-  // const [skuColors, setSkuColors] = useState([]);
-  // const [skuColorSelected, setSkuColorSelected] = useState(null);
-  // const [skuSizes, setSkuSizes] = useState([]);
-  // const [skuSizeSelected, setSkuSizeSelected] = useState(null);
-
-  // useEffect(() => {
-  //   if (product) {
-  //     const colors = product.productFields
-  //       .filter((field) => field.fieldName === "COLOUR")
-  //       .map((field) => ({ ...field, name: field.fieldValue }));
-  //     const sizes = product.productFields
-  //       .filter((field) => field.fieldName === "SIZE")
-  //       .map((field) => ({ ...field, name: field.fieldValue }));
-  //     setSku(`${product.modelCode}-`);
-  //     setSkuColors(colors);
-  //     setSkuSizes(sizes);
-  //     setSkuColorSelected(colors[0]);
-  //     setSkuSizeSelected(sizes[0]);
-  //   }
-  // }, [product]);
-
-  // const onSkuChanged = (e) => setSku(e.target.value);
-
-  // const openSkuModal = () => {
-  //   setSku(`${product.modelCode}-`);
-  //   setOpenAddSku(true);
-  // };
-  // const closeSkuModal = () => setOpenAddSku(false);
-
-  // const onAddSkuClicked = (evt) => {
-  //   evt.preventDefault();
-  //   const s = skus;
-  //   s.push({
-  //     sku,
-  //     color: skuColorSelected,
-  //     size: skuSizeSelected,
-  //   });
-  //   setSkus(s);
-  //   setSku("");
-  //   closeSkuModal();
-  // };
+console.log(product)
   const onToggleEnableClicked = () => {
     dispatch(
       updateExistingProduct({
@@ -649,17 +606,6 @@ export const ProductDetails = () => {
         })
       );
   };
-
-  // const onDeleteSkuClicked = (sku) => {
-  //   dispatch(deleteSku(sku))
-  //     .unwrap()
-  //     .then(() => {
-  //       addToast("Successfully deleted SKU", {
-  //         appearance: "success",
-  //         autoDismiss: true,
-  //       });
-  //     });
-  // };
 
   return (
     Boolean(product) && (

@@ -66,8 +66,6 @@ export const ManageReports = () => {
     if (id === 1) {
       const start = moment(startDate).format("DDMMYYYY");
       const end = moment(endDate).format("DDMMYYYY");
-      console.log(start + "|" + end);
-      console.log("Formated: " + start + "|" + end);
       handleDownloadSalesReport(start, end);
     } else if (id === 2) {
     } else if (id === 3) {

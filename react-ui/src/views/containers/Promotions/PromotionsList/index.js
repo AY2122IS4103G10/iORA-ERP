@@ -39,12 +39,12 @@ export const PromotionsTable = ({
         accessor: "quota",
       },
       {
-        Header: "Coeff.",
+        Header: "% Disc.",
         accessor: "coefficients",
         Cell: (e) => e.value.join(", "),
       },
       {
-        Header: "Constants",
+        Header: "Fixed Disc.",
         accessor: "constants",
         Cell: (e) => e.value.join(", "),
       },

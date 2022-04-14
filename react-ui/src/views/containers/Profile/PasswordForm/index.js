@@ -7,13 +7,14 @@ import { authApi } from "../../../../environments/Api";
 export const PasswordForm = () => {
   const navigate = useNavigate();
   const { addToast } = useToasts();
+  const [current, setCurrent] = useState("")
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const passwordMatch = password === confirmPassword;
 
   const handleChangePassword = async (e) => {
     try {
-      await authApi.changePassword({ password });
+      await authApi.changePassword({ current, password });
       addToast(`Successfully changed password`, {
         appearance: "success",
         autoDismiss: true,
@@ -42,7 +43,9 @@ export const PasswordForm = () => {
           <div className="mt-6">
             <dl className="divide-y divide-gray-200">
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
-                <dt className="text-sm font-medium text-gray-500">Password</dt>
+                <dt className="text-sm font-medium text-gray-500">
+                  Current password
+                </dt>
                 <div className="mt-1 sm:col-span-2">
                   <input
                     type="password"
@@ -55,9 +58,25 @@ export const PasswordForm = () => {
                   />
                 </div>
               </div>
+              <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                <dt className="text-sm font-medium text-gray-500">
+                  New password
+                </dt>
+                <div className="mt-1 sm:col-span-2">
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setCurrent(e.target.value)}
+                    required
+                    className="shadow-sm p-3 focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm rounded-md"
+                  />
+                </div>
+              </div>
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:pt-5">
                 <dt className="text-sm font-medium text-gray-500">
-                  Confirm Password
+                  Confirm password
                 </dt>
                 <div className="sm:col-span-2">
                   <div className="mt-1 relative rounded-md shadow-sm">

@@ -3,9 +3,11 @@ import {
   CogIcon,
   CollectionIcon,
   DocumentReportIcon,
-  DocumentTextIcon, InformationCircleIcon, LogoutIcon, QuestionMarkCircleIcon, ShieldCheckIcon,
+  DocumentTextIcon, GiftIcon, InformationCircleIcon, LogoutIcon, QuestionMarkCircleIcon, ShieldCheckIcon,
   ShoppingBagIcon,
+  ShoppingCartIcon,
   TicketIcon,
+  TruckIcon,
   UserGroupIcon
 } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
@@ -20,7 +22,7 @@ const navigation = [
   {
     name: "Products",
     href: "/sm/products",
-    icon: ShoppingBagIcon,
+    icon: ShoppingCartIcon,
     current: false,
   },
   {
@@ -32,13 +34,13 @@ const navigation = [
   {
     name: "Orders",
     href: "/sm/orders/search",
-    icon: ArchiveIcon,
+    icon: ShoppingBagIcon,
     current: false,
   },
   {
     name: "Stock Transfer",
     href: "/sm/stocktransfer/search",
-    icon: ArchiveIcon,
+    icon: TruckIcon,
     current: false,
   },
   {
@@ -62,7 +64,7 @@ const navigation = [
   {
     name: "Rewards & Loyalty",
     href: "/sm/rewards-loyalty/tiers",
-    icon: TicketIcon,
+    icon: GiftIcon,
     current: false,
   },
   {

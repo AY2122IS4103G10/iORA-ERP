@@ -231,6 +231,7 @@ const AddProductFormBody = ({
                             name="prodCode"
                             id="prodCode"
                             autoComplete="prodCode"
+                            placeholder="Enter product code."
                             value={prodCode}
                             onChange={onProdChanged}
                             required
@@ -248,6 +249,7 @@ const AddProductFormBody = ({
                             name="name"
                             id="name"
                             autoComplete="name"
+                            placeholder="Enter product name."
                             value={name}
                             onChange={onNameChanged}
                             required
@@ -262,6 +264,7 @@ const AddProductFormBody = ({
                             type="text"
                             id="description"
                             name="description"
+                            placeholder="Enter product description."
                             rows={3}
                             value={description}
                             onChange={onDescChanged}
@@ -341,7 +344,7 @@ const AddProductFormBody = ({
                           inputField="onlineOnly"
                           className="sm:mt-0 sm:col-span-2"
                         >
-                          <div className="flex items-center h-5">
+                          <div>
                             <input
                               type="checkbox"
                               name="onlineOnly"
@@ -356,7 +359,7 @@ const AddProductFormBody = ({
                         <SimpleInputGroup
                           label="Photos"
                           inputField="onlineOnly"
-                          className="relative sm:mt-0 sm:col-span-2"
+                          className="relative sm:mt-0 col-span-2"
                         >
                           {Boolean(images.length) && (
                             <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
@@ -398,46 +401,45 @@ const AddProductFormBody = ({
                               </ul>
                             </div>
                           )}
-                          <div className="flex">
-                            <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                              <div className="space-y-1 text-center">
-                                <svg
-                                  className="mx-auto h-12 w-12 text-gray-400"
-                                  stroke="currentColor"
-                                  fill="none"
-                                  viewBox="0 0 48 48"
-                                  aria-hidden="true"
+
+                          <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div className="space-y-1 text-center">
+                              <svg
+                                className="mx-auto h-12 w-12 text-gray-400"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 48 48"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              <div className="flex items-center justify-center text-sm text-gray-600">
+                                <label
+                                  htmlFor="file-upload"
+                                  className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500"
                                 >
-                                  <path
-                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                    strokeWidth={2}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
+                                  <span className="text-center">Upload a file</span>
+                                  <input
+                                    ref={fileRef}
+                                    id="file-upload"
+                                    name="file-upload"
+                                    type="file"
+                                    className="sr-only" 
+                                    accept="image/*"
+                                    multiple
+                                    onChange={onImagesChanged}
                                   />
-                                </svg>
-                                <div className="flex text-sm text-gray-600">
-                                  <label
-                                    htmlFor="file-upload"
-                                    className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500"
-                                  >
-                                    <span>Upload a file</span>
-                                    <input
-                                      ref={fileRef}
-                                      id="file-upload"
-                                      name="file-upload"
-                                      type="file"
-                                      className="sr-only"
-                                      accept="image/*"
-                                      multiple
-                                      onChange={onImagesChanged}
-                                    />
-                                  </label>
-                                  <p className="pl-1">or drag and drop</p>
-                                </div>
-                                <p className="text-xs text-gray-500">
-                                  PNG, JPG, GIF up to 10MB
-                                </p>
+                                </label>
+                                
                               </div>
+                              <p className="text-xs text-gray-500">
+                                PNG, JPG, GIF
+                              </p>
                             </div>
                           </div>
                         </SimpleInputGroup>

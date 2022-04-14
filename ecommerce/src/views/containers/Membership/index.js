@@ -241,7 +241,7 @@ export const Membership = () => {
                     </div>
                   </div>
                 )}
-                <dl className="grid grid-cols-1 gap-x-5 gap-y-8 pt-5 sm:grid-cols-5">
+                <dl className="grid grid-cols-1 gap-x-5 gap-y-8 pt-5 sm:grid-cols-6">
                   <div className="sm:col-span-2">
                     <dt className="text-sm font-bold text-gray-600">
                       Your Membership Tier
@@ -258,7 +258,7 @@ export const Membership = () => {
                       {user.membershipPoints}
                     </dd>
                   </div>
-                  <div className="sm:col-span-1">
+                  <div className="sm:col-span-2">
                     <dt className="text-sm font-bold text-gray-600">
                       Redeem Points
                     </dt>
@@ -307,7 +307,7 @@ export const Membership = () => {
                     <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
                       Get rewarded and earn points for every purchase. Join us
                       today and start enjoying shopping benefits at all our
-                      stores
+                      stores.
                     </p>
                   </div>
                   <div className="py-12 bg-white">

@@ -352,7 +352,7 @@ export const SimpleTable = ({
 
   return (
     <>
-      <div className="sm:flex justify-between sm:gap-x-2">
+      <div className="sm:flex justify-start sm:gap-x-2">
         {globalFilter && (
           <GlobalFilter
             preGlobalFilteredRows={preGlobalFilteredRows}

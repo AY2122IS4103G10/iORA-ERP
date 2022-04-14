@@ -194,23 +194,23 @@ const InputArea = ({ input, onInputChanged, onReplyClicked, file, setFile, loadi
     };
 
     return (
-        <div className="border-gray-200 mx-auto lg:max-w-7xl px-4 py-1 mt-5 sm:px-6">
+        <div className="max-w-3xl lg:max-w-7xl mx-auto py-1 mt-5 sm:px-2">
             <form className="relative px-4">
-                <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500">
+                <div className="shadow-sm">
                     <label htmlFor="input" className="sr-only">
                         Input
                     </label>
                     <textarea
-                        rows={2}
+                        rows={3}
                         name="input"
                         id="input"
-                        className="block w-full border-0 py-0 resize-none placeholder-gray-500 mt-1 focus:ring-0 sm:text-sm"
+                        className="focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Write a message..."
                         value={input}
                         onChange={onInputChanged}
                     />
                 </div>
-                <div className="border-t border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
+                <div className="px-2 py-4 flex justify-between items-center space-x-3 sm:px-3">
                     <div className="flex">
                         <input ref={fileRef}
                             onChange={handleChange}

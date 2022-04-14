@@ -413,6 +413,7 @@ export const SupportList = () => {
       customer: {
         id: user?.id,
       },
+      customerOrder: {id : order}
     };
 
     const image = new FormData();

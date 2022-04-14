@@ -75,6 +75,54 @@ const ItemTable = ({ data, subsys }) => {
   );
 };
 
+const ParcelsTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      {
+        Header: "#",
+        accessor: "id",
+      },
+      { Header: "Name", accessor: "ps" },
+      {
+        Header: "Tracking No.",
+        accessor: "trackingID",
+        Cell: (e) => {
+          return (
+            <a
+              href={e.row.original.trackingURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {e.value}
+            </a>
+          );
+        },
+      },
+      {
+        Header: "Created",
+        accessor: "dateTime",
+        Cell: (e) => moment(e.value).format("DD/MM/YYYY, h:mm:ss"),
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="pt-8">
+      <div className="md:flex md:items-center md:justify-between">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Deliveries
+        </h3>
+      </div>
+
+      <div className="mt-4">
+        <SimpleTable columns={columns} data={data} />
+      </div>
+    </div>
+  );
+};
+
 const OrderDetailsBody = ({
   subsys,
   history,
@@ -93,6 +141,7 @@ const OrderDetailsBody = ({
   exchangedLIs,
   voucher,
   site,
+  parcelDelivery,
 }) => {
   return (
     <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
@@ -256,8 +305,6 @@ const OrderDetailsBody = ({
                     </dd>
                   </div>
                 )}
-
-                
               </dl>
             </div>
           </div>
@@ -267,6 +314,11 @@ const OrderDetailsBody = ({
       <div className="lg:col-start-1 lg:col-span-3">
         <section aria-labelledby="line-items">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="md:col-span-2">
+              {Boolean(parcelDelivery?.length) && (
+                <ParcelsTable data={parcelDelivery} />
+              )}
+            </div>
             <div className="md:col-span-2">
               {Boolean(lineItems?.length) && (
                 <ItemTable data={lineItems} subsys={subsys} />
@@ -304,6 +356,7 @@ export const CustomerOrderDetails = () => {
     exchangedLIs,
     voucher,
     site,
+    parcelDelivery,
   } = useOutletContext();
   const [history, setHistory] = useState([]);
 
@@ -356,6 +409,7 @@ export const CustomerOrderDetails = () => {
       exchangedLIs={exchangedLIs}
       voucher={voucher}
       site={site}
+      parcelDelivery={parcelDelivery}
     />
   );
 };

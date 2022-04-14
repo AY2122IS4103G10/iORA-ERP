@@ -166,6 +166,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({ content: () => componentRef.current });
   const [lineItems, setLineItems] = useState([]);
+  const [parcelDelivery, setParcelDelivery] = useState([])
   const [promotions, setPromotions] = useState([]);
   const [refundedLIs, setRefundedLIs] = useState([]);
   const [exchangedLIs, setExchangedLIs] = useState([]);
@@ -216,6 +217,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           refundedLIs,
           exchangedLIs,
           voucher,
+          parcelDelivery
         } = data;
 
         fetchAllModelsBySkus(lineItems).then((data) => {
@@ -247,6 +249,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
         setPickupSite(pickupSite);
         setSite(site);
         setCountry(country);
+        setParcelDelivery(parcelDelivery)
         setQrValue(
           `http://localhost:3000/${subsys}/orders/${orderId}/pick-pack`
         );
@@ -381,6 +384,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             voucher,
             openInvoice,
             openInfoModal,
+            parcelDelivery
           }}
         />
       </div>

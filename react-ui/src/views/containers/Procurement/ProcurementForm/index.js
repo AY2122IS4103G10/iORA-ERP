@@ -774,15 +774,17 @@ export const ProcurementForm = () => {
   const [openInfo, setOpenInfo] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
-  const skus = useSelector(selectAllProducts).flatMap((model) =>
-    model.products.map((product) => ({
-      ...product,
-      modelCode: model.modelCode,
-      name: model.name,
-      imageLinks: model.imageLinks,
-      description: model.description,
-    }))
-  );
+  const skus = useSelector(selectAllProducts)
+    .filter((product) => product.available)
+    .flatMap((model) => {
+      return model.products.map((product) => ({
+        ...product,
+        modelCode: model.modelCode,
+        name: model.name,
+        imageLinks: model.imageLinks,
+        description: model.description,
+      }));
+    });
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -914,7 +916,7 @@ export const ProcurementForm = () => {
     warehouseSelected,
     lineItems.length,
     storeCheckedState.some(Boolean),
-    lineItems.every(item => item.requestedQty !== 0)
+    lineItems.every((item) => item.requestedQty !== 0),
   ].every(Boolean);
 
   const handleUpload = async (file) => {

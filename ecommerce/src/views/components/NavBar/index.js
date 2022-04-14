@@ -101,7 +101,7 @@ const SearchPopover = () => {
     const { data } = await api.getAll(
       `online/public/modelSearch?name=${e.target.value}`
     );
-    setResults(data);
+    setResults(data.filter(product => product.available));
   };
 
   return (

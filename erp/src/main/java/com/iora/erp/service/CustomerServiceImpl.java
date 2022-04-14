@@ -59,10 +59,30 @@ public class CustomerServiceImpl implements CustomerService {
             throw new RegistrationException("Email already exists.");
         } catch (CustomerException e) {
             customer.setMembershipTier(findMembershipTierById("BASIC"));
+            customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+            em.persist(customer);
+            return customer;
+        }
+    }
+
+    @Override
+    public Customer createCustomerAccountPOS(Customer customer) throws RegistrationException {
+        try {
+            getCustomerByPhone(customer.getContactNumber());
+            throw new RegistrationException("Phone number already exists.");
+        } catch (CustomerException e) {
+            // Do nothing
+        }
+
+        try {
+            getCustomerByEmail(customer.getEmail());
+            throw new RegistrationException("Email already exists.");
+        } catch (CustomerException e) {
+            customer.setMembershipTier(findMembershipTierById("BASIC"));
             String password = RandomString.make(10);
             customer.setPassword(passwordEncoder.encode(password));
             em.persist(customer);
-            // emailService.sendCustomerPasswordCreation(customer, password);
+            emailService.sendCustomerPasswordCreation(customer, password);
             return customer;
         }
     }

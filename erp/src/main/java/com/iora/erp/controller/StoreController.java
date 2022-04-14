@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.iora.erp.exception.StockTransferException;
+import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
@@ -293,6 +294,16 @@ public class StoreController {
      * ---------------------------------------------------------
      */
 
+    @PostMapping(path = "/registerCustomer", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> registerCustomer(@RequestBody Customer customer) {
+        try {
+            return ResponseEntity.ok(customerService.createCustomerAccountPOS(customer));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/customerOrder/view/{orderId}", produces = "application/json")
     public ResponseEntity<Object> getCustomerOrder(@PathVariable Long orderId) {
         try {
@@ -459,7 +470,7 @@ public class StoreController {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
-    }    
+    }
 
     @GetMapping(path = "/member/vouchers/{customerId}", produces = "application/json")
     public ResponseEntity<Object> getVouchersOfCustomer(@PathVariable Long customerId) {

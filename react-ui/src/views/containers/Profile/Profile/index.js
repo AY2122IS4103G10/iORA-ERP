@@ -76,7 +76,7 @@ export const Profile = () => {
                   {user?.payType === "MONTHLY" ? "Monthly " : "Daily "}Salary
                 </dt>
                 <dd className="mt-1 flex text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  <span className="flex-grow">${user?.salary}</span>
+                  <span className="flex-grow">${user?.salary.toFixed(2)}</span>
                 </dd>
               </div>
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:border-b sm:border-gray-200">

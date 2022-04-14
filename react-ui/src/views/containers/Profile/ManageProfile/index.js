@@ -6,7 +6,6 @@ const tabs = [
   { name: "View Profile", href: "/account", index: 0 },
   { name: "Edit Profile", href: "/account/edit", index: 1 },
   { name: "Change Password", href: "/account/changepass", index: 2 },
-  { name: "Settings", href: "/account/settings", index: 3 },
 ];
 
 export const Header = ({ path }) => {

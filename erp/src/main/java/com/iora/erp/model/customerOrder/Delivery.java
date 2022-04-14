@@ -22,13 +22,12 @@ public class Delivery {
     private String trackingID;
     private Date dateTime;
     private Long siteId;
-    private Boolean confirmOrder;
+    private String trackingURL;
 
     @Enumerated(EnumType.STRING)
     private ParcelSizeEnum ps;
 
     public Delivery() {
-        confirmOrder = false;
     }
 
     public Long getId() {
@@ -79,12 +78,12 @@ public class Delivery {
         this.ps = ps;
     }
 
-    public Boolean getConfirmOrder() {
-        return confirmOrder;
+    public String getTrackingURL() {
+        return trackingURL;
     }
 
-    public void setConfirmOrder(Boolean confirmOrder) {
-        this.confirmOrder = confirmOrder;
+    public void setTrackingURL(String trackingURL) {
+        this.trackingURL = trackingURL;
     }
 
 }

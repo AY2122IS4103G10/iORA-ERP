@@ -423,6 +423,7 @@ public class OnlineCustomerController {
     public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
             @RequestBody OnlineOrder parcelSizes) {
         try {
+            // OnlineOrder oo = shippIt.deliveryOrder(orderId, siteId, parcelSizes);
             return ResponseEntity.ok(shippIt.deliveryOrder(orderId, siteId, parcelSizes));
 
         } catch (Exception ex) {
@@ -441,11 +442,6 @@ public class OnlineCustomerController {
         }
     }
 
-    @RequestMapping(path = "/order/delivery/confirm", produces = "application/json", method = RequestMethod.GET)
-    public String confirmDeliveryingOrder() {
-        return shippIt.confirmDeliveryOrders();
-    }
-
     @GetMapping(path = "/order/delivery/retreivelabel/{parcelId}", produces = "application/json")
     public String getLabel(@PathVariable Long parcelId) {
         return shippIt.retreiveLabel(parcelId);
@@ -456,8 +452,6 @@ public class OnlineCustomerController {
         return customerOrderService.getDeliveryInfoById(deliveryId);
     }
 
-    // timebased confirm order
-    // button confrim order
     // tracking
 
     @PutMapping(path = "/deliver/{orderId}/{siteId}", produces = "application/json")

@@ -23,14 +23,14 @@ public interface ShippItService {
 
     public abstract OnlineOrder moreToDelivery(Long orderId) throws CustomerOrderException;
 
-    public abstract String confirmDeliveryOrders();
-
-    public abstract OnlineOrder cancelDeliverOrder(Long trackingId);
-
     public abstract String retreiveLabel(Long parcelId);
 
     public abstract OnlineOrder fetchStatus();
 
     public abstract List<Delivery> getAllUncomfirmedDelivery() throws OnlineOrderDeliveryException;
+
+    public abstract String trackingDelivery(Long parcelId);
+
+  //  public abstract OnlineOrder fillTrackingURL(Long onlineOrder) throws InterruptedException throws InterruptedException;
 
 }

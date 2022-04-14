@@ -21,7 +21,7 @@ import {
 } from "../../../../stores/slices/supportTicketSlice";
 import { selectUser } from "../../../../stores/slices/userSlice";
 
-const Header = ({ status, customerId, setOpen, subject, userId }) => {
+const Header = ({ status, customerId, setOpen, subject, userId, category }) => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:space-x-5 lg:px-8">
       <nav className="flex items-start py-3" aria-label="Breadcrumb">
@@ -37,10 +37,12 @@ const Header = ({ status, customerId, setOpen, subject, userId }) => {
         </Link>
       </nav>
       <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">
-          {subject}
-        </h3>
-
+        <div>
+          <h3 className="text-lg leading-6 font-medium text-gray-900">
+            {subject}
+          </h3>
+          <p className="mt-2 max-w-4xl text-sm text-gray-500">{category}</p>
+        </div>
         {status !== "RESOLVED" &&
         userId !== undefined &&
         customerId === userId ? (
@@ -421,6 +423,7 @@ export const SupportDetails = () => {
           setOpen={setOpen}
           subject={ticket.subject}
           userId={user?.id}
+          category={ticket.category}
         />
         <SupportTicketBody messages={ticket.messages} />
         {ticket.status === "PENDING_CUSTOMER" && (

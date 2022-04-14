@@ -246,6 +246,7 @@ function App() {
                 <Route index element={<CustomerOrderDetails subsys="sm" />} />
                 <Route path="pick-pack" element={<OnlineOrderPickPack />} />
                 <Route path="collect" element={<OnlineOrderCollection />} />
+                <Route path="delivery" element={<OnlineOrderInhouse />} />
               </Route>
               <Route path="create" element={<ProcurementForm />} />
               <Route path="edit/:orderId" element={<ProcurementForm />} />
@@ -633,6 +634,7 @@ function App() {
               >
                 <Route index element={<CustomerOrderDetails />} />
                 <Route path="pick-pack" element={<OnlineOrderPickPack />} />
+                <Route path="delivery" element={<OnlineOrderInhouse />} />
               </Route>
             </Route>
             {/* Stock Transfer Orders */}

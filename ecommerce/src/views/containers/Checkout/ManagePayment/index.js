@@ -22,8 +22,7 @@ export const ManagePayment = ({ order, isDelivery, onCancelClicked }) => {
       .catch((err) => console.log(err))
     }
      
-  }, [])
-
+  }, [isDelivery, order])
   const options = {
     clientSecret,
   };

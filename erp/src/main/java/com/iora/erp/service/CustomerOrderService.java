@@ -114,7 +114,7 @@ public interface CustomerOrderService {
         public abstract OnlineOrder adjustProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException,
                         NoStockLevelException, IllegalTransferException, ProductException;
 
-        public abstract OnlineOrder deliverOnlineOrder(Long orderId, Long siteId, List<Delivery> parcelSize)
+        public abstract OnlineOrder deliverOnlineOrder(Long orderId)
                         throws CustomerOrderException;
 
         public abstract List<ParcelSizeEnum> getParcelSizes();

@@ -4,9 +4,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { api, onlineOrderApi } from "../../../../environments/Api";
-import {
-  SimpleTable,
-} from "../../../components/Tables/SimpleTable";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import { ConfirmSection } from "../../Procurement/ProcurementPickPack";
 
 const DeliveryList = ({
@@ -16,6 +14,7 @@ const DeliveryList = ({
   pickupSite,
   currSiteId,
   onSaveQuantityClicked,
+  delivery,
 }) => {
   const [skipPageReset, setSkipPageReset] = useState(false);
   const columns = useMemo(() => {
@@ -118,7 +117,8 @@ const DeliveryList = ({
   }, [status, setData, onSaveQuantityClicked]);
   const hiddenColumns =
     pickupSite.id !== currSiteId ||
-    ["DELIVERING", "DELIVERING_MULTIPLE"].every((s) => s !== status)
+    ["DELIVERING", "DELIVERING_MULTIPLE"].every((s) => s !== status) ||
+    (!delivery && pickupSite.id === currSiteId)
       ? ["[editButton]"]
       : [];
   return (
@@ -208,14 +208,14 @@ export const OnlineOrderInhouse = () => {
     setLineItems,
     addToast,
     currSiteId,
+    delivery,
   } = useOutletContext();
   const navigate = useNavigate();
-
+  console.log(lineItems);
   const onMultipleClicked = async () => {
     try {
       const { data } = await onlineOrderApi.deliverMultiple(orderId);
-      const { lineItems, statusHistory } = data;
-      setLineItems(lineItems);
+      const { statusHistory } = data;
       setStatus(statusHistory[statusHistory.length - 1]);
       setStatusHistory(statusHistory);
       addToast(`Order #${orderId} has begun delivering.`, {
@@ -234,8 +234,7 @@ export const OnlineOrderInhouse = () => {
   const onSingleClicked = async () => {
     try {
       const { data } = await onlineOrderApi.deliverOrder(orderId);
-      const { lineItems, statusHistory } = data;
-      setLineItems(lineItems);
+      const { statusHistory } = data;
       setStatus(statusHistory[statusHistory.length - 1]);
       setStatusHistory(statusHistory);
       addToast(`Order #${orderId} has been delivered.`, {
@@ -284,10 +283,10 @@ export const OnlineOrderInhouse = () => {
   const onConfirmClicked = async () => {
     try {
       const { data } = await onlineOrderApi.receive(orderId, currSiteId);
-      const { lineItems: lIs, statusHistory } = data;
+      const { statusHistory } = data;
       setStatus(statusHistory[statusHistory.length - 1]);
       setStatusHistory(statusHistory);
-      setLineItems(lIs);
+
       addToast(`Order ${orderId} received.`, {
         appearance: "success",
         autoDismiss: true,
@@ -330,7 +329,7 @@ export const OnlineOrderInhouse = () => {
                   body="Confirm that all the items in this order have been received?
             This action cannot be undone, and this order will be marked as completed."
                   onConfirmClicked={onConfirmClicked}
-                  cancelPath={`/lg/orders/${orderId}`}
+                  cancelPath={`/str/orders/${orderId}`}
                 />
               </div>
             )
@@ -360,6 +359,7 @@ export const OnlineOrderInhouse = () => {
                 onSaveQuantityClicked={onSaveQuantityClicked}
                 pickupSite={pickupSite}
                 currSiteId={currSiteId}
+                delivery={delivery}
               />
             </section>
           )}

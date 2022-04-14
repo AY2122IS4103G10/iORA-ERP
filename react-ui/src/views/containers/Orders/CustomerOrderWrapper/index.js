@@ -1,3 +1,5 @@
+import { Dialog } from "@headlessui/react";
+import { CheckIcon } from "@heroicons/react/outline";
 import { useMemo } from "react";
 import { useRef } from "react";
 import { useState } from "react";
@@ -12,6 +14,7 @@ import { api, onlineOrderApi, orderApi } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import Confirmation from "../../../components/Modals/Confirmation";
+import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { BasicTable } from "../../../components/Tables/BasicTable";
 import { Tabs } from "../../../components/Tabs";
 import { OnlineOrderInvoice } from "../../OnlineOrder/OnlineOrderInvoice";
@@ -27,6 +30,7 @@ const deliveryStatuses = [
 ];
 
 const Header = ({
+  delivery,
   statusHistory,
   subsys,
   disableTabs,
@@ -61,6 +65,18 @@ const Header = ({
               >
                 <span>Cancel Order</span>
               </button>
+            )}
+            {status === "READY_FOR_DELIVERY" && delivery && (
+              <a
+                href="https://app.staging.shippit.com/merchant/manage_new_orders/ready_for_despatch"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              >
+                <button type="button" className="font-medium text-grat-900">
+                  <span>Dispatch order</span>
+                </button>
+              </a>
             )}
             {!disableInvoice && (
               <button
@@ -170,6 +186,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [openInfo, setOpenInfo] = useState(false);
   const [loading, setLoading] = useState(false);
   const currSiteId = useSelector(selectUserSite);
 
@@ -234,7 +251,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           `http://localhost:3000/${subsys}/orders/${orderId}/pick-pack`
         );
         setQrDelivery(
-          `http://localhost:3000/${subsys}/procurements/${orderId}/delivery`
+          `http://localhost:3000/${subsys}/orders/${orderId}/delivery`
         );
         setLoading(false);
       } catch (error) {
@@ -273,34 +290,49 @@ export const CustomerOrderWrapper = ({ subsys }) => {
   const openConfirmModal = () => setOpenConfirm(true);
   const closeConfirmModal = () => setOpenConfirm(false);
 
-  const tabs = [
-    {
-      name: "Details",
-      href: `/${subsys}/orders/${orderId}`,
-      current: true,
-    },
-    {
-      name: "Pick / Pack",
-      href: `/${subsys}/orders/${orderId}/pick-pack`,
-      current: false,
-    },
-    status !== "" &&
-    (delivery ||
-      (site?.id !== pickupSite?.id &&
-        statusHistory[statusHistory.length - 1].status !==
-          "READY_FOR_COLLECTION" &&
-        statusHistory[statusHistory.length - 1].status !== "COLLECTED"))
-      ? {
-          name: "Delivery",
-          href: `/${subsys}/orders/${orderId}/delivery`,
-          current: false,
-        }
-      : {
-          name: "Collection",
-          href: `/${subsys}/orders/${orderId}/collect`,
+  const openInfoModal = () => setOpenInfo(true);
+  const closeInfoModal = () => setOpenInfo(false);
+
+  const tabs = delivery
+    ? [
+        {
+          name: "Details",
+          href: `/${subsys}/orders/${orderId}`,
+          current: true,
+        },
+        {
+          name: "Pick / Pack",
+          href: `/${subsys}/orders/${orderId}/pick-pack`,
           current: false,
         },
-  ];
+      ]
+    : [
+        {
+          name: "Details",
+          href: `/${subsys}/orders/${orderId}`,
+          current: true,
+        },
+        {
+          name: "Pick / Pack",
+          href: `/${subsys}/orders/${orderId}/pick-pack`,
+          current: false,
+        },
+        status !== "" &&
+        site?.id !== pickupSite?.id &&
+        statusHistory[statusHistory.length - 1].status !==
+          "READY_FOR_COLLECTION" &&
+        statusHistory[statusHistory.length - 1].status !== "COLLECTED"
+          ? {
+              name: "Delivery",
+              href: `/${subsys}/orders/${orderId}/delivery`,
+              current: false,
+            }
+          : {
+              name: "Collection",
+              href: `/${subsys}/orders/${orderId}/collect`,
+              current: false,
+            },
+      ];
 
   return loading ? (
     <div className="flex mt-5 items-center justify-center">
@@ -320,6 +352,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           setAction={setAction}
           openConfirm={openConfirmModal}
           onCancelOrderClicked={onCancelOrderClicked}
+          delivery={delivery}
         />
         <Outlet
           context={{
@@ -347,6 +380,7 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             exchangedLIs,
             voucher,
             openInvoice,
+            openInfoModal,
           }}
         />
       </div>
@@ -371,7 +405,14 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             customer={customer}
             deliveryAddress={deliveryAddress}
             data={lineItems}
-            qrValue={qrValue}
+            qrValue={
+              status.status !== "READY_FOR_DELIVERY" ? qrValue : qrDelivery
+            }
+            qrHelper={
+              status.status !== "READY_FOR_DELIVERY"
+                ? "Scan to start picking."
+                : "Scan to start delivery."
+            }
             site={site}
             pickupSite={pickupSite}
           >
@@ -402,10 +443,10 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             customer={customer}
             deliveryAddress={deliveryAddress}
             qrValue={
-              status.status !== "READY_FOR_SHIPPING" ? qrValue : qrDelivery
+              status.status !== "READY_FOR_DELIVERY" ? qrValue : qrDelivery
             }
             qrHelper={
-              status.status !== "READY_FOR_SHIPPING"
+              status.status !== "READY_FOR_DELIVERY"
                 ? "Scan to start picking."
                 : "Scan to start delivery."
             }
@@ -426,6 +467,50 @@ export const CustomerOrderWrapper = ({ subsys }) => {
           onConfirm={action.action}
         />
       )}
+      <SimpleModal open={openInfo} closeModal={closeInfoModal}>
+        <div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+          <div>
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+              <CheckIcon
+                className="h-6 w-6 text-green-600"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="mt-3 text-center sm:mt-5">
+              <Dialog.Title
+                as="h3"
+                className="text-lg leading-6 font-medium text-gray-900"
+              >
+                Delivery order created
+              </Dialog.Title>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500">
+                  Delivery order for Order #{orderId} has been successfully
+                  created. You can dispatch the parcels to the customer on
+                  Shippit.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+            <a
+              href="https://app.staging.shippit.com/merchant/manage_new_orders/ready_for_despatch"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sm:col-span-1 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:col-start-2 sm:text-sm"
+            >
+              <button type="button">Dispatch now</button>
+            </a>
+            <button
+              type="button"
+              className="m:col-span-1 mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+              onClick={closeInfoModal}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </SimpleModal>
     </>
   );
 };

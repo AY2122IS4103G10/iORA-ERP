@@ -450,6 +450,27 @@ public class OnlineCustomerController {
         }
     }
 
+    @PutMapping(value = "/deliver/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(customerOrderService.deliverOnlineOrder(orderId));
+
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/deliverMultiple/{orderId}", produces = "application/json")
+    public ResponseEntity<Object> deliverMultipleOnlineOrder(@PathVariable Long orderId) {
+        try {
+            return ResponseEntity.ok(customerOrderService.deliverMultipleOnlineOrder(orderId));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "/order/delivery/confirm", produces = "application/json")
     public String confirmDeliveryingOrder() {
         return shippIt.confirmDeliveryOrders();

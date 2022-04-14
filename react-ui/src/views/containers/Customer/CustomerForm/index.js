@@ -1,13 +1,16 @@
-import {useEffect, useState} from "react";
-import {useDispatch} from "react-redux";
-import {useNavigate, useParams} from "react-router-dom";
-import {useToasts} from "react-toast-notifications";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import {SimpleInputGroup} from "../../../components/InputGroups/SimpleInputGroup";
-import {SimpleInputBox} from "../../../components/Input/SimpleInputBox";
-import {api} from "../../../../environments/Api";
-import {addNewCustomer, updateExistingCustomer} from "../../../../stores/slices/customerSlice";
+import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
+import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
+import { api } from "../../../../environments/Api";
+import {
+  addNewCustomer,
+  updateExistingCustomer,
+} from "../../../../stores/slices/customerSlice";
 
 import "react-datepicker/dist/react-datepicker.css";
 //import {set} from "immer/dist/internal";
@@ -70,7 +73,8 @@ const CustomerFormBody = ({
                     <SimpleInputGroup
                       label="First name"
                       inputField="firstName"
-                      className="sm:mt-0 sm:col-span-2">
+                      className="sm:mt-0 sm:col-span-2"
+                    >
                       <SimpleInputBox
                         type="text"
                         name="firstName"
@@ -84,7 +88,8 @@ const CustomerFormBody = ({
                     <SimpleInputGroup
                       label="Last name"
                       inputField="lastName"
-                      className="sm:mt-0 sm:col-span-2">
+                      className="sm:mt-0 sm:col-span-2"
+                    >
                       <SimpleInputBox
                         type="text"
                         name="lastName"
@@ -98,7 +103,8 @@ const CustomerFormBody = ({
                     <SimpleInputGroup
                       label="Email"
                       inputField="email"
-                      className="sm:mt-0 sm:col-span-2">
+                      className="sm:mt-0 sm:col-span-2"
+                    >
                       <SimpleInputBox
                         type="text"
                         name="email"
@@ -112,7 +118,8 @@ const CustomerFormBody = ({
                     <SimpleInputGroup
                       label="Date of birth"
                       inputField="dob"
-                      className="sm:mt-0 sm:col-span-2">
+                      className="sm:mt-0 sm:col-span-2"
+                    >
                       <DatePicker
                         className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                         selected={dob}
@@ -122,7 +129,8 @@ const CustomerFormBody = ({
                     <SimpleInputGroup
                       label="Contact number"
                       inputField="contactNumber"
-                      className="sm:mt-0 sm:col-span-2">
+                      className="sm:mt-0 sm:col-span-2"
+                    >
                       <SimpleInputBox
                         type="text"
                         name="contactNumber"
@@ -136,7 +144,8 @@ const CustomerFormBody = ({
                     <SimpleInputGroup
                       label="Membership Tier"
                       inputField="membershipTier"
-                      className="sm:mt-0 sm:col-span-2">
+                      className="sm:mt-0 sm:col-span-2"
+                    >
                       <SimpleInputBox
                         type="text"
                         name="membershipTier"
@@ -152,7 +161,8 @@ const CustomerFormBody = ({
                     <SimpleInputGroup
                       label="Membership Points"
                       inputField="membershipPoints"
-                      className="sm:mt-0 sm:col-span-2">
+                      className="sm:mt-0 sm:col-span-2"
+                    >
                       <SimpleInputBox
                         type="text"
                         name="membershipPoints"
@@ -167,12 +177,14 @@ const CustomerFormBody = ({
                     <SimpleInputGroup
                       label="Address"
                       inputField="address"
-                      className="relative rounded-md sm:mt-0 sm:col-span-2">
+                      className="relative rounded-md sm:mt-0 sm:col-span-2"
+                    >
                       <div className="py-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                         <div className="sm:col-span-3">
                           <label
                             htmlFor="receiverName"
-                            className="block text-sm font-medium text-gray-700">
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Receiver Name
                           </label>
                           <div className="mt-2">
@@ -190,7 +202,8 @@ const CustomerFormBody = ({
                         <div className="sm:col-span-3">
                           <label
                             htmlFor="deliveryContract"
-                            className="block text-sm font-medium text-gray-700">
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Contact Number
                           </label>
                           <div className="mt-2">
@@ -210,7 +223,8 @@ const CustomerFormBody = ({
                         <div className="sm:col-span-4">
                           <label
                             htmlFor="street1"
-                            className="block text-sm font-medium text-gray-700">
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Street / Building / Road
                           </label>
                           <div className="mt-2">
@@ -228,7 +242,8 @@ const CustomerFormBody = ({
                         <div className="sm:col-span-2">
                           <label
                             htmlFor="street2"
-                            className="block text-sm font-medium text-gray-700">
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Unit Number
                           </label>
                           <div className="mt-2">
@@ -245,7 +260,10 @@ const CustomerFormBody = ({
                         </div>
                       </div>
                       <div className="py-4">
-                        <label htmlFor="zip" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="zip"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           ZIP / Postal code
                         </label>
                         <div className="mt-2">
@@ -264,7 +282,8 @@ const CustomerFormBody = ({
                         <div className="sm:col-span-2">
                           <label
                             htmlFor="country"
-                            className="block text-sm font-medium text-gray-700">
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Country
                           </label>
 
@@ -273,7 +292,8 @@ const CustomerFormBody = ({
                             name="countries"
                             className="mt-2 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm rounded-md"
                             value={country}
-                            onChange={onCountry}>
+                            onChange={onCountry}
+                          >
                             {countries.map((country, index) => (
                               <option key={index} value={country}>
                                 {country}
@@ -282,7 +302,10 @@ const CustomerFormBody = ({
                           </select>
                         </div>
                         <div className="sm:col-span-2">
-                          <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="city"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             City
                           </label>
                           <div className="mt-2">
@@ -300,7 +323,8 @@ const CustomerFormBody = ({
                         <div className="sm:col-span-2">
                           <label
                             htmlFor="state"
-                            className="block text-sm font-medium text-gray-700">
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             State / Province
                           </label>
                           <div className="mt-2">
@@ -326,12 +350,14 @@ const CustomerFormBody = ({
                   <button
                     type="button"
                     className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-                    onClick={onCancelClicked}>
+                    onClick={onCancelClicked}
+                  >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
                     {!isEditing ? "Add" : "Save"} Customer
                   </button>
                 </div>
@@ -345,13 +371,13 @@ const CustomerFormBody = ({
 );
 
 export const fetchCountries = async () => {
-  const {data} = await api.getAll("admin/countries");
+  const { data } = await api.getAll("admin/countries");
   return data;
 };
 
-export const CustomerForm = ({subsys}) => {
-  const {customerId} = useParams();
-  const {addToast} = useToasts();
+export const CustomerForm = ({ subsys }) => {
+  const { customerId } = useParams();
+  const { addToast } = useToasts();
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -359,7 +385,7 @@ export const CustomerForm = ({subsys}) => {
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [membershipTier, setMembershipTier] = useState({name: "BASIC"});
+  const [membershipTier, setMembershipTier] = useState({ name: "BASIC" });
   const [membershipPoints, setMembershipPoints] = useState("0");
   const [receiverName, setRecieverName] = useState("");
   const [street1, setStreet1] = useState("");
@@ -392,7 +418,9 @@ export const CustomerForm = ({subsys}) => {
   const onDeliveryContact = (e) => setDeliveryContact(e.target.value);
   const onCountry = (e) => setCountry(e.target.value);
 
-  const canAdd = [firstName, lastName, dob, contactNumber, email].every(Boolean);
+  const canAdd = [firstName, lastName, dob, contactNumber, email].every(
+    Boolean
+  );
 
   useEffect(() => {
     fetchCountries().then((data) => setCountries(data));
@@ -452,7 +480,9 @@ export const CustomerForm = ({subsys}) => {
               appearance: "success",
               autoDismiss: true,
             });
-            navigate(subsys === "str" ? `/str/pos/orderPurchase` : "/sm/customers");
+            navigate(
+              subsys === "str" ? `/str/pos/orderPurchase` : "/sm/customers"
+            );
           })
           .catch((err) => {
             addToast(`Error: ${err.message}`, {
@@ -499,7 +529,13 @@ export const CustomerForm = ({subsys}) => {
   };
 
   const onCancelClicked = () =>
-    navigate(!isEditing ? "/sm/customers" : `/sm/customers/${customerId}`);
+    navigate(
+      subsys === "str"
+        ? "/str/pos/orderPurchase"
+        : !isEditing
+        ? "/sm/customers"
+        : `/sm/customers/${customerId}`
+    );
 
   return (
     <CustomerFormBody

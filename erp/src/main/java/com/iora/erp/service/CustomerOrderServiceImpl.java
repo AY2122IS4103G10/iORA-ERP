@@ -25,7 +25,7 @@ import javax.persistence.TypedQuery;
 import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.enumeration.PaymentTypeEnum;
-import com.iora.erp.enumeration.ParcelSize;
+import com.iora.erp.enumeration.ParcelSizeEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
@@ -40,6 +40,7 @@ import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
 import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OOStatus;
@@ -61,6 +62,7 @@ import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Service("customerOrderServiceImpl")
 @Transactional
@@ -1101,7 +1103,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public OnlineOrder deliverOnlineOrder(Long orderId) throws CustomerOrderException {
+    public OnlineOrder deliverOnlineOrder(Long orderId, Long siteId, List<Delivery> parcelSize)
+            throws CustomerOrderException {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 
         if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.READY_FOR_DELIVERY) {
@@ -1354,7 +1357,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public List<ParcelSize> getParcelSizes() {
-        return Arrays.asList(ParcelSize.values());
+    public List<ParcelSizeEnum> getParcelSizes() {
+        return Arrays.asList(ParcelSizeEnum.values());
+    }
+
+    @Override
+    public Delivery getDeliveryInfoById(Long deliveryId) {
+        return em.find(Delivery.class, deliveryId);
     }
 }

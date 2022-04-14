@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.iora.erp.enumeration.ParcelSize;
+import com.iora.erp.enumeration.ParcelSizeEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
@@ -14,6 +14,7 @@ import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
+import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.ExchangeLI;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.customerOrder.Payment;
@@ -93,9 +94,11 @@ public interface CustomerOrderService {
         public abstract OnlineOrder createOnlineOrder(OnlineOrder onlineOrder, String clientSecret)
                         throws StripeException, InsufficientPaymentException, CustomerException;
 
-        public abstract OnlineOrder customerCancelOnlineOrder(Long orderId, Long customerId) throws CustomerOrderException, CustomerException, StripeException;
+        public abstract OnlineOrder customerCancelOnlineOrder(Long orderId, Long customerId)
+                        throws CustomerOrderException, CustomerException, StripeException;
 
-        public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException, CustomerException, StripeException;
+        public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId)
+                        throws CustomerOrderException, CustomerException, StripeException;
 
         public abstract OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
 
@@ -111,9 +114,10 @@ public interface CustomerOrderService {
         public abstract OnlineOrder adjustProduct(Long orderId, String rfidsku, int qty) throws CustomerOrderException,
                         NoStockLevelException, IllegalTransferException, ProductException;
 
-        public abstract OnlineOrder deliverOnlineOrder(Long orderId) throws CustomerOrderException;
+        public abstract OnlineOrder deliverOnlineOrder(Long orderId, Long siteId, List<Delivery> parcelSize)
+                        throws CustomerOrderException;
 
-        public abstract List<ParcelSize> getParcelSizes();
+        public abstract List<ParcelSizeEnum> getParcelSizes();
 
         public abstract OnlineOrder deliverMultipleOnlineOrder(Long orderId) throws CustomerOrderException;
 
@@ -128,4 +132,6 @@ public interface CustomerOrderService {
         public abstract Map<Long, Long> getOnlineOrdersInDateRange(Date start, Date end);
 
         public abstract List<CustomerOrder> getDailyCustomerOrders(Long siteId, Date date);
+
+        public abstract Delivery getDeliveryInfoById(Long deliveryId);
 }

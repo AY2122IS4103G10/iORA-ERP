@@ -26,14 +26,14 @@ public class OnlineOrder extends CustomerOrder {
 
     private boolean delivery;
 
-    @JsonIgnoreProperties({"stockLevel"})
+    @JsonIgnoreProperties({ "stockLevel" })
     @ManyToOne
     private StoreSite pickupSite;
 
     @OneToOne(cascade = CascadeType.ALL)
     private DeliveryAddress deliveryAddress;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Delivery> parcelDelivery;
 
     @ElementCollection

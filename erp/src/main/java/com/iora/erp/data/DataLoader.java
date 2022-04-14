@@ -16,6 +16,7 @@ import javax.persistence.PersistenceContext;
 
 import com.iora.erp.enumeration.AccessRightsEnum;
 import com.iora.erp.enumeration.CountryEnum;
+import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.enumeration.PayTypeEnum;
 import com.iora.erp.enumeration.PaymentTypeEnum;
 import com.iora.erp.model.company.Address;

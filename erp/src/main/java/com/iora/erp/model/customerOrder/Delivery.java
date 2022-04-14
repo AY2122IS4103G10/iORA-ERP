@@ -1,6 +1,7 @@
 package com.iora.erp.model.customerOrder;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.iora.erp.enumeration.ParcelSize;
+import com.iora.erp.enumeration.ParcelSizeEnum;
 
 @Entity
 public class Delivery {
@@ -17,17 +18,13 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String deliveryID;
+    private Integer deliveryID;
     private String trackingID;
     private Date dateTime;
     private Long siteId;
 
     @Enumerated(EnumType.STRING)
-    private ParcelSize ps;
-
-    public Delivery(String parcelSize) {
-        this.ps = ParcelSize.valueOf(parcelSize);
-    }
+    private ParcelSizeEnum ps;
 
     public Delivery() {
     }
@@ -38,14 +35,6 @@ public class Delivery {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public ParcelSize getPs() {
-        return ps;
-    }
-
-    public void setPs(ParcelSize ps) {
-        this.ps = ps;
     }
 
     public Date getDateTime() {
@@ -64,11 +53,11 @@ public class Delivery {
         this.siteId = siteId;
     }
 
-    public String getDeliveryID() {
+    public Integer getDeliveryID() {
         return deliveryID;
     }
 
-    public void setDeliveryID(String deliveryID) {
+    public void setDeliveryID(Integer deliveryID) {
         this.deliveryID = deliveryID;
     }
 
@@ -78,6 +67,14 @@ public class Delivery {
 
     public void setTrackingID(String trackingID) {
         this.trackingID = trackingID;
+    }
+
+    public ParcelSizeEnum getPs() {
+        return ps;
+    }
+
+    public void setPs(ParcelSizeEnum ps) {
+        this.ps = ps;
     }
 
 }

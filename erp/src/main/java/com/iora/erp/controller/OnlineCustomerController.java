@@ -8,11 +8,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.websocket.server.PathParam;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iora.erp.enumeration.ParcelSize;
+import com.iora.erp.enumeration.ParcelSizeEnum;
 import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
@@ -414,25 +415,26 @@ public class OnlineCustomerController {
     }
 
     @GetMapping(path = "/order/parcelSize", produces = "application/json")
-    public List<ParcelSize> getParcelSize() {
+    public List<ParcelSizeEnum> getParcelSize() {
         return customerOrderService.getParcelSizes();
     }
 
-    @RequestMapping(value = "/order", method = RequestMethod.POST)
-    public ResponseEntity<Object> deliverOnlineOrder() {
+    @RequestMapping(value = "/order/delivery/{orderId}/{siteId}", consumes = "application/json", method = RequestMethod.POST)
+    public ResponseEntity<Object> deliverOnlineOrder(@PathVariable Long orderId, @PathVariable Long siteId,
+            @RequestBody OnlineOrder parcelSizes) {
         try {
+            return ResponseEntity.ok(shippIt.deliveryOrder(orderId, siteId, parcelSizes));
 
-            return ResponseEntity.ok(shippIt.deliveryOrder());
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
-    @PutMapping(path = "/deliverMultiple/{orderId}", produces = "application/json")
+    @PutMapping(path = "/order/delivery/declareMultiple/{orderId}", produces = "application/json")
     public ResponseEntity<Object> deliverMuiltipleOnlineOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity.ok(customerOrderService.deliverMultipleOnlineOrder(orderId));
+            return ResponseEntity.ok(shippIt.moreToDelivery(orderId));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

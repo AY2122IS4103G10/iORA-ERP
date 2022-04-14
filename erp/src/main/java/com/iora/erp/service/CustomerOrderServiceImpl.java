@@ -1104,7 +1104,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public OnlineOrder deliverOnlineOrder(Long orderId, Long siteId, List<Delivery> parcelSize)
+    public OnlineOrder deliverOnlineOrder(Long orderId)
             throws CustomerOrderException {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 

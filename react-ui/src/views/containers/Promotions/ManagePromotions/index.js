@@ -171,7 +171,7 @@ const PromoModal = ({
                             modalState !== "view" && percent && fixed
                               ? "Final price calculated using formula (100 - %disc) x price + fixedPrice."
                               : `Enter percentage discount(s) separated with a comma ",".
-                          Eg. 10% off for items within quota: "10".
+                          Eg. 10% off items: "10".
                           Eg. 50% off second item: "100,50".
                           Eg. 1 for 1: "100,0" (takes 100% of higher price)`
                           }
@@ -203,7 +203,7 @@ const PromoModal = ({
                         />
                       </SimpleInputGroup>
                     )}
-                    <SimpleInputGroup
+                    {/* <SimpleInputGroup
                       label="Options"
                       inputField="global-stackable"
                       className="rounded-md sm:mt-0 sm:col-span-2"
@@ -268,7 +268,7 @@ const PromoModal = ({
                           </div>
                         </div>
                       </fieldset>
-                    </SimpleInputGroup>
+                    </SimpleInputGroup> */}
                   </div>
                 </div>
               </div>

@@ -17,6 +17,7 @@ import { SimpleModal } from "../../../components/Modals/SimpleModal";
 import { useRef } from "react";
 import { PaperClipIcon } from "@heroicons/react/outline";
 import { TailSpin } from "react-loader-spinner";
+import { SimpleRadio } from "../../../components/RadioGroups/SimpleRadio";
 
 const prepareFields = (fields, checkedState) => {
   const f = [];
@@ -97,7 +98,7 @@ export const FormCheckboxes = ({
   ...rest
 }) => {
   return (
-    <fieldset className="space-y-5">
+    <fieldset className="space-y-5 mb-1">
       <legend className="sr-only">{legend}</legend>
       {options.map((option, index) => {
         return (
@@ -192,11 +193,10 @@ const AddProductFormBody = ({
   tagCheckedState,
   promotions,
   onPromosChanged,
-  promoCheckedState,
+  promoSelected,
   onSaveClicked,
   onCancelClicked,
   openModal,
-  setFieldNameSelected,
   images,
   setImages,
   onImagesChanged,
@@ -423,19 +423,20 @@ const AddProductFormBody = ({
                                   htmlFor="file-upload"
                                   className="relative cursor-pointer bg-white rounded-md font-medium text-cyan-600 hover:text-cyan-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-cyan-500"
                                 >
-                                  <span className="text-center">Upload a file</span>
+                                  <span className="text-center">
+                                    Upload a file
+                                  </span>
                                   <input
                                     ref={fileRef}
                                     id="file-upload"
                                     name="file-upload"
                                     type="file"
-                                    className="sr-only" 
+                                    className="sr-only"
                                     accept="image/*"
                                     multiple
                                     onChange={onImagesChanged}
                                   />
                                 </label>
-                                
                               </div>
                               <p className="text-xs text-gray-500">
                                 PNG, JPG, GIF
@@ -525,13 +526,18 @@ const AddProductFormBody = ({
             disableButton
           >
             {promotions.length ? (
-              <FormCheckboxes
-                legend="Promotion"
+              // <FormCheckboxes
+              //   legend="Promotion"
+              //   options={promotions}
+              //   inputField="Promotion"
+              //   onFieldsChanged={onPromosChanged}
+              //   fieldValues={promoCheckedState}
+              //   isEditing={isEditing}
+              // />
+              <SimpleRadio
                 options={promotions}
-                inputField="Promotion"
-                onFieldsChanged={onPromosChanged}
-                fieldValues={promoCheckedState}
-                isEditing={isEditing}
+                selected={promoSelected}
+                onSelectedChanged={onPromosChanged}
               />
             ) : (
               "No promotions found"
@@ -604,15 +610,25 @@ export const ProductForm = () => {
 
   useEffect(() => {
     api.getAll("sam/promotionFields").then((response) => {
-      setPromotions(response.data);
-      setPromoCheckedState(new Array(response.data.length).fill(false));
+      setPromotions(
+        [
+          {
+            id: 0,
+            fieldValue: "No promotion",
+          },
+        ].concat(response.data)
+      );
     });
   }, []);
   const [colorCheckedState, setColorCheckedState] = useState([]);
   const [sizeCheckedState, setSizeCheckedState] = useState([]);
   const [tagCheckedState, setTagCheckedState] = useState([]);
   const [catCheckedState, setCatCheckedState] = useState([]);
-  const [promoCheckedState, setPromoCheckedState] = useState([]);
+  // const [promoCheckedState, setPromoCheckedState] = useState([]);
+  const [promoSelected, setPromoSelected] = useState({
+    id: 0,
+    fieldValue: "No promotion",
+  });
 
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
@@ -644,12 +660,7 @@ export const ProductForm = () => {
     );
     setCatCheckedState(updateCheckedState);
   };
-  const onPromosChanged = (pos) => {
-    const updateCheckedState = promoCheckedState.map((item, index) =>
-      index === pos ? !item : item
-    );
-    setPromoCheckedState(updateCheckedState);
-  };
+  const onPromosChanged = (e) => setPromoSelected(e);
 
   const canAdd = [prodCode, name, description, listPrice].every(Boolean);
 
@@ -680,7 +691,7 @@ export const ProductForm = () => {
     fields = fields.concat(prepareFields(sizes, sizeCheckedState));
     fields = fields.concat(prepareFields(tags, tagCheckedState));
     fields = fields.concat(prepareFields(categories, catCheckedState));
-    fields = fields.concat(prepareFields(promotions, promoCheckedState));
+    if (promoSelected.id !== 0) fields = fields.concat(promoSelected);
 
     if (canAdd) {
       setLoading(true);
@@ -804,21 +815,18 @@ export const ProductForm = () => {
                 .includes(category)
             )
         );
-        setPromoCheckedState(
-          promotions
-            .map((field) => field.fieldValue)
-            .map((promo) =>
-              productFields
-                .filter(
-                  (field) =>
-                    field.fieldName === "CATEGORY" &&
-                    [field.quota, field.coefficients, field.constants].some(
-                      Boolean
-                    )
-                )
-                .map((field) => field.fieldValue)
-                .includes(promo)
-            )
+        const promo = productFields.find(
+          (field) =>
+            field.fieldName === "CATEGORY" &&
+            [field.quota, field.coefficients, field.constants].some(Boolean)
+        );
+        setPromoSelected(
+          promo !== undefined
+            ? promo
+            : {
+                id: 0,
+                fieldValue: "No promotion",
+              }
         );
       });
   }, [prodId, colors, sizes, tags, categories, promotions]);
@@ -892,7 +900,7 @@ export const ProductForm = () => {
         catCheckedState={catCheckedState}
         promotions={promotions}
         onPromosChanged={onPromosChanged}
-        promoCheckedState={promoCheckedState}
+        promoSelected={promoSelected}
         onSaveClicked={onSaveClicked}
         onCancelClicked={onCancelClicked}
         openModal={openModal}

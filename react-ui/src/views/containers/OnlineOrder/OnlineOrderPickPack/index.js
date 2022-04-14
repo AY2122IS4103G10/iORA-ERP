@@ -2,6 +2,7 @@ import { XIcon } from "@heroicons/react/outline";
 import { useEffect } from "react";
 import { useMemo } from "react";
 import { useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
@@ -198,6 +199,7 @@ const PackageModal = ({
   sizeSelected,
   onSizeSelectedChanged,
   onRemoveClicked,
+  loading,
 }) => {
   return (
     <SimpleModal open={open} closeModal={closeModal}>
@@ -280,7 +282,12 @@ const PackageModal = ({
                     type="submit"
                     className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                   >
-                    Confirm
+                    <span>Confirm</span>
+                    {loading && (
+                      <div className="ml-3 flex items-center justify-center">
+                        <TailSpin color="#FFFFFF" height={20} width={20} />
+                      </div>
+                    )}
                   </button>
                 </div>
               </div>
@@ -307,6 +314,7 @@ export const OnlineOrderPickPack = () => {
     pickupSite,
     site,
     delivery,
+    openInfoModal,
   } = useOutletContext();
   const status = st.status;
   const navigate = useNavigate();
@@ -315,6 +323,17 @@ export const OnlineOrderPickPack = () => {
   const [sizes, setSizes] = useState([]);
   const [sizeSelected, setSizeSelected] = useState([]);
   const [openPackage, setOpenPackage] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPackageSizes = async () => {
+      const { data } = await api.getAll("online/order/parcelSize");
+      const sizes = data.map((size) => size.replaceAll("_", " "));
+      setSizes(sizes);
+      setSizeSelected([sizes[0]]);
+    };
+    fetchPackageSizes();
+  }, []);
 
   const onNumPackagesChanged = (evt) => {
     evt.preventDefault();
@@ -337,17 +356,39 @@ export const OnlineOrderPickPack = () => {
     }
   };
 
-  const onConfirmClicked = () => handlePickPack();
+  const onSaveClicked = async (evt) => {
+    evt.preventDefault();
+    setLoading(true);
+    try {
+      const { data } = await api.create(
+        `online/order/delivery/${orderId}/${currSiteId}`,
+        {
+          parcelDelivery: sizeSelected.map((size) => ({
+            ps: size.replaceAll(" ", "_"),
+          })),
+        }
+      );
+      console.log(data);
+      const { statusHistory } = data;
+      setStatus(statusHistory[statusHistory.length - 1]);
+      setStatusHistory(statusHistory);
+      addToast("Order is ready for delivery", {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      openInfoModal();
+      navigate(`/${subsys}/orders/${orderId}`);
+    } catch (error) {
+      addToast(`Error: ${error.response.data}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => {
-    const fetchPackageSizes = async () => {
-      const { data } = await api.getAll("online/order/parcelSize");
-      const sizes = data.map((size) => size.replaceAll("_", " "));
-      setSizes(sizes);
-      setSizeSelected([sizes[0]]);
-    };
-    fetchPackageSizes();
-  }, []);
+  const onConfirmClicked = () => handlePickPack();
 
   const onScanClicked = (evt) => {
     evt.preventDefault();
@@ -477,7 +518,7 @@ export const OnlineOrderPickPack = () => {
                   This action cannot be undone, and this order will advance to the
                   ${status === "PICKED" ? "packing" : "delivery"} stage.`}
                         onConfirmClicked={
-                          status === "PACKED"
+                          status === "PACKED" && delivery
                             ? openPackageModal
                             : onConfirmClicked
                         }
@@ -542,6 +583,8 @@ export const OnlineOrderPickPack = () => {
           sizeSelected={sizeSelected}
           onSizeSelectedChanged={onSizeSelectedChanged}
           onRemoveClicked={onRemoveClicked}
+          onSaveClicked={onSaveClicked}
+          loading={loading}
         />
       )}
     </>

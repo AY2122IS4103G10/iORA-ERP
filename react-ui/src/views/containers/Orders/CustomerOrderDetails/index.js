@@ -125,8 +125,7 @@ const OrderDetailsBody = ({
                         <span className="block">{site.name}</span>
                         <span className="block">{site.address.road}</span>
                         <span className="block">
-                          {site.address.city},{" "}
-                          {site.address.postalCode}
+                          {site.address.city}, {site.address.postalCode}
                         </span>
                         <span className="block">{site.phoneNumber}</span>
                       </address>
@@ -144,9 +143,7 @@ const OrderDetailsBody = ({
                 )}
 
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Date
-                  </dt>
+                  <dt className="text-sm font-medium text-gray-500">Date</dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     {moment(dateTime).format("DD/MM/YYYY, H:mm:ss")}
                   </dd>
@@ -259,6 +256,8 @@ const OrderDetailsBody = ({
                     </dd>
                   </div>
                 )}
+
+                
               </dl>
             </div>
           </div>
@@ -307,7 +306,7 @@ export const CustomerOrderDetails = () => {
     site,
   } = useOutletContext();
   const [history, setHistory] = useState([]);
- 
+
   useEffect(() => {
     statusHistory !== undefined &&
       fetchAllActionBy(statusHistory).then((data) => {

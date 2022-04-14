@@ -152,7 +152,7 @@ export default function ViewModel() {
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedSize, setSelectedSize] = useState(0);
   const [clicked, setClicked] = useState(false);
-
+console.log(model)
   const productStock = useSelector(selectProductStock);
 
   useEffect(() => {

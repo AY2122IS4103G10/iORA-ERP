@@ -413,8 +413,8 @@ export const SupportList = () => {
       customer: {
         id: user?.id,
       },
-      customerOrder: {id : order}
     };
+    if (order) ticket["customerOrder"] = {id : order};
 
     const image = new FormData();
     image.append("image", file);

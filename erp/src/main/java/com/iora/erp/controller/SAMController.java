@@ -425,7 +425,7 @@ public class SAMController {
     }
 
     @GetMapping(path = "/viewStock/product/{sku}", produces = "application/json")
-    public List<Map<String,Object>> viewStockByProduct(@PathVariable String sku) {
+    public List<Map<String, Object>> viewStockByProduct(@PathVariable String sku) {
         return siteService.getStockLevelByProduct(sku);
     }
 
@@ -589,7 +589,6 @@ public class SAMController {
             exporter.setExporterInput(new SimpleExporterInput(finalReport));
             exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getOutputStream()));
 
-            
             response.setHeader(
                     HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=SalesReport.csv;");
             response.setContentType("text/csv");
@@ -748,7 +747,7 @@ public class SAMController {
     @PostMapping(path = "/customer/create", consumes = "application/json")
     public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
         try {
-            return ResponseEntity.ok(customerService.createCustomerAccount(customer));
+            return ResponseEntity.ok(customerService.createCustomerAccountPOS(customer));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

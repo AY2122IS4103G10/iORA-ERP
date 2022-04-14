@@ -79,8 +79,6 @@ public class OnlineCustomerController {
     StripeService stripeService;
     @Autowired
     private ShippItService shippIt;
-    @Autowired
-    private RestTemplate restTemplate;
 
     /*
      * ---------------------------------------------------------

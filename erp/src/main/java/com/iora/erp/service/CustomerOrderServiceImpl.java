@@ -890,7 +890,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         Site actionBy = em.find(Site.class, siteId);
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 
-        if (actionBy == null || (!(actionBy instanceof WarehouseSite) && !(actionBy instanceof StoreSite))) {
+        if (actionBy == null) {
             throw new CustomerOrderException("Site is not authorised to cancel the order.");
         } else if (actionBy instanceof WarehouseSite) {
             onlineOrder.addStatusHistory(new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.CANCELLED));
@@ -901,7 +901,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         Customer c = customerService.getCustomerById(onlineOrder.getCustomerId());
         revertMembershipPoints(c, onlineOrder.getTotalAmount());
         for (Payment p : onlineOrder.getPayments()) {
-            stripeService.refundPayment(p.getCcTransactionId(), p.getAmount());
+            if (p.getPaymentType() != PaymentTypeEnum.CASH) {
+                stripeService.refundPayment(p.getCcTransactionId(), p.getAmount());
+            }
             p.setAmount(0);
         }
 
@@ -970,7 +972,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 onlineOrder.addStatusHistory(
                         new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_COLLECTION));
             } else {
-
                 onlineOrder.addStatusHistory(
                         new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_DELIVERY));
             }

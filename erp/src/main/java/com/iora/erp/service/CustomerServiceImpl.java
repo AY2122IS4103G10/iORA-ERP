@@ -422,6 +422,10 @@ public class CustomerServiceImpl implements CustomerService {
     public SupportTicket resolveSupportTicket(Long id) throws SupportTicketException {
         SupportTicket st = getSupportTicket(id);
         st.setStatus(SupportTicket.Status.RESOLVED);
+
+        emailService.sendSimpleHTMLMessage(st.getCustomer().getEmail(), "iORA Support Ticket #" + st.getId(),
+                st.getCustomer().getLastName(), "Support Ticket #" + st.getId()
+                        + " has been marked as resolved. Please contact us if you require further assistance.");
         return em.merge(st);
     }
 

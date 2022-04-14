@@ -65,7 +65,7 @@ export function Notifications({ open, setOpen, setNewNoti }) {
       <Dialog
         as="div"
         className="fixed inset-0 overflow-hidden"
-        onClose={() => setOpen(false)}
+        onClose={() => null}
       >
         <div className="absolute inset-0 overflow-hidden">
           <Dialog.Overlay className="absolute inset-0" />
@@ -107,75 +107,70 @@ export function Notifications({ open, setOpen, setNewNoti }) {
                     </div>
                   ) : notifications.length ? (
                     <ul className="flex-1 divide-y divide-gray-200 overflow-y-auto">
-                      {notifications
-                        .slice(0)
-
-                        .map((noti, index) => (
-                          <li key={index}>
-                            <div className="group relative flex items-center py-6 px-5">
-                              <Link
-                                to={`${noti.title.split(" ")[0] === "Stock"
-                                    ? "stocktransfer/" +
+                      {notifications.slice(0).map((noti, index) => (
+                        <li key={index}>
+                          <div className="group relative flex items-center py-6 px-5">
+                            <Link
+                              to={`${
+                                noti.title.split(" ")[0] === "Stock"
+                                  ? "stocktransfer/" +
                                     noti.title.split(" ")[
-                                    noti.title.split(" ").length - 1
-                                    ]
-                                    : noti.title.split(" ")[0] === "Procurement"
-                                      ? "procurements/" +
-                                      noti.title.split(" ")[
                                       noti.title.split(" ").length - 1
-                                      ]
-                                      : noti.title.split(" ")[0] === "Online"
-                                        ? "orders/" +
-                                        noti.title.split(" ")[
-                                        noti.title.split(" ").length - 1
-                                        ]
-                                        : noti.title.split(" ")[0] === "Support"
-                                          ? "support/" +
-                                          noti.title.split(" ")[
-                                          noti.title.split(" ").length - 1
-                                          ]
-                                          : "stocktransfer/create"
-                                  }`}
-                              >
-                                {/* <div
+                                    ]
+                                  : noti.title.split(" ")[0] === "Procurement"
+                                  ? "procurements/" +
+                                    noti.title.split(" ")[
+                                      noti.title.split(" ").length - 1
+                                    ]
+                                  : noti.title.split(" ")[0] === "Online"
+                                  ? "orders/" +
+                                    noti.title.split(" ")[
+                                      noti.title.split(" ").length - 1
+                                    ]
+                                  : noti.title.split(" ")[0] === "Support"
+                                  ? "support/" +
+                                    noti.title.split(" ")[
+                                      noti.title.split(" ").length - 1
+                                    ]
+                                  : "stocktransfer/create"
+                              }`}
+                            >
+                              {/* <div
                                 className="absolute inset-0 group-hover:bg-gray-50"
                                 aria-hidden="true"
                               /> */}
-                                <div className="relative flex min-w-0 flex-1 items-center ">
-                                  <div className="ml-4 truncate">
-                                    <p className="truncate text-sm font-semibold text-gray-900 whitespace-pre-line">
-                                      {noti.title}
-                                    </p>
-                                    <p className="truncate text-sm text-gray-500 whitespace-pre-line">
-                                      {noti.message}
-                                    </p>
-                                    <br />
-                                    <p className="truncate text-sm text-gray-500">
-                                      {moment
-                                        .unix(noti.timeStamp / 1000)
-                                        .format(" H:mm:ss, DD/MM/YYYY")}
-                                    </p>
-                                  </div>
+                              <div className="relative flex min-w-0 flex-1 items-center ">
+                                <div className="ml-4 truncate">
+                                  <p className="truncate text-sm font-semibold text-gray-900 whitespace-pre-line">
+                                    {noti.title}
+                                  </p>
+                                  <p className="truncate text-sm text-gray-500 whitespace-pre-line">
+                                    {noti.message}
+                                  </p>
+                                  <br />
+                                  <p className="truncate text-sm text-gray-500">
+                                    {moment
+                                      .unix(noti.timeStamp / 1000)
+                                      .format(" H:mm:ss, DD/MM/YYYY")}
+                                  </p>
                                 </div>
-                              </Link>
-                              <div className="ml-3 flex h-7 items-center">
-                                <button
-                                  type="button"
-                                  className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-cyan-500"
-                                  onClick={() => dismissNotification(index)}
-                                >
-                                  <span className="sr-only">
-                                    Dismiss Notification
-                                  </span>
-                                  <XIcon
-                                    className="h-5 w-5"
-                                    aria-hidden="true"
-                                  />
-                                </button>
                               </div>
+                            </Link>
+                            <div className="ml-3 flex h-7 items-center">
+                              <button
+                                type="button"
+                                className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-cyan-500"
+                                onClick={() => dismissNotification(index)}
+                              >
+                                <span className="sr-only">
+                                  Dismiss Notification
+                                </span>
+                                <XIcon className="h-5 w-5" aria-hidden="true" />
+                              </button>
                             </div>
-                          </li>
-                        ))}
+                          </div>
+                        </li>
+                      ))}
                     </ul>
                   ) : (
                     <div className="relative block w-full rounded-lg p-12 text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">

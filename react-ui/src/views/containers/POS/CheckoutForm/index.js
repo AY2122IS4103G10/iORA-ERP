@@ -674,9 +674,7 @@ export const Card = ({
 }) => {
   const [terminal, setTerminal] = useState(null);
   const [connected, setConnected] = useState(false);
-  const [posId, setPosId] = useState(
-    localStorage.getItem("pos-posdeviceid")?.replace(/"/g, "")
-  );
+  const posId = localStorage.getItem("pos-posdeviceid")?.replace(/"/g, "");
   const [clientSecret, setClientSecret] = useState(null);
   const [loading, setLoading] = useState(false);
 

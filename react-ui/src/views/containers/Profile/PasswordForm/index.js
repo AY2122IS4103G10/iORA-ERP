@@ -51,8 +51,8 @@ export const PasswordForm = () => {
                     type="password"
                     name="password"
                     id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={current}
+                    onChange={(e) => setCurrent(e.target.value)}
                     required
                     className="shadow-sm p-3 focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm rounded-md"
                   />
@@ -68,7 +68,7 @@ export const PasswordForm = () => {
                     name="password"
                     id="password"
                     value={password}
-                    onChange={(e) => setCurrent(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                     className="shadow-sm p-3 focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm rounded-md"
                   />

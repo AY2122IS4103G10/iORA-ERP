@@ -2,6 +2,7 @@ package com.iora.erp.data;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -861,6 +862,7 @@ public class DataLoader implements CommandLineRunner {
 		co1.setSite(siteService.getSite(4L));
 		co1.setCustomerId(1L);
 		customerOrderService.createCustomerOrder(co1, null);
+
 		OnlineOrder oo1 = new OnlineOrder(false);
 		oo1.setCustomerId(2L);
 		oo1.setPickupSite((StoreSite) siteService.getSite(4L));
@@ -937,13 +939,174 @@ public class DataLoader implements CommandLineRunner {
 		oo6.setDeliveryAddress(customerService.getCustomerById(6L).getAddress());
 		customerOrderService.createOnlineOrder(oo6, null);
 
+		// For DataLoader only
+		CustomerOrder co2 = new CustomerOrder();
+		Payment payment8 = new Payment(1270d, "8-1", PaymentTypeEnum.CASH);
+		em.persist(payment8);
+		co2.addPayment(payment8);
+		co2.setSite(siteService.getSite(4L));
+		co2.setDateTime(new Date(1618382055000L));
+		customerOrderService.createCustomerOrder(co2, null);
+
+		CustomerOrder co3 = new CustomerOrder();
+		Payment payment9 = new Payment(2560d, "9-1", PaymentTypeEnum.CASH);
+		em.persist(payment9);
+		co3.addPayment(payment9);
+		co3.setSite(siteService.getSite(4L));
+		co3.setDateTime(new Date(1620974055000L));
+		customerOrderService.createCustomerOrder(co3, null);
+
+		CustomerOrder co4 = new CustomerOrder();
+		Payment payment10 = new Payment(2123d, "10-1", PaymentTypeEnum.CASH);
+		em.persist(payment10);
+		co4.addPayment(payment10);
+		co4.setSite(siteService.getSite(4L));
+		co4.setDateTime(new Date(1623652455000L));
+		customerOrderService.createCustomerOrder(co4, null);
+
+		CustomerOrder co5 = new CustomerOrder();
+		Payment payment11 = new Payment(2555, "11-1", PaymentTypeEnum.CASH);
+		em.persist(payment11);
+		co5.addPayment(payment11);
+		co5.setSite(siteService.getSite(4L));
+		co5.setDateTime(new Date(1626244455000L));
+		customerOrderService.createCustomerOrder(co5, null);
+
+		CustomerOrder co6 = new CustomerOrder();
+		Payment payment12 = new Payment(2888, "12-1", PaymentTypeEnum.CASH);
+		em.persist(payment12);
+		co6.addPayment(payment12);
+		co6.setSite(siteService.getSite(4L));
+		co6.setDateTime(new Date(1628922855000L));
+		customerOrderService.createCustomerOrder(co6, null);
+
+		CustomerOrder co7 = new CustomerOrder();
+		Payment payment13 = new Payment(2444d, "13-1", PaymentTypeEnum.CASH);
+		em.persist(payment13);
+		co7.addPayment(payment13);
+		co7.setSite(siteService.getSite(4L));
+		co7.setDateTime(new Date(1631601255000L));
+		customerOrderService.createCustomerOrder(co7, null);
+
+		CustomerOrder co8 = new CustomerOrder();
+		Payment payment14 = new Payment(3000, "14-1", PaymentTypeEnum.CASH);
+		em.persist(payment14);
+		co8.addPayment(payment14);
+		co8.setSite(siteService.getSite(4L));
+		co8.setDateTime(new Date(1634193255000L));
+		customerOrderService.createCustomerOrder(co8, null);
+
+		CustomerOrder co9 = new CustomerOrder();
+		Payment payment15 = new Payment(3123, "15-1", PaymentTypeEnum.CASH);
+		em.persist(payment15);
+		co9.addPayment(payment15);
+		co9.setSite(siteService.getSite(4L));
+		co9.setDateTime(new Date(1636871655000L));
+		customerOrderService.createCustomerOrder(co9, null);
+
+		CustomerOrder co10 = new CustomerOrder();
+		Payment payment16 = new Payment(3333d, "16-1", PaymentTypeEnum.CASH);
+		em.persist(payment16);
+		co10.addPayment(payment16);
+		co10.setSite(siteService.getSite(4L));
+		co10.setDateTime(new Date(1639463655000L));
+		customerOrderService.createCustomerOrder(co10, null);
+
+		CustomerOrder co11 = new CustomerOrder();
+		Payment payment17 = new Payment(3500, "17-1", PaymentTypeEnum.CASH);
+		em.persist(payment17);
+		co11.addPayment(payment17);
+		co11.setSite(siteService.getSite(4L));
+		co11.setDateTime(new Date(1642142055000L));
+		customerOrderService.createCustomerOrder(co11, null);
+
+		CustomerOrder co12 = new CustomerOrder();
+		Payment payment18 = new Payment(3888, "18-1", PaymentTypeEnum.CASH);
+		em.persist(payment18);
+		co12.addPayment(payment18);
+		co12.setSite(siteService.getSite(4L));
+		co12.setDateTime(new Date(1643438055000L));
+		customerOrderService.createCustomerOrder(co12, null);
+
+		CustomerOrder co13 = new CustomerOrder();
+		Payment payment19 = new Payment(4214, "19-1", PaymentTypeEnum.CASH);
+		em.persist(payment19);
+		co13.addPayment(payment19);
+		co13.setSite(siteService.getSite(4L));
+		co13.setDateTime(new Date(1644820455000L));
+		customerOrderService.createCustomerOrder(co13, null);
+
+		CustomerOrder co14 = new CustomerOrder();
+		Payment payment20 = new Payment(4888, "20-1", PaymentTypeEnum.CASH);
+		em.persist(payment20);
+		co14.addPayment(payment20);
+		co14.setSite(siteService.getSite(4L));
+		co14.setDateTime(new Date(1646030055000L));
+		customerOrderService.createCustomerOrder(co14, null);
+
+		CustomerOrder co15 = new CustomerOrder();
+		Payment payment21 = new Payment(3805, "21-1", PaymentTypeEnum.CASH);
+		em.persist(payment21);
+		co15.addPayment(payment21);
+		co15.setSite(siteService.getSite(4L));
+		co15.setDateTime(new Date(1647066855000L));
+		customerOrderService.createCustomerOrder(co15, null);
+
+		CustomerOrder co16 = new CustomerOrder();
+		Payment payment22 = new Payment(4123, "22-1", PaymentTypeEnum.CASH);
+		em.persist(payment22);
+		co16.addPayment(payment22);
+		co16.setSite(siteService.getSite(4L));
+		co16.setDateTime(new Date(1648449255000L));
+		customerOrderService.createCustomerOrder(co16, null);
+
+		CustomerOrder co17 = new CustomerOrder();
+		Payment payment23 = new Payment(3888, "23-1", PaymentTypeEnum.CASH);
+		em.persist(payment23);
+		co17.addPayment(payment23);
+		co17.setSite(siteService.getSite(4L));
+		co17.setDateTime(new Date(1648362855000L));
+		customerOrderService.createCustomerOrder(co17, null);
+
+		CustomerOrder co18 = new CustomerOrder();
+		Payment payment24 = new Payment(188, "24-1", PaymentTypeEnum.CASH);
+		em.persist(payment24);
+		co18.addPayment(payment24);
+		co18.setSite(siteService.getSite(4L));
+		co18.setDateTime(new Date(1648794855000L));
+		customerOrderService.createCustomerOrder(co18, null);
+
+		CustomerOrder co19 = new CustomerOrder();
+		Payment payment25 = new Payment(401, "25-1", PaymentTypeEnum.CASH);
+		em.persist(payment25);
+		co19.addPayment(payment25);
+		co19.setSite(siteService.getSite(4L));
+		co19.setDateTime(new Date(1649313255000L));
+		customerOrderService.createCustomerOrder(co19, null);
+
+		CustomerOrder co20 = new CustomerOrder();
+		Payment payment26 = new Payment(388, "26-1", PaymentTypeEnum.CASH);
+		em.persist(payment26);
+		co20.addPayment(payment26);
+		co20.setSite(siteService.getSite(4L));
+		co20.setDateTime(new Date(1649572455000L));
+		customerOrderService.createCustomerOrder(co20, null);
+
+		CustomerOrder co21 = new CustomerOrder();
+		Payment payment27 = new Payment(404, "27-1", PaymentTypeEnum.CASH);
+		em.persist(payment27);
+		co21.addPayment(payment27);
+		co21.setSite(siteService.getSite(4L));
+		co21.setDateTime(new Date(1650090855000L));
+		customerOrderService.createCustomerOrder(co21, null);
+
 		Customer cust = customerService.getCustomerById(2L);
 		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");
 		st.addMessage(new SupportTicketMsg("Please give me free products :D",
 				cust.getFirstName() + " " + cust.getLastName(), ""));
 
 		st.setCustomer(cust);
-		st.setCustomerOrder(co1);
+		st.setCustomerOrder(co21);
 		customerService.createSupportTicket(st);
 	}
 }

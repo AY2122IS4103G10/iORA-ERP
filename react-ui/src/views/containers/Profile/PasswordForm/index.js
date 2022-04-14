@@ -21,7 +21,7 @@ export const PasswordForm = () => {
       });
       navigate("/account");
     } catch (err) {
-      addToast(`Error: ${err.message}`, {
+      addToast(`Error: ${err.response.data}`, {
         appearance: "error",
         autoDismiss: true,
       });

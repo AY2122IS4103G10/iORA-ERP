@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,8 @@ public class AuthenticationController {
 
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /*
      * ---------------------------------------------------------
@@ -148,12 +151,13 @@ public class AuthenticationController {
         try {
             DecodedJWT decodedJWT = JWTUtil.decodeHeader(authHeader);
             String username = decodedJWT.getSubject();
-
-
-           // Need to validate this: body.get("currentPassword") 
-
+            String currentPassword = body.get("current");
 
             Employee employee = employeeService.getEmployeeByUsername(username);
+            if (!passwordEncoder.matches(currentPassword, employee.getPassword())) {
+                throw new JWTVerificationException("Incorrect current password.");
+            }
+
             Employee newE = new Employee(employee.getName(), employee.getEmail(),
                     employee.getSalary(), employee.getUsername(), body.get("password"), employee.getAvailStatus(),
                     employee.getPayType(), employee.getJobTitle(), employee.getDepartment(), employee.getCompany());

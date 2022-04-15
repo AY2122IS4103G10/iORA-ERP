@@ -24,9 +24,14 @@ export const getCustomerByPhone = createAsyncThunk(
 export const addNewCustomer = createAsyncThunk(
   "customers/addNewCustomer",
   async (initialCustomer) => {
-    const response = await api.create("sam/customer/create", initialCustomer);
-    // Email to ask customer to change password
-    return response.data;
+    try {
+
+      const response = await api.create("sam/customer/create", initialCustomer);
+      // Email to ask customer to change password
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data)
+    }
   }
 );
 

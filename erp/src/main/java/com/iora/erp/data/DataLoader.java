@@ -530,11 +530,13 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(c7);
 
 		// Generate 10 $10 vouchers
-		customerService.generateVouchers("Good Friday $10 Coupon", 10d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"),
+		customerService.generateVouchers("Good Friday $10 Coupon", 10d,
+				new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"),
 				null, 10);
 
 		// Generate 10 $5 vouchers
-		customerService.generateVouchers("Easter Sunday $5 Coupon", 5d, new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"), null,
+		customerService.generateVouchers("Easter Sunday $5 Coupon", 5d,
+				new SimpleDateFormat("yyyy-MM-dd").parse("2024-04-17"), null,
 				10);
 
 		// Adding Promotions

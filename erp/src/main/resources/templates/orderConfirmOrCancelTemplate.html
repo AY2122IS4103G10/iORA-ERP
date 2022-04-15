@@ -5,9 +5,9 @@
     <title th:remove="all">Template for HTML email</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
-<style type="text/css">
+<style>
     td,th, tr {
-        border: 1px solid #000000;
+        border: 2px solid #F5F5F5;
         text-align: left;
         padding: 8px;
     }
@@ -24,10 +24,12 @@
             <span th:text="${agenda}"></span>
             <span th:text="${#dates.format(dateTime, 'dd-MM-yyyy HH:mm')}">28 12 2012</span>
         </p>
+        <br>
+        <h3 th:text="${id}"></h3>
 
-        <table id="itemsTable" style="width:100%;">
+        <table id="itemsTable" style="width:80%;">
             <thead>
-                <tr>
+                <tr style="text-align: left; padding: 8px; ">
                     <th>Product</th>
                     <th>Qty</th>
                     <th>Price</th>

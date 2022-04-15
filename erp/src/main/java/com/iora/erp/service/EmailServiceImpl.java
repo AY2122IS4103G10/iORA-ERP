@@ -107,6 +107,8 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("agenda", "You have successfully placed an order with us on ");
         context.setVariable("dateTime", order.getDateTime());
         context.setVariable("orderLineItems", order.getLineItems());
+        String orderID = "Order ID #";
+        context.setVariable("id", orderID.concat(String.valueOf(order.getId())));
         context.setVariable("totalAmount", order.getTotalAmount());
         String subject = "iORA Order Confirmation #" + order.getId();
         sendHTMLMessage(customer.getEmail(), subject, "orderConfirmOrCancelTemplate", context);

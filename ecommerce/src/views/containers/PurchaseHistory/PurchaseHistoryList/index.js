@@ -20,7 +20,11 @@ const columns = [
   },
   {
     Header: "Status",
-    accessor: (row) => row.statusHistory[row.statusHistory.length - 1].status,
+    accessor: (row) => 
+      Boolean(row.statusHistory) ?
+      row.statusHistory[row.statusHistory.length - 1].status :
+      "COMPLETED"
+    ,
     Cell: (e) => e.value.replaceAll("_", " "),
     Filter: SelectColumnFilter,
     filter: "includes",

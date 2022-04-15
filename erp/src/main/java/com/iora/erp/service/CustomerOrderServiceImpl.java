@@ -438,7 +438,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         // Get all possible promotions
         Set<PromotionField> promotions = new HashSet<>(
-                em.createQuery("SELECT pf FROM PromotionField pf WHERE pf.global = TRUE", PromotionField.class)
+                em.createQuery("SELECT pf FROM PromotionField pf WHERE pf.global = TRUE AND pf.available = true", PromotionField.class)
                         .getResultList());
         for (CustomerOrderLI coli : lineItems) {
             Model m = modelMap.get(coli);

@@ -148,7 +148,7 @@ const MembershipTierFormBody = ({
                             />
                           </div>
                           <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
-                            Leave blank if not applicable.
+                            Denotes the maximum amount the multiplier will be applied to. Leave blank if not applicable.
                           </p>
                         </div>
                       </div>
@@ -197,7 +197,7 @@ const MembershipTierFormBody = ({
                             />
                           </div>
                           <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
-                            Leave blank if not applicable.
+                          Denotes the maximum number of orders applicable. Leave blank if not applicable.
                           </p>
                         </div>
                       </div>

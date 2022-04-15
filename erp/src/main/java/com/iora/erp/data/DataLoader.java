@@ -31,6 +31,7 @@ import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.SupportTicketMsg;
+import com.iora.erp.model.customer.SupportTicket.Status;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
@@ -456,8 +457,8 @@ public class DataLoader implements CommandLineRunner {
 		c2.setContactNumber("92711363");
 		c2.setDob(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"));
 		c2.setEmail("pengyu_33@msn.com");
+		c2.setMembershipTier(customerService.findMembershipTierById("BASIC"));
 		c2.setPassword(passwordEncoder.encode("password"));
-		c2.setMembershipPoints(200d);
 		em.persist(c2);
 		DeliveryAddress da2 = new DeliveryAddress("Remus", "252 Jurong East Street 24", "#02-120", "Singapore",
 				"600252", "",
@@ -863,11 +864,11 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(payment1);
 		co1.addPayment(payment1);
 		co1.setSite(siteService.getSite(4L));
-		co1.setCustomerId(1L);
+		co1.setCustomerId(7L);
 		customerOrderService.createCustomerOrder(co1, null);
 
 		OnlineOrder oo1 = new OnlineOrder(false);
-		oo1.setCustomerId(2L);
+		oo1.setCustomerId(7L);
 		oo1.setPickupSite((StoreSite) siteService.getSite(4L));
 		oo1.addLineItem(coli1);
 		oo1.addLineItem(coli2);
@@ -882,7 +883,7 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createOnlineOrder(oo1, null);
 
 		OnlineOrder oo2 = new OnlineOrder(true);
-		oo2.setCustomerId(3L);
+		oo2.setCustomerId(7L);
 		oo2.addLineItem(coli6);
 		oo2.addLineItem(coli7);
 		Payment payment3 = new Payment(coli6.getSubTotal() + coli7.getSubTotal(), "3-1", PaymentTypeEnum.CASH);
@@ -896,7 +897,7 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createOnlineOrder(oo2, null);
 
 		OnlineOrder oo3 = new OnlineOrder(true);
-		oo3.setCustomerId(4L);
+		oo3.setCustomerId(7L);
 		oo3.addLineItem(coli8);
 		oo3.addLineItem(coli9);
 		oo3.addLineItem(coli10);
@@ -909,7 +910,7 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createOnlineOrder(oo3, null);
 
 		OnlineOrder oo4 = new OnlineOrder(true);
-		oo4.setCustomerId(5L);
+		oo4.setCustomerId(7L);
 		oo4.addLineItem(coli11);
 		oo4.addLineItem(coli12);
 		Payment payment5 = new Payment(coli11.getSubTotal() + coli12.getSubTotal(), "5-1", PaymentTypeEnum.CASH);
@@ -920,7 +921,7 @@ public class DataLoader implements CommandLineRunner {
 		customerOrderService.createOnlineOrder(oo4, null);
 
 		OnlineOrder oo5 = new OnlineOrder(true);
-		oo5.setCustomerId(6L);
+		oo5.setCustomerId(7L);
 		oo5.addLineItem(coli13);
 		oo5.addLineItem(coli14);
 		Payment payment6 = new Payment(coli13.getSubTotal() + coli14.getSubTotal(), "6-1", PaymentTypeEnum.CASH);
@@ -1103,13 +1104,35 @@ public class DataLoader implements CommandLineRunner {
 		co21.setDateTime(new Date(1650090855000L));
 		customerOrderService.createCustomerOrder(co21, null);
 
-		Customer cust = customerService.getCustomerById(2L);
-		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Request for new products.");
-		st.addMessage(new SupportTicketMsg("Please give me free products :D",
+		Customer cust = customerService.getCustomerById(1L);
+		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Opening Hours of Store");
+		st.addMessage(new SupportTicketMsg("May I know what is the opening hours of Bugis Junction?",
 				cust.getFirstName() + " " + cust.getLastName(), ""));
-
+		st.addMessage(new SupportTicketMsg("It is from 11am to 9.30pm.",
+				"Darth Vader", ""));
+		st.setStatus(Status.RESOLVED);
 		st.setCustomer(cust);
-		st.setCustomerOrder(co21);
 		customerService.createSupportTicket(st);
+
+		Customer cust2 = customerService.getCustomerById(7L);
+		SupportTicket st2 = new SupportTicket(SupportTicket.Category.ACCOUNT, "Creating a new account.");
+		st2.addMessage(new SupportTicketMsg("Hihi! How do I create a new account for my boyfriend?",
+				cust2.getFirstName() + " " + cust2.getLastName(), ""));
+		st2.addMessage(new SupportTicketMsg("You may logout first, and click on Create Account",
+				"Darth Vader", ""));
+		st2.setStatus(Status.RESOLVED);
+		st2.setCustomer(cust2);
+		customerService.createSupportTicket(st2);
+
+		SupportTicket st3 = new SupportTicket(SupportTicket.Category.GENERAL, "Information on Stock.");
+		st3.addMessage(
+				new SupportTicketMsg("May I know if any of iORA stores has stock in Ditsy Pattern Skirt Yellow size M?",
+						cust.getFirstName() + " " + cust.getLastName(), ""));
+		st3.addMessage(
+				new SupportTicketMsg(
+						"We regret to inform that only Bugis Junction has stock for our Ditsy Pattern Skirt. However, we can deliver the dress to an outlet near to you if you wish. Do let me know.",
+						"Darth Vader", ""));
+		st3.setCustomer(cust2);
+		customerService.createSupportTicket(st3);
 	}
 }

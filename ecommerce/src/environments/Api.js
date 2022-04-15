@@ -52,7 +52,7 @@ export const authApi = {
     });
   },
   register(user) {
-    return axiosPublic.post(`${REST_ENDPOINT}online/register`, user);
+    return axiosPublic.post(`${REST_ENDPOINT}online/public/register`, user);
   },
 };
 

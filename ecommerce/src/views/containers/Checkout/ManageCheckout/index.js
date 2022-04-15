@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useToasts } from "react-toast-notifications";
 
 import { selectCart } from "../../../../stores/slices/cartSlice";
 import { selectUser, selectUserId } from "../../../../stores/slices/userSlice";
@@ -49,6 +50,7 @@ export const ManageCheckout = () => {
   const [storeList, setStoreList] = useState([]);
   const [voucher, setVoucher] = useState("");
   const [voucherItem, setVoucherItem] = useState(null);
+  const { addToast } = useToasts();
 
   const cart = useSelector(selectCart);
   // const customerId = useSelector(selectUserId);
@@ -103,6 +105,11 @@ export const ManageCheckout = () => {
     checkoutApi.applyVoucher(voucher)
     .then((response) => {
       setVoucherItem(response.data);
+    }).catch((error) => {
+      addToast(`Voucher is Invalid`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
     });
   }
   const handleMakePayment = () => {

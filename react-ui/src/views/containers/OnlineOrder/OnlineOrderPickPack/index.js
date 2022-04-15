@@ -514,9 +514,13 @@ export const OnlineOrderPickPack = () => {
                         }`}
                         body={`Confirm that all the items in this order have been ${
                           status === "PICKED" ? "picked" : "packed"
-                        }?
-                  This action cannot be undone, and this order will advance to the
-                  ${status === "PICKED" ? "packing" : "delivery"} stage.`}
+                        }? This action cannot be undone
+                 ${
+                   status === "PICKED"
+                     ? ", and this order will advance to the packing stage."
+                     : ", and the customer will be notified that their order is ready for collection."
+                 }
+                  `}
                         onConfirmClicked={
                           status === "PACKED" && delivery
                             ? openPackageModal

@@ -14,8 +14,10 @@ import {
   removeItemFromCart,
   selectCart,
   setDeliveryChoice,
+  clearCart
 } from "../../../stores/slices/cartSlice";
 import { classNames } from "../../../utilities/Util";
+import ConfirmModal from "../../components/Modals/ConfirmModal";
 
 const deliveryOptions = [
   { id: 1, name: "Standard Shipping", description: "Shipping Fee: $2.50" },
@@ -31,6 +33,7 @@ export const CartItems = ({
   onAddQtyClicked,
   onMinusQtyClicked,
   onRemoveItemClicked,
+  openConfirmModal
 }) => {
   return (
     <section aria-labelledby="cart-heading" className="lg:col-span-7">
@@ -39,116 +42,125 @@ export const CartItems = ({
       </h2>
 
       {cart.length ? (
-        <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
-          {cart.map((item, id) => (
-            <li key={id} className="flex py-6 sm:py-10">
-              <div className="flex-shrink-0">
-                <img
-                  src={item.model.imageLinks[0]}
-                  alt=""
-                  className="w-24 h-24 rounded-md object-center object-cover sm:w-48 sm:h-48"
-                />
-              </div>
-
-              <div className="ml-4 flex-1 flex flex-col justify-between sm:ml-6">
-                <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
-                  <div>
-                    <div className="flex justify-between">
-                      <h3 className="text-sm">
-                        <Link
-                          to={`/products/view/${item.model.modelCode}`}
-                          className="font-medium text-gray-700 hover:text-gray-800"
-                        >
-                          {item.model.name}
-                        </Link>
-                      </h3>
-                    </div>
-                    <div className="mt-1 flex text-sm">
-                      <p className="text-gray-500">
-                        {
-                          item.product?.productFields.find(
-                            (field) => field.fieldName === "COLOUR"
-                          ).fieldValue
-                        }
-                      </p>
-                      <p className="ml-4 pl-4 border-l border-gray-200 text-gray-500">
-                        {
-                          item.product?.productFields.find(
-                            (field) => field.fieldName === "SIZE"
-                          ).fieldValue
-                        }
-                      </p>
-                    </div>
-
-                    <div>
-                      {item.model.listPrice !== item.model.discountPrice ? (
-                        <>
-                          <span className="line-through text-xs mr-2 text-gray-500">
-                            ${item.model.listPrice}
-                          </span>
-                          <span className="mt-1 text-sm font-medium text-gray-900">
-                            ${item.model.discountPrice}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="mt-1 text-sm font-medium text-gray-900">
-                          ${item.model.listPrice}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 sm:mt-0 sm:pr-9">
-                    <label htmlFor={`quantity-${id}`} className="sr-only">
-                      Quantity, {item.product.name}
-                    </label>
-
-                    <span className="relative z-0 inline-flex shadow-sm rounded-md">
-                      <button
-                        type="button"
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                        onClick={(e) => onMinusQtyClicked(e, item.product)}
-                      >
-                        <span className="sr-only">Previous</span>
-                        <MinusSmIcon className="h-5 w-5" aria-hidden="true" />
-                      </button>
-                      <input
-                        name="qty"
-                        id="qty"
-                        className="text-center block w-full sm:text-sm border border-gray-300"
-                        placeholder="0"
-                        value={item.qty}
-                        disabled
-                      />
-                      <button
-                        type="button"
-                        className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                        onClick={(e) => onAddQtyClicked(e, item.product)}
-                      >
-                        <span className="sr-only">Next</span>
-                        <PlusSmIcon className="h-5 w-5" aria-hidden="true" />
-                      </button>
-                    </span>
-                    <div className="absolute top-0 right-0">
-                      <button
-                        type="button"
-                        className="-m-2 p-2 inline-flex text-gray-400 hover:text-gray-500"
-                        onClick={(e) => onRemoveItemClicked(e, item.product)}
-                      >
-                        <span className="sr-only">Remove</span>
-                        <XIconSolid className="h-5 w-5" aria-hidden="true" />
-                      </button>
-                    </div>
-                  </div>
+        <>
+          <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
+            {cart.map((item, id) => (
+              <li key={id} className="flex py-6 sm:py-10">
+                <div className="flex-shrink-0">
+                  <img
+                    src={item.model.imageLinks[0]}
+                    alt=""
+                    className="w-24 h-24 rounded-md object-center object-cover sm:w-48 sm:h-48"
+                  />
                 </div>
 
-                <p className="mt-4 flex flex-row-reverse font-bold text-sm text-gray-700 space-x-2">
-                  Subtotal: ${parseInt(item.model.discountPrice) * item.qty}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+                <div className="ml-4 flex-1 flex flex-col justify-between sm:ml-6">
+                  <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
+                    <div>
+                      <div className="flex justify-between">
+                        <h3 className="text-sm">
+                          <Link
+                            to={`/products/view/${item.model.modelCode}`}
+                            className="font-medium text-gray-700 hover:text-gray-800"
+                          >
+                            {item.model.name}
+                          </Link>
+                        </h3>
+                      </div>
+                      <div className="mt-1 flex text-sm">
+                        <p className="text-gray-500">
+                          {
+                            item.product?.productFields.find(
+                              (field) => field.fieldName === "COLOUR"
+                            ).fieldValue
+                          }
+                        </p>
+                        <p className="ml-4 pl-4 border-l border-gray-200 text-gray-500">
+                          {
+                            item.product?.productFields.find(
+                              (field) => field.fieldName === "SIZE"
+                            ).fieldValue
+                          }
+                        </p>
+                      </div>
+
+                      <div>
+                        {item.model.listPrice !== item.model.discountPrice ? (
+                          <>
+                            <span className="line-through text-xs mr-2 text-gray-500">
+                              ${item.model.listPrice}
+                            </span>
+                            <span className="mt-1 text-sm font-medium text-gray-900">
+                              ${item.model.discountPrice}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="mt-1 text-sm font-medium text-gray-900">
+                            ${item.model.listPrice}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 sm:mt-0 sm:pr-9">
+                      <label htmlFor={`quantity-${id}`} className="sr-only">
+                        Quantity, {item.product.name}
+                      </label>
+
+                      <span className="relative z-0 inline-flex shadow-sm rounded-md">
+                        <button
+                          type="button"
+                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                          onClick={(e) => onMinusQtyClicked(e, item.product)}
+                        >
+                          <span className="sr-only">Previous</span>
+                          <MinusSmIcon className="h-5 w-5" aria-hidden="true" />
+                        </button>
+                        <input
+                          name="qty"
+                          id="qty"
+                          className="text-center block w-full sm:text-sm border border-gray-300"
+                          placeholder="0"
+                          value={item.qty}
+                          disabled
+                        />
+                        <button
+                          type="button"
+                          className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                          onClick={(e) => onAddQtyClicked(e, item.product)}
+                        >
+                          <span className="sr-only">Next</span>
+                          <PlusSmIcon className="h-5 w-5" aria-hidden="true" />
+                        </button>
+                      </span>
+                      <div className="absolute top-0 right-0">
+                        <button
+                          type="button"
+                          className="-m-2 p-2 inline-flex text-gray-400 hover:text-gray-500"
+                          onClick={(e) => onRemoveItemClicked(e, item.product)}
+                        >
+                          <span className="sr-only">Remove</span>
+                          <XIconSolid className="h-5 w-5" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="mt-4 flex flex-row-reverse font-bold text-sm text-gray-700 space-x-2">
+                    Subtotal: ${parseInt(item.model.discountPrice) * item.qty}
+                  </p>
+                </div>
+              </li>
+            ))}
+
+          </ul>
+          <button
+            className="float-right inline-flex rounded-xl  hover:bg-red-50 w-fit m-2 px-1 text-sm font-medium text-red-700  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-200"
+            onClick={openConfirmModal}>
+            Clear Cart
+            <XIconSolid className="ml-1 h-5 w-5" />
+          </button>
+        </>
       ) : (
         <div className="text-center">
           <ShoppingCartIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -250,7 +262,17 @@ export const Cart = () => {
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [promotions, setPromotions] = useState([]);
   const [delivery, setDelivery] = useState(0);
+  const [open, setOpen] = useState(false);
   const cart = useSelector(selectCart);
+
+  const openConfirmModal = (e) => {
+    e.preventDefault();
+    setOpen(true)
+  };
+  const closeConfirmModal = (e) => {
+    e.preventDefault();
+    setOpen(false)
+  };
 
   const onAddQtyClicked = (e, product) => {
     e.preventDefault();
@@ -266,6 +288,12 @@ export const Cart = () => {
     e.preventDefault();
     dispatch(removeItemFromCart(product));
   };
+
+  const onClearCartClicked = (e) => {
+    e.preventDefault();
+    dispatch(clearCart());
+    setOpen(false);
+  }
 
   const onCheckoutClicked = (e) => {
     e.preventDefault();
@@ -287,7 +315,7 @@ export const Cart = () => {
         return lineItem;
       });
       setSubTotal(subTotal);
-      
+
       const response = await checkoutApi.calculatePromotions(lineItems);
       console.log(response.data);
       setPromotions(response.data[1]);
@@ -302,28 +330,37 @@ export const Cart = () => {
   }, [cart]);
 
   return (
-    <div className="max-w-2xl mx-auto pt-16 pb-24 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-        My Cart
-      </h1>
+    <>
+      <div className="max-w-2xl mx-auto pt-16 pb-24 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          My Cart
+        </h1>
 
-      <form className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16">
-        <CartItems
-          cart={cart}
-          onAddQtyClicked={onAddQtyClicked}
-          onMinusQtyClicked={onMinusQtyClicked}
-          onRemoveItemClicked={onRemoveItemClicked}
-        />
+        <form className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16">
+          <CartItems
+            cart={cart}
+            onAddQtyClicked={onAddQtyClicked}
+            onMinusQtyClicked={onMinusQtyClicked}
+            onRemoveItemClicked={onRemoveItemClicked}
+            openConfirmModal={openConfirmModal}
+          />
 
-        <CartSummary
-          cart={cart}
-          delivery={delivery}
-          setDelivery={setDelivery}
-          subTotal={subTotal}
-          totalDiscount={totalDiscount}
-          onCheckoutClicked={onCheckoutClicked}
-        />
-      </form>
-    </div>
+          <CartSummary
+            cart={cart}
+            delivery={delivery}
+            setDelivery={setDelivery}
+            subTotal={subTotal}
+            totalDiscount={totalDiscount}
+            onCheckoutClicked={onCheckoutClicked}
+          />
+        </form>
+      </div>
+      <ConfirmModal
+        item="cart"
+        open={open}
+        closeModal={closeConfirmModal}
+        onConfirm={onClearCartClicked}
+      />
+    </>
   );
 };

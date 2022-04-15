@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.iora.erp.model.company.Address;
 import com.iora.erp.model.company.Employee;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.SupportTicket;
@@ -13,7 +14,6 @@ import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -109,7 +109,29 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
         String subject = "iORA Order Confirmation #" + order.getId();
-        sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
+        sendHTMLMessage(customer.getEmail(), subject, "orderConfirmOrCancelTemplate", context);
+    }
+
+    @Override
+    public void sendOrderReadyToCollect(Customer customer, OnlineOrder order) {
+        Context context = new Context();
+        Address address = order.getPickupSite().getAddress();
+        context.setVariable("line1", address.getRoad());
+        context.setVariable("line2", address.getUnit() + ", " + address.getBuilding());
+        context.setVariable("line3", address.getPostalCode());
+        context.setVariable("orderLineItems", order.getLineItems());
+        context.setVariable("totalAmount", order.getTotalAmount());
+        String subject = "iORA Your Order Is Ready";
+        sendHTMLMessage(customer.getEmail(), subject, "orderReadyToCollectTemplate", context);
+    }
+
+    @Override
+    public void sendOrderReadyToDeliver(Customer customer, OnlineOrder order) {
+        Context context = new Context();
+        context.setVariable("orderLineItems", order.getLineItems());
+        context.setVariable("totalAmount", order.getTotalAmount());
+        String subject = "iORA Your Order Is Ready";
+        sendHTMLMessage(customer.getEmail(), subject, "orderReadyToDeliverTemplate", context);
     }
 
     @Override
@@ -123,7 +145,7 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("orderLineItems", order.getLineItems());
         context.setVariable("totalAmount", order.getTotalAmount());
         String subject = "iORA Order Cancellation #" + order.getId();
-        sendHTMLMessage(customer.getEmail(), subject, "orderConfirmTemplate", context);
+        sendHTMLMessage(customer.getEmail(), subject, "orderConfirmOrCancelTemplate", context);
 
     }
 

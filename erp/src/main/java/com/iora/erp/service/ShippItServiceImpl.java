@@ -22,7 +22,6 @@ import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.OnlineOrderDeliveryException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.Delivery;
-import com.iora.erp.model.customerOrder.OOStatus;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.site.Site;
 
@@ -136,8 +135,6 @@ public class ShippItServiceImpl implements ShippItService {
                 HttpEntity<String> entity = new HttpEntity<>(order.toString(), headers);
                 ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
                 if (response.getStatusCode().is2xxSuccessful()) {
-                    onlineOrder.addStatusHistory(
-                            new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.READY_FOR_DELIVERY));
 
                     String jsonB = response.getBody();
                     JSONObject jsonObject = new JSONObject(jsonB);
@@ -156,9 +153,6 @@ public class ShippItServiceImpl implements ShippItService {
                     System.out.println(deliveryURL);
                     // trackingDelivery(delivery.getId());
                 }
-            }
-            if (onlineOrder.getParcelDelivery().size() == oOrder.getParcelDelivery().size()) {
-                onlineOrder.setStatus(OnlineOrderStatusEnum.READY_FOR_DELIVERY);
             }
 
             // for (Delivery xDelivery : onlineOrder.getParcelDelivery()) {

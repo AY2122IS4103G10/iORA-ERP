@@ -61,17 +61,19 @@ export const Profile = () => {
     setContactNo(user.contactNumber);
     setDob(user.dob);
     setEmail(user.email);
-    setRecieverName(user.address.name);
-    setStreet1(user.address.street1);
-    setStreet2(user.address.street2);
-    setZip(user.address.zip);
-    setCity(user.address.city);
-    setState(user.address.state);
-    setCountry(user.address.country);
-    setDeliveryCon(user.address.phone);
-    setAddressID(user.address.id);
+    if (user.address) {
+      setRecieverName(user.address.name);
+      setStreet1(user.address.street1);
+      setStreet2(user.address.street2);
+      setZip(user.address.zip);
+      setCity(user.address.city);
+      setState(user.address.state);
+      setCountry(user.address.country);
+      setDeliveryCon(user.address.phone);
+      setAddressID(user.address.id);
+    }
   };
-
+console.log(user)
   useEffect(() => {
     if (user) {
       onLoad(user);
@@ -85,6 +87,17 @@ export const Profile = () => {
 
   const onSaveClicked = (evt) => {
     evt.preventDefault();
+    const address = {
+      street1,
+      street2,
+      name: receiverName,
+      city,
+      state,
+      zip,
+      country,
+      phone: deliveryCon,
+    };
+    if (addressID) address["id"] = addressID;
     dispatch(
       updateAccount({
         ...user,
@@ -93,17 +106,7 @@ export const Profile = () => {
         dob,
         contactNumber: contactNo,
         email,
-        address: {
-          id: addressID,
-          street1,
-          street2,
-          name: receiverName,
-          city,
-          state,
-          zip,
-          country,
-          phone: deliveryCon,
-        },
+        address,
       })
     )
       .then(({ payload }) => {

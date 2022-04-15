@@ -45,7 +45,10 @@ export const createSupportTicket = createAsyncThunk(
 export const replySupportTicket = createAsyncThunk(
   "supportTickets/replySupportTicket",
   async ({ ticketId, name, body }) => {
-    const response = await api.update(`online/ticket/reply/${ticketId}?name=${name}`, body);
+    const response = await api.update(
+      `online/ticket/reply/${ticketId}?name=${name}`,
+      body
+    );
     return response.data;
   }
 );
@@ -53,8 +56,12 @@ export const replySupportTicket = createAsyncThunk(
 export const resolveSupportTicket = createAsyncThunk(
   "supportTickets/resolveSupportTicket",
   async (ticketId) => {
-    const response = await ticketApi.resolveTicket(ticketId);
-    return response.data;
+    try {
+      const response = await ticketApi.resolveTicket(ticketId);
+      return response.data;
+    } catch (err) {
+      return Promise.reject(err.response.data);
+    }
   }
 );
 
@@ -63,7 +70,9 @@ const supportTicketSlice = createSlice({
   initialState,
   extraReducers(builder) {
     builder.addCase(createSupportTicket.fulfilled, (state, action) => {
-      state.user.supportTickets = state.user.supportTickets.push(action.payload);
+      state.user.supportTickets = state.user.supportTickets.push(
+        action.payload
+      );
     });
     builder.addCase(fetchSupportTickets.pending, (state, action) => {
       state.detailsStatus = "loading";
@@ -96,13 +105,16 @@ const supportTicketSlice = createSlice({
       state.listStatus = "failed";
     });
     builder.addCase(replySupportTicket.fulfilled, (state, action) => {
-      state.detailsStatus = "idle";
+      console.log(action.payload);
+      const { id, status, messages } = action.payload;
+      const supportTicket = state.supportTickets.find((st) => st.id === id);
+      if (supportTicket) {
+        supportTicket.status = status;
+        supportTicket.messages = messages;
+      }
     });
     builder.addCase(resolveSupportTicket.fulfilled, (state, action) => {
-      const {
-        id,
-        status
-      } = action.payload;
+      const { id, status } = action.payload;
       const supportTicket = state.supportTickets.find((st) => st.id === id);
       if (supportTicket) {
         supportTicket.status = status;
@@ -120,4 +132,6 @@ export const selectUserSupportTickets = (state) =>
   state.supportTickets.userSupportTickets;
 
 export const selectTicketById = (state, ticketId) =>
-  state.supportTickets.supportTickets.find((supportTicket) => supportTicket.id === ticketId);
+  state.supportTickets.supportTickets.find(
+    (supportTicket) => supportTicket.id === ticketId
+  );

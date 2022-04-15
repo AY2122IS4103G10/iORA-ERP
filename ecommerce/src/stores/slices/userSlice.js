@@ -261,7 +261,7 @@ const userSlice = createSlice({
         (order) => order.id === action.payload.id
       );
       if (order) {
-        order.statusHistory = action.payload.statusHistory;
+        order.status = action.payload.status;
       }
       state.status = "succeeded";
     });
@@ -270,7 +270,7 @@ const userSlice = createSlice({
         (order) => order.id === action.payload.id
       );
       if (order) {
-        order.statusHistory = action.payload.statusHistory;
+        order.status = action.payload.status;
       }
       state.status = "succeeded";
     });

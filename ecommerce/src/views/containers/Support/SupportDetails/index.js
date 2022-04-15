@@ -214,7 +214,7 @@ const InputArea = ({
   );
 };
 
-const ResolveModal = ({ open, setOpen, onResolveClicked }) => {
+const ResolveModal = ({ open, setOpen, onResolveClicked, loading }) => {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
@@ -282,7 +282,12 @@ const ResolveModal = ({ open, setOpen, onResolveClicked }) => {
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={onResolveClicked}
                 >
-                  Resolve
+                  <span>Resolve</span>
+                  {loading && (
+                    <div className="ml-3 flex items-center justify-center">
+                      <TailSpin color="#FFFFFF" height={20} width={20} />
+                    </div>
+                  )}
                 </button>
                 <button
                   type="button"
@@ -319,22 +324,24 @@ export const SupportDetails = () => {
     dispatch(fetchSupportTickets());
   }, [dispatch, navigate]);
 
-  const onResolveClicked = () => {
-    setOpen(false);
-    dispatch(resolveSupportTicket(ticketId))
-      .then(() => {
-        addToast("Ticket has been marked as Resolved.", {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        navigate(`/support/${ticketId}`);
-      })
-      .catch((err) =>
-        addToast(`Error: ${err.message}`, {
-          appearance: "error",
-          autoDismiss: true,
-        })
-      );
+  const onResolveClicked = async () => {
+    setLoading(true);
+    try {
+      await dispatch(resolveSupportTicket(ticketId)).unwrap();
+      addToast("Ticket has been marked as Resolved.", {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      navigate(`/support/${ticketId}`);
+    } catch (err) {
+      addToast(`Error: ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    } finally {
+      setLoading(false);
+      setOpen(false);
+    }
   };
 
   const onInputChanged = (e) => setInput(e.target.value);
@@ -440,6 +447,7 @@ export const SupportDetails = () => {
           open={open}
           setOpen={setOpen}
           onResolveClicked={onResolveClicked}
+          loading={loading}
         />
       </div>
     )

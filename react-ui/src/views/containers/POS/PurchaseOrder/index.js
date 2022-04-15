@@ -5,7 +5,7 @@ import {
   ExclamationIcon,
   MinusSmIcon,
   PlusSmIcon,
-  SelectorIcon
+  SelectorIcon,
 } from "@heroicons/react/solid";
 import { useEffect, useState } from "react";
 import { useToasts } from "react-toast-notifications";
@@ -358,8 +358,8 @@ export const PosPurchaseOrder = () => {
       const response = await posApi.addProductToLineItems(rfid, lineItems);
       setLineItems(response.data);
       if (!productDetails.has(rfid)) {
-        const detail = await api.get("store/productDetails", rfid);
-        setProductDetails(productDetails.set(rfid, detail.data));
+        const { data } = await api.get("store/productDetails", rfid);
+        setProductDetails(productDetails.set(data.sku, data));
       }
       setAmount(response.data.map((x) => x.subTotal).reduce((x, y) => x + y));
       setRfid("");

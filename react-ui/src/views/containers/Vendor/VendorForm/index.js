@@ -10,7 +10,7 @@ import {
   addNewVendor,
   updateExistingVendor,
 } from "../../../../stores/slices/vendorSlice";
-import { AddressField } from "../../Sites/SiteForm";
+import { AddressField, fetchCountries } from "../../Sites/SiteForm";
 
 const VendorFormBody = ({
   isEditing,
@@ -30,6 +30,7 @@ const VendorFormBody = ({
   onUnitChanged,
   country,
   onCountryChanged,
+  countries,
   city,
   onCityChanged,
   state,
@@ -129,6 +130,7 @@ const VendorFormBody = ({
                         onUnitChanged={onUnitChanged}
                         country={country}
                         onCountryChanged={onCountryChanged}
+                        countries={countries}
                         city={city}
                         onCityChanged={onCityChanged}
                         state={state}
@@ -182,14 +184,18 @@ export const VendorForm = () => {
   const [address1, setAddress1] = useState("");
   const [building, setBuilding] = useState("");
   const [unit, setUnit] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("Singapore");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [billing, setBilling] = useState(true);
+  const [countries, setCountries] = useState([]);
 
+  useEffect(() => {
+    fetchCountries().then((data) => setCountries(data));
+  }, []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { addToast } = useToasts();
@@ -358,6 +364,7 @@ export const VendorForm = () => {
       onUnitChanged={onUnitChanged}
       country={country}
       onCountryChanged={onCountryChanged}
+      countries={countries}
       city={city}
       onCityChanged={onCityChanged}
       state={state}

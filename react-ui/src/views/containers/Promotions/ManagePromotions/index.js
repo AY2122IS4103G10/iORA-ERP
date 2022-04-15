@@ -203,7 +203,7 @@ const PromoModal = ({
                         />
                       </SimpleInputGroup>
                     )}
-                    {/* <SimpleInputGroup
+                    <SimpleInputGroup
                       label="Options"
                       inputField="global-stackable"
                       className="rounded-md sm:mt-0 sm:col-span-2"
@@ -239,7 +239,7 @@ const PromoModal = ({
                             </p>
                           </div>
                         </div>
-                        <div className="relative flex items-start">
+                        {/* <div className="relative flex items-start">
                           <div className="flex items-center h-5">
                             <input
                               type="checkbox"
@@ -266,9 +266,9 @@ const PromoModal = ({
                               Promotion can be used with other promotions.
                             </p>
                           </div>
-                        </div>
+                        </div> */}
                       </fieldset>
-                    </SimpleInputGroup> */}
+                    </SimpleInputGroup>
                   </div>
                 </div>
               </div>

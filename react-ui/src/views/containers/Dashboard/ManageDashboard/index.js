@@ -8,7 +8,7 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip
+  Tooltip,
 } from "chart.js";
 import moment from "moment";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -22,14 +22,27 @@ import {
   getProcurementOrdersOfSite,
   getStockLevelSites,
   getStockTransferOrdersOfSite,
-  setSiteId
+  getVoucherStats,
+  setSiteId,
 } from "../../../../stores/slices/dashboardSlice";
 import { Header } from "../../../components/Header";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
 import SharedStats from "../components/Stats";
-import { colourPicker, cyans, multi, getRevenue, getOrder, getProduct, getRevenuePerOrder, delta, deltaType, rangeLabels } from "../utils";
+import {
+  colourPicker,
+  cyans,
+  multi,
+  getRevenue,
+  getOrder,
+  getProduct,
+  getRevenuePerOrder,
+  delta,
+  deltaType,
+  rangeLabels,
+  topfew,
+} from "../utils";
 
 ChartJS.register(
   ArcElement,
@@ -44,13 +57,14 @@ ChartJS.register(
 );
 
 const tabs = [
-  {name: "Dashboard", href: "", current: true},
-  {name: "Reports", href: "reports", current: false},
-]
+  { name: "Dashboard", href: "", current: true },
+  { name: "Reports", href: "reports", current: false },
+];
 
 export const ManageDashboard = () => {
   const dispatch = useDispatch();
   const siteId = Number(localStorage.getItem("siteId"));
+  const [showTopStock, setShowTopStock] = useState(topfew[0]);
   const [siteData, setSiteData] = useState([]);
   const [siteChosen, setSiteChosen] = useState({ id: 0, name: "Choose One" });
   const options = [
@@ -62,11 +76,12 @@ export const ManageDashboard = () => {
   const [range, setRange] = useState(options[0]);
 
   const status = useSelector(({ dashboard }) => dashboard.status);
+  const voucherStats = useSelector(({ dashboard }) => dashboard.voucherStats);
   const stockLevelSites = useSelector(
     ({ dashboard }) => dashboard.stockLevelSites
   );
-  const stats = useSelector(
-    ({ dashboard }) => [...dashboard.customerOrdersByDate].reverse()
+  const stats = useSelector(({ dashboard }) =>
+    [...dashboard.customerOrdersByDate].reverse()
   );
   const currStats = stats[0];
   const prevStats = stats[1];
@@ -82,6 +97,7 @@ export const ManageDashboard = () => {
 
   useEffect(() => {
     status === "idle" && dispatch(getStockLevelSites());
+    dispatch(getVoucherStats());
     status === "succeeded-1" &&
       stockLevelSites.length > 0 &&
       setSiteData(
@@ -131,7 +147,7 @@ export const ManageDashboard = () => {
 
   return (
     <>
-      <SectionHeading header="Dashboard" tabs={tabs}/>
+      <SectionHeading header="Dashboard" tabs={tabs} />
       <div className="flex justify-center min-w-fit">
         <div className="flex grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 w-screen lg:w-full 2xl:max-w-7xl items-start justify-start">
           <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6 col-span-1 md:col-span-2 2xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -178,10 +194,7 @@ export const ManageDashboard = () => {
                       name: "Total Customer Orders",
                       stat: getOrder(currStats),
                       previousStat: getOrder(prevStats),
-                      change: delta(
-                        getOrder(currStats),
-                        getOrder(prevStats)
-                      ),
+                      change: delta(getOrder(currStats), getOrder(prevStats)),
                       changeType: deltaType(
                         getOrder(currStats),
                         getOrder(prevStats)
@@ -229,6 +242,46 @@ export const ManageDashboard = () => {
                         display: false,
                       },
                     },
+                  }}
+                />
+              </div>
+              <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6 md:col-span-2">
+                <h3 className="text-lg font-medium">Voucher Details</h3>
+                <Chart
+                  type="bar"
+                  data={{
+                    labels: voucherStats.slice(0, 10).map((v) => v.campaign),
+                    datasets: [
+                      {
+                        label: `Percentage of issued vouchers redeemed`,
+                        data: voucherStats
+                          .slice(0, 10)
+                          .map((v) => v.redeemed / v.issued),
+                        borderColor: colourPicker(cyans, 4, 1)[3],
+                        backgroundColor: colourPicker(cyans, 4, 0.5)[3],
+                        borderWidth: 2,
+                        fill: false,
+                        type: "line",
+                      },
+                      {
+                        label: `Vouchers issued`,
+                        data: voucherStats.slice(0, 10).map((v) => v.issued),
+                        borderColor: colourPicker(multi, 5, 1)[4],
+                        backgroundColor: colourPicker(multi, 5, 0.5)[4],
+                        borderWidth: 2,
+                        fill: true,
+                        type: "bar",
+                      },
+                      {
+                        label: `Vouchers redeemed`,
+                        data: voucherStats.slice(0, 10).map((v) => v.redeemed),
+                        borderColor: colourPicker(multi, 3, 1)[2],
+                        backgroundColor: colourPicker(multi, 3, 0.5)[2],
+                        borderWidth: 2,
+                        fill: true,
+                        type: "bar",
+                      },
+                    ],
                   }}
                 />
               </div>
@@ -297,7 +350,10 @@ export const ManageDashboard = () => {
                       name: "Total Customer Orders",
                       stat: getOrder(currStats, siteChosen?.id),
                       previousStat: getOrder(prevStats, siteChosen?.id),
-                      change: delta(getOrder(currStats), getOrder(prevStats, siteChosen?.id)),
+                      change: delta(
+                        getOrder(currStats),
+                        getOrder(prevStats, siteChosen?.id)
+                      ),
                       changeType: deltaType(
                         getOrder(currStats, siteChosen?.id),
                         getOrder(prevStats, siteChosen?.id)
@@ -320,7 +376,10 @@ export const ManageDashboard = () => {
                     {
                       name: "Average Order Revenue",
                       stat: getRevenuePerOrder(currStats, siteChosen?.id),
-                      previousStat: getRevenuePerOrder(prevStats, siteChosen?.id),
+                      previousStat: getRevenuePerOrder(
+                        prevStats,
+                        siteChosen?.id
+                      ),
                       prefix: "$",
                       change: delta(
                         getRevenuePerOrder(currStats, siteChosen?.id),
@@ -345,75 +404,102 @@ export const ManageDashboard = () => {
               )}
               <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6 md:col-span-2">
                 <h3 className="text-lg font-medium">Sales</h3>
-                {stats.length > 2 &&
-                  <Chart type="bar" data={{
-                    labels: rangeLabels(range.unit),
-                    datasets: [
-                      {
-                        label: `Revenue over past 7 ${range.unit}s in $`,
-                        data: stats.slice(0, 7).reverse().map(x => getRevenue(x, siteChosen?.id)),
-                        borderColor: colourPicker(cyans, 3, 1)[2],
-                        backgroundColor: colourPicker(cyans, 3, 0.5)[2],
-                        borderWidth: 2,
-                        fill: false,
-                        type: 'line',
-                      },
-                      {
-                        label: `Products sold over past 7 ${range.unit}s`,
-                        data: stats.slice(0, 7).reverse().map(x => getProduct(x, siteChosen?.id)),
-                        borderColor: colourPicker(multi, 5, 1)[4],
-                        backgroundColor: colourPicker(multi, 5, 0.5)[4],
-                        borderWidth: 2,
-                        fill: true,
-                        type: 'bar',
-                      },
-                      {
-                        label: `Orders made over past 7 ${range.unit}s`,
-                        data: stats.slice(0, 7).reverse().map(x => getOrder(x, siteChosen?.id)),
-                        borderColor: colourPicker(multi, 3, 1)[2],
-                        backgroundColor: colourPicker(multi, 3, 0.5)[2],
-                        borderWidth: 2,
-                        fill: true,
-                        type: 'bar',
-                      },
-                    ]
-                  }} />}
+                {stats.length > 2 && (
+                  <Chart
+                    type="bar"
+                    data={{
+                      labels: rangeLabels(range.unit),
+                      datasets: [
+                        {
+                          label: `Revenue over past 7 ${range.unit}s in $`,
+                          data: stats
+                            .slice(0, 7)
+                            .reverse()
+                            .map((x) => getRevenue(x, siteChosen?.id)),
+                          borderColor: colourPicker(cyans, 3, 1)[2],
+                          backgroundColor: colourPicker(cyans, 3, 0.5)[2],
+                          borderWidth: 2,
+                          fill: false,
+                          type: "line",
+                        },
+                        {
+                          label: `Products sold over past 7 ${range.unit}s`,
+                          data: stats
+                            .slice(0, 7)
+                            .reverse()
+                            .map((x) => getProduct(x, siteChosen?.id)),
+                          borderColor: colourPicker(multi, 5, 1)[4],
+                          backgroundColor: colourPicker(multi, 5, 0.5)[4],
+                          borderWidth: 2,
+                          fill: true,
+                          type: "bar",
+                        },
+                        {
+                          label: `Orders made over past 7 ${range.unit}s`,
+                          data: stats
+                            .slice(0, 7)
+                            .reverse()
+                            .map((x) => getOrder(x, siteChosen?.id)),
+                          borderColor: colourPicker(multi, 3, 1)[2],
+                          backgroundColor: colourPicker(multi, 3, 0.5)[2],
+                          borderWidth: 2,
+                          fill: true,
+                          type: "bar",
+                        },
+                      ],
+                    }}
+                  />
+                )}
               </div>
               <div className="rounded-lg bg-white overflow-hidden shadow m-4 p-6">
                 <h3 className="text-lg font-medium">
                   Stock Level of {siteChosen?.name}
                 </h3>
                 {siteChosen.id !== 0 && (
-                  <Doughnut
-                    className="mt-3"
-                    data={{
-                      labels: stockLevelSites
-                        ?.find((x) => x.id === siteChosen.id)
-                        ?.stockLevel.products.map((y) => y.sku),
-                      datasets: [
-                        {
-                          label: "Stock Level of Selected Site",
-                          data: stockLevelSites
-                            ?.find((x) => x.id === siteChosen.id)
-                            ?.stockLevel.products.map((y) => y.qty),
-                          backgroundColor: colourPicker(
-                            cyans,
-                            siteData.length,
-                            0.6
-                          ),
-                          borderColor: colourPicker(cyans, siteData.length, 1),
-                          borderWidth: 0,
+                  <>
+                    <SimpleSelectMenu
+                      label="Show top"
+                      options={topfew}
+                      selected={showTopStock}
+                      setSelected={setShowTopStock}
+                    />
+                    <Doughnut
+                      className="mt-3"
+                      data={{
+                        labels: stockLevelSites
+                          ?.find((x) => x.id === siteChosen.id)
+                          ?.stockLevel.products.slice(0, showTopStock.name)
+                          .map((y) => y.sku),
+                        datasets: [
+                          {
+                            label: "Stock Level of Selected Site",
+                            data: stockLevelSites
+                              ?.find((x) => x.id === siteChosen.id)
+                              ?.stockLevel.products.slice(0, showTopStock.name)
+                              .map((y) => y.qty),
+                            backgroundColor: colourPicker(
+                              cyans,
+                              siteData.length,
+                              0.6
+                            ),
+                            borderColor: colourPicker(
+                              cyans,
+                              siteData.length,
+                              1
+                            ),
+                            borderWidth: 0,
+                          },
+                        ],
+                      }}
+                      options={{
+                        plugins: {
+                          legend: {
+                            display: showTopStock.name <= 10,
+                          },
                         },
-                      ],
-                    }}
-                    options={{
-                      plugins: {
-                        legend: {
-                          display: false,
-                        },
-                      },
-                    }}
-                  />
+                      }}
+                    />
+                  </>
                 )}
               </div>
             </>
@@ -450,50 +536,55 @@ const Bestsellers = ({ name, orders }) => {
   const modelBestsellers =
     prodQtys.length > 0
       ? [
-        ...prodQtys.reduce(
-          (map, prod) =>
-            map.set(
-              prod[0].split("-")[0],
-              map.get(prod[0].split("-")[0]) || 0 + prod[1]
-            ),
-          new Map()
-        ),
-      ].sort((m1, m2) => m2[1] - m1[1])
+          ...prodQtys.reduce(
+            (map, prod) =>
+              map.set(
+                prod[0].split("-")[0],
+                map.get(prod[0].split("-")[0]) || 0 + prod[1]
+              ),
+            new Map()
+          ),
+        ].sort((m1, m2) => m2[1] - m1[1])
       : [];
   const prodBestsellers = prodQtys.sort((p1, p2) => p2[1] - p1[1]);
-  const compact = showModels ? modelBestsellers.length < 3 : prodBestsellers.length < 3;
+  const compact = showModels
+    ? modelBestsellers.length < 3
+    : prodBestsellers.length < 3;
 
   const changeShowModels = async () => {
     setLoading(true);
     setShowModels(!showModels);
     setTimeout(() => setLoading(false), 700);
-  }
+  };
 
   return (
-    <div className={`rounded-lg bg-white overflow-visible shadow m-4 p-6 row-span-${compact ? 1 : 2}`}>
-      <h3 className="text-lg font-medium mb-4">
-        Bestsellers in {name}
-      </h3>
+    <div
+      className={`rounded-lg bg-white overflow-visible shadow m-4 p-6 row-span-${
+        compact ? 1 : 2
+      }`}
+    >
+      <h3 className="text-lg font-medium mb-4">Bestsellers in {name}</h3>
       <ToggleLeftLabel
         enabled={!showModels}
         onEnabledChanged={changeShowModels}
         label="Filtered by Colour and Size"
       />
       <dl className="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200">
-        {loading ?
+        {loading ? (
           <div className="flex py-12 items-center justify-center">
             <TailSpin color="#00BFFF" height={30} width={30} />
-          </div> : showModels ? (
-            modelBestsellers
-              .slice(0, 5)
-              ?.map((model, index) => <ModelCard model={model} index={index} />)
-            // ) : selectedModelCode ? (
-            //   <></>
-          ) : (
-            prodBestsellers
-              .slice(0, 5)
-              ?.map((prod, index) => <ProductCard prod={prod} index={index} />)
-          )}
+          </div>
+        ) : showModels ? (
+          modelBestsellers
+            .slice(0, 5)
+            ?.map((model, index) => <ModelCard model={model} index={index} />)
+        ) : (
+          // ) : selectedModelCode ? (
+          //   <></>
+          prodBestsellers
+            .slice(0, 5)
+            ?.map((prod, index) => <ProductCard prod={prod} index={index} />)
+        )}
       </dl>
     </div>
   );
@@ -503,9 +594,10 @@ const ModelCard = ({ model, index }) => {
   const [modelFull, setModel] = useState();
 
   useEffect(() => {
-    model && productApi.getModelByModelCode(model[0]).then(({ data }) => {
-      setModel(data);
-    });
+    model &&
+      productApi.getModelByModelCode(model[0]).then(({ data }) => {
+        setModel(data);
+      });
   }, [model]);
 
   return (
@@ -520,7 +612,9 @@ const ModelCard = ({ model, index }) => {
         <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
           <div className="grid grid-cols-1">
             <p className="ml-4 text-sm font-semibold text-gray-500">
-              <strong className="font-medium text-cyan-700">Product Code:</strong>{" "}
+              <strong className="font-medium text-cyan-700">
+                Product Code:
+              </strong>{" "}
               {modelFull?.modelCode}
             </p>
             <p className="ml-4 text-sm font-semibold text-gray-500">

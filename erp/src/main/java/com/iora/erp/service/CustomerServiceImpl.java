@@ -1,9 +1,12 @@
 package com.iora.erp.service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -269,6 +272,30 @@ public class CustomerServiceImpl implements CustomerService {
         q = em.createQuery("SELECT v FROM Voucher v WHERE :amount = v.amount AND v.issued = false", Voucher.class);
         q.setParameter("amount", amount);
         return q.getResultList();
+    }
+
+    @Override
+    public List<Map<String, String>> getVouchersPerformance() {
+        Query q;
+        q = em.createNativeQuery(
+                "SELECT campaign, sum(case when issued = true then 1 else 0 end) as issued,  sum(case when redeemed = true then 1 else 0 end)  as redeemed FROM VOUCHER Group By Campaign");
+
+        List<Map<String, String>> vouchers = new ArrayList<>();
+
+        for (Object object : q.getResultList()) {
+            Map<String, String> voucher = new HashMap<>();
+            Object[] array = (Object[]) object;
+            voucher.put("campaign", (String) array[0]);
+
+            BigInteger issued = (BigInteger) array[1];
+            voucher.put("issued", issued.toString());
+
+            BigInteger redeemed = (BigInteger) array[2];
+            voucher.put("redeemed", redeemed.toString());
+            vouchers.add(voucher);
+        }
+
+        return vouchers;
     }
 
     @Override

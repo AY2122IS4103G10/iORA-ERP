@@ -427,9 +427,10 @@ public class OnlineCustomerController {
             @RequestBody OnlineOrder parcelSizes) {
         try {
             // OnlineOrder oo = shippIt.deliveryOrder(orderId, siteId, parcelSizes);
-            return ResponseEntity.ok(shippIt.deliveryOrder(orderId, siteId, parcelSizes));
-
+            shippIt.deliveryOrder(orderId, siteId, parcelSizes);
+            return ResponseEntity.ok(customerOrderService.pickPackOnlineOrder(orderId, siteId));
         } catch (Exception ex) {
+            ex.printStackTrace();
             System.err.println(ex.getMessage());
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -438,7 +439,7 @@ public class OnlineCustomerController {
     @PutMapping(path = "/order/delivery/declareMultiple/{orderId}", produces = "application/json")
     public ResponseEntity<Object> deliverMuiltipleOnlineOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity.ok(shippIt.moreToDelivery(orderId));
+            return ResponseEntity.ok(customerOrderService.deliverMultipleOnlineOrder(orderId));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

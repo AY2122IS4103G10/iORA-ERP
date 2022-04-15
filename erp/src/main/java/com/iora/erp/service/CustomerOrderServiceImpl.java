@@ -447,7 +447,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (ProductField pf : m.getProductFields()) {
                 if (pf instanceof PromotionField && ((PromotionField) pf).getAvailable()
                         && ((PromotionField) pf).getQuota() == 1) {
-                    promotions.add((PromotionField) pf);
+                            singlePromotionsSet.add((PromotionField) pf);
                 }
             }
 
@@ -461,7 +461,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 if (newPrice < bestPrice) {
                     bestPf = pf;
                     bestPrice = newPrice;
-                    bestDiscount = m.getDiscountPrice() - newPrice;
+                    bestDiscount = newPrice - m.getDiscountPrice() ;
                 }
             }
 
@@ -539,7 +539,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             if (bestSinglePromosUsed.get(coli) > 0) {
                 PromotionLI pli = new PromotionLI(entry.getValue());
                 pli.setQty(bestSinglePromosUsed.get(coli));
-                pli.setSubTotal(modelMap.get(coli).getDiscountPrice() - bestPrices.get(coli));
+                pli.setSubTotal(bestPrices.get(coli) - modelMap.get(coli).getDiscountPrice());
                 pli.setProduct(coli.getProduct());
                 promotionList.add(pli);
             }
@@ -954,7 +954,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
+    public OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException, CustomerException {
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
         Site actionBy = em.find(Site.class, siteId);
 
@@ -973,9 +973,26 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             if (onlineOrder.getSite().equals(onlineOrder.getPickupSite())) {
                 onlineOrder.addStatusHistory(
                         new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_COLLECTION));
+                emailService.sendOrderReadyToCollect(customerService.getCustomerById(onlineOrder.getCustomerId()),
+                        onlineOrder);
             } else {
                 onlineOrder.addStatusHistory(
                         new OOStatus(actionBy, new Date(), OnlineOrderStatusEnum.READY_FOR_DELIVERY));
+                if (onlineOrder.getPickupSite() == null) {
+
+                    emailService.sendOrderReadyToDeliver(customerService.getCustomerById(onlineOrder.getCustomerId()),
+                            onlineOrder);
+
+                    // Remove Stock Level
+                    for (CustomerOrderLI ooli : onlineOrder.getLineItems()) {
+                        try {
+                            siteService.removeProducts(onlineOrder.getSite().getId(), ooli.getProduct().getSku(),
+                                    ooli.getPackedQty());
+                        } catch (NoStockLevelException | IllegalTransferException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
         }
         return updateOnlineOrder(onlineOrder);
@@ -1160,7 +1177,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     // Only for self-pickup order
     @Override
-    public OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException {
+    public OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException, CustomerException {
         Site actionBy = em.find(Site.class, siteId);
         OnlineOrder onlineOrder = (OnlineOrder) getCustomerOrder(orderId);
 
@@ -1173,6 +1190,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         onlineOrder.addStatusHistory(
                 new OOStatus(onlineOrder.getSite(), new Date(), OnlineOrderStatusEnum.READY_FOR_COLLECTION));
+        emailService.sendOrderReadyToCollect(customerService.getCustomerById(onlineOrder.getCustomerId()), onlineOrder);
         return updateOnlineOrder(onlineOrder);
     }
 

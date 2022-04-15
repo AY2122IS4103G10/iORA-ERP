@@ -559,13 +559,10 @@ public class SAMController {
         }
     }
 
-    @GetMapping(path = "/dashboard/voucher/{campaign}", produces = "application/json")
-    public ResponseEntity<Object> getVouchersPerformance(
-            @RequestParam(required = false) @DateTimeFormat(pattern = "ddMMyyyy") Date date,
-            @PathVariable Long siteId) {
+    @GetMapping(path = "/dashboard/vouchers", produces = "application/json")
+    public ResponseEntity<Object> getVouchersPerformance() {
         try {
-            return ResponseEntity
-                    .ok(stockTransferService.getDailyStockTransferOrders(siteId, date == null ? new Date() : date));
+            return ResponseEntity.ok(customerService.getVouchersPerformance());
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

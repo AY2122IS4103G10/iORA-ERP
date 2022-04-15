@@ -100,7 +100,7 @@ public interface CustomerOrderService {
         public abstract OnlineOrder cancelOnlineOrder(Long orderId, Long siteId)
                         throws CustomerOrderException, CustomerException, StripeException;
 
-        public abstract OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
+        public abstract OnlineOrder pickPackOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException, CustomerException;
 
         public abstract Map<String, Integer> getPickingList(Long siteId) throws ProductException;
 
@@ -121,7 +121,7 @@ public interface CustomerOrderService {
 
         public abstract OnlineOrder deliverMultipleOnlineOrder(Long orderId) throws CustomerOrderException;
 
-        public abstract OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException;
+        public abstract OnlineOrder receiveOnlineOrder(Long orderId, Long siteId) throws CustomerOrderException, CustomerException;
 
         public abstract OnlineOrder collectOnlineOrder(Long orderId) throws CustomerOrderException;
 

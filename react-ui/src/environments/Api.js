@@ -476,8 +476,7 @@ export const posApi = {
   },
   addRefundLineItem(orderId, refundLI, refundAmount) {
     return axiosPrivate.post(
-      `${REST_ENDPOINT}store/customerOrder/refund/${orderId}${
-        `?refundAmount=${refundAmount}` || ""
+      `${REST_ENDPOINT}store/customerOrder/refund/${orderId}${`?refundAmount=${refundAmount}` || ""
       }`,
       refundLI
     );
@@ -565,9 +564,21 @@ export const dashboardApi = {
 export const reportApi = {
   getSalesReport(startDate, endDate) {
     return axiosPrivate.get(
-      `${REST_ENDPOINT}sam/reports/dailySales?start=${startDate}&end=${endDate}`, 
+      `${REST_ENDPOINT}sam/reports/dailySales?start=${startDate}&end=${endDate}`,
       {
-        responseType:"blob",
+        responseType: "blob",
+        headers: {
+          Accept: 'application/octet-stream',
+        },
+      }
+    );
+  },
+
+  getProcurementReport(siteId, startDate, endDate) {
+    return axiosPrivate.get(
+      `${REST_ENDPOINT}sam/reports/poli?siteId=${siteId}&start=${startDate}&end=${endDate}`,
+      {
+        responseType: "blob",
         headers: {
           Accept: 'application/octet-stream',
         },

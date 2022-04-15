@@ -222,7 +222,7 @@ const userSlice = createSlice({
     });
     builder.addCase(register.fulfilled, (state, action) => {
       action.payload.password !== undefined && delete action.payload.password;
-      state.user = action.payload;
+      state.user = {...action.payload};
       state.status = "succeeded";
       state.loggedIn = true;
     });
@@ -230,8 +230,8 @@ const userSlice = createSlice({
       state.error = "Register failed";
     });
     builder.addCase(updateAccount.fulfilled, (state, action) => {
-      action.payload.password !== undefined && delete action.payload.password;
-      state.user = { ...action.payload };
+      // action.payload.password !== undefined && delete action.payload.password;
+      // state.user = { ...action.payload };
       state.status = "succeeded";
     });
     builder.addCase(updateAccount.rejected, (state, action) => {

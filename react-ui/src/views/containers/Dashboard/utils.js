@@ -1,5 +1,12 @@
 import moment from "moment";
 
+export const topfew = [
+  {id : 0, name: 5},
+  {id : 1, name: 10},
+  {id : 2, name: 20},
+  {id : 3, name: 50},
+]
+
 export const cyans = [
   "rgba(22, 78, 99, alpha)",
   "rgba(21, 94, 117, alpha)",

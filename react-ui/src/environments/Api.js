@@ -545,6 +545,9 @@ export const dashboardApi = {
       `${REST_ENDPOINT}sam/dashboard/onlineOrders?start=${startDate}&end=${endDate}`
     );
   },
+  getVoucherStats() {
+    return axiosPrivate.get(`${REST_ENDPOINT}sam/dashboard/vouchers`);
+  },
   getCustomerOrdersOfSite(siteId, date = "") {
     return axiosPrivate.get(
       `${REST_ENDPOINT}sam/dashboard/customerOrders/${siteId}?date=${date}`
@@ -565,13 +568,13 @@ export const dashboardApi = {
 export const reportApi = {
   getSalesReport(startDate, endDate) {
     return axiosPrivate.get(
-      `${REST_ENDPOINT}sam/reports/dailySales?start=${startDate}&end=${endDate}`, 
+      `${REST_ENDPOINT}sam/reports/dailySales?start=${startDate}&end=${endDate}`,
       {
-        responseType:"blob",
+        responseType: "blob",
         headers: {
-          Accept: 'application/octet-stream',
+          Accept: "application/octet-stream",
         },
       }
     );
-  }
-}
+  },
+};

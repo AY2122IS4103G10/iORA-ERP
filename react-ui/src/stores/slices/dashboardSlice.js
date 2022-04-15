@@ -4,12 +4,13 @@ import { dashboardApi } from "../../environments/Api";
 const initialState = {
   stockLevelSites: [],
   stockLevelProducts: [],
-  customerOrdersByDate: [[],[]],
+  customerOrdersByDate: [[], []],
   storeOrdersByDate: [],
   onlineOrdersByDate: [],
   customerOrders: [],
   procurementOrders: [],
   stockTransferOrders: [],
+  voucherStats: [],
   siteId: -1,
   status: "idle",
   error: null,
@@ -41,6 +42,10 @@ const dashboardSlice = createSlice({
     builder.addCase(getCustomerOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.customerOrdersByDate.push(action.payload);
+    });
+    builder.addCase(getVoucherStats.fulfilled, (state, action) => {
+      state.status = "succeeded-2";
+      state.voucherStats = action.payload;
     });
     builder.addCase(getCustomerOrders.rejected, (state, action) => {
       state.status = "failed";
@@ -162,6 +167,14 @@ export const getOnlineOrders = createAsyncThunk(
   "dashboard/getOnlineOrders",
   async ({ startDate, endDate }) => {
     const response = await dashboardApi.getOnlineOrders({ startDate, endDate });
+    return response.data;
+  }
+);
+
+export const getVoucherStats = createAsyncThunk(
+  "dashboard/getVoucherStats",
+  async () => {
+    const response = await dashboardApi.getVoucherStats();
     return response.data;
   }
 );

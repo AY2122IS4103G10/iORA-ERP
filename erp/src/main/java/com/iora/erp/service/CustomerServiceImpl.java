@@ -118,17 +118,22 @@ public class CustomerServiceImpl implements CustomerService {
         old.setFirstName(customer.getFirstName());
         old.setLastName(customer.getLastName());
 
-        DeliveryAddress da = em.find(DeliveryAddress.class, customer.getAddress().getId());
-        da.setName(customer.getAddress().getName());
-        da.setStreet1(customer.getAddress().getStreet1());
-        da.setStreet2(customer.getAddress().getStreet2());
-        da.setCountry(customer.getAddress().getCountry());
-        da.setState(customer.getAddress().getState());
-        da.setCity(customer.getAddress().getCity());
-        da.setZip(customer.getAddress().getZip());
-        da.setPhone(customer.getAddress().getPhone());
-        System.out.println(da.getStreet1());
-        old.setAddress(da);
+        if (old.getAddress() == null) {
+            DeliveryAddress da = customer.getAddress();
+            em.persist(da);
+            old.setAddress(da);
+        } else {
+            DeliveryAddress da = em.find(DeliveryAddress.class, customer.getAddress().getId());
+            da.setName(customer.getAddress().getName());
+            da.setStreet1(customer.getAddress().getStreet1());
+            da.setStreet2(customer.getAddress().getStreet2());
+            da.setCountry(customer.getAddress().getCountry());
+            da.setState(customer.getAddress().getState());
+            da.setCity(customer.getAddress().getCity());
+            da.setZip(customer.getAddress().getZip());
+            da.setPhone(customer.getAddress().getPhone());
+            old.setAddress(da);
+        }
         return old;
     }
 

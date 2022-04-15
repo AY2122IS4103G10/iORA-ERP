@@ -38,7 +38,8 @@ const prodFieldSlice = createSlice({
       state.status = "failed";
     });
     builder.addCase(addNewProductField.fulfilled, (state, action) => {
-      state.status = "idle";
+      state.prodFields.push(action.payload)
+      state.status = "success";
     });
   },
 });

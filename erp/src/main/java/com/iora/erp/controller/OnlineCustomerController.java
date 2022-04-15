@@ -445,7 +445,7 @@ public class OnlineCustomerController {
     @PutMapping(path = "/order/delivery/declareMultiple/{orderId}", produces = "application/json")
     public ResponseEntity<Object> deliverMuiltipleOnlineOrder(@PathVariable Long orderId) {
         try {
-            return ResponseEntity.ok(shippIt.moreToDelivery(orderId));
+            return ResponseEntity.ok(customerOrderService.deliverMultipleOnlineOrder(orderId));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

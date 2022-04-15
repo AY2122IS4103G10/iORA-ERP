@@ -16,7 +16,7 @@ public class ScheduleJob {
     @Autowired
     ShippItService shipItService;
 
-    @Scheduled(cron = "*/5 * * * * ?")
+    @Scheduled(cron = "0 * * * * *")
     public void showtime() {
         shipItService.fetchStatus();
     }

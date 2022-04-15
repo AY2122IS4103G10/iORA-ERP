@@ -64,6 +64,8 @@ const columns = [
     accessor: (row) =>
       row.product.productFields.find((field) => field.fieldName === "COLOUR")
         .fieldValue,
+        Filter: SelectColumnFilter,
+        filter: "includes",
     Cell: (e) =>
       e.row.original.status === "Low" ? (
         <span className="text-red-500">{e.value}</span>
@@ -76,6 +78,8 @@ const columns = [
     accessor: (row) =>
       row.product.productFields.find((field) => field.fieldName === "SIZE")
         .fieldValue,
+        Filter: SelectColumnFilter,
+        filter: "includes",
     Cell: (e) =>
       e.row.original.status === "Low" ? (
         <span className="text-red-500">{e.value}</span>

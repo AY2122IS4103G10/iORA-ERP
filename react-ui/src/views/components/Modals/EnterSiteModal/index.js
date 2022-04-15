@@ -12,6 +12,7 @@ export const EnterSiteModal = ({
   siteCode,
   onSiteCodeChanged,
   handleEnterSite,
+  disableSiteCode,
 }) => {
   const navigate = useNavigate();
   return (
@@ -34,7 +35,7 @@ export const EnterSiteModal = ({
                 setSelected={setSiteSelected}
               />
             </div>
-            <input
+            {!disableSiteCode &&<input
               type="text"
               name="siteCode"
               id="siteCode"
@@ -42,7 +43,7 @@ export const EnterSiteModal = ({
               placeholder="Site Code"
               value={siteCode}
               onChange={onSiteCodeChanged}
-            />
+            />}
           </div>
           <div className="pt-4">
             <div className="mt-5 grid grid-cols-1 gap-2 justify-center">

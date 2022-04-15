@@ -142,5 +142,8 @@ export const productApi = {
 export const onlineOrderApi = {
   cancelOrder(orderId, customerId) {
     return axiosPrivate.put(`${REST_ENDPOINT}online/customer/cancel/${orderId}/${customerId}`)
+  },
+  completeOrder(orderId) {
+    return axiosPrivate.put(`${REST_ENDPOINT}online/deliver/simulateDelivered/${orderId}`)
   }
 }

@@ -457,6 +457,16 @@ public class OnlineCustomerController {
         }
     }
 
+    @PutMapping(value = "/deliver/simulateDelivered/{orderId}", produces = "application/json")
+    public OnlineOrder simulateOnlineOrderDelivered(@PathVariable Long orderId) {
+        try {
+            return shippIt.simulateDeliveryComplete(orderId);
+
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
     @PutMapping(path = "/deliverMultiple/{orderId}", produces = "application/json")
     public ResponseEntity<Object> deliverMultipleOnlineOrder(@PathVariable Long orderId) {
         try {

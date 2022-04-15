@@ -447,7 +447,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (ProductField pf : m.getProductFields()) {
                 if (pf instanceof PromotionField && ((PromotionField) pf).getAvailable()
                         && ((PromotionField) pf).getQuota() == 1) {
-                            singlePromotionsSet.add((PromotionField) pf);
+                    singlePromotionsSet.add((PromotionField) pf);
                 }
             }
 
@@ -461,7 +461,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 if (newPrice < bestPrice) {
                     bestPf = pf;
                     bestPrice = newPrice;
-                    bestDiscount = newPrice - m.getDiscountPrice() ;
+                    bestDiscount = newPrice - m.getDiscountPrice();
                 }
             }
 

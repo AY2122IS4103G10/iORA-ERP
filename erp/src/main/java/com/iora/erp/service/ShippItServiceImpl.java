@@ -26,6 +26,7 @@ import com.iora.erp.model.customerOrder.OOStatus;
 import com.iora.erp.model.customerOrder.OnlineOrder;
 import com.iora.erp.model.site.Site;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -50,8 +52,11 @@ public class ShippItServiceImpl implements ShippItService {
     @Value("${WEBHOOKS_SHIPPIT}")
     private String webhook;
 
+    private List<Long> allDelivery;
+
     @PostConstruct
     public void init() {
+        allDelivery = new ArrayList<>();
     }
 
     @Autowired
@@ -70,20 +75,6 @@ public class ShippItServiceImpl implements ShippItService {
     private EntityManager em;
 
     @Override
-    public OnlineOrder createDelivery(Long orderId, Long siteId, List<Delivery> deliveries)
-            throws CustomerOrderException, CustomerException {
-        OnlineOrder onlineOrder = (OnlineOrder) customerOrderService.getCustomerOrder(orderId);
-        for (Delivery d : deliveries) {
-            em.persist(d);
-            onlineOrder.getParcelDelivery().add(d);
-        }
-        Customer cust = customerService.getCustomerById(onlineOrder.getCustomerId());
-        Site site = siteService.getSite(siteId);
-
-        return onlineOrder;
-    }
-
-    @Override
     public String tokenBearer() {
         return apiKey;
     }
@@ -93,13 +84,13 @@ public class ShippItServiceImpl implements ShippItService {
             throws CustomerOrderException, CustomerException {
         OnlineOrder onlineOrder = (OnlineOrder) customerOrderService.getCustomerOrder(orderId);
 
-        if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PACKED
-                || onlineOrder.getStatus() == OnlineOrderStatusEnum.DELIVERING_MULTIPLE) {
+        if (onlineOrder.getLastStatus() == OnlineOrderStatusEnum.PACKED) {
             List<Delivery> deliveryParcel = oOrder.getParcelDelivery();
 
             String url = "https://app.staging.shippit.com/api/3/orders";
 
             JSONObject order = new JSONObject();
+            List<String> urlsTracking = new ArrayList<>();
 
             for (int i = 0; i < deliveryParcel.size(); i++) {
                 ParcelSizeEnum parcelInfo = deliveryParcel.get(i).getPs();
@@ -153,36 +144,27 @@ public class ShippItServiceImpl implements ShippItService {
                     String deliveryURL = "https://app.staging.shippit.com/track/";
                     deliveryURL = deliveryURL.concat(delivery.getTrackingID().toLowerCase());
                     delivery.setTrackingURL(deliveryURL);
-                    System.out.println(deliveryURL);
-                    // trackingDelivery(delivery.getId());
+                    delivery.setStatus(OnlineOrderStatusEnum.READY_FOR_DELIVERY);
+                    urlsTracking.add(deliveryURL);
+                    allDelivery.add(delivery.getId());
                 }
             }
             if (onlineOrder.getParcelDelivery().size() == oOrder.getParcelDelivery().size()) {
                 onlineOrder.setStatus(OnlineOrderStatusEnum.READY_FOR_DELIVERY);
             }
 
+            // String msgBody = "Thank you for patience! "
             // for (Delivery xDelivery : onlineOrder.getParcelDelivery()) {
             // trackingDelivery(xDelivery.getId());
             // retreiveLabel(xDelivery.getId());
             // }
 
+            // make sure it confirms the order
             return onlineOrder;
 
         } else {
             throw new CustomerOrderException("Order is not up for delivery.");
         }
-    }
-
-    @Override
-    public OnlineOrder moreToDelivery(Long orderId) throws CustomerOrderException {
-        OnlineOrder onlineOrder = (OnlineOrder) customerOrderService.getCustomerOrder(orderId);
-
-        if (onlineOrder.getStatus() == OnlineOrderStatusEnum.READY_FOR_DELIVERY
-                || onlineOrder.getStatus() == OnlineOrderStatusEnum.DELIVERING_MULTIPLE) {
-            // true = more to deliver
-            onlineOrder.setStatus(OnlineOrderStatusEnum.DELIVERING_MULTIPLE);
-        }
-        return onlineOrder;
     }
 
     @Override
@@ -203,23 +185,6 @@ public class ShippItServiceImpl implements ShippItService {
     }
 
     @Override
-    public OnlineOrder fetchStatus() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Delivery> getAllUncomfirmedDelivery() throws OnlineOrderDeliveryException {
-        try {
-            Query q = em.createQuery("SELECT d FROM Delivery d WHERE d.confirmOrder = :status");
-            q.setParameter("status", true);
-            return q.getResultList();
-        } catch (Exception ex) {
-            throw new OnlineOrderDeliveryException();
-        }
-    }
-
-    @Override
     public String trackingDelivery(Long parcelId) {
         Delivery parcel = em.find(Delivery.class, parcelId);
         String trackingNum = parcel.getTrackingID();
@@ -237,22 +202,66 @@ public class ShippItServiceImpl implements ShippItService {
         return link;
     }
 
-    /*
-     * @Override
-     * public OnlineOrder fillTrackingURL(Long onlineOrder) throws
-     * InterruptedException {
-     * TimeUnit.MINUTES.sleep(1);
-     * OnlineOrder oo = em.find(OnlineOrder.class, onlineOrder);
-     * List<Delivery> parcelList = oo.getParcelDelivery();
-     * for (Delivery delivery : parcelList) {
-     * String url = trackingDelivery(delivery.getId());
-     * Delivery dd = em.find(Delivery.class, delivery.getId());
-     * dd.setTrackingURL(url);
-     * System.out.println(dd.toString());
-     * }
-     * System.out.println(oo.toString());
-     * oo = em.find(OnlineOrder.class, onlineOrder);
-     * return oo;
-     * }
-     */
+    @Scheduled(cron = "*/5 * * * * ?")
+    @Async
+    @Override
+    public void fetchStatus() {
+        Query q = em.createQuery("SELECT x FROM OnlineOrder x WHERE x.status =:status");
+        q.setParameter("status", OnlineOrderStatusEnum.READY_FOR_DELIVERY);
+        List<OnlineOrder> listOO = q.getResultList();
+
+        System.out.println("I am running here");
+        String url = "https://app.staging.shippit.com/api/3/orders/{tracking_number}/tracking";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(tokenBearer());
+
+        for (OnlineOrder oo : listOO) {
+            List<Delivery> ddList = oo.getParcelDelivery();
+            Boolean completed = true;
+
+            for (Delivery dd : ddList) {
+                Delivery xx = em.find(Delivery.class, dd.getId());
+
+                Date nowDate = new Date();
+                long differenceInTime = nowDate.getTime() - xx.getDateTime().getTime();
+
+                if (differenceInTime > 30000) {
+
+                    HttpEntity<String> entity = new HttpEntity<>(headers);
+                    ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class,
+                            dd.getTrackingID());
+                    String jsonB = response.getBody();
+                    JSONObject jsonObject = new JSONObject(jsonB);
+                    JSONArray listR = jsonObject.getJSONObject("response").getJSONArray("track");
+                    JSONObject lastStatusObject = listR.getJSONObject(0);
+                    String lastStatus = lastStatusObject.getString("status");
+                    System.out.println(lastStatus);
+
+                    if (lastStatus.equals("Completed")) {
+                        xx.setStatus(OnlineOrderStatusEnum.DELIVERED);
+
+                    } else if ((lastStatus.equals("with_driver") || lastStatus.equals("in_transit"))
+                            && !xx.getStatus().equals(OnlineOrderStatusEnum.DELIVERING)) {
+                        xx.setStatus(OnlineOrderStatusEnum.DELIVERING);
+                        completed = false;
+                    } else {
+                        completed = false;
+                    }
+                } else {
+                    completed = false;
+                }
+            }
+
+            if (completed != false) {
+                OnlineOrder ooPersist = em.find(OnlineOrder.class, oo.getId());
+                ooPersist.setStatus(OnlineOrderStatusEnum.DELIVERED);
+                OOStatus onlineStatus = new OOStatus();
+                onlineStatus.setStatus(OnlineOrderStatusEnum.DELIVERED);
+                onlineStatus.setTimeStamp(new Date());
+                em.persist(onlineStatus);
+                ooPersist.getStatusHistory().add(onlineStatus);
+            }
+        }
+    }
 }

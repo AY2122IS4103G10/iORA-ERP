@@ -201,8 +201,9 @@ public class ShippItServiceImpl implements ShippItService {
     @Async
     @Override
     public void fetchStatus() {
-        Query q = em.createQuery("SELECT x FROM OnlineOrder x WHERE x.status =:status");
+        Query q = em.createQuery("SELECT x FROM OnlineOrder x WHERE x.status =:status OR x.status =:status2");
         q.setParameter("status", OnlineOrderStatusEnum.READY_FOR_DELIVERY);
+        q.setParameter("status2", OnlineOrderStatusEnum.DELIVERING);
         List<OnlineOrder> listOO = q.getResultList();
 
         System.out.println("I am running here");

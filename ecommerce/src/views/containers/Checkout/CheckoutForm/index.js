@@ -31,6 +31,7 @@ export const AddressForm = ({
   postalCode,
   setPostalCode,
 }) => {
+  console.log(postalCode)
   return (
     <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
       <div className="sm:col-span-3">
@@ -135,7 +136,7 @@ export const AddressForm = ({
         </label>
         <div className="mt-1">
           <input
-            type="number"
+            type="text"
             id="postal-code"
             autoComplete="postal-code"
             value={postalCode}

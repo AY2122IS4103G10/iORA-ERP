@@ -472,6 +472,16 @@ export const CustomerForm = ({ subsys }) => {
             availStatus: true,
             email,
             password,
+            address: {
+              street1,
+              street2,
+              name: receiverName,
+              city,
+              state,
+              zip,
+              country,
+              phone: deliveryContact,
+            },
           })
         )
           .unwrap()

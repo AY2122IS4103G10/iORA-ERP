@@ -255,7 +255,7 @@ export const Membership = () => {
                       Your Membership Points
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900">
-                      {user.membershipPoints}
+                      {user.membershipPoints.toFixed(2)}
                     </dd>
                   </div>
                   <div className="sm:col-span-2">

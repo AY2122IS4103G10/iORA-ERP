@@ -62,19 +62,19 @@ export const CheckoutSuccessful = () => {
     >
       {confirmedOrder !== null ? (
         <div className="max-w-3xl mx-auto">
-            <div className="flex items-end justify-end mb-4">
-              <button
-                type="button"
-                className="mr-10 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
-                onClick={handlePrint}
-              >
-                <PrinterIcon
-                  className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-                <span>Print</span>
-              </button>
-            </div>
+          <div className="flex items-end justify-end mb-4">
+            <button
+              type="button"
+              className="mr-10 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
+              onClick={handlePrint}
+            >
+              <PrinterIcon
+                className="-ml-1 mr-2 h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+              <span>Print</span>
+            </button>
+          </div>
           <div className="max-w-2xl">
             <h1 className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
               Thank you!
@@ -89,11 +89,6 @@ export const CheckoutSuccessful = () => {
               </span>{" "}
               has placed and will be with you soon.
             </p>
-
-            <dl className="mt-12 text-sm font-medium">
-              <dt className="text-gray-900">Tracking number</dt>
-              <dd className="text-gray-600 mt-2">#######</dd>
-            </dl>
           </div>
 
           <section

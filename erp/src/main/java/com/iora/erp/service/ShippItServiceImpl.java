@@ -197,6 +197,25 @@ public class ShippItServiceImpl implements ShippItService {
         return link;
     }
 
+    @Override
+    public OnlineOrder simulateDeliveryComplete(Long onlineOrderId) {
+        OnlineOrder oo = em.find(OnlineOrder.class, onlineOrderId);
+        if (oo.getStatus() == OnlineOrderStatusEnum.PACKED || oo.getStatus() == OnlineOrderStatusEnum.READY_FOR_DELIVERY
+                || oo.getStatus() == OnlineOrderStatusEnum.DELIVERING) {
+            List<Delivery> parcels = oo.getParcelDelivery();
+            for (Delivery dd : parcels) {
+                Delivery delivered = em.find(Delivery.class, dd.getId());
+                delivered.setStatus(OnlineOrderStatusEnum.DELIVERED);
+            }
+
+            OnlineOrder ooPersist = em.find(OnlineOrder.class, oo.getId());
+            ooPersist.setStatus(OnlineOrderStatusEnum.DELIVERED);
+            ooPersist.getStatusHistory().add(new OOStatus(null, new Date(), OnlineOrderStatusEnum.DELIVERED));
+        }
+
+        return oo;
+    }
+
     @Scheduled(cron = "*/15 * * * * *")
     @Async
     @Override
@@ -255,4 +274,5 @@ public class ShippItServiceImpl implements ShippItService {
             }
         }
     }
+
 }

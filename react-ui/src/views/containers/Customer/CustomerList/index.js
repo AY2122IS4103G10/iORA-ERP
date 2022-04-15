@@ -35,6 +35,7 @@ export const CustomerTable = ({ data, handleOnClick }) => {
       {
         Header: "Member Points",
         accessor: "membershipPoints",
+        Cell: (e) => e.value.toFixed(2)
       },
       {
         Header: "Member Tier",

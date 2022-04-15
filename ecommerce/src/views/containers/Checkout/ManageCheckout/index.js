@@ -47,6 +47,8 @@ export const ManageCheckout = () => {
   );
   const [store, setStore] = useState({ name: "Select Store" });
   const [storeList, setStoreList] = useState([]);
+  const [voucher, setVoucher] = useState("");
+  const [voucherItem, setVoucherItem] = useState(null);
 
   const cart = useSelector(selectCart);
   const customerId = useSelector(selectUserId);
@@ -95,11 +97,19 @@ export const ManageCheckout = () => {
 
   const onCancelClicked = () => setEnterPayment(false);
 
+  const handleApplyVoucher = () => {
+    checkoutApi.applyVoucher(voucher)
+    .then((response) => {
+      setVoucherItem(response.data);
+    });
+  }
   const handleMakePayment = () => {
     let delivery = selectedDeliveryMethod.id === 1 ? true : false;
     let totalAmount =
-      afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.5 : 0);
+      afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.5 : 0) 
+      - (voucherItem !== null ? voucherItem.amount : 0);
     let order = {
+      voucher: voucherItem,
       lineItems,
       customerId,
       totalAmount: totalAmount,
@@ -136,6 +146,7 @@ export const ManageCheckout = () => {
           afterDiscount={afterDiscount}
           promotions={promotions}
           selectedDeliveryMethod={selectedDeliveryMethod}
+          voucherItem={voucherItem}
         />
         {enterPayment ? (
           <ManagePayment
@@ -145,6 +156,8 @@ export const ManageCheckout = () => {
           />
         ) : (
           <CheckoutForm
+            voucher={voucher}
+            setVoucher={setVoucher}
             email={email}
             setEmail={setEmail}
             phoneNumber={phoneNumber}
@@ -171,6 +184,7 @@ export const ManageCheckout = () => {
             setStore={setStore}
             storeList={storeList}
             handleMakePayment={handleMakePayment}
+            handleApplyVoucher={handleApplyVoucher}
           />
         )}
       </div>

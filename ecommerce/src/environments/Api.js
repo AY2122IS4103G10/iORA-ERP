@@ -100,6 +100,11 @@ export const checkoutApi = {
       lineItems
     );
   },
+  applyVoucher(code) {
+    return axiosPublic.get(
+      `${REST_ENDPOINT}online/public/voucher/apply?code=${code}`,
+    )
+  },
   getStores() {
     return axiosPublic.get(
       `${REST_ENDPOINT}online/public/stores/singapore`,

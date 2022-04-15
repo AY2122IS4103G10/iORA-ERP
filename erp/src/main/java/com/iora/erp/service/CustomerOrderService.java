@@ -12,6 +12,7 @@ import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
+import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.Delivery;
@@ -134,8 +135,9 @@ public interface CustomerOrderService {
         public abstract List<CustomerOrder> getDailyCustomerOrders(Long siteId, Date date);
 
         public abstract List<CustomerOrder> getCustomerOrdersInRange(Long siteId, Date start, Date end);
-        
+
         public abstract List<CustomerOrder> getAllCustomerOrderInRange(Date start, Date end);
 
         public abstract Delivery getDeliveryInfoById(Long deliveryId);
+
 }

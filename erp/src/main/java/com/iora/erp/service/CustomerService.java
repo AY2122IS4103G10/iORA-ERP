@@ -2,6 +2,7 @@ package com.iora.erp.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.RegistrationException;
@@ -50,6 +51,8 @@ public interface CustomerService {
     public abstract List<Voucher> getVouchersOfCustomer(Long customerId) throws CustomerException;
 
     public abstract List<Voucher> getAvailableVouchersByAmount(double amount);
+
+    public abstract List<Map<String, String>> getVouchersPerformance();
 
     public abstract void deleteVoucher(String voucherCode) throws CustomerException;
 

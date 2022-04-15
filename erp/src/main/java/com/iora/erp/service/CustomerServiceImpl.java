@@ -84,7 +84,16 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setMembershipTier(findMembershipTierById("BASIC"));
             String password = RandomString.make(10);
             customer.setPassword(passwordEncoder.encode(password));
+            DeliveryAddress da = customer.getAddress();
+            if (da != null) {
+                em.persist(da);
+            }
+
             em.persist(customer);
+
+            if (da != null) {
+                customer.setAddress(da);
+            }
             emailService.sendCustomerPasswordCreation(customer, password);
             return customer;
         }

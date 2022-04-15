@@ -118,7 +118,7 @@
 							<staticText>
 								<reportElement mode="Transparent" x="0" y="0" width="90" height="30" forecolor="#030303" backcolor="#E6E6E6" uuid="9cc826f7-6e40-43c1-b9ae-bf6a1914e5ec"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Arial " size="12" isBold="true"/>
+									<font fontName="Arial" size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Order Id]]></text>
 							</staticText>

@@ -72,7 +72,7 @@
 				<staticText>
 					<reportElement x="0" y="0" width="234" height="92" forecolor="#FFFFFF" uuid="9e48917a-7b59-4ffd-baad-725f45563194"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Helvetica Neue" size="24" isBold="true"/>
+						<font fontName="Arial" size="24" isBold="true"/>
 					</textElement>
 					<text><![CDATA[  Daily Sales Report]]></text>
 				</staticText>
@@ -118,7 +118,7 @@
 							<staticText>
 								<reportElement mode="Transparent" x="0" y="0" width="90" height="30" forecolor="#030303" backcolor="#E6E6E6" uuid="9cc826f7-6e40-43c1-b9ae-bf6a1914e5ec"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12" isBold="true"/>
+									<font fontName="Arial " size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Order Id]]></text>
 							</staticText>
@@ -129,7 +129,7 @@
 								<reportElement key="" x="0" y="0" width="90" height="30" uuid="674b1f85-5cb9-4388-8546-7f2ead0f93f0"/>
 								<box leftPadding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12"/>
+									<font fontName="Arial" size="12"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
 							</textField>
@@ -142,7 +142,7 @@
 							<staticText>
 								<reportElement mode="Transparent" x="0" y="0" width="90" height="30" forecolor="#030303" backcolor="#E6E6E6" uuid="8e077bf1-8e22-454a-982a-2ebf93262391"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12" isBold="true"/>
+									<font fontName="Arial" size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Customer Id]]></text>
 							</staticText>
@@ -153,7 +153,7 @@
 								<reportElement key="" x="0" y="0" width="90" height="30" uuid="7adb28c9-86b1-4ed4-8047-9d558360c10c"/>
 								<box leftPadding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12"/>
+									<font fontName="Arial" size="12"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{customerId}]]></textFieldExpression>
 							</textField>
@@ -166,7 +166,7 @@
 							<staticText>
 								<reportElement mode="Transparent" x="0" y="0" width="90" height="30" forecolor="#030303" backcolor="#E6E6E6" uuid="4a2c844d-7021-459b-bc83-d9bc295c4ea6"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12" isBold="true"/>
+									<font fontName="Arial" size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Date]]></text>
 							</staticText>
@@ -177,7 +177,7 @@
 								<reportElement key="" x="0" y="0" width="90" height="30" uuid="18a308cf-7bf6-41fd-8a70-44d93cfdf7d3"/>
 								<box leftPadding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12"/>
+									<font fontName="Arial" size="12"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{dateTime}]]></textFieldExpression>
 							</textField>
@@ -190,7 +190,7 @@
 							<staticText>
 								<reportElement mode="Transparent" x="0" y="0" width="90" height="30" forecolor="#030303" backcolor="#E6E6E6" uuid="4516ed7d-583d-401b-9b3e-048ecaf5184c"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12" isBold="true"/>
+									<font fontName="Arial" size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Site]]></text>
 							</staticText>
@@ -201,7 +201,7 @@
 								<reportElement key="" x="0" y="0" width="90" height="30" uuid="2a63aa85-90bd-4d2b-8a2e-99da6dc68afb"/>
 								<box leftPadding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12"/>
+									<font fontName="Arial" size="12"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{site}]]></textFieldExpression>
 							</textField>
@@ -214,7 +214,7 @@
 							<staticText>
 								<reportElement mode="Transparent" x="0" y="0" width="90" height="30" forecolor="#030303" backcolor="#E6E6E6" uuid="2dc67f38-1ee2-42ac-a230-1ef3107699b5"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12" isBold="true"/>
+									<font fontName="Arial" size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Voucher]]></text>
 							</staticText>
@@ -225,7 +225,7 @@
 								<reportElement key="" x="0" y="0" width="90" height="30" uuid="29d97180-4802-4cc8-818a-fc472d0a86ec"/>
 								<box leftPadding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12"/>
+									<font fontName="Arial" size="12"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{voucher}]]></textFieldExpression>
 							</textField>
@@ -238,7 +238,7 @@
 							<staticText>
 								<reportElement mode="Transparent" x="0" y="0" width="90" height="30" forecolor="#030303" backcolor="#E6E6E6" uuid="7aa3dd0b-725c-4cee-b38d-ee3fc35ae69d"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12" isBold="true"/>
+									<font fontName="Arial" size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Total Amount]]></text>
 							</staticText>
@@ -249,7 +249,7 @@
 								<reportElement key="" x="0" y="0" width="90" height="30" uuid="260e1454-aa9e-4f55-8854-b4a1ae2a7ae8"/>
 								<box leftPadding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Helvetica Neue" size="12"/>
+									<font fontName="Arial" size="12"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{totalAmount}]]></textFieldExpression>
 							</textField>

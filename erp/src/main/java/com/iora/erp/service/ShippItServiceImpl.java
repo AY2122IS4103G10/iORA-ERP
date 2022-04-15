@@ -148,13 +148,6 @@ public class ShippItServiceImpl implements ShippItService {
                 }
             }
 
-            // String msgBody = "Thank you for patience! "
-            // for (Delivery xDelivery : onlineOrder.getParcelDelivery()) {
-            // trackingDelivery(xDelivery.getId());
-            // retreiveLabel(xDelivery.getId());
-            // }
-
-            // make sure it confirms the order
             return onlineOrder;
 
         } else {
@@ -220,7 +213,8 @@ public class ShippItServiceImpl implements ShippItService {
     @Async
     @Override
     public void fetchStatus() {
-        Query q = em.createQuery("SELECT x FROM OnlineOrder x WHERE x.status =:status OR x.status =:status2");
+        Query q = em.createQuery(
+                "SELECT x FROM OnlineOrder x WHERE (x.status =:status OR x.status =:status2) AND x.delivery = TRUE");
         q.setParameter("status", OnlineOrderStatusEnum.READY_FOR_DELIVERY);
         q.setParameter("status2", OnlineOrderStatusEnum.DELIVERING);
         List<OnlineOrder> listOO = q.getResultList();

@@ -41,6 +41,7 @@ import {
   delta,
   deltaType,
   rangeLabels,
+  topfew,
 } from "../utils";
 
 ChartJS.register(
@@ -63,6 +64,7 @@ const tabs = [
 export const ManageDashboard = () => {
   const dispatch = useDispatch();
   const siteId = Number(localStorage.getItem("siteId"));
+  const [showTopStock, setShowTopStock] = useState(topfew[0]);
   const [siteData, setSiteData] = useState([]);
   const [siteChosen, setSiteChosen] = useState({ id: 0, name: "Choose One" });
   const options = [
@@ -454,36 +456,50 @@ export const ManageDashboard = () => {
                   Stock Level of {siteChosen?.name}
                 </h3>
                 {siteChosen.id !== 0 && (
-                  <Doughnut
-                    className="mt-3"
-                    data={{
-                      labels: stockLevelSites
-                        ?.find((x) => x.id === siteChosen.id)
-                        ?.stockLevel.products.map((y) => y.sku),
-                      datasets: [
-                        {
-                          label: "Stock Level of Selected Site",
-                          data: stockLevelSites
-                            ?.find((x) => x.id === siteChosen.id)
-                            ?.stockLevel.products.map((y) => y.qty),
-                          backgroundColor: colourPicker(
-                            cyans,
-                            siteData.length,
-                            0.6
-                          ),
-                          borderColor: colourPicker(cyans, siteData.length, 1),
-                          borderWidth: 0,
+                  <>
+                    <SimpleSelectMenu
+                      label="Show top"
+                      options={topfew}
+                      selected={showTopStock}
+                      setSelected={setShowTopStock}
+                    />
+                    <Doughnut
+                      className="mt-3"
+                      data={{
+                        labels: stockLevelSites
+                          ?.find((x) => x.id === siteChosen.id)
+                          ?.stockLevel.products.slice(0, showTopStock.name)
+                          .map((y) => y.sku),
+                        datasets: [
+                          {
+                            label: "Stock Level of Selected Site",
+                            data: stockLevelSites
+                              ?.find((x) => x.id === siteChosen.id)
+                              ?.stockLevel.products.slice(0, showTopStock.name)
+                              .map((y) => y.qty),
+                            backgroundColor: colourPicker(
+                              cyans,
+                              siteData.length,
+                              0.6
+                            ),
+                            borderColor: colourPicker(
+                              cyans,
+                              siteData.length,
+                              1
+                            ),
+                            borderWidth: 0,
+                          },
+                        ],
+                      }}
+                      options={{
+                        plugins: {
+                          legend: {
+                            display: showTopStock.name <= 10,
+                          },
                         },
-                      ],
-                    }}
-                    options={{
-                      plugins: {
-                        legend: {
-                          display: false,
-                        },
-                      },
-                    }}
-                  />
+                      }}
+                    />
+                  </>
                 )}
               </div>
             </>

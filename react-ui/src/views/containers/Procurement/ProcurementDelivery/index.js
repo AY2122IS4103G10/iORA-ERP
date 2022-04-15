@@ -58,9 +58,7 @@ const DeliveryList = ({
             return {
               ...old[rowIndex],
               [columnId]: { ...old[rowIndex][columnId], [storeId]: value },
-              [status === "PICKING" || status === "MANUFACTURED"
-                ? "pickedQty"
-                : "packedQty"]: Object.values({
+              receivedQty: Object.values({
                 ...old[rowIndex][columnId],
                 [storeId]: value,
               })

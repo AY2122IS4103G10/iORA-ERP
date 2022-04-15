@@ -389,7 +389,7 @@ export const ManagePromotions = () => {
   const [openPromo, setOpenPromo] = useState(false);
 
   const onNameChanged = (e) => setName(e.target.value);
-  const onQuotaChanged = (e) => setQuota(e.target.value);
+  const onQuotaChanged = (e) => setQuota(Math.max(e.target.value,1));
   const onCoefficientsChanged = (e) => setCoefficients(e.target.value);
   const onConstantsChanged = (e) => setConstants(e.target.value);
   const onGlobalChanged = () => setGlobal(!global);

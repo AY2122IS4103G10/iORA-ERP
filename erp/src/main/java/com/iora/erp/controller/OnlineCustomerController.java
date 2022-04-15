@@ -627,38 +627,14 @@ public class OnlineCustomerController {
         }
     }
 
-    // @GetMapping(path = "/public/reports/po")
-    // public void generateProcurementReport(
-    //         HttpServletResponse response,
-    //         @RequestParam Long siteId, 
-    //         @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date start,
-    //         @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date end) {
-    //     try {
-    //         List<ProcurementOrder> orders = procurementService.getProcurementOrdersInRange(siteId, start, end);
-    //         System.out.println(orders);
-
-    //         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(orders);
-    //         HashMap<String, Object> map = new HashMap<>();
-    //         map.put("JasperCustomSubReportLocation", "podetails.jrxml");
-    //         map.put("JasperCustomSubReportDataSource", beanCollectionDataSource);
-    //         map.put("DS1", beanCollectionDataSource);
-
-    //         JasperReport compileReport = JasperCompileManager
-    //                 .compileReport(new FileInputStream("src/main/resources/templates/PO.jrxml"));
-    //         JasperPrint finalReport = JasperFillManager.fillReport(compileReport, map, new JREmptyDataSource());
-    //         JRCsvExporter exporter = new JRCsvExporter();
-    //         exporter.setExporterInput(new SimpleExporterInput(finalReport));
-    //         exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getOutputStream()));
-
-    //         response.setHeader(
-    //                 HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=ProcurementReport.csv;");
-    //         response.setContentType("text/csv");
-    //         exporter.exportReport();
-
-    //     } catch (Exception ex) {
-    //         ex.printStackTrace();
-    //     }
-    // }
-
+    @GetMapping(path = "/public/voucher/apply", produces = "application/json")
+    public ResponseEntity<Object> applyVoucher(@RequestParam String code) {
+        try {
+            return ResponseEntity.ok(customerService.getVoucher(code));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
 }

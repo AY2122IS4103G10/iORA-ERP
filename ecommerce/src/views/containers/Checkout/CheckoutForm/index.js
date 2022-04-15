@@ -220,7 +220,47 @@ export const StorePickupForm = ({ store, setStore, storeList }) => {
   );
 };
 
+export const VoucherForm = ({ voucher, setVoucher, handleApplyVoucher }) => {
+
+
+  return (
+    <section aria-labelledby="voucher-heading" className="mt-10">
+      <h2
+        id="voucher-heading"
+        className="text-lg font-medium text-gray-900"
+      >
+        Voucher
+      </h2>
+
+      <div className="my-4">
+        <label className="block text-sm font-medium text-gray-700">
+          Voucher Code
+        </label>
+        <div className="mt-1">
+          <input
+            type="text"
+            id="voucherCode"
+            value={voucher}
+            placeholder="leave blank if not using"
+            onChange={(e) => setVoucher(e.target.value)}
+            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+          />
+          <button
+            type="submit"
+            className="mt-1 float-right min-w bg-gray-800 border border-transparent rounded-md shadow-sm py-2 px-4 text-xs font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500 sm:ml-6 sm:order-last sm:w-auto"
+            onClick={handleApplyVoucher}
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export const CheckoutForm = ({
+  voucher,
+  setVoucher,
   email,
   setEmail,
   name,
@@ -246,10 +286,14 @@ export const CheckoutForm = ({
   storeList,
   handleMakePayment,
   onCancelClicked,
+  handleApplyVoucher,
 }) => {
   return (
     <div className="m-8 pt-4 pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-1">
       <div className="max-w-lg mx-auto lg:max-w-none">
+
+        <VoucherForm voucher={voucher} setVoucher={setVoucher} handleApplyVoucher={handleApplyVoucher}/>
+
         <section aria-labelledby="contact-info-heading">
           <h2
             id="contact-info-heading"
@@ -310,6 +354,8 @@ export const CheckoutForm = ({
             </div>
           </div>
         </section>
+
+
 
         <div className="mt-10 border-t border-gray-200 pt-10">
           <RadioGroupComponent

@@ -655,7 +655,11 @@ export const ProductForm = () => {
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
   const onListPriceChanged = (e) => setListPrice(e.target.value);
-  const onDiscountPriceChanged = (e) => setDiscountPrice(e.target.value);
+  const onDiscountPriceChanged = (e) => {
+    if (parseFloat(e.target.value) < listPrice) {
+      setDiscountPrice(e.target.value);
+    }
+  };
   const onOnlineOnlyChanged = () => setOnlineOnly(!onlineOnly);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
@@ -745,7 +749,8 @@ export const ProductForm = () => {
               appearance: "error",
               autoDismiss: true,
             })
-          );
+          )
+          .finally(setLoading(false));
       } else {
         dispatch(updateExistingProduct(product))
           .unwrap()
@@ -757,12 +762,14 @@ export const ProductForm = () => {
             });
             navigate(`/sm/products/${data.modelCode}`);
           })
-          .catch((err) =>
+          .catch((err) =>{
+          console.log(err);
             addToast(`Error: ${err.message}`, {
               appearance: "error",
               autoDismiss: true,
-            })
-          );
+            })}
+          )
+          .finally(setLoading(false));
       }
     }
   };
@@ -875,7 +882,7 @@ export const ProductForm = () => {
             appearance: "success",
             autoDismiss: true,
           });
-          onLoad()
+          onLoad();
           closeModal();
         })
         .catch((err) =>

@@ -53,16 +53,6 @@ export const AProductStock = ({ subsys }) => {
         ),
     },
     {
-      Header: "Code",
-      accessor: "site.siteCode",
-      Cell: (e) =>
-        e.row.original.status === "Low" ? (
-          <span className="text-red-500">{e.value}</span>
-        ) : (
-          e.value
-        ),
-    },
-    {
       Header: "Name",
       accessor: "site.name",
       Cell: (e) => {

@@ -217,20 +217,8 @@ export const VendorForm = () => {
 
   const [requestStatus, setRequestStatus] = useState("idle");
   const canAdd =
-    [
-      companyName,
-      country,
-      city,
-      building,
-      state,
-      unit,
-      address1,
-      postalCode,
-      latitude,
-      longitude,
-      description,
-      telephone,
-    ].every(Boolean) && requestStatus === "idle";
+    [companyName, description, telephone].every(Boolean) &&
+    requestStatus === "idle";
   const onAddVendorClicked = (evt) => {
     evt.preventDefault();
     if (canAdd)

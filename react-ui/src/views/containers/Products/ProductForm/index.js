@@ -749,7 +749,8 @@ export const ProductForm = () => {
               appearance: "error",
               autoDismiss: true,
             })
-          );
+          )
+          .finally(setLoading(false));
       } else {
         dispatch(updateExistingProduct(product))
           .unwrap()
@@ -761,12 +762,14 @@ export const ProductForm = () => {
             });
             navigate(`/sm/products/${data.modelCode}`);
           })
-          .catch((err) =>
+          .catch((err) =>{
+          console.log(err);
             addToast(`Error: ${err.message}`, {
               appearance: "error",
               autoDismiss: true,
-            })
-          );
+            })}
+          )
+          .finally(setLoading(false));
       }
     }
   };

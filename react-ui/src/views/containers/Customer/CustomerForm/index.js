@@ -394,7 +394,7 @@ export const CustomerForm = ({ subsys }) => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [deliveryContact, setDeliveryContact] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("Singapore");
   const [countries, setCountries] = useState([]);
   const [addressID, setAddressID] = useState("");
 

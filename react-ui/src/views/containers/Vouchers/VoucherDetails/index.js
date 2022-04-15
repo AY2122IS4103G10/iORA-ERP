@@ -326,7 +326,7 @@ export const VoucherDetails = () => {
           appearance: "success",
           autoDismiss: true,
         });
-        navigate("/sm/vouchers");
+        navigate("/sm/rewards-loyalty/vouchers");
       })
       .catch((err) =>
         addToast(`Error: ${err.message}`, {

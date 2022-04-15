@@ -454,6 +454,13 @@ export const PurchaseHistoryDetails = () => {
                       ${calculateSubTotal(lineItems)}
                     </dd>
                   </div>
+                  {order.voucher !== null ? 
+                    <div className="py-4 flex items-center justify-between">
+                      <dt className="text-gray-600">Voucher</dt>
+                      <dd className="font-medium text-gray-900">
+                        -${order.voucher.amount}
+                      </dd>
+                    </div> : null}
                   <div className="py-4 flex items-center justify-between">
                     <dt className="text-gray-600">Shipping</dt>
                     <dd className="font-medium text-gray-900">
@@ -478,7 +485,7 @@ export const PurchaseHistoryDetails = () => {
               </div> */}
                   <div className="pt-4 flex items-center justify-between">
                     <dt className="font-medium text-gray-900">Order total</dt>
-                    <dd className="font-medium text-gray-600">
+                    <dd className="font-medium text-gray-900">
                       ${order.totalAmount.toFixed(2)}
                     </dd>
                   </div>

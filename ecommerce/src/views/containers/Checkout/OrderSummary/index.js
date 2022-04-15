@@ -2,7 +2,7 @@
 // import { Popover, Transition } from '@headlessui/react'
 // import { ChevronUpIcon } from '@heroicons/react/solid'
 
-export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, selectedDeliveryMethod }) => {
+export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, selectedDeliveryMethod, voucherItem }) => {
     return (
         <>
             <h1 className="sr-only">Order information</h1>
@@ -51,6 +51,11 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                             <dd>${subTotal}</dd>
                         </div>
 
+                       {voucherItem !== null ?
+                        <div className="flex items-center justify-between">
+                            <dt className="text-gray-600">Voucher</dt>
+                            <dd>-${voucherItem?.amount}</dd>
+                        </div> : null}
 
                         <div className="flex items-center justify-between">
                             <dt className="text-gray-600">Discounts/Promotions</dt>
@@ -64,7 +69,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
 
                         <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                             <dt className="text-base">Total</dt>
-                            <dd className="text-base">${afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0.00)}</dd>
+                            <dd className="text-base">${afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0.00) - (voucherItem !== null ? voucherItem.amount : 0)}</dd>
                         </div>
                     </dl>
                   

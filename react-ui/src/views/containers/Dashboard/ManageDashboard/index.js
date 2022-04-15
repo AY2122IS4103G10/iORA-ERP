@@ -576,13 +576,13 @@ const Bestsellers = ({ name, orders }) => {
         ) : showModels ? (
           modelBestsellers
             .slice(0, 5)
-            ?.map((model, index) => <ModelCard model={model} index={index} />)
+            ?.map((model, index) => <ModelCard key={index} model={model} index={index} />)
         ) : (
           // ) : selectedModelCode ? (
           //   <></>
           prodBestsellers
             .slice(0, 5)
-            ?.map((prod, index) => <ProductCard prod={prod} index={index} />)
+            ?.map((prod, index) => <ProductCard key={index} prod={prod} index={index} />)
         )}
       </dl>
     </div>
@@ -600,7 +600,7 @@ const ModelCard = ({ model, index }) => {
   }, [model]);
 
   return (
-    <div key={model[0]} className="flex px-4 py-5 sm:p-6">
+    <div key={index} className="flex px-4 py-5 sm:p-6">
       <div className="flex-grow">
         <dt className="text-base font-medium text-gray-900">
           {index + 1}. {modelFull?.name}
@@ -673,7 +673,7 @@ const ProductCard = ({ prod, index }) => {
   }, [prod]);
 
   return (
-    <div key={prod[0]} className="flex px-4 py-5 sm:p-6">
+    <div key={index} className="flex px-4 py-5 sm:p-6">
       <div className="flex-grow">
         <dt className="text-base font-medium text-gray-900">
           {index + 1}. {model?.name}

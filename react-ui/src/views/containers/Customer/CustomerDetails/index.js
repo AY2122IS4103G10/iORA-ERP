@@ -284,7 +284,7 @@ const OrderHistory = ({ data }) => {
           Order History
         </h3>
       </div>
-      {Boolean(data.length) ? (
+      {Boolean(data !== null && data.length) ? (
         <div className="mt-4">
           <SimpleTable
             columns={columns}

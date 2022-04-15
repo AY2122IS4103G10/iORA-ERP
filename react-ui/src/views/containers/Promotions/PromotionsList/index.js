@@ -45,7 +45,7 @@ export const PromotionsTable = ({
           return e.value
             .map((c) => ((1 - c) * 100).toFixed(0))
             .map((val) => {
-              return val != 100 ? val : 0;
+              return val !== 100 ? val : 0;
             })
             .join(", ");
         },

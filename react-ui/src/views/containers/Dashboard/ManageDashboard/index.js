@@ -25,7 +25,6 @@ import {
   getVoucherStats,
   setSiteId,
 } from "../../../../stores/slices/dashboardSlice";
-import { Header } from "../../../components/Header";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
@@ -33,13 +32,13 @@ import SharedStats from "../components/Stats";
 import {
   colourPicker,
   cyans,
-  multi,
-  getRevenue,
-  getOrder,
-  getProduct,
-  getRevenuePerOrder,
   delta,
   deltaType,
+  getOrder,
+  getProduct,
+  getRevenue,
+  getRevenuePerOrder,
+  multi,
   rangeLabels,
   topfew,
 } from "../utils";
@@ -61,7 +60,7 @@ const tabs = [
   { name: "Reports", href: "reports", current: false },
 ];
 
-export const ManageDashboard = () => {
+export const ManageDashboard = (subsys) => {
   const dispatch = useDispatch();
   const siteId = Number(localStorage.getItem("siteId"));
   const [showTopStock, setShowTopStock] = useState(topfew[0]);
@@ -147,7 +146,7 @@ export const ManageDashboard = () => {
 
   return (
     <>
-      <SectionHeading header="Dashboard" tabs={tabs} />
+     { subsys === "ad" ? null : <SectionHeading header="Dashboard" tabs={tabs} />}
       <div className="flex justify-center min-w-fit">
         <div className="flex grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 w-screen lg:w-full 2xl:max-w-7xl items-start justify-start">
           <div className="rounded-lg bg-white overflow-visible shadow m-4 p-6 col-span-1 md:col-span-2 2xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-2">

@@ -51,19 +51,21 @@ export const ManageCheckout = () => {
   const [voucherItem, setVoucherItem] = useState(null);
 
   const cart = useSelector(selectCart);
-  const customerId = useSelector(selectUserId);
+  // const customerId = useSelector(selectUserId);
 
   useEffect(() => {
     if (user) {
       setEmail(user.email);
       setName(`${user.firstName} ${user.lastName}`);
       setPhoneNumber(user.contactNumber);
-      setCountry(user.address?.country);
-      setAddress(user.address?.street1);
-      setAddress2(user.address?.street2);
-      setCity(user.address?.city);
-      setState(user.address?.state);
-      setPostalCode(user.address?.zip);
+      if (user.address) {
+        setCountry(user.address.country);
+        setAddress(user.address.street1);
+        setAddress2(user.address.street2);
+        setCity(user.address.city);
+        setState(user.address.state);
+        setPostalCode(user.address.zip);
+      }
     }
   }, [user]);
 
@@ -111,7 +113,7 @@ export const ManageCheckout = () => {
     let order = {
       voucher: voucherItem,
       lineItems,
-      customerId,
+      customerId: user?.id,
       totalAmount: totalAmount,
       delivery,
       promotions: promotions,

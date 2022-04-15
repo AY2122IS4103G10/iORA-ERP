@@ -481,7 +481,14 @@ export const ProcurementWrapper = ({ subsys }) => {
           <ProcurementInvoice
             ref={componentRef}
             title={`${
-              status.status === "READY_FOR_SHIPPING" ? "Delivery" : ""
+              [
+                "READY_FOR_SHIPPING",
+                "SHIPPING",
+                "SHIPPING_MULTIPLE",
+                "COMPLETED",
+              ].some((s) => s === status.status)
+                ? "Delivery"
+                : ""
             } Invoice`}
             orderId={procurementId}
             orderStatus={status}
@@ -490,11 +497,25 @@ export const ProcurementWrapper = ({ subsys }) => {
             fromSite={manufacturing}
             toSite={warehouse}
             data={lineItems}
-            qrValue={qrValue}
+            qrValue={
+              [
+                "READY_FOR_SHIPPING",
+                "SHIPPING",
+                "SHIPPING_MULTIPLE",
+                "COMPLETED",
+              ].some((s) => s === status.status)
+                ? qrDelivery
+                : qrValue
+            }
             qrHelper={
-              status.status !== "READY_FOR_SHIPPING"
-                ? "Scan to start picking."
-                : "Scan to start delivery."
+              [
+                "READY_FOR_SHIPPING",
+                "SHIPPING",
+                "SHIPPING_MULTIPLE",
+                "COMPLETED",
+              ].some((s) => s === status.status)
+                ? "Scan to start delivery."
+                : "Scan to start picking."
             }
           >
             <InvoiceSummary data={lineItems} status={status.status} />
@@ -511,7 +532,14 @@ export const ProcurementWrapper = ({ subsys }) => {
         >
           <ProcurementInvoice
             title={`${
-              status.status === "READY_FOR_SHIPPING" ? "Delivery" : ""
+              [
+                "READY_FOR_SHIPPING",
+                "SHIPPING",
+                "SHIPPING_MULTIPLE",
+                "COMPLETED",
+              ].some((s) => s === status.status)
+                ? "Delivery"
+                : ""
             } Invoice`}
             orderId={procurementId}
             orderStatus={status}
@@ -520,12 +548,24 @@ export const ProcurementWrapper = ({ subsys }) => {
             fromSite={manufacturing}
             toSite={warehouse}
             qrValue={
-              status.status !== "READY_FOR_SHIPPING" ? qrValue : qrDelivery
+              [
+                "READY_FOR_SHIPPING",
+                "SHIPPING",
+                "SHIPPING_MULTIPLE",
+                "COMPLETED",
+              ].some((s) => s === status.status)
+                ? qrDelivery
+                : qrValue
             }
             qrHelper={
-              status.status !== "READY_FOR_SHIPPING"
-                ? "Scan to start picking."
-                : "Scan to start delivery."
+              [
+                "READY_FOR_SHIPPING",
+                "SHIPPING",
+                "SHIPPING_MULTIPLE",
+                "COMPLETED",
+              ].some((s) => s === status.status)
+                ? "Scan to start delivery."
+                : "Scan to start picking."
             }
           >
             <InvoiceSummary data={lineItems} status={status.status} />

@@ -677,6 +677,7 @@ public class ProductServiceImpl implements ProductService {
         Product p = getProduct(rfidsku);
 
         Model m = getModelByProduct(p);
+        jo.put("sku", p.getSku());
         jo.put("name", m.getName());
         jo.put("listPrice", m.getListPrice());
         jo.put("discountedPrice", m.getDiscountPrice());

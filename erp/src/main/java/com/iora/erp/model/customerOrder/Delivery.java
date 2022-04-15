@@ -1,7 +1,6 @@
 package com.iora.erp.model.customerOrder;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.enumeration.ParcelSizeEnum;
 
 @Entity
@@ -23,6 +23,8 @@ public class Delivery {
     private Date dateTime;
     private Long siteId;
     private String trackingURL;
+    @Enumerated(EnumType.STRING)
+    private OnlineOrderStatusEnum status;
 
     @Enumerated(EnumType.STRING)
     private ParcelSizeEnum ps;
@@ -84,6 +86,14 @@ public class Delivery {
 
     public void setTrackingURL(String trackingURL) {
         this.trackingURL = trackingURL;
+    }
+
+    public OnlineOrderStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(OnlineOrderStatusEnum status) {
+        this.status = status;
     }
 
 }

@@ -13,24 +13,14 @@ import org.springframework.http.ResponseEntity;
 
 public interface ShippItService {
 
-    public abstract OnlineOrder createDelivery(Long orderId, Long siteId, List<Delivery> deliveries)
-            throws CustomerOrderException, CustomerException;
+        public abstract String tokenBearer();
 
-    public abstract String tokenBearer();
+        public abstract OnlineOrder deliveryOrder(Long orderId, Long siteId, OnlineOrder parcelSizes)
+                        throws CustomerOrderException, CustomerException;
 
-    public abstract OnlineOrder deliveryOrder(Long orderId, Long siteId, OnlineOrder parcelSizes)
-            throws CustomerOrderException, CustomerException;
+        public abstract String retreiveLabel(Long parcelId);
 
-    public abstract OnlineOrder moreToDelivery(Long orderId) throws CustomerOrderException;
+        public abstract String trackingDelivery(Long parcelId);
 
-    public abstract String retreiveLabel(Long parcelId);
-
-    public abstract OnlineOrder fetchStatus();
-
-    public abstract List<Delivery> getAllUncomfirmedDelivery() throws OnlineOrderDeliveryException;
-
-    public abstract String trackingDelivery(Long parcelId);
-
-  //  public abstract OnlineOrder fillTrackingURL(Long onlineOrder) throws InterruptedException throws InterruptedException;
-
+        public abstract void fetchStatus();
 }

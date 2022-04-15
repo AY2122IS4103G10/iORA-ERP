@@ -394,7 +394,7 @@ export const CustomerForm = ({ subsys }) => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [deliveryContact, setDeliveryContact] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("Singapore");
   const [countries, setCountries] = useState([]);
   const [addressID, setAddressID] = useState("");
 
@@ -472,6 +472,16 @@ export const CustomerForm = ({ subsys }) => {
             availStatus: true,
             email,
             password,
+            address: {
+              street1,
+              street2,
+              name: receiverName,
+              city,
+              state,
+              zip,
+              country,
+              phone: deliveryContact,
+            },
           })
         )
           .unwrap()

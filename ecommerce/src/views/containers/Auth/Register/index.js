@@ -79,7 +79,7 @@ export const Register = () => {
               appearance: "success",
               autoDismiss: true,
             });
-            data.id !== -1 && navigate("/login")
+            data.id !== -1 && navigate("/login");
           })
           .catch((error) => {
             addToast(`Error: ${error.message}`, {
@@ -316,13 +316,13 @@ export const Register = () => {
           </form>
         </div>
         <div className="mt-6 text-center">
-            <Link
-              to="/"
-              className="text-base font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              <span aria-hidden="true"> &larr;</span> Back to store
-            </Link>
-          </div>
+          <Link
+            to="/"
+            className="text-base font-medium text-indigo-600 hover:text-indigo-500"
+          >
+            <span aria-hidden="true"> &larr;</span> Back to store
+          </Link>
+        </div>
       </div>
     </div>
   );

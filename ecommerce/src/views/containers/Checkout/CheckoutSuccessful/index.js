@@ -87,7 +87,6 @@ export const CheckoutSuccessful = () => {
               </span>{" "}
               has been placed and will be with you soon.
             </p>
-
           </div>
 
           <section

@@ -146,7 +146,6 @@ export const MyStoreStock = (subsys) => {
       <SectionHeading
         header="Stock Levels"
         tabs={tabs}
-        button={<EditStockButton />}
       />
       {stockStatus === "loading" || loading ? (
         <div className="flex mt-5 items-center justify-center">

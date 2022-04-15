@@ -568,13 +568,19 @@ public class SAMController {
         }
     }
 
-    @GetMapping(path = "/reports/dailySales")
+    @GetMapping(path = "/reports/sales")
     public void generateSalesReport(
             HttpServletResponse response,
+            @RequestParam Long siteId, 
             @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date start,
             @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date end) {
         try {
-            List<CustomerOrder> orders = customerOrderService.getAllCustomerOrderInRange(start, end);
+            List<CustomerOrder> orders;
+            if (siteId == 1) {
+                orders = customerOrderService.getAllCustomerOrderInRange(start, end);
+            } else {
+                orders = customerOrderService.getCustomerOrdersInRange(siteId, start, end);
+            }
             System.out.println(orders);
 
             JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(orders);

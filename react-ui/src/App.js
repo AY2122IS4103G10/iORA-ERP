@@ -102,6 +102,7 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import { OnlineOrderPicking } from "./views/containers/OnlineOrder/OnlineOrderPicking/index.js";
 import { OnlineOrderInhouse } from "./views/containers/Orders/OnlineOrderInhouse/index.js";
 import { ManageReports } from "./views/containers/Reports/ManageReports/index.js";
+import { ReportWrapper } from "./views/containers/Reports/ReportWrapper/index.js";
 
 function App() {
   const { pathname } = useLocation();
@@ -305,8 +306,8 @@ function App() {
 
             {/* Analytics */}
             <Route path="analytics" element={<Outlet />}>
-              <Route index element={<ManageDashboard />} />
-              <Route path="reports" element={<ManageReports/>}/>
+              <Route index element={<ManageDashboard subsys="sm"/>} />
+              <Route path="reports" element={<ReportWrapper subsys="sm"/>}/>
             </Route>
           </Route>
 
@@ -407,7 +408,11 @@ function App() {
               </Route>
             </Route>
 
-            <Route path="analytics" element={<ManageDashboard />} />
+            <Route path="analytics" element={<Outlet />}>
+              <Route index element={<ManageDashboard subsys="str" />} />
+              <Route path="reports" element={<ReportWrapper subsys="str"/>}/>
+
+            </Route>
           </Route>
 
           {/* Admin Subsystem */}
@@ -456,7 +461,7 @@ function App() {
               <Route path="edit/:vendorId" element={<VendorForm />} />
             </Route>
             <Route path="analytics" element={<Outlet />}>
-              <Route index element={<ManageDashboard />} />
+              <Route index element={<ManageDashboard subsys="ad"/>} />
             </Route>
           </Route>
 
@@ -597,6 +602,7 @@ function App() {
                 <Route index element={<ProcurementDetails />} />
                 <Route path="pick-pack" element={<ProcurementPickPack />} />
                 <Route path="delivery" element={<ProcurementDelivery />} />
+
               </Route>
             </Route>
 
@@ -668,6 +674,10 @@ function App() {
                 path="edit/:id"
                 element={<StockTransferForm subsys="wh" />}
               />
+            </Route>
+
+            <Route path="reports" elements={<Outlet/>}>
+              <Route index element={<ReportWrapper subsys="wh"/>}/>
             </Route>
           </Route>
 

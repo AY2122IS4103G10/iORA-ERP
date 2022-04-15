@@ -70,21 +70,13 @@ export const LGIndex = () => {
 
   const handleEnterSite = (evt) => {
     evt.preventDefault();
-    if (siteSelected.siteCode === siteCode.trim()) {
-      localStorage.setItem("siteId", siteSelected.id);
-      addToast(`Logged in to ${siteSelected.name}`, {
-        appearance: "success",
-        autoDismiss: true,
-      });
-      dispatch(updateCurrSite());
-      setSiteCode("");
-      closeSiteModal();
-    } else {
-      addToast("Error: Invalid site code. Please try again.", {
-        appearance: "error",
-        autoDismiss: true,
-      });
-    }
+    localStorage.setItem("siteId", siteSelected.id);
+    addToast(`Logged in to ${siteSelected.name}`, {
+      appearance: "success",
+      autoDismiss: true,
+    });
+    dispatch(updateCurrSite());
+    closeSiteModal()
   };
   const onSiteCodeChanged = (e) => setSiteCode(e.target.value);
 
@@ -123,6 +115,7 @@ export const LGIndex = () => {
                 siteCode={siteCode}
                 onSiteCodeChanged={onSiteCodeChanged}
                 handleEnterSite={handleEnterSite}
+                disableSiteCode
               />
             )}
           </>

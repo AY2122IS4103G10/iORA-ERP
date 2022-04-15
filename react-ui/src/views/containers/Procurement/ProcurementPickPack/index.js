@@ -131,6 +131,8 @@ export const PickPackList = ({
         accessor: (row) =>
           row.product.productFields.find((field) => field.fieldName === "SIZE")
             .fieldValue,
+            minWidth: 80,
+          maxWidth: 104,
       },
       {
         Header: "Sites",
@@ -140,18 +142,26 @@ export const PickPackList = ({
       {
         Header: "Req",
         accessor: "requestedQty",
+        minWidth: 120,
+        maxWidth: 130,
       },
       {
         Header: "Picked",
         accessor: "pickedQty",
+        minWidth: 120,
+          maxWidth: 130,
       },
       {
         Header: "Packed",
         accessor: "packedQty",
+        minWidth: 120,
+        maxWidth: 130,
       },
       {
         Header: "",
         accessor: "[editButton]",
+        minWidth: 120,
+        maxWidth: 130,
         Cell: (e) => {
           return (
             <button

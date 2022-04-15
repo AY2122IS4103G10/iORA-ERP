@@ -315,6 +315,7 @@ export const OnlineOrderPickPack = () => {
     site,
     delivery,
     openInfoModal,
+    setParcelDelivery
   } = useOutletContext();
   const status = st.status;
   const navigate = useNavigate();
@@ -368,8 +369,8 @@ export const OnlineOrderPickPack = () => {
           })),
         }
       );
-      console.log(data);
-      const { statusHistory } = data;
+      const { parcelDelivery, statusHistory } = data;
+      setParcelDelivery(parcelDelivery)
       setStatus(statusHistory[statusHistory.length - 1]);
       setStatusHistory(statusHistory);
       addToast("Order is ready for delivery", {
@@ -509,6 +510,7 @@ export const OnlineOrderPickPack = () => {
                       <ConfirmSection
                         subsys={subsys}
                         procurementId={orderId}
+
                         title={`Confirm items ${
                           status === "PICKED" ? "picked" : "packed"
                         }`}
@@ -520,7 +522,7 @@ export const OnlineOrderPickPack = () => {
                      ? "and this order will advance to the packing stage."
                      : subsys === "str"
                      ? "and the customer will be notified that their order is ready for collection."
-                     : "and this order will advance to the packing stage."
+                     : "and this order will advance to the delivery stage."
                  }
                   `}
                         onConfirmClicked={

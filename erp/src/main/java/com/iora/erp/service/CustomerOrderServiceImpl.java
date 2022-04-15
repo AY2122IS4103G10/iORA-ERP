@@ -447,7 +447,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             for (ProductField pf : m.getProductFields()) {
                 if (pf instanceof PromotionField && ((PromotionField) pf).getAvailable()
                         && ((PromotionField) pf).getQuota() == 1) {
-                    promotions.add((PromotionField) pf);
+                            singlePromotionsSet.add((PromotionField) pf);
                 }
             }
 
@@ -461,7 +461,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 if (newPrice < bestPrice) {
                     bestPf = pf;
                     bestPrice = newPrice;
-                    bestDiscount = m.getDiscountPrice() - newPrice;
+                    bestDiscount = newPrice - m.getDiscountPrice() ;
                 }
             }
 
@@ -539,7 +539,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             if (bestSinglePromosUsed.get(coli) > 0) {
                 PromotionLI pli = new PromotionLI(entry.getValue());
                 pli.setQty(bestSinglePromosUsed.get(coli));
-                pli.setSubTotal(modelMap.get(coli).getDiscountPrice() - bestPrices.get(coli));
+                pli.setSubTotal(bestPrices.get(coli) - modelMap.get(coli).getDiscountPrice());
                 pli.setProduct(coli.getProduct());
                 promotionList.add(pli);
             }

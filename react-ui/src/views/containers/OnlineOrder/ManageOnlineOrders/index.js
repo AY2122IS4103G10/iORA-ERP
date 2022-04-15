@@ -55,7 +55,7 @@ const Header = ({ subsys }) => {
           {subsys === "wh" && (
             <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
               <a
-                href="https://app.staging.shippit.com/merchant/manage_new_orders/ready_for_despatch"
+                href="https://app.staging.shippit.com/new_orders/"
                 target="_blank"
                 rel="noopener noreferrer"
               >

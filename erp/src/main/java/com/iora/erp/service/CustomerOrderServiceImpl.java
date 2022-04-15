@@ -537,9 +537,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         for (Map.Entry<CustomerOrderLI, PromotionField> entry : bestSinglePromos.entrySet()) {
             CustomerOrderLI coli = entry.getKey();
             if (bestSinglePromosUsed.get(coli) > 0) {
+                Integer qtyToAdd = bestSinglePromosUsed.get(coli);
                 PromotionLI pli = new PromotionLI(entry.getValue());
                 pli.setQty(bestSinglePromosUsed.get(coli));
-                pli.setSubTotal(bestPrices.get(coli) - modelMap.get(coli).getDiscountPrice());
+                pli.setSubTotal(qtyToAdd * (bestPrices.get(coli) - modelMap.get(coli).getDiscountPrice()));
                 pli.setProduct(coli.getProduct());
                 promotionList.add(pli);
             }

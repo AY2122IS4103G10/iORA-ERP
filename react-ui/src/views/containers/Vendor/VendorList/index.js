@@ -66,11 +66,13 @@ export const VendorList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const data = useSelector(selectAllVendors);
-  const vendorStatus = useSelector((state) => state.vendors.status);
 
   useEffect(() => {
-    vendorStatus === "idle" && dispatch(fetchVendors());
-  }, [vendorStatus, dispatch]);
+    const fetch = async () => {
+      await dispatch(fetchVendors()).unwrap();
+    };
+    fetch();
+  }, [dispatch]);
 
   const handleOnClick = (row) => navigate(`/ad/vendors/${row.original.id}`);
 

@@ -44,9 +44,7 @@ export const PurchaseHistoryDetails = () => {
   const order = useSelector((state) =>
     selectUserOrderById(state, parseInt(orderId))
   );
-  const status = Boolean(order?.statusHistory)
-    ? order?.statusHistory[order?.statusHistory.length - 1]
-    : null;
+  const status = order?.status;
   const [lineItems, setLineItems] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,9 +95,7 @@ export const PurchaseHistoryDetails = () => {
 
   useEffect(() => {
     const orderLineItems = order?.lineItems || [];
-    const status = Boolean(order?.statusHistory)
-      ? order?.statusHistory[order?.statusHistory.length - 1]
-      : null;
+    const status = order?.status;
     fetchAllModelsBySkus(orderLineItems).then((data) =>
       setLineItems(
         orderLineItems.map((item, index) => {
@@ -113,7 +109,7 @@ export const PurchaseHistoryDetails = () => {
               ...data[index],
               step: !Boolean(status)
                 ? null
-                : status.status === "PENDING" || status.status === "CANCELLED"
+                : status === "PENDING" || status === "CANCELLED"
                 ? 0
                 : (
                     order?.pickupSite
@@ -125,13 +121,13 @@ export const PurchaseHistoryDetails = () => {
                           "READY_FOR_DELIVERY",
                           "DELIVERING",
                           "DELIVERING_MULTIPLE",
-                        ].some((s) => status.status === s)
+                        ].some((s) => status === s)
                       : ["PICKING", "PICKED", "PACKING", "PACKED"].some(
-                          (s) => status.status === s
+                          (s) => status === s
                         )
                   )
                 ? 1
-                : status.status === "DELIVERED" || status.status === "COLLECTED"
+                : status === "DELIVERED" || status === "COLLECTED"
                 ? 4
                 : 2,
             },
@@ -153,14 +149,14 @@ export const PurchaseHistoryDetails = () => {
                 <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
                   Order Details
                 </h1>
-                {status.status === "CANCELLED" && (
+                {Boolean(status) && status === "CANCELLED" && (
                   <span className="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
                     Cancelled
                   </span>
                 )}
               </div>
               <div className="flex items-center justify-end space-x-3">
-                {status.status === "PENDING" && (
+                {Boolean(status) && status === "PENDING" && (
                   <button
                     type="button"
                     className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
@@ -227,7 +223,7 @@ export const PurchaseHistoryDetails = () => {
                   </Menu>
                 )}
               </div>
-              {status.status === "READY_FOR_DELIVERY" && (
+              {Boolean(status) && status === "READY_FOR_DELIVERY" && (
                 <button
                   type="button"
                   className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
@@ -383,13 +379,13 @@ export const PurchaseHistoryDetails = () => {
                               </div>
                             </dl>
                             <p className="font-medium text-gray-900 mt-6 md:mt-10">
-                              {(
-                                status.status.charAt(0) +
-                                status.status.slice(1).toLowerCase()
+                              {(Boolean(status) && 
+                                status.charAt(0) +
+                                status.slice(1).toLowerCase()
                               ).replaceAll("_", " ")}{" "}
                               on{" "}
-                              {moment
-                                .unix(status.timeStamp / 1000)
+                              {Boolean(status) && moment
+                                .unix(status?.timeStamp / 1000)
                                 .format("MMMM Do, YYYY")}
                             </p>
                             <div className="mt-6">

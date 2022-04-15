@@ -136,7 +136,7 @@ public class OnlineCustomerController {
         }
     }
 
-    @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/public/register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> registerAccount(@RequestBody Customer customer) {
         try {
             return ResponseEntity.ok(customerService.createCustomerAccount(customer));

@@ -725,7 +725,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         cal.setTime(customer.getDob());
         if (currentMonth == cal.get(Calendar.MONTH)) {
             Integer ordersThisMonth = em
-                    .createQuery("SELECT o FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
+                    .createQuery("SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date",
                             CustomerOrder.class)
                     .setParameter("id", customer.getId())
                     .setParameter("date",
@@ -753,7 +753,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         cal.setTime(customer.getDob());
         if (currentMonth == cal.get(Calendar.MONTH)) {
             Integer ordersThisMonth = em
-                    .createQuery("SELECT o FROM CustomerOrder o WHERE o.customer.id = :id AND o.dateTime >= :date",
+                    .createQuery("SELECT o FROM CustomerOrder o WHERE o.customerId = :id AND o.dateTime >= :date",
                             CustomerOrder.class)
                     .setParameter("id", customer.getId())
                     .setParameter("date",

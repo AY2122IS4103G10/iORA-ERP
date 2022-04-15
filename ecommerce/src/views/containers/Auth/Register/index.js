@@ -62,7 +62,7 @@ export const Register = () => {
             email,
             dob,
             contactNumber: contactNo,
-            hashPass: password,
+            password,
           })
         )
           .unwrap()

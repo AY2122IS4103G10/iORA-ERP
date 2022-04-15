@@ -1,16 +1,14 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { listingApi } from "../../../../environments/Api";
-import { useReactToPrint } from "react-to-print";
+import { PrinterIcon } from "@heroicons/react/outline";
 import moment from "moment";
-import { useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+import { listingApi } from "../../../../environments/Api";
 import {
   fetchPurchase,
-  selectPurchase,
+  selectPurchase
 } from "../../../../stores/slices/purchasesSlice";
-import { useDispatch } from "react-redux";
-import { useRef } from "react";
-import { PrinterIcon } from "@heroicons/react/outline";
 
 function calculateSubTotal(lineItems) {
   let subTotal = 0;
@@ -87,13 +85,9 @@ export const CheckoutSuccessful = () => {
               <span className="text-lg text-black font-bold">
                 #{confirmedOrder?.id}
               </span>{" "}
-              has placed and will be with you soon.
+              has been placed and will be with you soon.
             </p>
 
-            <dl className="mt-12 text-sm font-medium">
-              <dt className="text-gray-900">Tracking number</dt>
-              <dd className="text-gray-600 mt-2">#######</dd>
-            </dl>
           </div>
 
           <section
@@ -120,7 +114,7 @@ export const CheckoutSuccessful = () => {
                     <div className="flex-auto flex flex-col">
                       <div>
                         <h4 className="font-medium text-gray-900">
-                          <a href={item.product.sku}>{models[id].name}</a>
+                          <Link to={`/products/view/${item.product.sku.substring(0,item.product.sku.indexOf('-'))}`}>{models[id].name}</Link>
                         </h4>
                         <p className="mt-2 text-sm text-gray-600">
                           {models[id].description}

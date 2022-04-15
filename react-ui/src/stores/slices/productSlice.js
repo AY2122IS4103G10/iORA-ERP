@@ -40,16 +40,24 @@ export const getAProduct = createAsyncThunk(
 export const addNewProduct = createAsyncThunk(
   "products/addNewPost",
   async (initialProduct) => {
-    const response = await api.create("sam/model", initialProduct);
-    return response.data;
+    try {
+      const response = await api.create("sam/model", initialProduct);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
 export const updateExistingProduct = createAsyncThunk(
   "products/updateExistingProduct",
   async (existingProduct) => {
-    const response = await api.update("sam/model", existingProduct);
-    return response.data;
+    try {
+      const response = await api.update("sam/model", existingProduct);
+      return response.data;
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
   }
 );
 
@@ -126,7 +134,7 @@ const productSlice = createSlice({
     builder.addCase(updateExistingProduct.fulfilled, (state, action) => {
       state.status = "idle";
     });
-    
+
     builder.addCase(getProductItem.pending, (state, action) => {
       state.status = "loading";
     });

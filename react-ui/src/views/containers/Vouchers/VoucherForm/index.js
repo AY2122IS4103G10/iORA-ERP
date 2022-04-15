@@ -102,6 +102,7 @@ const VoucherFormBody = ({
                       <DatePicker
                         className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                         selected={expDate}
+                        minDate={new Date()}
                         onChange={onExpDateChanged}
                         dateFormat="dd/MM/yyyy"
                       />

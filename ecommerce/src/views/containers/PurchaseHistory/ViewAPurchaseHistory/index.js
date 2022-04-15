@@ -379,14 +379,15 @@ export const PurchaseHistoryDetails = () => {
                               </div>
                             </dl>
                             <p className="font-medium text-gray-900 mt-6 md:mt-10">
-                              {(Boolean(status) && 
-                                status.charAt(0) +
-                                status.slice(1).toLowerCase()
+                              {(
+                                Boolean(status) &&
+                                status.charAt(0) + status.slice(1).toLowerCase()
                               ).replaceAll("_", " ")}{" "}
                               on{" "}
-                              {Boolean(status) && moment
-                                .unix(status?.timeStamp / 1000)
-                                .format("MMMM Do, YYYY")}
+                              {Boolean(status) &&
+                                moment(status?.timeStamp).format(
+                                  "MMMM Do, YYYY"
+                                )}
                             </p>
                             <div className="mt-6">
                               <div className="bg-gray-200 rounded-full overflow-hidden">

@@ -18,7 +18,10 @@ export const fetchSupportTickets = createAsyncThunk(
 export const replySupportTicket = createAsyncThunk(
   "supportTickets/replySupportTicket",
   async ({ ticketId, name, body }) => {
-    const response = await api.update(`sam/ticket/reply/${ticketId}?name=${name}`, body);
+    const response = await api.update(
+      `sam/ticket/reply/${ticketId}?name=${name}`,
+      body
+    );
     return response.data;
   }
 );
@@ -26,8 +29,12 @@ export const replySupportTicket = createAsyncThunk(
 export const resolveSupportTicket = createAsyncThunk(
   "supportTickets/resolveSupportTicket",
   async (ticketId) => {
-    const response = await ticketApi.resolveTicket(ticketId);
-    return response.data;
+    try {
+      const response = await ticketApi.resolveTicket(ticketId);
+      return response.data;
+    } catch (err) {
+      return Promise.reject(err.response.data);
+    }
   }
 );
 
@@ -57,10 +64,7 @@ const supportTicketSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(resolveSupportTicket.fulfilled, (state, action) => {
-      const {
-        id,
-        status
-      } = action.payload;
+      const { id, status } = action.payload;
       const supportTicket = state.supportTickets.find((st) => st.id === id);
       if (supportTicket) {
         supportTicket.status = status;
@@ -78,4 +82,6 @@ export const selectAllSupportTickets = (state) =>
   state.supportTickets.supportTickets;
 
 export const selectTicketById = (state, ticketId) =>
-  state.supportTickets.supportTickets.find((supportTicket) => supportTicket.id === ticketId);
+  state.supportTickets.supportTickets.find(
+    (supportTicket) => supportTicket.id === ticketId
+  );

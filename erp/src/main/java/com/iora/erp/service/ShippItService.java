@@ -22,5 +22,7 @@ public interface ShippItService {
 
         public abstract String trackingDelivery(Long parcelId);
 
+        public abstract OnlineOrder simulateDeliveryComplete(Long onlineOrderId);
+
         public abstract void fetchStatus();
 }

@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 import { selectCart } from "../../../../stores/slices/cartSlice";
-import { selectUserId } from "../../../../stores/slices/userSlice";
+import { selectUser, selectUserId } from "../../../../stores/slices/userSlice";
 
 import { checkoutApi } from "../../../../environments/Api";
-import { countries } from "../../../../utilities/Util";
 import { OrderSummary } from "../OrderSummary";
 import { CheckoutForm } from "../CheckoutForm";
 import { ManagePayment } from "../ManagePayment";
@@ -26,25 +25,19 @@ const deliveryMethods = [
 ];
 
 export const ManageCheckout = () => {
+  const user = useSelector(selectUser);
   const [enterPayment, setEnterPayment] = useState(false);
   const [subTotal, setSubTotal] = useState(0);
   const [afterDiscount, setAfterDiscount] = useState(0);
   const [promotions, setPromotions] = useState([]);
   const [lineItems, setLineItems] = useState(null);
   const [order, setOrder] = useState(null);
-  const [email, setEmail] = useState(
-    JSON.parse(localStorage.getItem("user")).email
-  );
-  const [name, setName] = useState(
-    JSON.parse(localStorage.getItem("user")).firstName +
-      " " +
-      JSON.parse(localStorage.getItem("user")).lastName
-  );
-  const [phoneNumber, setPhoneNumber] = useState(
-    JSON.parse(localStorage.getItem("user")).contactNumber
-  );
-  const [country, setCountry] = useState({ name: countries[197] });
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [country, setCountry] = useState("Singapore");
   const [address, setAddress] = useState("");
+  const [address2, setAddress2] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
@@ -58,20 +51,21 @@ export const ManageCheckout = () => {
   const cart = useSelector(selectCart);
   const customerId = useSelector(selectUserId);
 
-  const loadAddress = () => {
-    setAddress(
-      JSON.parse(localStorage.getItem("user")).address.street1 +
-        " " +
-        JSON.parse(localStorage.getItem("user")).address.street2
-    );
-    setCity(JSON.parse(localStorage.getItem("user")).address.city);
-    setState(JSON.parse(localStorage.getItem("user")).address.state);
-    setPostalCode(JSON.parse(localStorage.getItem("user")).address.zip);
-  };
+  useEffect(() => {
+    if (user) {
+      setEmail(user.email);
+      setName(`${user.firstName} ${user.lastName}`);
+      setPhoneNumber(user.contactNumber);
+      setCountry(user.address?.country);
+      setAddress(user.address?.street1);
+      setAddress2(user.address?.street2);
+      setCity(user.address?.city);
+      setState(user.address?.state);
+      setPostalCode(user.address?.zip);
+    }
+  }, [user]);
 
   useEffect(() => {
-    Boolean(JSON.parse(localStorage.getItem("user")).address) && loadAddress();
-
     checkoutApi
       .getStores()
       .then((response) => setStoreList(response.data))
@@ -109,15 +103,16 @@ export const ManageCheckout = () => {
       lineItems,
       customerId,
       totalAmount: totalAmount,
-      country: country.name,
       delivery,
       promotions: promotions,
       deliveryAddress: {
-        name: name,
-        street1: address,
-        city: city,
+        name,
+        street1: address.trim(),
+        street2: address2.trim(),
+        country,
+        city,
         zip: postalCode,
-        state: state,
+        state,
         phone: phoneNumber,
       },
       pickupSite: selectedDeliveryMethod.id === 1 ? null : store,
@@ -160,6 +155,8 @@ export const ManageCheckout = () => {
             setCountry={setCountry}
             address={address}
             setAddress={setAddress}
+            address2={address2}
+            setAddress2={setAddress2}
             postalCode={postalCode}
             setPostalCode={setPostalCode}
             city={city}

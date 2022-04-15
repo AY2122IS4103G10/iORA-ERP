@@ -70,7 +70,7 @@ const ItemsSummary = ({
       {
         Header: "Cost",
         accessor: "costPrice",
-        Cell: (e) => `$${e.value}`,
+        Cell: (e) => `$${e.value.toFixed(2)}`,
       },
       {
         Header: "Total Cost",
@@ -87,7 +87,7 @@ const ItemsSummary = ({
           } else qty = row.packedQty;
           return row.costPrice * qty;
         },
-        Cell: (e) => `$${e.value}`,
+        Cell: (e) => `$${e.value.toFixed(2)}`,
       },
       {
         Header: "Sites",

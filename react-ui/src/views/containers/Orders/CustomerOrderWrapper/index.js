@@ -384,7 +384,8 @@ export const CustomerOrderWrapper = ({ subsys }) => {
             voucher,
             openInvoice,
             openInfoModal,
-            parcelDelivery
+            parcelDelivery,
+            setParcelDelivery,
           }}
         />
       </div>

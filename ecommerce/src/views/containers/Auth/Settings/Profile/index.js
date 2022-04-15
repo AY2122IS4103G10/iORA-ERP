@@ -9,6 +9,12 @@ import {
   updateAccount,
 } from "../../../../../stores/slices/userSlice";
 import { useEffect } from "react";
+import { api } from "../../../../../environments/Api";
+
+export const fetchCountries = async () => {
+  const { data } = await api.getAll("admin/countries");
+  return data;
+};
 
 export const Profile = () => {
   const dispatch = useDispatch();
@@ -18,17 +24,22 @@ export const Profile = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [contactNo, setContactNo] = useState("");
-  const [dob, setDob] = useState(null);
+  const [dob, setDob] = useState(new Date());
   const [receiverName, setRecieverName] = useState("");
   const [street1, setStreet1] = useState("");
   const [street2, setStreet2] = useState("");
   const [zip, setZip] = useState("");
   const [city, setCity] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("Singapore");
   const [state, setState] = useState("");
   const [deliveryCon, setDeliveryCon] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [addressID, setAddressID] = useState("");
+  const [countries, setCountries] = useState([]);
+
+  useEffect(() => {
+    fetchCountries().then((data) => setCountries(data));
+  }, []);
 
   const onFirstNameChanged = (e) => setFirstName(e.target.value);
   const onLastNameChanged = (e) => setLastName(e.target.value);
@@ -361,15 +372,28 @@ export const Profile = () => {
                     Country
                   </label>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="country"
-                      id="country"
-                      autoComplete="country"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    // <input
+                    //   type="text"
+                    //   name="country"
+                    //   id="country"
+                    //   autoComplete="country"
+                    //   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    //   value={country}
+                    //   onChange={onCountryChanged}
+                    // />
+                    <select
+                      id="countries"
+                      name="countries"
+                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                       value={country}
                       onChange={onCountryChanged}
-                    />
+                    >
+                      {countries.map((country, index) => (
+                        <option key={index} value={country}>
+                          {country}
+                        </option>
+                      ))}
+                    </select>
                   ) : (
                     <p className="py-3 sm:text-sm">{country}</p>
                   )}

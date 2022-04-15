@@ -11,6 +11,7 @@ import { useToasts } from "react-toast-notifications";
 import { productApi } from "../../../../environments/Api";
 import {
   cancelOrder,
+  completeOrder,
   selectUser,
   selectUserOrderById,
 } from "../../../../stores/slices/userSlice";
@@ -48,6 +49,7 @@ export const PurchaseHistoryDetails = () => {
   const [lineItems, setLineItems] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [action, setAction] = useState(null);
 
   const onCancelOrderClicked = async () => {
     setLoading(true);
@@ -70,12 +72,27 @@ export const PurchaseHistoryDetails = () => {
     }
   };
 
+  const onCompleteOrderClicked = async () => {
+    setLoading(true);
+    try {
+      await dispatch(completeOrder(order?.id)).unwrap();
+      addToast(`Success: Order ${orderId} has been completed.`, {
+        appearance: "success",
+        autoDismiss: true,
+      });
+      closeConfirmModal();
+    } catch (err) {
+      addToast(`Error:  ${err.message}`, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openConfirmModal = () => setOpenConfirm(true);
   const closeConfirmModal = () => setOpenConfirm(false);
-
-  // useEffect(() => {
-  //   user.id && dispatch(fetchCustomer(user.id));
-  // }, [dispatch, user.id]);
 
   useEffect(() => {
     const orderLineItems = order?.lineItems || [];
@@ -113,11 +130,10 @@ export const PurchaseHistoryDetails = () => {
                           "PICKED",
                           "PACKING",
                           "PACKED",
-                          "READY_FOR_DELIVERY",
                         ].some((s) => status.status === s)
                   )
                 ? 1
-                : status.status === "COMPLETED" || status.status === "COLLECTED"
+                : status.status === "DELIVERED" || status.status === "COLLECTED"
                 ? 4
                 : 2,
             },
@@ -149,9 +165,34 @@ export const PurchaseHistoryDetails = () => {
                 <button
                   type="button"
                   className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                  onClick={openConfirmModal}
+                  onClick={() => {
+                    setAction({
+                      name: "cancel",
+                      description:
+                        "You will be refunded the full amount in store credit which can be used for future purchases with us.",
+                      action: onCancelOrderClicked,
+                    });
+                    openConfirmModal();
+                  }}
                 >
                   <span>Cancel order</span>
+                </button>
+              )}
+              {status.status === "READY_FOR_DELIVERY" && (
+                <button
+                  type="button"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  onClick={() => {
+                    setAction({
+                      name: "complete",
+                      description:
+                        "Please ensure that you have received all items in this order. If there any discrepancies, do contact our staff by submitting a support ticket.",
+                      action: onCompleteOrderClicked,
+                    });
+                    openConfirmModal();
+                  }}
+                >
+                  <span>Complete order</span>
                 </button>
               )}
             </div>
@@ -451,65 +492,66 @@ export const PurchaseHistoryDetails = () => {
           <TailSpin color="#111827" height={20} width={20} />
         </div>
       )}
-      <SimpleModal open={openConfirm} closeModal={closeConfirmModal}>
-        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-          <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
-            <button
-              type="button"
-              className="bg-white rounded-md text-gray-400 hover:text-gray-500"
-              onClick={closeConfirmModal}
-            >
-              <span className="sr-only">Close</span>
-              <XIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
-          </div>
-          <div className="sm:flex sm:items-start">
-            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-              <ExclamationIcon
-                className="h-6 w-6 text-red-600"
-                aria-hidden="true"
-              />
-            </div>
-            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <Dialog.Title
-                as="h3"
-                className="text-lg leading-6 font-medium text-gray-900"
+      {Boolean(action) && (
+        <SimpleModal open={openConfirm} closeModal={closeConfirmModal}>
+          <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
+              <button
+                type="button"
+                className="bg-white rounded-md text-gray-400 hover:text-gray-500"
+                onClick={closeConfirmModal}
               >
-                Confirm cancel Order #{orderId}
-              </Dialog.Title>
-              <div className="mt-2">
-                <p className="text-sm text-gray-500">
-                  Confirm cancel Order #{orderId}? You will be refunded the full
-                  amount in store credit which can be used for future purchases
-                  with us.
-                </p>
+                <span className="sr-only">Close</span>
+                <XIcon className="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+            <div className="sm:flex sm:items-start">
+              <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <ExclamationIcon
+                  className="h-6 w-6 text-red-600"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <Dialog.Title
+                  as="h3"
+                  className="text-lg leading-6 font-medium text-gray-900"
+                >
+                  Confirm {action.name.toLowerCase()} Order #{orderId}
+                </Dialog.Title>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">
+                    Confirm {action.name.toLowerCase()} Order #{orderId}?{" "}
+                    {action.description}
+                  </p>
+                </div>
               </div>
             </div>
+            <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+              <button
+                type="button"
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                onClick={action.action}
+              >
+                <span>Confirm</span>
+                {loading && (
+                  <div className="flex ml-2 items-center justify-center">
+                    <TailSpin color="#FFFFFF" height={20} width={20} />
+                  </div>
+                )}
+              </button>
+              <button
+                type="button"
+                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:w-auto sm:text-sm"
+                onClick={closeConfirmModal}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-          <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-            <button
-              type="button"
-              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-              onClick={onCancelOrderClicked}
-            >
-              <span>Confirm</span>
-              {loading && (
-                <div className="flex ml-2 items-center justify-center">
-                  <TailSpin color="#FFFFFF" height={20} width={20} />
-                </div>
-              )}
-            </button>
-            <button
-              type="button"
-              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:w-auto sm:text-sm"
-              onClick={closeConfirmModal}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </SimpleModal>
+        </SimpleModal>
+      )}
     </>
   );
 };

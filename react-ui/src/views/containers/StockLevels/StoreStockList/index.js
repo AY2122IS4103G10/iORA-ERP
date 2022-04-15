@@ -38,13 +38,14 @@ export const MyStoreStock = (subsys) => {
         setData(
           siteStock.products.map((item, index) => ({
             ...item,
-            product: {
-              ...item.product,
-              modelCode: data[index].modelCode,
-              name: data[index].name,
-              description: data[index].description,
-              imageLinks: data[index].imageLinks,
-            },
+            // product: {
+            //   ...item.product,
+            modelCode: data[index].modelCode,
+            name: data[index].name,
+            description: data[index].description,
+            imageLinks: data[index].imageLinks,
+            status: item.product.baselineQty > item.qty ? "Low" : "Normal",
+            // },
           }))
         );
         setLoading(false);
@@ -88,12 +89,37 @@ export const MyStoreStock = (subsys) => {
   const columns = useMemo(
     () => [
       {
+        Header: "Product Code",
+        accessor: "modelCode",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+        Cell: (e) =>
+          e.row.original.status === "Low" ? (
+            <span className="text-red-500">{e.value}</span>
+          ) : (
+            e.value
+          ),
+      },
+      {
         Header: "SKU",
         accessor: "sku",
+        Cell: (e) =>
+          e.row.original.status === "Low" ? (
+            <span className="text-red-500">{e.value}</span>
+          ) : (
+            e.value
+          ),
       },
       {
         Header: "Name",
-        accessor: "product.name",
+        accessor: "name",
+        Cell: (e) => {
+          return e.row.original.status === "Low" ? (
+            <span className="text-red-500">{e.value}</span>
+          ) : (
+            e.value
+          );
+        },
       },
       {
         Header: "Colour",
@@ -104,6 +130,12 @@ export const MyStoreStock = (subsys) => {
         },
         Filter: SelectColumnFilter,
         filter: "includes",
+        Cell: (e) =>
+          e.row.original.status === "Low" ? (
+            <span className="text-red-500">{e.value}</span>
+          ) : (
+            e.value
+          ),
       },
       {
         Header: "Size",
@@ -114,29 +146,36 @@ export const MyStoreStock = (subsys) => {
         },
         Filter: SelectColumnFilter,
         filter: "includes",
+        Cell: (e) =>
+          e.row.original.status === "Low" ? (
+            <span className="text-red-500">{e.value}</span>
+          ) : (
+            e.value
+          ),
       },
 
       {
         Header: "Qty",
         accessor: "qty",
+        Cell: (e) =>
+          e.row.original.status === "Low" ? (
+            <span className="text-red-500">{e.value}</span>
+          ) : (
+            e.value
+          ),
       },
-      // {
-      //   Header: "",
-      //   accessor: "accessor",
-      //   disableSortBy: true,
-      //   Cell: (e) => {
-      //     return (
-      //       <div>
-      //         <button
-      //           type="button"
-      //           className="px-3 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-      //         >
-      //           Edit Qty
-      //         </button>
-      //       </div>
-      //     );
-      //   }
-      // }
+      {
+        Header: "Status",
+        accessor: "status",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+        Cell: (e) =>
+          e.value === "Low" ? (
+            <span className="text-red-500">Low</span>
+          ) : (
+            e.value
+          ),
+      },
     ],
     []
   );

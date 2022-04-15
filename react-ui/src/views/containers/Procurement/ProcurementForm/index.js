@@ -307,14 +307,14 @@ const UploadFileList = ({ data, setData }) => {
       {
         Header: "Product Code",
         accessor: "modelCode",
-        minWidth: 100,
-        maxWidth: 160,
+        minWidth: 250,
+        maxWidth: 300,
       },
       {
         Header: "Name",
         accessor: "name",
-        minWidth: 300,
-        maxWidth: 350,
+        minWidth: 350,
+        maxWidth: 380,
         Cell: (e) => {
           return e.row.original.imageLinks.length ? (
             <a
@@ -333,7 +333,7 @@ const UploadFileList = ({ data, setData }) => {
       {
         Header: "",
         accessor: "files",
-        minWidth: 368,
+        minWidth: 487,
         maxWidth: 500,
         Cell: (e) => {
           const fileRef = useRef();

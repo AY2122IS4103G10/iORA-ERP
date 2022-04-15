@@ -1377,6 +1377,34 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    public List<CustomerOrder> getCustomerOrdersInRange(Long siteId, Date start, Date end) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(start);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date dateStart = cal.getTime();
+        
+        cal.setTime(end);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        Date dateEnd = cal.getTime();
+
+        TypedQuery<CustomerOrder> q = em
+                .createQuery(
+                        "SELECT co FROM CustomerOrder co WHERE co.site.id = :siteId AND co.dateTime BETWEEN :start AND :end",
+                        CustomerOrder.class)
+                .setParameter("siteId", siteId)
+                .setParameter("start", dateStart)
+                .setParameter("end", dateEnd);
+
+        return q.getResultList();
+    }
+
+
+
+    @Override
     public List<CustomerOrder> getAllCustomerOrderInRange(Date start, Date end) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(start);

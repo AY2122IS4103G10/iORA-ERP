@@ -565,9 +565,9 @@ export const dashboardApi = {
 };
 
 export const reportApi = {
-  getSalesReport(startDate, endDate) {
+  getSalesReport(siteId, startDate, endDate) {
     return axiosPrivate.get(
-      `${REST_ENDPOINT}sam/reports/dailySales?start=${startDate}&end=${endDate}`,
+      `${REST_ENDPOINT}sam/reports/sales?siteId=${siteId}&start=${startDate}&end=${endDate}`,
       {
         responseType: "blob",
         headers: {

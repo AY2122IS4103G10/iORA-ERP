@@ -1,14 +1,11 @@
-import { PrinterIcon } from "@heroicons/react/outline";
+import {PrinterIcon} from "@heroicons/react/outline";
 import moment from "moment";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
-import { listingApi } from "../../../../environments/Api";
-import {
-  fetchPurchase,
-  selectPurchase
-} from "../../../../stores/slices/purchasesSlice";
+import {useEffect, useRef, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {Link, useParams} from "react-router-dom";
+import {useReactToPrint} from "react-to-print";
+import {listingApi} from "../../../../environments/Api";
+import {fetchPurchase, selectPurchase} from "../../../../stores/slices/purchasesSlice";
 
 function calculateSubTotal(lineItems) {
   let subTotal = 0;
@@ -18,15 +15,13 @@ function calculateSubTotal(lineItems) {
 
 function calculateDiscounts(promotions) {
   let totalDiscount = 0;
-  totalDiscount = promotions
-    .map((promo) => promo.subTotal)
-    .reduce((a, b) => a - b);
+  totalDiscount = promotions.map((promo) => promo.subTotal).reduce((a, b) => a - b);
   return Math.abs(totalDiscount);
 }
 
 export const CheckoutSuccessful = () => {
   const dispatch = useDispatch();
-  const { id } = useParams();
+  const {id} = useParams();
   const [models, setModels] = useState(null);
   const confirmedOrder = useSelector(selectPurchase);
   const componentRef = useRef();
@@ -54,22 +49,15 @@ export const CheckoutSuccessful = () => {
   console.log(confirmedOrder);
 
   return (
-    <main
-      ref={componentRef}
-      className="bg-white px-4 pt-16 pb-24 sm:px-6 sm:pt-18 lg:px-8"
-    >
+    <main ref={componentRef} className="bg-white px-4 pt-16 pb-24 sm:px-6 sm:pt-18 lg:px-8">
       {confirmedOrder !== null ? (
         <div className="max-w-3xl mx-auto">
           <div className="flex items-end justify-end mb-4">
             <button
               type="button"
               className="mr-10 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
-              onClick={handlePrint}
-            >
-              <PrinterIcon
-                className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
+              onClick={handlePrint}>
+              <PrinterIcon className="-ml-1 mr-2 h-5 w-5 text-gray-400" aria-hidden="true" />
               <span>Print</span>
             </button>
           </div>
@@ -81,28 +69,19 @@ export const CheckoutSuccessful = () => {
               Your order has been placed!
             </p>
             <p className="mt-2 text-base text-gray-800">
-              Your order{" "}
-              <span className="text-lg text-black font-bold">
-                #{confirmedOrder?.id}
-              </span>{" "}
+              Your order <span className="text-lg text-black font-bold">#{confirmedOrder?.id}</span>{" "}
               has been placed and will be with you soon.
             </p>
           </div>
 
-          <section
-            aria-labelledby="order-heading"
-            className="mt-10 border-t border-gray-200"
-          >
+          <section aria-labelledby="order-heading" className="mt-10 border-t border-gray-200">
             <h2 id="order-heading" className="sr-only">
               Your order
             </h2>
 
             <h3 className="sr-only">Items</h3>
             {confirmedOrder?.lineItems.map((item, id) => (
-              <div
-                key={id}
-                className="py-10 border-b border-gray-200 flex space-x-6"
-              >
+              <div key={id} className="py-10 border-b border-gray-200 flex space-x-6">
                 {models !== null ? (
                   <>
                     <img
@@ -113,34 +92,34 @@ export const CheckoutSuccessful = () => {
                     <div className="flex-auto flex flex-col">
                       <div>
                         <h4 className="font-medium text-gray-900">
-                          <Link to={`/products/view/${item.product.sku.substring(0,item.product.sku.indexOf('-'))}`}>{models[id].name}</Link>
+                          <Link
+                            to={`/products/view/${item.product.sku.substring(
+                              0,
+                              item.product.sku.indexOf("-")
+                            )}`}>
+                            {models[id].name}
+                          </Link>
                         </h4>
-                        <p className="mt-2 text-sm text-gray-600">
-                          {models[id].description}
-                        </p>
+                        <p className="mt-2 text-sm text-gray-600">{models[id].description}</p>
                         <span className="mt-2 text-sm text-gray-600">
                           Colour:{" "}
                           {
-                            item.product.productFields.find(
-                              (field) => field.fieldName === "COLOUR"
-                            ).fieldValue
+                            item.product.productFields.find((field) => field.fieldName === "COLOUR")
+                              .fieldValue
                           }
                         </span>
                         <span className="mt-2 text-sm text-gray-600">
                           {" | "}Size:{" "}
                           {
-                            item.product.productFields.find(
-                              (field) => field.fieldName === "SIZE"
-                            ).fieldValue
+                            item.product.productFields.find((field) => field.fieldName === "SIZE")
+                              .fieldValue
                           }
                         </span>
                       </div>
                       <div className="mt-6 flex-1 flex items-end">
                         <dl className="flex text-sm divide-x divide-gray-200 space-x-4 sm:space-x-6">
                           <div className="flex">
-                            <dt className="font-medium text-gray-900">
-                              Quantity
-                            </dt>
+                            <dt className="font-medium text-gray-900">Quantity</dt>
                             <dd className="ml-2 text-gray-700">{item.qty}</dd>
                           </div>
                           <div className="pl-4 flex sm:pl-6">
@@ -163,18 +142,13 @@ export const CheckoutSuccessful = () => {
               <h4 className="sr-only">Addresses</h4>
               <dl className="grid grid-cols-2 gap-x-6 text-sm py-10">
                 <div>
-                  <dt className="font-medium text-gray-900">
-                    Shipping address
-                  </dt>
+                  <dt className="font-medium text-gray-900">Shipping address</dt>
                   <dd className="mt-2 text-gray-700">
                     <address className="not-italic">
                       <span className="block">Name</span>
+                      <span className="block">{confirmedOrder?.deliveryAddress?.street1}</span>
                       <span className="block">
-                        {confirmedOrder?.deliveryAddress?.street1}
-                      </span>
-                      <span className="block">
-                        {confirmedOrder?.country},{" "}
-                        {confirmedOrder.deliveryAddress.zip}
+                        {confirmedOrder?.country}, {confirmedOrder.deliveryAddress.zip}
                       </span>
                     </address>
                   </dd>
@@ -182,11 +156,7 @@ export const CheckoutSuccessful = () => {
                 <div>
                   <dt className="font-medium text-gray-900">Delivery method</dt>
                   <dd className="mt-2 text-gray-700">
-                    <p>
-                      {confirmedOrder.delivery === true
-                        ? "Doorstep Delivery"
-                        : "Store Pickup"}
-                    </p>
+                    <p>{confirmedOrder.delivery === true ? "Doorstep Delivery" : "Store Pickup"}</p>
                     <p>
                       {confirmedOrder.delivery === true
                         ? "Takes up to 7 working days"
@@ -214,18 +184,15 @@ export const CheckoutSuccessful = () => {
               <dl className="space-y-6 border-t border-gray-200 text-sm pt-10">
                 <div className="flex justify-between">
                   <dt className="font-medium text-gray-900">Subtotal</dt>
-                  <dd className="text-gray-700">
-                    ${calculateSubTotal(confirmedOrder.lineItems)}
-                  </dd>
+                  <dd className="text-gray-700">${calculateSubTotal(confirmedOrder.lineItems)}</dd>
                 </div>
 
-                {confirmedOrder.voucher !== null ?
+                {confirmedOrder.voucher !== null ? (
                   <div className="flex justify-between">
                     <dt className="font-medium text-gray-900">Voucher</dt>
-                    <dd className="text-gray-700">
-                      -${confirmedOrder.voucher.amount}
-                    </dd>
-                  </div> : null}
+                    <dd className="text-gray-700">-${confirmedOrder.voucher.amount}</dd>
+                  </div>
+                ) : null}
 
                 <div className="flex justify-between">
                   <dt className="flex font-medium text-gray-900">
@@ -234,8 +201,7 @@ export const CheckoutSuccessful = () => {
                   </dt>
                   <dd className="text-gray-700">
                     -$
-                    {confirmedOrder.promotions === null ||
-                      confirmedOrder.promotions.length === 0
+                    {confirmedOrder.promotions === null || confirmedOrder.promotions.length === 0
                       ? "0"
                       : calculateDiscounts(confirmedOrder.promotions)}
                   </dd>

@@ -16,7 +16,7 @@ import com.iora.erp.model.site.Site;
 
 @Embeddable
 public class OOStatus {
-    @JsonIgnoreProperties({"stockLevel"})
+    @JsonIgnoreProperties({ "stockLevel" })
     @ManyToOne
     private Site actionBy;
 
@@ -68,4 +68,5 @@ public class OOStatus {
                 ", status='" + getStatus() + "'" +
                 "}";
     }
+
 }

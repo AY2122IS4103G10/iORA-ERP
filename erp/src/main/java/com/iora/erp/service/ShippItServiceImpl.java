@@ -256,11 +256,7 @@ public class ShippItServiceImpl implements ShippItService {
             if (completed != false) {
                 OnlineOrder ooPersist = em.find(OnlineOrder.class, oo.getId());
                 ooPersist.setStatus(OnlineOrderStatusEnum.DELIVERED);
-                OOStatus onlineStatus = new OOStatus();
-                onlineStatus.setStatus(OnlineOrderStatusEnum.DELIVERED);
-                onlineStatus.setTimeStamp(new Date());
-                em.persist(onlineStatus);
-                ooPersist.getStatusHistory().add(onlineStatus);
+                ooPersist.getStatusHistory().add(new OOStatus(null, new Date(), OnlineOrderStatusEnum.DELIVERED));
             }
         }
     }

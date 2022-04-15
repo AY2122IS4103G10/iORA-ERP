@@ -25,7 +25,6 @@ import {
   getVoucherStats,
   setSiteId,
 } from "../../../../stores/slices/dashboardSlice";
-import { Header } from "../../../components/Header";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
 import SimpleSelectMenu from "../../../components/SelectMenus/SimpleSelectMenu";
 import { ToggleLeftLabel } from "../../../components/Toggles/LeftLabel";
@@ -33,13 +32,13 @@ import SharedStats from "../components/Stats";
 import {
   colourPicker,
   cyans,
-  multi,
-  getRevenue,
-  getOrder,
-  getProduct,
-  getRevenuePerOrder,
   delta,
   deltaType,
+  getOrder,
+  getProduct,
+  getRevenue,
+  getRevenuePerOrder,
+  multi,
   rangeLabels,
   topfew,
 } from "../utils";

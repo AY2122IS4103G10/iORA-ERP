@@ -246,6 +246,8 @@ export const OrderDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { addToast } = useToasts();
+  const [leaveTimer, setLeaveTimer] = useState(null);
+
   const order = useSelector((state) =>
     selectOrderById(state, parseInt(orderId))
   );
@@ -297,13 +299,19 @@ export const OrderDetails = () => {
   }, [orderStatus, dispatch, siteId]);
 
   useEffect(() => {
-    if (!order) {
-      addToast(`Error: You cannot view Customer Order ${orderId}`, {
-        appearance: "error",
-        autoDismiss: true,
-      });
-      navigate("/str/pos/orderHistory");
-    }
+    const leaveWhenUnauthorized = () =>
+      setTimeout(() => {
+        addToast(`Error: You cannot view Customer Order ${orderId}`, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+        navigate("/str/pos/orderHistory");
+      }, 1500);
+    console.log(leaveTimer);
+    order
+      ? leaveTimer && clearTimeout(leaveTimer)
+      : !leaveTimer && setLeaveTimer(leaveWhenUnauthorized());
+
     const orderLineItems = order?.lineItems || [];
     fetchAllModelsBySkus(orderLineItems).then((data) =>
       setLineItems(
@@ -323,7 +331,7 @@ export const OrderDetails = () => {
         })
       )
     );
-  }, [order, addToast, navigate, orderId]);
+  }, [order, addToast, navigate, orderId, leaveTimer]);
 
   useEffect(() => {
     exchangedSku.id !== -1 &&
@@ -333,11 +341,12 @@ export const OrderDetails = () => {
   }, [exchangedSku]);
 
   useEffect(() => {
-    const refundProduct = order?.lineItems?.find((x) => x.product.sku === refundSku?.name);
-    refundSku.id !== -1 && order.lineItems.length > 0 &&
-      setRefundAmount(
-        refundProduct.subTotal * refundQty / refundProduct.qty
-      );
+    const refundProduct = order?.lineItems?.find(
+      (x) => x.product.sku === refundSku?.name
+    );
+    refundSku.id !== -1 &&
+      order.lineItems.length > 0 &&
+      setRefundAmount((refundProduct.subTotal * refundQty) / refundProduct.qty);
   }, [refundSku, order?.lineItems, refundQty]);
 
   const openRefundModal = () => setOpenRefund(true);
@@ -353,6 +362,7 @@ export const OrderDetails = () => {
         addRefundLineItem({ orderId, product, qty: refundQty, refundAmount })
       );
       closeRefundModal();
+      navigate(0);
     }
     if (event === "exchange") {
       const oldItem = order.lineItems
@@ -363,145 +373,146 @@ export const OrderDetails = () => {
       );
       dispatch(addExchangeLineItem({ orderId, oldItem, newItem }));
       closeExchangeModal();
+      navigate(0);
     }
   };
 
-  return orderStatus === "loading" ? (
-    <div className="flex mt-5 items-center justify-center">
-      <TailSpin color="#00BFFF" height={20} width={20} />
+  return orderStatus === "loading" || !order ? (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32">
+      <div className="flex justify-center">
+        <TailSpin color="#00BFFF" height={72} width={72} />
+      </div>
     </div>
-  ) : (
-    orderStatus === "succeeded" && (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <NavigatePrev page="Orders" path="/str/pos/orderHistory" />
-        <Header
-          order={order}
-          openRefundModal={openRefundModal}
-          openExchangeModal={openExchangeModal}
-        />
-        <RefundModal
-          open={openRefund}
-          closeModal={closeRefundModal}
-          onConfirm={() => updateOrder("refund")}
-          lineItems={order?.lineItems.map((lineItem) => {
-            return { index: lineItem.id, name: lineItem.product.sku };
-          })}
-          refundAmount={refundAmount}
-          refundSku={refundSku}
-          refundQty={refundQty}
-          setRefundAmount={(e) => setRefundAmount(e.target.value)}
-          setRefundSku={setRefundSku}
-          setRefundQty={mapRefundQty}
-        />
-        <ExchangeModal
-          open={openExchange}
-          closeModal={closeExchangeModal}
-          onConfirm={() => updateOrder("exchange")}
-          lineItems={order?.lineItems.map((lineItem) => {
-            return { index: lineItem.id, name: lineItem.product.sku };
-          })}
-          exchangedSku={exchangedSku}
-          exchangeSku={exchangeSku}
-          exchangeOptions={exchangeOptions.map((product, index) => {
-            return { index, name: product.sku };
-          })}
-          setExchangedSku={setExchangedSku}
-          setExchangeSku={mapExchangeSku}
-        />
-        <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
-          <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-            {/* Site Information list*/}
-            <section aria-labelledby="applicant-information-title">
-              <div className="bg-white shadow sm:rounded-lg">
-                <div className="px-4 py-5 sm:px-6">
-                  <h2
-                    id="order-information-title"
-                    className="text-lg leading-6 font-medium text-gray-900"
-                  >
-                    Order Information
-                  </h2>
-                </div>
-                <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-                  <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Customer No.
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {order.customerId}
-                      </dd>
-                    </div>
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Transaction Date
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {moment(order.dateTime).format("DD/MM/YYYY, H:mm:ss")}
-                      </dd>
-                    </div>
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Total Amount
-                      </dt>
-
-                      <dd className="mt-1 text-sm text-gray-900">
-                        ${order.totalAmount.toFixed(2)}
-                      </dd>
-                    </div>
-
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">
-                        Payment Type
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {order.payments
-                          .map((payment) => payment.paymentType)
-                          .join(", ")}
-                      </dd>
-                    </div>
-                    {order.voucher && (
-                      <div className="sm:col-span-1">
-                        <dt className="text-sm font-medium text-gray-500">
-                          Voucher
-                        </dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          <address className="not-italic">
-                            <span className="block">
-                              ${order.voucher.amount}
-                            </span>
-                            <span className="block">
-                              {order.voucher.voucherCode}
-                            </span>
-                          </address>
-                        </dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
+  ) : orderStatus === "succeeded" ? (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+      <NavigatePrev page="Orders" path="/str/pos/orderHistory" />
+      <Header
+        order={order}
+        openRefundModal={openRefundModal}
+        openExchangeModal={openExchangeModal}
+      />
+      <RefundModal
+        open={openRefund}
+        closeModal={closeRefundModal}
+        onConfirm={() => updateOrder("refund")}
+        lineItems={order?.lineItems.map((lineItem) => {
+          return { index: lineItem.id, name: lineItem.product.sku };
+        })}
+        refundAmount={refundAmount}
+        refundSku={refundSku}
+        refundQty={refundQty}
+        setRefundAmount={(e) => setRefundAmount(e.target.value)}
+        setRefundSku={setRefundSku}
+        setRefundQty={mapRefundQty}
+      />
+      <ExchangeModal
+        open={openExchange}
+        closeModal={closeExchangeModal}
+        onConfirm={() => updateOrder("exchange")}
+        lineItems={order?.lineItems.map((lineItem) => {
+          return { index: lineItem.id, name: lineItem.product.sku };
+        })}
+        exchangedSku={exchangedSku}
+        exchangeSku={exchangeSku}
+        exchangeOptions={exchangeOptions.map((product, index) => {
+          return { index, name: product.sku };
+        })}
+        setExchangedSku={setExchangedSku}
+        setExchangeSku={mapExchangeSku}
+      />
+      <div className="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-1">
+        <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+          {/* Site Information list*/}
+          <section aria-labelledby="applicant-information-title">
+            <div className="bg-white shadow sm:rounded-lg">
+              <div className="px-4 py-5 sm:px-6">
+                <h2
+                  id="order-information-title"
+                  className="text-lg leading-6 font-medium text-gray-900"
+                >
+                  Order Information
+                </h2>
               </div>
-            </section>
-            <section aria-labelledby="line-items">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div className="md:col-span-2">
-                  {Boolean(lineItems?.length) && <ItemTable data={lineItems} />}
-                </div>
-                {Boolean(order.promotions?.length) && (
-                  <PromoTable data={order.promotions} />
-                )}
-                {order?.voucher && <VoucherTable data={[order?.voucher]} />}
-                {Boolean(order.refundedLIs?.length) && (
-                  <RefundTable data={order?.refundedLIs} />
-                )}
-                {Boolean(order.exchangedLIs?.length) && (
-                  <ExchangeTable data={order?.exchangedLIs} />
-                )}
+              <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+                <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Customer No.
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {order?.customerId}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Transaction Date
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {moment(order?.dateTime).format("DD/MM/YYYY, H:mm:ss")}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Total Amount
+                    </dt>
+
+                    <dd className="mt-1 text-sm text-gray-900">
+                      ${order?.totalAmount.toFixed(2)}
+                    </dd>
+                  </div>
+
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Payment Type
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {order?.payments
+                        .map((payment) => payment.paymentType)
+                        .join(", ")}
+                    </dd>
+                  </div>
+                  {order?.voucher && (
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Voucher
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900">
+                        <address className="not-italic">
+                          <span className="block">
+                            ${order?.voucher.amount}
+                          </span>
+                          <span className="block">
+                            {order?.voucher.voucherCode}
+                          </span>
+                        </address>
+                      </dd>
+                    </div>
+                  )}
+                </dl>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
+          <section aria-labelledby="line-items">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="md:col-span-2">
+                {Boolean(lineItems?.length) && <ItemTable data={lineItems} />}
+              </div>
+              {Boolean(order.promotions?.length) && (
+                <PromoTable data={order.promotions} />
+              )}
+              {order?.voucher && <VoucherTable data={[order?.voucher]} />}
+              {Boolean(order.refundedLIs?.length) && (
+                <RefundTable data={order?.refundedLIs} />
+              )}
+              {Boolean(order.exchangedLIs?.length) && (
+                <ExchangeTable data={order?.exchangedLIs} />
+              )}
+            </div>
+          </section>
         </div>
       </div>
-    )
-  );
+    </div>
+  ) : null;
 };
 
 const RefundModal = ({

@@ -10,27 +10,8 @@ import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 
-const tabs = [
-  { name: "Dashboard", href: "/sm/analytics", current: false },
-  { name: "Reports", href: "", current: true },
-];
 
-const options = [
-  {
-    id: 1,
-    report: "Sales Report",
-  },
-  {
-    id: 2,
-    report: "Procurement Report",
-  },
-  {
-    id: 3,
-    report: "Transaction Report",
-  },
-];
-
-export const ManageReports = () => {
+export const ManageReports = ({options}) => {
   const dispatch = useDispatch();
   let todayDate = moment(new Date()).format("YYYY-MM-DD");
   const [startDate, setStartDate] = useState(todayDate);
@@ -113,7 +94,6 @@ export const ManageReports = () => {
   };
   return (
     <>
-      <SectionHeading header="Reports" tabs={tabs} />
       <div className="mx-12">
         <div className="my-6 grid grid-cols-2 gap-16">
           <div className="col-span-1 ">

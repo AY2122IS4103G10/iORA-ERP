@@ -64,7 +64,7 @@ export const ManageReports = ({options}) => {
   };
 
   const handleDownloadSalesReport = (startDate, endDate) => {
-    reportApi.getSalesReport(startDate, endDate).then((response) => {
+    reportApi.getSalesReport(siteId, startDate, endDate).then((response) => {
       const blob = new Blob([response.data]);
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
@@ -94,7 +94,7 @@ export const ManageReports = ({options}) => {
   };
   return (
     <>
-      <div className="mx-12">
+      <div className="mx-12 xl:mx-72">
         <div className="my-6 grid grid-cols-2 gap-16">
           <div className="col-span-1 ">
             <label className="pl-1 text-sm font-medium text-gray-900">

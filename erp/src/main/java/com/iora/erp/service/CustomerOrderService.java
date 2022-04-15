@@ -133,6 +133,8 @@ public interface CustomerOrderService {
 
         public abstract List<CustomerOrder> getDailyCustomerOrders(Long siteId, Date date);
 
+        public abstract List<CustomerOrder> getCustomerOrdersInRange(Long siteId, Date start, Date end);
+        
         public abstract List<CustomerOrder> getAllCustomerOrderInRange(Date start, Date end);
 
         public abstract Delivery getDeliveryInfoById(Long deliveryId);

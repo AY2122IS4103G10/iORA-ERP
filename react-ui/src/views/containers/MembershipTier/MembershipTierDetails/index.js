@@ -66,7 +66,7 @@ const MembershipTierDetailsBody = ({ minSpend, multiplier, birthday }) => (
             <dl className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2">
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
-                  Minimum Spend
+                  Minimum Spend 
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">{minSpend}</dd>
               </div>
@@ -97,12 +97,12 @@ const MembershipTierDetailsBody = ({ minSpend, multiplier, birthday }) => (
                 <dd className="mt-1 text-sm text-gray-900">{birthday.name}</dd>
               </div>
               <div className="sm:col-span-1">
-                <dt className="text-sm font-medium text-gray-500">Quota</dt>
+                <dt className="text-sm font-medium text-gray-500">Maximum Quota</dt>
                 <dd className="mt-1 text-sm text-gray-900">{birthday.quota}</dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">
-                  Birthday Spend
+                  Maximum Amount Applicable
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">
                   {birthday.birthdaySpend}

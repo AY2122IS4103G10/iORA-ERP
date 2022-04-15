@@ -146,7 +146,7 @@ const CustomerDetailsBody = ({
                   Membership Points
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {membershipPoints ? membershipPoints : "-"}
+                  {membershipPoints ? membershipPoints.toFixed(2) : "-"}
                 </dd>
               </div>
             </dl>

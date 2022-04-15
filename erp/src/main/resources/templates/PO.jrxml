@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.19.0.final using JasperReports Library version 6.19.0-646c68931cebf1a58bc65c4359d1f0ca223c5e94  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="POallfields" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="624055af-16b4-4c96-b135-612853c7c716">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="JasperCustomSubReportLocation" class="net.sf.jasperreports.engine.JasperReport"/>
+	<parameter name="JasperCustomSubReportDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<field name="id" class="java.lang.Long">
+	</field>
+	<field name="headquarters" class="java.lang.Long">
+		<fieldDescription><![CDATA[headquarters.id]]>]</fieldDescription>
+	</field>
+	<field name="manufacturing" class="java.lang.Long">
+		<fieldDescription><![CDATA[manufacturing.id]]>]</fieldDescription>
+	</field>
+	<field name="warehouse" class="java.lang.Long">
+		<fieldDescription><![CDATA[warehouse.id]]>]</fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="185" height="30" uuid="913459ae-fec9-4c67-94fe-349fe0049ca3">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="beda1592-0adf-4ac6-a0ff-63675d0494be"/>
+				</reportElement>
+				<text><![CDATA[PROCUREMENT_ORDER_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="185" y="0" width="185" height="30" uuid="f763fc59-890a-4bd4-9bab-da903f27d35e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cc86c815-25db-4ee3-975d-b8b75bcf62cd"/>
+				</reportElement>
+				<text><![CDATA[HEADQUARTERS_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="0" width="185" height="30" uuid="f4563fbf-f40f-487c-8023-10f9d1b4aca1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="00ac1799-8bfd-4d06-94e1-e7243eeb72d3"/>
+				</reportElement>
+				<text><![CDATA[MANUFACTURING_ID]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="307" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="185" height="30" uuid="cefe5043-b90f-4129-ac4f-1ffc4d78851f">
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="185" y="0" width="185" height="30" uuid="cbbf0822-9ac0-48d8-baa4-bcdcce956b04">
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{headquarters}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="0" width="185" height="30" uuid="a8d957ac-159c-40e3-b02b-77852b9fae7d">
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{manufacturing}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="30" width="555" height="200" uuid="63765fef-372b-4a69-bb6d-0ee0c1cd7959"/>
+				<subreportParameter name="id">
+					<subreportParameterExpression><![CDATA[$F{id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource ($P{JasperCustomSubReportDataSource}.getData())]]></dataSourceExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{JasperCustomSubReportLocation}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

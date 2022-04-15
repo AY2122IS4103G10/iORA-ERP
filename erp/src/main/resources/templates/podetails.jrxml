@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.19.0.final using JasperReports Library version 6.19.0-646c68931cebf1a58bc65c4359d1f0ca223c5e94  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="podetails" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2c9ea3b8-7a81-4168-a16b-357d5ed77373">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<subDataset name="Dataset1" uuid="3b0779d1-3e0e-4eb3-8071-f7b390d81332">
+		<parameter name="DS1" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="id" class="java.lang.Long">
+		</field>
+		<field name="sku" class="java.lang.String">
+			 <fieldDescription><![CDATA[product.sku]]></fieldDescription>
+		</field>
+		<field name="costPrice" class="java.lang.Double">
+		</field>
+		<field name="requestedQty" class="java.lang.Integer">
+		</field>
+		<field name="receivedQty" class="java.lang.Integer">
+		</field>
+	</subDataset>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="180" height="30" uuid="7d9d8c69-96f9-4220-860d-dc569948b5fe"/>
+				<text><![CDATA[SKU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="1" width="200" height="30" uuid="6cd55793-534f-46a3-a43b-8b12bac1b09c"/>
+				<text><![CDATA[Qty]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="1" width="170" height="30" uuid="b1c9dd20-ecbb-4a9d-82d6-7f13ac44d117"/>
+				<text><![CDATA[Cost Price]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="330" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="180" height="30" uuid="72a4565b-0186-4532-af38-43d5324c9d15"/>
+				<textFieldExpression><![CDATA[$F{sku}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="350" y="0" width="200" height="30" uuid="cd5f2af3-f3be-4f2b-876a-d3ff58d214d1"/>
+				<textFieldExpression><![CDATA[$F{requestedQty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="1" width="170" height="30" uuid="a02240b2-a1de-4b02-ac33-82714697bece"/>
+				<textFieldExpression><![CDATA[$F{costPrice}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

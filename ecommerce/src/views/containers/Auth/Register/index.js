@@ -67,7 +67,7 @@ export const Register = () => {
         )
           .unwrap()
           .then((data) => {
-            localStorage.setItem("user", JSON.stringify(data.id));
+            // localStorage.setItem("user", JSON.stringify(data));
             setEmail("");
             setPassword("");
             setConfirmPassword("");
@@ -75,13 +75,12 @@ export const Register = () => {
             setLastName("");
             setContactNo("");
             setDob("");
-            addToast("Welcome to iORA!", {
+            addToast("Welcome to iORA! Please log in to your account.", {
               appearance: "success",
               autoDismiss: true,
             });
-            return data.id;
+            data.id !== -1 && navigate("/login")
           })
-          .then((id) => id !== -1 && navigate("/"))
           .catch((error) => {
             addToast(`Error: ${error.message}`, {
               appearance: "error",

@@ -197,7 +197,7 @@ public class ShippItServiceImpl implements ShippItService {
         return link;
     }
 
-    @Scheduled(cron = "*/5 * * * * ?")
+    @Scheduled(cron = "*/15 * * * * *")
     @Async
     @Override
     public void fetchStatus() {
@@ -206,7 +206,6 @@ public class ShippItServiceImpl implements ShippItService {
         q.setParameter("status2", OnlineOrderStatusEnum.DELIVERING);
         List<OnlineOrder> listOO = q.getResultList();
 
-        System.out.println("I am running here");
         String url = "https://app.staging.shippit.com/api/3/orders/{tracking_number}/tracking";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

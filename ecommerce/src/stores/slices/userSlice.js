@@ -221,17 +221,17 @@ const userSlice = createSlice({
       state.loggedIn = true;
     });
     builder.addCase(register.fulfilled, (state, action) => {
-      action.payload.password !== undefined && delete action.payload.password;
-      state.user = {...action.payload};
+      // action.payload.password !== undefined && delete action.payload.password;
+      // state.user = {...action.payload};
       state.status = "succeeded";
-      state.loggedIn = true;
+      // state.loggedIn = true;
     });
     builder.addCase(register.rejected, (state, action) => {
       state.error = "Register failed";
     });
     builder.addCase(updateAccount.fulfilled, (state, action) => {
-      // action.payload.password !== undefined && delete action.payload.password;
-      // state.user = { ...action.payload };
+      action.payload.password !== undefined && delete action.payload.password;
+      state.user = { ...action.payload };
       state.status = "succeeded";
     });
     builder.addCase(updateAccount.rejected, (state, action) => {

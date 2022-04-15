@@ -1,6 +1,6 @@
-import { XIcon } from "@heroicons/react/solid";
+import { ChevronDownIcon, XIcon } from "@heroicons/react/solid";
 import { ExclamationIcon } from "@heroicons/react/outline";
-import { Dialog } from "@headlessui/react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { TailSpin } from "react-loader-spinner";
@@ -18,6 +18,7 @@ import {
 import { classNames } from "../../../../utilities/Util";
 import { NavigatePrev } from "../../../components/Breadcrumbs/NavigatePrev";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
+import { Fragment } from "react";
 
 export const fetchModelBySku = async (sku) => {
   const { data } = await productApi.getModelBySku(sku);
@@ -125,12 +126,9 @@ export const PurchaseHistoryDetails = () => {
                           "DELIVERING",
                           "DELIVERING_MULTIPLE",
                         ].some((s) => status.status === s)
-                      : [
-                          "PICKING",
-                          "PICKED",
-                          "PACKING",
-                          "PACKED",
-                        ].some((s) => status.status === s)
+                      : ["PICKING", "PICKED", "PACKING", "PACKED"].some(
+                          (s) => status.status === s
+                        )
                   )
                 ? 1
                 : status.status === "DELIVERED" || status.status === "COLLECTED"
@@ -161,23 +159,74 @@ export const PurchaseHistoryDetails = () => {
                   </span>
                 )}
               </div>
-              {status.status === "PENDING" && (
-                <button
-                  type="button"
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                  onClick={() => {
-                    setAction({
-                      name: "cancel",
-                      description:
-                        "You will be refunded the full amount in store credit which can be used for future purchases with us.",
-                      action: onCancelOrderClicked,
-                    });
-                    openConfirmModal();
-                  }}
-                >
-                  <span>Cancel order</span>
-                </button>
-              )}
+              <div className="flex items-center justify-end space-x-3">
+                {status.status === "PENDING" && (
+                  <button
+                    type="button"
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    onClick={() => {
+                      setAction({
+                        name: "cancel",
+                        description:
+                          "You will be refunded the full amount in store credit which can be used for future purchases with us.",
+                        action: onCancelOrderClicked,
+                      });
+                      openConfirmModal();
+                    }}
+                  >
+                    <span>Cancel order</span>
+                  </button>
+                )}
+                {Boolean(order.parcelDelivery?.length) && (
+                  <Menu as="div" className="relative inline-block text-left">
+                    <div>
+                      <Menu.Button className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500">
+                        Tracking
+                        <ChevronDownIcon
+                          className="-mr-1 ml-2 h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      </Menu.Button>
+                    </div>
+
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="z-10 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="py-1">
+                          {order.parcelDelivery.map((delivery) => {
+                            return (
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <a
+                                    href={delivery.trackingURL}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={classNames(
+                                      active
+                                        ? "bg-gray-100 text-gray-900"
+                                        : "text-gray-700",
+                                      "block px-4 py-2 text-sm"
+                                    )}
+                                  >
+                                    {delivery.trackingID}
+                                  </a>
+                                )}
+                              </Menu.Item>
+                            );
+                          })}
+                        </div>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+                )}
+              </div>
               {status.status === "READY_FOR_DELIVERY" && (
                 <button
                   type="button"
@@ -210,6 +259,7 @@ export const PurchaseHistoryDetails = () => {
                 <dd className="font-medium text-gray-900">
                   {moment.unix(order?.dateTime / 1000).format("MMMM Do, YYYY")}
                 </dd>
+                <dd></dd>
               </dl>
               {Boolean(order?.statusHistory) && (
                 <div className="mt-4 sm:mt-0">
@@ -454,13 +504,14 @@ export const PurchaseHistoryDetails = () => {
                       ${calculateSubTotal(lineItems)}
                     </dd>
                   </div>
-                  {order.voucher !== null ? 
+                  {order.voucher !== null ? (
                     <div className="py-4 flex items-center justify-between">
                       <dt className="text-gray-600">Voucher</dt>
                       <dd className="font-medium text-gray-900">
                         -${order.voucher.amount}
                       </dd>
-                    </div> : null}
+                    </div>
+                  ) : null}
                   <div className="py-4 flex items-center justify-between">
                     <dt className="text-gray-600">Shipping</dt>
                     <dd className="font-medium text-gray-900">

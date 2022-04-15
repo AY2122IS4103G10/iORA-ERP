@@ -18,6 +18,7 @@ import com.iora.erp.model.customer.SupportTicket;
 import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
+import com.iora.erp.model.procurementOrder.ProcurementOrderLI;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.product.Product;
 import com.iora.erp.model.product.ProductField;
@@ -588,6 +589,68 @@ public class SAMController {
 
             response.setHeader(
                     HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=SalesReport.csv;");
+            response.setContentType("text/csv");
+            exporter.exportReport();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    @GetMapping(path = "/reports/po")
+    public void generateProcurementReport(
+            HttpServletResponse response,
+            @RequestParam Long siteId, 
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date start,
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date end) {
+        try {
+            List<ProcurementOrder> orders = procurementService.getProcurementOrdersInRange(siteId, start, end);
+            System.out.println(orders);
+
+            JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(orders);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("DS1", beanCollectionDataSource);
+            JasperReport compileReport = JasperCompileManager
+                    .compileReport(new FileInputStream("src/main/resources/templates/PO.jrxml"));
+            JasperPrint finalReport = JasperFillManager.fillReport(compileReport, map, new JREmptyDataSource());
+            JRCsvExporter exporter = new JRCsvExporter();
+            exporter.setExporterInput(new SimpleExporterInput(finalReport));
+            exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getOutputStream()));
+
+            response.setHeader(
+                    HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=ProcurementReport.csv;");
+            response.setContentType("text/csv");
+            exporter.exportReport();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @GetMapping(path = "/reports/poli")
+    public void generateSimpleProcurementReport(
+            HttpServletResponse response,
+            @RequestParam Long siteId, 
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date start,
+            @RequestParam @DateTimeFormat(pattern = "ddMMyyyy") Date end) {
+        try {
+            List<ProcurementOrderLI> lineItems = procurementService.getProcurementLineItemsInRange(siteId, start, end);
+            System.out.println(lineItems);
+
+            JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(lineItems);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("DS1", beanCollectionDataSource);
+
+            JasperReport compileReport = JasperCompileManager
+                    .compileReport(new FileInputStream("src/main/resources/templates/SimplePO.jrxml"));
+            JasperPrint finalReport = JasperFillManager.fillReport(compileReport, map, new JREmptyDataSource());
+            JRCsvExporter exporter = new JRCsvExporter();
+            exporter.setExporterInput(new SimpleExporterInput(finalReport));
+            exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getOutputStream()));
+
+            response.setHeader(
+                    HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=ProcurementReport.csv;");
             response.setContentType("text/csv");
             exporter.exportReport();
 

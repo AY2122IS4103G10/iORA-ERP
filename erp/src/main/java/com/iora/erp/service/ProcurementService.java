@@ -9,6 +9,7 @@ import com.iora.erp.exception.ProcurementOrderException;
 import com.iora.erp.exception.ProductException;
 import com.iora.erp.exception.SiteConfirmationException;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
+import com.iora.erp.model.procurementOrder.ProcurementOrderLI;
 import com.iora.erp.model.site.Site;
 
 public interface ProcurementService {
@@ -37,4 +38,6 @@ public interface ProcurementService {
     public abstract ProcurementOrder completeProcurementOrder(Long id) throws IllegalPOModificationException, ProcurementOrderException;
 
     public abstract List<ProcurementOrder> getDailyProcurementOrders(Long siteId, Date date);
+    public abstract List<ProcurementOrder> getProcurementOrdersInRange(Long siteId, Date start, Date end);
+    public abstract List<ProcurementOrderLI> getProcurementLineItemsInRange(Long siteId, Date start, Date end);
 }

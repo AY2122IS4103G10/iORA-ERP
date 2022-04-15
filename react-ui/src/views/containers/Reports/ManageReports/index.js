@@ -1,6 +1,9 @@
 import { DownloadIcon } from "@heroicons/react/solid";
 import moment from "moment";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUserSite, updateCurrSite } from "../../../../stores/slices/userSlice";
+
 import { reportApi } from "../../../../environments/Api";
 import { SectionHeading } from "../../../components/HeadingWithTabs";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
@@ -28,9 +31,15 @@ const options = [
 ];
 
 export const ManageReports = () => {
+  const dispatch = useDispatch();
   let todayDate = moment(new Date()).format("YYYY-MM-DD");
   const [startDate, setStartDate] = useState(todayDate);
   const [endDate, setEndDate] = useState(todayDate);
+  const siteId = useSelector(selectUserSite);
+
+  useEffect(() => {
+    dispatch(updateCurrSite());
+  },[])
 
   const columns = useMemo(() => {
     return [
@@ -63,11 +72,12 @@ export const ManageReports = () => {
 
   const onDownloadClicked = (e, id, startDate, endDate) => {
     e.preventDefault();
+    const start = moment(startDate).format("DDMMYYYY");
+    const end = moment(endDate).format("DDMMYYYY");
     if (id === 1) {
-      const start = moment(startDate).format("DDMMYYYY");
-      const end = moment(endDate).format("DDMMYYYY");
       handleDownloadSalesReport(start, end);
     } else if (id === 2) {
+      handleDownloadProcurementReport(siteId, start, end);
     } else if (id === 3) {
     }
   };
@@ -81,6 +91,16 @@ export const ManageReports = () => {
       link.click();
     });
   };
+
+  const handleDownloadProcurementReport = (siteId, startDate, endDate) => {
+    reportApi.getProcurementReport(siteId, startDate, endDate).then((response) => {
+      const blob = new Blob([response.data]);
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = "Procurement Report_" + startDate + "_" + endDate + ".csv";
+      link.click();
+    });
+  }
 
   const onStartDateChanged = (e) => {
     e.preventDefault();

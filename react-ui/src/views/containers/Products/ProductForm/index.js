@@ -201,6 +201,7 @@ const AddProductFormBody = ({
   setImages,
   onImagesChanged,
   loading,
+  setFieldNameSelected,
 }) => {
   const fileRef = useRef();
   return (
@@ -482,8 +483,8 @@ const AddProductFormBody = ({
           <RightColSection
             fieldName="Colour"
             openModal={openModal}
-            // setFieldNameSelected={setFieldNameSelected}
-            disableButton
+            setFieldNameSelected={setFieldNameSelected}
+            // disableButton
           >
             {colors.length ? (
               <FormCheckboxes
@@ -502,8 +503,8 @@ const AddProductFormBody = ({
           <RightColSection
             fieldName="Size"
             openModal={openModal}
-            // setFieldNameSelected={setFieldNameSelected}
-            disableButton
+            setFieldNameSelected={setFieldNameSelected}
+            // disableButton
           >
             {sizes.length ? (
               <FormCheckboxes
@@ -522,8 +523,8 @@ const AddProductFormBody = ({
           <RightColSection
             fieldName="Promotion"
             openModal={openModal}
-            // setFieldNameSelected={setFieldNameSelected}
-            disableButton
+            setFieldNameSelected={setFieldNameSelected}
+            // disableButton
           >
             {promotions.length ? (
               // <FormCheckboxes
@@ -546,8 +547,8 @@ const AddProductFormBody = ({
           <RightColSection
             fieldName="Tag"
             openModal={openModal}
-            // setFieldNameSelected={setFieldNameSelected}
-            disableButton
+            setFieldNameSelected={setFieldNameSelected}
+            // disableButton
           >
             {tags.length ? (
               <FormCheckboxes
@@ -588,24 +589,44 @@ export const ProductForm = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const onLoad = async () => {
+    const { data } = await api.getAll("sam/productField");
+    const allFields = data;
+    const colors = allFields.filter((field) => field.fieldName === "COLOUR");
+    const sizes = allFields.filter((field) => field.fieldName === "SIZE");
+    const tags = allFields.filter((field) => field.fieldName === "TAG");
+    const categories = allFields.filter(
+      (field) => field.fieldName === "CATEGORY"
+    );
+    setColors(colors);
+    setSizes(sizes);
+    setTags(tags);
+    setCategories(categories);
+    setColorCheckedState(new Array(colors.length).fill(false));
+    setSizeCheckedState(new Array(sizes.length).fill(false));
+    setTagCheckedState(new Array(tags.length).fill(false));
+    setCatCheckedState(new Array(categories.length).fill(false));
+  };
+
   useEffect(() => {
-    api.getAll("sam/productField").then((response) => {
-      const allFields = response.data;
-      const colors = allFields.filter((field) => field.fieldName === "COLOUR");
-      const sizes = allFields.filter((field) => field.fieldName === "SIZE");
-      const tags = allFields.filter((field) => field.fieldName === "TAG");
-      const categories = allFields.filter(
-        (field) => field.fieldName === "CATEGORY"
-      );
-      setColors(colors);
-      setSizes(sizes);
-      setTags(tags);
-      setCategories(categories);
-      setColorCheckedState(new Array(colors.length).fill(false));
-      setSizeCheckedState(new Array(sizes.length).fill(false));
-      setTagCheckedState(new Array(tags.length).fill(false));
-      setCatCheckedState(new Array(categories.length).fill(false));
-    });
+    onLoad();
+    // api.getAll("sam/productField").then((response) => {
+    //   const allFields = response.data;
+    //   const colors = allFields.filter((field) => field.fieldName === "COLOUR");
+    //   const sizes = allFields.filter((field) => field.fieldName === "SIZE");
+    //   const tags = allFields.filter((field) => field.fieldName === "TAG");
+    //   const categories = allFields.filter(
+    //     (field) => field.fieldName === "CATEGORY"
+    //   );
+    //   setColors(colors);
+    //   setSizes(sizes);
+    //   setTags(tags);
+    //   setCategories(categories);
+    //   setColorCheckedState(new Array(colors.length).fill(false));
+    //   setSizeCheckedState(new Array(sizes.length).fill(false));
+    //   setTagCheckedState(new Array(tags.length).fill(false));
+    //   setCatCheckedState(new Array(categories.length).fill(false));
+    // });
   }, []);
 
   useEffect(() => {
@@ -854,6 +875,7 @@ export const ProductForm = () => {
             appearance: "success",
             autoDismiss: true,
           });
+          onLoad()
           closeModal();
         })
         .catch((err) =>

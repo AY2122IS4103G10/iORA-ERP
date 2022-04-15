@@ -6,7 +6,8 @@ import {
   ServerIcon,
   ShieldCheckIcon,
   ShoppingBagIcon,
-  TruckIcon
+  TruckIcon,
+  DocumentReportIcon
 } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,6 +51,12 @@ const navigation = [
     href: "/wh/stocktransfer/search",
     icon: TruckIcon,
     current: true,
+  },
+  {
+    name: "Reports",
+    href: "/wh/reports",
+    icon: DocumentReportIcon,
+    current: false,
   },
 ];
 

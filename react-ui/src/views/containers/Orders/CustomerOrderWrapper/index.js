@@ -271,7 +271,9 @@ export const CustomerOrderWrapper = ({ subsys }) => {
     setLoading(true);
     try {
       const { data } = await onlineOrderApi.cancelOrder(orderId, currSiteId);
-      console.log(data);
+      const {statusHistory} = data
+      setStatus(statusHistory[statusHistory.length - 1])
+      setStatusHistory(statusHistory)
       addToast(`Success: Cancelled Order ${orderId}`, {
         appearance: "success",
         autoDismiss: true,

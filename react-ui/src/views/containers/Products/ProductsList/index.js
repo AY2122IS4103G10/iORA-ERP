@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { TailSpin } from "react-loader-spinner";
-import { SimpleTable } from "../../../components/Tables/SimpleTable";
 import {
   fetchProducts,
-  selectAllProducts,
+  selectAllProducts
 } from "../../../../stores/slices/productSlice";
+import { SimpleTable } from "../../../components/Tables/SimpleTable";
 
 export const ProductsTable = ({ data, handleOnClick }) => {
   const columns = useMemo(

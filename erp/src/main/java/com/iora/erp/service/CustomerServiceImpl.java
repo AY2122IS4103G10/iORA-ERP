@@ -422,6 +422,8 @@ public class CustomerServiceImpl implements CustomerService {
     public MembershipTier createMembershipTier(MembershipTier membershipTier) {
         if (membershipTier.getBirthday() == null) {
             membershipTier.setBirthday(em.find(BirthdayPoints.class, "STANDARD"));
+        } else {
+            em.merge(membershipTier.getBirthday());
         }
         return em.merge(membershipTier);
     }

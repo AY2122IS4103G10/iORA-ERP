@@ -63,9 +63,7 @@ export const listingApi = {
     );
   },
   getListingByLine(line) {
-    return axiosPublic.get(
-      `${REST_ENDPOINT}online/public/model/tag/${line}`
-    );
+    return axiosPublic.get(`${REST_ENDPOINT}online/public/model/tag/${line}`);
   },
 
   getListingByCategory(cat) {
@@ -75,9 +73,7 @@ export const listingApi = {
   },
 
   getModel(modelCode) {
-    return axiosPublic.get(
-      `${REST_ENDPOINT}online/public/model/${modelCode}`
-    );
+    return axiosPublic.get(`${REST_ENDPOINT}online/public/model/${modelCode}`);
   },
   getProductStock(sku) {
     return axiosPublic.get(
@@ -90,8 +86,8 @@ export const listingApi = {
       `${REST_ENDPOINT}online/public/model/skulist`,
       skuList
     );
-  }
-}
+  },
+};
 
 export const checkoutApi = {
   calculatePromotions(lineItems) {
@@ -102,41 +98,41 @@ export const checkoutApi = {
   },
   applyVoucher(code) {
     return axiosPublic.get(
-      `${REST_ENDPOINT}online/public/voucher/apply?code=${code}`,
-    )
+      `${REST_ENDPOINT}online/public/voucher/apply?code=${code}`
+    );
   },
   getStores() {
-    return axiosPublic.get(
-      `${REST_ENDPOINT}online/public/stores/singapore`,
-    )
-  }, 
+    return axiosPublic.get(`${REST_ENDPOINT}online/public/stores/singapore`);
+  },
   createPaymentIntent(totalAmount, isDelivery) {
     return axiosPublic.post(
-      `${REST_ENDPOINT}online/public/pay/${totalAmount}/${isDelivery}`,
+      `${REST_ENDPOINT}online/public/pay/${Number.parseInt(
+        totalAmount
+      )}/${isDelivery}`,
       totalAmount
-    )
+    );
   },
   createOnlineOrder(onlineOrder, paymentIntentId) {
     return axiosPublic.post(
       `${REST_ENDPOINT}online/public/create?paymentIntentId=${paymentIntentId}`,
       onlineOrder
-    )
-  }
-}
+    );
+  },
+};
 
 export const purchasesApi = {
   getOrder(id) {
-    return axiosPrivate.get(
-      `${REST_ENDPOINT}online/order/${id}`,
-    )
-  }
-}
+    return axiosPrivate.get(`${REST_ENDPOINT}online/order/${id}`);
+  },
+};
 
 export const ticketApi = {
   resolveTicket(ticketId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}online/ticket/resolve/${ticketId}`);
-  }
-}
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/ticket/resolve/${ticketId}`
+    );
+  },
+};
 
 export const productApi = {
   getModelBySku(sku) {
@@ -146,9 +142,13 @@ export const productApi = {
 
 export const onlineOrderApi = {
   cancelOrder(orderId, customerId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}online/customer/cancel/${orderId}/${customerId}`)
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/customer/cancel/${orderId}/${customerId}`
+    );
   },
   completeOrder(orderId) {
-    return axiosPrivate.put(`${REST_ENDPOINT}online/deliver/simulateDelivered/${orderId}`)
-  }
-}
+    return axiosPrivate.put(
+      `${REST_ENDPOINT}online/deliver/simulateDelivered/${orderId}`
+    );
+  },
+};

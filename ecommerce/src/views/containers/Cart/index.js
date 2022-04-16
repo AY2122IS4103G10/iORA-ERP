@@ -147,7 +147,7 @@ export const CartItems = ({
                   </div>
 
                   <p className="mt-4 flex flex-row-reverse font-bold text-sm text-gray-700 space-x-2">
-                    Subtotal: ${parseInt(item.model.discountPrice) * item.qty}
+                    Subtotal: ${(parseFloat(item.model.discountPrice) * item.qty).toFixed(2)}
                   </p>
                 </div>
               </li>
@@ -233,7 +233,7 @@ export const CartSummary = ({
         <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
           <dt className="text-base font-medium text-gray-900">Order total</dt>
           <dd className="text-base font-medium text-gray-900">
-            ${subTotal + totalDiscount}
+            ${(subTotal + totalDiscount).toFixed(2)}
           </dd>
         </div>
       </dl>

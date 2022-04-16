@@ -225,7 +225,7 @@ export const VoucherForm = ({ voucher, setVoucher, handleApplyVoucher }) => {
 
 
   return (
-    <section aria-labelledby="voucher-heading" className="mt-10">
+    <section aria-labelledby="voucher-heading" className="mt-2 pb-6">
       <h2
         id="voucher-heading"
         className="text-lg font-medium text-gray-900"

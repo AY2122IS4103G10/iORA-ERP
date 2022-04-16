@@ -298,8 +298,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     e.printStackTrace();
                 }
             }
-        } else {
-
         }
 
         return em.merge(customerOrder);
@@ -806,7 +804,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             // update customer delivery address
             Customer c = customerService.getCustomerById(onlineOrder.getCustomerId());
             c.setAddress(onlineOrder.getDeliveryAddress());
-            emailService.sendOnlineOrderConfirmation(c, onlineOrder);
 
             em.merge(c);
             onlineOrder.setSite(siteService.getSite(3L));
@@ -847,6 +844,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         em.persist(onlineOrder);
         finaliseCustomerOrder(onlineOrder);
+
+        if (onlineOrder.getId() > 7L) {
+            emailService.sendOnlineOrderConfirmation(customerService.getCustomerById(onlineOrder.getCustomerId()), onlineOrder);
+        }
 
         onlineOrder.getSite().addNotification(new Notification("Online Order (NEW) # " + onlineOrder.getId(),
                 "Status is " + onlineOrder.getLastStatus().name() + ": "

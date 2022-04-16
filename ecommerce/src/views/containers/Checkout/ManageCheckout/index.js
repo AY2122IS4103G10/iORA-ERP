@@ -117,7 +117,8 @@ export const ManageCheckout = () => {
     let totalAmount =
       afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.5 : 0) 
       - (voucherItem !== null ? voucherItem.amount : 0);
-    let order = {
+      totalAmount.toFixed(2);
+      let order = {
       voucher: voucherItem,
       lineItems,
       customerId: user?.id,

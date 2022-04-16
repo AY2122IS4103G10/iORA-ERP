@@ -235,7 +235,7 @@ export const Membership = () => {
                         completed={`${currSpend + 150}`}
                         maxCompleted={nextTier.minSpend + 150}
                         customLabel={`$${
-                          nextTier.minSpend - currSpend
+                          (nextTier.minSpend - currSpend).toFixed(2)
                         } more to ${nextTier.name}`}
                       />
                     </div>

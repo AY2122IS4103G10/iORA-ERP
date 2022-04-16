@@ -27,7 +27,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                                         Size: {item.product?.productFields.find((field) => field.fieldName === "SIZE").fieldValue}
                                     </p>
                                 </div>
-                                <p className="flex-none text-base font-medium">${parseInt(item.model.discountPrice) * item.qty}</p>
+                                <p className="flex-none text-base font-medium">${(parseFloat(item.model.discountPrice) * item.qty).toFixed(2)}</p>
                             </li>
                         ))}
                     </ul>
@@ -39,7 +39,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                         {promotions.map((promo) => (
                             <div key={promo.id} className="flex items-center justify-between">
                                 <dt className="text-gray-600">{promo.promotion.fieldValue}</dt>
-                                <dd>-${Math.abs(promo.subTotal)}</dd>
+                                <dd>-${Math.abs(promo.subTotal).toFixed(2)}</dd>
                             </div>
                         )
                         )}
@@ -48,7 +48,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
                     <dl className="text-sm font-medium text-gray-900 space-y-6 border-t border-gray-200 pt-6 lg:block">
                         <div className="flex items-center justify-between">
                             <dt className="text-gray-600">Subtotal</dt>
-                            <dd>${subTotal}</dd>
+                            <dd>${subTotal.toFixed(2)}</dd>
                         </div>
 
                        {voucherItem !== null ?
@@ -59,7 +59,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
 
                         <div className="flex items-center justify-between">
                             <dt className="text-gray-600">Discounts/Promotions</dt>
-                            <dd>-${subTotal - afterDiscount}</dd>
+                            <dd>-${(subTotal - afterDiscount).toFixed(2)}</dd>
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -69,7 +69,7 @@ export const OrderSummary = ({ cart, subTotal, afterDiscount, promotions, select
 
                         <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                             <dt className="text-base">Total</dt>
-                            <dd className="text-base">${afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0.00) - (voucherItem !== null ? voucherItem.amount : 0)}</dd>
+                            <dd className="text-base">${(afterDiscount + (selectedDeliveryMethod.id === 1 ? 2.50 : 0.00) - (voucherItem !== null ? voucherItem.amount : 0)).toFixed(2)}</dd>
                         </div>
                     </dl>
                   

@@ -184,7 +184,7 @@ export const CheckoutSuccessful = () => {
               <dl className="space-y-6 border-t border-gray-200 text-sm pt-10">
                 <div className="flex justify-between">
                   <dt className="font-medium text-gray-900">Subtotal</dt>
-                  <dd className="text-gray-700">${calculateSubTotal(confirmedOrder.lineItems)}</dd>
+                  <dd className="text-gray-700">${calculateSubTotal(confirmedOrder.lineItems).toFixed(2)}</dd>
                 </div>
 
                 {confirmedOrder.voucher !== null ? (
@@ -203,7 +203,7 @@ export const CheckoutSuccessful = () => {
                     -$
                     {confirmedOrder.promotions === null || confirmedOrder.promotions.length === 0
                       ? "0"
-                      : calculateDiscounts(confirmedOrder.promotions)}
+                      : calculateDiscounts(confirmedOrder.promotions).toFixed(2)}
                   </dd>
                 </div>
                 <div className="flex justify-between">
@@ -215,7 +215,7 @@ export const CheckoutSuccessful = () => {
                 <div className="flex justify-between">
                   <dt className="text-base font-bold text-gray-900">Total</dt>
                   <dd className="text-base text-gray-900 font-bold">
-                    ${confirmedOrder.totalAmount}
+                    ${confirmedOrder.totalAmount.toFixed(2)}
                   </dd>
                 </div>
               </dl>

@@ -420,8 +420,6 @@ export const SupportDetails = () => {
             });
     }
   };
-
-  console.log(ticket);
   
   return (
     Boolean(ticket) && (

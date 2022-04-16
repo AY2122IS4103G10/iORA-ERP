@@ -591,10 +591,10 @@ public class ProcurementServiceImpl implements ProcurementService {
         cal.set(Calendar.SECOND, 59);
         Date dateEnd = cal.getTime();
 
-        return em
+        return (List<ProcurementOrderLI>)
+                em
                 .createQuery(
-                        "SELECT DISTINCT po.lineItems FROM ProcurementOrder po left join po.statusHistory sh WHERE (po.manufacturing.id = :siteId OR po.headquarters.id = :siteId OR po.warehouse.id = :siteId) AND sh.timeStamp BETWEEN :start AND :end",
-                        ProcurementOrderLI.class)
+                        "SELECT DISTINCT po.lineItems FROM ProcurementOrder po left join po.statusHistory sh WHERE (po.manufacturing.id = :siteId OR po.headquarters.id = :siteId OR po.warehouse.id = :siteId) AND sh.timeStamp BETWEEN :start AND :end")
                 .setParameter("siteId", siteId)
                 .setParameter("start", dateStart)
                 .setParameter("end", dateEnd)

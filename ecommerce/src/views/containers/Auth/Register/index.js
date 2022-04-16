@@ -106,7 +106,7 @@ export const Register = () => {
           <Link
             key="login"
             to="/login"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="font-medium text-gray-600 hover:text-gray-500"
           >
             log in
           </Link>
@@ -136,7 +136,7 @@ export const Register = () => {
                       type="email"
                       value={email}
                       onChange={onEmailChanged}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       autoComplete="email"
                       autoFocus
                       required
@@ -160,7 +160,7 @@ export const Register = () => {
                       onChange={onPasswordChanged}
                       className={classNames(
                         !error
-                          ? "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          ? "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                           : "block w-full pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md"
                       )}
                       required
@@ -197,7 +197,7 @@ export const Register = () => {
                       onChange={onConfirmPasswordChanged}
                       className={classNames(
                         !error
-                          ? "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          ? "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                           : "block w-full pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md"
                       )}
                       required
@@ -240,7 +240,7 @@ export const Register = () => {
                         name="firstName"
                         type="text"
                         autoComplete="firstName"
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                         value={firstName}
                         onChange={onFirstNameChanged}
                         required
@@ -260,7 +260,7 @@ export const Register = () => {
                         name="lastName"
                         type="text"
                         autoComplete="lastName"
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                         value={lastName}
                         onChange={onLastNameChanged}
                         required
@@ -280,7 +280,7 @@ export const Register = () => {
                         name="contactNo"
                         type="text"
                         autoComplete="contactNo"
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                         value={contactNo}
                         onChange={onContactNoChanged}
                         required
@@ -296,7 +296,7 @@ export const Register = () => {
                     </label>
                     <div className="mt-1">
                       <DatePicker
-                        className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                        className="focus:ring-gray-500 focus:border-gray-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                         selected={dob}
                         onChange={onDobChanged}
                       />
@@ -308,7 +308,7 @@ export const Register = () => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
                 Sign up
               </button>
@@ -318,7 +318,7 @@ export const Register = () => {
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-base font-medium text-indigo-600 hover:text-indigo-500"
+            className="text-base font-medium text-gray-600 hover:text-gray-500"
           >
             <span aria-hidden="true"> &larr;</span> Back to store
           </Link>

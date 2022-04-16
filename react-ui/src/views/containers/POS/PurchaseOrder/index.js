@@ -386,14 +386,16 @@ export const PosPurchaseOrder = () => {
     async function calculate() {
       const response = await posApi.calculatePromotions(lineItems);
       setPromotions(response.data[1]);
-      setAmount(
-        response.data
-          .map((y) => y.map((x) => x.subTotal).reduce((x, y) => x + y, 0))
-          .reduce((x, y) => x + y, 0)
-      );
     }
     calculate();
   }, [setPromotions, lineItems]);
+
+  useEffect(() => {
+    const amt = [lineItems, promotions]
+      .map((y) => y.map((x) => x.subTotal).reduce((x, y) => x + y, 0))
+      .reduce((x, y) => x + y, 0);
+    setAmount(amt);
+  }, [promotions, lineItems]);
 
   const addRfidClicked = (e, _rfid = null) => {
     e.preventDefault();
@@ -455,7 +457,7 @@ export const PosPurchaseOrder = () => {
         clear={clear}
         amount={amount}
         order={order}
-        checkoutItems={order?.lineItems}
+        checkoutItems={[].concat(order?.lineItems).concat(order?.promotions)}
       />
       <SimpleModal open={sureModalState} closeModal={closeSureModal}>
         <div className="inline-block align-middle bg-white rounded-lg px-4 pt-4 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:p-6">

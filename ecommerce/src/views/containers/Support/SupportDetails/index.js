@@ -433,7 +433,7 @@ export const SupportDetails = () => {
           category={ticket.category}
         />
         <SupportTicketBody messages={ticket.messages} />
-        {(ticket.status === "PENDING_CUSTOMER" || ticket.status === "PENDING") && (
+        {(ticket.status === "PENDING_CUSTOMER") && (
           <InputArea
             input={input}
             onInputChanged={onInputChanged}

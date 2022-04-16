@@ -19,9 +19,6 @@ import com.iora.erp.service.AdminService;
 import com.iora.erp.service.EmployeeService;
 import com.iora.erp.service.SiteService;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +28,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("admin")
@@ -398,8 +398,9 @@ public class AdminController {
     public ResponseEntity<Object> addSite(@RequestBody Site site, @PathVariable String storeType) {
         try {
             return ResponseEntity.ok(siteService.createSite(site, storeType));
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+        } 
+        catch (Exception ex) {
+            return ResponseEntity.badRequest().body("Site name already exists");
         }
     }
 

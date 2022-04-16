@@ -852,10 +852,10 @@ public class DataLoader implements CommandLineRunner {
 		coli20.setQty(1);
 		customerOrderService.createCustomerOrderLI(coli20);
 
-		siteService.addProducts(4L, "AB0010031H-1", 8);
-		siteService.addProducts(4L, "ASK0009136A-1", 9);
-		siteService.addProducts(4L, "AB0009153W-1", 9);
-		siteService.addProducts(4L, "ASK0007868Y-1", 9);
+		siteService.addProducts(4L, "AB0010031H-1", 18);
+		siteService.addProducts(4L, "ASK0009136A-1", 19);
+		siteService.addProducts(4L, "AB0009153W-1", 19);
+		siteService.addProducts(4L, "ASK0007868Y-1", 19);
 		CustomerOrder co1 = new CustomerOrder();
 		co1.addLineItem(coli4);
 		co1.addLineItem(coli5);

@@ -128,7 +128,7 @@ export const getRevenuePerOrder = (obj, id = null) => {
 }
 
 export const delta = (curr, prev) =>
-  Number.parseFloat(Math.abs(curr - prev) / prev).toFixed(2);
+  Number.parseFloat(100 * Math.abs(curr - prev) / prev).toFixed(2);
 
 export const deltaType = (curr, prev) => (curr > prev ? "increase" : "decrease");
 

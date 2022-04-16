@@ -101,7 +101,6 @@ import { VouchersList } from "./views/containers/Vouchers/VouchersList";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import { OnlineOrderPicking } from "./views/containers/OnlineOrder/OnlineOrderPicking/index.js";
 import { OnlineOrderInhouse } from "./views/containers/Orders/OnlineOrderInhouse/index.js";
-import { ManageReports } from "./views/containers/Reports/ManageReports/index.js";
 import { ReportWrapper } from "./views/containers/Reports/ReportWrapper/index.js";
 
 function App() {

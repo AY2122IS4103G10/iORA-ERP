@@ -48,7 +48,7 @@ const tiers = [
   {
     id: 3,
     name: "Diamond",
-    spending: "$200 - $999",
+    spending: "$2500 onwards",
     points: "7%",
   },
 ];

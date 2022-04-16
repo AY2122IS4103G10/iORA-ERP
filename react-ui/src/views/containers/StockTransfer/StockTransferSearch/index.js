@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useToasts } from "react-toast-notifications";
+import { ToastProvider, useToasts } from "react-toast-notifications";
 import { api } from "../../../../environments/Api";
 import { selectUserSite } from "../../../../stores/slices/userSlice";
 
@@ -17,7 +17,7 @@ export const StockTransferSearch = ({ subsys }) => {
     const fetchStockTransfer = async () => {
       try {
         const { data } = await api.get("store/stockTransfer", search.trim());
-        const { id, fromSite, statusHistory } = data;
+        const { id, fromSite, toSite, statusHistory } = data;
         if (subsys === "lg") {
           if (
             currSiteId !== fromSite.id ||
@@ -26,7 +26,7 @@ export const StockTransferSearch = ({ subsys }) => {
           )
             throw new Error("Not authorised to view order.");
         } else if (subsys === "str" || subsys === "wh") {
-          if (currSiteId !== fromSite.id)
+          if (currSiteId !== fromSite.id && currSiteId !== toSite.id)
             throw new Error("Not authorised to view order.");
         }
         navigate(pathname.replace("search", id));

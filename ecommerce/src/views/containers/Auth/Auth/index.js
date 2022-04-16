@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import {
   fetchCustomer,
-  fetchCustomerByEmail,
   refreshTokenJwt,
 } from "../../../../stores/slices/userSlice";
 
@@ -24,7 +23,6 @@ export function Auth({ children }) {
           location.pathname === "/login" &&
             data?.username !== null &&
             navigate("/settings/account");
-          // data.username && dispatch(fetchCustomerByEmail(data.username));
         })
         .catch((err) => {
           addToast(`Error: ${err.message}`, {

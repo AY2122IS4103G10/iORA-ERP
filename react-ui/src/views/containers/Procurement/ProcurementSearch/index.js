@@ -24,7 +24,7 @@ export const ProcurementSearch = ({ subsys }) => {
             ? "sam/procurementOrder"
             : "manufacturing/procurementOrder";
         const { data } = await api.get(url, search.trim());
-        const { id, manufacturing, statusHistory } = data;
+        const { id, manufacturing, warehouse, statusHistory } = data;
         if (subsys === "lg") {
           if (
             currSiteId === manufacturing &&
@@ -34,7 +34,7 @@ export const ProcurementSearch = ({ subsys }) => {
             navigate(pathname.replace("search", id));
           else throw new Error("Not authorised to view order.");
         } else if (subsys === "mf") {
-          if (currSiteId === manufacturing)
+          if (currSiteId === manufacturing || currSiteId === warehouse)
             navigate(pathname.replace("search", id));
           else throw new Error("Not authorised to view order.");
         } else navigate(pathname.replace("search", id));

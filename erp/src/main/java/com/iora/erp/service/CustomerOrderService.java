@@ -12,7 +12,6 @@ import com.iora.erp.exception.InsufficientPaymentException;
 import com.iora.erp.exception.ModelException;
 import com.iora.erp.exception.NoStockLevelException;
 import com.iora.erp.exception.ProductException;
-import com.iora.erp.model.customer.Voucher;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.Delivery;

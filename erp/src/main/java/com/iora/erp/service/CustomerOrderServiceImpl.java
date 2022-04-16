@@ -24,8 +24,8 @@ import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
-import com.iora.erp.enumeration.PaymentTypeEnum;
 import com.iora.erp.enumeration.ParcelSizeEnum;
+import com.iora.erp.enumeration.PaymentTypeEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
@@ -55,14 +55,12 @@ import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevelLI;
-import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.stripe.exception.StripeException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 @Service("customerOrderServiceImpl")
 @Transactional

@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.ProcurementOrderStatusEnum;
@@ -245,7 +244,7 @@ public class ProcurementServiceImpl implements ProcurementService {
     public ProcurementOrder pickProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException {
         ProcurementOrder old = getProcurementOrder(procurementOrder.getId());
         old.setLineItems(procurementOrder.getLineItems());
-        
+
         old.addStatus(new POStatus(old.getLastActor(), new Date(), ProcurementOrderStatusEnum.PACKING));
         return updateProcurementOrder(old);
     }
@@ -406,7 +405,8 @@ public class ProcurementServiceImpl implements ProcurementService {
     }
 
     @Override
-    public ProcurementOrder receiveProcurementOrder(ProcurementOrder procurementOrder) throws ProcurementOrderException {
+    public ProcurementOrder receiveProcurementOrder(ProcurementOrder procurementOrder)
+            throws ProcurementOrderException {
         ProcurementOrder old = getProcurementOrder(procurementOrder.getId());
         old.setLineItems(procurementOrder.getLineItems());
         old.addStatus(new POStatus(old.getLastActor(), new Date(), ProcurementOrderStatusEnum.COMPLETED));
@@ -431,16 +431,19 @@ public class ProcurementServiceImpl implements ProcurementService {
             if (poli.getProduct().equals(product)) {
                 poli.setReceivedQty(poli.getReceivedQty() + qty);
 
-                /* boolean picked = true;
-                for (ProcurementOrderLI poli2 : lineItems) {
-                    if (poli2.getReceivedQty() != poli2.getPickedQty()) {
-                        picked = false;
-                    }
-                }
-                if (picked) {
-                    procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
-                            ProcurementOrderStatusEnum.COMPLETED));
-                } */
+                /*
+                 * boolean picked = true;
+                 * for (ProcurementOrderLI poli2 : lineItems) {
+                 * if (poli2.getReceivedQty() != poli2.getPickedQty()) {
+                 * picked = false;
+                 * }
+                 * }
+                 * if (picked) {
+                 * procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new
+                 * Date(),
+                 * ProcurementOrderStatusEnum.COMPLETED));
+                 * }
+                 */
 
                 try {
                     siteService.addProducts(procurementOrder.getWarehouse().getId(), poli.getProduct().getSku(), qty);
@@ -472,16 +475,19 @@ public class ProcurementServiceImpl implements ProcurementService {
             if (poli.getProduct().equals(product)) {
                 poli.setReceivedQty(qty);
 
-                /* boolean picked = true;
-                for (ProcurementOrderLI poli2 : lineItems) {
-                    if (poli2.getReceivedQty() != poli2.getPickedQty()) {
-                        picked = false;
-                    }
-                }
-                if (picked) {
-                    procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new Date(),
-                            ProcurementOrderStatusEnum.COMPLETED));
-                } */
+                /*
+                 * boolean picked = true;
+                 * for (ProcurementOrderLI poli2 : lineItems) {
+                 * if (poli2.getReceivedQty() != poli2.getPickedQty()) {
+                 * picked = false;
+                 * }
+                 * }
+                 * if (picked) {
+                 * procurementOrder.addStatus(new POStatus(procurementOrder.getLastActor(), new
+                 * Date(),
+                 * ProcurementOrderStatusEnum.COMPLETED));
+                 * }
+                 */
 
                 try {
                     siteService.addProducts(procurementOrder.getWarehouse().getId(), poli.getProduct().getSku(), qty);
@@ -564,7 +570,7 @@ public class ProcurementServiceImpl implements ProcurementService {
 
     public Map<Long, List<ProcurementOrderLI>> getMappingOfIDandLI(List<ProcurementOrder> orders) {
         Map<Long, List<ProcurementOrderLI>> map = new HashMap<>();
-        for (ProcurementOrder order: orders) {
+        for (ProcurementOrder order : orders) {
             map.put(order.getId(), order.getLineItems());
         }
         return map;
@@ -585,14 +591,13 @@ public class ProcurementServiceImpl implements ProcurementService {
         cal.set(Calendar.SECOND, 59);
         Date dateEnd = cal.getTime();
 
-        Query q = em
+        return em
                 .createQuery(
-                        "SELECT DISTINCT po.lineItems FROM ProcurementOrder po left join po.statusHistory sh WHERE (po.manufacturing.id = :siteId OR po.headquarters.id = :siteId OR po.warehouse.id = :siteId) AND sh.timeStamp BETWEEN :start AND :end")
+                        "SELECT DISTINCT po.lineItems FROM ProcurementOrder po left join po.statusHistory sh WHERE (po.manufacturing.id = :siteId OR po.headquarters.id = :siteId OR po.warehouse.id = :siteId) AND sh.timeStamp BETWEEN :start AND :end",
+                        ProcurementOrderLI.class)
                 .setParameter("siteId", siteId)
                 .setParameter("start", dateStart)
-                .setParameter("end", dateEnd);
-
-        return (List<ProcurementOrderLI>) q.getResultList();
+                .setParameter("end", dateEnd)
+                .getResultList();
     }
-
 }

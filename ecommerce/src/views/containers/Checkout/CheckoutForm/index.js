@@ -6,13 +6,13 @@ const deliveryMethods = [
   {
     id: 1,
     title: "Standard Shipping",
-    description: "4–10 business days",
+    description: "4–7 business days",
     footer: "$2.50",
   },
   {
     id: 2,
     title: "Store Pickup",
-    description: "5-7 business days",
+    description: "2-3 business days",
     footer: "Free",
   },
 ];

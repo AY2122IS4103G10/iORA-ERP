@@ -1103,6 +1103,46 @@ public class DataLoader implements CommandLineRunner {
 		co21.setDateTime(new Date(1650090855000L));
 		customerOrderService.createCustomerOrder(co21, null);
 
+		CustomerOrder co22 = new CustomerOrder();
+		Payment payment28 = new Payment(550, "28-1", PaymentTypeEnum.CASH);
+		em.persist(payment28);
+		co22.addPayment(payment28);
+		co22.setSite(siteService.getSite(4L));
+		co22.setDateTime(new Date(1649645015000L));
+		customerOrderService.createCustomerOrder(co22, null);
+
+		CustomerOrder co23 = new CustomerOrder();
+		Payment payment29 = new Payment(340, "29-1", PaymentTypeEnum.CASH);
+		em.persist(payment29);
+		co23.addPayment(payment29);
+		co23.setSite(siteService.getSite(4L));
+		co23.setDateTime(new Date(1649731415000L));
+		customerOrderService.createCustomerOrder(co23, null);
+
+		CustomerOrder co24 = new CustomerOrder();
+		Payment payment30 = new Payment(540, "30-1", PaymentTypeEnum.CASH);
+		em.persist(payment30);
+		co24.addPayment(payment30);
+		co24.setSite(siteService.getSite(4L));
+		co24.setDateTime(new Date(1649817815000L));
+		customerOrderService.createCustomerOrder(co24, null);
+
+		CustomerOrder co25 = new CustomerOrder();
+		Payment payment31 = new Payment(680, "31-1", PaymentTypeEnum.CASH);
+		em.persist(payment31);
+		co25.addPayment(payment31);
+		co25.setSite(siteService.getSite(4L));
+		co25.setDateTime(new Date(1649904215000L));
+		customerOrderService.createCustomerOrder(co25, null);
+
+		CustomerOrder co26 = new CustomerOrder();
+		Payment payment32 = new Payment(450, "32-1", PaymentTypeEnum.CASH);
+		em.persist(payment32);
+		co26.addPayment(payment32);
+		co26.setSite(siteService.getSite(4L));
+		co26.setDateTime(new Date(1649990615000L));
+		customerOrderService.createCustomerOrder(co26, null);
+
 		Customer cust = customerService.getCustomerById(1L);
 		SupportTicket st = new SupportTicket(SupportTicket.Category.GENERAL, "Opening Hours of Store");
 		st.addMessage(new SupportTicketMsg("May I know what is the opening hours of Bugis Junction?",

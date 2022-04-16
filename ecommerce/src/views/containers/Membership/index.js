@@ -264,7 +264,7 @@ export const Membership = () => {
                     </dt>
                     <div className="flex items-center justify-between space-x-2">
                       <select
-                        className="focus:ring-indigo-500 focus:border-indigo-500 relative block w-full rounded-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
+                        className="focus:ring-gray-500 focus:border-gray-500 relative block w-full rounded-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
                         value={amount}
                         onChange={handleChange}
                       >
@@ -274,7 +274,7 @@ export const Membership = () => {
                       </select>
                       <button
                         type="button"
-                        className="py-2 px-4 border text-white border-gray-300 bg-indigo-600 rounded-md shadow-sm text-sm font-medium hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="py-2 px-4 border text-white border-gray-300 bg-gray-600 rounded-md shadow-sm text-sm font-medium hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                         onClick={() => setOpen(true)}
                       >
                         Redeem
@@ -316,7 +316,7 @@ export const Membership = () => {
                       <dl className="space-y-10 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
                         <div className="relative">
                           <dt>
-                            <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+                            <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-gray-500 text-white">
                               <UserCircleIcon
                                 className="h-6 w-6"
                                 aria-hidden="true"
@@ -329,7 +329,7 @@ export const Membership = () => {
                         </div>
                         <div className="relative">
                           <dt>
-                            <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+                            <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-gray-500 text-white">
                               <CakeIcon
                                 className="h-6 w-6"
                                 aria-hidden="true"
@@ -342,7 +342,7 @@ export const Membership = () => {
                         </div>
                         <div className="relative">
                           <dt>
-                            <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+                            <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-gray-500 text-white">
                               <NewspaperIcon
                                 className="h-6 w-6"
                                 aria-hidden="true"
@@ -378,7 +378,7 @@ export const Membership = () => {
                           <ul className="mt-6 space-y-6">
                             <li key={1} className="flex">
                               <CheckIcon
-                                className="flex-shrink-0 w-6 h-6 text-indigo-500"
+                                className="flex-shrink-0 w-6 h-6 text-gray-500"
                                 aria-hidden="true"
                               />
                               <p className="ml-3 text-gray-500">
@@ -391,7 +391,7 @@ export const Membership = () => {
                             </li>
                             <li key={2} className="flex">
                               <CheckIcon
-                                className="flex-shrink-0 w-6 h-6 text-indigo-500"
+                                className="flex-shrink-0 w-6 h-6 text-gray-500"
                                 aria-hidden="true"
                               />
                               <p className="ml-3 text-gray-500">
@@ -402,7 +402,7 @@ export const Membership = () => {
                             </li>
                             <li key={3} className="flex">
                               <CheckIcon
-                                className="flex-shrink-0 w-6 h-6 text-indigo-500"
+                                className="flex-shrink-0 w-6 h-6 text-gray-500"
                                 aria-hidden="true"
                               />
                               <p className="ml-3 text-gray-500">
@@ -412,7 +412,7 @@ export const Membership = () => {
                             </li>
                             <li key={4} className="flex">
                               <CheckIcon
-                                className="flex-shrink-0 w-6 h-6 text-indigo-500"
+                                className="flex-shrink-0 w-6 h-6 text-gray-500"
                                 aria-hidden="true"
                               />
                               <p className="ml-3 text-gray-500">
@@ -558,7 +558,7 @@ export const Membership = () => {
                     <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
                       <button
                         type="button"
-                        className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                         onClick={() => setOpen(false)}
                       >
                         <span className="sr-only">Close</span>
@@ -566,9 +566,9 @@ export const Membership = () => {
                       </button>
                     </div>
                     <div className="sm:flex sm:items-start">
-                      <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                      <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 sm:mx-0 sm:h-10 sm:w-10">
                         <ExclamationIcon
-                          className="h-6 w-6 text-indigo-600"
+                          className="h-6 w-6 text-red-600"
                           aria-hidden="true"
                         />
                       </div>
@@ -580,7 +580,7 @@ export const Membership = () => {
                           Redeem Voucher
                         </Dialog.Title>
                         <div className="mt-2">
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-900">
                             Your membership points will be redeemed, and a $
                             {amount} voucher will be sent to your email address.
                           </p>
@@ -596,14 +596,14 @@ export const Membership = () => {
                     <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                       <button
                         type="button"
-                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:ml-3 sm:w-auto sm:text-sm"
                         onClick={onRedeemClicked}
                       >
                         Redeem
                       </button>
                       <button
                         type="button"
-                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm"
                         onClick={() => setOpen(false)}
                       >
                         Cancel

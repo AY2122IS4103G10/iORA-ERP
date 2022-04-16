@@ -25,7 +25,7 @@ export const EnterSiteModal = ({
                 as="h3"
                 className="text-center text-lg leading-6 font-medium text-gray-900"
               >
-                Choose Site and enter Site Code
+                Choose Site{!disableSiteCode && " and enter Site Code"}
               </Dialog.Title>
             </div>
             <div className="pb-3">
@@ -35,15 +35,17 @@ export const EnterSiteModal = ({
                 setSelected={setSiteSelected}
               />
             </div>
-            {!disableSiteCode &&<input
-              type="text"
-              name="siteCode"
-              id="siteCode"
-              className="flex-grow shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
-              placeholder="Site Code"
-              value={siteCode}
-              onChange={onSiteCodeChanged}
-            />}
+            {!disableSiteCode && (
+              <input
+                type="text"
+                name="siteCode"
+                id="siteCode"
+                className="flex-grow shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                placeholder="Site Code"
+                value={siteCode}
+                onChange={onSiteCodeChanged}
+              />
+            )}
           </div>
           <div className="pt-4">
             <div className="mt-5 grid grid-cols-1 gap-2 justify-center">

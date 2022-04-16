@@ -421,6 +421,8 @@ export const SupportDetails = () => {
     }
   };
 
+  console.log(ticket);
+  
   return (
     Boolean(ticket) && (
       <div className="max-h-screen overflow-auto py-8 xl:py-10">
@@ -433,7 +435,7 @@ export const SupportDetails = () => {
           category={ticket.category}
         />
         <SupportTicketBody messages={ticket.messages} />
-        {ticket.status === "PENDING_CUSTOMER" && (
+        {(ticket.status === "PENDING_CUSTOMER" || ticket.status === "PENDING") && (
           <InputArea
             input={input}
             onInputChanged={onInputChanged}

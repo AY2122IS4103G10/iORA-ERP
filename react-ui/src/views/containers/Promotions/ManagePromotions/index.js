@@ -52,8 +52,8 @@ const PromoModal = ({
                     {modalState === "add"
                       ? "Add New"
                       : modalState === "edit"
-                      ? "Edit"
-                      : "View"}{" "}
+                        ? "Edit"
+                        : "View"}{" "}
                     Promotion
                   </h3>
                   <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
@@ -86,7 +86,14 @@ const PromoModal = ({
                         required
                         disabled={modalState === "view"}
                       />
+                      <p
+                        id="candidates-description"
+                        className="text-gray-500 text-sm pt-1"
+                      >
+                        Minimum quantity to achieve promotion
+                      </p>
                     </SimpleInputGroup>
+
                     <SimpleInputGroup
                       label="Discount Type"
                       inputField="global-stackable"
@@ -389,7 +396,7 @@ export const ManagePromotions = () => {
   const [openPromo, setOpenPromo] = useState(false);
 
   const onNameChanged = (e) => setName(e.target.value);
-  const onQuotaChanged = (e) => setQuota(Math.max(e.target.value,1));
+  const onQuotaChanged = (e) => setQuota(Math.max(e.target.value, 1));
   const onCoefficientsChanged = (e) => setCoefficients(e.target.value);
   const onConstantsChanged = (e) => setConstants(e.target.value);
   const onGlobalChanged = () => setGlobal(!global);
@@ -421,13 +428,13 @@ export const ManagePromotions = () => {
             quota: quota,
             coefficients: percent
               ? coefficients
-                  .split(",")
-                  .map((coeff) => 1 - parseFloat(coeff.trim()) / 100)
+                .split(",")
+                .map((coeff) => 1 - parseFloat(coeff.trim()) / 100)
               : new Array(quota).fill(0.0),
             constants: fixed
               ? constants
-                  .split(",")
-                  .map((constant) => parseFloat(constant.trim()))
+                .split(",")
+                .map((constant) => parseFloat(constant.trim()))
               : new Array(quota).fill(0.0),
             global,
             stackable,
@@ -456,13 +463,13 @@ export const ManagePromotions = () => {
             quota: quota,
             coefficients: percent
               ? coefficients
-                  .split(",")
-                  .map((coeff) => 1 - parseFloat(coeff.trim()) / 100)
+                .split(",")
+                .map((coeff) => 1 - parseFloat(coeff.trim()) / 100)
               : new Array(quota).fill(0.0),
             constants: fixed
               ? constants
-                  .split(",")
-                  .map((constant) => parseFloat(constant.trim()))
+                .split(",")
+                .map((constant) => parseFloat(constant.trim()))
               : new Array(quota).fill(0.0),
             global,
             stackable,

@@ -24,8 +24,8 @@ import javax.persistence.TypedQuery;
 
 import com.iora.erp.enumeration.CountryEnum;
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
-import com.iora.erp.enumeration.PaymentTypeEnum;
 import com.iora.erp.enumeration.ParcelSizeEnum;
+import com.iora.erp.enumeration.PaymentTypeEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
 import com.iora.erp.exception.IllegalTransferException;
@@ -55,14 +55,12 @@ import com.iora.erp.model.product.ProductItem;
 import com.iora.erp.model.product.PromotionField;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevelLI;
-import com.iora.erp.model.site.StoreSite;
 import com.iora.erp.model.site.WarehouseSite;
 import com.stripe.exception.StripeException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 @Service("customerOrderServiceImpl")
 @Transactional
@@ -300,18 +298,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     e.printStackTrace();
                 }
             }
-        } else {
-            // update customer delivery address
-            OnlineOrder oo = (OnlineOrder) customerOrder;
-            Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
-            c.setAddress(oo.getDeliveryAddress());
-
-            // send email to customer
-            // TODO: remove this 7L
-            if (oo.getId() > 7L) {
-                emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
-            }
-            em.merge(c);
         }
 
         return em.merge(customerOrder);
@@ -438,7 +424,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         // Get all possible promotions
         Set<PromotionField> promotions = new HashSet<>(
-                em.createQuery("SELECT pf FROM PromotionField pf WHERE pf.global = TRUE AND pf.available = true", PromotionField.class)
+                em.createQuery("SELECT pf FROM PromotionField pf WHERE pf.global = TRUE AND pf.available = true",
+                        PromotionField.class)
                         .getResultList());
         for (CustomerOrderLI coli : lineItems) {
             Model m = modelMap.get(coli);
@@ -814,6 +801,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             customerService.redeemVoucher(onlineOrder.getVoucher().getVoucherCode());
         }
         if (onlineOrder.isDelivery()) {
+            // update customer delivery address
+            Customer c = customerService.getCustomerById(onlineOrder.getCustomerId());
+            c.setAddress(onlineOrder.getDeliveryAddress());
+
+            em.merge(c);
             onlineOrder.setSite(siteService.getSite(3L));
             onlineOrder
                     .addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
@@ -852,6 +844,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         em.persist(onlineOrder);
         finaliseCustomerOrder(onlineOrder);
+
+        if (onlineOrder.getId() > 7L) {
+            emailService.sendOnlineOrderConfirmation(customerService.getCustomerById(onlineOrder.getCustomerId()), onlineOrder);
+        }
 
         onlineOrder.getSite().addNotification(new Notification("Online Order (NEW) # " + onlineOrder.getId(),
                 "Status is " + onlineOrder.getLastStatus().name() + ": "
@@ -1384,7 +1380,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         Date dateStart = cal.getTime();
-        
+
         cal.setTime(end);
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
@@ -1401,8 +1397,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         return q.getResultList();
     }
-
-
 
     @Override
     public List<CustomerOrder> getAllCustomerOrderInRange(Date start, Date end) {

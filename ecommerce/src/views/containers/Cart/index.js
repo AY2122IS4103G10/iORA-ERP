@@ -19,14 +19,14 @@ import {
 import { classNames } from "../../../utilities/Util";
 import ConfirmModal from "../../components/Modals/ConfirmModal";
 
-const deliveryOptions = [
-  { id: 1, name: "Standard Shipping", description: "Shipping Fee: $2.50" },
-  {
-    id: 2,
-    name: "Collect In-Stores",
-    description: "Pick up in a physical store of your choice",
-  },
-];
+// const deliveryOptions = [
+//   { id: 1, name: "Standard Shipping", description: "Shipping Fee: $2.50" },
+//   {
+//     id: 2,
+//     name: "Collect In-Stores",
+//     description: "Pick up in a physical store of your choice",
+//   },
+// ];
 
 export const CartItems = ({
   cart,

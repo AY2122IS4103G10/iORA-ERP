@@ -3,11 +3,9 @@ package com.iora.erp.controller;
 import java.util.List;
 import java.util.Map;
 
-import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.procurementOrder.ProcurementOrder;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
-import com.iora.erp.service.ShippItService;
 import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.SiteService;
@@ -35,8 +33,6 @@ public class WarehouseController {
     private ProcurementService procurementService;
     @Autowired
     private ProductService productService;
-    @Autowired
-    private ShippItService easyPostService;
 
     /*
      * ---------------------------------------------------------

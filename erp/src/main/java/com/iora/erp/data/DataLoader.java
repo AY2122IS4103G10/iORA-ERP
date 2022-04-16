@@ -3,21 +3,20 @@ package com.iora.erp.data;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.Map;
-import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import com.iora.erp.enumeration.AccessRightsEnum;
 import com.iora.erp.enumeration.CountryEnum;
-import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.enumeration.PayTypeEnum;
 import com.iora.erp.enumeration.PaymentTypeEnum;
 import com.iora.erp.model.company.Address;
@@ -30,8 +29,8 @@ import com.iora.erp.model.customer.BirthdayPoints;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.MembershipTier;
 import com.iora.erp.model.customer.SupportTicket;
-import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customer.SupportTicket.Status;
+import com.iora.erp.model.customer.SupportTicketMsg;
 import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.DeliveryAddress;
@@ -890,10 +889,10 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(payment3);
 		oo2.addPayment(payment3);
 		oo2.setSite(siteService.getSite(3L));
-		DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
+		/* DeliveryAddress da1 = new DeliveryAddress("Work", "13 Computing Drive NUS School of Computing, COM1", "",
 				"Singapore",
-				"117417", "", CountryEnum.Singapore, "65162727");
-		oo2.setDeliveryAddress(da1);
+				"117417", "", CountryEnum.Singapore, "65162727"); */
+		oo2.setDeliveryAddress(da);
 		customerOrderService.createOnlineOrder(oo2, null);
 
 		OnlineOrder oo3 = new OnlineOrder(true);
@@ -928,7 +927,7 @@ public class DataLoader implements CommandLineRunner {
 		em.persist(payment6);
 		oo5.addPayment(payment6);
 		oo5.setSite(siteService.getSite(3L));
-		oo5.setDeliveryAddress(customerService.getCustomerById(6L).getAddress());
+		oo5.setDeliveryAddress(da);
 		customerOrderService.createOnlineOrder(oo5, null);
 
 		siteService.editStockLevel(4L, "ASK0010259H-1", 0);
@@ -1127,11 +1126,12 @@ public class DataLoader implements CommandLineRunner {
 		SupportTicket st3 = new SupportTicket(SupportTicket.Category.GENERAL, "Information on Stock.");
 		st3.addMessage(
 				new SupportTicketMsg("May I know if any of iORA stores has stock in Ditsy Pattern Skirt Yellow size M?",
-						cust.getFirstName() + " " + cust.getLastName(), ""));
+						cust2.getFirstName() + " " + cust2.getLastName(), ""));
 		st3.addMessage(
 				new SupportTicketMsg(
 						"We regret to inform that only Bugis Junction has stock for our Ditsy Pattern Skirt. However, we can deliver the dress to an outlet near to you if you wish. Do let me know.",
 						"Darth Vader", ""));
+		st3.setStatus(Status.PENDING_CUSTOMER);
 		st3.setCustomer(cust2);
 		customerService.createSupportTicket(st3);
 	}

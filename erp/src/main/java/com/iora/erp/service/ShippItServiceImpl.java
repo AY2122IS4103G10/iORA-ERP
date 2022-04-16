@@ -1,37 +1,28 @@
 package com.iora.erp.service;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 import com.iora.erp.enumeration.OnlineOrderStatusEnum;
 import com.iora.erp.enumeration.ParcelSizeEnum;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.exception.CustomerOrderException;
-import com.iora.erp.exception.OnlineOrderDeliveryException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OOStatus;
 import com.iora.erp.model.customerOrder.OnlineOrder;
-import com.iora.erp.model.site.Site;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -64,9 +55,6 @@ public class ShippItServiceImpl implements ShippItService {
 
     @Autowired
     private CustomerService customerService;
-
-    @Autowired
-    private SiteService siteService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -213,8 +201,8 @@ public class ShippItServiceImpl implements ShippItService {
     @Async
     @Override
     public void fetchStatus() {
-        Query q = em.createQuery(
-                "SELECT x FROM OnlineOrder x WHERE (x.status =:status OR x.status =:status2) AND x.delivery = TRUE");
+        TypedQuery<OnlineOrder> q = em.createQuery(
+                "SELECT x FROM OnlineOrder x WHERE (x.status =:status OR x.status =:status2) AND x.delivery = TRUE", OnlineOrder.class);
         q.setParameter("status", OnlineOrderStatusEnum.READY_FOR_DELIVERY);
         q.setParameter("status2", OnlineOrderStatusEnum.DELIVERING);
         List<OnlineOrder> listOO = q.getResultList();

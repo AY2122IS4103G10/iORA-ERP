@@ -1,16 +1,12 @@
 package com.iora.erp.controller;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.PathParam;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -20,26 +16,21 @@ import com.iora.erp.exception.AuthenticationException;
 import com.iora.erp.exception.CustomerException;
 import com.iora.erp.model.customer.Customer;
 import com.iora.erp.model.customer.SupportTicket;
-import com.iora.erp.model.customerOrder.CustomerOrder;
 import com.iora.erp.model.customerOrder.CustomerOrderLI;
 import com.iora.erp.model.customerOrder.Delivery;
 import com.iora.erp.model.customerOrder.OnlineOrder;
-import com.iora.erp.model.procurementOrder.ProcurementOrder;
-import com.iora.erp.model.procurementOrder.ProcurementOrderLI;
 import com.iora.erp.model.product.Model;
 import com.iora.erp.model.site.Site;
 import com.iora.erp.model.site.StockLevel;
 import com.iora.erp.security.JWTUtil;
 import com.iora.erp.service.CustomerOrderService;
 import com.iora.erp.service.CustomerService;
-import com.iora.erp.service.ProcurementService;
 import com.iora.erp.service.ProductService;
 import com.iora.erp.service.ShippItService;
 import com.iora.erp.service.SiteService;
 import com.iora.erp.service.StripeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,8 +54,6 @@ public class OnlineCustomerController {
     private CustomerService customerService;
     @Autowired
     private CustomerOrderService customerOrderService;
-    @Autowired
-    private ProcurementService procurementService;
     @Autowired
     private ProductService productService;
     @Autowired

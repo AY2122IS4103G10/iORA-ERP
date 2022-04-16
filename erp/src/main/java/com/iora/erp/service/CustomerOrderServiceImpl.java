@@ -1,5 +1,6 @@
 package com.iora.erp.service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -527,7 +528,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 Integer qtyToAdd = bestSinglePromosUsed.get(coli);
                 PromotionLI pli = new PromotionLI(entry.getValue());
                 pli.setQty(bestSinglePromosUsed.get(coli));
-                pli.setSubTotal(qtyToAdd * (bestPrices.get(coli) - modelMap.get(coli).getDiscountPrice()));
+                pli.setSubTotal(new BigDecimal(qtyToAdd * (bestPrices.get(coli) - modelMap.get(coli).getDiscountPrice())).doubleValue());
                 pli.setProduct(coli.getProduct());
                 promotionList.add(pli);
             }

@@ -1,23 +1,22 @@
-import { useEffect, useState } from "react";
+import { PaperClipIcon } from "@heroicons/react/outline";
+import { useEffect, useRef, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+import { api, utilApi } from "../../../../environments/Api";
 import { addNewProductField } from "../../../../stores/slices/prodFieldSlice";
-
 import {
   addNewProduct,
-  updateExistingProduct,
+  updateExistingProduct
 } from "../../../../stores/slices/productSlice";
-import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleInputBox } from "../../../components/Input/SimpleInputBox";
 import { SimpleTextArea } from "../../../components/Input/SimpleTextArea";
-import { api, utilApi } from "../../../../environments/Api";
-
+import { SimpleInputGroup } from "../../../components/InputGroups/SimpleInputGroup";
 import { SimpleModal } from "../../../components/Modals/SimpleModal";
-import { useRef } from "react";
-import { PaperClipIcon } from "@heroicons/react/outline";
-import { TailSpin } from "react-loader-spinner";
 import { SimpleRadio } from "../../../components/RadioGroups/SimpleRadio";
+
+
 
 const prepareFields = (fields, checkedState) => {
   const f = [];
@@ -273,7 +272,7 @@ const AddProductFormBody = ({
                           />
                         </SimpleInputGroup>
                         <SimpleInputGroup
-                          label="List Price"
+                          label="Original Price"
                           inputField="listPrice"
                           className="relative rounded-md sm:mt-0 sm:col-span-2"
                         >
@@ -337,7 +336,7 @@ const AddProductFormBody = ({
                             </div>
                           </div>
                           <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">
-                            Leave blank if there is no discount.
+                            Leave as 0 if there is no discount.
                           </p>
                         </SimpleInputGroup>
                         <SimpleInputGroup
@@ -484,7 +483,7 @@ const AddProductFormBody = ({
             fieldName="Colour"
             openModal={openModal}
             setFieldNameSelected={setFieldNameSelected}
-            // disableButton
+          // disableButton
           >
             {colors.length ? (
               <FormCheckboxes
@@ -504,7 +503,7 @@ const AddProductFormBody = ({
             fieldName="Size"
             openModal={openModal}
             setFieldNameSelected={setFieldNameSelected}
-            // disableButton
+          // disableButton
           >
             {sizes.length ? (
               <FormCheckboxes
@@ -524,7 +523,7 @@ const AddProductFormBody = ({
             fieldName="Promotion"
             openModal={openModal}
             setFieldNameSelected={setFieldNameSelected}
-            // disableButton
+          // disableButton
           >
             {promotions.length ? (
               // <FormCheckboxes
@@ -548,7 +547,7 @@ const AddProductFormBody = ({
             fieldName="Tag"
             openModal={openModal}
             setFieldNameSelected={setFieldNameSelected}
-            // disableButton
+          // disableButton
           >
             {tags.length ? (
               <FormCheckboxes
@@ -654,12 +653,8 @@ export const ProductForm = () => {
   const onProdChanged = (e) => setProdCode(e.target.value);
   const onNameChanged = (e) => setName(e.target.value);
   const onDescChanged = (e) => setDescription(e.target.value);
-  const onListPriceChanged = (e) => setListPrice(e.target.value);
-  const onDiscountPriceChanged = (e) => {
-    if (parseFloat(e.target.value) < listPrice) {
-      setDiscountPrice(e.target.value);
-    }
-  };
+  const onListPriceChanged = (e) => setListPrice(Math.max(1, e.target.value));
+  const onDiscountPriceChanged = (e) => { setDiscountPrice(Math.min(listPrice, e.target.value)) };
   const onOnlineOnlyChanged = () => setOnlineOnly(!onlineOnly);
   const onColorsChanged = (pos) => {
     const updateCheckedState = colorCheckedState.map((item, index) =>
@@ -732,7 +727,8 @@ export const ProductForm = () => {
         productFields: fields,
         imageLinks: urls,
       };
-      if (discountPrice !== "") product["discountPrice"] = discountPrice;
+      if (discountPrice !== 0) product["discountPrice"] = discountPrice; 
+      else product["discountPrice"] = listPrice;
       if (!isEditing) {
         dispatch(addNewProduct(product))
           .unwrap()
@@ -762,12 +758,13 @@ export const ProductForm = () => {
             });
             navigate(`/sm/products/${data.modelCode}`);
           })
-          .catch((err) =>{
-          console.log(err);
+          .catch((err) => {
+            console.log(err);
             addToast(`Error: ${err.message}`, {
               appearance: "error",
               autoDismiss: true,
-            })}
+            })
+          }
           )
           .finally(setLoading(false));
       }
@@ -852,9 +849,9 @@ export const ProductForm = () => {
           promo !== undefined
             ? promo
             : {
-                id: 0,
-                fieldValue: "No promotion",
-              }
+              id: 0,
+              fieldValue: "No promotion",
+            }
         );
       });
   }, [prodId, colors, sizes, tags, categories, promotions]);

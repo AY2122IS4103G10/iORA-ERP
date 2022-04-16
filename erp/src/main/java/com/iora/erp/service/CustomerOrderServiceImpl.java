@@ -301,17 +301,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 }
             }
         } else {
-            // update customer delivery address
-            OnlineOrder oo = (OnlineOrder) customerOrder;
-            Customer c = customerService.getCustomerById(customerOrder.getCustomerId());
-            c.setAddress(oo.getDeliveryAddress());
 
-            // send email to customer
-            // TODO: remove this 7L
-            if (oo.getId() > 7L) {
-                emailService.sendOnlineOrderConfirmation(c, (OnlineOrder) customerOrder);
-            }
-            em.merge(c);
         }
 
         return em.merge(customerOrder);
@@ -438,7 +428,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         // Get all possible promotions
         Set<PromotionField> promotions = new HashSet<>(
-                em.createQuery("SELECT pf FROM PromotionField pf WHERE pf.global = TRUE AND pf.available = true", PromotionField.class)
+                em.createQuery("SELECT pf FROM PromotionField pf WHERE pf.global = TRUE AND pf.available = true",
+                        PromotionField.class)
                         .getResultList());
         for (CustomerOrderLI coli : lineItems) {
             Model m = modelMap.get(coli);
@@ -814,6 +805,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             customerService.redeemVoucher(onlineOrder.getVoucher().getVoucherCode());
         }
         if (onlineOrder.isDelivery()) {
+            // update customer delivery address
+            Customer c = customerService.getCustomerById(onlineOrder.getCustomerId());
+            c.setAddress(onlineOrder.getDeliveryAddress());
+            emailService.sendOnlineOrderConfirmation(c, onlineOrder);
+
+            em.merge(c);
             onlineOrder.setSite(siteService.getSite(3L));
             onlineOrder
                     .addStatusHistory(new OOStatus(siteService.getSite(3L), new Date(), OnlineOrderStatusEnum.PENDING));
@@ -1384,7 +1381,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         Date dateStart = cal.getTime();
-        
+
         cal.setTime(end);
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
@@ -1401,8 +1398,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         return q.getResultList();
     }
-
-
 
     @Override
     public List<CustomerOrder> getAllCustomerOrderInRange(Date start, Date end) {

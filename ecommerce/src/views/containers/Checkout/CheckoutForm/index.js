@@ -6,13 +6,13 @@ const deliveryMethods = [
   {
     id: 1,
     title: "Standard Shipping",
-    description: "4–10 business days",
+    description: "4–7 business days",
     footer: "$2.50",
   },
   {
     id: 2,
     title: "Store Pickup",
-    description: "5-7 business days",
+    description: "2-3 business days",
     footer: "Free",
   },
 ];
@@ -225,7 +225,7 @@ export const VoucherForm = ({ voucher, setVoucher, handleApplyVoucher }) => {
 
 
   return (
-    <section aria-labelledby="voucher-heading" className="mt-10">
+    <section aria-labelledby="voucher-heading" className="mt-2 pb-6">
       <h2
         id="voucher-heading"
         className="text-lg font-medium text-gray-900"

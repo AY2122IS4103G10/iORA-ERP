@@ -153,7 +153,7 @@ console.log(user)
                       name="first-name"
                       id="first-name"
                       autoComplete="cc-given-name"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={firstName}
                       onChange={onFirstNameChanged}
                       required
@@ -177,7 +177,7 @@ console.log(user)
                       name="last-name"
                       id="last-name"
                       autoComplete="cc-family-name"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={lastName}
                       onChange={onLastNameChanged}
                       required
@@ -200,7 +200,7 @@ console.log(user)
                       name="email-address"
                       id="email-address"
                       autoComplete="email"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={email}
                       onChange={onEmailChanged}
                       required
@@ -223,7 +223,7 @@ console.log(user)
                       name="contactNo"
                       id="contactNo"
                       autoComplete="contactNo"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={contactNo}
                       onChange={onContactNoChanged}
                       required
@@ -242,7 +242,7 @@ console.log(user)
                   </label>
                   {isEditing ? (
                     <DatePicker
-                      className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                      className="focus:ring-gray-500 focus:border-gray-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                       selected={dob}
                       onChange={onDobChanged}
                     />
@@ -275,7 +275,7 @@ console.log(user)
                       name="receiverName"
                       id="receiverName"
                       autoComplete="receiverName"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={receiverName}
                       onChange={onReceiverNameChanged}
                     />
@@ -296,7 +296,7 @@ console.log(user)
                       name="receiverContact"
                       id="receiverContact"
                       autoComplete="receiverContact"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={deliveryCon}
                       onChange={onDeliveryConChanged}
                     />
@@ -317,7 +317,7 @@ console.log(user)
                       name="street1"
                       id="street1"
                       autoComplete="street1"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={street1}
                       onChange={onStreet1Changed}
                     />
@@ -338,7 +338,7 @@ console.log(user)
                       name="street2"
                       id="street2"
                       autoComplete="street2"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={street2}
                       onChange={onStreet2Changed}
                     />
@@ -359,7 +359,7 @@ console.log(user)
                       name="zip"
                       id="zip"
                       autoComplete="zip"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={zip}
                       onChange={onZipChanged}
                     />
@@ -380,14 +380,14 @@ console.log(user)
                     //   name="country"
                     //   id="country"
                     //   autoComplete="country"
-                    //   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    //   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                     //   value={country}
                     //   onChange={onCountryChanged}
                     // />
                     <select
                       id="countries"
                       name="countries"
-                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm rounded-md"
                       value={country}
                       onChange={onCountryChanged}
                     >
@@ -414,7 +414,7 @@ console.log(user)
                       name="city"
                       id="city"
                       autoComplete="city"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       value={city}
                       onChange={onCityChanged}
                     />
@@ -435,7 +435,7 @@ console.log(user)
                       name="state"
                       id="state"
                       autoComplete="state"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                       placeholder="Optional"
                       value={state}
                       onChange={onStateChanged}
@@ -450,7 +450,7 @@ console.log(user)
               {isEditing && (
                 <button
                   type="button"
-                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                   onClick={() => setIsEditing(!isEditing)}
                 >
                   Cancel
@@ -458,7 +458,7 @@ console.log(user)
               )}
               <button
                 type="submit"
-                className="ml-3 bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="ml-3 bg-gray-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
                 {isEditing ? "Save" : "Edit"}
               </button>

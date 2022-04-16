@@ -153,8 +153,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendVoucherCode(Customer customer, Voucher voucher) {
-        String text = "Please redeem it any of our physical or online stores before the expiry date "
-                + new SimpleDateFormat("yyyy-mm-dd").format(voucher.getExpiry());
+        String text = "Please redeem it any of our physical or at https://iora.online/sg/ before the expiry date "
+                + new SimpleDateFormat("yyyy-MM-dd").format(voucher.getExpiry());
 
         sendAgendaHTMLMessage(
                 customer.getEmail(),

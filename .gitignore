@@ -41,3 +41,4 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .DS_Store
+react-ui/src/config.js
